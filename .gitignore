@@ -1,7 +1,7 @@
 .bundle/
 log/*.log
 pkg/
-test/dummy/log/*.log
-test/dummy/storage/
-test/dummy/tmp/
+spec/dummy/log/*.log
+spec/dummy/storage/
+spec/dummy/tmp/
 Gemfile.lock

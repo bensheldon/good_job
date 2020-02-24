@@ -5,7 +5,7 @@ module GoodJob
     end
 
     def perform
-      Rails.logger.info "Perform job_id #{@good_job.id}: on thread #{Thread.current.name}"
+      # Rails.logger.info "Perform job_id #{@good_job.id}: on thread #{Thread.current.name}"
       @good_job.with_advisory_lock do
         @good_job.reload
 
