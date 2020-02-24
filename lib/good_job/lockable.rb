@@ -54,8 +54,9 @@ module GoodJob
         begin
           advisory_lock!
           yield
-        ensure
-          advisory_unlock
+        rescue StandardError => e
+          advisory_unlock unless e.is_a? RecordAlreadyAdvisoryLockedError
+          raise
         end
       end
 
