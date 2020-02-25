@@ -31,17 +31,13 @@ jobs:
         uses: actions/cache@v1
         with:
           path: vendor/bundle
-          key: v1-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          key: v1-${{ runner.os }}-gems-${{ hashFiles('**/good_job.gemspec') }}-${{ hashFiles('**/Gemfile') }}
           restore-keys: |
             v1-${{ runner.os }}-gems-
       - name: Install gems
         run: |
-          gem install bundler -v $(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -1 | tr -d " ")
           bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3 --frozen && bundle clean
-      - name: Install packages
-        run: |
-          yarn install --pure-lockfile
+          bundle install --jobs 4 --retry 3 && bundle clean
       # /Dependencies
 
       - name: Setup test database
