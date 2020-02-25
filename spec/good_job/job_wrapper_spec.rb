@@ -17,7 +17,7 @@ RSpec.describe GoodJob::JobWrapper do
     end)
   end
 
-  it 'locks the job' do
+  it 'locks the job and prevents from being run at same time twice' do
     ExampleJob.perform_later
 
     good_job = GoodJob::Job.last

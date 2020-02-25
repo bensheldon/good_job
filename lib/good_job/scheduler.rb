@@ -24,7 +24,7 @@ module GoodJob
       fallback_policy:  :abort # shouldn't matter -- 0 max queue
     }.freeze
 
-    def initialize(query = GoodJob.all, **options)
+    def initialize(query = GoodJob::Job.all, **options)
       @query = query
 
       @active_jobs = Concurrent::Array.new
@@ -68,12 +68,14 @@ module GoodJob
 
     def schedule_job(job)
       future = Concurrent::Future.new(args: [job], executor: @pool) do |j|
-        thread_name = Thread.current.name || Thread.current.object_id
-        puts "Executing job #{job.id} in thread #{thread_name}"
+        Rails.application.executor.wrap do
+          thread_name = Thread.current.name || Thread.current.object_id
+          puts "Executing job #{job.id} in thread #{thread_name}"
 
-        JobWrapper.new(j).perform
+          JobWrapper.new(j).perform
 
-        true
+          true
+        end
       end
       future.add_observer(TaskObserver.new(job, @active_jobs, self))
       future.execute
@@ -91,9 +93,9 @@ module GoodJob
         if result
           puts "(#{time}) Execution of #{@job.id} successfully returned #{result}\n"
         elsif ex.is_a?(Concurrent::TimeoutError)
-          puts "(#{time}) Execution timed out\n"
+          puts "(#{time}) Execution of #{@job.id} timed out\n"
         else
-          puts "(#{time}) Execution failed with error #{result} #{ex}\n"
+          puts "(#{time}) Execution of #{@job.id} failed with error #{result} #{ex}\n"
         end
 
         @active_jobs.delete(@job)
