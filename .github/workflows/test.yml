@@ -1,0 +1,48 @@
+name: Test
+on: [push]
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    env:
+      PGHOST: localhost
+      PGUSER: dummy
+      RAILS_ENV: test
+    services:
+      postgres:
+        image: postgres:10.8
+        env:
+          POSTGRES_USER: dummy
+          POSTGRES_DB: dummy_test
+          POSTGRES_PASSWORD: ""
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Dependencies
+      - name: Install missing libs (This is slated to be added to the base image soon!)
+        run: sudo apt-get -yqq install libpq-dev
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+      - name: Ruby gem cache
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: v1-${{ runner.os }}-gems-${{ hashFiles('**/good_job.gemspec') }}-${{ hashFiles('**/Gemfile') }}
+          restore-keys: |
+            v1-${{ runner.os }}-gems-
+      - name: Install gems
+        run: |
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3 && bundle clean
+      # /Dependencies
+
+      - name: Setup test database
+        run: |
+          cd spec/dummy
+          bin/rails db:test:prepare
+      - name: Run tests
+        run: RAILS_ENV=test DISABLE_SPRING=1 bin/rspec
