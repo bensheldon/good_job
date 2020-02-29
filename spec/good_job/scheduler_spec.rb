@@ -27,7 +27,7 @@ RSpec.describe GoodJob::Scheduler do
 
   let(:adapter) { GoodJob::Adapter.new }
 
-  let(:number_of_jobs) { 50 }
+  let(:number_of_jobs) { 250 }
 
   let!(:good_jobs) do
     number_of_jobs.times do |i|
@@ -38,7 +38,7 @@ RSpec.describe GoodJob::Scheduler do
   it 'pops items off of the queue and runs them' do
     scheduler = GoodJob::Scheduler.new
 
-    Timeout::timeout(5) do
+    Timeout.timeout(5) do
       sleep(0.5) until GoodJob::Job.count == 0
     end
 
