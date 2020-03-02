@@ -16,18 +16,4 @@ RSpec.describe GoodJob::JobWrapper do
       end
     end)
   end
-
-  it 'locks the job and prevents from being run at same time twice' do
-    ExampleJob.perform_later
-
-    good_job = GoodJob::Job.last
-    expect(good_job).to be_present
-
-    thread1 = Concurrent::Promises.future(good_job) { |j| GoodJob::JobWrapper.new(j).perform }
-    thread2 = Concurrent::Promises.future(good_job) { |j| GoodJob::JobWrapper.new(j).perform }
-
-    expect do
-      Concurrent::Promises.zip(thread1, thread2).value!
-    end.to raise_error GoodJob::Lockable::RecordAlreadyAdvisoryLockedError
-  end
 end

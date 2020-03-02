@@ -27,18 +27,14 @@ module GoodJob
     def initialize(query = GoodJob::Job.all, **options)
       @query = query
 
-      @active_jobs = Concurrent::Array.new
       @pool = Concurrent::ThreadPoolExecutor.new(DEFAULT_POOL_OPTIONS)
       @timer = Concurrent::TimerTask.new(DEFAULT_TIMER_OPTIONS) do
-        schedule_jobs
+        idle_threads = @pool.max_length - @pool.length
+        puts "There are idle_threads: #{idle_threads}"
+        create_thread if idle_threads.positive?
         true
       end
-      # @timer.add_observer(TaskObserver.new)
       @timer.execute
-    end
-
-    def active_jobs
-      @active_jobs
     end
 
     def execute
@@ -56,50 +52,37 @@ module GoodJob
       end
     end
 
-    def schedule_jobs(count = 100)
-      idle_threads = @pool.max_length - @active_jobs.count
-      to_enqueue = [count, idle_threads].min
-      return if to_enqueue.zero?
-
-      jobs = @query.advisory_unlocked.limit(to_enqueue).load
-      puts "Scheduling #{jobs.size} job(s)"
-      jobs.each { |job| schedule_job(job) }
-    end
-
-    def schedule_job(job)
-      future = Concurrent::Future.new(args: [job], executor: @pool) do |j|
+    def create_thread
+      future = Concurrent::Future.new(args: [@query], executor: @pool) do |query|
         Rails.application.executor.wrap do
           thread_name = Thread.current.name || Thread.current.object_id
-          puts "Executing job #{job.id} in thread #{thread_name}"
+          while job = query.with_advisory_lock.first
+            puts "Executing job #{job.id} in thread #{thread_name}"
 
-          JobWrapper.new(j).perform
+            JobWrapper.new(job).perform
 
+            job.advisory_unlock
+          end
           true
         end
       end
-      future.add_observer(TaskObserver.new(job, @active_jobs, self))
+      future.add_observer(TaskObserver.new(self))
       future.execute
-      @active_jobs << job
     end
 
     class TaskObserver
-      def initialize(job, active_jobs, scheduler)
-        @job = job
-        @active_jobs = active_jobs
+      def initialize(scheduler)
         @scheduler = scheduler
       end
 
       def update(time, result, ex)
         if result
-          puts "(#{time}) Execution of #{@job.id} successfully returned #{result}\n"
+          puts "(#{time}) Execution successfully returned #{result}\n"
         elsif ex.is_a?(Concurrent::TimeoutError)
-          puts "(#{time}) Execution of #{@job.id} timed out\n"
+          puts "(#{time}) Execution timed out\n"
         else
-          puts "(#{time}) Execution of #{@job.id} failed with error #{result} #{ex}\n"
+          puts "(#{time}) Execution failed with error #{result} #{ex}\n"
         end
-
-        @active_jobs.delete(@job)
-        @scheduler.schedule_jobs(1)
       end
     end
   end
