@@ -10,28 +10,23 @@ module GoodJob
     end
 
     def enqueue(job)
-      good_job = GoodJob::Job.create(
-        queue_name: job.queue_name,
-        priority: job.priority,
-        serialized_params: job.serialize
-      )
-
-      @scheduler.enqueue(good_job) if inline?
+      enqueue_at(job, nil)
     end
 
     def enqueue_at(job, timestamp)
-      good_job = GoodJob::Job.create(
+      params = {
         queue_name: job.queue_name,
         priority: job.priority,
         serialized_params: job.serialize,
-        scheduled_at: Time.at(timestamp)
-      )
+      }
+      params[:scheduled_at] = Time.at(timestamp) if timestamp
 
+      good_job = GoodJob::Job.create(params)
       @scheduler.enqueue(good_job) if inline?
     end
 
     def shutdown(wait: true)
-      @scheduler.shutdown(wait: wait) if @scheduler
+      @scheduler&.shutdown(wait: wait)
     end
   end
 end
