@@ -24,9 +24,12 @@ Gem::Specification.new do |spec|
   end
 
   spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
+  spec.executables = "good_job"
 
-  spec.add_dependency "rails", "~> 6.0.2", ">= 6.0.2.1"
+  spec.add_dependency "concurrent-ruby"
+  spec.add_dependency "rails"
+  spec.add_dependency "thor"
+  spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "pg"
   spec.add_development_dependency "rspec-rails"
-  spec.add_development_dependency "database_cleaner"
 end

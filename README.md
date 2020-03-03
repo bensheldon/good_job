@@ -37,10 +37,9 @@ GoodJob is a multithreaded, Postgres-based ActiveJob backend for Ruby on Rails.
     ```
 
 1. In production, the scheduler is designed to run in its own process:
-
-```ruby
-# TBD
-```
+    ```bash
+    $ bundle exec good_job
+    ```
 
 ## Installation
 Add this line to your application's Gemfile:

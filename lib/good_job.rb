@@ -1,4 +1,4 @@
-require "good_job/railtie"
+require "rails"
 
 require 'good_job/lockable'
 require 'good_job/job'
