@@ -80,6 +80,21 @@ $ bundle install
 # => Using good_job 0.1.0 from https://github.com/bensheldon/good_job.git (at /Users/You/Projects/good_job@dc57fb0)
 ```
 
+## Releasing
+
+Package maintainers can release this gem with the following [gem-release](https://github.com/svenfuchs/gem-release) command:
+
+```bash
+# Sign into rubygems
+$ gem signin
+
+# Increase the version number
+$ gem bump 
+
+# Push to rubygems.org
+$ gem release
+```
+
 ## Contributing
 Contribution directions go here.
 
