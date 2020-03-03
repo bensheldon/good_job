@@ -23,13 +23,14 @@ Gem::Specification.new do |spec|
       "public gem pushes."
   end
 
-  spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
+  spec.files = Dir["{lib}/**/*", "bin/good_job", "LICENSE.txt", "README.md"]
   spec.executables = "good_job"
 
   spec.add_dependency "concurrent-ruby"
   spec.add_dependency "rails"
   spec.add_dependency "thor"
   spec.add_development_dependency "database_cleaner"
+  spec.add_development_dependency "gem-release"
   spec.add_development_dependency "pg"
   spec.add_development_dependency "rspec-rails"
 end
