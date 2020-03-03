@@ -30,7 +30,7 @@ RSpec.describe GoodJob::Scheduler do
       self.queue_name = 'test'
       self.priority = 50
       retry_on(RetryableError, wait: 0, attempts: 3) do |job, error|
-        puts "FAILED"
+        # puts "FAILED"
       end
 
       def perform(*args, **kwargs)
