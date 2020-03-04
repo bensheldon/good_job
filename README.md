@@ -2,14 +2,27 @@
 
 GoodJob is a multithreaded, Postgres-based ActiveJob backend for Ruby on Rails.
 
+## Installation
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'good_job', github: 'bensheldon/good_job'
+```
+
+And then execute:
+```bash
+$ bundle
+```
+
 ## Usage
 
 1. Create a database migration:
     ```bash
-    bin/rails g migration CreateGoodJobs
+    $ bin/rails g migration CreateGoodJobs
     ```
 
-    And then add to the newly created file:
+    Add to the newly created migration file:
 
     ```ruby
     class CreateGoodJobs < ActiveRecord::Migration[6.0]
@@ -27,6 +40,13 @@ GoodJob is a multithreaded, Postgres-based ActiveJob backend for Ruby on Rails.
       end
     end
     ```
+    
+    Run the migration:
+    
+    ```bash
+    $ bin/rails db:migrate
+    ```
+    
 1. Configure the ActiveJob adapter:
     ```ruby
     # config/environments/production.rb
@@ -40,18 +60,6 @@ GoodJob is a multithreaded, Postgres-based ActiveJob backend for Ruby on Rails.
     ```bash
     $ bundle exec good_job
     ```
-
-## Installation
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'good_job', github: 'bensheldon/good_job'
-```
-
-And then execute:
-```bash
-$ bundle
-```
 
 ## Development
 
@@ -96,7 +104,9 @@ $ gem release
 ```
 
 ## Contributing
+
 Contribution directions go here.
 
 ## License
+
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
