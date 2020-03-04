@@ -43,4 +43,13 @@ RSpec.describe GoodJob::Adapter do
       expect(good_job.scheduled_at).to be_within(1.second).of 1.minute.from_now
     end
   end
+
+  describe '#provider_job_id' do
+    it 'is assigned at creation' do
+      enqueued_job = ExampleJob.perform_later
+      good_job = GoodJob::Job.find(enqueued_job.provider_job_id)
+
+      expect(enqueued_job.provider_job_id).to eq good_job.id
+    end
+  end
 end

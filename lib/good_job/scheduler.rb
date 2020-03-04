@@ -37,6 +37,10 @@ module GoodJob
       @timer.execute
     end
 
+    def ordered_query
+      @query.where("scheduled_at < ?", Time.current).or(@query.where(scheduled_at: nil)).order(priority: :desc)
+    end
+
     def execute
     end
 
@@ -53,7 +57,7 @@ module GoodJob
     end
 
     def create_thread
-      future = Concurrent::Future.new(args: [@query], executor: @pool) do |query|
+      future = Concurrent::Future.new(args: [ordered_query], executor: @pool) do |query|
         Rails.application.executor.wrap do
           thread_name = Thread.current.name || Thread.current.object_id
           while job = query.with_advisory_lock.first
