@@ -19,7 +19,7 @@ RSpec.describe GoodJob::Scheduler do
       def perform(*args, **kwargs)
         thread_name = Thread.current.name || Thread.current.object_id
 
-        RUN_JOBS << { args: args, kwargs: kwargs }
+        RUN_JOBS << provider_job_id
         THREAD_JOBS[thread_name] << provider_job_id
       end
     end)
@@ -97,6 +97,41 @@ RSpec.describe GoodJob::Scheduler do
       end
 
       scheduler.shutdown
+    end
+  end
+
+  describe 'queue ordering' do
+    include ActiveSupport::Testing::TimeHelpers
+
+    it 'orders by scheduled_at and priority' do
+      priority_10 = ExampleJob.set(priority: 10).perform_later
+      priority_5 = ExampleJob.set(priority: 5).perform_later
+
+      scheduled_10 = ExampleJob.set(priority: 10, wait: 1.hour).perform_later
+      scheduled_5 = ExampleJob.set(priority: 5, wait: 1.hour).perform_later
+
+      scheduler = GoodJob::Scheduler.new
+      sleep(0.5)
+      scheduler.shutdown
+
+      expect(RUN_JOBS).to eq [
+                               priority_10.provider_job_id,
+                               priority_5.provider_job_id,
+                             ]
+
+      travel 2.hours do
+        scheduler = GoodJob::Scheduler.new
+        sleep(0.5)
+        scheduler.shutdown
+      end
+
+      expect(RUN_JOBS).to eq [
+                               priority_10.provider_job_id,
+                               priority_5.provider_job_id,
+                               scheduled_10.provider_job_id,
+                               scheduled_5.provider_job_id,
+                             ]
+
     end
   end
 end

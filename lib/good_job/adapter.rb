@@ -22,7 +22,11 @@ module GoodJob
       params[:scheduled_at] = Time.at(timestamp) if timestamp
 
       good_job = GoodJob::Job.create(params)
+      job.provider_job_id = good_job.id
+
       @scheduler.enqueue(good_job) if inline?
+
+      good_job
     end
 
     def shutdown(wait: true)
