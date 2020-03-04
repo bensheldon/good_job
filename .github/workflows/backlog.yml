@@ -1,0 +1,30 @@
+  
+name: Backlog
+on:
+  issues:
+    types: [opened, reopened]
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  add_issue:
+    name: "Add Issue"
+    if: github.event_name == 'issue'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: alex-page/github-project-automation-plus@9a05133
+        with:
+          project: Backlog
+          column: Inbox
+          repo-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+
+  add_pull_request:
+    name: "Add Pull Request"
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: alex-page/github-project-automation-plus@9a05133
+        with:
+          project: Backlog
+          column: In progress
+          repo-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
