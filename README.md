@@ -2,6 +2,13 @@
 
 GoodJob is a multithreaded, Postgres-based ActiveJob backend for Ruby on Rails.
 
+Inspired by [Delayed::Job](https://github.com/collectiveidea/delayed_job) and [Que](https://github.com/que-rb/que), GoodJob’s design principles are:
+
+- Stand on the shoulders of ActiveJob. For example, [exception](https://edgeguides.rubyonrails.org/active_job_basics.html#exceptions) and [retry](https://edgeguides.rubyonrails.org/active_job_basics.html#retrying-or-discarding-failed-jobs) behavior. 
+- Stand on the shoulders of Ruby on Rails. For example, ActiveRecord ORM, connection pools, and [multithreaded support](https://guides.rubyonrails.org/threading_and_code_execution.html) with [Concurrent-Ruby](https://github.com/ruby-concurrency/concurrent-ruby).
+- Stand on the shoulders of Postgres. For example, Advisory Locks.
+- Convention over simplicity over performance. 
+
 ## Installation
 
 Add this line to your application's Gemfile:
