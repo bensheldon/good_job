@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/bensheldon/good_job/tree/HEAD)
+## [v0.2.0](https://github.com/bensheldon/good_job/tree/v0.2.0) (2020-03-06)
 
-[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.1.0...HEAD)
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.1.0...v0.2.0)
 
 **Merged pull requests:**
 
