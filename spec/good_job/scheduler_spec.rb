@@ -24,9 +24,8 @@ RSpec.describe GoodJob::Scheduler do
       end
     end)
 
+    stub_const 'RetryableError', Class.new(StandardError)
     stub_const 'ErrorJob', (Class.new(ApplicationJob) do
-      RetryableError = Class.new(StandardError)
-
       self.queue_name = 'test'
       self.priority = 50
       retry_on(RetryableError, wait: 0, attempts: 3) do |job, error|

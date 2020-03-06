@@ -4,7 +4,7 @@ require "concurrent/utility/processor_counter"
 
 module GoodJob
   class Scheduler
-    MINIMUM_EXECUTION_INTERVAL = 0.1
+    MAX_THREADS = Concurrent.processor_count
 
     DEFAULT_TIMER_OPTIONS = {
       execution_interval: 1,
@@ -12,16 +12,14 @@ module GoodJob
       run_now: true
     }.freeze
 
-    MAX_THREADS = Concurrent.processor_count
-
     DEFAULT_POOL_OPTIONS = {
-      name:            'good_job',
-      min_threads:     0,
-      max_threads:     MAX_THREADS,
-      auto_terminate:  true,
-      idletime:        0,
-      max_queue:       0,
-      fallback_policy:  :abort # shouldn't matter -- 0 max queue
+      name: 'good_job',
+      min_threads: 0,
+      max_threads: MAX_THREADS,
+      auto_terminate: true,
+      idletime: 0,
+      max_queue: 0,
+      fallback_policy: :abort # shouldn't matter -- 0 max queue
     }.freeze
 
     def initialize(query = GoodJob::Job.all, **options)
@@ -30,10 +28,9 @@ module GoodJob
       @pool = Concurrent::ThreadPoolExecutor.new(DEFAULT_POOL_OPTIONS)
       @timer = Concurrent::TimerTask.new(DEFAULT_TIMER_OPTIONS) do
         idle_threads = @pool.max_length - @pool.length
-        puts "There are idle_threads: #{idle_threads}"
         create_thread if idle_threads.positive?
-        true
       end
+      @timer.add_observer(TimerObserver.new)
       @timer.execute
     end
 
@@ -59,34 +56,29 @@ module GoodJob
     def create_thread
       future = Concurrent::Future.new(args: [ordered_query], executor: @pool) do |query|
         Rails.application.executor.wrap do
-          thread_name = Thread.current.name || Thread.current.object_id
-          while job = query.with_advisory_lock.first
-            puts "Executing job #{job.id} in thread #{thread_name}"
+          while good_job = query.with_advisory_lock.first
+            ActiveSupport::Notifications.instrument("job_started.good_job", { good_job: good_job })
 
-            JobWrapper.new(job).perform
+            JobWrapper.new(good_job).perform
 
-            job.advisory_unlock
+            good_job.advisory_unlock
           end
-          true
         end
+        true
       end
-      future.add_observer(TaskObserver.new(self))
+      future.add_observer(TaskObserver.new)
       future.execute
     end
 
-    class TaskObserver
-      def initialize(scheduler)
-        @scheduler = scheduler
+    class TimerObserver
+      def update(time, result, error)
+        ActiveSupport::Notifications.instrument("timer_task_finished.good_job", { result: result, error: error, time: time })
       end
+    end
 
-      def update(time, result, ex)
-        if result
-          puts "(#{time}) Execution successfully returned #{result}\n"
-        elsif ex.is_a?(Concurrent::TimeoutError)
-          puts "(#{time}) Execution timed out\n"
-        else
-          puts "(#{time}) Execution failed with error #{result} #{ex}\n"
-        end
+    class TaskObserver
+      def update(time, result, error)
+        ActiveSupport::Notifications.instrument("job_finished.good_job", { result: result, error: error, time: time })
       end
     end
   end
