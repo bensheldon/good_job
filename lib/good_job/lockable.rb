@@ -42,7 +42,7 @@ module GoodJob
       end
 
       def advisory_lock
-        self.class.connection.execute(self.class.sanitize_sql_for_conditions(["SELECT 1 as one WHERE pg_try_advisory_lock(('x'||substr(md5(?), 1, 16))::bit(64)::bigint)", id])).ntuples > 0
+        self.class.connection.execute(sanitize_sql_for_conditions(["SELECT 1 as one WHERE pg_try_advisory_lock(('x'||substr(md5(?), 1, 16))::bit(64)::bigint)", id])).ntuples > 0
       end
 
       def advisory_lock!
@@ -91,6 +91,13 @@ module GoodJob
 
       def advisory_unlock!
         advisory_unlock while advisory_locked?
+      end
+
+      private
+
+      def sanitize_sql_for_conditions(*args)
+        # Made public in Rails 5.2
+        self.class.send(:sanitize_sql_for_conditions, *args)
       end
     end
   end
