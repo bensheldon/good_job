@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "thor"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "gem-release"
+  spec.add_development_dependency "github_changelog_generator"
   spec.add_development_dependency "pg"
   spec.add_development_dependency "rspec-rails"
 end
