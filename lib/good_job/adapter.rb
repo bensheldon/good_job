@@ -24,7 +24,10 @@ module GoodJob
       good_job = GoodJob::Job.create(params)
       job.provider_job_id = good_job.id
 
-      @scheduler.enqueue(good_job) if inline?
+      GoodJob.tag_logger do
+        ActiveSupport::Notifications.instrument("create.good_job", { good_job: good_job, job: job })
+        @scheduler.enqueue(good_job) if inline?
+      end
 
       good_job
     end
