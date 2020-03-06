@@ -107,7 +107,7 @@ $ gem signin
 $ gem bump -v minor --no-commit
 
 # Update the changelog
-$ bundle exec changelog
+$ bundle exec rake changelog
 
 # Commit the version and changelog to git
 $ bundle commit_version

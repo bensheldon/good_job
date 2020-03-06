@@ -28,6 +28,8 @@ desc 'Commit version and changelog'
 task :commit_version do
   `git add lib/good_job/version.rb CHANGELOG.md`
   `git commit -m "Bump good_job to v#{GoodJob::VERSION}"`
+  `git tag v#{GoodJob::VERSION}`
+  puts "Don't forget to push to Github"
 end
 
 require 'rspec/core/rake_task'
