@@ -17,9 +17,10 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{lib}/**/*", "bin/good_job", "LICENSE.txt", "README.md"]
   spec.executables = "good_job"
 
-  spec.add_dependency "concurrent-ruby"
-  spec.add_dependency "rails"
-  spec.add_dependency "thor"
+  spec.add_dependency "concurrent-ruby", ">= 1.0.2"
+  spec.add_dependency "rails", ">= 5.1.0"
+  spec.add_dependency "thor", ">= 0.14.1"
+  spec.add_development_dependency "appraisal"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "gem-release"
   spec.add_development_dependency "github_changelog_generator"

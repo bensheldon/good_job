@@ -4,4 +4,3 @@ pkg/
 spec/dummy/log/*.log
 spec/dummy/storage/
 spec/dummy/tmp/
-Gemfile.lock
