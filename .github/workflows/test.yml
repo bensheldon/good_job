@@ -41,7 +41,7 @@ jobs:
       - name: Install bundler
         run: gem update --system && gem install bundler -v $(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -1 | tr -d " ")
       - name: Install Gemfile gems
-        run: bundle install && bundle clean
+        run: bundle install
       - name: Install Appraisal gems
         run: bundle exec appraisal install
       # /Dependencies
