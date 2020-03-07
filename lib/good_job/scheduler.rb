@@ -9,7 +9,7 @@ module GoodJob
     DEFAULT_TIMER_OPTIONS = {
       execution_interval: 1,
       timeout_interval: 1,
-      run_now: true
+      run_now: true,
     }.freeze
 
     DEFAULT_POOL_OPTIONS = {
@@ -19,10 +19,10 @@ module GoodJob
       auto_terminate: true,
       idletime: 0,
       max_queue: 0,
-      fallback_policy: :abort # shouldn't matter -- 0 max queue
+      fallback_policy: :abort, # shouldn't matter -- 0 max queue
     }.freeze
 
-    def initialize(query = GoodJob::Job.all, **options)
+    def initialize(query = GoodJob::Job.all, **_options)
       @query = query
 
       @pool = Concurrent::ThreadPoolExecutor.new(DEFAULT_POOL_OPTIONS)
@@ -51,12 +51,17 @@ module GoodJob
         @pool.shutdown
         @pool.wait_for_termination if wait
       end
+
+      true
     end
 
     def create_thread
       future = Concurrent::Future.new(args: [ordered_query], executor: @pool) do |query|
         Rails.application.executor.wrap do
-          while good_job = query.with_advisory_lock.first
+          loop do
+            good_job = query.with_advisory_lock.first
+            break unless good_job
+
             ActiveSupport::Notifications.instrument("job_started.good_job", { good_job: good_job })
 
             JobWrapper.new(good_job).perform
@@ -64,6 +69,7 @@ module GoodJob
             good_job.advisory_unlock
           end
         end
+
         true
       end
       future.add_observer(TaskObserver.new)

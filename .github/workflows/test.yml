@@ -1,6 +1,41 @@
 name: Test
 on: [push]
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    env:
+      BUNDLE_JOBS: 4
+      BUNDLE_RETRY: 3
+      BUNDLE_PATH: vendor/bundle
+      DISABLE_SPRING: 1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Dependencies
+      - name: Install missing libs (This is slated to be added to the base image soon!)
+        run: sudo apt-get -yqq install libpq-dev
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+      - name: Ruby gem cache
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: v1-${{ runner.os }}-gems-${{ hashFiles('**/good_job.gemspec') }}-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Appraisals') }}
+          restore-keys: |
+            v1-${{ runner.os }}-gems-
+      - name: Install bundler
+        run: gem update --system && gem install bundler -v $(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -1 | tr -d " ")
+      - name: Install Gemfile gems
+        run: bundle install
+      - name: Install Appraisal gems
+        run: bundle exec appraisal install --path $BUNDLE_PATH
+      # /Dependencies
+
+      - name: Run linter
+        run: bin/lint --nofix
+
   test:
     name: Test
     runs-on: ubuntu-latest
@@ -43,7 +78,7 @@ jobs:
       - name: Install Gemfile gems
         run: bundle install
       - name: Install Appraisal gems
-        run: bundle exec appraisal install
+        run: bundle exec appraisal install --path $BUNDLE_PATH
       # /Dependencies
 
       - name: Setup test database

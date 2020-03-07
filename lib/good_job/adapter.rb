@@ -5,10 +5,6 @@ module GoodJob
       @scheduler = InlineScheduler.new if inline?
     end
 
-    def inline?
-      @options.fetch(:inline, false)
-    end
-
     def enqueue(job)
       enqueue_at(job, nil)
     end
@@ -34,6 +30,12 @@ module GoodJob
 
     def shutdown(wait: true)
       @scheduler&.shutdown(wait: wait)
+    end
+
+    private
+
+    def inline?
+      @options.fetch(:inline, false)
     end
   end
 end

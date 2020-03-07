@@ -8,7 +8,8 @@ module GoodJob
     def start
       require RAILS_ENVIRONMENT_RB
 
-      scheduler = GoodJob::Scheduler.new
+      GoodJob::Scheduler.new
+
       Kernel.loop do
         sleep 1
       end

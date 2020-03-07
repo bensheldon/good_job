@@ -17,7 +17,7 @@ module GoodJob
       scope :advisory_unlocked, -> { joins_advisory_locks.where(pg_locks: { locktype: nil }) }
       scope :with_advisory_lock, (lambda do
         where(<<~SQL)
-           pg_try_advisory_lock(('x'||substr(md5(id::text), 1, 16))::bit(64)::bigint)
+          pg_try_advisory_lock(('x'||substr(md5(id::text), 1, 16))::bit(64)::bigint)
         SQL
       end)
 
@@ -42,7 +42,7 @@ module GoodJob
       end
 
       def advisory_lock
-        self.class.connection.execute(sanitize_sql_for_conditions(["SELECT 1 as one WHERE pg_try_advisory_lock(('x'||substr(md5(?), 1, 16))::bit(64)::bigint)", id])).ntuples > 0
+        self.class.connection.execute(sanitize_sql_for_conditions(["SELECT 1 as one WHERE pg_try_advisory_lock(('x'||substr(md5(?), 1, 16))::bit(64)::bigint)", id])).ntuples.positive?
       end
 
       def advisory_lock!
@@ -51,17 +51,15 @@ module GoodJob
       end
 
       def with_advisory_lock
-        begin
-          advisory_lock!
-          yield
-        rescue StandardError => e
-          advisory_unlock unless e.is_a? RecordAlreadyAdvisoryLockedError
-          raise
-        end
+        advisory_lock!
+        yield
+      rescue StandardError => e
+        advisory_unlock unless e.is_a? RecordAlreadyAdvisoryLockedError
+        raise
       end
 
       def advisory_locked?
-        self.class.connection.execute(<<~SQL).ntuples > 0
+        self.class.connection.execute(<<~SQL).ntuples.positive?
           SELECT 1 as one
           FROM pg_locks
           WHERE
@@ -73,7 +71,7 @@ module GoodJob
       end
 
       def owns_advisory_lock?
-        self.class.connection.execute(<<~SQL).ntuples > 0
+        self.class.connection.execute(<<~SQL).ntuples.positive?
           SELECT 1 as one
           FROM pg_locks
           WHERE
