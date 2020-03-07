@@ -7,7 +7,7 @@ inherit_mode:
     - Include
 
 AllCops:
-  TargetRubyVersion: 2.6.3
+  TargetRubyVersion: 2.4.0
   DisplayCopNames: true
   DisplayStyleGuide: true
   Include:
