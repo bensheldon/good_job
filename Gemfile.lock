@@ -3,6 +3,7 @@ PATH
   specs:
     good_job (0.2.0)
       concurrent-ruby (>= 1.0.2)
+      pg (>= 1.0.0)
       rails (>= 5.1.0)
       thor (>= 0.14.1)
 
@@ -113,7 +114,7 @@ GEM
     octokit (4.16.0)
       faraday (>= 0.9)
       sawyer (~> 0.8.0, >= 0.5.3)
-    pg (0.21.0)
+    pg (1.2.2)
     public_suffix (4.0.3)
     rack (2.1.2)
     rack-test (1.1.0)
@@ -192,7 +193,6 @@ DEPENDENCIES
   gem-release
   github_changelog_generator
   good_job!
-  pg
   rspec-rails
 
 BUNDLED WITH
