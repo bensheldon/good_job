@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Job do
-  let(:job) { GoodJob::Job.create! }
+  let(:job) { described_class.create! }
 
   describe 'lockable' do
     describe '#advisory_lock' do
@@ -10,7 +10,7 @@ RSpec.describe GoodJob::Job do
         expect(job.advisory_locked?).to be true
         expect(job.owns_advisory_lock?).to be true
 
-        other_thread_owns_advisory_lock = Concurrent::Promises.future(job) { |j| j.owns_advisory_lock? }.value!
+        other_thread_owns_advisory_lock = Concurrent::Promises.future(job, &:owns_advisory_lock?).value!
         expect(other_thread_owns_advisory_lock).to be false
       end
     end
@@ -43,7 +43,6 @@ RSpec.describe GoodJob::Job do
           job.advisory_unlock!
         end.to change(job, :advisory_locked?).from(true).to(false)
       end
-
     end
   end
 
@@ -52,7 +51,7 @@ RSpec.describe GoodJob::Job do
     job.advisory_lock!
 
     expect do
-      Concurrent::Promises.future(job) { |j| j.advisory_lock! }.value!
+      Concurrent::Promises.future(job, &:advisory_lock!).value!
     end.to raise_error GoodJob::Lockable::RecordAlreadyAdvisoryLockedError
   end
 end

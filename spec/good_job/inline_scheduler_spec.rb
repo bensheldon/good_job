@@ -28,8 +28,8 @@ RSpec.describe GoodJob::InlineScheduler do
       ExampleJob.perform_later('first', 'second', keyword_arg: 'keyword_arg')
 
       expect(RUN_JOBS.first).to eq({
-                                     args: ['first', 'second'],
-                                     kwargs: { keyword_arg: 'keyword_arg' }
+                                     args: %w[first second],
+                                     kwargs: { keyword_arg: 'keyword_arg' },
                                    })
     end
   end

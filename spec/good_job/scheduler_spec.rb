@@ -16,7 +16,7 @@ RSpec.describe GoodJob::Scheduler do
       self.queue_name = 'test'
       self.priority = 50
 
-      def perform(*args, **kwargs)
+      def perform(*_args, **_kwargs)
         thread_name = Thread.current.name || Thread.current.object_id
 
         RUN_JOBS << provider_job_id
@@ -45,7 +45,7 @@ RSpec.describe GoodJob::Scheduler do
 
   let(:adapter) { GoodJob::Adapter.new }
 
-  context 'large number of jobs' do
+  context 'when there are a large number of jobs' do
     let(:number_of_jobs) { 250 }
 
     let!(:good_jobs) do
@@ -55,7 +55,7 @@ RSpec.describe GoodJob::Scheduler do
     end
 
     it 'pops items off of the queue and runs them' do
-      scheduler = GoodJob::Scheduler.new
+      scheduler = described_class.new
 
       Timeout.timeout(5) do
         sleep(0.5) until GoodJob::Job.count == 0
@@ -68,10 +68,10 @@ RSpec.describe GoodJob::Scheduler do
           hash[job_id] += 1
         end
 
-        rerun_jobs = jobs_tally.select { |key, value| value > 1 }
+        rerun_jobs = jobs_tally.select { |_key, value| value > 1 }
 
         rerun_jobs.each do |job_id, tally|
-          rerun_threads = THREAD_JOBS.select { |thread, jobs| jobs.include? job_id }.keys
+          rerun_threads = THREAD_JOBS.select { |_thread, thread_jobs| thread_jobs.include? job_id }.keys
 
           puts "Ran job id #{job_id} for #{tally} times on threads #{rerun_threads}"
         end
@@ -85,11 +85,11 @@ RSpec.describe GoodJob::Scheduler do
     end
   end
 
-  context 'jobs with errors' do
+  context 'when job has errors' do
     let!(:jobs) { ErrorJob.perform_later }
 
     it "handles and retries jobs with errors" do
-      scheduler = GoodJob::Scheduler.new
+      scheduler = described_class.new
 
       Timeout.timeout(5) do
         sleep(0.5) until GoodJob::Job.count == 0
@@ -109,28 +109,27 @@ RSpec.describe GoodJob::Scheduler do
       scheduled_10 = ExampleJob.set(priority: 10, wait: 1.hour).perform_later
       scheduled_5 = ExampleJob.set(priority: 5, wait: 1.hour).perform_later
 
-      scheduler = GoodJob::Scheduler.new
+      scheduler = described_class.new
       sleep(0.5)
       scheduler.shutdown
 
       expect(RUN_JOBS).to eq [
-                               priority_10.provider_job_id,
-                               priority_5.provider_job_id,
-                             ]
+        priority_10.provider_job_id,
+        priority_5.provider_job_id,
+      ]
 
       travel 2.hours do
-        scheduler = GoodJob::Scheduler.new
+        scheduler = described_class.new
         sleep(0.5)
         scheduler.shutdown
       end
 
       expect(RUN_JOBS).to eq [
-                               priority_10.provider_job_id,
-                               priority_5.provider_job_id,
-                               scheduled_10.provider_job_id,
-                               scheduled_5.provider_job_id,
-                             ]
-
+        priority_10.provider_job_id,
+        priority_5.provider_job_id,
+        scheduled_10.provider_job_id,
+        scheduled_5.provider_job_id,
+      ]
     end
   end
 end

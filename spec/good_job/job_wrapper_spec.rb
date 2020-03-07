@@ -10,10 +10,12 @@ RSpec.describe GoodJob::JobWrapper do
 
   before do
     stub_const 'ExampleJob', (Class.new(ApplicationJob) do
-      def perform(*args, **kwargs)
+      def perform(*_args, **_kwargs)
         sleep 1
         true
       end
     end)
   end
+
+  it "is a pending example"
 end

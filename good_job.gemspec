@@ -1,4 +1,4 @@
-$:.push File.expand_path("lib", __dir__)
+$LOAD_PATH.push File.expand_path("lib", __dir__)
 
 # Maintain your gem's version:
 require "good_job/version"
@@ -26,4 +26,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "gem-release"
   spec.add_development_dependency "github_changelog_generator"
   spec.add_development_dependency "rspec-rails"
+  spec.add_development_dependency "rubocop"
+  spec.add_development_dependency "rubocop-rspec"
 end

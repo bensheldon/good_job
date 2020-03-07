@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Adapter do
-  let(:adapter) { GoodJob::Adapter.new }
+  let(:adapter) { described_class.new }
 
   before do
     stub_const 'ExampleJob', (Class.new(ApplicationJob) do

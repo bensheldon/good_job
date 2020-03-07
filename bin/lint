@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'fileutils'
+require 'optparse'
+
+options = {}
+OptionParser.new do |opt|
+  opt.on('-n', '--nofix', 'Do not fix') { |o| options[:nofix] = o }
+end.parse!
+
+GEM_ROOT = File.expand_path('..', __dir__)
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+FileUtils.chdir GEM_ROOT do
+  puts '== Rubocop =='
+  system! "bundle exec rubocop #{options[:nofix] ? '--parallel' : '--safe-auto-correct'}"
+end
