@@ -110,7 +110,7 @@ $ gem bump -v minor --no-commit
 $ bundle exec rake changelog
 
 # Commit the version and changelog to git
-$ bundle commit_version
+$ bundle exec rake commit_version
 
 # Push to rubygems.org
 $ gem release

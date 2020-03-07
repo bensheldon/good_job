@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/bensheldon/good_job/tree/HEAD)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.2.0...HEAD)
+
+**Merged pull requests:**
+
+- Clean up Gemspec [\#15](https://github.com/bensheldon/good_job/pull/15) ([bensheldon](https://github.com/bensheldon))
+- Set up Rubocop [\#14](https://github.com/bensheldon/good_job/pull/14) ([bensheldon](https://github.com/bensheldon))
+- Add pg gem as explicit dependency [\#13](https://github.com/bensheldon/good_job/pull/13) ([bensheldon](https://github.com/bensheldon))
+- Bump nokogiri from 1.10.7 to 1.10.9 [\#12](https://github.com/bensheldon/good_job/pull/12) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add Appraisal with tests for Rails 5.1, 5.2, 6.0 [\#11](https://github.com/bensheldon/good_job/pull/11) ([bensheldon](https://github.com/bensheldon))
+
 ## [v0.2.0](https://github.com/bensheldon/good_job/tree/v0.2.0) (2020-03-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.1.0...v0.2.0)
