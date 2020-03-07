@@ -1,3 +1,12 @@
+GIT
+  remote: https://github.com/thoughtbot/appraisal.git
+  revision: ac8341f81d7c662a6d48e52b2ca12aceffe49e9d
+  specs:
+    appraisal (2.2.0)
+      bundler
+      rake
+      thor (>= 0.14.0)
+
 PATH
   remote: .
   specs:
@@ -67,10 +76,6 @@ GEM
       zeitwerk (~> 2.2)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    appraisal (2.2.0)
-      bundler
-      rake
-      thor (>= 0.14.0)
     ast (2.4.0)
     builder (3.2.4)
     concurrent-ruby (1.1.6)
@@ -206,7 +211,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  appraisal
+  appraisal!
   database_cleaner
   gem-release
   github_changelog_generator
