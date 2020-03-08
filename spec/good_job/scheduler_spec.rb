@@ -56,10 +56,7 @@ RSpec.describe GoodJob::Scheduler do
 
     it 'pops items off of the queue and runs them' do
       scheduler = described_class.new
-
-      Timeout.timeout(5) do
-        sleep(0.5) until GoodJob::Job.count == 0
-      end
+      sleep_until { GoodJob::Job.count == 0 }
 
       if RUN_JOBS.size != number_of_jobs
         jobs = THREAD_JOBS.values.flatten
@@ -91,8 +88,9 @@ RSpec.describe GoodJob::Scheduler do
     it "handles and retries jobs with errors" do
       scheduler = described_class.new
 
-      Timeout.timeout(5) do
-        sleep(0.5) until GoodJob::Job.count == 0
+      50.times do
+        sleep 0.1
+        break if GoodJob::Job.count == 0
       end
 
       scheduler.shutdown
@@ -110,7 +108,7 @@ RSpec.describe GoodJob::Scheduler do
       scheduled_5 = ExampleJob.set(priority: 5, wait: 1.hour).perform_later
 
       scheduler = described_class.new
-      sleep(0.5)
+      sleep_until { GoodJob::Job.count == 2 }
       scheduler.shutdown
 
       expect(RUN_JOBS).to eq [
@@ -120,7 +118,7 @@ RSpec.describe GoodJob::Scheduler do
 
       travel 2.hours do
         scheduler = described_class.new
-        sleep(0.5)
+        sleep_until { GoodJob::Job.count == 0 }
         scheduler.shutdown
       end
 
