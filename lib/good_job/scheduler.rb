@@ -42,17 +42,24 @@ module GoodJob
     end
 
     def shutdown(wait: true)
-      if @timer.running?
-        @timer.shutdown
-        @timer.wait_for_termination if wait
-      end
+      @_shutdown = true
 
-      if @pool.running?
-        @pool.shutdown
-        @pool.wait_for_termination if wait
-      end
+      ActiveSupport::Notifications.instrument("scheduler_start_shutdown.good_job", { wait: wait })
+      ActiveSupport::Notifications.instrument("scheduler_shutdown.good_job", { wait: wait }) do
+        if @timer.running?
+          @timer.shutdown
+          @timer.wait_for_termination if wait
+        end
 
-      true
+        if @pool.running?
+          @pool.shutdown
+          @pool.wait_for_termination if wait
+        end
+      end
+    end
+
+    def shutdown?
+      @_shutdown
     end
 
     def create_thread

@@ -42,6 +42,18 @@ module GoodJob
         end
       end
 
+      def scheduler_start_shutdown(_event)
+        info do
+          "Shutting down scheduler..."
+        end
+      end
+
+      def scheduler_shutdown(_event)
+        info do
+          "Scheduler is shut down."
+        end
+      end
+
       private
 
       def logger
