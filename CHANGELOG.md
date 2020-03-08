@@ -1,8 +1,17 @@
 # Changelog
 
-## [Unreleased](https://github.com/bensheldon/good_job/tree/HEAD)
+## [0.2.2](https://github.com/bensheldon/good_job/tree/0.2.2) (2020-03-07)
 
-[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.2.0...HEAD)
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.2.1...0.2.2)
+
+**Merged pull requests:**
+
+- Gracefully shutdown Scheduler when executable receives TERM or INT [\#17](https://github.com/bensheldon/good_job/pull/17) ([bensheldon](https://github.com/bensheldon))
+- Update Appraisals [\#16](https://github.com/bensheldon/good_job/pull/16) ([bensheldon](https://github.com/bensheldon))
+
+## [v0.2.1](https://github.com/bensheldon/good_job/tree/v0.2.1) (2020-03-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.2.0...v0.2.1)
 
 **Merged pull requests:**
 

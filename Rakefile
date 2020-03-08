@@ -22,6 +22,7 @@ require 'github_changelog_generator/task'
 GitHubChangelogGenerator::RakeTask.new :changelog do |config|
   config.user = 'bensheldon'
   config.project = 'good_job'
+  config.future_release = GoodJob::VERSION
 end
 
 desc 'Commit version and changelog'
@@ -29,7 +30,7 @@ task :commit_version do
   `git add lib/good_job/version.rb CHANGELOG.md`
   `git commit -m "Bump good_job to v#{GoodJob::VERSION}"`
   `git tag v#{GoodJob::VERSION}`
-  puts "Don't forget to push to Github"
+  puts "Don't forget to push to Github: git push --follow-tags"
 end
 
 require 'rspec/core/rake_task'
