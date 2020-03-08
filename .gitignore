@@ -1,6 +1,7 @@
 .bundle/
 log/*.log
 pkg/
+vendor/bundle
 spec/dummy/log/*.log
 spec/dummy/storage/
 spec/dummy/tmp/

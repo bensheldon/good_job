@@ -1,7 +1,16 @@
+GIT
+  remote: https://github.com/thoughtbot/appraisal.git
+  revision: ac8341f81d7c662a6d48e52b2ca12aceffe49e9d
+  specs:
+    appraisal (2.2.0)
+      bundler
+      rake
+      thor (>= 0.14.0)
+
 PATH
   remote: ..
   specs:
-    good_job (0.2.0)
+    good_job (0.2.1)
       concurrent-ruby (>= 1.0.2)
       pg (>= 1.0.0)
       rails (>= 5.1.0)
@@ -49,11 +58,8 @@ GEM
       tzinfo (~> 1.1)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    appraisal (2.2.0)
-      bundler
-      rake
-      thor (>= 0.14.0)
     arel (8.0.0)
+    ast (2.4.0)
     builder (3.2.4)
     concurrent-ruby (1.1.6)
     crass (1.0.6)
@@ -77,6 +83,7 @@ GEM
       activesupport (>= 4.2.0)
     i18n (1.8.2)
       concurrent-ruby (~> 1.0)
+    jaro_winkler (1.5.4)
     loofah (2.4.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -94,6 +101,9 @@ GEM
     octokit (4.16.0)
       faraday (>= 0.9)
       sawyer (~> 0.8.0, >= 0.5.3)
+    parallel (1.19.1)
+    parser (2.7.0.4)
+      ast (~> 2.4.0)
     pg (1.2.2)
     public_suffix (4.0.3)
     rack (2.2.2)
@@ -125,6 +135,7 @@ GEM
     rainbow (3.0.0)
     rake (13.0.1)
     retriable (3.1.2)
+    rexml (3.2.4)
     rspec-core (3.9.1)
       rspec-support (~> 3.9.1)
     rspec-expectations (3.9.0)
@@ -142,6 +153,17 @@ GEM
       rspec-mocks (~> 3.9.0)
       rspec-support (~> 3.9.0)
     rspec-support (3.9.2)
+    rubocop (0.80.1)
+      jaro_winkler (~> 1.5.1)
+      parallel (~> 1.10)
+      parser (>= 2.7.0.1)
+      rainbow (>= 2.2.2, < 4.0)
+      rexml
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 1.7)
+    rubocop-rspec (1.38.1)
+      rubocop (>= 0.68.1)
+    ruby-progressbar (1.10.1)
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
@@ -156,6 +178,7 @@ GEM
     thread_safe (0.3.6)
     tzinfo (1.2.6)
       thread_safe (~> 0.1)
+    unicode-display_width (1.6.1)
     websocket-driver (0.6.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.4)
@@ -164,13 +187,15 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  appraisal
+  appraisal!
   database_cleaner
   gem-release
   github_changelog_generator
   good_job!
   rails (~> 5.1.0)
   rspec-rails
+  rubocop
+  rubocop-rspec
 
 BUNDLED WITH
    2.1.2
