@@ -56,7 +56,7 @@ RSpec.describe GoodJob::Scheduler do
 
     it 'pops items off of the queue and runs them' do
       scheduler = described_class.new
-      sleep_until { GoodJob::Job.count == 0 }
+      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.count == 0 }
 
       if RUN_JOBS.size != number_of_jobs
         jobs = THREAD_JOBS.values.flatten
