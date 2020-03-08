@@ -5,17 +5,22 @@ module GoodJob
     RAILS_ENVIRONMENT_RB = File.expand_path("config/environment.rb")
 
     desc :start, "Start jobs"
+    method_option :max_threads, type: :numeric
     def start
       require RAILS_ENVIRONMENT_RB
 
-      scheduler = GoodJob::Scheduler.new
+      max_threads = options[:max_threads] ||
+                    ENV['GOOD_JOB_MAX_THREADS'] ||
+                    ENV['RAILS_MAX_THREADS'] ||
+                    ActiveRecord::Base.connection_pool.size
+
+      $stdout.puts "GoodJob starting with max_threads=#{max_threads}"
+      scheduler = GoodJob::Scheduler.new(pool_options: { max_threads: max_threads })
 
       %w[INT TERM].each do |signal|
         trap(signal) { @stop_good_job_executable = true }
       end
       @stop_good_job_executable = false
-
-      $stdout.puts "GoodJob waiting for jobs..."
 
       Kernel.loop do
         sleep 0.1

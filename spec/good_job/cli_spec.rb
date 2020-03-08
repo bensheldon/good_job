@@ -43,5 +43,21 @@ RSpec.describe GoodJob::CLI do
       expect(GoodJob::Scheduler).to have_received(:new)
       expect(scheduler_mock).to have_received(:shutdown)
     end
+
+    describe 'max threads' do
+      it 'defaults to --max_threads, GOOD_JOB_MAX_THREADS, RAILS_MAX_THREADS, database connection pool size' do
+        allow(Kernel).to receive(:loop)
+
+        cli = described_class.new([], { max_threads: 4 }, {})
+        stub_const 'ENV', ENV.to_hash.merge({ 'RAILS_MAX_THREADS' => 3, 'GOOD_JOB_MAX_THREADS' => 2 })
+        allow(ActiveRecord::Base.connection_pool).to receive(:size).and_return(1)
+
+        expect do
+          cli.start
+        end.to output.to_stdout
+
+        expect(GoodJob::Scheduler).to have_received(:new).with(pool_options: { max_threads: 4 })
+      end
+    end
   end
 end

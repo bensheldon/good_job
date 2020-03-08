@@ -67,6 +67,17 @@ $ bundle
     ```bash
     $ bundle exec good_job
     ```
+   
+### Configuring Job Execution Threads
+    
+GoodJob executes enqueued jobs using threads. There is a lot than can be said about [multithreaded behavior in Ruby on Rails](https://guides.rubyonrails.org/threading_and_code_execution.html), but briefly:
+
+- Each GoodJob execution thread requires its own database connection, which are automatically checked out from Rails’s connection pool. _Allowing GoodJob to schedule more threads than are available in the database connection pool can lead to timeouts and is not recommended._ 
+- The maximum number of GoodJob threads can be configured, in decreasing precedence:
+    1. `$ bundle exec good_job --max_threads 4`
+    2. `$ GOOD_JOB_MAX_THREADS=4 bundle exec good_job`
+    3. `$ RAILS_MAX_THREADS=4 bundle exec good_job`
+    4. Implicitly via Rails's database connection pool size (`ActiveRecord::Base.connection_pool.size`)
 
 ## Development
 
