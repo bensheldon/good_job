@@ -15,18 +15,14 @@ module GoodJob
       end)
 
       scope :advisory_unlocked, -> { joins_advisory_locks.where(pg_locks: { locktype: nil }) }
-      scope :with_advisory_lock, (lambda do
-        where(<<~SQL)
-          pg_try_advisory_lock(('x'||substr(md5(id::text), 1, 16))::bit(64)::bigint)
-        SQL
-      end)
 
       def self.first_advisory_locked_row(query)
-        find_by_sql(<<~SQL)
+        find_by_sql(<<~SQL).first
           WITH rows AS (#{query.to_sql})
-          SELECT rows.id
+          SELECT rows.*
           FROM rows
           WHERE pg_try_advisory_lock(('x'||substr(md5(id::text), 1, 16))::bit(64)::bigint)
+          LIMIT 1
         SQL
       end
       # private_class_method :first_advisory_locked_row
