@@ -69,8 +69,7 @@ module GoodJob
           break unless good_job
 
           executed_job = true
-          ActiveSupport::Notifications.instrument("job_started.good_job", { good_job: good_job })
-          JobWrapper.new(good_job).perform
+          good_job.perform
           good_job.advisory_unlock
         end
 
@@ -80,13 +79,13 @@ module GoodJob
       future.execute
     end
 
-    def timer_observer(time, result, error)
-      ActiveSupport::Notifications.instrument("job_finished.good_job", { result: result, error: error, time: time })
+    def timer_observer(time, executed_task, error)
+      ActiveSupport::Notifications.instrument("finished_timer_task.good_job", { result: executed_task, error: error, time: time })
     end
 
-    def task_observer(time, executed_job, error)
-      ActiveSupport::Notifications.instrument("job_finished.good_job", { result: executed_job, error: error, time: time })
-      create_thread if executed_job
+    def task_observer(time, executed_task, error)
+      ActiveSupport::Notifications.instrument("finished_job_task.good_job", { result: executed_task, error: error, time: time })
+      create_thread if executed_task
     end
   end
 end

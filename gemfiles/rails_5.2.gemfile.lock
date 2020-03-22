@@ -10,7 +10,7 @@ GIT
 PATH
   remote: ..
   specs:
-    good_job (0.2.1)
+    good_job (0.2.2)
       concurrent-ruby (>= 1.0.2)
       pg (>= 1.0.0)
       rails (>= 5.1.0)
@@ -65,6 +65,7 @@ GEM
     arel (9.0.0)
     ast (2.4.0)
     builder (3.2.4)
+    coderay (1.1.2)
     concurrent-ruby (1.1.6)
     crass (1.0.6)
     database_cleaner (1.8.3)
@@ -111,7 +112,10 @@ GEM
     parallel (1.19.1)
     parser (2.7.0.4)
       ast (~> 2.4.0)
-    pg (1.2.2)
+    pg (1.2.3)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     public_suffix (4.0.3)
     rack (2.2.2)
     rack-test (1.1.0)
@@ -200,6 +204,7 @@ DEPENDENCIES
   gem-release
   github_changelog_generator
   good_job!
+  pry
   rails (~> 5.2.0)
   rspec-rails
   rubocop

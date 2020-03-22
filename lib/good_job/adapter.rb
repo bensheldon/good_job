@@ -1,41 +1,36 @@
 module GoodJob
   class Adapter
-    def initialize(options = {})
-      @options = options
-      @scheduler = InlineScheduler.new if inline?
+    def initialize(inline: false)
+      @inline = inline
     end
 
-    def enqueue(job)
-      enqueue_at(job, nil)
+    def enqueue(active_job)
+      enqueue_at(active_job, nil)
     end
 
-    def enqueue_at(job, timestamp)
-      params = {
-        queue_name: job.queue_name,
-        priority: job.priority,
-        serialized_params: job.serialize,
-      }
-      params[:scheduled_at] = Time.at(timestamp) if timestamp
+    def enqueue_at(active_job, timestamp)
+      good_job = GoodJob::Job.enqueue(
+        active_job,
+        scheduled_at: timestamp ? Time.at(timestamp) : nil,
+        create_with_advisory_lock: inline?
+      )
 
-      good_job = GoodJob::Job.create(params)
-      job.provider_job_id = good_job.id
-
-      GoodJob.tag_logger do
-        ActiveSupport::Notifications.instrument("create.good_job", { good_job: good_job, job: job })
-        @scheduler.enqueue(good_job) if inline?
+      if inline?
+        good_job.perform
+        good_job.advisory_unlock
       end
 
       good_job
     end
 
-    def shutdown(wait: true)
-      @scheduler&.shutdown(wait: wait)
+    def shutdown(wait: true) # rubocop:disable Lint/UnusedMethodArgument
+      nil
     end
 
     private
 
     def inline?
-      @options.fetch(:inline, false)
+      @inline
     end
   end
 end
