@@ -1,11 +1,15 @@
 # Changelog
 
-## [0.2.2](https://github.com/bensheldon/good_job/tree/0.2.2) (2020-03-07)
+## [0.3.0](https://github.com/bensheldon/good_job/tree/0.3.0) (2020-03-22)
 
-[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.2.1...0.2.2)
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.2.1...0.3.0)
 
 **Merged pull requests:**
 
+- Update development Ruby to 2.6.5 [\#22](https://github.com/bensheldon/good_job/pull/22) ([bensheldon](https://github.com/bensheldon))
+- Simplify the internal API, removing JobWrapper and InlineScheduler [\#21](https://github.com/bensheldon/good_job/pull/21) ([bensheldon](https://github.com/bensheldon))
+- Generate a new future for every executed job [\#20](https://github.com/bensheldon/good_job/pull/20) ([bensheldon](https://github.com/bensheldon))
+- Configuration for maximum number of job execution threads [\#18](https://github.com/bensheldon/good_job/pull/18) ([bensheldon](https://github.com/bensheldon))
 - Gracefully shutdown Scheduler when executable receives TERM or INT [\#17](https://github.com/bensheldon/good_job/pull/17) ([bensheldon](https://github.com/bensheldon))
 - Update Appraisals [\#16](https://github.com/bensheldon/good_job/pull/16) ([bensheldon](https://github.com/bensheldon))
 
