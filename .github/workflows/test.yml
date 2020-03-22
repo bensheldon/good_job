@@ -16,7 +16,7 @@ jobs:
       # Dependencies
       - name: Install missing libs (This is slated to be added to the base image soon!)
         run: sudo apt-get -yqq install libpq-dev
-      - name: Setup Ruby
+      - name: Set up Ruby
         uses: ruby/setup-ruby@v1
       - name: Ruby gem cache
         uses: actions/cache@v1
@@ -64,7 +64,7 @@ jobs:
       # Dependencies
       - name: Install missing libs (This is slated to be added to the base image soon!)
         run: sudo apt-get -yqq install libpq-dev
-      - name: Setup Ruby
+      - name: Set up Ruby
         uses: ruby/setup-ruby@v1
       - name: Ruby gem cache
         uses: actions/cache@v1
@@ -81,7 +81,7 @@ jobs:
         run: bundle exec appraisal install --path $BUNDLE_PATH
       # /Dependencies
 
-      - name: Setup test database
+      - name: Set up test database
         run: |
           cd spec/dummy
           bin/rails db:test:prepare
