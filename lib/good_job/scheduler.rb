@@ -1,5 +1,5 @@
-require "concurrent/scheduled_task"
 require "concurrent/executor/thread_pool_executor"
+require "concurrent/timer_task"
 require "concurrent/utility/processor_counter"
 
 module GoodJob
@@ -28,7 +28,7 @@ module GoodJob
         idle_threads = @pool.max_length - @pool.length
         create_thread if idle_threads.positive?
       end
-      @timer.add_observer(TimerObserver.new)
+      @timer.add_observer(self, :timer_observer)
       @timer.execute
     end
 
@@ -62,36 +62,31 @@ module GoodJob
 
     def create_thread
       future = Concurrent::Future.new(args: [ordered_query], executor: @pool) do |query|
-        loop do
-          executed_job = false
+        executed_job = false
 
-          Rails.application.executor.wrap do
-            good_job = query.with_advisory_lock.first
-            break unless good_job
+        Rails.application.executor.wrap do
+          good_job = GoodJob::Job.first_advisory_locked_row(query)
+          break unless good_job
 
-            executed_job = true
-            ActiveSupport::Notifications.instrument("job_started.good_job", { good_job: good_job })
-            JobWrapper.new(good_job).perform
-            good_job.advisory_unlock
-          end
-
-          break unless executed_job
+          executed_job = true
+          ActiveSupport::Notifications.instrument("job_started.good_job", { good_job: good_job })
+          JobWrapper.new(good_job).perform
+          good_job.advisory_unlock
         end
+
+        executed_job
       end
-      future.add_observer(TaskObserver.new)
+      future.add_observer(self, :task_observer)
       future.execute
     end
 
-    class TimerObserver
-      def update(time, result, error)
-        ActiveSupport::Notifications.instrument("timer_task_finished.good_job", { result: result, error: error, time: time })
-      end
+    def timer_observer(time, result, error)
+      ActiveSupport::Notifications.instrument("job_finished.good_job", { result: result, error: error, time: time })
     end
 
-    class TaskObserver
-      def update(time, result, error)
-        ActiveSupport::Notifications.instrument("job_finished.good_job", { result: result, error: error, time: time })
-      end
+    def task_observer(time, executed_job, error)
+      ActiveSupport::Notifications.instrument("job_finished.good_job", { result: executed_job, error: error, time: time })
+      create_thread if executed_job
     end
   end
 end
