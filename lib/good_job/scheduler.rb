@@ -62,18 +62,18 @@ module GoodJob
 
     def create_thread
       future = Concurrent::Future.new(args: [ordered_query], executor: @pool) do |query|
-        executed_job = false
+        good_job = nil
 
         Rails.application.executor.wrap do
-          good_job = GoodJob::Job.first_advisory_locked_row(query)
-          break unless good_job
+          query.limit(1).with_advisory_lock do |good_jobs|
+            good_job = good_jobs.first
+            break unless good_job
 
-          executed_job = true
-          good_job.perform
-          good_job.advisory_unlock
+            good_job.perform
+          end
         end
 
-        executed_job
+        good_job
       end
       future.add_observer(self, :task_observer)
       future.execute
@@ -83,9 +83,9 @@ module GoodJob
       ActiveSupport::Notifications.instrument("finished_timer_task.good_job", { result: executed_task, error: error, time: time })
     end
 
-    def task_observer(time, executed_task, error)
-      ActiveSupport::Notifications.instrument("finished_job_task.good_job", { result: executed_task, error: error, time: time })
-      create_thread if executed_task
+    def task_observer(time, performed_job, error)
+      ActiveSupport::Notifications.instrument("finished_job_task.good_job", { good_job: performed_job, error: error, time: time })
+      create_thread if performed_job
     end
   end
 end
