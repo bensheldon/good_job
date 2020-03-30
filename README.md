@@ -114,17 +114,10 @@ Package maintainers can release this gem with the following [gem-release](https:
 # Sign into rubygems
 $ gem signin
 
-# Increase the version number
-$ gem bump -v minor --no-commit
-
-# Update the changelog
-$ bundle exec rake changelog
-
-# Commit the version and changelog to git
+# Update version number, changelog, and create git commit:
 $ bundle exec rake commit_version
 
-# Push to rubygems.org
-$ gem release
+# ..and follow subsequent directions. 
 ```
 
 ## Contributing
