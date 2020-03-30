@@ -30,7 +30,7 @@ def system!(*args)
 end
 
 desc 'Commit version and changelog'
-task :commit_version, [:version] do |t, args|
+task :commit_version, [:version] do |_t, args|
   version = args[:version]
   if version.blank?
     puts "Pass a version [major|minor|patch|pre|release] or a given version number [x.x.x]:"
