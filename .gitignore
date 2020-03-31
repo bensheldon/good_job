@@ -5,3 +5,4 @@ vendor/bundle
 spec/dummy/log/*.log
 spec/dummy/storage/
 spec/dummy/tmp/
+.env

@@ -44,6 +44,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "appraisal"
   spec.add_development_dependency "database_cleaner"
+  spec.add_development_dependency "foreman"
   spec.add_development_dependency "gem-release"
   spec.add_development_dependency "github_changelog_generator"
   spec.add_development_dependency "pry"
