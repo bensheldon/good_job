@@ -22,6 +22,7 @@ require 'github_changelog_generator/task'
 GitHubChangelogGenerator::RakeTask.new :changelog do |config|
   config.user = 'bensheldon'
   config.project = 'good_job'
+  config.future_release = GoodJob::VERSION
 end
 
 def system!(*args)
@@ -29,16 +30,16 @@ def system!(*args)
 end
 
 desc 'Commit version and changelog'
-task :commit_version, [:version] do |_t, args|
-  version = args[:version]
-  if version.blank?
+task :commit_version, [:version_bump] do |_t, args|
+  version_bump = args[:version_bump]
+  if version_bump.blank?
     puts "Pass a version [major|minor|patch|pre|release] or a given version number [x.x.x]:"
-    puts "$ bundle exec commit_version[VERSION]"
+    puts "$ bundle exec commit_version[VERSION_BUMP]"
     return
   end
 
   puts "\n== Bumping version number =="
-  system! "gem bump --no-commit --version #{version}"
+  system! "gem bump --no-commit --version #{version_bump}"
 
   puts "\n== Reloading GoodJob::VERSION"
   load File.expand_path('../lib/good_job/version.rb', __FILE__)
@@ -58,7 +59,7 @@ task :commit_version, [:version] do |_t, args|
 
   puts "\n== Next steps =="
   puts "Push commit and tag to Github:"
-  puts "$ git push --follow-tags"
+  puts "$ git push origin v#{GoodJob::VERSION}"
   puts "\n"
   puts "Push to rubygems"
   puts "$ gem release"
