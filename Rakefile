@@ -42,7 +42,7 @@ task :commit_version, [:version_bump] do |_t, args|
   system! "gem bump --no-commit --version #{version_bump}"
 
   puts "\n== Reloading GoodJob::VERSION"
-  load File.expand_path('../lib/good_job/version.rb', __FILE__)
+  load File.expand_path('lib/good_job/version.rb', __dir__)
   puts GoodJob::VERSION
 
   puts "\n== Updating Changelog =="
