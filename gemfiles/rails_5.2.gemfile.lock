@@ -10,7 +10,7 @@ GIT
 PATH
   remote: ..
   specs:
-    good_job (0.2.2)
+    good_job (0.4.0)
       concurrent-ruby (>= 1.0.2)
       pg (>= 1.0.0)
       rails (>= 5.1.0)
@@ -75,6 +75,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday-http-cache (2.0.0)
       faraday (~> 0.8)
+    foreman (0.87.0)
     gem-release (2.1.1)
     github_changelog_generator (1.15.0)
       activesupport
@@ -201,6 +202,7 @@ PLATFORMS
 DEPENDENCIES
   appraisal!
   database_cleaner
+  foreman
   gem-release
   github_changelog_generator
   good_job!

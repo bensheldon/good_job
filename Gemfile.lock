@@ -10,7 +10,7 @@ GIT
 PATH
   remote: .
   specs:
-    good_job (0.3.0)
+    good_job (0.4.0)
       concurrent-ruby (>= 1.0.2)
       pg (>= 1.0.0)
       rails (>= 5.1.0)
