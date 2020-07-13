@@ -6,6 +6,7 @@ require 'optparse'
 options = {}
 OptionParser.new do |opt|
   opt.on('-n', '--nofix', 'Do not fix') { |o| options[:nofix] = o }
+  opt.on('-t', '--todo', 'Generate todo file') { |o| options[:todo] = o }
 end.parse!
 
 GEM_ROOT = File.expand_path('..', __dir__)
@@ -16,5 +17,15 @@ end
 
 FileUtils.chdir GEM_ROOT do
   puts '== Rubocop =='
-  system! "bundle exec rubocop #{options[:nofix] ? '--parallel' : '--safe-auto-correct'}"
+
+  flags = []
+  if options[:todo]
+    flags << '--auto-gen-config'
+  elsif !options[:nofix]
+    flags << '--auto-correct'
+  else
+    flags << '--parallel'
+  end
+
+  system! "bundle exec rubocop #{flags.join(' ')}"
 end

@@ -1,3 +1,5 @@
+inherit_from: .rubocop_todo.yml
+
 require:
   - rubocop-rspec
 
@@ -16,6 +18,7 @@ AllCops:
     - pkg/**/*
     - spec/dummy/**/*
     - vendor/**/*
+  NewCops: enable
 
 Layout/EmptyLineAfterMagicComment:
   Enabled: false
@@ -32,24 +35,7 @@ Layout/ParameterAlignment:
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
-Metrics/AbcSize:
-  Enabled: false
-
-Metrics/BlockLength:
-  Enabled: false
-
-Metrics/CyclomaticComplexity:
-  Enabled: false
-
-Metrics/ClassLength:
-  CountComments: false  # count full line comments?
-  Max: 500
-
-Metrics/MethodLength:
-  CountComments: false  # count full line comments?
-  Max: 100
-
-Metrics/PerceivedComplexity:
+Metrics:
   Enabled: false
 
 Naming/MemoizedInstanceVariableName:
