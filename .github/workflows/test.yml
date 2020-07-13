@@ -82,8 +82,7 @@ jobs:
       # /Dependencies
 
       - name: Set up test database
-        run: |
-          cd spec/dummy
-          bin/rails db:test:prepare
+        run: bin/rails db:test:prepare
+        working-directory: spec/dummy
       - name: Run tests
         run: bundle exec appraisal bin/rspec

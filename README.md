@@ -94,6 +94,17 @@ $ bin/setup_test
 $ bin/rspec
 ```
 
+This gem uses Appraisal to run tests against multiple versions of Rails:
+
+```bash
+# Install Appraisal(s) gemfiles
+$ bundle exec appraisal
+
+# Run tests
+$ bundle exec appraisal bin/rspec
+
+```
+
 For developing locally within another Ruby on Rails project:
 
 ```bash
