@@ -8,6 +8,8 @@ require "good_job/scheduler"
 require 'good_job/adapter'
 require 'good_job/pg_locks'
 
+require 'active_job/queue_adapters/good_job_adapter'
+
 module GoodJob
   include Logging
 

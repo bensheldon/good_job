@@ -27,8 +27,6 @@ module GoodJob
       nil
     end
 
-    private
-
     def inline?
       @inline
     end

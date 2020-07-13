@@ -1,14 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Scheduler do
-  around do |example|
-    original_adapter = ActiveJob::Base.queue_adapter
-    ActiveJob::Base.queue_adapter = adapter
-    example.run
-    ActiveJob::Base.queue_adapter = original_adapter
-  end
-
   before do
+    ActiveJob::Base.queue_adapter = adapter
+
     stub_const "RUN_JOBS", Concurrent::Array.new
     stub_const "THREAD_JOBS", Concurrent::Hash.new(Concurrent::Array.new)
 

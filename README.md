@@ -14,12 +14,12 @@ Inspired by [Delayed::Job](https://github.com/collectiveidea/delayed_job) and [Q
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'good_job', github: 'bensheldon/good_job'
+gem 'good_job'
 ```
 
 And then execute:
 ```bash
-$ bundle
+$ bundle install
 ```
 
 ## Usage
@@ -56,11 +56,21 @@ $ bundle
     
 1. Configure the ActiveJob adapter:
     ```ruby
-    # config/environments/production.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new
-
+    # config/application.rb
+    config.active_job.queue_adapter = :good_job
+    ```
+    
+    By default, using `:good_job` is equivalent to manually configuring the adapter:
+    
+    ```ruby
     # config/environments/development.rb
     config.active_job.queue_adapter = GoodJob::Adapter.new(inline: true)
+   
+    # config/environments/test.rb
+    config.active_job.queue_adapter = GoodJob::Adapter.new(inline: true)
+   
+    # config/environments/production.rb
+    config.active_job.queue_adapter = GoodJob::Adapter.new
     ```
 
 1. In production, the scheduler is designed to run in its own process:
