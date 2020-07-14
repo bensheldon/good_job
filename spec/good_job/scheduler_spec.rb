@@ -50,7 +50,7 @@ RSpec.describe GoodJob::Scheduler do
     end
 
     it 'pops items off of the queue and runs them' do
-      scheduler = described_class.new
+      scheduler = described_class.new(GoodJob::Job.all.to_performer)
       sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.count == 0 }
 
       if RUN_JOBS.size != number_of_jobs
@@ -81,48 +81,11 @@ RSpec.describe GoodJob::Scheduler do
     let!(:jobs) { ErrorJob.perform_later }
 
     it "handles and retries jobs with errors" do
-      scheduler = described_class.new
+      scheduler = described_class.new(GoodJob::Job.all.to_performer)
 
-      50.times do
-        sleep 0.1
-        break if GoodJob::Job.count == 0
-      end
+      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.count == 0 }
 
       scheduler.shutdown
-    end
-  end
-
-  describe 'queue ordering' do
-    include ActiveSupport::Testing::TimeHelpers
-
-    it 'orders by scheduled_at and priority' do
-      priority_10 = ExampleJob.set(priority: 10).perform_later
-      priority_5 = ExampleJob.set(priority: 5).perform_later
-
-      scheduled_10 = ExampleJob.set(priority: 10, wait: 1.hour).perform_later
-      scheduled_5 = ExampleJob.set(priority: 5, wait: 1.hour).perform_later
-
-      scheduler = described_class.new
-      sleep_until { GoodJob::Job.count == 2 }
-      scheduler.shutdown
-
-      expect(RUN_JOBS).to eq [
-        priority_10.provider_job_id,
-        priority_5.provider_job_id,
-      ]
-
-      travel 2.hours do
-        scheduler = described_class.new
-        sleep_until { GoodJob::Job.count == 0 }
-        scheduler.shutdown
-      end
-
-      expect(RUN_JOBS).to eq [
-        priority_10.provider_job_id,
-        priority_5.provider_job_id,
-        scheduled_10.provider_job_id,
-        scheduled_5.provider_job_id,
-      ]
     end
   end
 end

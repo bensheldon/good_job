@@ -16,8 +16,11 @@ module GoodJob
       )
 
       if inline?
-        good_job.perform
-        good_job.advisory_unlock
+        begin
+          good_job.perform
+        ensure
+          good_job.advisory_unlock
+        end
       end
 
       good_job

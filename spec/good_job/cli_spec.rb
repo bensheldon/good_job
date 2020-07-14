@@ -7,12 +7,12 @@ RSpec.describe GoodJob::CLI do
 
   before do
     stub_const 'GoodJob::CLI::RAILS_ENVIRONMENT_RB', File.expand_path("spec/dummy/config/environment.rb")
-
     allow(GoodJob::Scheduler).to receive(:new).and_return scheduler_mock
   end
 
   describe '#start' do
     it 'initializes a scheduler' do
+      allow(GoodJob::Scheduler).to receive(:new).and_call_original
       allow(Kernel).to receive(:loop)
 
       cli = described_class.new([], {}, {})
@@ -22,7 +22,6 @@ RSpec.describe GoodJob::CLI do
       end.to output.to_stdout
 
       expect(GoodJob::Scheduler).to have_received(:new)
-      expect(scheduler_mock).to have_received(:shutdown)
     end
 
     it 'can gracefully shut down on INT signal' do
@@ -56,7 +55,7 @@ RSpec.describe GoodJob::CLI do
           cli.start
         end.to output.to_stdout
 
-        expect(GoodJob::Scheduler).to have_received(:new).with(pool_options: { max_threads: 4 })
+        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Job::Performer), pool_options: { max_threads: 4 })
       end
     end
   end
