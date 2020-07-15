@@ -6,6 +6,7 @@ module GoodJob
 
     scope :only_scheduled, -> { where("scheduled_at < ?", Time.current).or(where(scheduled_at: nil)) }
     scope :priority_ordered, -> { order(priority: :desc) }
+    scope :to_performer, -> { Performer.new(self) }
 
     class Performer
       def initialize(query)
@@ -24,10 +25,6 @@ module GoodJob
 
         good_job
       end
-    end
-
-    def self.to_performer
-      Performer.new(self)
     end
 
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
