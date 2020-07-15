@@ -18,13 +18,6 @@ end
 
 require 'bundler/gem_tasks'
 
-require 'github_changelog_generator/task'
-GitHubChangelogGenerator::RakeTask.new :changelog do |config|
-  config.user = 'bensheldon'
-  config.project = 'good_job'
-  config.future_release = GoodJob::VERSION
-end
-
 def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
@@ -32,10 +25,10 @@ end
 desc 'Commit version and changelog'
 task :commit_version, [:version_bump] do |_t, args|
   version_bump = args[:version_bump]
-  if version_bump.blank?
+  if version_bump.nil?
     puts "Pass a version [major|minor|patch|pre|release] or a given version number [x.x.x]:"
-    puts "$ bundle exec commit_version[VERSION_BUMP]"
-    return
+    puts "$ bundle exec rake commit_version[VERSION_BUMP]"
+    exit(1)
   end
 
   puts "\n== Bumping version number =="
@@ -46,7 +39,7 @@ task :commit_version, [:version_bump] do |_t, args|
   puts GoodJob::VERSION
 
   puts "\n== Updating Changelog =="
-  system! "bundle exec foreman run rake changelog"
+  system! ENV, "bundle exec github_changelog_generator --user bensheldon --project good_job --future-release v#{GoodJob::VERSION}"
 
   puts "\n== Updating Gemfile.lock version =="
   system! "bundle install"
@@ -58,11 +51,9 @@ task :commit_version, [:version_bump] do |_t, args|
   system! "git tag v#{GoodJob::VERSION}"
 
   puts "\n== Next steps =="
-  puts "Push commit and tag to Github:"
-  puts "$ git push origin v#{GoodJob::VERSION}"
-  puts "\n"
-  puts "Push to rubygems"
-  puts "$ gem release"
+  puts "Run the following commands:\n\n"
+  puts "1. Push commit and tag to Github: `$ git push origin v#{GoodJob::VERSION}`"
+  puts "2. Push to Rubygems.org: `$ gem release`"
 end
 
 require 'rspec/core/rake_task'
