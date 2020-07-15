@@ -78,6 +78,19 @@ $ bundle install
     $ bundle exec good_job
     ```
    
+   Configuration options available with `help`:
+   ```bash
+   $ bundle exec good_job help start
+   
+   # Usage:
+   #  good_job start
+   #
+   # Options:
+   #   [--max-threads=N]         # Maximum number of threads to use for working jobs (default: ActiveRecord::Base.connection_pool.size)
+   #   [--queues=queue1,queue2]  # Queues to work from. Separate multiple queues with commas (default: *)
+   #   [--poll-interval=N]       # Interval between polls for available jobs in seconds (default: 1)
+   ```
+   
 ### Configuring Job Execution Threads
     
 GoodJob executes enqueued jobs using threads. There is a lot than can be said about [multithreaded behavior in Ruby on Rails](https://guides.rubyonrails.org/threading_and_code_execution.html), but briefly:
