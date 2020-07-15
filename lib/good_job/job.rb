@@ -2,9 +2,12 @@ module GoodJob
   class Job < ActiveRecord::Base
     include Lockable
 
-    self.table_name = 'good_jobs'
+    DEFAULT_QUEUE_NAME = 'default'.freeze
+    DEFAULT_PRIORITY = 0
 
-    scope :only_scheduled, -> { where("scheduled_at < ?", Time.current).or(where(scheduled_at: nil)) }
+    self.table_name = 'good_jobs'.freeze
+
+    scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(Time.current)).or(where(scheduled_at: nil)) }
     scope :priority_ordered, -> { order(priority: :desc) }
     scope :to_performer, -> { Performer.new(self) }
 
@@ -31,10 +34,10 @@ module GoodJob
       good_job = nil
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         good_job = GoodJob::Job.new(
-          queue_name: active_job.queue_name,
-          priority: active_job.priority,
+          queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
+          priority: active_job.priority || DEFAULT_PRIORITY,
           serialized_params: active_job.serialize,
-          scheduled_at: scheduled_at,
+          scheduled_at: scheduled_at || Time.current,
           create_with_advisory_lock: create_with_advisory_lock
         )
 

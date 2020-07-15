@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_24_015928) do
+ActiveRecord::Schema.define(version: 2020_07_15_224305) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -23,6 +23,8 @@ ActiveRecord::Schema.define(version: 2020_02_24_015928) do
     t.integer "priority"
     t.jsonb "serialized_params"
     t.datetime "scheduled_at"
+    t.index ["queue_name", "scheduled_at"], name: "index_good_jobs_on_queue_name_and_scheduled_at"
+    t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at"
   end
 
 end
