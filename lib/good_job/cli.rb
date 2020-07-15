@@ -15,7 +15,9 @@ module GoodJob
                     ActiveRecord::Base.connection_pool.size
 
       $stdout.puts "GoodJob starting with max_threads=#{max_threads}"
-      scheduler = GoodJob::Scheduler.new(pool_options: { max_threads: max_threads })
+
+      job_performer = GoodJob::Job.only_scheduled.priority_ordered.to_performer
+      scheduler = GoodJob::Scheduler.new(job_performer, pool_options: { max_threads: max_threads })
 
       %w[INT TERM].each do |signal|
         trap(signal) { @stop_good_job_executable = true }

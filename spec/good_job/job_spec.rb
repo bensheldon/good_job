@@ -14,6 +14,21 @@ RSpec.describe GoodJob::Job do
     end)
   end
 
+  describe '.to_performer' do
+    it 'performs a job' do
+      allow_any_instance_of(described_class).to receive(:perform), &:destroy!
+
+      job_1 = described_class.create!
+      job_2 = described_class.create!
+
+      performer = described_class.to_performer
+      5.times { performer.next }
+
+      expect { job_1.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { job_2.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+  end
+
   describe 'lockable' do
     describe '.advisory_lock' do
       around do |example|

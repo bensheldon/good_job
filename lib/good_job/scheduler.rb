@@ -20,9 +20,10 @@ module GoodJob
       fallback_policy: :abort, # shouldn't matter -- 0 max queue
     }.freeze
 
-    def initialize(query = GoodJob::Job.all, timer_options: {}, pool_options: {})
-      @query = query
+    def initialize(performer, timer_options: {}, pool_options: {})
+      raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
 
+      @performer = performer
       @pool = Concurrent::ThreadPoolExecutor.new(DEFAULT_POOL_OPTIONS.merge(pool_options))
       @timer = Concurrent::TimerTask.new(DEFAULT_TIMER_OPTIONS.merge(timer_options)) do
         idle_threads = @pool.max_length - @pool.length
@@ -30,10 +31,6 @@ module GoodJob
       end
       @timer.add_observer(self, :timer_observer)
       @timer.execute
-    end
-
-    def ordered_query
-      @query.where("scheduled_at < ?", Time.current).or(@query.where(scheduled_at: nil)).order(priority: :desc)
     end
 
     def execute
@@ -61,19 +58,10 @@ module GoodJob
     end
 
     def create_thread
-      future = Concurrent::Future.new(args: [ordered_query], executor: @pool) do |query|
-        good_job = nil
-
-        Rails.application.executor.wrap do
-          query.limit(1).with_advisory_lock do |good_jobs|
-            good_job = good_jobs.first
-            break unless good_job
-
-            good_job.perform
-          end
-        end
-
-        good_job
+      future = Concurrent::Future.new(args: [@performer], executor: @pool) do |performer|
+        result = nil
+        Rails.application.executor.wrap { result = performer.next }
+        result
       end
       future.add_observer(self, :task_observer)
       future.execute
@@ -83,9 +71,9 @@ module GoodJob
       ActiveSupport::Notifications.instrument("finished_timer_task.good_job", { result: executed_task, error: error, time: time })
     end
 
-    def task_observer(time, performed_job, error)
-      ActiveSupport::Notifications.instrument("finished_job_task.good_job", { good_job: performed_job, error: error, time: time })
-      create_thread if performed_job
+    def task_observer(time, result, error)
+      ActiveSupport::Notifications.instrument("finished_job_task.good_job", { result: result, error: error, time: time })
+      create_thread if result
     end
   end
 end

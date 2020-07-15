@@ -4,6 +4,32 @@ module GoodJob
 
     self.table_name = 'good_jobs'
 
+    scope :only_scheduled, -> { where("scheduled_at < ?", Time.current).or(where(scheduled_at: nil)) }
+    scope :priority_ordered, -> { order(priority: :desc) }
+
+    class Performer
+      def initialize(query)
+        @query = query
+      end
+
+      def next
+        good_job = nil
+
+        @query.limit(1).with_advisory_lock do |good_jobs|
+          good_job = good_jobs.first
+          break unless good_job
+
+          good_job.perform
+        end
+
+        good_job
+      end
+    end
+
+    def self.to_performer
+      Performer.new(self)
+    end
+
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
       good_job = nil
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
