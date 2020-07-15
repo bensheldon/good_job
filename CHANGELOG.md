@@ -1,13 +1,29 @@
 # Changelog
 
-## [0.5.0](https://github.com/bensheldon/good_job/tree/0.5.0) (2020-07-13)
+## [v0.6.0](https://github.com/bensheldon/good_job/tree/v0.6.0) (2020-07-15)
 
-[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.4.0...0.5.0)
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.5.0...v0.6.0)
+
+**Closed issues:**
+
+- Improve the command line options [\#32](https://github.com/bensheldon/good_job/issues/32)
+- Allow config.active\_job.queue\_adapter = :good\_job to work [\#5](https://github.com/bensheldon/good_job/issues/5)
+
+**Merged pull requests:**
+
+- Improve generation of changelog [\#36](https://github.com/bensheldon/good_job/pull/36) ([bensheldon](https://github.com/bensheldon))
+- Update Github Action Workflow for Backlog Project Board [\#35](https://github.com/bensheldon/good_job/pull/35) ([bensheldon](https://github.com/bensheldon))
+- Add configuration options to good\_job executable [\#33](https://github.com/bensheldon/good_job/pull/33) ([bensheldon](https://github.com/bensheldon))
+- Extract Job querying behavior out of Scheduler [\#31](https://github.com/bensheldon/good_job/pull/31) ([bensheldon](https://github.com/bensheldon))
+- Allow configuration of Rails queue adapter with `:good\_job` [\#28](https://github.com/bensheldon/good_job/pull/28) ([bensheldon](https://github.com/bensheldon))
+
+## [v0.5.0](https://github.com/bensheldon/good_job/tree/v0.5.0) (2020-07-13)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.4.0...v0.5.0)
 
 **Merged pull requests:**
 
 - Update development Ruby to 2.6.6 and gems [\#29](https://github.com/bensheldon/good_job/pull/29) ([bensheldon](https://github.com/bensheldon))
-- Allow configuration of Rails queue adapter with `:good\_job` [\#28](https://github.com/bensheldon/good_job/pull/28) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.4.0](https://github.com/bensheldon/good_job/tree/v0.4.0) (2020-03-31)
 
@@ -46,6 +62,7 @@
 
 - Clean up Gemspec [\#15](https://github.com/bensheldon/good_job/pull/15) ([bensheldon](https://github.com/bensheldon))
 - Set up Rubocop [\#14](https://github.com/bensheldon/good_job/pull/14) ([bensheldon](https://github.com/bensheldon))
+- Add pg gem as explicit dependency [\#13](https://github.com/bensheldon/good_job/pull/13) ([bensheldon](https://github.com/bensheldon))
 - Bump nokogiri from 1.10.7 to 1.10.9 [\#12](https://github.com/bensheldon/good_job/pull/12) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Add Appraisal with tests for Rails 5.1, 5.2, 6.0 [\#11](https://github.com/bensheldon/good_job/pull/11) ([bensheldon](https://github.com/bensheldon))
 
@@ -55,7 +72,6 @@
 
 **Merged pull requests:**
 
-- Add pg gem as explicit dependency [\#13](https://github.com/bensheldon/good_job/pull/13) ([bensheldon](https://github.com/bensheldon))
 - Use Rails.logger and ActiveSupport::Notifications for logging instead of puts [\#10](https://github.com/bensheldon/good_job/pull/10) ([bensheldon](https://github.com/bensheldon))
 - Remove minitest files [\#9](https://github.com/bensheldon/good_job/pull/9) ([bensheldon](https://github.com/bensheldon))
 - Use scheduled\_at and priority for scheduling [\#8](https://github.com/bensheldon/good_job/pull/8) ([bensheldon](https://github.com/bensheldon))

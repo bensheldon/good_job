@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    good_job (0.5.0)
+    good_job (0.6.0)
       concurrent-ruby (>= 1.0.2)
       pg (>= 1.0.0)
       rails (>= 5.1.0)
