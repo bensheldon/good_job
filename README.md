@@ -149,7 +149,7 @@ Package maintainers can release this gem with the following [gem-release](https:
 $ gem signin
 
 # Update version number, changelog, and create git commit:
-$ bundle exec rake commit_version
+$ bundle exec rake commit_version[minor] # major,minor,patch
 
 # ..and follow subsequent directions. 
 ```
