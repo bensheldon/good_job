@@ -43,6 +43,9 @@ $ bundle install
           t.integer :priority
           t.jsonb :serialized_params
           t.timestamp :scheduled_at
+   
+          t.index :scheduled_at
+          t.index [:queue_name, :scheduled_at]
         end
       end
     end
