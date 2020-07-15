@@ -2,7 +2,6 @@
 
 source "https://rubygems.org"
 
-gem "appraisal", git: "https://github.com/thoughtbot/appraisal.git"
 gem "rails", "~> 6.0.0"
 
 gemspec path: "../"
