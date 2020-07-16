@@ -7,7 +7,15 @@ Inspired by [Delayed::Job](https://github.com/collectiveidea/delayed_job) and [Q
 - Stand on the shoulders of ActiveJob. For example, [exception](https://edgeguides.rubyonrails.org/active_job_basics.html#exceptions) and [retry](https://edgeguides.rubyonrails.org/active_job_basics.html#retrying-or-discarding-failed-jobs) behavior. 
 - Stand on the shoulders of Ruby on Rails. For example, ActiveRecord ORM, connection pools, and [multithreaded support](https://guides.rubyonrails.org/threading_and_code_execution.html) with [Concurrent-Ruby](https://github.com/ruby-concurrency/concurrent-ruby).
 - Stand on the shoulders of Postgres. For example, Advisory Locks.
-- Convention over simplicity over performance. 
+- Convention over simplicity over performance.
+
+GoodJob supports all ActiveJob functionality:
+- Async. GoodJob has the ability to run the job in a non-blocking manner.
+- Queues. Jobs may set which queue they are run in with queue_as or by using the set method.
+- Delayed. GoodJob will run the job in the future through perform_later.
+- Priorities. The order in which jobs are processed can be configured differently.
+- Timeouts. GoodJob defers to ActiveJob where it can be implemented as an `around` hook. See [Taking advantage of ActiveJob](#taking-advantage-of-activejob).
+- Retries. GoodJob will automatically retry uncompleted jobs immediately. See [Taking advantage of ActiveJob](#taking-advantage-of-activejob).
 
 ## Installation
 
@@ -76,6 +84,11 @@ $ bundle install
     config.active_job.queue_adapter = GoodJob::Adapter.new
     ```
 
+1. Queue your job 🎉: 
+    ```ruby
+    YourJob.set(queue: :some_queue, wait: 5.minutes, priority: 10).perform_later
+    ```
+
 1. In production, the scheduler is designed to run in its own process:
     ```bash
     $ bundle exec good_job
@@ -93,6 +106,25 @@ $ bundle install
    #   [--queues=queue1,queue2]  # Queues to work from. Separate multiple queues with commas (default: *)
    #   [--poll-interval=N]       # Interval between polls for available jobs in seconds (default: 1)
    ```
+
+### Taking advantage of ActiveJob
+
+ActiveJob has a rich set of built-in functionality for timeouts, error handling, and retrying. For example:
+
+```ruby
+class ApplicationJob < ActiveJob::Base  
+  # Retry errors an infinite number of times with exponential back-off
+  retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
+
+  # Timeout jobs after 10 minutes
+  JobTimeoutError = Class.new(StandardError)
+  around_perform do |_job, block|
+    Timeout.timeout(10.minutes, JobTimeoutError) do
+      block.call
+    end
+  end
+end
+```
    
 ### Configuring Job Execution Threads
     
