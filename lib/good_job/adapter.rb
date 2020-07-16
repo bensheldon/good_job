@@ -11,7 +11,7 @@ module GoodJob
     def enqueue_at(active_job, timestamp)
       good_job = GoodJob::Job.enqueue(
         active_job,
-        scheduled_at: timestamp ? Time.at(timestamp) : nil,
+        scheduled_at: timestamp ? Time.zone.at(timestamp) : nil,
         create_with_advisory_lock: inline?
       )
 
