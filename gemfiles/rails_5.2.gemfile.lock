@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    good_job (0.6.0)
+    good_job (0.7.0)
       concurrent-ruby (>= 1.0.2)
       pg (>= 1.0.0)
       rails (>= 5.1.0)
@@ -172,6 +172,12 @@ GEM
       unicode-display_width (>= 1.4.0, < 2.0)
     rubocop-ast (0.1.0)
       parser (>= 2.7.0.1)
+    rubocop-performance (1.7.0)
+      rubocop (>= 0.82.0)
+    rubocop-rails (2.6.0)
+      activesupport (>= 4.2.0)
+      rack (>= 1.1)
+      rubocop (>= 0.82.0)
     rubocop-rspec (1.42.0)
       rubocop (>= 0.87.0)
     ruby-progressbar (1.10.1)
@@ -208,6 +214,8 @@ DEPENDENCIES
   rails (~> 5.2.0)
   rspec-rails
   rubocop
+  rubocop-performance
+  rubocop-rails
   rubocop-rspec
 
 BUNDLED WITH

@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.7.0](https://github.com/bensheldon/good_job/tree/v0.7.0) (2020-07-15)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.6.0...v0.7.0)
+
+**Closed issues:**
+
+- Always store a default priority \(0\) and scheduled\_at\(Time.current\) [\#30](https://github.com/bensheldon/good_job/issues/30)
+
+**Merged pull requests:**
+
+- Add more examples to Readme [\#39](https://github.com/bensheldon/good_job/pull/39) ([bensheldon](https://github.com/bensheldon))
+- Add additional Rubocops and lint [\#38](https://github.com/bensheldon/good_job/pull/38) ([bensheldon](https://github.com/bensheldon))
+- Always store a default queue\_name, priority and scheduled\_at; index by queue\_name and scheduled\_at [\#37](https://github.com/bensheldon/good_job/pull/37) ([bensheldon](https://github.com/bensheldon))
+
 ## [v0.6.0](https://github.com/bensheldon/good_job/tree/v0.6.0) (2020-07-15)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.5.0...v0.6.0)
