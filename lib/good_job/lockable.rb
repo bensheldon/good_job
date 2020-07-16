@@ -37,14 +37,17 @@ module GoodJob
       scope :owns_advisory_locked, -> { joins_advisory_locks.where('"pg_locks"."pid" = pg_backend_pid()') }
 
       attr_accessor :create_with_advisory_lock
+
       after_create -> { advisory_lock }, if: :create_with_advisory_lock
     end
 
     class_methods do
-      def with_advisory_lock(&block)
+      def with_advisory_lock
+        raise ArgumentError, "Must provide a block" unless block_given?
+
         records = advisory_lock.to_a
         begin
-          block.call(records)
+          yield(records)
         ensure
           records.each(&:advisory_unlock)
         end
@@ -73,6 +76,8 @@ module GoodJob
     end
 
     def with_advisory_lock
+      raise ArgumentError, "Must provide a block" unless block_given?
+
       advisory_lock!
       yield
     ensure

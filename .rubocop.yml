@@ -1,6 +1,8 @@
 inherit_from: .rubocop_todo.yml
 
 require:
+  - rubocop-performance
+  - rubocop-rails
   - rubocop-rspec
 
 inherit_mode:
@@ -40,6 +42,12 @@ Metrics:
 
 Naming/MemoizedInstanceVariableName:
   EnforcedStyleForLeadingUnderscores: required
+
+Rails/RakeEnvironment:
+  Enabled: false
+
+Rails/ApplicationRecord:
+  Enabled: false
 
 RSpec/AnyInstance:
   Enabled: false
