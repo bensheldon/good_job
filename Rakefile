@@ -55,7 +55,7 @@ task :commit_version, [:version_bump] do |_t, args|
   puts "  1. Push commit and tag to Github:"
   puts "    $ git push origin --follow-tags"
   puts "  2. Push to Rubygems.org:"
-  puts "    $ gem release`"
+  puts "    $ gem release"
 end
 
 require 'rspec/core/rake_task'
