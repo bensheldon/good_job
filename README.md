@@ -5,8 +5,9 @@ GoodJob is a multithreaded, Postgres-based ActiveJob backend for Ruby on Rails.
 **Inspired by [Delayed::Job](https://github.com/collectiveidea/delayed_job) and [Que](https://github.com/que-rb/que), GoodJob is designed for maximum compatibility with Ruby on Rails, ActiveJob, and Postgres to be simple and performant for most workloads.**
 
 - **Designed for ActiveJob.** Complete support for [async, queues, delays, priorities, timeouts, and retries](https://edgeguides.rubyonrails.org/active_job_basics.html) with near-zero configuration. 
-- **Built for Rails**. Fully adopts Ruby on Rails [threading and code execution guidelines](https://guides.rubyonrails.org/threading_and_code_execution.html) with [Concurrent::Ruby](https://github.com/ruby-concurrency/concurrent-ruby). 
+- **Built for Rails.** Fully adopts Ruby on Rails [threading and code execution guidelines](https://guides.rubyonrails.org/threading_and_code_execution.html) with [Concurrent::Ruby](https://github.com/ruby-concurrency/concurrent-ruby). 
 - **Backed by Postgres.** Relies upon Postgres integrity and session-level Advisory Locks to provide run-once safety and stay within the limits of `schema.rb`.
+- **For most workloads.** Targets full-stack teams, economy-minded solo developers, and applications that enqueue less than 1-million jobs/day.
 
 ## Installation
 
@@ -127,6 +128,29 @@ GoodJob executes enqueued jobs using threads. There is a lot than can be said ab
     2. `$ GOOD_JOB_MAX_THREADS=4 bundle exec good_job`
     3. `$ RAILS_MAX_THREADS=4 bundle exec good_job`
     4. Implicitly via Rails's database connection pool size (`ActiveRecord::Base.connection_pool.size`)
+
+### Migrating to GoodJob from a different ActiveJob backend
+
+If your application is already using an ActiveJob backend, you will need to install GoodJob to enqueue and perform newly created jobs _and_ finish performing pre-existing jobs on the previous backend.
+
+1. Enqueue newly created jobs on GoodJob either entirely by setting `ActiveJob::Base.queue_adapter = :good_job` or progressively via individual job classes:
+
+    ```ruby
+    # jobs/specific_job.rb
+    class SpecificJob < ApplicationJob
+      self.queue_adapter = :good_job
+      # ...
+    end
+    ```
+
+1. Continue running executors for both backends. For example, on Heroku it's possible to run [two processes](https://help.heroku.com/CTFS2TJK/how-do-i-run-multiple-processes-on-a-dyno) within the same dyno:
+    ```procfile
+    # Procfile
+    # ...
+    worker: bundle exec que ./config/environment.rb & bundle exec good_job & wait -n
+    ```
+
+1. Once you are confident that no unperformed jobs remain in the previous ActiveJob backend, code and configuration for that backend can be completely removed.
 
 ## Development
 
