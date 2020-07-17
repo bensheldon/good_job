@@ -66,13 +66,13 @@ $ bundle install
     
     ```ruby
     # config/environments/development.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new(inline: true)
+    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
    
     # config/environments/test.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new(inline: true)
+    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
    
     # config/environments/production.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new
+    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
     ```
 
 1. Queue your job 🎉: 
