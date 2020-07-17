@@ -2,20 +2,11 @@
 
 GoodJob is a multithreaded, Postgres-based ActiveJob backend for Ruby on Rails.
 
-Inspired by [Delayed::Job](https://github.com/collectiveidea/delayed_job) and [Que](https://github.com/que-rb/que), GoodJob’s design principles are:
+**Inspired by [Delayed::Job](https://github.com/collectiveidea/delayed_job) and [Que](https://github.com/que-rb/que), GoodJob is designed for maximum compatibility with Ruby on Rails, ActiveJob, and Postgres to be simple and performant for most workloads.**
 
-- Stand on the shoulders of ActiveJob. For example, [exception](https://edgeguides.rubyonrails.org/active_job_basics.html#exceptions) and [retry](https://edgeguides.rubyonrails.org/active_job_basics.html#retrying-or-discarding-failed-jobs) behavior. 
-- Stand on the shoulders of Ruby on Rails. For example, ActiveRecord ORM, connection pools, and [multithreaded support](https://guides.rubyonrails.org/threading_and_code_execution.html) with [Concurrent-Ruby](https://github.com/ruby-concurrency/concurrent-ruby).
-- Stand on the shoulders of Postgres. For example, Advisory Locks.
-- Convention over simplicity over performance.
-
-GoodJob supports all ActiveJob functionality:
-- Async. GoodJob has the ability to run the job in a non-blocking manner.
-- Queues. Jobs may set which queue they are run in with queue_as or by using the set method.
-- Delayed. GoodJob will run the job in the future through perform_later.
-- Priorities. The order in which jobs are processed can be configured differently.
-- Timeouts. GoodJob defers to ActiveJob where it can be implemented as an `around` hook. See [Taking advantage of ActiveJob](#taking-advantage-of-activejob).
-- Retries. GoodJob will automatically retry uncompleted jobs immediately. See [Taking advantage of ActiveJob](#taking-advantage-of-activejob).
+- **Designed for ActiveJob.** Complete support for [async, queues, delays, priorities, timeouts, and retries](https://edgeguides.rubyonrails.org/active_job_basics.html) with near-zero configuration. 
+- **Built for Rails**. Fully adopts Ruby on Rails [threading and code execution guidelines](https://guides.rubyonrails.org/threading_and_code_execution.html) with [Concurrent::Ruby](https://github.com/ruby-concurrency/concurrent-ruby). 
+- **Backed by Postgres.** Relies upon Postgres integrity and session-level Advisory Locks to provide run-once safety and stay within the limits of `schema.rb`.
 
 ## Installation
 
