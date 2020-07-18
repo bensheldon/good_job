@@ -9,18 +9,20 @@ jobs:
   add_to_backlog:
     name: "Add to Backlog Project Board"
     runs-on: ubuntu-latest
+    env:
+      gh_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
     steps:
       - name: 'Add Issue'
-        if: ${{ github.event_name == 'issue' }}
+        if: ${{ github.event_name == 'issue' && env.gh_token }}
         uses: alex-page/github-project-automation-plus@9a05133
         with:
           project: Backlog
           column: Inbox
-          repo-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          repo-token: ${{ env.gh_token }}
       - name: "Add Pull Request"
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' && env.gh_token }}
         uses: alex-page/github-project-automation-plus@9a05133
         with:
           project: Backlog
           column: In progress
-          repo-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          repo-token: ${{ env.gh_token }}
