@@ -70,15 +70,17 @@ RSpec.describe GoodJob::CLI do
         cli = described_class.new([], { queues: 'mice,elephant' }, {})
         stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_QUEUES' => 'elephant,whale' })
 
-        allow(GoodJob::Scheduler).to receive(:new) do |performer, _options|
-          performer_query = performer.instance_variable_get(:@query)
-          expect(performer_query.to_sql).to eq GoodJob::Job.where(queue_name: %w[mice elephant]).only_scheduled.priority_ordered.to_sql
-
+        performer = nil
+        allow(GoodJob::Scheduler).to receive(:new) do |performer_arg, _options|
+          performer = performer_arg
           scheduler_mock
         end
 
         expect { cli.start }.to output.to_stdout
         expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Job::Performer), a_kind_of(Hash))
+
+        performer_query = performer.instance_variable_get(:@query)
+        expect(performer_query.to_sql).to eq GoodJob::Job.where(queue_name: %w[mice elephant]).priority_ordered.to_sql
       end
     end
   end

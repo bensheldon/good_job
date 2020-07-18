@@ -36,11 +36,11 @@ module GoodJob
         ENV['GOOD_JOB_POLL_INTERVAL']
       ).to_i
 
-      job_query = GoodJob::Job.all
+      job_query = GoodJob::Job.all.priority_ordered
       queue_names_without_all = queue_names.reject { |q| q == '*' }
       job_query = job_query.where(queue_name: queue_names_without_all) unless queue_names_without_all.size.zero?
 
-      job_performer = job_query.only_scheduled.priority_ordered.to_performer
+      job_performer = job_query.to_performer
 
       $stdout.puts "GoodJob worker starting with max_threads=#{max_threads} on queues=#{queue_names.join(',')}"
 

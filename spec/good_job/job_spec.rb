@@ -27,6 +27,20 @@ RSpec.describe GoodJob::Job do
       expect { job_1.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { job_2.reload }.to raise_error ActiveRecord::RecordNotFound
     end
+
+    it 'sets scheduled_at condition dynamically' do
+      allow_any_instance_of(described_class).to receive(:perform), &:destroy!
+      job = described_class.create!(scheduled_at: 12.hours.from_now)
+      performer = described_class.to_performer
+
+      performer.next
+      expect { job.reload }.not_to raise_error
+
+      travel 1.day do
+        performer.next
+        expect { job.reload }.to raise_error ActiveRecord::RecordNotFound
+      end
+    end
   end
 
   describe 'lockable' do
