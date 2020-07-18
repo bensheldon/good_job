@@ -1,8 +1,8 @@
 # Changelog
 
-## [v0.8.0](https://github.com/bensheldon/good_job/tree/v0.8.0) (2020-07-17)
+## [v0.8.1](https://github.com/bensheldon/good_job/tree/v0.8.1) (2020-07-17)
 
-[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.6.0...v0.8.0)
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.6.0...v0.8.1)
 
 **Closed issues:**
 
@@ -10,6 +10,7 @@
 
 **Merged pull requests:**
 
+- Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
 - Replace Adapter inline boolean kwarg with execution\_mode instead [\#41](https://github.com/bensheldon/good_job/pull/41) ([bensheldon](https://github.com/bensheldon))
 - Add more examples to Readme [\#39](https://github.com/bensheldon/good_job/pull/39) ([bensheldon](https://github.com/bensheldon))
 - Add additional Rubocops and lint [\#38](https://github.com/bensheldon/good_job/pull/38) ([bensheldon](https://github.com/bensheldon))
