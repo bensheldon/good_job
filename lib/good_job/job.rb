@@ -19,7 +19,7 @@ module GoodJob
       def next
         good_job = nil
 
-        @query.limit(1).with_advisory_lock do |good_jobs|
+        @query.only_scheduled.limit(1).with_advisory_lock do |good_jobs|
           good_job = good_jobs.first
           break unless good_job
 
