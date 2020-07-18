@@ -1,15 +1,18 @@
 # Changelog
 
-## [v0.8.1](https://github.com/bensheldon/good_job/tree/v0.8.1) (2020-07-17)
+## [v0.8.2](https://github.com/bensheldon/good_job/tree/v0.8.2) (2020-07-18)
 
-[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.6.0...v0.8.1)
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.6.0...v0.8.2)
 
 **Closed issues:**
 
 - Always store a default priority \(0\) and scheduled\_at\(Time.current\) [\#30](https://github.com/bensheldon/good_job/issues/30)
+- Add a job timeout configuration to time out jobs that have run too long [\#19](https://github.com/bensheldon/good_job/issues/19)
 
 **Merged pull requests:**
 
+- Run Github Action tests on PRs from forks [\#44](https://github.com/bensheldon/good_job/pull/44) ([bensheldon](https://github.com/bensheldon))
+- Fix Rubygems homepage URL [\#43](https://github.com/bensheldon/good_job/pull/43) ([joshmn](https://github.com/joshmn))
 - Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
 - Replace Adapter inline boolean kwarg with execution\_mode instead [\#41](https://github.com/bensheldon/good_job/pull/41) ([bensheldon](https://github.com/bensheldon))
 - Add more examples to Readme [\#39](https://github.com/bensheldon/good_job/pull/39) ([bensheldon](https://github.com/bensheldon))
