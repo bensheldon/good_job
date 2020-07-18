@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.license     = "MIT"
   spec.authors     = ["Ben Sheldon"]
   spec.email       = ["bensheldon@gmail.com"]
-  spec.homepage    = "https://github.com/benheldon/good_job"
+  spec.homepage    = "https://github.com/bensheldon/good_job"
   spec.metadata = {
     "bug_tracker_uri"   => "https://github.com/bensheldon/good_job/issues",
     "changelog_uri"     => "https://github.com/bensheldon/good_job/blob/master/CHANGELOG.md",
