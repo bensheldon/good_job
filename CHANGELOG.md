@@ -1,8 +1,8 @@
 # Changelog
 
-## [v0.8.2](https://github.com/bensheldon/good_job/tree/v0.8.2) (2020-07-18)
+## [v0.9.0](https://github.com/bensheldon/good_job/tree/v0.9.0) (2020-07-20)
 
-[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.6.0...v0.8.2)
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.6.0...v0.9.0)
 
 **Closed issues:**
 
@@ -11,6 +11,7 @@
 
 **Merged pull requests:**
 
+- Allow preservation of finished job records [\#46](https://github.com/bensheldon/good_job/pull/46) ([bensheldon](https://github.com/bensheldon))
 - Run Github Action tests on PRs from forks [\#44](https://github.com/bensheldon/good_job/pull/44) ([bensheldon](https://github.com/bensheldon))
 - Fix Rubygems homepage URL [\#43](https://github.com/bensheldon/good_job/pull/43) ([joshmn](https://github.com/joshmn))
 - Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
