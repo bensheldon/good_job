@@ -1,8 +1,8 @@
 # Changelog
 
-## [v0.9.0](https://github.com/bensheldon/good_job/tree/v0.9.0) (2020-07-20)
+## [v1.0.0](https://github.com/bensheldon/good_job/tree/v1.0.0) (2020-07-20)
 
-[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.6.0...v0.9.0)
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v0.6.0...v1.0.0)
 
 **Closed issues:**
 
