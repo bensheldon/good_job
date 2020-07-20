@@ -40,7 +40,12 @@ module GoodJob
       queue_names_without_all = queue_names.reject { |q| q == '*' }
       job_query = job_query.where(queue_name: queue_names_without_all) unless queue_names_without_all.size.zero?
 
-      job_performer = job_query.to_performer
+      performer_method = if GoodJob.preserve_job_records
+                           :perform_with_advisory_lock_and_preserve_job_records
+                         else
+                           :perform_with_advisory_lock_and_destroy_job_records
+                         end
+      job_performer = GoodJob::Performer.new(job_query, performer_method)
 
       $stdout.puts "GoodJob worker starting with max_threads=#{max_threads} on queues=#{queue_names.join(',')}"
 
@@ -66,6 +71,19 @@ module GoodJob
       $stdout.puts "\nFinishing GoodJob's current jobs before exiting..."
       scheduler.shutdown
       $stdout.puts "GoodJob's jobs finished, exiting..."
+    end
+
+    desc :cleanup_preserved_jobs, "Delete preserved job records"
+    method_option :before_seconds_ago,
+                  type: :numeric,
+                  default: 24 * 60 * 60,
+                  desc: "Delete records finished more than this many seconds ago"
+    def cleanup_preserved_jobs
+      require RAILS_ENVIRONMENT_RB
+
+      timestamp = Time.current - options[:before_seconds_ago]
+      result = GoodJob::Job.finished(timestamp).delete_all
+      $stdout.puts "Deleted #{result} preserved #{'job'.pluralize(result)} finished before #{timestamp}."
     end
 
     default_task :start

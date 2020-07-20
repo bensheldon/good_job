@@ -50,7 +50,9 @@ RSpec.describe GoodJob::Scheduler do
     end
 
     it 'pops items off of the queue and runs them' do
-      scheduler = described_class.new(GoodJob::Job.all.to_performer)
+      performer = GoodJob::Performer.new(GoodJob::Job.all, :perform_with_advisory_lock)
+      scheduler = described_class.new(performer)
+
       sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.count == 0 }
 
       if RUN_JOBS.size != number_of_jobs
@@ -81,7 +83,8 @@ RSpec.describe GoodJob::Scheduler do
     let!(:jobs) { ErrorJob.perform_later }
 
     it "handles and retries jobs with errors" do
-      scheduler = described_class.new(GoodJob::Job.all.to_performer)
+      performer = GoodJob::Performer.new(GoodJob::Job.all, :perform_with_advisory_lock)
+      scheduler = described_class.new(performer)
 
       sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.count == 0 }
 
