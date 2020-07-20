@@ -57,7 +57,7 @@ RSpec.describe GoodJob::CLI do
           cli.start
         end.to output.to_stdout
 
-        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Job::Performer), pool_options: { max_threads: 4 }, timer_options: {})
+        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Performer), pool_options: { max_threads: 4 }, timer_options: {})
       end
     end
 
@@ -77,11 +77,26 @@ RSpec.describe GoodJob::CLI do
         end
 
         expect { cli.start }.to output.to_stdout
-        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Job::Performer), a_kind_of(Hash))
+        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Performer), a_kind_of(Hash))
 
-        performer_query = performer.instance_variable_get(:@query)
+        performer_query = performer.instance_variable_get(:@target)
         expect(performer_query.to_sql).to eq GoodJob::Job.where(queue_name: %w[mice elephant]).priority_ordered.to_sql
       end
+    end
+  end
+
+  describe '#cleanup_preserved_jobs' do
+    let!(:recent_job) { GoodJob::Job.create!(finished_at: 12.hours.ago) }
+    let!(:old_unfinished_job) { GoodJob::Job.create!(scheduled_at: 2.days.ago, finished_at: nil) }
+    let!(:old_finished_job) { GoodJob::Job.create!(finished_at: 36.hours.ago) }
+
+    it 'deletes finished jobs' do
+      cli = described_class.new([], { before_seconds_ago: 24.hours.to_i }, {})
+      expect { cli.cleanup_preserved_jobs }.to output(/Deleted 1 preserved job/).to_stdout
+
+      expect { recent_job.reload }.not_to raise_error
+      expect { old_unfinished_job.reload }.not_to raise_error
+      expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
     end
   end
 end

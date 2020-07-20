@@ -59,21 +59,21 @@ module GoodJob
 
     def create_thread
       future = Concurrent::Future.new(args: [@performer], executor: @pool) do |performer|
-        result = nil
-        Rails.application.executor.wrap { result = performer.next }
-        result
+        output = nil
+        Rails.application.executor.wrap { output = performer.next }
+        output
       end
       future.add_observer(self, :task_observer)
       future.execute
     end
 
-    def timer_observer(time, executed_task, error)
-      ActiveSupport::Notifications.instrument("finished_timer_task.good_job", { result: executed_task, error: error, time: time })
+    def timer_observer(time, executed_task, thread_error)
+      ActiveSupport::Notifications.instrument("finished_timer_task.good_job", { result: executed_task, error: thread_error, time: time })
     end
 
-    def task_observer(time, result, error)
-      ActiveSupport::Notifications.instrument("finished_job_task.good_job", { result: result, error: error, time: time })
-      create_thread if result
+    def task_observer(time, output, thread_error)
+      ActiveSupport::Notifications.instrument("finished_job_task.good_job", { result: output, error: thread_error, time: time })
+      create_thread if output
     end
   end
 end

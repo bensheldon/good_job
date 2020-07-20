@@ -43,9 +43,12 @@ $ bundle install
           t.integer :priority
           t.jsonb :serialized_params
           t.timestamp :scheduled_at
-   
-          t.index :scheduled_at
-          t.index [:queue_name, :scheduled_at]
+          t.timestamp :performed_at
+          t.timestamp :finished_at
+          t.text :error
+
+          add_index :good_jobs, :scheduled_at, where: "(finished_at IS NULL)"
+          add_index :good_jobs, [:queue_name, :scheduled_at], where: "(finished_at IS NULL)"
         end
       end
     end
@@ -151,6 +154,32 @@ If your application is already using an ActiveJob backend, you will need to inst
     ```
 
 1. Once you are confident that no unperformed jobs remain in the previous ActiveJob backend, code and configuration for that backend can be completely removed.
+
+### Monitoring and preserving worked jobs
+
+GoodJob is fully instrumented with [`ActiveSupport::Notifications`](https://edgeguides.rubyonrails.org/active_support_instrumentation.html#introduction-to-instrumentation).
+
+By default, GoodJob will delete job records after they are run, regardless of whether they succeed or not (raising a kind of `StandardError`), unless they are interrupted (raising a kind of `Exception`). 
+
+To preserve job records for later inspection, set an initializer:
+
+```ruby
+# config/initializers/good_job.rb
+GoodJob.preserve_job_records = true
+```
+
+It is also necessary to delete these preserved jobs from the database after a certain time period:
+
+- For example, in a Rake task:
+  
+    ```ruby
+    # GoodJob::Job.finished(1.day.ago).delete_all
+    ```
+- For example, using the `good_job` command-line utility:
+
+    ```bash
+    $ bundle exec good_job cleanup_preserved_jobs --before-seconds-ago=86400
+    ```
 
 ## Development
 
