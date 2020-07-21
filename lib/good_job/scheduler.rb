@@ -15,7 +15,7 @@ module GoodJob
       min_threads: 0,
       max_threads: Concurrent.processor_count,
       auto_terminate: true,
-      idletime: 0,
+      idletime: 60,
       max_queue: 0,
       fallback_policy: :abort, # shouldn't matter -- 0 max queue
     }.freeze
