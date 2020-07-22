@@ -9,6 +9,8 @@ GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 - **Backed by Postgres.** Relies upon Postgres integrity and session-level Advisory Locks to provide run-once safety and stay within the limits of `schema.rb`.
 - **For most workloads.** Targets full-stack teams, economy-minded solo developers, and applications that enqueue less than 1-million jobs/day.
 
+For more of the story of GoodJob, read the [introductory blog post](https://island94.org/2020/07/introducing-goodjob-1-0).
+
 ## Installation
 
 Add this line to your application's Gemfile:
