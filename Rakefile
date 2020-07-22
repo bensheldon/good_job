@@ -53,7 +53,7 @@ task :commit_version, [:version_bump] do |_t, args|
   puts "\n== Next steps =="
   puts "Run the following commands:\n\n"
   puts "  1. Push commit and tag to Github:"
-  puts "    $ git push origin --follow-tags"
+  puts "    $ git push origin && git push origin --tags"
   puts "  2. Push to Rubygems.org:"
   puts "    $ gem release"
 end
