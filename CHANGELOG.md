@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.0.1](https://github.com/bensheldon/good_job/tree/v1.0.1) (2020-07-21)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.0.0...v1.0.1)
+
+**Merged pull requests:**
+
+- Change threadpool idletime default to 60 seconds from 0 [\#49](https://github.com/bensheldon/good_job/pull/49) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.0.0](https://github.com/bensheldon/good_job/tree/v1.0.0) (2020-07-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.9.0...v1.0.0)
@@ -24,14 +32,11 @@
 
 - Run Github Action tests on PRs from forks [\#44](https://github.com/bensheldon/good_job/pull/44) ([bensheldon](https://github.com/bensheldon))
 - Fix Rubygems homepage URL [\#43](https://github.com/bensheldon/good_job/pull/43) ([joshmn](https://github.com/joshmn))
+- Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.8.1](https://github.com/bensheldon/good_job/tree/v0.8.1) (2020-07-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.0...v0.8.1)
-
-**Merged pull requests:**
-
-- Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.8.0](https://github.com/bensheldon/good_job/tree/v0.8.0) (2020-07-17)
 
