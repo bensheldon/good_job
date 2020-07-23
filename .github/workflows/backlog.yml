@@ -13,7 +13,7 @@ jobs:
       gh_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
     steps:
       - name: 'Add Issue'
-        if: ${{ github.event_name == 'issue' && env.gh_token }}
+        if: ${{ github.event_name == 'issues' && env.gh_token }}
         uses: alex-page/github-project-automation-plus@9a05133
         with:
           project: Backlog
