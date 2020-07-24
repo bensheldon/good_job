@@ -28,34 +28,9 @@ $ bundle install
 
 1. Create a database migration:
     ```bash
-    $ bin/rails g migration CreateGoodJobs
+    $ bin/rails g good_job:install
     ```
 
-    Add to the newly created migration file:
-
-    ```ruby
-    class CreateGoodJobs < ActiveRecord::Migration[6.0]
-      def change
-        enable_extension 'pgcrypto'
-
-        create_table :good_jobs, id: :uuid do |t|
-          t.timestamps
-
-          t.text :queue_name
-          t.integer :priority
-          t.jsonb :serialized_params
-          t.timestamp :scheduled_at
-          t.timestamp :performed_at
-          t.timestamp :finished_at
-          t.text :error
-        end
-
-        add_index :good_jobs, :scheduled_at, where: "(finished_at IS NULL)"
-        add_index :good_jobs, [:queue_name, :scheduled_at], where: "(finished_at IS NULL)"
-      end
-    end
-    ```
-    
     Run the migration:
     
     ```bash
