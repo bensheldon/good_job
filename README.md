@@ -48,10 +48,10 @@ $ bundle install
           t.timestamp :performed_at
           t.timestamp :finished_at
           t.text :error
-
-          add_index :good_jobs, :scheduled_at, where: "(finished_at IS NULL)"
-          add_index :good_jobs, [:queue_name, :scheduled_at], where: "(finished_at IS NULL)"
         end
+
+        add_index :good_jobs, :scheduled_at, where: "(finished_at IS NULL)"
+        add_index :good_jobs, [:queue_name, :scheduled_at], where: "(finished_at IS NULL)"
       end
     end
     ```
