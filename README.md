@@ -167,7 +167,7 @@ To run tests:
 $ git clone git@github.com:bensheldon/good_job.git
 
 # Set up the local environment
-$ bin/setup_test
+$ bin/setup
 
 # Run the tests
 $ bin/rspec
