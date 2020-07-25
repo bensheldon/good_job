@@ -79,25 +79,85 @@ $ bundle install
    #   [--poll-interval=N]       # Interval between polls for available jobs in seconds (default: 1)
    ```
 
-### Taking advantage of ActiveJob
+### Error handling, retries, and reliability
 
-ActiveJob has a rich set of built-in functionality for timeouts, error handling, and retrying. For example:
+GoodJob guarantees _at-least-once_ performance of jobs. GoodJob fully supports ActiveJob's built-in functionality for error handling, retries and timeouts. 
+
+#### Error handling
+
+By default, if a job raises an error while it is being performed, _and it bubbles up to the GoodJob backend_, GoodJob will be immediately re-perform the job until it finishes successfully.
+
+- `Exception`-type errors, such as a SIGINT, will always cause a job to be re-performed.
+- `StandardError`-type errors, by default, will cause a job to be re-performed, though this is configurable:
+   
+    ```ruby
+    # config/initializers/good_job.rb
+    GoodJob.reperform_jobs_on_standard_error = true # => default
+    ```
+
+### Retrying jobs
+
+ActiveJob can be configured to retry an infinite number of times, with an exponential backoff. Using ActiveJob's `retry_on` will ensure that errors do not bubble up to the GoodJob backend:
 
 ```ruby
 class ApplicationJob < ActiveJob::Base  
-  # Retry errors an infinite number of times with exponential back-off
   retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
+  # ...
+end
+```
 
-  # Timeout jobs after 10 minutes
+When specifying a limited number of retries, care must be taken to ensure that an error does not bubble up to the GoodJob backend because that will result in the job being re-performed:
+
+```ruby
+class ApplicationJob < ActiveJob::Base  
+  retry_on StandardError, attempts: 5 do |_job, _exception|
+    # Log error, etc.
+    # You must implement this block, otherwise, 
+    #   Active Job will re-raise the error.
+    # Do not re-raise the error, otherwise 
+    #   GoodJob will immediately re-perform the job. 
+  end
+  # ...
+end
+```
+
+GoodJob can be configured to allow omitting `retry_on`'s block argument and implicitly discard un-handled errors:
+
+    ```ruby
+    # config/initializers/good_job.rb
+    
+    # Do NOT re-perform a job if a StandardError bubbles up to the GoodJob backend
+    GoodJob.reperform_jobs_on_standard_error = false 
+    ```
+
+ActiveJob's `discard_on` functionality is supported too.
+
+#### ActionMailer retries
+
+Using a Mailer's `#deliver_later` will enqueue an instance of `ActionMailer::DeliveryJob` which inherits from `ActiveJob::Base` rather than your applications `ApplicationJob`. You can use an initializer to configure retries on `ActionMailer::DeliveryJob`:
+
+```ruby
+# config/initializers/good_job.rb
+ActionMailer::DeliveryJob.retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
+```
+
+#### Timeouts
+
+Job timeouts can be configured with an `around_perform`:
+
+```ruby
+class ApplicationJob < ActiveJob::Base  
   JobTimeoutError = Class.new(StandardError)
+  
   around_perform do |_job, block|
+    # Timeout jobs after 10 minutes
     Timeout.timeout(10.minutes, JobTimeoutError) do
       block.call
     end
   end
 end
 ```
-   
+
 ### Configuring Job Execution Threads
     
 GoodJob executes enqueued jobs using threads. There is a lot than can be said about [multithreaded behavior in Ruby on Rails](https://guides.rubyonrails.org/threading_and_code_execution.html), but briefly:
