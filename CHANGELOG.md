@@ -1,6 +1,23 @@
 # Changelog
 
-## [v1.0.1](https://github.com/bensheldon/good_job/tree/v1.0.1) (2020-07-21)
+## [v1.0.2](https://github.com/bensheldon/good_job/tree/v1.0.2) (2020-07-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.0.1...v1.0.2)
+
+**Fixed bugs:**
+
+- Fix counting of available execution threads [\#58](https://github.com/bensheldon/good_job/pull/58) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- repeating/recurring jobs [\#53](https://github.com/bensheldon/good_job/issues/53)
+
+**Merged pull requests:**
+
+- Add migration generator [\#56](https://github.com/bensheldon/good_job/pull/56) ([thedanbob](https://github.com/thedanbob))
+- Fix migration script in readme [\#55](https://github.com/bensheldon/good_job/pull/55) ([thedanbob](https://github.com/thedanbob))
+
+## [v1.0.1](https://github.com/bensheldon/good_job/tree/v1.0.1) (2020-07-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.0.0...v1.0.1)
 
@@ -32,11 +49,14 @@
 
 - Run Github Action tests on PRs from forks [\#44](https://github.com/bensheldon/good_job/pull/44) ([bensheldon](https://github.com/bensheldon))
 - Fix Rubygems homepage URL [\#43](https://github.com/bensheldon/good_job/pull/43) ([joshmn](https://github.com/joshmn))
-- Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.8.1](https://github.com/bensheldon/good_job/tree/v0.8.1) (2020-07-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.0...v0.8.1)
+
+**Merged pull requests:**
+
+- Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.8.0](https://github.com/bensheldon/good_job/tree/v0.8.0) (2020-07-17)
 
