@@ -81,19 +81,6 @@ RSpec.describe GoodJob::Job do
       expect(errored_good_job).to eq e_good_job
       expect(errored_result).to eq nil
       expect(errored_error).to be_an ExpectedError
-
-      # Nothing is on the queue
-      output = described_class.all.perform_with_advisory_lock
-      expect(output).to eq nil
-    end
-
-    it 'destroy_after: false does not delete the job but marks it as finished' do
-      described_class.all.perform_with_advisory_lock(destroy_after: false)
-
-      expect(good_job.reload).to have_attributes(
-        performed_at: within(1.second).of(Time.current),
-        finished_at: within(1.second).of(Time.current)
-      )
     end
   end
 
@@ -167,20 +154,40 @@ RSpec.describe GoodJob::Job do
         expect(error).to be_a(ExpectedError)
       end
 
-      it 'destroys the job' do
-        good_job.perform
+      describe 'GoodJob.reperform_jobs_on_standard_error behavior' do
+        context 'when true' do
+          it 'leaves the job record unfinished' do
+            good_job.perform(destroy_after: false)
 
-        expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
-      end
+            expect(good_job.reload).to have_attributes(
+              error: "ExpectedError: Raised expected error",
+              performed_at: within(1.second).of(Time.current),
+              finished_at: nil
+            )
+          end
 
-      it 'can preserve the job' do
-        good_job.perform(destroy_after: false)
+          it 'does not destroy the job record' do
+            good_job.perform(destroy_after: true)
+            expect { good_job.reload }.not_to raise_error
+          end
+        end
 
-        expect(good_job.reload).to have_attributes(
-          error: "ExpectedError: Raised expected error",
-          performed_at: within(1.second).of(Time.current),
-          finished_at: within(1.second).of(Time.current)
-        )
+        context 'when false' do
+          it 'destroys the job' do
+            good_job.perform(destroy_after: true, reperform_on_standard_error: false)
+            expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
+          end
+
+          it 'can preserve the job' do
+            good_job.perform(destroy_after: false, reperform_on_standard_error: false)
+
+            expect(good_job.reload).to have_attributes(
+              error: "ExpectedError: Raised expected error",
+              performed_at: within(1.second).of(Time.current),
+              finished_at: within(1.second).of(Time.current)
+            )
+          end
+        end
       end
     end
   end

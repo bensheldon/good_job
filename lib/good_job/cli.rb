@@ -39,13 +39,7 @@ module GoodJob
       job_query = GoodJob::Job.all.priority_ordered
       queue_names_without_all = queue_names.reject { |q| q == '*' }
       job_query = job_query.where(queue_name: queue_names_without_all) unless queue_names_without_all.size.zero?
-
-      performer_method = if GoodJob.preserve_job_records
-                           :perform_with_advisory_lock_and_preserve_job_records
-                         else
-                           :perform_with_advisory_lock_and_destroy_job_records
-                         end
-      job_performer = GoodJob::Performer.new(job_query, performer_method)
+      job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock)
 
       $stdout.puts "GoodJob worker starting with max_threads=#{max_threads} on queues=#{queue_names.join(',')}"
 
