@@ -1,6 +1,23 @@
 # Changelog
 
-## [v1.0.2](https://github.com/bensheldon/good_job/tree/v1.0.2) (2020-07-24)
+## [v1.0.3](https://github.com/bensheldon/good_job/tree/v1.0.3) (2020-07-25)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.0.2...v1.0.3)
+
+**Fixed bugs:**
+
+- Preserve GoodJob::Jobs when a StandardError is raised [\#60](https://github.com/bensheldon/good_job/issues/60)
+
+**Closed issues:**
+
+- Have an initial setup generator [\#6](https://github.com/bensheldon/good_job/issues/6)
+
+**Merged pull requests:**
+
+- Re-perform a job if a StandardError bubbles up; better document job reliability [\#62](https://github.com/bensheldon/good_job/pull/62) ([bensheldon](https://github.com/bensheldon))
+- Update the setup documentation to use correct bin setup command [\#61](https://github.com/bensheldon/good_job/pull/61) ([jm96441n](https://github.com/jm96441n))
+
+## [v1.0.2](https://github.com/bensheldon/good_job/tree/v1.0.2) (2020-07-25)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.0.1...v1.0.2)
 
@@ -96,6 +113,7 @@
 - Add configuration options to good\_job executable [\#33](https://github.com/bensheldon/good_job/pull/33) ([bensheldon](https://github.com/bensheldon))
 - Extract Job querying behavior out of Scheduler [\#31](https://github.com/bensheldon/good_job/pull/31) ([bensheldon](https://github.com/bensheldon))
 - Allow configuration of Rails queue adapter with `:good\_job` [\#28](https://github.com/bensheldon/good_job/pull/28) ([bensheldon](https://github.com/bensheldon))
+- Update development Ruby to 2.6.5 [\#22](https://github.com/bensheldon/good_job/pull/22) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.5.0](https://github.com/bensheldon/good_job/tree/v0.5.0) (2020-07-13)
 
@@ -120,7 +138,6 @@
 
 **Merged pull requests:**
 
-- Update development Ruby to 2.6.5 [\#22](https://github.com/bensheldon/good_job/pull/22) ([bensheldon](https://github.com/bensheldon))
 - Simplify the internal API, removing JobWrapper and InlineScheduler [\#21](https://github.com/bensheldon/good_job/pull/21) ([bensheldon](https://github.com/bensheldon))
 - Generate a new future for every executed job [\#20](https://github.com/bensheldon/good_job/pull/20) ([bensheldon](https://github.com/bensheldon))
 - Configuration for maximum number of job execution threads [\#18](https://github.com/bensheldon/good_job/pull/18) ([bensheldon](https://github.com/bensheldon))
