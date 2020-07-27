@@ -218,7 +218,15 @@ It is also necessary to delete these preserved jobs from the database after a ce
     $ bundle exec good_job cleanup_preserved_jobs --before-seconds-ago=86400
     ```
 
-## Development
+## Contributing
+
+Contributions are welcomed and appreciated 🙏
+
+- Review the [Prioritized Project Backlog](https://github.com/bensheldon/good_job/projects/1).
+- Open a new Issue or contribute to an [existing Issue](https://github.com/bensheldon/good_job/issues). Questions or suggestions are fantastic.
+- Participate according to our [Code of Conduct](https://github.com/bensheldon/good_job/projects/1).
+
+### Gem development
 
 To run tests:
 
@@ -241,7 +249,6 @@ $ bundle exec appraisal
 
 # Run tests
 $ bundle exec appraisal bin/rspec
-
 ```
 
 For developing locally within another Ruby on Rails project:
@@ -256,23 +263,22 @@ $ bundle install
 # => Using good_job 0.1.0 from https://github.com/bensheldon/good_job.git (at /Users/You/Projects/good_job@dc57fb0)
 ```
 
-## Releasing
+### Releasing
 
-Package maintainers can release this gem with the following [gem-release](https://github.com/svenfuchs/gem-release) command:
+Package maintainers can release this gem by running:
 
 ```bash
 # Sign into rubygems
 $ gem signin
 
+# Add a .env file with the following:
+# CHANGELOG_GITHUB_TOKEN= # Github Personal Access Token
+
 # Update version number, changelog, and create git commit:
-$ bundle exec rake commit_version[minor] # major,minor,patch
+$ foreman run bundle exec rake commit_version[minor] # major,minor,patch
 
 # ..and follow subsequent directions. 
 ```
-
-## Contributing
-
-Contribution directions go here.
 
 ## License
 
