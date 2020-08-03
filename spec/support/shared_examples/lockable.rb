@@ -1,4 +1,4 @@
-RSpec.shared_examples 'promotable' do
+RSpec.shared_examples 'lockable' do
   describe '.advisory_lock' do
     around do |example|
       RSpec.configure do |config|

@@ -52,6 +52,10 @@ Rails/ApplicationRecord:
 RSpec/AnyInstance:
   Enabled: false
 
+RSpec/DescribeClass:
+  Exclude:
+    - spec/integration/*
+
 RSpec/ExampleLength:
   Enabled: false
 

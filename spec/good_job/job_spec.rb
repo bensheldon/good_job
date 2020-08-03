@@ -19,7 +19,7 @@ RSpec.describe GoodJob::Job do
     end)
   end
 
-  it_behaves_like 'promotable'
+  it_behaves_like 'lockable'
 
   describe '.enqueue' do
     let(:active_job) { ExampleJob.new }

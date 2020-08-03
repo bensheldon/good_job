@@ -19,7 +19,7 @@ module GoodJob
       def create(event)
         good_job = event.payload[:good_job]
 
-        info do
+        debug do
           "Created GoodJob resource with id #{good_job.id}"
         end
       end

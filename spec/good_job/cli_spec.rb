@@ -80,7 +80,7 @@ RSpec.describe GoodJob::CLI do
         expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Performer), a_kind_of(Hash))
 
         performer_query = performer.instance_variable_get(:@target)
-        expect(performer_query.to_sql).to eq GoodJob::Job.where(queue_name: %w[mice elephant]).priority_ordered.to_sql
+        expect(performer_query.to_sql).to eq GoodJob::Job.where(queue_name: %w[mice elephant]).to_sql
       end
     end
   end

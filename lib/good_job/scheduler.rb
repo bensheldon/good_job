@@ -24,15 +24,10 @@ module GoodJob
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
 
       @performer = performer
-      @pool = ThreadPoolExecutor.new(DEFAULT_POOL_OPTIONS.merge(pool_options))
-      @timer = Concurrent::TimerTask.new(DEFAULT_TIMER_OPTIONS.merge(timer_options)) do
-        create_thread
-      end
-      @timer.add_observer(self, :timer_observer)
-      @timer.execute
-    end
+      @pool_options = DEFAULT_POOL_OPTIONS.merge(pool_options)
+      @timer_options = DEFAULT_TIMER_OPTIONS.merge(timer_options)
 
-    def execute
+      create_pools
     end
 
     def shutdown(wait: true)
@@ -40,12 +35,12 @@ module GoodJob
 
       ActiveSupport::Notifications.instrument("scheduler_start_shutdown.good_job", { wait: wait })
       ActiveSupport::Notifications.instrument("scheduler_shutdown.good_job", { wait: wait }) do
-        if @timer.running?
+        if @timer&.running?
           @timer.shutdown
           @timer.wait_for_termination if wait
         end
 
-        if @pool.running?
+        if @pool&.running?
           @pool.shutdown
           @pool.wait_for_termination if wait
         end
@@ -54,6 +49,11 @@ module GoodJob
 
     def shutdown?
       @_shutdown
+    end
+
+    def restart(wait: true)
+      shutdown(wait: wait) unless shutdown?
+      create_pools
     end
 
     def create_thread
@@ -87,6 +87,17 @@ module GoodJob
           workers_still_to_be_created + workers_created_but_waiting
         end
       end
+    end
+
+    private
+
+    def create_pools
+      @pool = ThreadPoolExecutor.new(@pool_options)
+      return unless @timer_options[:execution_interval].positive?
+
+      @timer = Concurrent::TimerTask.new(@timer_options) { create_thread }
+      @timer.add_observer(self, :timer_observer)
+      @timer.execute
     end
   end
 end

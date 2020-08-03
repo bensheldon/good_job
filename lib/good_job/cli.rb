@@ -25,23 +25,21 @@ module GoodJob
         ActiveRecord::Base.connection_pool.size
       ).to_i
 
-      queue_names = (
+      queue_string = (
         options[:queues] ||
         ENV['GOOD_JOB_QUEUES'] ||
         '*'
-      ).split(',').map(&:strip)
+      )
 
       poll_interval = (
         options[:poll_interval] ||
         ENV['GOOD_JOB_POLL_INTERVAL']
       ).to_i
 
-      job_query = GoodJob::Job.all.priority_ordered
-      queue_names_without_all = queue_names.reject { |q| q == '*' }
-      job_query = job_query.where(queue_name: queue_names_without_all) unless queue_names_without_all.size.zero?
+      job_query = GoodJob::Job.queue_string(queue_string)
       job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock)
 
-      $stdout.puts "GoodJob worker starting with max_threads=#{max_threads} on queues=#{queue_names.join(',')}"
+      $stdout.puts "GoodJob worker starting with max_threads=#{max_threads} on queues=#{queue_string}"
 
       timer_options = {}
       timer_options[:execution_interval] = poll_interval if poll_interval.positive?
