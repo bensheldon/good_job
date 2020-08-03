@@ -3,53 +3,50 @@ require 'rails_helper'
 
 RSpec.describe GoodJob::Adapter do
   let(:adapter) { described_class.new }
+  let(:active_job) { instance_double(ApplicationJob) }
+  let(:good_job) { instance_double(GoodJob::Job) }
 
-  before do
-    stub_const 'ExampleJob', (Class.new(ApplicationJob) do
-      self.queue_name = 'test'
-      self.priority = 50
-
-      def perform(*args, **kwargs)
-      end
-    end)
-  end
-
-  around do |example|
-    original_adapter = ActiveJob::Base.queue_adapter
-    ActiveJob::Base.queue_adapter = adapter
-    example.run
-    ActiveJob::Base.queue_adapter = original_adapter
+  describe '#initialize' do
+    it 'guards against improper execution modes' do
+      expect do
+        described_class.new(execution_mode: :blarg)
+      end.to raise_error ArgumentError
+    end
   end
 
   describe '#enqueue' do
-    it 'performs the job directly' do
-      ExampleJob.perform_later('first', 'second', keyword_arg: 'keyword_arg')
+    it 'calls GoodJob::Job.enqueue with parameters' do
+      allow(GoodJob::Job).to receive(:enqueue).and_return(:good_job)
 
-      good_job = GoodJob::Job.last
-      expect(good_job.queue_name).to eq 'test'
-      expect(good_job.priority).to eq 50
+      adapter.enqueue(active_job)
+
+      expect(GoodJob::Job).to have_received(:enqueue).with(
+        active_job,
+        create_with_advisory_lock: false,
+        scheduled_at: nil
+      )
     end
   end
 
   describe '#enqueue_at' do
-    it 'assigns parameters' do
-      expect do
-        ExampleJob.set(wait: 1.minute).perform_later('first', 'second', keyword_arg: 'keyword_arg')
-      end.to change(GoodJob::Job, :count).by(1)
+    it 'calls GoodJob::Job.enqueue with parameters' do
+      allow(GoodJob::Job).to receive(:enqueue).and_return(:good_job)
 
-      good_job = GoodJob::Job.last
-      expect(good_job.queue_name).to eq 'test'
-      expect(good_job.priority).to eq 50
-      expect(good_job.scheduled_at).to be_within(1.second).of 1.minute.from_now
+      scheduled_at = 1.minute.from_now
+
+      adapter.enqueue_at(active_job, scheduled_at.to_i)
+
+      expect(GoodJob::Job).to have_received(:enqueue).with(
+        active_job,
+        create_with_advisory_lock: false,
+        scheduled_at: scheduled_at.change(usec: 0)
+      )
     end
   end
 
-  describe '#provider_job_id' do
-    it 'is assigned at creation' do
-      enqueued_job = ExampleJob.perform_later
-      good_job = GoodJob::Job.find(enqueued_job.provider_job_id)
-
-      expect(enqueued_job.provider_job_id).to eq good_job.id
+  describe '#shutdown' do
+    it 'is callable' do
+      adapter.shutdown
     end
   end
 end
