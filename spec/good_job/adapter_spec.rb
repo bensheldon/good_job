@@ -26,6 +26,19 @@ RSpec.describe GoodJob::Adapter do
         scheduled_at: nil
       )
     end
+
+    context 'when async' do
+      it 'trigger an execution thread' do
+        allow(GoodJob::Job).to receive(:enqueue).and_return(:good_job)
+
+        scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
+        adapter = described_class.new(execution_mode: :async, scheduler: scheduler)
+
+        adapter.enqueue(active_job)
+
+        expect(scheduler).to have_received(:create_thread)
+      end
+    end
   end
 
   describe '#enqueue_at' do

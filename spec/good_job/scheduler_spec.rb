@@ -7,6 +7,17 @@ RSpec.describe GoodJob::Scheduler do
     expect { example.run }.to output.to_stdout # rubocop:disable RSpec/ExpectInHook
   end
 
+  describe '.instances' do
+    it 'contains all registered instances' do
+      scheduler = nil
+      expect do
+        scheduler = described_class.new(performer)
+      end.to change { described_class.instances.size }.by(1)
+
+      expect(described_class.instances).to include scheduler
+    end
+  end
+
   describe '#shutdown' do
     it 'shuts down the theadpools' do
       scheduler = described_class.new(performer)

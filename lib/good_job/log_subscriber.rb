@@ -30,26 +30,33 @@ module GoodJob
       max_threads = event.payload[:max_threads]
       poll_interval = event.payload[:poll_interval]
       performer_name = event.payload[:performer_name]
+      process_id = event.payload[:process_id]
 
-      info_and_stdout do
+      info_and_stdout(tags: [process_id]) do
         "GoodJob started scheduler with queues=#{performer_name} max_threads=#{max_threads} poll_interval=#{poll_interval}."
       end
     end
 
-    def scheduler_shutdown_start(_event)
-      info_and_stdout do
+    def scheduler_shutdown_start(event)
+      process_id = event.payload[:process_id]
+
+      info_and_stdout(tags: [process_id]) do
         "GoodJob shutting down scheduler..."
       end
     end
 
-    def scheduler_shutdown(_event)
-      info_and_stdout do
+    def scheduler_shutdown(event)
+      process_id = event.payload[:process_id]
+
+      info_and_stdout(tags: [process_id]) do
         "GoodJob scheduler is shut down."
       end
     end
 
-    def scheduler_restart_pools(_event)
-      info_and_stdout do
+    def scheduler_restart_pools(event)
+      process_id = event.payload[:process_id]
+
+      info_and_stdout(tags: [process_id]) do
         "GoodJob scheduler has restarted."
       end
     end
@@ -71,11 +78,12 @@ module GoodJob
 
     %w(info debug warn error fatal unknown).each do |level|
       class_eval <<-METHOD, __FILE__, __LINE__ + 1
-        def #{level}(progname = nil, &block)
+        def #{level}(progname = nil, tags: [], &block)
           return unless logger
 
           if logger.respond_to?(:tagged)
-            logger.tagged('GoodJob') do
+            tags.unshift "GoodJob" unless logger.formatter.current_tags.include?("GoodJob")
+            logger.tagged(*tags.compact) do
               logger.#{level}(progname, &block)
             end
           else
@@ -85,10 +93,14 @@ module GoodJob
       METHOD
     end
 
-    def info_and_stdout(progname = nil, &block)
-      $stdout.puts yield unless ActiveSupport::Logger.logger_outputs_to?(logger, STDOUT)
+    def info_and_stdout(progname = nil, tags: [], &block)
+      unless ActiveSupport::Logger.logger_outputs_to?(logger, STDOUT)
+        tags_string = (['GoodJob'] + tags).map { |t| "[#{t}]" }.join(' ')
+        stdout_message = "#{tags_string}#{yield}"
+        $stdout.puts stdout_message
+      end
 
-      info(progname, &block)
+      info(progname, tags: [], &block)
     end
 
     def thread_name
