@@ -29,12 +29,7 @@ RSpec.describe GoodJob::CLI do
     it 'can gracefully shut down on INT signal' do
       cli = described_class.new([], {}, {})
 
-      cli_thread = Concurrent::Promises.future do
-        expect do
-          cli.start
-        end.to output(/finished, exiting/).to_stdout
-      end
-
+      cli_thread = Concurrent::Promises.future { cli.start }
       sleep_until { cli.instance_variable_get(:@stop_good_job_executable) == false }
 
       Process.kill 'INT', Process.pid # Send the signal to ourselves
@@ -53,10 +48,7 @@ RSpec.describe GoodJob::CLI do
         stub_const 'ENV', ENV.to_hash.merge({ 'RAILS_MAX_THREADS' => 3, 'GOOD_JOB_MAX_THREADS' => 2 })
         allow(ActiveRecord::Base.connection_pool).to receive(:size).and_return(1)
 
-        expect do
-          cli.start
-        end.to output.to_stdout
-
+        cli.start
         expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Performer), pool_options: { max_threads: 4 }, timer_options: {})
       end
     end
@@ -76,7 +68,7 @@ RSpec.describe GoodJob::CLI do
           scheduler_mock
         end
 
-        expect { cli.start }.to output.to_stdout
+        cli.start
         expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Performer), a_kind_of(Hash))
 
         performer_query = performer.instance_variable_get(:@target)
@@ -92,7 +84,7 @@ RSpec.describe GoodJob::CLI do
 
     it 'deletes finished jobs' do
       cli = described_class.new([], { before_seconds_ago: 24.hours.to_i }, {})
-      expect { cli.cleanup_preserved_jobs }.to output(/Deleted 1 preserved job/).to_stdout
+      expect { cli.cleanup_preserved_jobs }.to output(/GoodJob deleted 1 preserved job/).to_stdout
 
       expect { recent_job.reload }.not_to raise_error
       expect { old_unfinished_job.reload }.not_to raise_error
