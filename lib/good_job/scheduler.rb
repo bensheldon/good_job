@@ -33,7 +33,7 @@ module GoodJob
     def shutdown(wait: true)
       @_shutdown = true
 
-      ActiveSupport::Notifications.instrument("scheduler_start_shutdown.good_job", { wait: wait })
+      ActiveSupport::Notifications.instrument("scheduler_shutdown_start.good_job", { wait: wait })
       ActiveSupport::Notifications.instrument("scheduler_shutdown.good_job", { wait: wait }) do
         if @timer&.running?
           @timer.shutdown
@@ -52,8 +52,10 @@ module GoodJob
     end
 
     def restart(wait: true)
-      shutdown(wait: wait) unless shutdown?
-      create_pools
+      ActiveSupport::Notifications.instrument("scheduler_restart_pools.good_job") do
+        shutdown(wait: wait) unless shutdown?
+        create_pools
+      end
     end
 
     def create_thread
@@ -92,12 +94,14 @@ module GoodJob
     private
 
     def create_pools
-      @pool = ThreadPoolExecutor.new(@pool_options)
-      return unless @timer_options[:execution_interval].positive?
+      ActiveSupport::Notifications.instrument("scheduler_create_pools.good_job", { performer_name: @performer.name, max_threads: @pool_options[:max_threads], poll_interval: @timer_options[:execution_interval] }) do
+        @pool = ThreadPoolExecutor.new(@pool_options)
+        next unless @timer_options[:execution_interval].positive?
 
-      @timer = Concurrent::TimerTask.new(@timer_options) { create_thread }
-      @timer.add_observer(self, :timer_observer)
-      @timer.execute
+        @timer = Concurrent::TimerTask.new(@timer_options) { create_thread }
+        @timer.add_observer(self, :timer_observer)
+        @timer.execute
+      end
     end
   end
 end

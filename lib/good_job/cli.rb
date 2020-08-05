@@ -37,9 +37,7 @@ module GoodJob
       ).to_i
 
       job_query = GoodJob::Job.queue_string(queue_string)
-      job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock)
-
-      $stdout.puts "GoodJob worker starting with max_threads=#{max_threads} on queues=#{queue_string}"
+      job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: queue_string)
 
       timer_options = {}
       timer_options[:execution_interval] = poll_interval if poll_interval.positive?
@@ -60,9 +58,7 @@ module GoodJob
         break if @stop_good_job_executable || scheduler.shutdown?
       end
 
-      $stdout.puts "\nFinishing GoodJob's current jobs before exiting..."
       scheduler.shutdown
-      $stdout.puts "GoodJob's jobs finished, exiting..."
     end
 
     desc :cleanup_preserved_jobs, "Delete preserved job records"
@@ -74,8 +70,11 @@ module GoodJob
       require RAILS_ENVIRONMENT_RB
 
       timestamp = Time.current - options[:before_seconds_ago]
-      result = GoodJob::Job.finished(timestamp).delete_all
-      $stdout.puts "Deleted #{result} preserved #{'job'.pluralize(result)} finished before #{timestamp}."
+      ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { before_seconds_ago: options[:before_seconds_ago], timestamp: timestamp }) do |payload|
+        deleted_records_count = GoodJob::Job.finished(timestamp).delete_all
+
+        payload[:deleted_records_count] = deleted_records_count
+      end
     end
 
     default_task :start

@@ -1,7 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Scheduler do
-  let(:performer) { instance_double(GoodJob::Performer, next: nil) }
+  let(:performer) { instance_double(GoodJob::Performer, next: nil, name: '') }
+
+  around do |example|
+    expect { example.run }.to output.to_stdout # rubocop:disable RSpec/ExpectInHook
+  end
 
   describe '#shutdown' do
     it 'shuts down the theadpools' do

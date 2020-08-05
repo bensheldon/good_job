@@ -1,8 +1,11 @@
 module GoodJob
   class Performer
-    def initialize(target, method_name)
+    attr_reader :name
+
+    def initialize(target, method_name, name: nil)
       @target = target
       @method_name = method_name
+      @name = name
     end
 
     def next
