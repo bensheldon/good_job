@@ -100,6 +100,15 @@ By default, if a job raises an error while it is being performed, _and it bubble
     GoodJob.reperform_jobs_on_standard_error = true # => default
     ```
 
+To report errors that _do_ bubble up to the GoodJob backend, assign a callable to `GoodJob.on_thread_error`. For example:
+
+```ruby
+# config/initializers/good_job.rb
+
+# With Sentry (or Bugsnag, Airbrake, Honeybadger, etc)
+GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
+```
+
 ### Retrying jobs
 
 ActiveJob can be configured to retry an infinite number of times, with an exponential backoff. Using ActiveJob's `retry_on` will ensure that errors do not bubble up to the GoodJob backend:
