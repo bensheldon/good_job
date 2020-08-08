@@ -86,7 +86,7 @@ $ bundle install
 
 ### Error handling, retries, and reliability
 
-GoodJob guarantees _at-least-once_ performance of jobs. GoodJob fully supports ActiveJob's built-in functionality for error handling, retries and timeouts. 
+GoodJob guarantees that a completely-performed job will run once and only once. GoodJob fully supports ActiveJob's built-in functionality for error handling, retries and timeouts. Writing reliable, transactional, and idempotent `ActiveJob#perform` methods is outside the scope of GoodJob.
 
 #### Error handling
 
