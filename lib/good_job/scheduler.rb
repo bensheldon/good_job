@@ -75,10 +75,12 @@ module GoodJob
     end
 
     def timer_observer(time, executed_task, thread_error)
+      GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
       ActiveSupport::Notifications.instrument("finished_timer_task.good_job", { result: executed_task, error: thread_error, time: time })
     end
 
     def task_observer(time, output, thread_error)
+      GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
       ActiveSupport::Notifications.instrument("finished_job_task.good_job", { result: output, error: thread_error, time: time })
       create_thread if output
     end
