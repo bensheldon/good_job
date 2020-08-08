@@ -5,7 +5,7 @@ require 'rails/all'
 Bundler.require(*Rails.groups)
 require "good_job"
 
-module Dummy
+module TestApp
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     # config.load_defaults 6.0

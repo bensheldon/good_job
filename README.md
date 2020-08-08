@@ -27,7 +27,8 @@ $ bundle install
 ## Usage
 
 1. Create a database migration:
-    ```bash
+    
+   ```bash
     $ bin/rails g good_job:install
     ```
 
@@ -38,7 +39,8 @@ $ bundle install
     ```
     
 1. Configure the ActiveJob adapter:
-    ```ruby
+    
+   ```ruby
     # config/application.rb
     config.active_job.queue_adapter = :good_job
     ```
@@ -57,16 +59,19 @@ $ bundle install
     ```
 
 1. Queue your job 🎉: 
+    
     ```ruby
     YourJob.set(queue: :some_queue, wait: 5.minutes, priority: 10).perform_later
     ```
 
 1. In production, the scheduler is designed to run in its own process:
+    
     ```bash
     $ bundle exec good_job
     ```
    
    Configuration options available with `help`:
+
    ```bash
    $ bundle exec good_job help start
    
@@ -174,11 +179,13 @@ GoodJob executes enqueued jobs using threads. There is a lot than can be said ab
 GoodJob is able to run "async" in the same process as the webserver (e.g. `bin/rail s`). GoodJob's async execution mode offers benefits of economy by not requiring a separate job worker process, but with the tradeoff of increased complexity. Async mode can be configured in two ways:
 
 - Directly configure the ActiveJob adapter:
+
     ```ruby
     # config/environments/production.rb
     config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :async, max_threads: 4, poll_interval: 30)
     ```
 - Or, when using `...queue_adapter = :good_job`, via environment variables:
+
     ```bash
     $ GOOD_JOB_EXECUTION_MODE=async GOOD_JOB_MAX_THREADS=4 GOOD_JOB_POLL_INTERVAL=30 bin/rails server
     ```
@@ -186,12 +193,14 @@ GoodJob is able to run "async" in the same process as the webserver (e.g. `bin/r
 Depending on your application configuration, you may need to take additional steps:
 
 - Ensure that you have enough database connections for both web and job execution threads:
+
     ```yaml
     # config/database.yml
     pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i %>
     ```
 
 - When running Puma with workers (`WEB_CONCURRENCY > 0`) or another process-forking webserver, GoodJob's threadpool schedulers should be stopped before forking, restarted after fork, and cleanly shut down on exit. Stopping GoodJob's scheduler pre-fork is recommended to ensure that GoodJob does not continue executing jobs in the parent/controller process. For example, with Puma:
+
     ```ruby
     # config/puma.rb
   
@@ -215,6 +224,7 @@ Depending on your application configuration, you may need to take additional ste
 If your application is already using an ActiveJob backend, you will need to install GoodJob to enqueue and perform newly created jobs _and_ finish performing pre-existing jobs on the previous backend.
 
 1. Enqueue newly created jobs on GoodJob either entirely by setting `ActiveJob::Base.queue_adapter = :good_job` or progressively via individual job classes:
+
     ```ruby
     # jobs/specific_job.rb
     class SpecificJob < ApplicationJob
@@ -253,6 +263,7 @@ It is also necessary to delete these preserved jobs from the database after a ce
     ```ruby
     GoodJob::Job.finished(1.day.ago).delete_all
     ```
+
 - For example, using the `good_job` command-line utility:
 
     ```bash
