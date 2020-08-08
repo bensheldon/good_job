@@ -16,7 +16,7 @@ module GoodJob
                   type: :numeric,
                   desc: "Interval between polls for available jobs in seconds (default: 1)"
     def start
-      require RAILS_ENVIRONMENT_RB
+      set_up_application!
 
       max_threads = (
         options[:max_threads] ||
@@ -61,13 +61,15 @@ module GoodJob
       scheduler.shutdown
     end
 
+    default_task :start
+
     desc :cleanup_preserved_jobs, "Delete preserved job records"
     method_option :before_seconds_ago,
                   type: :numeric,
                   default: 24 * 60 * 60,
                   desc: "Delete records finished more than this many seconds ago"
     def cleanup_preserved_jobs
-      require RAILS_ENVIRONMENT_RB
+      set_up_application!
 
       timestamp = Time.current - options[:before_seconds_ago]
       ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { before_seconds_ago: options[:before_seconds_ago], timestamp: timestamp }) do |payload|
@@ -77,6 +79,10 @@ module GoodJob
       end
     end
 
-    default_task :start
+    no_commands do
+      def set_up_application!
+        require RAILS_ENVIRONMENT_RB
+      end
+    end
   end
 end

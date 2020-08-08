@@ -1,8 +1,8 @@
 module GoodJob
   class Adapter
-    EXECUTION_MODES = [:inline, :external].freeze # TODO: async
+    EXECUTION_MODES = [:async, :external, :inline].freeze
 
-    def initialize(execution_mode: nil, inline: false)
+    def initialize(execution_mode: nil, max_threads: nil, poll_interval: nil, scheduler: nil, inline: false)
       if inline
         ActiveSupport::Deprecation.warn('GoodJob::Adapter#new(inline: true) is deprecated; use GoodJob::Adapter.new(execution_mode: :inline) instead')
         @execution_mode = :inline
@@ -12,6 +12,18 @@ module GoodJob
         @execution_mode = execution_mode
       else
         @execution_mode = :external
+      end
+
+      @scheduler = scheduler
+      if @execution_mode == :async && @scheduler.blank? # rubocop:disable Style/GuardClause
+        timer_options = {}
+        timer_options[:execution_interval] = poll_interval if poll_interval.present?
+
+        pool_options = {}
+        pool_options[:max_threads] = max_threads if max_threads.present?
+
+        job_performer = GoodJob::Performer.new(GoodJob::Job, :perform_with_advisory_lock, name: '*')
+        @scheduler = GoodJob::Scheduler.new(job_performer, timer_options: timer_options, pool_options: pool_options)
       end
     end
 
@@ -34,11 +46,21 @@ module GoodJob
         end
       end
 
+      @scheduler.create_thread if execute_async?
+
       good_job
     end
 
-    def shutdown(wait: true) # rubocop:disable Lint/UnusedMethodArgument
-      nil
+    def shutdown(wait: true)
+      @scheduler&.shutdown(wait: wait)
+    end
+
+    def execute_async?
+      @execution_mode == :async
+    end
+
+    def execute_externally?
+      @execution_mode == :external
     end
 
     def execute_inline?
@@ -48,10 +70,6 @@ module GoodJob
     def inline?
       ActiveSupport::Deprecation.warn('GoodJob::Adapter::inline? is deprecated; use GoodJob::Adapter::execute_inline? instead')
       execute_inline?
-    end
-
-    def execute_externally?
-      @execution_mode == :external
     end
   end
 end

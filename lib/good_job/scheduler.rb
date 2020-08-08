@@ -20,8 +20,12 @@ module GoodJob
       fallback_policy: :discard,
     }.freeze
 
+    cattr_reader :instances, default: [], instance_reader: false
+
     def initialize(performer, timer_options: {}, pool_options: {})
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
+
+      self.class.instances << self
 
       @performer = performer
       @pool_options = DEFAULT_POOL_OPTIONS.merge(pool_options)
@@ -33,8 +37,8 @@ module GoodJob
     def shutdown(wait: true)
       @_shutdown = true
 
-      ActiveSupport::Notifications.instrument("scheduler_shutdown_start.good_job", { wait: wait })
-      ActiveSupport::Notifications.instrument("scheduler_shutdown.good_job", { wait: wait }) do
+      ActiveSupport::Notifications.instrument("scheduler_shutdown_start.good_job", { wait: wait, process_id: process_id })
+      ActiveSupport::Notifications.instrument("scheduler_shutdown.good_job", { wait: wait, process_id: process_id }) do
         if @timer&.running?
           @timer.shutdown
           @timer.wait_for_termination if wait
@@ -52,7 +56,7 @@ module GoodJob
     end
 
     def restart(wait: true)
-      ActiveSupport::Notifications.instrument("scheduler_restart_pools.good_job") do
+      ActiveSupport::Notifications.instrument("scheduler_restart_pools.good_job", { process_id: process_id }) do
         shutdown(wait: wait) unless shutdown?
         create_pools
       end
@@ -94,7 +98,7 @@ module GoodJob
     private
 
     def create_pools
-      ActiveSupport::Notifications.instrument("scheduler_create_pools.good_job", { performer_name: @performer.name, max_threads: @pool_options[:max_threads], poll_interval: @timer_options[:execution_interval] }) do
+      ActiveSupport::Notifications.instrument("scheduler_create_pools.good_job", { performer_name: @performer.name, max_threads: @pool_options[:max_threads], poll_interval: @timer_options[:execution_interval], process_id: process_id }) do
         @pool = ThreadPoolExecutor.new(@pool_options)
         next unless @timer_options[:execution_interval].positive?
 
@@ -102,6 +106,14 @@ module GoodJob
         @timer.add_observer(self, :timer_observer)
         @timer.execute
       end
+    end
+
+    def process_id
+      Process.pid
+    end
+
+    def thread_name
+      Thread.current.name || Thread.current.object_id
     end
   end
 end
