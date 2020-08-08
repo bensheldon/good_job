@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PGHOST: localhost
-      PGUSER: dummy
+      PGUSER: test_app
       RAILS_ENV: test
       BUNDLE_JOBS: 4
       BUNDLE_RETRY: 3
@@ -55,8 +55,8 @@ jobs:
       postgres:
         image: postgres:10.8
         env:
-          POSTGRES_USER: dummy
-          POSTGRES_DB: dummy_test
+          POSTGRES_USER: test_app
+          POSTGRES_DB: test_app_test
           POSTGRES_PASSWORD: ""
         ports: ["5432:5432"]
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -87,6 +87,6 @@ jobs:
 
       - name: Set up test database
         run: bin/rails db:test:prepare
-        working-directory: spec/dummy
+        working-directory: spec/test_app
       - name: Run tests
         run: bundle exec appraisal bin/rspec

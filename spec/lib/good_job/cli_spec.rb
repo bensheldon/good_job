@@ -8,7 +8,7 @@ RSpec.describe GoodJob::CLI do
   let(:args) { [] }
 
   before do
-    stub_const 'GoodJob::CLI::RAILS_ENVIRONMENT_RB', File.expand_path("spec/dummy/config/environment.rb")
+    stub_const 'GoodJob::CLI::RAILS_ENVIRONMENT_RB', File.expand_path("spec/test_app/config/environment.rb")
     allow(GoodJob::Scheduler).to receive(:new).and_return scheduler_mock
   end
 
