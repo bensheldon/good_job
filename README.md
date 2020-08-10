@@ -105,7 +105,7 @@ To report errors that _do_ bubble up to the GoodJob backend, assign a callable t
 ```ruby
 # config/initializers/good_job.rb
 
-# With Sentry (or Bugsnag, Airbrake, Honeybadger, etc)
+# With Sentry (or Bugsnag, Airbrake, Honeybadger, etc.)
 GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
 ```
 
@@ -144,6 +144,23 @@ GoodJob can be configured to allow omitting `retry_on`'s block argument and impl
 GoodJob.reperform_jobs_on_standard_error = false 
 ```
 
+When using an exception monitoring service (e.g. Sentry, Bugsnag, Airbrake, Honeybadger, etc), the use of `rescue_on` may be incompatible with their ActiveJob integration. It's safest to explicitly wrap jobs with an exception reporter. For example:
+
+```ruby
+class ApplicationJob < ActiveJob::Base  
+  retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
+  
+  around_perform do |_job, block|
+    block.call
+  rescue StandardError => e
+    Raven.capture_exception(e)
+    raise
+  end
+  # ...
+end
+```
+
+
 ActiveJob's `discard_on` functionality is supported too.
 
 #### ActionMailer retries
@@ -153,6 +170,14 @@ Using a Mailer's `#deliver_later` will enqueue an instance of `ActionMailer::Del
 ```ruby
 # config/initializers/good_job.rb
 ActionMailer::DeliveryJob.retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
+
+# With Sentry (or Bugsnag, Airbrake, Honeybadger, etc.)
+ActionMailer::DeliveryJob.around_perform do |_job, block|
+  block.call
+rescue StandardError => e
+  Raven.capture_exception(e)
+  raise
+end
 ```
 
 #### Timeouts
