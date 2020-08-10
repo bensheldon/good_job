@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    good_job (1.0.3)
+    good_job (1.1.0)
       concurrent-ruby (>= 1.0.2)
       pg (>= 1.0.0)
       rails (>= 5.1.0)
@@ -78,6 +78,7 @@ GEM
     crass (1.0.6)
     database_cleaner (1.8.5)
     diff-lcs (1.4.4)
+    dotenv (2.7.6)
     erubi (1.9.0)
     faraday (1.0.1)
       multipart-post (>= 1.2, < 3)
@@ -125,6 +126,8 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (4.0.5)
+    puma (4.3.5)
+      nio4r (~> 2.0)
     rack (2.2.3)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -222,11 +225,13 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   database_cleaner
+  dotenv
   foreman
   gem-release
   github_changelog_generator
   good_job!
   pry
+  puma
   rails (~> 6.0.0)
   rspec-rails
   rubocop

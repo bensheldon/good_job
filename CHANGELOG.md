@@ -1,6 +1,25 @@
 # Changelog
 
-## [v1.0.3](https://github.com/bensheldon/good_job/tree/v1.0.3) (2020-07-25)
+## [v1.1.0](https://github.com/bensheldon/good_job/tree/v1.1.0) (2020-08-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.0.3...v1.1.0)
+
+**Closed issues:**
+
+- Document reliability guarantees [\#59](https://github.com/bensheldon/good_job/issues/59)
+- Document how to hook in exception monitor \(Sentry, Rollbar, etc\) [\#47](https://github.com/bensheldon/good_job/issues/47)
+- Allow an Async mode [\#27](https://github.com/bensheldon/good_job/issues/27)
+
+**Merged pull requests:**
+
+- Add a callable hook on thread errors [\#71](https://github.com/bensheldon/good_job/pull/71) ([bensheldon](https://github.com/bensheldon))
+- Clarify reliability guarantees [\#70](https://github.com/bensheldon/good_job/pull/70) ([bensheldon](https://github.com/bensheldon))
+- Clean up Readme formatting; re-arrange tests for clarity and values [\#69](https://github.com/bensheldon/good_job/pull/69) ([bensheldon](https://github.com/bensheldon))
+- Create an Async execution mode [\#68](https://github.com/bensheldon/good_job/pull/68) ([bensheldon](https://github.com/bensheldon))
+- Move all stdout to LogSubscriber [\#67](https://github.com/bensheldon/good_job/pull/67) ([bensheldon](https://github.com/bensheldon))
+- Allow schedulers to be restarted; separate unit tests from integration tests [\#66](https://github.com/bensheldon/good_job/pull/66) ([bensheldon](https://github.com/bensheldon))
+
+## [v1.0.3](https://github.com/bensheldon/good_job/tree/v1.0.3) (2020-07-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.0.2...v1.0.3)
 
@@ -113,7 +132,6 @@
 - Add configuration options to good\_job executable [\#33](https://github.com/bensheldon/good_job/pull/33) ([bensheldon](https://github.com/bensheldon))
 - Extract Job querying behavior out of Scheduler [\#31](https://github.com/bensheldon/good_job/pull/31) ([bensheldon](https://github.com/bensheldon))
 - Allow configuration of Rails queue adapter with `:good\_job` [\#28](https://github.com/bensheldon/good_job/pull/28) ([bensheldon](https://github.com/bensheldon))
-- Update development Ruby to 2.6.5 [\#22](https://github.com/bensheldon/good_job/pull/22) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.5.0](https://github.com/bensheldon/good_job/tree/v0.5.0) (2020-07-13)
 
@@ -138,6 +156,7 @@
 
 **Merged pull requests:**
 
+- Update development Ruby to 2.6.5 [\#22](https://github.com/bensheldon/good_job/pull/22) ([bensheldon](https://github.com/bensheldon))
 - Simplify the internal API, removing JobWrapper and InlineScheduler [\#21](https://github.com/bensheldon/good_job/pull/21) ([bensheldon](https://github.com/bensheldon))
 - Generate a new future for every executed job [\#20](https://github.com/bensheldon/good_job/pull/20) ([bensheldon](https://github.com/bensheldon))
 - Configuration for maximum number of job execution threads [\#18](https://github.com/bensheldon/good_job/pull/18) ([bensheldon](https://github.com/bensheldon))
