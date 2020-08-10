@@ -4,6 +4,7 @@ rescue LoadError
   puts 'You must `gem install bundler` and `bundle install` to run rake tasks'
 end
 
+require 'dotenv/load'
 require_relative "lib/good_job/version"
 
 require 'rdoc/task'
@@ -16,14 +17,12 @@ RDoc::Task.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
 
-require 'bundler/gem_tasks'
-
 def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
 desc 'Commit version and changelog'
-task :commit_version, [:version_bump] do |_t, args|
+task :release, [:version_bump] do |_t, args|
   version_bump = args[:version_bump]
   if version_bump.nil?
     puts "Pass a version [major|minor|patch|pre|release] or a given version number [x.x.x]:"

@@ -78,6 +78,7 @@ GEM
     crass (1.0.6)
     database_cleaner (1.8.5)
     diff-lcs (1.4.4)
+    dotenv (2.7.6)
     erubi (1.9.0)
     faraday (1.0.1)
       multipart-post (>= 1.2, < 3)
@@ -224,6 +225,7 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   database_cleaner
+  dotenv
   foreman
   gem-release
   github_changelog_generator
