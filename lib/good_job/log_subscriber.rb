@@ -96,7 +96,7 @@ module GoodJob
     def info_and_stdout(progname = nil, tags: [], &block)
       unless ActiveSupport::Logger.logger_outputs_to?(logger, STDOUT)
         tags_string = (['GoodJob'] + tags).map { |t| "[#{t}]" }.join(' ')
-        stdout_message = "#{tags_string}#{yield}"
+        stdout_message = "#{tags_string} #{yield}"
         $stdout.puts stdout_message
       end
 
