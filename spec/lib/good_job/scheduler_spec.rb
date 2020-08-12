@@ -82,4 +82,24 @@ RSpec.describe GoodJob::Scheduler do
       expect(scheduler.instance_variable_get(:@pool).running?).to be true
     end
   end
+
+  describe '.from_configuration' do
+    describe 'multi-scheduling' do
+      it 'instantiates multiple schedulers' do
+        configuration = GoodJob::Configuration.new({ queues: '*:1;mice,ferrets:2;elephant:4' })
+        multi_scheduler = described_class.from_configuration(configuration)
+
+        all_scheduler, rodents_scheduler, elephants_scheduler = multi_scheduler.schedulers
+
+        expect(all_scheduler.instance_variable_get(:@performer).name).to eq '*'
+        expect(all_scheduler.instance_variable_get(:@pool_options)[:max_threads]).to eq 1
+
+        expect(rodents_scheduler.instance_variable_get(:@performer).name).to eq 'mice,ferrets'
+        expect(rodents_scheduler.instance_variable_get(:@pool_options)[:max_threads]).to eq 2
+
+        expect(elephants_scheduler.instance_variable_get(:@performer).name).to eq 'elephant'
+        expect(elephants_scheduler.instance_variable_get(:@pool_options)[:max_threads]).to eq 4
+      end
+    end
+  end
 end

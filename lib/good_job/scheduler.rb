@@ -23,16 +23,28 @@ module GoodJob
     cattr_reader :instances, default: [], instance_reader: false
 
     def self.from_configuration(configuration)
-      job_query = GoodJob::Job.queue_string(configuration.queue_string)
-      job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: configuration.queue_string)
+      schedulers = configuration.queue_string.split(';').map do |queue_string_and_max_threads|
+        queue_string, max_threads = queue_string_and_max_threads.split(':')
+        max_threads = (max_threads || configuration.max_threads).to_i
 
-      timer_options = {}
-      timer_options[:execution_interval] = configuration.poll_interval if configuration.poll_interval.positive?
-      pool_options = {
-        max_threads: configuration.max_threads,
-      }
+        job_query = GoodJob::Job.queue_string(queue_string)
+        job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: queue_string)
 
-      GoodJob::Scheduler.new(job_performer, timer_options: timer_options, pool_options: pool_options)
+        timer_options = {}
+        timer_options[:execution_interval] = configuration.poll_interval if configuration.poll_interval.positive?
+
+        pool_options = {
+          max_threads: max_threads,
+        }
+
+        GoodJob::Scheduler.new(job_performer, timer_options: timer_options, pool_options: pool_options)
+      end
+
+      if schedulers.size > 1
+        GoodJob::MultiScheduler.new(schedulers)
+      else
+        schedulers.first
+      end
     end
 
     def initialize(performer, timer_options: {}, pool_options: {})

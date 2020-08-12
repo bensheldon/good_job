@@ -46,5 +46,10 @@ on_worker_shutdown do
   GoodJob::Scheduler.instances.each { |s| s.shutdown }
 end
 
+MAIN_PID = Process.pid
+at_exit do
+  GoodJob::Scheduler.instances.each { |s| s.shutdown } if Process.pid == MAIN_PID
+end
+
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
