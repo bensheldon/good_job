@@ -10,8 +10,8 @@ module GoodJob
                   desc: "Maximum number of threads to use for working jobs (default: ActiveRecord::Base.connection_pool.size)"
     method_option :queues,
                   type: :string,
-                  banner: "queue1,queue2",
-                  desc: "Queues to work from. Separate multiple queues with commas (default: *)"
+                  banner: "queue1,queue2(;queue3,queue4:5)",
+                  desc: "Queues to work from. Separate multiple queues with commas; separate isolated execution pools with semicolons and threads with colons (default: *)"
     method_option :poll_interval,
                   type: :numeric,
                   desc: "Interval between polls for available jobs in seconds (default: 1)"
