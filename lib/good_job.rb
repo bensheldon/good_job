@@ -1,6 +1,7 @@
 require "rails"
 require 'good_job/railtie'
 
+require 'good_job/configuration'
 require 'good_job/log_subscriber'
 require 'good_job/lockable'
 require 'good_job/job'

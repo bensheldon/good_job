@@ -22,6 +22,19 @@ module GoodJob
 
     cattr_reader :instances, default: [], instance_reader: false
 
+    def self.from_configuration(configuration)
+      job_query = GoodJob::Job.queue_string(configuration.queue_string)
+      job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: configuration.queue_string)
+
+      timer_options = {}
+      timer_options[:execution_interval] = configuration.poll_interval if configuration.poll_interval.positive?
+      pool_options = {
+        max_threads: configuration.max_threads,
+      }
+
+      GoodJob::Scheduler.new(job_performer, timer_options: timer_options, pool_options: pool_options)
+    end
+
     def initialize(performer, timer_options: {}, pool_options: {})
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
 

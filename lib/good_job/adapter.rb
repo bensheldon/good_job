@@ -3,28 +3,24 @@ module GoodJob
     EXECUTION_MODES = [:async, :external, :inline].freeze
 
     def initialize(execution_mode: nil, max_threads: nil, poll_interval: nil, scheduler: nil, inline: false)
-      if inline
+      if inline && execution_mode.nil?
         ActiveSupport::Deprecation.warn('GoodJob::Adapter#new(inline: true) is deprecated; use GoodJob::Adapter.new(execution_mode: :inline) instead')
-        @execution_mode = :inline
-      elsif execution_mode
-        raise ArgumentError, "execution_mode: must be one of #{EXECUTION_MODES.join(', ')}." unless EXECUTION_MODES.include?(execution_mode)
-
-        @execution_mode = execution_mode
-      else
-        @execution_mode = :external
+        execution_mode = :inline
       end
+
+      configuration = GoodJob::Configuration.new({
+                                                   execution_mode: execution_mode,
+                                                   max_threads: max_threads,
+                                                   poll_interval: poll_interval,
+                                                 },
+                                                 env: ENV)
+
+      raise ArgumentError, "execution_mode: must be one of #{EXECUTION_MODES.join(', ')}." unless EXECUTION_MODES.include?(configuration.execution_mode)
+
+      @execution_mode = configuration.execution_mode
 
       @scheduler = scheduler
-      if @execution_mode == :async && @scheduler.blank? # rubocop:disable Style/GuardClause
-        timer_options = {}
-        timer_options[:execution_interval] = poll_interval if poll_interval.present?
-
-        pool_options = {}
-        pool_options[:max_threads] = max_threads if max_threads.present?
-
-        job_performer = GoodJob::Performer.new(GoodJob::Job, :perform_with_advisory_lock, name: '*')
-        @scheduler = GoodJob::Scheduler.new(job_performer, timer_options: timer_options, pool_options: pool_options)
-      end
+      @scheduler = GoodJob::Scheduler.from_configuration(configuration) if @execution_mode == :async && @scheduler.blank?
     end
 
     def enqueue(active_job)

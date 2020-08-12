@@ -18,35 +18,8 @@ module GoodJob
     def start
       set_up_application!
 
-      max_threads = (
-        options[:max_threads] ||
-        ENV['GOOD_JOB_MAX_THREADS'] ||
-        ENV['RAILS_MAX_THREADS'] ||
-        ActiveRecord::Base.connection_pool.size
-      ).to_i
-
-      queue_string = (
-        options[:queues] ||
-        ENV['GOOD_JOB_QUEUES'] ||
-        '*'
-      )
-
-      poll_interval = (
-        options[:poll_interval] ||
-        ENV['GOOD_JOB_POLL_INTERVAL']
-      ).to_i
-
-      job_query = GoodJob::Job.queue_string(queue_string)
-      job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: queue_string)
-
-      timer_options = {}
-      timer_options[:execution_interval] = poll_interval if poll_interval.positive?
-
-      pool_options = {
-        max_threads: max_threads,
-      }
-
-      scheduler = GoodJob::Scheduler.new(job_performer, timer_options: timer_options, pool_options: pool_options)
+      configuration = Configuration.new(options, env: ENV)
+      scheduler = Scheduler.from_configuration(configuration)
 
       @stop_good_job_executable = false
       %w[INT TERM].each do |signal|
