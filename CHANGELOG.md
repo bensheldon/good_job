@@ -1,6 +1,19 @@
 # Changelog
 
-## [v1.1.0](https://github.com/bensheldon/good_job/tree/v1.1.0) (2020-08-09)
+## [v1.1.1](https://github.com/bensheldon/good_job/tree/v1.1.1) (2020-08-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.1.0...v1.1.1)
+
+**Implemented enhancements:**
+
+- Allow multiple schedulers within the same process. e.g. `queues=mice:2,elephants:4` [\#45](https://github.com/bensheldon/good_job/issues/45)
+
+**Merged pull requests:**
+
+- Allow instantiation of multiple schedulers via --queues [\#76](https://github.com/bensheldon/good_job/pull/76) ([bensheldon](https://github.com/bensheldon))
+- Extract options parsing to Configuration object [\#74](https://github.com/bensheldon/good_job/pull/74) ([bensheldon](https://github.com/bensheldon))
+
+## [v1.1.0](https://github.com/bensheldon/good_job/tree/v1.1.0) (2020-08-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.0.3...v1.1.0)
 
@@ -43,10 +56,6 @@
 **Fixed bugs:**
 
 - Fix counting of available execution threads [\#58](https://github.com/bensheldon/good_job/pull/58) ([bensheldon](https://github.com/bensheldon))
-
-**Closed issues:**
-
-- repeating/recurring jobs [\#53](https://github.com/bensheldon/good_job/issues/53)
 
 **Merged pull requests:**
 
@@ -115,6 +124,7 @@
 - Add more examples to Readme [\#39](https://github.com/bensheldon/good_job/pull/39) ([bensheldon](https://github.com/bensheldon))
 - Add additional Rubocops and lint [\#38](https://github.com/bensheldon/good_job/pull/38) ([bensheldon](https://github.com/bensheldon))
 - Always store a default queue\_name, priority and scheduled\_at; index by queue\_name and scheduled\_at [\#37](https://github.com/bensheldon/good_job/pull/37) ([bensheldon](https://github.com/bensheldon))
+- Extract Job querying behavior out of Scheduler [\#31](https://github.com/bensheldon/good_job/pull/31) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.6.0](https://github.com/bensheldon/good_job/tree/v0.6.0) (2020-07-15)
 
@@ -130,7 +140,6 @@
 - Improve generation of changelog [\#36](https://github.com/bensheldon/good_job/pull/36) ([bensheldon](https://github.com/bensheldon))
 - Update Github Action Workflow for Backlog Project Board [\#35](https://github.com/bensheldon/good_job/pull/35) ([bensheldon](https://github.com/bensheldon))
 - Add configuration options to good\_job executable [\#33](https://github.com/bensheldon/good_job/pull/33) ([bensheldon](https://github.com/bensheldon))
-- Extract Job querying behavior out of Scheduler [\#31](https://github.com/bensheldon/good_job/pull/31) ([bensheldon](https://github.com/bensheldon))
 - Allow configuration of Rails queue adapter with `:good\_job` [\#28](https://github.com/bensheldon/good_job/pull/28) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.5.0](https://github.com/bensheldon/good_job/tree/v0.5.0) (2020-07-13)
