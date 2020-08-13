@@ -46,7 +46,7 @@ task :release, [:version_bump] do |_t, args|
 
   puts "\n== Creating git commit  =="
   system! "git add lib/good_job/version.rb CHANGELOG.md Gemfile.lock gemfiles/*.gemfile.lock"
-  system! "git commit -m \"Bump good_job to v#{GoodJob::VERSION}\""
+  system! "git commit -m \"Release good_job v#{GoodJob::VERSION}\""
   system! "git tag v#{GoodJob::VERSION}"
 
   puts "\n== Next steps =="
