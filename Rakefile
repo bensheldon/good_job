@@ -26,7 +26,7 @@ task :release, [:version_bump] do |_t, args|
   version_bump = args[:version_bump]
   if version_bump.nil?
     puts "Pass a version [major|minor|patch|pre|release] or a given version number [x.x.x]:"
-    puts "$ bundle exec rake commit_version[VERSION_BUMP]"
+    puts "$ bundle exec rake release[VERSION_BUMP]"
     exit(1)
   end
 
