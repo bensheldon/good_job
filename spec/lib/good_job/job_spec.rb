@@ -84,6 +84,23 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  describe '.queue_string' do
+    it 'separates commas' do
+      query = described_class.queue_string('first,second')
+      expect(query.to_sql).to eq described_class.where(queue_name: %w[first second]).to_sql
+    end
+
+    it 'excludes queues commas' do
+      query = described_class.queue_string('-first,second')
+      expect(query.to_sql).to eq described_class.where.not(queue_name: %w[first second]).or(described_class.where(queue_name: nil)).to_sql
+    end
+
+    it 'accepts empty strings' do
+      query = described_class.queue_string('')
+      expect(query.to_sql).to eq described_class.all.to_sql
+    end
+  end
+
   describe '#perform' do
     let(:active_job) { ExampleJob.new("a string") }
     let!(:good_job) { described_class.enqueue(active_job) }
