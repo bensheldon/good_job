@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.1.2](https://github.com/bensheldon/good_job/tree/v1.1.2) (2020-08-13)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.1.1...v1.1.2)
+
+**Implemented enhancements:**
+
+- Allow the omission of queue names within a scheduler [\#73](https://github.com/bensheldon/good_job/issues/73)
+
+**Merged pull requests:**
+
+- Allow named queues to be excluded with a minus [\#77](https://github.com/bensheldon/good_job/pull/77) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.1.1](https://github.com/bensheldon/good_job/tree/v1.1.1) (2020-08-12)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.1.0...v1.1.1)
@@ -124,7 +136,6 @@
 - Add more examples to Readme [\#39](https://github.com/bensheldon/good_job/pull/39) ([bensheldon](https://github.com/bensheldon))
 - Add additional Rubocops and lint [\#38](https://github.com/bensheldon/good_job/pull/38) ([bensheldon](https://github.com/bensheldon))
 - Always store a default queue\_name, priority and scheduled\_at; index by queue\_name and scheduled\_at [\#37](https://github.com/bensheldon/good_job/pull/37) ([bensheldon](https://github.com/bensheldon))
-- Extract Job querying behavior out of Scheduler [\#31](https://github.com/bensheldon/good_job/pull/31) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.6.0](https://github.com/bensheldon/good_job/tree/v0.6.0) (2020-07-15)
 
@@ -140,6 +151,7 @@
 - Improve generation of changelog [\#36](https://github.com/bensheldon/good_job/pull/36) ([bensheldon](https://github.com/bensheldon))
 - Update Github Action Workflow for Backlog Project Board [\#35](https://github.com/bensheldon/good_job/pull/35) ([bensheldon](https://github.com/bensheldon))
 - Add configuration options to good\_job executable [\#33](https://github.com/bensheldon/good_job/pull/33) ([bensheldon](https://github.com/bensheldon))
+- Extract Job querying behavior out of Scheduler [\#31](https://github.com/bensheldon/good_job/pull/31) ([bensheldon](https://github.com/bensheldon))
 - Allow configuration of Rails queue adapter with `:good\_job` [\#28](https://github.com/bensheldon/good_job/pull/28) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.5.0](https://github.com/bensheldon/good_job/tree/v0.5.0) (2020-07-13)
