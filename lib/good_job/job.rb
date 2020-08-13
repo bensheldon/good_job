@@ -21,8 +21,21 @@ module GoodJob
     scope :priority_ordered, -> { order('priority DESC NULLS LAST') }
     scope :finished, ->(timestamp = nil) { timestamp ? where(arel_table['finished_at'].lteq(timestamp)) : where.not(finished_at: nil) }
     scope :queue_string, (lambda do |string|
-      queue_names_without_all = (string.presence || '*').split(',').map(&:strip).reject { |q| q == '*' }
-      where(queue_name: queue_names_without_all) unless queue_names_without_all.size.zero?
+      string = string.presence || '*'
+
+      if string.first == '-'
+        exclude_queues = true
+        string = string[1..-1]
+      end
+
+      queue_names_without_all = string.split(',').map(&:strip).reject { |q| q == '*' }
+      return if queue_names_without_all.size.zero?
+
+      if exclude_queues
+        where.not(queue_name: queue_names_without_all).or where(queue_name: nil)
+      else
+        where(queue_name: queue_names_without_all)
+      end
     end)
 
     def self.perform_with_advisory_lock

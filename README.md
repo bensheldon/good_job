@@ -79,29 +79,36 @@ $ bundle install
       good_job start
     
     Options:
-      [--max-threads=N]                           # Maximum number of threads to use for working jobs (default: ActiveRecord::Base.connection_pool.size)
-      [--queues=queue1,queue2(;queue3,queue4:5)]  # Queues to work from. Separate multiple queues with commas; separate isolated execution pools with semicolons and threads with colons (default: *)
-      [--poll-interval=N]                         # Interval between polls for available jobs in seconds (default: 1)
+      [--max-threads=N]                                          # Maximum number of threads to use for working jobs (default: ActiveRecord::Base.connection_pool.size)
+      [--queues=queue1,queue2(;queue3,queue4:5;-queue1,queue2)]  # Queues to work from. Separate multiple queues with commas; exclude queues with a leading minus; separate isolated execution pools with semicolons and threads with colons (default: *)
+      [--poll-interval=N]                                        # Interval between polls for available jobs in seconds (default: 1)    
     
     Start job worker
     ```
 
-1. Optimize execution to reduce congestion and execution latency. By default, GoodJob creates a single thread execution pool that will execute jobs from any queue. Depending on your application's workload, job types, and service level objectives, you may wish to optimize execution resources; for example, providing dedicated execution resources for transactional emails so they are not delayed by long-running batch jobs. Some options:
+1. Optimize execution to reduce congestion and execution latency. 
+
+    By default, GoodJob creates a single thread execution pool that will execute jobs from any queue. Depending on your application's workload, job types, and service level objectives, you may wish to optimize execution resources; for example, providing dedicated execution resources for transactional emails so they are not delayed by long-running batch jobs. Some options:
 
     - Multiple execution pools within a single process:
         
         ```bash
-        $ bundle exec good_job --queues=*;transactional_messages:2;batch_processing:1 --max-threads=5
+        $ bundle exec good_job --queues=transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;* --max-threads=5
         ```
       
-        This configuration will result in a single process with 3 isolated thread execution pools. A pool that will run jobs from any queue, `*`, with up to 5 threads; a pool that will only run jobs enqueued on `transactional_messages` with up to 2 threads; and a pool dedicated to the `batch_processing` queue with a single thread.
+        This configuration will result in a single process with 4 isolated thread execution pools. Isolated execution pools are separated with a semicolon (`;`) and queue names and thread counts with a colon (`:`)
+        
+        - `transactional_messages:2`: execute jobs enqueued on `transactional_messages` with up to 2 threads.
+        - `batch_processing:1` execute jobs enqueued on `batch_processing` with a single thread.
+        - `-transactional_messages,batch_processing`: execute jobs enqueued on _any_ queue _excluding_ `transactional_messages` or `batch_processing` with up to 2 threads.
+        - `*`: execute jobs on any queue on up to 5 threads, as configured by `--max-threads=5`
         
         For moderate workloads, multiple isolated thread execution pools offers a good balance between congestion management and economy. 
         
         Configuration can be injected by environment variables too:
         
         ```bash
-        $ GOOD_JOB_QUEUES="*;transactional_messages:2;batch_processing:1" GOOD_JOB_MAX_THREADS=5 bundle exec good_job
+        $ GOOD_JOB_QUEUES="transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;*" GOOD_JOB_MAX_THREADS=5 bundle exec good_job
         ```
         
     - Multiple processes; for example, on Heroku:
