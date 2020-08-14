@@ -76,11 +76,11 @@ module GoodJob
     def perform(destroy_after: !GoodJob.preserve_job_records, reperform_on_standard_error: GoodJob.reperform_jobs_on_standard_error)
       raise PreviouslyPerformedError, 'Cannot perform a job that has already been performed' if finished_at
 
+      GoodJob::CurrentExecution.reset
       result = nil
       rescued_error = nil
       error = nil
 
-      ActiveSupport::Notifications.instrument("before_perform_job.good_job", { good_job: self })
       self.performed_at = Time.current
       save! unless destroy_after
 
@@ -96,11 +96,16 @@ module GoodJob
         rescued_error = e
       end
 
+      retry_or_discard_error = GoodJob::CurrentExecution.error_on_retry ||
+                               GoodJob::CurrentExecution.error_on_discard
+
       if rescued_error
         error = rescued_error
       elsif result.is_a?(Exception)
         error = result
         result = nil
+      elsif retry_or_discard_error
+        error = retry_or_discard_error
       end
 
       error_message = "#{error.class}: #{error.message}" if error

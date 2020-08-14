@@ -10,6 +10,7 @@ require 'good_job/multi_scheduler'
 require 'good_job/adapter'
 require 'good_job/pg_locks'
 require 'good_job/performer'
+require 'good_job/current_execution'
 
 require 'active_job/queue_adapters/good_job_adapter'
 

@@ -202,6 +202,7 @@ GEM
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    yard (0.9.25)
 
 PLATFORMS
   ruby
@@ -222,6 +223,7 @@ DEPENDENCIES
   rubocop-performance
   rubocop-rails
   rubocop-rspec
+  yard
 
 BUNDLED WITH
    2.1.4
