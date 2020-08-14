@@ -28,10 +28,10 @@ module GoodJob # :nodoc:
       fallback_policy: :discard,
     }.freeze
 
-    # All instantiated Schedulers in the current process.
-    # @!scope class
     # @!attribute [r] instances
-    # @return [array<GoodJob:Scheduler>]
+    #   @!scope class
+    #   All instantiated Schedulers in the current process.
+    #   @return [array<GoodJob:Scheduler>]
     cattr_reader :instances, default: [], instance_reader: false
 
     # Creates GoodJob::Scheduler(s) and Performers from a GoodJob::Configuration instance.

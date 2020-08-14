@@ -105,11 +105,78 @@ RSpec.describe GoodJob::Job do
     let(:active_job) { ExampleJob.new("a string") }
     let!(:good_job) { described_class.enqueue(active_job) }
 
-    it 'returns the results of the job' do
-      result, error = good_job.perform
+    describe 'return value' do
+      it 'returns the results of the job' do
+        result, error = good_job.perform
 
-      expect(result).to eq "a string"
-      expect(error).to be_nil
+        expect(result).to eq "a string"
+        expect(error).to be_nil
+      end
+
+      context 'when there is an error' do
+        let(:active_job) { ExampleJob.new("whoops", raise_error: true) }
+
+        it 'returns the error' do
+          result, error = good_job.perform
+
+          expect(result).to eq nil
+          expect(error).to be_an_instance_of ExpectedError
+        end
+
+        context 'when error monitoring service intercepts exception' do
+          before do
+            # Similar to Sentry monitor's implementation
+            # https://github.com/getsentry/raven-ruby/blob/20b260a6d04e0ca01d5cddbd9728e6fc8ae9a90c/lib/raven/integrations/rails/active_job.rb#L21-L31
+            ExampleJob.around_perform do |_job, block|
+              begin
+                block.call
+              rescue StandardError => e
+                next if rescue_with_handler(e)
+
+                raise e
+              ensure
+                nil
+              end
+            end
+          end
+
+          it 'returns the error' do
+            result, error = good_job.perform
+
+            expect(result).to eq nil
+            expect(error).to be_an_instance_of ExpectedError
+          end
+
+          if Gem::Version.new(Rails.version) > Gem::Version.new("6")
+            # Necessary instrumentation was added in Rails 6.0
+            context 'when retry_on is used' do
+              before do
+                ExampleJob.retry_on(StandardError, wait: 0, attempts: Float::INFINITY) { nil }
+              end
+
+              it 'returns the error' do
+                result, error = good_job.perform
+
+                expect(result).to eq nil
+                expect(error).to be_an_instance_of ExpectedError
+              end
+            end
+
+            context 'when discard_on is used' do
+              before do
+                ExampleJob.discard_on(StandardError) { nil }
+              end
+
+              it 'returns the error' do
+                result, error = good_job.perform
+
+                expect(result).to eq nil
+                expect(error).to be_an_instance_of ExpectedError
+              end
+            end
+          end
+        end
+      end
     end
 
     it 'destroys the job' do
@@ -134,7 +201,7 @@ RSpec.describe GoodJob::Job do
       let(:active_job) { ExampleJob.new("a string", raise_error: true) }
 
       before do
-        ExampleJob.retry_on StandardError, wait: 0, attempts: Float::INFINITY
+        ExampleJob.retry_on(StandardError, wait: 0, attempts: Float::INFINITY) { nil }
       end
 
       it 'returns the results of the job' do
