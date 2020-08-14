@@ -6,3 +6,5 @@ spec/test_app/log/*.log
 spec/test_app/storage/
 spec/test_app/tmp/
 .env
+doc
+.yardoc
