@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.1.3](https://github.com/bensheldon/good_job/tree/v1.1.3) (2020-08-14)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.1.2...v1.1.3)
+
+**Fixed bugs:**
+
+- Job exceptions not properly attached to good\_jobs record  [\#72](https://github.com/bensheldon/good_job/issues/72)
+
+**Merged pull requests:**
+
+- Capture errors via instrumentation from retry\_on and discard\_on [\#79](https://github.com/bensheldon/good_job/pull/79) ([bensheldon](https://github.com/bensheldon))
+- Document GoodJob::Scheduler with Yard [\#78](https://github.com/bensheldon/good_job/pull/78) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.1.2](https://github.com/bensheldon/good_job/tree/v1.1.2) (2020-08-13)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.1.1...v1.1.2)
@@ -60,6 +73,7 @@
 
 - Re-perform a job if a StandardError bubbles up; better document job reliability [\#62](https://github.com/bensheldon/good_job/pull/62) ([bensheldon](https://github.com/bensheldon))
 - Update the setup documentation to use correct bin setup command [\#61](https://github.com/bensheldon/good_job/pull/61) ([jm96441n](https://github.com/jm96441n))
+- Allow preservation of finished job records [\#46](https://github.com/bensheldon/good_job/pull/46) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.0.2](https://github.com/bensheldon/good_job/tree/v1.0.2) (2020-07-25)
 
@@ -89,10 +103,6 @@
 ## [v0.9.0](https://github.com/bensheldon/good_job/tree/v0.9.0) (2020-07-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.2...v0.9.0)
-
-**Merged pull requests:**
-
-- Allow preservation of finished job records [\#46](https://github.com/bensheldon/good_job/pull/46) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.8.2](https://github.com/bensheldon/good_job/tree/v0.8.2) (2020-07-18)
 
