@@ -3,10 +3,6 @@ require 'rails_helper'
 RSpec.describe GoodJob::Scheduler do
   let(:performer) { instance_double(GoodJob::Performer, next: nil, name: '') }
 
-  around do |example|
-    expect { example.run }.to output.to_stdout # rubocop:disable RSpec/ExpectInHook
-  end
-
   context 'when thread error' do
     let(:error_proc) { double("Error Collector", call: nil) } # rubocop:disable RSpec/VerifiedDoubles
 

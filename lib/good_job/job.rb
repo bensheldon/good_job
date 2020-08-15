@@ -89,7 +89,7 @@ module GoodJob
       )
 
       begin
-        ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self }) do
+        ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, process_id: GoodJob::CurrentExecution.process_id, thread_name: GoodJob::CurrentExecution.thread_name }) do
           result = ActiveJob::Base.execute(params)
         end
       rescue StandardError => e

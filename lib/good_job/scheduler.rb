@@ -19,7 +19,6 @@ module GoodJob # :nodoc:
 
     # Defaults for instance of Concurrent::ThreadPoolExecutor
     DEFAULT_POOL_OPTIONS = {
-      name: 'good_job',
       min_threads: 0,
       max_threads: Concurrent.processor_count,
       auto_terminate: true,
@@ -74,6 +73,8 @@ module GoodJob # :nodoc:
       @pool_options = DEFAULT_POOL_OPTIONS.merge(pool_options)
       @timer_options = DEFAULT_TIMER_OPTIONS.merge(timer_options)
 
+      @pool_options[:name] = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@pool_options[:max_threads]} poll_interval=#{@timer_options[:execution_interval]})"
+
       create_pools
     end
 
@@ -83,8 +84,8 @@ module GoodJob # :nodoc:
     def shutdown(wait: true)
       @_shutdown = true
 
-      ActiveSupport::Notifications.instrument("scheduler_shutdown_start.good_job", { wait: wait, process_id: process_id })
-      ActiveSupport::Notifications.instrument("scheduler_shutdown.good_job", { wait: wait, process_id: process_id }) do
+      instrument("scheduler_shutdown_start", { wait: wait })
+      instrument("scheduler_shutdown", { wait: wait }) do
         if @timer&.running?
           @timer.shutdown
           @timer.wait_for_termination if wait
@@ -107,7 +108,7 @@ module GoodJob # :nodoc:
     # @param wait [Boolean] Wait for actively executing jobs to finish
     # @return [void]
     def restart(wait: true)
-      ActiveSupport::Notifications.instrument("scheduler_restart_pools.good_job", { process_id: process_id }) do
+      instrument("scheduler_restart_pools") do
         shutdown(wait: wait) unless shutdown?
         create_pools
       end
@@ -133,7 +134,7 @@ module GoodJob # :nodoc:
     # @return [void]
     def timer_observer(time, executed_task, thread_error)
       GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
-      ActiveSupport::Notifications.instrument("finished_timer_task.good_job", { result: executed_task, error: thread_error, time: time })
+      instrument("finished_timer_task", { result: executed_task, error: thread_error, time: time })
     end
 
     # Invoked on completion of ThreadPoolExecutor task
@@ -141,7 +142,7 @@ module GoodJob # :nodoc:
     # @return [void]
     def task_observer(time, output, thread_error)
       GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
-      ActiveSupport::Notifications.instrument("finished_job_task.good_job", { result: output, error: thread_error, time: time })
+      instrument("finished_job_task", { result: output, error: thread_error, time: time })
       create_thread if output
     end
 
@@ -149,7 +150,7 @@ module GoodJob # :nodoc:
 
     # @return [void]
     def create_pools
-      ActiveSupport::Notifications.instrument("scheduler_create_pools.good_job", { performer_name: @performer.name, max_threads: @pool_options[:max_threads], poll_interval: @timer_options[:execution_interval], process_id: process_id }) do
+      instrument("scheduler_create_pools", { performer_name: @performer.name, max_threads: @pool_options[:max_threads], poll_interval: @timer_options[:execution_interval] }) do
         @pool = ThreadPoolExecutor.new(@pool_options)
         next unless @timer_options[:execution_interval].positive?
 
@@ -159,14 +160,14 @@ module GoodJob # :nodoc:
       end
     end
 
-    # @return [Integer] Current process ID
-    def process_id
-      Process.pid
-    end
+    def instrument(name, payload = {}, &block)
+      payload = payload.reverse_merge({
+                                        scheduler: self,
+                                        process_id: GoodJob::CurrentExecution.process_id,
+                                        thread_name: GoodJob::CurrentExecution.thread_name,
+                                      })
 
-    # @return [String] Current thread name
-    def thread_name
-      (Thread.current.name || Thread.current.object_id).to_s
+      ActiveSupport::Notifications.instrument("#{name}.good_job", payload, &block)
     end
   end
 

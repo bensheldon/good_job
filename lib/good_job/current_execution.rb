@@ -21,5 +21,15 @@ module GoodJob
       self.error_on_retry = nil
       self.error_on_discard = nil
     end
+
+    # @return [Integer] Current process ID
+    def self.process_id
+      Process.pid
+    end
+
+    # @return [String] Current thread name
+    def self.thread_name
+      (Thread.current.name || Thread.current.object_id).to_s
+    end
   end
 end

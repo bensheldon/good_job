@@ -18,10 +18,7 @@ RSpec.describe GoodJob::CLI do
       allow(Kernel).to receive(:loop)
 
       cli = described_class.new([], {}, {})
-
-      expect do
-        cli.start
-      end.to output.to_stdout
+      cli.start
 
       expect(GoodJob::Scheduler).to have_received(:new)
     end
@@ -84,7 +81,8 @@ RSpec.describe GoodJob::CLI do
 
     it 'deletes finished jobs' do
       cli = described_class.new([], { before_seconds_ago: 24.hours.to_i }, {})
-      expect { cli.cleanup_preserved_jobs }.to output(/GoodJob deleted 1 preserved job/).to_stdout
+
+      cli.cleanup_preserved_jobs
 
       expect { recent_job.reload }.not_to raise_error
       expect { old_unfinished_job.reload }.not_to raise_error
