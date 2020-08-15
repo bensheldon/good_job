@@ -40,10 +40,6 @@ RSpec.describe 'Schedule Integration' do
 
   let(:adapter) { GoodJob::Adapter.new }
 
-  around do |example|
-    expect { example.run }.to output.to_stdout # rubocop:disable RSpec/ExpectInHook
-  end
-
   context 'when there are a large number of jobs' do
     let(:number_of_jobs) { 250 }
 

@@ -15,7 +15,7 @@ require 'good_job/current_execution'
 require 'active_job/queue_adapters/good_job_adapter'
 
 module GoodJob
-  cattr_accessor :logger, default: ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new(STDOUT))
+  mattr_accessor :logger, default: ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new(STDOUT))
   mattr_accessor :preserve_job_records, default: false
   mattr_accessor :reperform_jobs_on_standard_error, default: true
   mattr_accessor :on_thread_error, default: nil

@@ -55,6 +55,10 @@ module GoodJob
     no_commands do
       def set_up_application!
         require RAILS_ENVIRONMENT_RB
+        return unless defined?(GOOD_JOB_LOG_TO_STDOUT) && GOOD_JOB_LOG_TO_STDOUT && !ActiveSupport::Logger.logger_outputs_to?(GoodJob.logger, STDOUT)
+
+        GoodJob::LogSubscriber.loggers << ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new(STDOUT))
+        GoodJob::LogSubscriber.reset_logger
       end
     end
   end
