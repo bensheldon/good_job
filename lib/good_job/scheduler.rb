@@ -42,7 +42,17 @@ module GoodJob # :nodoc:
         max_threads = (max_threads || configuration.max_threads).to_i
 
         job_query = GoodJob::Job.queue_string(queue_string)
-        job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: queue_string)
+        parsed = GoodJob::Job.queue_parser(queue_string)
+        job_filter = proc do |state|
+          if parsed[:exclude]
+            !parsed[:exclude].include? state[:queue_name]
+          elsif parsed[:include]
+            parsed[:include].include? state[:queue_name]
+          else
+            true
+          end
+        end
+        job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: queue_string, filter: job_filter)
 
         timer_options = {}
         timer_options[:execution_interval] = configuration.poll_interval if configuration.poll_interval.positive?
@@ -116,8 +126,12 @@ module GoodJob # :nodoc:
 
     # Triggers the execution the Performer, if an execution thread is available.
     # @return [Boolean]
-    def create_thread
-      return false unless @pool.ready_worker_count.positive?
+    def create_thread(state = nil)
+      return nil unless @pool.ready_worker_count.positive?
+
+      if state
+        return false unless @performer.next?(state)
+      end
 
       future = Concurrent::Future.new(args: [@performer], executor: @pool) do |performer|
         output = nil

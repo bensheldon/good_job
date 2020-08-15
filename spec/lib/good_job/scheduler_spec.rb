@@ -3,6 +3,10 @@ require 'rails_helper'
 RSpec.describe GoodJob::Scheduler do
   let(:performer) { instance_double(GoodJob::Performer, next: nil, name: '') }
 
+  after do
+    described_class.instances.each(&:shutdown)
+  end
+
   context 'when thread error' do
     let(:error_proc) { double("Error Collector", call: nil) } # rubocop:disable RSpec/VerifiedDoubles
 
@@ -76,6 +80,22 @@ RSpec.describe GoodJob::Scheduler do
 
       expect(scheduler.instance_variable_get(:@timer).running?).to be true
       expect(scheduler.instance_variable_get(:@pool).running?).to be true
+    end
+  end
+
+  describe '#create_thread' do
+    it 'returns true if the state matches the performer' do
+      configuration = GoodJob::Configuration.new({ queues: 'mice:2' })
+      scheduler = described_class.from_configuration(configuration)
+
+      expect(scheduler.create_thread(queue_name: 'mice')).to eq true
+    end
+
+    it 'returns false if the state does not match the performer' do
+      configuration = GoodJob::Configuration.new({ queues: 'mice:2' })
+      scheduler = described_class.from_configuration(configuration)
+
+      expect(scheduler.create_thread(queue_name: 'elephant')).to eq false
     end
   end
 

@@ -18,8 +18,15 @@ module GoodJob
       schedulers.each { |s| s.restart(wait: wait) }
     end
 
-    def create_thread
-      schedulers.all?(&:create_thread)
+    def create_thread(state = nil)
+      if state
+        schedulers.any? { |scheduler| scheduler.create_thread(state) }
+      else
+        results = schedulers.map { |scheduler| scheduler.create_thread(state) }
+        return nil if results.all(&:nil?)
+
+        results.any?
+      end
     end
   end
 end

@@ -4,7 +4,7 @@ require 'rails_helper'
 RSpec.describe GoodJob::Adapter do
   let(:adapter) { described_class.new }
   let(:active_job) { instance_double(ApplicationJob) }
-  let(:good_job) { instance_double(GoodJob::Job) }
+  let(:good_job) { instance_double(GoodJob::Job, queue_name: 'default') }
 
   describe '#initialize' do
     it 'guards against improper execution modes' do
@@ -29,7 +29,7 @@ RSpec.describe GoodJob::Adapter do
 
     context 'when async' do
       it 'trigger an execution thread' do
-        allow(GoodJob::Job).to receive(:enqueue).and_return(:good_job)
+        allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
 
         scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
         adapter = described_class.new(execution_mode: :async, scheduler: scheduler)
