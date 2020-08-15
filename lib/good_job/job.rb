@@ -9,6 +9,25 @@ module GoodJob
 
     self.table_name = 'good_jobs'.freeze
 
+    def self.queue_parser(string)
+      string = string.presence || '*'
+
+      if string.first == '-'
+        exclude_queues = true
+        string = string[1..-1]
+      end
+
+      queues = string.split(',').map(&:strip)
+
+      if queues.include?('*')
+        { all: true }
+      elsif exclude_queues
+        { exclude: queues }
+      else
+        { include: queues }
+      end
+    end
+
     scope :unfinished, (lambda do
       if column_names.include?('finished_at')
         where(finished_at: nil)
@@ -21,20 +40,14 @@ module GoodJob
     scope :priority_ordered, -> { order('priority DESC NULLS LAST') }
     scope :finished, ->(timestamp = nil) { timestamp ? where(arel_table['finished_at'].lteq(timestamp)) : where.not(finished_at: nil) }
     scope :queue_string, (lambda do |string|
-      string = string.presence || '*'
+      parsed = queue_parser(string)
 
-      if string.first == '-'
-        exclude_queues = true
-        string = string[1..-1]
-      end
-
-      queue_names_without_all = string.split(',').map(&:strip).reject { |q| q == '*' }
-      return if queue_names_without_all.size.zero?
-
-      if exclude_queues
-        where.not(queue_name: queue_names_without_all).or where(queue_name: nil)
-      else
-        where(queue_name: queue_names_without_all)
+      if parsed[:all]
+        all
+      elsif parsed[:exclude]
+        where.not(queue_name: parsed[:exclude]).or where(queue_name: nil)
+      elsif parsed[:include]
+        where(queue_name: parsed[:include])
       end
     end)
 

@@ -42,7 +42,7 @@ module GoodJob
         end
       end
 
-      @scheduler.create_thread if execute_async?
+      @scheduler.create_thread(queue_name: good_job.queue_name) if execute_async?
 
       good_job
     end

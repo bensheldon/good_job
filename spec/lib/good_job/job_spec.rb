@@ -84,6 +84,25 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  describe '.queue_parser' do
+    it 'creates an intermediary hash' do
+      result = described_class.queue_parser('first,second')
+      expect(result).to eq({
+                             include: %w[first second],
+                           })
+
+      result = described_class.queue_parser('-first,second')
+      expect(result).to eq({
+                             exclude: %w[first second],
+                           })
+
+      result = described_class.queue_parser('')
+      expect(result).to eq({
+                             all: true,
+                           })
+    end
+  end
+
   describe '.queue_string' do
     it 'separates commas' do
       query = described_class.queue_string('first,second')
