@@ -18,8 +18,10 @@ module GoodJob
     def start
       set_up_application!
 
-      configuration = Configuration.new(options, env: ENV)
-      scheduler = Scheduler.from_configuration(configuration)
+      notifier = GoodJob::Notifier.new
+      configuration = GoodJob::Configuration.new(options)
+      scheduler = GoodJob::Scheduler.from_configuration(configuration)
+      notifier.recipients << [scheduler, :create_thread]
 
       @stop_good_job_executable = false
       %w[INT TERM].each do |signal|
@@ -28,9 +30,10 @@ module GoodJob
 
       Kernel.loop do
         sleep 0.1
-        break if @stop_good_job_executable || scheduler.shutdown?
+        break if @stop_good_job_executable || scheduler.shutdown? || notifier.shutdown?
       end
 
+      notifier.shutdown
       scheduler.shutdown
     end
 
@@ -41,6 +44,7 @@ module GoodJob
                   type: :numeric,
                   default: 24 * 60 * 60,
                   desc: "Delete records finished more than this many seconds ago"
+
     def cleanup_preserved_jobs
       set_up_application!
 

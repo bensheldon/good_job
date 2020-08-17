@@ -16,7 +16,7 @@ RSpec.describe GoodJob::Adapter do
 
   describe '#enqueue' do
     it 'calls GoodJob::Job.enqueue with parameters' do
-      allow(GoodJob::Job).to receive(:enqueue)
+      allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
 
       adapter.enqueue(active_job)
 
@@ -43,7 +43,7 @@ RSpec.describe GoodJob::Adapter do
 
   describe '#enqueue_at' do
     it 'calls GoodJob::Job.enqueue with parameters' do
-      allow(GoodJob::Job).to receive(:enqueue).and_return(:good_job)
+      allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
 
       scheduled_at = 1.minute.from_now
 

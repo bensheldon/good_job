@@ -16,6 +16,7 @@ module TestApp
     # the framework and any gems in your application.
     #
 
+    config.middleware.insert_before Rack::Sendfile, ActionDispatch::DebugLocks
     config.log_level = :debug
   end
 end
