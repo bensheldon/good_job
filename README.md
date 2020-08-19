@@ -6,7 +6,7 @@ GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 
 - **Designed for ActiveJob.** Complete support for [async, queues, delays, priorities, timeouts, and retries](https://edgeguides.rubyonrails.org/active_job_basics.html) with near-zero configuration. 
 - **Built for Rails.** Fully adopts Ruby on Rails [threading and code execution guidelines](https://guides.rubyonrails.org/threading_and_code_execution.html) with [Concurrent::Ruby](https://github.com/ruby-concurrency/concurrent-ruby). 
-- **Backed by Postgres.** Relies upon Postgres integrity and session-level Advisory Locks to provide run-once safety and stay within the limits of `schema.rb`.
+- **Backed by Postgres.** Relies upon Postgres integrity, session-level Advisory Locks to provide run-once safety and stay within the limits of `schema.rb`, and LISTEN/NOTIFY to reduce queuing latency.
 - **For most workloads.** Targets full-stack teams, economy-minded solo developers, and applications that enqueue less than 1-million jobs/day.
 
 For more of the story of GoodJob, read the [introductory blog post](https://island94.org/2020/07/introducing-goodjob-1-0).
@@ -284,15 +284,20 @@ Depending on your application configuration, you may need to take additional ste
     # config/puma.rb
   
     before_fork do
-      GoodJob::Scheduler.instances.each { |s| s.shutdown }
+      GoodJob.shutdown
     end
     
     on_worker_boot do
-      GoodJob::Scheduler.instances.each { |s| s.restart }
+      GoodJob.restart
     end
     
     on_worker_shutdown do
-      GoodJob::Scheduler.instances.each { |s| s.shutdown }
+      GoodJob.shutdown
+    end
+  
+    MAIN_PID = Process.pid
+    at_exit do
+      GoodJob.shutdown if Process.pid == MAIN_PID
     end
     ```
   

@@ -35,7 +35,7 @@ RSpec.describe GoodJob::Job do
         serialized_params: a_kind_of(Hash),
         queue_name: 'test',
         priority: 50,
-        scheduled_at: within(1.second).of(Time.current)
+        scheduled_at: nil
       )
     end
 

@@ -73,7 +73,7 @@ module GoodJob
           queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
           priority: active_job.priority || DEFAULT_PRIORITY,
           serialized_params: active_job.serialize,
-          scheduled_at: scheduled_at || Time.current,
+          scheduled_at: scheduled_at,
           create_with_advisory_lock: create_with_advisory_lock
         )
 

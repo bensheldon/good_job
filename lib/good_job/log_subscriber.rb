@@ -71,6 +71,34 @@ module GoodJob
       end
     end
 
+    def notifier_listen(_event)
+      info do
+        "Notifier subscribed with LISTEN"
+      end
+    end
+
+    def notifier_notified(event)
+      payload = event.payload[:payload]
+
+      debug do
+        "Notifier received payload: #{payload}"
+      end
+    end
+
+    def notifier_notify_error(event)
+      error = event.payload[:error]
+
+      error do
+        "Notifier errored: #{error}"
+      end
+    end
+
+    def notifier_unlisten(_event)
+      info do
+        "Notifier unsubscribed with UNLISTEN"
+      end
+    end
+
     def cleanup_preserved_jobs(event)
       timestamp = event.payload[:timestamp]
       deleted_records_count = event.payload[:deleted_records_count]

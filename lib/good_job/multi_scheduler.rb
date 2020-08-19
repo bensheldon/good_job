@@ -19,13 +19,15 @@ module GoodJob
     end
 
     def create_thread(state = nil)
-      if state
-        schedulers.any? { |scheduler| scheduler.create_thread(state) }
-      else
-        results = schedulers.map { |scheduler| scheduler.create_thread(state) }
-        return nil if results.all(&:nil?)
+      results = []
+      any_true = schedulers.any? do |scheduler|
+        scheduler.create_thread(state).tap { |result| results << result }
+      end
 
-        results.any?
+      if any_true
+        true
+      else
+        results.any? { |result| result == false } ? false : nil
       end
     end
   end

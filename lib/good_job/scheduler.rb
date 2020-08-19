@@ -3,12 +3,14 @@ require "concurrent/timer_task"
 require "concurrent/utility/processor_counter"
 
 module GoodJob # :nodoc:
+  #
   # Schedulers are generic thread execution pools that are responsible for
   # periodically checking for available execution tasks, executing tasks in a
   # bounded thread-pool, and efficiently scaling execution threads.
   #
   # Schedulers are "generic" in the sense that they delegate task execution
   # details to a "Performer" object that responds to #next.
+  #
   class Scheduler
     # Defaults for instance of Concurrent::TimerTask
     DEFAULT_TIMER_OPTIONS = {
@@ -55,7 +57,7 @@ module GoodJob # :nodoc:
         job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: queue_string, filter: job_filter)
 
         timer_options = {}
-        timer_options[:execution_interval] = configuration.poll_interval if configuration.poll_interval.positive?
+        timer_options[:execution_interval] = configuration.poll_interval
 
         pool_options = {
           max_threads: max_threads,
@@ -121,13 +123,15 @@ module GoodJob # :nodoc:
       instrument("scheduler_restart_pools") do
         shutdown(wait: wait) unless shutdown?
         create_pools
+        @_shutdown = false
       end
     end
 
-    # Triggers the execution the Performer, if an execution thread is available.
-    # @return [Boolean]
+    # Triggers a Performer execution, if an execution thread is available.
+    # @param state [nil, Object] Allows Performer#next? to accept or reject the execution
+    # @return [nil, Boolean] if the thread was created
     def create_thread(state = nil)
-      return nil unless @pool.ready_worker_count.positive?
+      return nil unless @pool.running? && @pool.ready_worker_count.positive?
 
       if state
         return false unless @performer.next?(state)
@@ -140,6 +144,7 @@ module GoodJob # :nodoc:
       end
       future.add_observer(self, :task_observer)
       future.execute
+
       true
     end
 

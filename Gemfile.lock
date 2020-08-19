@@ -84,6 +84,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday-http-cache (2.2.0)
       faraday (>= 0.8)
+    ffi (1.13.1)
     foreman (0.87.1)
     gem-release (2.1.1)
     github_changelog_generator (1.15.2)
@@ -110,6 +111,7 @@ GEM
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.14.1)
+    msgpack (1.3.3)
     multi_json (1.15.0)
     multipart-post (2.1.1)
     nio4r (2.5.2)
@@ -118,6 +120,7 @@ GEM
     octokit (4.18.0)
       faraday (>= 0.9)
       sawyer (~> 0.8.0, >= 0.5.3)
+    optimist (3.0.1)
     parallel (1.19.2)
     parser (2.7.1.4)
       ast (~> 2.4.1)
@@ -125,6 +128,8 @@ GEM
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    pry-rails (0.3.9)
+      pry (>= 0.10.4)
     public_suffix (4.0.5)
     puma (4.3.5)
       nio4r (~> 2.0)
@@ -159,6 +164,10 @@ GEM
       thor (>= 0.20.3, < 2.0)
     rainbow (3.0.0)
     rake (13.0.1)
+    rbtrace (0.4.14)
+      ffi (>= 1.0.6)
+      msgpack (>= 0.4.3)
+      optimist (>= 3.0.0)
     regexp_parser (1.7.1)
     retriable (3.1.2)
     rexml (3.2.4)
@@ -202,6 +211,7 @@ GEM
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
+    sigdump (0.2.4)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -231,13 +241,15 @@ DEPENDENCIES
   gem-release
   github_changelog_generator
   good_job!
-  pry
+  pry-rails
   puma
+  rbtrace
   rspec-rails
   rubocop
   rubocop-performance
   rubocop-rails
   rubocop-rspec
+  sigdump
   yard
 
 BUNDLED WITH
