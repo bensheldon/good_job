@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+puts "== Rebuilding Yard Documentation (ignore [warn] Unrecognized/invalid option...) =="
+# https://github.com/lsegal/yard/issues/844
+system!("bundle exec yard doc --no-cache --list-undoc")
+
+puts "\n== Starting Yard Server =="
+system!("bundle exec yard server --reload")
