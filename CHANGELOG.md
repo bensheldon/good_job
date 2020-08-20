@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.2.0](https://github.com/bensheldon/good_job/tree/v1.2.0) (2020-08-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.1.4...v1.2.0)
+
+**Merged pull requests:**
+
+- Document GoodJob module [\#83](https://github.com/bensheldon/good_job/pull/83) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.1.4](https://github.com/bensheldon/good_job/tree/v1.1.4) (2020-08-19)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.1.3...v1.1.4)
@@ -51,6 +59,7 @@
 **Merged pull requests:**
 
 - Allow instantiation of multiple schedulers via --queues [\#76](https://github.com/bensheldon/good_job/pull/76) ([bensheldon](https://github.com/bensheldon))
+- Extract options parsing to Configuration object [\#74](https://github.com/bensheldon/good_job/pull/74) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.1.0](https://github.com/bensheldon/good_job/tree/v1.1.0) (2020-08-10)
 
@@ -85,7 +94,6 @@
 
 **Merged pull requests:**
 
-- Extract options parsing to Configuration object [\#74](https://github.com/bensheldon/good_job/pull/74) ([bensheldon](https://github.com/bensheldon))
 - Re-perform a job if a StandardError bubbles up; better document job reliability [\#62](https://github.com/bensheldon/good_job/pull/62) ([bensheldon](https://github.com/bensheldon))
 - Update the setup documentation to use correct bin setup command [\#61](https://github.com/bensheldon/good_job/pull/61) ([jm96441n](https://github.com/jm96441n))
 
@@ -108,7 +116,7 @@
 
 **Merged pull requests:**
 
-- Allow preservation of finished job records [\#46](https://github.com/bensheldon/good_job/pull/46) ([bensheldon](https://github.com/bensheldon))
+- Change threadpool idletime default to 60 seconds from 0 [\#49](https://github.com/bensheldon/good_job/pull/49) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.0.0](https://github.com/bensheldon/good_job/tree/v1.0.0) (2020-07-20)
 
@@ -117,6 +125,10 @@
 ## [v0.9.0](https://github.com/bensheldon/good_job/tree/v0.9.0) (2020-07-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.2...v0.9.0)
+
+**Merged pull requests:**
+
+- Allow preservation of finished job records [\#46](https://github.com/bensheldon/good_job/pull/46) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.8.2](https://github.com/bensheldon/good_job/tree/v0.8.2) (2020-07-18)
 
@@ -145,7 +157,6 @@
 
 **Merged pull requests:**
 
-- Change threadpool idletime default to 60 seconds from 0 [\#49](https://github.com/bensheldon/good_job/pull/49) ([bensheldon](https://github.com/bensheldon))
 - Replace Adapter inline boolean kwarg with execution\_mode instead [\#41](https://github.com/bensheldon/good_job/pull/41) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.7.0](https://github.com/bensheldon/good_job/tree/v0.7.0) (2020-07-16)
