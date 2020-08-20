@@ -11,6 +11,19 @@ GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 
 For more of the story of GoodJob, read the [introductory blog post](https://island94.org/2020/07/introducing-goodjob-1-0).
 
+<details>
+<summary><strong>📊 Comparison of GoodJob with other job queue backends (click to expand)</strong></summary>
+
+|                 | Queues, priority, retries | Database                              | Concurrency       | Reliability/Integrity  | Latency                  |
+|-----------------|---------------------------|---------------------------------------|-------------------|------------------------|--------------------------|
+| **GoodJob**     | ✅ Yes                     | ✅ Postgres                            | ✅ Multithreaded   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
+| **Que**         | ✅ Yes                     | 🟨 Postgres, requires  `structure.sql` | ✅ Multithreaded   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
+| **Delayed Job** | ✅ Yes                     | ✅ Postgres                            | 🟥 Single-threaded | ✅ ACID, record-based   | 🟨 Polling                |
+| **Sidekiq**     | ✅ Yes                     | 🟥 Redis                               | ✅ Multithreaded   | 🟥 Crashes lose jobs    | ✅ Redis BRPOP            |
+| **Sidekiq Pro** | ✅ Yes                     | 🟥 Redis                               | ✅ Multithreaded   | ✅ Redis RPOPLPUSH      | ✅ Redis RPOPLPUSH        |
+
+</details>
+
 ## Installation
 
 Add this line to your application's Gemfile:
