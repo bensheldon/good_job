@@ -1,6 +1,20 @@
 # Changelog
 
-## [v1.2.0](https://github.com/bensheldon/good_job/tree/v1.2.0) (2020-08-19)
+## [v1.2.1](https://github.com/bensheldon/good_job/tree/v1.2.1) (2020-08-21)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.0...v1.2.1)
+
+**Closed issues:**
+
+- undefined method `thread\_mattr\_accessor' when not requiring the Sprockets Railstie [\#85](https://github.com/bensheldon/good_job/issues/85)
+- Document comparison of GoodJob with other backends [\#51](https://github.com/bensheldon/good_job/issues/51)
+
+**Merged pull requests:**
+
+- Explicitly require thread\_mattr\_accessor from ActiveSupport [\#86](https://github.com/bensheldon/good_job/pull/86) ([bensheldon](https://github.com/bensheldon))
+- Add comparison of other backends to Readme [\#84](https://github.com/bensheldon/good_job/pull/84) ([bensheldon](https://github.com/bensheldon))
+
+## [v1.2.0](https://github.com/bensheldon/good_job/tree/v1.2.0) (2020-08-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.1.4...v1.2.0)
 
