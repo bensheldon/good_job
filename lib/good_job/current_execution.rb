@@ -1,3 +1,5 @@
+require 'active_support/core_ext/module/attribute_accessors_per_thread'
+
 module GoodJob
   # Thread-local attributes for passing values from Instrumentation.
   # (Cannot use ActiveSupport::CurrentAttributes because ActiveJob resets it)
