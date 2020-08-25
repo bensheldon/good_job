@@ -56,11 +56,13 @@ module GoodJob
       result = nil
       error = nil
 
-      unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock do |good_jobs|
-        good_job = good_jobs.first
-        break unless good_job
+      Rails.application.executor.wrap do
+        unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock do |good_jobs|
+          good_job = good_jobs.first
+          break unless good_job
 
-        result, error = good_job.perform
+          result, error = good_job.perform
+        end
       end
 
       [good_job, result, error] if good_job
