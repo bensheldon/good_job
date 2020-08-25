@@ -137,7 +137,7 @@ module GoodJob # :nodoc:
         return false unless @performer.next?(state)
       end
 
-      future = Concurrent::Future.new(args: [@performer], executor: @pool, &:next)
+      future = Concurrent::Future.new(executor: @pool, &@performer.method(:next))
       future.add_observer(self, :task_observer)
       future.execute
 
