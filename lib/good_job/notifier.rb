@@ -7,6 +7,7 @@ module GoodJob # :nodoc:
   class Notifier
     CHANNEL = 'good_job'.freeze
     POOL_OPTIONS = {
+      name: name,
       min_threads: 0,
       max_threads: 1,
       auto_terminate: true,
