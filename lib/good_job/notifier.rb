@@ -69,13 +69,13 @@ module GoodJob # :nodoc:
 
     def listen
       future = Concurrent::Future.new(args: [@recipients, @pool, @listening], executor: @pool) do |recipients, pool, listening|
-        Rails.application.reloader.wrap do
-          with_listen_connection do |conn|
-            ActiveSupport::Notifications.instrument("notifier_listen.good_job") do
-              conn.async_exec "LISTEN #{CHANNEL}"
-            end
+        begin
+          Rails.application.reloader.wrap do
+            with_listen_connection do |conn|
+              ActiveSupport::Notifications.instrument("notifier_listen.good_job") do
+                conn.async_exec "LISTEN #{CHANNEL}"
+              end
 
-            begin
               ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
                 while pool.running?
                   listening.make_true
@@ -93,15 +93,15 @@ module GoodJob # :nodoc:
                   listening.make_false
                 end
               end
-            rescue StandardError => e
-              ActiveSupport::Notifications.instrument("notifier_notify_error.good_job", { error: e })
-              raise
-            ensure
-              @listening.make_false
-              ActiveSupport::Notifications.instrument("notifier_unlisten.good_job") do
-                conn.async_exec "UNLISTEN *"
-              end
             end
+          end
+        rescue StandardError => e
+          ActiveSupport::Notifications.instrument("notifier_notify_error.good_job", { error: e })
+          raise
+        ensure
+          @listening.make_false
+          ActiveSupport::Notifications.instrument("notifier_unlisten.good_job") do
+            conn.async_exec "UNLISTEN *"
           end
         end
       end
