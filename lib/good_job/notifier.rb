@@ -70,28 +70,26 @@ module GoodJob # :nodoc:
     def listen
       future = Concurrent::Future.new(args: [@recipients, @pool, @listening], executor: @pool) do |recipients, pool, listening|
         begin
-          Rails.application.reloader.wrap do
-            with_listen_connection do |conn|
-              ActiveSupport::Notifications.instrument("notifier_listen.good_job") do
-                conn.async_exec "LISTEN #{CHANNEL}"
-              end
+          with_listen_connection do |conn|
+            ActiveSupport::Notifications.instrument("notifier_listen.good_job") do
+              conn.async_exec "LISTEN #{CHANNEL}"
+            end
 
-              ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
-                while pool.running?
-                  listening.make_true
-                  conn.wait_for_notify(WAIT_INTERVAL) do |channel, _pid, payload|
-                    listening.make_false
-                    next unless channel == CHANNEL
-
-                    ActiveSupport::Notifications.instrument("notifier_notified.good_job", { payload: payload })
-                    parsed_payload = JSON.parse(payload, symbolize_names: true)
-                    recipients.each do |recipient|
-                      target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
-                      target.send(method_name, parsed_payload)
-                    end
-                  end
+            ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
+              while pool.running?
+                listening.make_true
+                conn.wait_for_notify(WAIT_INTERVAL) do |channel, _pid, payload|
                   listening.make_false
+                  next unless channel == CHANNEL
+
+                  ActiveSupport::Notifications.instrument("notifier_notified.good_job", { payload: payload })
+                  parsed_payload = JSON.parse(payload, symbolize_names: true)
+                  recipients.each do |recipient|
+                    target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
+                    target.send(method_name, parsed_payload)
+                  end
                 end
+                listening.make_false
               end
             end
           end
