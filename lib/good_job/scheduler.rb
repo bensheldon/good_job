@@ -21,6 +21,7 @@ module GoodJob # :nodoc:
 
     # Defaults for instance of Concurrent::ThreadPoolExecutor
     DEFAULT_POOL_OPTIONS = {
+      name: name,
       min_threads: 0,
       max_threads: Concurrent.processor_count,
       auto_terminate: true,
