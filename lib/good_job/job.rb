@@ -56,7 +56,7 @@ module GoodJob
       result = nil
       error = nil
 
-      Rails.application.executor.wrap do
+      connection_pool.with_connection do
         unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock do |good_jobs|
           good_job = good_jobs.first
           break unless good_job
