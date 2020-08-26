@@ -55,19 +55,17 @@ module GoodJob
     end
 
     def advisory_lock
-      query = <<~SQL
-        SELECT 1 AS one
-        WHERE pg_try_advisory_lock(('x'||substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
+      where_sql = <<~SQL
+        pg_try_advisory_lock(('x'||substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
       SQL
-      self.class.connection.execute(sanitize_sql_for_conditions([query, { table_name: self.class.table_name, id: send(self.class.primary_key) }])).ntuples.positive?
+      self.class.unscoped.where(where_sql, { table_name: self.class.table_name, id: send(self.class.primary_key) }).exists?
     end
 
     def advisory_unlock
-      query = <<~SQL
-        SELECT 1 AS one
-        WHERE pg_advisory_unlock(('x'||substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
+      where_sql = <<~SQL
+        pg_advisory_unlock(('x'||substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
       SQL
-      self.class.connection.execute(sanitize_sql_for_conditions([query, { table_name: self.class.table_name, id: send(self.class.primary_key) }])).ntuples.positive?
+      self.class.unscoped.where(where_sql, { table_name: self.class.table_name, id: send(self.class.primary_key) }).exists?
     end
 
     def advisory_lock!
@@ -85,11 +83,11 @@ module GoodJob
     end
 
     def advisory_locked?
-      self.class.advisory_locked.where(id: send(self.class.primary_key)).any?
+      self.class.unscoped.advisory_locked.where(id: send(self.class.primary_key)).exists?
     end
 
     def owns_advisory_lock?
-      self.class.owns_advisory_locked.where(id: send(self.class.primary_key)).any?
+      self.class.unscoped.owns_advisory_locked.where(id: send(self.class.primary_key)).exists?
     end
 
     def advisory_unlock!
