@@ -35,20 +35,20 @@ workers ENV.fetch("WEB_CONCURRENCY") { 0 }
 preload_app! if ENV["PRELOAD_APP"]
 
 before_fork do
-  GoodJob::Scheduler.instances.each { |s| s.shutdown }
+  GoodJob.shutdown
 end
 
 on_worker_boot do
-  GoodJob::Scheduler.instances.each { |s| s.restart }
+  GoodJob.restart
 end
 
 on_worker_shutdown do
-  GoodJob::Scheduler.instances.each { |s| s.shutdown }
+  GoodJob.shutdown
 end
 
 MAIN_PID = Process.pid
 at_exit do
-  GoodJob::Scheduler.instances.each { |s| s.shutdown } if Process.pid == MAIN_PID
+  GoodJob.shutdown if Process.pid == MAIN_PID
 end
 
 # Allow puma to be restarted by `rails restart` command.
