@@ -9,10 +9,12 @@ module GoodJob
       end
 
       configuration = GoodJob::Configuration.new(
-        execution_mode: execution_mode,
-        queues: queues,
-        max_threads: max_threads,
-        poll_interval: poll_interval
+        {
+          execution_mode: execution_mode,
+          queues: queues,
+          max_threads: max_threads,
+          poll_interval: poll_interval,
+        }
       )
 
       @execution_mode = configuration.execution_mode
