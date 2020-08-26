@@ -61,6 +61,13 @@ module GoodJob
           good_job = good_jobs.first
           break unless good_job
 
+          # TODO: Determine why some records are fetched without an advisory lock at all
+          if good_job.advisory_locked? && !good_job.owns_advisory_lock?
+            puts "LOCKED BUT DOES NOT OWN LOCK"
+          elsif !good_job.advisory_locked?
+            puts "TOTALLY UNLOCKED"
+          end
+
           result, error = good_job.perform
         end
       end
