@@ -2,6 +2,16 @@
 
 GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 
+Table of Contents
+1. Set up
+1. GoodJob Configuration
+1. Detailed usage and application configuration
+    1. Errors and retries
+    1. Timeouts
+    1. Async
+1. Going Deeper
+    1. Scaling
+
 **Inspired by [Delayed::Job](https://github.com/collectiveidea/delayed_job) and [Que](https://github.com/que-rb/que), GoodJob is designed for maximum compatibility with Ruby on Rails, ActiveJob, and Postgres to be simple and performant for most workloads.**
 
 - **Designed for ActiveJob.** Complete support for [async, queues, delays, priorities, timeouts, and retries](https://edgeguides.rubyonrails.org/active_job_basics.html) with near-zero configuration. 
@@ -24,24 +34,23 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 
 </details>
 
-## Installation
+## Set up
 
-Add this line to your application's Gemfile:
+1. Add `good_job` to your application's Gemfile:
 
-```ruby
-gem 'good_job'
-```
+    ```ruby
+    gem 'good_job'
+    ```
 
-And then execute:
-```bash
-$ bundle install
-```
+1. Install the gem:
 
-## Usage
+    ```bash
+    $ bundle install
+    ```
 
-1. Create a database migration:
+1. Run the GoodJob install generator. This will generate a database migration to create a table for GoodJob's job records:
     
-   ```bash
+    ```bash
     $ bin/rails g good_job:install
     ```
 
@@ -57,47 +66,117 @@ $ bundle install
     # config/application.rb
     config.active_job.queue_adapter = :good_job
     ```
-    
-    By default, using `:good_job` is equivalent to manually configuring the adapter:
+
+1. Inside of your application, queue your job 🎉: 
     
     ```ruby
-    # config/environments/development.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-   
-    # config/environments/test.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-   
-    # config/environments/production.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+    YourJob.perform_later
     ```
-
-1. Queue your job 🎉: 
+    
+    GoodJob supports all ActiveJob features:
     
     ```ruby
     YourJob.set(queue: :some_queue, wait: 5.minutes, priority: 10).perform_later
     ```
 
-1. In production, the scheduler is designed to run in its own process:
-    
-    ```bash
-    $ bundle exec good_job
-    ```
-   
-   Configuration options available with `help`:
+1. In development, GoodJob executes jobs immediately. In production, GoodJob provides different options:
 
-    ```bash
-    $ bundle exec good_job help start
+    - By default, GoodJob separates job enqueuing from job execution so that jobs can be scaled independently of the web server.  Use the GoodJob command-line tool to execute jobs:
+    
+        ```bash
+        $ bundle exec good_job start
+        ```
+        
+        Ideally the command-line tool should be run on a separate machine or container from the web process. For example, on Heroku:
+        
+        ```Procfile
+        web: rails server
+        worker: bundle exec good_job start
+        ```
+        
+        The command-line tool supports a variety of options, see the reference below for command-line configuration.
+
+  - GoodJob can also be configured to execute jobs within the web server process to save on resources. This is useful for low-workloads when economy is paramount.
+  
+        ```
+        $ GOOD_JOB_EXECUTION_MODE=async rails server
+        ```
+    
+        Additional configuration is likely necessary, see the reference below for async configuration.
    
-    Usage:
-      good_job start
+## Configuration
+
+### Command-line options
+
+There several top-level commands available through the `good_job` command-line tool.
+
+Configuration options are available with `help`.
+
+#### `good_job start`
+
+`good_job start` executes queued jobs.
+
+```bash
+$ bundle exec good_job help start
+
+Usage:
+  good_job start
+
+Options:
+  [--max-threads=COUNT]      # Maximum number of threads to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
+  [--queues=QUEUE_LIST]      # Queues to work from. (env var: GOOD_JOB_QUEUES, default: *)
+  [--poll-interval=SECONDS]  # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 1)
+
+Executes queued jobs.
+
+All options can be configured with environment variables.
+See option descriptions for the matching environment variable name.
+
+== Configuring queues
+Separate multiple queues with commas; exclude queues with a leading minus;
+separate isolated execution pools with semicolons and threads with colons.
+```
     
-    Options:
-      [--max-threads=N]                                          # Maximum number of threads to use for working jobs (default: ActiveRecord::Base.connection_pool.size)
-      [--queues=queue1,queue2(;queue3,queue4:5;-queue1,queue2)]  # Queues to work from. Separate multiple queues with commas; exclude queues with a leading minus; separate isolated execution pools with semicolons and threads with colons (default: *)
-      [--poll-interval=N]                                        # Interval between polls for available jobs in seconds (default: 1)    
-    
-    Start job worker
-    ```
+#### `good_job cleanup_preserved_jobs`
+
+`good_job cleanup_preserved_jobs` deletes preserved job records. See [`GoodJob.preserve_job_records` for when this command is useful.
+
+```
+Usage:
+  good_job cleanup_preserved_jobs
+
+Options:
+  [--before-seconds-ago=SECONDS]  # Delete records finished more than this many seconds ago
+                                  # Default: 86400
+
+Deletes preserved job records.
+
+By default, GoodJob deletes job records when the job is performed and this
+command is not necessary.
+
+However, when `GoodJob.preserve_job_records = true`, the jobs will be
+preserved in the database. This is useful when wanting to analyze or
+inspect job performance.
+
+If you are preserving job records this way, use this command regularly
+to delete old records and preserve space in your database.
+```
+   
+### Adapter options
+
+ - execution_mode. 
+ - max_threads. adapter, --max-threads, GOOD_JOB_MAX_THREADS
+ - queues
+ - poll_interval
+
+### Global / code-level options
+ - logger
+ - preserve_job_records
+ - reperform_jobs_on_standard_error
+ - on_thread_error
+
+## Going deeper
+
 
 1. Optimize execution to reduce congestion and execution latency. 
 
@@ -141,6 +220,9 @@ $ bundle install
       Running multiple processes can optimize for CPU performance at the expense of greater memory and system resource usage.
 
     _Keep in mind, queue operations and management is an advanced discipline. This stuff is complex, especially for heavy workloads and unique processing requirements. Good job 👍_
+
+
+
 
 ### Error handling, retries, and reliability
 
@@ -217,7 +299,6 @@ class ApplicationJob < ActiveJob::Base
   # ...
 end
 ```
-
 
 ActiveJob's `discard_on` functionality is supported too.
 
@@ -365,6 +446,21 @@ It is also necessary to delete these preserved jobs from the database after a ce
 
     ```bash
     $ bundle exec good_job cleanup_preserved_jobs --before-seconds-ago=86400
+    ```
+
+<!-- Understanding THE ADAPTER -->
+    
+    By default, using `:good_job` is equivalent to manually configuring the adapter:
+    
+    ```ruby
+    # config/environments/development.rb
+    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+   
+    # config/environments/test.rb
+    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+   
+    # config/environments/production.rb
+    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
     ```
 
 ## Contributing
