@@ -2,9 +2,11 @@ PATH
   remote: ..
   specs:
     good_job (1.2.2)
+      activejob (>= 5.1.0)
+      activerecord (>= 5.1.0)
       concurrent-ruby (>= 1.0.2)
       pg (>= 1.0.0)
-      rails (>= 5.1.0)
+      railties (>= 5.1.0)
       thor (>= 0.14.1)
 
 GEM
