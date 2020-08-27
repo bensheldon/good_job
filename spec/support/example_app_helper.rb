@@ -5,7 +5,7 @@ module ExampleAppHelper
     root_path = example_app_path.join('..')
 
     FileUtils.cd(root_path) do
-      `rails new #{app_name} -d postgresql --skip-action-mailer --skip-action-mailbox --skip-action-cable --skip-sprockets --skip-listen --skip-javascript --skip-turbolinks --skip-system-test --skip-test-unit --skip-bootsnap --skip-spring`
+      `rails new #{app_name} -d postgresql --no-assets --skip-action-text --skip-action-mailer --skip-action-mailbox --skip-action-cable --skip-sprockets --skip-listen --skip-javascript --skip-turbolinks --skip-system-test --skip-test-unit --skip-bootsnap --skip-spring --skip-active-storage`
     end
 
     File.open("#{example_app_path}/Gemfile", 'a') do |f|
