@@ -43,6 +43,9 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [2.5, 2.6, 2.7]
     env:
       PGHOST: localhost
       PGUSER: test_app
@@ -70,6 +73,8 @@ jobs:
         run: sudo apt-get -yqq install libpq-dev
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
       - name: Ruby gem cache
         uses: actions/cache@v1
         with:
