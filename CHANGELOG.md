@@ -1,6 +1,18 @@
 # Changelog
 
-## [v1.2.2](https://github.com/bensheldon/good_job/tree/v1.2.2) (2020-08-26)
+## [v1.2.3](https://github.com/bensheldon/good_job/tree/v1.2.3) (2020-08-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.2...v1.2.3)
+
+**Closed issues:**
+
+- requiring more dependencies in then needed [\#103](https://github.com/bensheldon/good_job/issues/103)
+
+**Merged pull requests:**
+
+- stop depending on all rails libs [\#104](https://github.com/bensheldon/good_job/pull/104) ([thilo](https://github.com/thilo))
+
+## [v1.2.2](https://github.com/bensheldon/good_job/tree/v1.2.2) (2020-08-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.1...v1.2.2)
 
@@ -77,6 +89,7 @@
 
 **Merged pull requests:**
 
+- Capture errors via instrumentation from retry\_on and discard\_on [\#79](https://github.com/bensheldon/good_job/pull/79) ([bensheldon](https://github.com/bensheldon))
 - Document GoodJob::Scheduler with Yard [\#78](https://github.com/bensheldon/good_job/pull/78) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.1.2](https://github.com/bensheldon/good_job/tree/v1.1.2) (2020-08-13)
@@ -101,7 +114,6 @@
 
 **Merged pull requests:**
 
-- Capture errors via instrumentation from retry\_on and discard\_on [\#79](https://github.com/bensheldon/good_job/pull/79) ([bensheldon](https://github.com/bensheldon))
 - Allow instantiation of multiple schedulers via --queues [\#76](https://github.com/bensheldon/good_job/pull/76) ([bensheldon](https://github.com/bensheldon))
 - Extract options parsing to Configuration object [\#74](https://github.com/bensheldon/good_job/pull/74) ([bensheldon](https://github.com/bensheldon))
 
