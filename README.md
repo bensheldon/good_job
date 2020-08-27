@@ -62,7 +62,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     
 1. Configure the ActiveJob adapter:
     
-   ```ruby
+    ```ruby
     # config/application.rb
     config.active_job.queue_adapter = :good_job
     ```
@@ -96,7 +96,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         
         The command-line tool supports a variety of options, see the reference below for command-line configuration.
 
-  - GoodJob can also be configured to execute jobs within the web server process to save on resources. This is useful for low-workloads when economy is paramount.
+    - GoodJob can also be configured to execute jobs within the web server process to save on resources. This is useful for low-workloads when economy is paramount.
   
         ```
         $ GOOD_JOB_EXECUTION_MODE=async rails server
@@ -161,19 +161,52 @@ inspect job performance.
 If you are preserving job records this way, use this command regularly
 to delete old records and preserve space in your database.
 ```
-   
+
+
 ### Adapter options
 
- - execution_mode. 
- - max_threads. adapter, --max-threads, GOOD_JOB_MAX_THREADS
- - queues
- - poll_interval
+To use GoodJob, you can set `config.active_job.queue_adapter` to a `:good_job` or to an instance of `GoodJob::Adapter`, which you can configure with several options:
+
+- `execution_mode` (symbol) specifies how and where jobs should be executed. You can also set this with the environment variable `GOOD_JOB_EXECUTION_MODE`. It can be any one of:
+    - `:inline` executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
+    - `:external` causes the adapter to equeue jobs, but not execute them. When using this option (the default for production environments), you’ll need to use the command-line tool to actually execute your jobs.
+    - `:async` causes the adapter to execute you jobs in separate threads in whatever process queued them (usually the web process). This is akin to running the command-line tool’s code inside your web server. It can be more economical for small workloads (you don’t need a separate machine or environment for running your jobs), but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.
+- `max_threads` (integer) sets the maximum number of threads to use when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
+- `queues` (string) determines which queues to execute jobs from when `execution_mode` is set to `:async`. See the description of `good_job start` for more details on the format of this string. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
+- `poll_interval` (float) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`.
+ 
+Using the symbol instead of explicitly configuring the options above (i.e. setting `config.active_job.queue_adapter = :good_job`) is equivalent to:
+
+```ruby
+# config/environments/development.rb
+config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+
+# config/environments/test.rb
+config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+
+# config/environments/production.rb
+config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+```
+
 
 ### Global / code-level options
- - logger
- - preserve_job_records
- - reperform_jobs_on_standard_error
- - on_thread_error
+
+Good Job’s general behavior can also be configured via several attributes directly on the `GoodJob` module:
+
+- `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger`.
+- `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `false`)
+- reperform_jobs_on_standard_error (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `true`)
+- `on_thread_error` (proc, lambda, or callable) will be called when a job raises an error. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake.
+ 
+You’ll generally want to configure these in `config/initializers/good_job.rb`, like so:
+
+```ruby
+# config/initializers/good_job.rb
+GoodJob.on_thread_error = true
+GoodJob.reperform_jobs_on_standard_error = false
+GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
+```
+
 
 ## Going deeper
 
