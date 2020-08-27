@@ -1,12 +1,42 @@
 # Changelog
 
+## [v1.2.2](https://github.com/bensheldon/good_job/tree/v1.2.2) (2020-08-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.1...v1.2.2)
+
+**Implemented enhancements:**
+
+- Run Github Action tests against Ruby 2.5, 2.6, 2.7 [\#100](https://github.com/bensheldon/good_job/issues/100)
+
+**Fixed bugs:**
+
+- Freezes puma on code change [\#95](https://github.com/bensheldon/good_job/issues/95)
+- Ruby 2.7 keyword arguments warning [\#93](https://github.com/bensheldon/good_job/issues/93)
+
+**Closed issues:**
+
+- Add test for `rails g good\_job:install` [\#57](https://github.com/bensheldon/good_job/issues/57)
+
+**Merged pull requests:**
+
+- Use more ActiveRecord in Lockable and not connection.execute [\#102](https://github.com/bensheldon/good_job/pull/102) ([bensheldon](https://github.com/bensheldon))
+- Run CI tests on Ruby 2.5, 2.6, and 2.7 [\#101](https://github.com/bensheldon/good_job/pull/101) ([arku](https://github.com/arku))
+- Return to using executor.wrap around Scheduler execution task [\#99](https://github.com/bensheldon/good_job/pull/99) ([bensheldon](https://github.com/bensheldon))
+- Fix Ruby 2.7 keyword arguments warning [\#98](https://github.com/bensheldon/good_job/pull/98) ([arku](https://github.com/arku))
+- Remove executor/reloader for less interlocking [\#97](https://github.com/bensheldon/good_job/pull/97) ([sj26](https://github.com/sj26))
+- Name the thread pools [\#96](https://github.com/bensheldon/good_job/pull/96) ([sj26](https://github.com/sj26))
+- Add test for `rails g good\_job:install` [\#94](https://github.com/bensheldon/good_job/pull/94) ([arku](https://github.com/arku))
+
 ## [v1.2.1](https://github.com/bensheldon/good_job/tree/v1.2.1) (2020-08-21)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.0...v1.2.1)
 
-**Closed issues:**
+**Fixed bugs:**
 
 - undefined method `thread\_mattr\_accessor' when not requiring the Sprockets Railstie [\#85](https://github.com/bensheldon/good_job/issues/85)
+
+**Closed issues:**
+
 - Document comparison of GoodJob with other backends [\#51](https://github.com/bensheldon/good_job/issues/51)
 
 **Merged pull requests:**
@@ -47,7 +77,6 @@
 
 **Merged pull requests:**
 
-- Capture errors via instrumentation from retry\_on and discard\_on [\#79](https://github.com/bensheldon/good_job/pull/79) ([bensheldon](https://github.com/bensheldon))
 - Document GoodJob::Scheduler with Yard [\#78](https://github.com/bensheldon/good_job/pull/78) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.1.2](https://github.com/bensheldon/good_job/tree/v1.1.2) (2020-08-13)
@@ -72,6 +101,7 @@
 
 **Merged pull requests:**
 
+- Capture errors via instrumentation from retry\_on and discard\_on [\#79](https://github.com/bensheldon/good_job/pull/79) ([bensheldon](https://github.com/bensheldon))
 - Allow instantiation of multiple schedulers via --queues [\#76](https://github.com/bensheldon/good_job/pull/76) ([bensheldon](https://github.com/bensheldon))
 - Extract options parsing to Configuration object [\#74](https://github.com/bensheldon/good_job/pull/74) ([bensheldon](https://github.com/bensheldon))
 
