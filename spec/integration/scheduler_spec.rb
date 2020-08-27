@@ -41,7 +41,7 @@ RSpec.describe 'Schedule Integration' do
   let(:adapter) { GoodJob::Adapter.new }
 
   context 'when there are a large number of jobs' do
-    let(:number_of_jobs) { 250 }
+    let(:number_of_jobs) { 1000 }
 
     let!(:good_jobs) do
       number_of_jobs.times do |i|
@@ -53,7 +53,7 @@ RSpec.describe 'Schedule Integration' do
       performer = GoodJob::Performer.new(GoodJob::Job.all, :perform_with_advisory_lock)
       scheduler = GoodJob::Scheduler.new(performer)
 
-      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.count == 0 }
+      sleep_until(max: 20, increments_of: 0.5) { GoodJob::Job.count == 0 }
 
       rerun_jobs = {}
 

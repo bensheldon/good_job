@@ -56,13 +56,12 @@ module GoodJob
       result = nil
       error = nil
 
-      connection_pool.with_connection do
-        unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock do |good_jobs|
-          good_job = good_jobs.first
-          break unless good_job
+      unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock do |good_jobs|
+        good_job = good_jobs.first
+        # TODO: Determine why some records are fetched without an advisory lock at all
+        break unless good_job&.owns_advisory_lock?
 
-          result, error = good_job.perform
-        end
+        result, error = good_job.perform
       end
 
       [good_job, result, error] if good_job
