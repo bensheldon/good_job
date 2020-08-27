@@ -4,17 +4,29 @@ module GoodJob
   class CLI < Thor
     RAILS_ENVIRONMENT_RB = File.expand_path("config/environment.rb")
 
-    desc :start, "Start job worker"
+    desc :start, <<~DESCRIPTION
+      Executes queued jobs.
+
+      All options can be configured with environment variables. 
+      See option descriptions for the matching environment variable name.
+
+      == Configuring queues
+      Separate multiple queues with commas; exclude queues with a leading minus; 
+      separate isolated execution pools with semicolons and threads with colons.
+
+    DESCRIPTION
     method_option :max_threads,
                   type: :numeric,
-                  desc: "Maximum number of threads to use for working jobs (default: ActiveRecord::Base.connection_pool.size)"
+                  banner: 'COUNT',
+                  desc: "Maximum number of threads to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)"
     method_option :queues,
                   type: :string,
-                  banner: "queue1,queue2(;queue3,queue4:5;-queue1,queue2)",
-                  desc: "Queues to work from. Separate multiple queues with commas; exclude queues with a leading minus; separate isolated execution pools with semicolons and threads with colons (default: *)"
+                  banner: "QUEUE_LIST",
+                  desc: "Queues to work from. (env var: GOOD_JOB_QUEUES, default: *)"
     method_option :poll_interval,
                   type: :numeric,
-                  desc: "Interval between polls for available jobs in seconds (default: 1)"
+                  banner: 'SECONDS',
+                  desc: "Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 1)"
     def start
       set_up_application!
 
@@ -39,12 +51,25 @@ module GoodJob
 
     default_task :start
 
-    desc :cleanup_preserved_jobs, "Delete preserved job records"
+    desc :cleanup_preserved_jobs, <<~DESCRIPTION
+      Deletes preserved job records. 
+
+      By default, GoodJob deletes job records when the job is performed and this
+      command is not necessary.
+
+      However, when `GoodJob.preserve_job_records = true`, the jobs will be
+      preserved in the database. This is useful when wanting to analyze or
+      inspect job performance.
+
+      If you are preserving job records this way, use this command regularly
+      to delete old records and preserve space in your database.
+
+    DESCRIPTION
     method_option :before_seconds_ago,
                   type: :numeric,
+                  banner: 'SECONDS',
                   default: 24 * 60 * 60,
                   desc: "Delete records finished more than this many seconds ago"
-
     def cleanup_preserved_jobs
       set_up_application!
 

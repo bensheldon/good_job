@@ -17,31 +17,55 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 |                 | Queues, priority, retries | Database                              | Concurrency       | Reliability/Integrity  | Latency                  |
 |-----------------|---------------------------|---------------------------------------|-------------------|------------------------|--------------------------|
 | **GoodJob**     | ✅ Yes                     | ✅ Postgres                            | ✅ Multithreaded   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
-| **Que**         | ✅ Yes                     | 🟨 Postgres, requires  `structure.sql` | ✅ Multithreaded   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
-| **Delayed Job** | ✅ Yes                     | ✅ Postgres                            | 🟥 Single-threaded | ✅ ACID, record-based   | 🟨 Polling                |
-| **Sidekiq**     | ✅ Yes                     | 🟥 Redis                               | ✅ Multithreaded   | 🟥 Crashes lose jobs    | ✅ Redis BRPOP            |
-| **Sidekiq Pro** | ✅ Yes                     | 🟥 Redis                               | ✅ Multithreaded   | ✅ Redis RPOPLPUSH      | ✅ Redis RPOPLPUSH        |
+| **Que**         | ✅ Yes                     | 🔶️ Postgres, requires  `structure.sql` | ✅ Multithreaded   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
+| **Delayed Job** | ✅ Yes                     | ✅ Postgres                            | 🔴 Single-threaded | ✅ ACID, record-based   | 🔶 Polling                |
+| **Sidekiq**     | ✅ Yes                     | 🔴 Redis                               | ✅ Multithreaded   | 🔴 Crashes lose jobs    | ✅ Redis BRPOP            |
+| **Sidekiq Pro** | ✅ Yes                     | 🔴 Redis                               | ✅ Multithreaded   | ✅ Redis RPOPLPUSH      | ✅ Redis RPOPLPUSH        |
 
 </details>
 
-## Installation
+## Table of contents
 
-Add this line to your application's Gemfile:
+- [Set up](#set-up)
+- [Configuration](#configuration)
+    + [Command-line options](#command-line-options)
+        - [`good_job start`](#good-job-start)
+        - [`good_job cleanup_preserved_jobs`](#good-job-cleanup-preserved-jobs)
+    + [Adapter options](#adapter-options)
+    + [Global options](#global-options)
+- [Going deeper](#going-deeper)
+    + [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
+        - [Exceptions](#exceptions)
+        - [Retries](#retries)
+        - [ActionMailer retries](#actionmailer-retries)
+    + [Timeouts](#timeouts)
+    + [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
+    + [Database connections](#database-connections)
+    + [Executing jobs async / in-process](#executing-jobs-async--in-process)
+    + [Migrating to GoodJob from a different ActiveJob backend](#migrating-to-goodjob-from-a-different-activejob-backend)
+    + [Monitoring and preserving worked jobs](#monitoring-and-preserving-worked-jobs)
+- [Contributing](#contributing)
+    + [Gem development](#gem-development)
+    + [Releasing](#releasing)
+- [License](#license)
 
-```ruby
-gem 'good_job'
-```
+## Set up
 
-And then execute:
-```bash
-$ bundle install
-```
+1. Add `good_job` to your application's Gemfile:
 
-## Usage
+    ```ruby
+    gem 'good_job'
+    ```
 
-1. Create a database migration:
+1. Install the gem:
+
+    ```bash
+    $ bundle install
+    ```
+
+1. Run the GoodJob install generator. This will generate a database migration to create a table for GoodJob's job records:
     
-   ```bash
+    ```bash
     $ bin/rails g good_job:install
     ```
 
@@ -53,123 +77,171 @@ $ bundle install
     
 1. Configure the ActiveJob adapter:
     
-   ```ruby
+    ```ruby
     # config/application.rb
     config.active_job.queue_adapter = :good_job
     ```
-    
-    By default, using `:good_job` is equivalent to manually configuring the adapter:
+
+1. Inside of your application, queue your job 🎉: 
     
     ```ruby
-    # config/environments/development.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-   
-    # config/environments/test.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-   
-    # config/environments/production.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+    YourJob.perform_later
     ```
-
-1. Queue your job 🎉: 
+    
+    GoodJob supports all ActiveJob features:
     
     ```ruby
     YourJob.set(queue: :some_queue, wait: 5.minutes, priority: 10).perform_later
     ```
 
-1. In production, the scheduler is designed to run in its own process:
+1. In development, GoodJob executes jobs immediately. In production, GoodJob provides different options:
+
+    - By default, GoodJob separates job enqueuing from job execution so that jobs can be scaled independently of the web server.  Use the GoodJob command-line tool to execute jobs:
     
-    ```bash
-    $ bundle exec good_job
-    ```
-   
-   Configuration options available with `help`:
-
-    ```bash
-    $ bundle exec good_job help start
-   
-    Usage:
-      good_job start
-    
-    Options:
-      [--max-threads=N]                                          # Maximum number of threads to use for working jobs (default: ActiveRecord::Base.connection_pool.size)
-      [--queues=queue1,queue2(;queue3,queue4:5;-queue1,queue2)]  # Queues to work from. Separate multiple queues with commas; exclude queues with a leading minus; separate isolated execution pools with semicolons and threads with colons (default: *)
-      [--poll-interval=N]                                        # Interval between polls for available jobs in seconds (default: 1)    
-    
-    Start job worker
-    ```
-
-1. Optimize execution to reduce congestion and execution latency. 
-
-    By default, GoodJob creates a single thread execution pool that will execute jobs from any queue. Depending on your application's workload, job types, and service level objectives, you may wish to optimize execution resources; for example, providing dedicated execution resources for transactional emails so they are not delayed by long-running batch jobs. Some options:
-
-    - Multiple execution pools within a single process:
-        
         ```bash
-        $ bundle exec good_job --queues=transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;* --max-threads=5
-        ```
-      
-        This configuration will result in a single process with 4 isolated thread execution pools. Isolated execution pools are separated with a semicolon (`;`) and queue names and thread counts with a colon (`:`)
-        
-        - `transactional_messages:2`: execute jobs enqueued on `transactional_messages` with up to 2 threads.
-        - `batch_processing:1` execute jobs enqueued on `batch_processing` with a single thread.
-        - `-transactional_messages,batch_processing`: execute jobs enqueued on _any_ queue _excluding_ `transactional_messages` or `batch_processing` with up to 2 threads.
-        - `*`: execute jobs on any queue on up to 5 threads, as configured by `--max-threads=5`
-        
-        For moderate workloads, multiple isolated thread execution pools offers a good balance between congestion management and economy. 
-        
-        Configuration can be injected by environment variables too:
-        
-        ```bash
-        $ GOOD_JOB_QUEUES="transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;*" GOOD_JOB_MAX_THREADS=5 bundle exec good_job
+        $ bundle exec good_job start
         ```
         
-    - Multiple processes; for example, on Heroku:
+        Ideally the command-line tool should be run on a separate machine or container from the web process. For example, on Heroku:
+        
+        ```Procfile
+        web: rails server
+        worker: bundle exec good_job start
+        ```
+        
+        The command-line tool supports a variety of options, see the reference below for command-line configuration.
+
+    - GoodJob can also be configured to execute jobs within the web server process to save on resources. This is useful for low-workloads when economy is paramount.
+  
+        ```
+        $ GOOD_JOB_EXECUTION_MODE=async rails server
+        ```
     
-        ```procfile
-        # Procfile
-        
-        # Separate dyno types
-        worker: bundle exec good_job --max-threads=5
-        transactional_worker: bundle exec good_job --queues=transactional_messages --max-threads=2
-        batch_worker: bundle exec good_job --queues=batch_processing --max-threads=1
-      
-        # Combined multi-process dyno
-        combined_worker: bundle exec good_job --max-threads=5 & bundle exec good_job --queues=transactional_messages --max-threads=2 & bundle exec good_job --queues=batch_processing --max-threads=1 & wait -n
-        ```
-      
-      Running multiple processes can optimize for CPU performance at the expense of greater memory and system resource usage.
-
-    _Keep in mind, queue operations and management is an advanced discipline. This stuff is complex, especially for heavy workloads and unique processing requirements. Good job 👍_
-
-### Error handling, retries, and reliability
-
-GoodJob guarantees that a completely-performed job will run once and only once. GoodJob fully supports ActiveJob's built-in functionality for error handling, retries and timeouts. Writing reliable, transactional, and idempotent `ActiveJob#perform` methods is outside the scope of GoodJob.
-
-#### Error handling
-
-By default, if a job raises an error while it is being performed, _and it bubbles up to the GoodJob backend_, GoodJob will be immediately re-perform the job until it finishes successfully.
-
-- `Exception`-type errors, such as a SIGINT, will always cause a job to be re-performed.
-- `StandardError`-type errors, by default, will cause a job to be re-performed, though this is configurable:
+        Additional configuration is likely necessary, see the reference below for async configuration.
    
-    ```ruby
-    # config/initializers/good_job.rb
-    GoodJob.reperform_jobs_on_standard_error = true # => default
-    ```
+## Configuration
 
-To report errors that _do_ bubble up to the GoodJob backend, assign a callable to `GoodJob.on_thread_error`. For example:
+### Command-line options
+
+There several top-level commands available through the `good_job` command-line tool.
+
+Configuration options are available with `help`.
+
+#### `good_job start`
+
+`good_job start` executes queued jobs.
+
+```bash
+$ bundle exec good_job help start
+
+Usage:
+  good_job start
+
+Options:
+  [--max-threads=COUNT]      # Maximum number of threads to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
+  [--queues=QUEUE_LIST]      # Queues to work from. (env var: GOOD_JOB_QUEUES, default: *)
+  [--poll-interval=SECONDS]  # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 1)
+
+Executes queued jobs.
+
+All options can be configured with environment variables.
+See option descriptions for the matching environment variable name.
+
+== Configuring queues
+Separate multiple queues with commas; exclude queues with a leading minus;
+separate isolated execution pools with semicolons and threads with colons.
+```
+    
+#### `good_job cleanup_preserved_jobs`
+
+`good_job cleanup_preserved_jobs` deletes preserved job records. See [`GoodJob.preserve_job_records` for when this command is useful.
+
+```
+Usage:
+  good_job cleanup_preserved_jobs
+
+Options:
+  [--before-seconds-ago=SECONDS]  # Delete records finished more than this many seconds ago
+                                  # Default: 86400
+
+Deletes preserved job records.
+
+By default, GoodJob deletes job records when the job is performed and this
+command is not necessary.
+
+However, when `GoodJob.preserve_job_records = true`, the jobs will be
+preserved in the database. This is useful when wanting to analyze or
+inspect job performance.
+
+If you are preserving job records this way, use this command regularly
+to delete old records and preserve space in your database.
+```
+
+### Adapter options
+
+To use GoodJob, you can set `config.active_job.queue_adapter` to a `:good_job` or to an instance of `GoodJob::Adapter`, which you can configure with several options:
+
+- `execution_mode` (symbol) specifies how and where jobs should be executed. You can also set this with the environment variable `GOOD_JOB_EXECUTION_MODE`. It can be any one of:
+    - `:inline` executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
+    - `:external` causes the adapter to equeue jobs, but not execute them. When using this option (the default for production environments), you’ll need to use the command-line tool to actually execute your jobs.
+    - `:async` causes the adapter to execute you jobs in separate threads in whatever process queued them (usually the web process). This is akin to running the command-line tool’s code inside your web server. It can be more economical for small workloads (you don’t need a separate machine or environment for running your jobs), but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.
+- `max_threads` (integer) sets the maximum number of threads to use when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
+- `queues` (string) determines which queues to execute jobs from when `execution_mode` is set to `:async`. See the description of `good_job start` for more details on the format of this string. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
+- `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`.
+ 
+Using the symbol instead of explicitly configuring the options above (i.e. setting `config.active_job.queue_adapter = :good_job`) is equivalent to:
+
+```ruby
+# config/environments/development.rb
+config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+
+# config/environments/test.rb
+config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+
+# config/environments/production.rb
+config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+```
+
+### Global options
+
+Good Job’s general behavior can also be configured via several attributes directly on the `GoodJob` module:
+
+- **`GoodJob.logger`** ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger`.
+- **`GoodJob.preserve_job_records`** (boolean) keeps job records in your database even after jobs are completed. (Default: `false`)
+- **`GoodJob.reperform_jobs_on_standard_error`** (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `true`)
+- **`GoodJob.on_thread_error`** (proc, lambda, or callable) will be called when a job raises an error. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake.
+ 
+You’ll generally want to configure these in `config/initializers/good_job.rb`, like so:
 
 ```ruby
 # config/initializers/good_job.rb
-
-# With Sentry (or Bugsnag, Airbrake, Honeybadger, etc.)
+GoodJob.preserve_job_records = true
+GoodJob.reperform_jobs_on_standard_error = false
 GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
 ```
 
-### Retrying jobs
+## Going deeper
 
-ActiveJob can be configured to retry an infinite number of times, with an exponential backoff. Using ActiveJob's `retry_on` will ensure that errors do not bubble up to the GoodJob backend:
+### Exceptions, retries, and reliability
+
+GoodJob guarantees that a completely-performed job will run once and only once. GoodJob fully supports ActiveJob's built-in functionality for error handling, retries and timeouts. 
+
+#### Exceptions
+
+ActiveJob provides [tools for rescuing and retrying exceptions](https://guides.rubyonrails.org/active_job_basics.html#exceptions), including `retry_on`, `discard_on`, `rescue_from` that will rescue exceptions before they get to GoodJob.
+
+If errors do reach GoodJob, you can assign a callable to `GoodJob.on_thread_error` to be notified. For example, to log errors to an exception monitoring service like Sentry (or Bugsnag, Airbrake, Honeybadger, etc.):
+
+```ruby
+# config/initializers/good_job.rb
+GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
+```
+
+#### Retries
+
+By default, GoodJob will automatically and immediately retry a job when an exception is raised to GoodJob. 
+
+However, ActiveJob can be configured to retry an infinite number of times, with an exponential backoff. Using ActiveJob's `retry_on` prevents exceptions from reaching GoodJob:
 
 ```ruby
 class ApplicationJob < ActiveJob::Base  
@@ -178,36 +250,34 @@ class ApplicationJob < ActiveJob::Base
 end
 ```
 
-When specifying a limited number of retries, care must be taken to ensure that an error does not bubble up to the GoodJob backend because that will result in the job being re-performed:
+When using `retry_on` with _a limited number of retries_, the final exception will not be rescued and will raise to GoodJob. GoodJob can be configured to discard un-handled exceptions instead of retrying them:
+
+```ruby
+# config/initializers/good_job.rb
+GoodJob.reperform_jobs_on_standard_error = false 
+```
+
+Alternatively, pass a block to `retry_on` to handle the final exception instead of raising it to GoodJob: 
 
 ```ruby
 class ApplicationJob < ActiveJob::Base  
   retry_on StandardError, attempts: 5 do |_job, _exception|
-    # Log error, etc.
-    # You must implement this block, otherwise, 
-    #   Active Job will re-raise the error.
-    # Do not re-raise the error, otherwise 
-    #   GoodJob will immediately re-perform the job. 
+    # Log error, do nothing, etc. 
   end
   # ...
 end
 ```
 
-GoodJob can be configured to allow omitting `retry_on`'s block argument and implicitly discard un-handled errors:
-
-```ruby
-# config/initializers/good_job.rb
-
-# Do NOT re-perform a job if a StandardError bubbles up to the GoodJob backend
-GoodJob.reperform_jobs_on_standard_error = false 
-```
-
-When using an exception monitoring service (e.g. Sentry, Bugsnag, Airbrake, Honeybadger, etc), the use of `rescue_on` may be incompatible with their ActiveJob integration. It's safest to explicitly wrap jobs with an exception reporter. For example:
+When using `retry_on` with an infinite number of retries, exceptions will never be raised to GoodJob, which means `GoodJob.on_thread_error` will never be called. To report log or report exceptions to an exception monitoring service (e.g. Sentry, Bugsnag, Airbrake, Honeybadger, etc), create an explicit exception wrapper. For example:
 
 ```ruby
 class ApplicationJob < ActiveJob::Base  
   retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
   
+  retry_on SpecialError, attempts: 5 do |_job, exception|
+    Raven.capture_exception(exception)
+  end 
+
   around_perform do |_job, block|
     block.call
   rescue StandardError => e
@@ -218,12 +288,11 @@ class ApplicationJob < ActiveJob::Base
 end
 ```
 
-
-ActiveJob's `discard_on` functionality is supported too.
-
 #### ActionMailer retries
 
-Using a Mailer's `#deliver_later` will enqueue an instance of `ActionMailer::DeliveryJob` which inherits from `ActiveJob::Base` rather than your applications `ApplicationJob`. You can use an initializer to configure retries on `ActionMailer::DeliveryJob`:
+Any configuration in `ApplicationJob` will have to be duplicated on `ActionMailer::DeliveryJob` because ActionMailer uses a custom class, `ActionMailer::DeliveryJob`, which inherits from `ActiveJob::Base`,  rather than your applications `ApplicationJob`. 
+
+You can use an initializer to configure `ActionMailer::DeliveryJob`, for example:
 
 ```ruby
 # config/initializers/good_job.rb
@@ -238,7 +307,7 @@ rescue StandardError => e
 end
 ```
 
-#### Timeouts
+### Timeouts
 
 Job timeouts can be configured with an `around_perform`:
 
@@ -255,20 +324,61 @@ class ApplicationJob < ActiveJob::Base
 end
 ```
 
-### Configuring job execution threads
-    
-GoodJob executes enqueued jobs using threads. There is a lot than can be said about [multithreaded behavior in Ruby on Rails](https://guides.rubyonrails.org/threading_and_code_execution.html), but briefly:
+### Optimize queues, threads, and processes
 
-- Each GoodJob execution thread requires its own database connection, which are automatically checked out from Rails’s connection pool. _Allowing GoodJob to schedule more threads than are available in the database connection pool can lead to timeouts and is not recommended._ 
-- The maximum number of GoodJob threads can be configured, in decreasing precedence:
-    1. `$ bundle exec good_job --max_threads 4`
-    2. `$ GOOD_JOB_MAX_THREADS=4 bundle exec good_job`
-    3. `$ RAILS_MAX_THREADS=4 bundle exec good_job`
-    4. Implicitly via Rails's database connection pool size (`ActiveRecord::Base.connection_pool.size`)
+By default, GoodJob creates a single thread execution pool that will execute jobs from any queue. Depending on your application's workload, job types, and service level objectives, you may wish to optimize execution resources. For example, providing dedicated execution resources for transactional emails so they are not delayed by long-running batch jobs. Some options:
+
+- Multiple execution pools within a single process:
+    
+    ```bash
+    $ bundle exec good_job --queues=transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;* --max-threads=5
+    ```
+  
+    This configuration will result in a single process with 4 isolated thread execution pools. Isolated execution pools are separated with a semicolon (`;`) and queue names and thread counts with a colon (`:`)
+    
+    - `transactional_messages:2`: execute jobs enqueued on `transactional_messages` with up to 2 threads.
+    - `batch_processing:1` execute jobs enqueued on `batch_processing` with a single thread.
+    - `-transactional_messages,batch_processing`: execute jobs enqueued on _any_ queue _excluding_ `transactional_messages` or `batch_processing` with up to 2 threads.
+    - `*`: execute jobs on any queue on up to 5 threads, as configured by `--max-threads=5`
+    
+    For moderate workloads, multiple isolated thread execution pools offers a good balance between congestion management and economy. 
+    
+    Configuration can be injected by environment variables too:
+    
+    ```bash
+    $ GOOD_JOB_QUEUES="transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;*" GOOD_JOB_MAX_THREADS=5 bundle exec good_job
+    ```
+    
+- Multiple processes; for example, on Heroku:
+
+    ```procfile
+    # Procfile
+    
+    # Separate dyno types
+    worker: bundle exec good_job --max-threads=5
+    transactional_worker: bundle exec good_job --queues=transactional_messages --max-threads=2
+    batch_worker: bundle exec good_job --queues=batch_processing --max-threads=1
+  
+    # Combined multi-process dyno
+    combined_worker: bundle exec good_job --max-threads=5 & bundle exec good_job --queues=transactional_messages --max-threads=2 & bundle exec good_job --queues=batch_processing --max-threads=1 & wait -n
+    ```
+  
+  Running multiple processes can optimize for CPU performance at the expense of greater memory and system resource usage.
+
+_Keep in mind, queue operations and management is an advanced discipline. This stuff is complex, especially for heavy workloads and unique processing requirements. Good job 👍_
+
+### Database connections
+    
+Each GoodJob execution thread requires its own database connection that is automatically checked out from Rails’s connection pool. _Allowing GoodJob to create more threads than available database connections can lead to timeouts and is not recommended._ For example:
+
+```yaml
+# config/database.yml
+pool: <%= [ENV.fetch("RAILS_MAX_THREADS", 5).to_i, ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i].max %>
+```
 
 ### Executing jobs async / in-process
 
-GoodJob is able to run "async" in the same process as the webserver (e.g. `bin/rail s`). GoodJob's async execution mode offers benefits of economy by not requiring a separate job worker process, but with the tradeoff of increased complexity. Async mode can be configured in two ways:
+GoodJob can execute jobs "async" in the same process as the webserver (e.g. `bin/rail s`). GoodJob's async execution mode offers benefits of economy by not requiring a separate job worker process, but with the tradeoff of increased complexity. Async mode can be configured in two ways:
 
 - Directly configure the ActiveJob adapter:
 
