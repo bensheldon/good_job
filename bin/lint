@@ -16,7 +16,7 @@ def system!(*args)
 end
 
 FileUtils.chdir GEM_ROOT do
-  puts '== Rubocop =='
+  puts "\n== Rubocop =="
 
   flags = []
   if options[:todo]
@@ -28,4 +28,8 @@ FileUtils.chdir GEM_ROOT do
   end
 
   system! "bundle exec rubocop #{flags.join(' ')}"
+
+  puts "\n== Markdown Lint =="
+
+  system! "bundle exec mdl --style .mdstyle.rb README.md"
 end
