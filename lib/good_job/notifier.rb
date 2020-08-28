@@ -2,7 +2,11 @@ require 'concurrent/atomic/atomic_boolean'
 
 module GoodJob # :nodoc:
   #
-  # Wrapper for Postgres LISTEN/NOTIFY
+  # Notifiers hook into Postgres LISTEN/NOTIFY functionality to emit and listen for notifications across processes.
+  #
+  # Notifiers can emit NOTIFY messages through Postgres.
+  # A notifier will LISTEN for messages by creating a background thread that runs in an instance of +Concurrent::ThreadPoolExecutor+.
+  # When a message is received, the notifier passes the message to each of its recipients.
   #
   class Notifier
     CHANNEL = 'good_job'.freeze
@@ -19,7 +23,8 @@ module GoodJob # :nodoc:
 
     # @!attribute [r] instances
     #   @!scope class
-    #   @return [array<GoodJob:Adapter>] the instances of +GoodJob::Notifier+
+    #   List of all instantiated Notifiers in the current process.
+    #   @return [array<GoodJob:Adapter>]
     cattr_reader :instances, default: [], instance_reader: false
 
     def self.notify(message)
@@ -29,8 +34,11 @@ module GoodJob # :nodoc:
       SQL
     end
 
+    # List of recipients that will receive notifications.
+    # @return [Array<#call, Array(Object, Symbol)>]
     attr_reader :recipients
 
+    # @param recipients [Array<#call, Array(Object, Symbol)>]
     def initialize(*recipients)
       @recipients = Concurrent::Array.new(recipients)
       @listening = Concurrent::AtomicBoolean.new(false)
