@@ -9,7 +9,9 @@ module GoodJob # :nodoc:
   # When a message is received, the notifier passes the message to each of its recipients.
   #
   class Notifier
+    # Default Postgres channel for LISTEN/NOTIFY
     CHANNEL = 'good_job'.freeze
+    # Defaults for instance of Concurrent::ThreadPoolExecutor
     POOL_OPTIONS = {
       name: name,
       min_threads: 0,
@@ -19,6 +21,7 @@ module GoodJob # :nodoc:
       max_queue: 1,
       fallback_policy: :discard,
     }.freeze
+    # Seconds to block while LISTENing for a message
     WAIT_INTERVAL = 1
 
     # @!attribute [r] instances
@@ -27,6 +30,8 @@ module GoodJob # :nodoc:
     #   @return [array<GoodJob:Adapter>]
     cattr_reader :instances, default: [], instance_reader: false
 
+    # Send a message via Postgres NOTIFY
+    # @param message [#to_json]
     def self.notify(message)
       connection = ActiveRecord::Base.connection
       connection.exec_query <<~SQL
@@ -49,16 +54,29 @@ module GoodJob # :nodoc:
       listen
     end
 
+    # Tests whether the notifier is active and listening for new messages.
+    # @return [true, false, nil]
     def listening?
       @listening.true?
     end
 
+    # Restart the notifier.
+    # When shutdown, start; or shutdown and start.
+    # @param wait [Boolean] Wait for background thread to finish
+    # @return [void]
     def restart(wait: true)
       shutdown(wait: wait)
       create_pool
       listen
     end
 
+    # Shut down the notifier.
+    # This stops the background LISTENing thread.
+    # If +wait+ is +true+, the notifier will wait for background thread to shutdown.
+    # If +wait+ is +false+, this method will return immediately even though threads may still be running.
+    # Use {#shutdown?} to determine whether threads have stopped.
+    # @param wait [Boolean] Wait for actively executing jobs to finish
+    # @return [void]
     def shutdown(wait: true)
       return unless @pool.running?
 
@@ -66,6 +84,8 @@ module GoodJob # :nodoc:
       @pool.wait_for_termination if wait
     end
 
+    # Tests whether the notifier is shutdown.
+    # @return [true, false, nil]
     def shutdown?
       !@pool.running?
     end
