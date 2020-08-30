@@ -201,6 +201,8 @@ DEPENDENCIES
   gem-release
   github_changelog_generator
   good_job!
+  kramdown
+  kramdown-parser-gfm
   mdl
   pry-rails
   puma
