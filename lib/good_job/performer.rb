@@ -4,6 +4,10 @@ module GoodJob
   # {Scheduler}. It mainly functions as glue between a {Scheduler} and the jobs
   # it should be executing.
   #
+  # The Performer enforces a callable that does not rely on scoped/closure
+  # variables because they might not be available when executed in a different
+  # thread.
+  #
   class Performer
     # @!attribute [r] name
     # @return [String]
@@ -39,6 +43,12 @@ module GoodJob
     # Tests whether this performer should be used in GoodJob's current state by
     # calling the +filter+ callable set in {#initialize}. Always returns +true+
     # if there is no filter.
+    #
+    # For example, state will be a LISTEN/NOTIFY message that is passed down
+    # from the Notifier to the Scheduler. The Scheduler is able to ask
+    # its performer "does this message relate to you?", and if not, ignore it
+    # to minimize thread wake-ups, database queries, and thundering herds.
+    #
     # @return [Boolean] whether the performer's {#next} method should be
     #   called in the current state.
     def next?(state = {})
