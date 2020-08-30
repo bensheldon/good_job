@@ -11,7 +11,7 @@ GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 
 For more of the story of GoodJob, read the [introductory blog post](https://island94.org/2020/07/introducing-goodjob-1-0).
 
-<details>
+<details markdown="1">
 <summary><strong>📊 Comparison of GoodJob with other job queue backends (click to expand)</strong></summary>
 
 |                 | Queues, priority, retries | Database                              | Concurrency       | Reliability/Integrity  | Latency                  |

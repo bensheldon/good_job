@@ -50,6 +50,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "foreman"
   spec.add_development_dependency "gem-release"
   spec.add_development_dependency "github_changelog_generator"
+  spec.add_development_dependency "kramdown"
+  spec.add_development_dependency "kramdown-parser-gfm"
   spec.add_development_dependency "mdl"
   spec.add_development_dependency "pry-rails"
   spec.add_development_dependency "puma"
