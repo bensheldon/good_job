@@ -1,4 +1,7 @@
 module GoodJob
+  #
+  # ActiveJob Adapter.
+  #
   class Adapter
     # Valid execution modes.
     EXECUTION_MODES = [:async, :external, :inline].freeze
