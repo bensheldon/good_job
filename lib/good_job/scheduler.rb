@@ -129,7 +129,8 @@ module GoodJob # :nodoc:
       @_shutdown
     end
 
-    # Restart the Scheduler. When shutdown, start; or shutdown and start.
+    # Restart the Scheduler.
+    # When shutdown, start; or shutdown and start.
     # @param wait [Boolean] Wait for actively executing jobs to finish
     # @return [void]
     def restart(wait: true)
@@ -141,7 +142,6 @@ module GoodJob # :nodoc:
     end
 
     # Wakes a thread to allow the performer to execute a task.
-    #
     # @param state [nil, Object] Contextual information for the performer. See {Performer#next?}.
     # @return [nil, Boolean] Whether work was started.
     #   Returns +nil+ if the scheduler is unable to take new work, for example if the thread pool is shut down or at capacity.
