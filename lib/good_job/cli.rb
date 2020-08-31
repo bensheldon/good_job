@@ -68,13 +68,18 @@ module GoodJob
     method_option :before_seconds_ago,
                   type: :numeric,
                   banner: 'SECONDS',
-                  default: 24 * 60 * 60,
-                  desc: "Delete records finished more than this many seconds ago"
+                  desc: "Delete records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 86400)"
     def cleanup_preserved_jobs
       set_up_application!
 
-      timestamp = Time.current - options[:before_seconds_ago]
-      ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { before_seconds_ago: options[:before_seconds_ago], timestamp: timestamp }) do |payload|
+      configuration = GoodJob::Configuration.new(options)
+
+      timestamp = Time.current - configuration.cleanup_preserved_jobs_before_seconds_ago
+
+      ActiveSupport::Notifications.instrument(
+        "cleanup_preserved_jobs.good_job",
+        { before_seconds_ago: configuration.cleanup_preserved_jobs_before_seconds_ago, timestamp: timestamp }
+      ) do |payload|
         deleted_records_count = GoodJob::Job.finished(timestamp).delete_all
 
         payload[:deleted_records_count] = deleted_records_count
