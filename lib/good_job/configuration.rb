@@ -51,5 +51,13 @@ module GoodJob
         1
       ).to_i
     end
+
+    def cleanup_preserved_jobs_before_seconds_ago
+      (
+        options[:before_seconds_ago] ||
+        env['GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO'] ||
+        24 * 60 * 60
+      ).to_i
+    end
   end
 end

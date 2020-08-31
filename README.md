@@ -163,8 +163,7 @@ Usage:
   good_job cleanup_preserved_jobs
 
 Options:
-  [--before-seconds-ago=SECONDS]  # Delete records finished more than this many seconds ago
-                                  # Default: 86400
+  [--before-seconds-ago=SECONDS] # Delete records finished more than this many seconds ago (env var:  GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 86400)
 
 Deletes preserved job records.
 

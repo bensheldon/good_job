@@ -15,4 +15,31 @@ RSpec.describe GoodJob::Configuration do
       end
     end
   end
+
+  describe '#cleanup_preserved_jobs_before_seconds_ago' do
+    it 'defaults to 86400' do
+      configuration = described_class.new({})
+      expect(configuration.cleanup_preserved_jobs_before_seconds_ago).to eq 86400
+    end
+
+    context 'when environment variable is set' do
+      before do
+        stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO' => 36000 })
+      end
+
+      context 'when option is given' do
+        it 'uses option value' do
+          configuration = described_class.new({ before_seconds_ago: 10000 })
+          expect(configuration.cleanup_preserved_jobs_before_seconds_ago).to eq 10000
+        end
+      end
+
+      context 'when option is not given' do
+        it 'uses environment variable' do
+          configuration = described_class.new({})
+          expect(configuration.cleanup_preserved_jobs_before_seconds_ago).to eq 36000
+        end
+      end
+    end
+  end
 end
