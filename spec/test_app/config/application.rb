@@ -1,6 +1,7 @@
 require_relative 'boot'
 
 require 'rails/all'
+require "good_job/engine"
 
 Bundler.require(*Rails.groups)
 require "good_job"
