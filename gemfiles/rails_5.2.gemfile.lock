@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    good_job (1.2.3)
+    good_job (1.2.4)
       activejob (>= 5.1.0)
       activerecord (>= 5.1.0)
       concurrent-ruby (>= 1.0.2)
@@ -62,6 +62,7 @@ GEM
     arel (9.0.0)
     ast (2.4.1)
     builder (3.2.4)
+    chef-utils (16.4.41)
     coderay (1.1.3)
     concurrent-ruby (1.1.6)
     crass (1.0.6)
@@ -88,6 +89,10 @@ GEM
       activesupport (>= 4.2.0)
     i18n (1.8.3)
       concurrent-ruby (~> 1.0)
+    kramdown (2.3.0)
+      rexml
+    kramdown-parser-gfm (1.1.0)
+      kramdown (~> 2.0)
     loofah (2.6.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -95,11 +100,22 @@ GEM
       mini_mime (>= 0.1.1)
     marcel (0.3.3)
       mimemagic (~> 0.3.2)
+    mdl (0.11.0)
+      kramdown (~> 2.3)
+      kramdown-parser-gfm (~> 1.1)
+      mixlib-cli (~> 2.1, >= 2.1.1)
+      mixlib-config (>= 2.2.1, < 4)
+      mixlib-shellout
     method_source (1.0.0)
     mimemagic (0.3.5)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.14.1)
+    mixlib-cli (2.1.8)
+    mixlib-config (3.0.9)
+      tomlrb
+    mixlib-shellout (3.1.4)
+      chef-utils
     msgpack (1.3.3)
     multi_json (1.15.0)
     multipart-post (2.1.1)
@@ -208,6 +224,7 @@ GEM
       sprockets (>= 3.0.0)
     thor (1.0.1)
     thread_safe (0.3.6)
+    tomlrb (1.3.0)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     unicode-display_width (1.7.0)
@@ -227,6 +244,9 @@ DEPENDENCIES
   gem-release
   github_changelog_generator
   good_job!
+  kramdown
+  kramdown-parser-gfm
+  mdl
   pry-rails
   puma
   rails (~> 5.2.0)

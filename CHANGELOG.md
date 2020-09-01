@@ -1,5 +1,30 @@
 # Changelog
 
+## [v1.2.4](https://github.com/bensheldon/good_job/tree/v1.2.4) (2020-09-01)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.3...v1.2.4)
+
+**Implemented enhancements:**
+
+- Add environment variable to mirror `cleanup\_preserved\_jobs --before-seconds-ago=SECONDS` [\#110](https://github.com/bensheldon/good_job/issues/110)
+
+**Closed issues:**
+
+- Remove unused PgLocks class [\#121](https://github.com/bensheldon/good_job/issues/121)
+- Fix minor issue with CommandLine option links in README.md [\#116](https://github.com/bensheldon/good_job/issues/116)
+- Unused .advisory\_lock\_details in PgLocks [\#105](https://github.com/bensheldon/good_job/issues/105)
+
+**Merged pull requests:**
+
+- Remove unused PgLocks class [\#120](https://github.com/bensheldon/good_job/pull/120) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
+- Better table name detection for Job queries [\#119](https://github.com/bensheldon/good_job/pull/119) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
+- Fix readme CommandLine option links [\#115](https://github.com/bensheldon/good_job/pull/115) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
+- Allow env variable config for cleanups [\#114](https://github.com/bensheldon/good_job/pull/114) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
+- Have YARD render markdown files with GFM \(Github Flavored Markdown\) [\#113](https://github.com/bensheldon/good_job/pull/113) ([bensheldon](https://github.com/bensheldon))
+- Add markdownlint to lint readme [\#109](https://github.com/bensheldon/good_job/pull/109) ([bensheldon](https://github.com/bensheldon))
+- Remove unused method in PgLocks [\#107](https://github.com/bensheldon/good_job/pull/107) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
+- Re-organize Readme: frontload configuration, add Table of Contents  [\#106](https://github.com/bensheldon/good_job/pull/106) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.2.3](https://github.com/bensheldon/good_job/tree/v1.2.3) (2020-08-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.2...v1.2.3)
@@ -63,6 +88,7 @@
 **Merged pull requests:**
 
 - Document GoodJob module [\#83](https://github.com/bensheldon/good_job/pull/83) ([bensheldon](https://github.com/bensheldon))
+- Add Postgres LISTEN/NOTIFY support [\#82](https://github.com/bensheldon/good_job/pull/82) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.1.4](https://github.com/bensheldon/good_job/tree/v1.1.4) (2020-08-19)
 
@@ -75,7 +101,6 @@
 
 **Merged pull requests:**
 
-- Add Postgres LISTEN/NOTIFY support [\#82](https://github.com/bensheldon/good_job/pull/82) ([bensheldon](https://github.com/bensheldon))
 - Allow Schedulers to filter \#create\_thread to avoid flood of queries when running async with multiple schedulers [\#81](https://github.com/bensheldon/good_job/pull/81) ([bensheldon](https://github.com/bensheldon))
 - Fully name scheduler threadpools and thread names; refactor CLI STDOUT [\#80](https://github.com/bensheldon/good_job/pull/80) ([bensheldon](https://github.com/bensheldon))
 
@@ -157,10 +182,6 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.0.1...v1.0.2)
 
-**Fixed bugs:**
-
-- Fix counting of available execution threads [\#58](https://github.com/bensheldon/good_job/pull/58) ([bensheldon](https://github.com/bensheldon))
-
 **Merged pull requests:**
 
 - Add migration generator [\#56](https://github.com/bensheldon/good_job/pull/56) ([thedanbob](https://github.com/thedanbob))
@@ -181,6 +202,10 @@
 ## [v0.9.0](https://github.com/bensheldon/good_job/tree/v0.9.0) (2020-07-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.2...v0.9.0)
+
+**Fixed bugs:**
+
+- Fix counting of available execution threads [\#58](https://github.com/bensheldon/good_job/pull/58) ([bensheldon](https://github.com/bensheldon))
 
 **Merged pull requests:**
 
@@ -262,6 +287,7 @@
 
 - Improve ActiveRecord usage for advisory locking [\#24](https://github.com/bensheldon/good_job/pull/24) ([bensheldon](https://github.com/bensheldon))
 - Remove support for Rails 5.1 [\#23](https://github.com/bensheldon/good_job/pull/23) ([bensheldon](https://github.com/bensheldon))
+- Clean up Gemspec [\#15](https://github.com/bensheldon/good_job/pull/15) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.3.0](https://github.com/bensheldon/good_job/tree/v0.3.0) (2020-03-22)
 
@@ -289,7 +315,6 @@
 
 **Merged pull requests:**
 
-- Clean up Gemspec [\#15](https://github.com/bensheldon/good_job/pull/15) ([bensheldon](https://github.com/bensheldon))
 - Set up Rubocop [\#14](https://github.com/bensheldon/good_job/pull/14) ([bensheldon](https://github.com/bensheldon))
 - Add pg gem as explicit dependency [\#13](https://github.com/bensheldon/good_job/pull/13) ([bensheldon](https://github.com/bensheldon))
 - Bump nokogiri from 1.10.7 to 1.10.9 [\#12](https://github.com/bensheldon/good_job/pull/12) ([dependabot[bot]](https://github.com/apps/dependabot))
