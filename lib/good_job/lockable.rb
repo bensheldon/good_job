@@ -87,8 +87,15 @@ module GoodJob
 
       # @!attribute [r] create_with_advisory_lock
       # @return [Boolean]
-      # Whether an advisory lock should be acquired immediately after creating
-      # the record.
+      # Whether an advisory lock should be acquired in the same transaction
+      # that created the record.
+      #
+      # This helps prevent another thread or database session from acquiring a
+      # lock on the record between the time you create it and the time you
+      # request a lock, since other sessions will not be able to see the new
+      # record until the transaction that creates it is completed (at which
+      # point you have already acquired the lock).
+      #
       # @example
       #   record = MyLockableRecord.create(create_with_advisory_lock: true)
       #   record.advisory_locked?
