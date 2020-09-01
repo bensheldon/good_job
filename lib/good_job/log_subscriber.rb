@@ -16,6 +16,7 @@ module GoodJob
     #   Responds to the +$0.good_job+ notification.
     #   @return [void]
     def create(event)
+      # FIXME: This method does not match any good_job notifications.
       good_job = event.payload[:good_job]
 
       debug do
@@ -25,6 +26,7 @@ module GoodJob
 
     # @macro notification_responder
     def timer_task_finished(event)
+      # FIXME: This method does not match any good_job notifications.
       exception = event.payload[:error]
       return unless exception
 
@@ -35,6 +37,7 @@ module GoodJob
 
     # @macro notification_responder
     def job_finished(event)
+      # FIXME: This method does not match any good_job notifications.
       exception = event.payload[:error]
       return unless exception
 
