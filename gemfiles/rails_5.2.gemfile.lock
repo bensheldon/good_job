@@ -8,6 +8,7 @@ PATH
       pg (>= 1.0.0)
       railties (>= 5.1.0)
       thor (>= 0.14.1)
+      zeitwerk (>= 2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -232,6 +233,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yard (0.9.25)
+    zeitwerk (2.4.0)
 
 PLATFORMS
   ruby

@@ -1,18 +1,18 @@
 require "rails"
-require 'good_job/railtie'
 
-require 'good_job/configuration'
-require 'good_job/log_subscriber'
-require 'good_job/lockable'
-require 'good_job/job'
-require 'good_job/scheduler'
-require 'good_job/multi_scheduler'
-require 'good_job/adapter'
-require 'good_job/performer'
-require 'good_job/current_execution'
-require 'good_job/notifier'
+require "active_job"
+require "active_job/queue_adapters"
 
-require 'active_job/queue_adapters/good_job_adapter'
+require "zeitwerk"
+
+loader = Zeitwerk::Loader.for_gem
+loader.inflector.inflect(
+  'cli' => "CLI"
+)
+loader.push_dir(File.join(__dir__, ["generators"]))
+loader.setup
+
+require "good_job/railtie"
 
 # GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 #

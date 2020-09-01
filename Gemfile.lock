@@ -8,6 +8,7 @@ PATH
       pg (>= 1.0.0)
       railties (>= 5.1.0)
       thor (>= 0.14.1)
+      zeitwerk (>= 2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -188,7 +189,7 @@ GEM
       thread_safe (~> 0.1)
     unicode-display_width (1.7.0)
     yard (0.9.25)
-    zeitwerk (2.3.1)
+    zeitwerk (2.4.0)
 
 PLATFORMS
   ruby
