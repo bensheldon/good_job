@@ -10,6 +10,8 @@ module GoodJob
   # documentation for more.
   #
   class LogSubscriber < ActiveSupport::LogSubscriber
+    # @group Notifications
+
     # @!macro notification_responder
     #   Responds to the +$0.good_job+ notification.
     #   @return [void]
@@ -132,6 +134,10 @@ module GoodJob
         "GoodJob deleted #{deleted_records_count} preserved #{'job'.pluralize(deleted_records_count)} finished before #{timestamp}."
       end
     end
+
+    # @endgroup
+    # NOTE: the double-blank line below is required to actually end the group.
+
 
     class << self
       # Tracks all loggers that {LogSubscriber} is writing to. You can write to
