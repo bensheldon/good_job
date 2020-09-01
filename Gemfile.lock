@@ -188,6 +188,8 @@ GEM
       thread_safe (~> 0.1)
     unicode-display_width (1.7.0)
     yard (0.9.25)
+    yard-activesupport-concern (0.0.1)
+      yard (>= 0.8)
     zeitwerk (2.3.1)
 
 PLATFORMS
@@ -214,6 +216,7 @@ DEPENDENCIES
   rubocop-rspec
   sigdump
   yard
+  yard-activesupport-concern
 
 BUNDLED WITH
    2.1.4
