@@ -13,20 +13,20 @@ module GoodJob
 
         query = cte_table.project(cte_table[:id])
                   .with(composed_cte)
-                  .where(Arel.sql(sanitize_sql_for_conditions(["pg_try_advisory_lock(('x'||substr(md5(:table_name || \"#{cte_table.name}\".\"#{primary_key}\"::text), 1, 16))::bit(64)::bigint)", { table_name: table_name }])))
+                  .where(Arel.sql(sanitize_sql_for_conditions(["pg_try_advisory_lock(('x' || substr(md5(:table_name || #{connection.quote_table_name(cte_table.name)}.#{quoted_primary_key}::text), 1, 16))::bit(64)::bigint)", { table_name: table_name }])))
 
         limit = original_query.arel.ast.limit
         query.limit = limit.value if limit.present?
 
-        unscoped.where(arel_table[:id].in(query)).merge(original_query.only(:order))
+        unscoped.where(arel_table[primary_key].in(query)).merge(original_query.only(:order))
       end)
 
       scope :joins_advisory_locks, (lambda do
         join_sql = <<~SQL
           LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'
             AND pg_locks.objsubid = 1
-            AND pg_locks.classid = ('x'||substr(md5(:table_name || #{quoted_table_name}.#{quoted_primary_key}::text), 1, 16))::bit(32)::int
-            AND pg_locks.objid = (('x'||substr(md5(:table_name || #{quoted_table_name}.#{quoted_primary_key}::text), 1, 16))::bit(64) << 32)::bit(32)::int
+            AND pg_locks.classid = ('x' || substr(md5(:table_name || #{quoted_table_name}.#{quoted_primary_key}::text), 1, 16))::bit(32)::int
+            AND pg_locks.objid = (('x' || substr(md5(:table_name || #{quoted_table_name}.#{quoted_primary_key}::text), 1, 16))::bit(64) << 32)::bit(32)::int
         SQL
 
         joins(sanitize_sql_for_conditions([join_sql, { table_name: table_name }]))
@@ -56,14 +56,14 @@ module GoodJob
 
     def advisory_lock
       where_sql = <<~SQL
-        pg_try_advisory_lock(('x'||substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
+        pg_try_advisory_lock(('x' || substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
       SQL
       self.class.unscoped.where(where_sql, { table_name: self.class.table_name, id: send(self.class.primary_key) }).exists?
     end
 
     def advisory_unlock
       where_sql = <<~SQL
-        pg_advisory_unlock(('x'||substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
+        pg_advisory_unlock(('x' || substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
       SQL
       self.class.unscoped.where(where_sql, { table_name: self.class.table_name, id: send(self.class.primary_key) }).exists?
     end
