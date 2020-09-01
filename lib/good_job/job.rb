@@ -108,7 +108,7 @@ module GoodJob
 
     # Finds the next eligible Job, acquire an advisory lock related to it, and
     # executes the job.
-    # @return [Array<GoodJob::Job, Object, Exception>, nil]
+    # @return [Array<(GoodJob::Job, Object, Exception)>, nil]
     #   If a job was executed, returns an array with the {Job} record, the
     #   return value for the job's +#perform+ method, and the exception the job
     #   raised, if any (if the job raised, then the second array entry will be
@@ -167,7 +167,7 @@ module GoodJob
     #   Whether to re-queue the job to execute again if it raised an instance
     #   of +StandardError+. Defaults to the value of
     #   {GoodJob.reperform_jobs_on_standard_error}.
-    # @return [Array<Object, Exception>]
+    # @return [Array<(Object, Exception)>]
     #   An array of the return value of the job's +#perform+ method and the
     #   exception raised by the job, if any. If the job completed successfully,
     #   the second array entry (the exception) will be +nil+ and vice versa.

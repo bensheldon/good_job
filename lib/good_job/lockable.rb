@@ -195,7 +195,7 @@ module GoodJob
 
     # Releases all advisory locks on the record that are held by the current
     # database session.
-    # @return [nil]
+    # @return [void]
     def advisory_unlock!
       advisory_unlock while advisory_locked?
     end
