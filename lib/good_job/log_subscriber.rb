@@ -10,6 +10,9 @@ module GoodJob
   # documentation for more.
   #
   class LogSubscriber < ActiveSupport::LogSubscriber
+    # @!macro notification_responder
+    #   Responds to the +$0.good_job+ notification.
+    #   @return [void]
     def create(event)
       good_job = event.payload[:good_job]
 
@@ -18,6 +21,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def timer_task_finished(event)
       exception = event.payload[:error]
       return unless exception
@@ -27,6 +31,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def job_finished(event)
       exception = event.payload[:error]
       return unless exception
@@ -36,6 +41,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def scheduler_create_pools(event)
       max_threads = event.payload[:max_threads]
       poll_interval = event.payload[:poll_interval]
@@ -47,6 +53,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def scheduler_shutdown_start(event)
       process_id = event.payload[:process_id]
 
@@ -55,6 +62,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def scheduler_shutdown(event)
       process_id = event.payload[:process_id]
 
@@ -63,6 +71,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def scheduler_restart_pools(event)
       process_id = event.payload[:process_id]
 
@@ -71,6 +80,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def perform_job(event)
       good_job = event.payload[:good_job]
       process_id = event.payload[:process_id]
@@ -81,12 +91,14 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def notifier_listen(_event)
       info do
         "Notifier subscribed with LISTEN"
       end
     end
 
+    # @macro notification_responder
     def notifier_notified(event)
       payload = event.payload[:payload]
 
@@ -95,6 +107,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def notifier_notify_error(event)
       error = event.payload[:error]
 
@@ -103,12 +116,14 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def notifier_unlisten(_event)
       info do
         "Notifier unsubscribed with UNLISTEN"
       end
     end
 
+    # @macro notification_responder
     def cleanup_preserved_jobs(event)
       timestamp = event.payload[:timestamp]
       deleted_records_count = event.payload[:deleted_records_count]
