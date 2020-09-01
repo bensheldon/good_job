@@ -10,7 +10,7 @@ module GoodJob
   # documentation for more.
   #
   class LogSubscriber < ActiveSupport::LogSubscriber
-    # @group Notifications
+    # @!group Notifications
 
     # @!macro notification_responder
     #   Responds to the +$0.good_job+ notification.
@@ -138,9 +138,13 @@ module GoodJob
       end
     end
 
-    # @endgroup
-    # NOTE: the double-blank line below is required to actually end the group.
+    # @!endgroup
 
+    # Get the logger associated with this {LogSubscriber} instance.
+    # @return [Logger]
+    def logger
+      GoodJob::LogSubscriber.logger
+    end
 
     class << self
       # Tracks all loggers that {LogSubscriber} is writing to. You can write to
@@ -179,12 +183,6 @@ module GoodJob
       def reset_logger
         @_logger = nil
       end
-    end
-
-    # Get the logger associated with this {LogSubscriber} instance.
-    # @return [Logger]
-    def logger
-      GoodJob::LogSubscriber.logger
     end
 
     private
