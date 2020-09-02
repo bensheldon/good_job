@@ -1,6 +1,22 @@
 module GoodJob
+  #
+  # Listens to GoodJob notifications and logs them.
+  #
+  # Each method corresponds to the name of a notification. For example, when
+  # the {Scheduler} shuts down, it sends a notification named
+  # +"scheduler_shutdown.good_job"+ and the {#scheduler_shutdown} method will
+  # be called here. See the
+  # {https://api.rubyonrails.org/classes/ActiveSupport/LogSubscriber.html ActiveSupport::LogSubscriber}
+  # documentation for more.
+  #
   class LogSubscriber < ActiveSupport::LogSubscriber
+    # @!group Notifications
+
+    # @!macro notification_responder
+    #   Responds to the +$0.good_job+ notification.
+    #   @return [void]
     def create(event)
+      # FIXME: This method does not match any good_job notifications.
       good_job = event.payload[:good_job]
 
       debug do
@@ -8,7 +24,9 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def timer_task_finished(event)
+      # FIXME: This method does not match any good_job notifications.
       exception = event.payload[:error]
       return unless exception
 
@@ -17,7 +35,9 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def job_finished(event)
+      # FIXME: This method does not match any good_job notifications.
       exception = event.payload[:error]
       return unless exception
 
@@ -26,6 +46,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def scheduler_create_pools(event)
       max_threads = event.payload[:max_threads]
       poll_interval = event.payload[:poll_interval]
@@ -37,6 +58,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def scheduler_shutdown_start(event)
       process_id = event.payload[:process_id]
 
@@ -45,6 +67,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def scheduler_shutdown(event)
       process_id = event.payload[:process_id]
 
@@ -53,6 +76,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def scheduler_restart_pools(event)
       process_id = event.payload[:process_id]
 
@@ -61,6 +85,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def perform_job(event)
       good_job = event.payload[:good_job]
       process_id = event.payload[:process_id]
@@ -71,12 +96,14 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def notifier_listen(_event)
       info do
         "Notifier subscribed with LISTEN"
       end
     end
 
+    # @macro notification_responder
     def notifier_notified(event)
       payload = event.payload[:payload]
 
@@ -85,6 +112,7 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def notifier_notify_error(event)
       error = event.payload[:error]
 
@@ -93,12 +121,14 @@ module GoodJob
       end
     end
 
+    # @macro notification_responder
     def notifier_unlisten(_event)
       info do
         "Notifier unsubscribed with UNLISTEN"
       end
     end
 
+    # @macro notification_responder
     def cleanup_preserved_jobs(event)
       timestamp = event.payload[:timestamp]
       deleted_records_count = event.payload[:deleted_records_count]
@@ -108,11 +138,34 @@ module GoodJob
       end
     end
 
+    # @!endgroup
+
+    # Get the logger associated with this {LogSubscriber} instance.
+    # @return [Logger]
+    def logger
+      GoodJob::LogSubscriber.logger
+    end
+
     class << self
+      # Tracks all loggers that {LogSubscriber} is writing to. You can write to
+      # multiple logs by appending to this array. After updating it, you should
+      # usually call {LogSubscriber.reset_logger} to make sure they are all
+      # written to.
+      #
+      # Defaults to {GoodJob.logger}.
+      # @return [Array<Logger>]
+      # @example Write to STDOUT and to a file:
+      #   GoodJob::LogSubscriber.loggers << ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new(STDOUT))
+      #   GoodJob::LogSubscriber.loggers << ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new("log/my_logs.log"))
+      #   GoodJob::LogSubscriber.reset_logger
       def loggers
         @_loggers ||= [GoodJob.logger]
       end
 
+      # Represents all the loggers attached to {LogSubscriber} with a single
+      # logging interface. Writing to this logger is a shortcut for writing to
+      # each of the loggers in {LogSubscriber.loggers}.
+      # @return [Logger]
       def logger
         @_logger ||= begin
                       logger = Logger.new(StringIO.new)
@@ -123,17 +176,22 @@ module GoodJob
                     end
       end
 
+      # Reset {LogSubscriber.logger} and force it to rebuild a new shortcut to
+      # all the loggers in {LogSubscriber.loggers}. You should usually call
+      # this after modifying the {LogSubscriber.loggers} array.
+      # @return [void]
       def reset_logger
         @_logger = nil
       end
     end
 
-    def logger
-      GoodJob::LogSubscriber.logger
-    end
-
     private
 
+    # Add "GoodJob" plus any specified tags to every
+    # {ActiveSupport::TaggedLogging} logger in {LogSubscriber.loggers}. Tags
+    # are only applicable inside the block passed to this method.
+    # @yield [void]
+    # @return [void]
     def tag_logger(*tags, &block)
       tags = tags.dup.unshift("GoodJob").compact
 
@@ -152,6 +210,14 @@ module GoodJob
       end.call
     end
 
+    # Ensure that the standard logging methods include "GoodJob" as a tag and
+    # that they include a second argument allowing callers to specify ad-hoc
+    # tags to include in the message.
+    #
+    # For example, to include the tag "ForFunsies" on an +info+ message:
+    #
+    #     self.info("Some message", tags: ["ForFunsies"])
+    #
     %w(info debug warn error fatal unknown).each do |level|
       class_eval <<-METHOD, __FILE__, __LINE__ + 1
         def #{level}(progname = nil, tags: [], &block)

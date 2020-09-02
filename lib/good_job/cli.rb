@@ -1,17 +1,33 @@
 require 'thor'
 
 module GoodJob
+  #
+  # Implements the +good_job+ command-line tool, which executes jobs and
+  # provides other utilities. The actual entry point is in +exe/good_job+, but
+  # it just sets up and calls this class.
+  #
+  # The +good_job+ command-line tool is based on Thor, a CLI framework for
+  # Ruby. For more on general usage, see http://whatisthor.com/ and
+  # https://github.com/erikhuda/thor/wiki.
+  #
   class CLI < Thor
+    # Path to the local Rails application's environment configuration.
+    # Requiring this loads the application's configuration and classes.
     RAILS_ENVIRONMENT_RB = File.expand_path("config/environment.rb")
 
-    desc :start, <<~DESCRIPTION
+    # @!macro thor.desc
+    #   @!method $1
+    #   @return [void]
+    #   The +good_job $1+ command. $2
+    desc :start, "Executes queued jobs."
+    long_desc <<~DESCRIPTION
       Executes queued jobs.
 
-      All options can be configured with environment variables. 
+      All options can be configured with environment variables.
       See option descriptions for the matching environment variable name.
 
       == Configuring queues
-      Separate multiple queues with commas; exclude queues with a leading minus; 
+      \x5Separate multiple queues with commas; exclude queues with a leading minus;
       separate isolated execution pools with semicolons and threads with colons.
 
     DESCRIPTION
@@ -51,8 +67,10 @@ module GoodJob
 
     default_task :start
 
-    desc :cleanup_preserved_jobs, <<~DESCRIPTION
-      Deletes preserved job records. 
+    # @!macro thor.desc
+    desc :cleanup_preserved_jobs, "Deletes preserved job records."
+    long_desc <<~DESCRIPTION
+      Deletes preserved job records.
 
       By default, GoodJob deletes job records when the job is performed and this
       command is not necessary.
@@ -87,6 +105,11 @@ module GoodJob
     end
 
     no_commands do
+      # Load the current Rails application and configuration that the good_job
+      # command-line tool should be working within.
+      #
+      # GoodJob components that need access to constants, classes, etc. from
+      # Rails or from the application can be set up here.
       def set_up_application!
         require RAILS_ENVIRONMENT_RB
         return unless defined?(GOOD_JOB_LOG_TO_STDOUT) && GOOD_JOB_LOG_TO_STDOUT && !ActiveSupport::Logger.logger_outputs_to?(GoodJob.logger, STDOUT)

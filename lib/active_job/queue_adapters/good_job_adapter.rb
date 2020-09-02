@@ -1,5 +1,6 @@
-module ActiveJob
-  module QueueAdapters
+module ActiveJob # :nodoc:
+  module QueueAdapters # :nodoc:
+    # See {GoodJob::Adapter} for details.
     class GoodJobAdapter < GoodJob::Adapter
       def initialize(execution_mode: nil, max_threads: nil, poll_interval: nil, scheduler: nil, inline: false)
         configuration = GoodJob::Configuration.new({ execution_mode: execution_mode }, env: ENV)
