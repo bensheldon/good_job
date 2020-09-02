@@ -4,10 +4,21 @@
   <title>Good job</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
+
+  <style>
+    <%= render "assets/css/bootstrap-reboot" %>
+    <%= render "assets/css/chartist" %>
+    <%= render "assets/css/style" %>
+  </style>
+
+  <script>
+    <%= render "assets/js/chartist" %>
+  </script>
 </head>
 <body>
-
-<%= yield %>
+  <div class="container">
+    <%= yield %>
+  </div>
 
 </body>
 </html>
