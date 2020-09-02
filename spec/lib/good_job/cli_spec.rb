@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require 'rails_helper'
-require 'good_job/cli'
 
 RSpec.describe GoodJob::CLI do
   let(:scheduler_mock) { instance_double GoodJob::Scheduler, shutdown?: false, shutdown: nil }
