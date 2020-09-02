@@ -1,4 +1,5 @@
 $LOAD_PATH.push File.expand_path("lib", __dir__)
+$LOAD_PATH.push File.expand_path("engine/lib", __dir__)
 
 # Maintain your gem's version:
 require "good_job/version"
@@ -46,6 +47,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "zeitwerk", ">= 2.0"
 
   spec.add_development_dependency "appraisal"
+  spec.add_development_dependency "capybara"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "dotenv"
   spec.add_development_dependency "foreman"
@@ -62,6 +64,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop-performance"
   spec.add_development_dependency "rubocop-rails"
   spec.add_development_dependency "rubocop-rspec"
+  spec.add_development_dependency "selenium-webdriver"
   spec.add_development_dependency "sigdump"
   spec.add_development_dependency "yard"
 end
