@@ -149,10 +149,7 @@ module GoodJob # :nodoc:
     #   Returns +false+ if the performer decides not to attempt to execute a task based on the +state+ that is passed to it.
     def create_thread(state = nil)
       return nil unless @pool.running? && @pool.ready_worker_count.positive?
-
-      if state
-        return false unless @performer.next?(state)
-      end
+      return false if state && !@performer.next?(state)
 
       future = Concurrent::Future.new(args: [@performer], executor: @pool) do |performer|
         output = nil

@@ -1,0 +1,26 @@
+<div class="table-responsive">
+  <table class="table table-bordered table-hover">
+    <thead>
+      <th>GoodJob ID</th>
+      <th>ActiveJob ID</th>
+      <th>Job Class</th>
+      <th>Queue</th>
+      <th>Scheduled At</th>
+      <th>ActiveJob Params</th>
+      <th>Error</th>
+    </thead>
+    <tbody>
+      <% jobs.each do |job| %>
+        <tr id="<%= dom_id(job) %>">
+          <td><%= link_to job.id, active_job_path(job.serialized_params['job_id'], anchor: dom_id(job)) %></td>
+          <td><%= link_to job.serialized_params['job_id'], active_job_path(job.serialized_params['job_id']) %></td>
+          <td><%= job.serialized_params['job_class'] %></td>
+          <td><%= job.queue_name %></td>
+          <td><%= job.scheduled_at || job.created_at %></td>
+          <td><%= job.serialized_params %></td>
+          <td><%= job.error %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
