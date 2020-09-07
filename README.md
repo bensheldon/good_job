@@ -291,22 +291,25 @@ end
 
 #### ActionMailer retries
 
-Any configuration in `ApplicationJob` will have to be duplicated on `ActionMailer::DeliveryJob` because ActionMailer uses a custom class, `ActionMailer::DeliveryJob`, which inherits from `ActiveJob::Base`,  rather than your applications `ApplicationJob`.
+Any configuration in `ApplicationJob` will have to be duplicated on `ActionMailer::MailDeliveryJob` because ActionMailer uses a custom class, `ActionMailer::MailDeliveryJob`, which inherits from `ActiveJob::Base`,  rather than your applications `ApplicationJob`.
 
-You can use an initializer to configure `ActionMailer::DeliveryJob`, for example:
+You can use an initializer to configure `ActionMailer::MailDeliveryJob`, for example:
 
 ```ruby
 # config/initializers/good_job.rb
-ActionMailer::DeliveryJob.retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
+ActionMailer::MailDeliveryJob.retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
 
 # With Sentry (or Bugsnag, Airbrake, Honeybadger, etc.)
-ActionMailer::DeliveryJob.around_perform do |_job, block|
+ActionMailer::MailDeliveryJob.around_perform do |_job, block|
   block.call
 rescue StandardError => e
   Raven.capture_exception(e)
   raise
 end
 ```
+
+Note, that `ActionMailer::MailDeliveryJob` is a default since Rails 6.0. Be sure that your app is using that class, as it
+might also be configured to use (deprecated now) `ActionMailer::DeliveryJob`.
 
 ### Timeouts
 
