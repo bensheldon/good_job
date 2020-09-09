@@ -291,7 +291,7 @@ end
 
 #### ActionMailer retries
 
-Any configuration in `ApplicationJob` will have to be duplicated on `ActionMailer::MailDeliveryJob` because ActionMailer uses a custom class, `ActionMailer::MailDeliveryJob`, which inherits from `ActiveJob::Base`,  rather than your applications `ApplicationJob`.
+Any configuration in `ApplicationJob` will have to be duplicated on `ActionMailer::MailDeliveryJob` (`ActionMailer::DeliveryJob` in Rails 5.2 or earlier) because ActionMailer uses a custom class, `ActionMailer::MailDeliveryJob`, which inherits from `ActiveJob::Base`,  rather than your applications `ApplicationJob`.
 
 You can use an initializer to configure `ActionMailer::MailDeliveryJob`, for example:
 
