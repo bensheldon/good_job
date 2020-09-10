@@ -33,7 +33,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         - [`good_job cleanup_preserved_jobs`](#good_job-cleanup_preserved_jobs)
     - [Adapter options](#adapter-options)
     - [Global options](#global-options)
-- [Going deeper](#going-deeper)
+- [Go deeper](#go-deeper)
     - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
         - [Exceptions](#exceptions)
         - [Retries](#retries)
@@ -41,12 +41,12 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Timeouts](#timeouts)
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
     - [Database connections](#database-connections)
-    - [Executing jobs async / in-process](#executing-jobs-async--in-process)
-    - [Migrating to GoodJob from a different ActiveJob backend](#migrating-to-goodjob-from-a-different-activejob-backend)
-    - [Monitoring and preserving worked jobs](#monitoring-and-preserving-worked-jobs)
-- [Contributing](#contributing)
+    - [Execute jobs async / in-process](#execute-jobs-async--in-process)
+    - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
+    - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
+- [Contribute](#contribute)
     - [Gem development](#gem-development)
-    - [Releasing](#releasing)
+    - [Release](#release)
 - [License](#license)
 
 ## Set up
@@ -221,7 +221,7 @@ GoodJob.reperform_jobs_on_standard_error = false
 GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
 ```
 
-## Going deeper
+## Go deeper
 
 ### Exceptions, retries, and reliability
 
@@ -380,7 +380,7 @@ Each GoodJob execution thread requires its own database connection that is autom
 pool: <%= [ENV.fetch("RAILS_MAX_THREADS", 5).to_i, ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i].max %>
 ```
 
-### Executing jobs async / in-process
+### Execute jobs async / in-process
 
 GoodJob can execute jobs "async" in the same process as the webserver (e.g. `bin/rail s`). GoodJob's async execution mode offers benefits of economy by not requiring a separate job worker process, but with the tradeoff of increased complexity. Async mode can be configured in two ways:
 
@@ -431,7 +431,7 @@ Depending on your application configuration, you may need to take additional ste
 
   GoodJob is compatible with Puma's `preload_app!` method.
 
-### Migrating to GoodJob from a different ActiveJob backend
+### Migrate to GoodJob from a different ActiveJob backend
 
 If your application is already using an ActiveJob backend, you will need to install GoodJob to enqueue and perform newly created jobs _and_ finish performing pre-existing jobs on the previous backend.
 
@@ -455,7 +455,7 @@ If your application is already using an ActiveJob backend, you will need to inst
 
 1. Once you are confident that no unperformed jobs remain in the previous ActiveJob backend, code and configuration for that backend can be completely removed.
 
-### Monitoring and preserving worked jobs
+### Monitor and preserve worked jobs
 
 GoodJob is fully instrumented with [`ActiveSupport::Notifications`](https://edgeguides.rubyonrails.org/active_support_instrumentation.html#introduction-to-instrumentation).
 
@@ -482,7 +482,7 @@ It is also necessary to delete these preserved jobs from the database after a ce
     $ bundle exec good_job cleanup_preserved_jobs --before-seconds-ago=86400
     ```
 
-## Contributing
+## Contribute
 
 Contributions are welcomed and appreciated 🙏
 
@@ -527,7 +527,7 @@ $ bundle install
 # => Using good_job 0.1.0 from https://github.com/bensheldon/good_job.git (at /Users/You/Projects/good_job@dc57fb0)
 ```
 
-### Releasing
+### Release
 
 Package maintainers can release this gem by running:
 
