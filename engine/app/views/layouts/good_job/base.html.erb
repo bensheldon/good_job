@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Good job</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <style>
+    <%= render "vendor/bootstrap/bootstrap.css" %>
+    <%= render "vendor/chartist/chartist.css" %>
+    <%= render "assets/style.css" %>
+  </style>
+
+  <script>
+    <%= render "vendor/bootstrap/bootstrap-native.js" %>
+    <%= render "vendor/chartist/chartist.js" %>
+  </script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <%= link_to "GoodJob 👍", root_path, class: 'navbar-brand mb-0 h1' %>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <%= link_to "All jobs", root_path, class: ["nav-link", ("active" if current_page?(root_path))] %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Upcoming Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Finished Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Errored Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <%= yield %>
+  </div>
+</body>
+</html>

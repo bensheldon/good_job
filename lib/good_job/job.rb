@@ -106,6 +106,24 @@ module GoodJob
       end
     end)
 
+    # Get Jobs in display order with optional keyset pagination.
+    # @!method display_all(after_scheduled_at: nil, after_id: nil)
+    # @!scope class
+    # @param after_scheduled_at [DateTime, String, nil]
+    #   Display records scheduled after this time for keyset pagination
+    # @param after_id [Numeric, String, nil]
+    #   Display records after this ID for keyset pagination
+    # @return [ActiveRecord::Relation]
+    scope :display_all, (lambda do |after_scheduled_at: nil, after_id: nil|
+      query = order(Arel.sql('COALESCE(scheduled_at, created_at) DESC, id DESC'))
+      if after_scheduled_at.present? && after_id.present?
+        query = query.where(Arel.sql('(COALESCE(scheduled_at, created_at), id) < (:after_scheduled_at, :after_id)'), after_scheduled_at: after_scheduled_at, after_id: after_id)
+      elsif after_scheduled_at.present?
+        query = query.where(Arel.sql('(COALESCE(scheduled_at, created_at)) < (:after_scheduled_at)'), after_scheduled_at: after_scheduled_at)
+      end
+      query
+    end)
+
     # Finds the next eligible Job, acquire an advisory lock related to it, and
     # executes the job.
     # @return [Array<(GoodJob::Job, Object, Exception)>, nil]

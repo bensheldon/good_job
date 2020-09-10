@@ -3,6 +3,6 @@ require 'rails_helper'
 describe 'Dashboard', type: :system, js: true do
   it 'renders successfully' do
     visit '/good_job'
-    expect(page).to have_content 'Hello world!'
+    expect(page).to have_content 'GoodJob 👍'
   end
 end

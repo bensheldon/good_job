@@ -95,3 +95,9 @@ jobs:
         working-directory: spec/test_app
       - name: Run tests
         run: bundle exec appraisal bin/rspec
+      - name: Archive system spec screenshots
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: screenshots
+          path: spec/test_app/tmp/screenshots

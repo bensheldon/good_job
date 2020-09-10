@@ -25,7 +25,7 @@ module GoodJob
   #   @return [Logger]
   #   @example Output GoodJob logs to a file:
   #     GoodJob.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new("log/my_logs.log"))
-  mattr_accessor :logger, default: ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new(STDOUT))
+  mattr_accessor :logger, default: ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
 
   # @!attribute [rw] preserve_job_records
   #   @!scope class

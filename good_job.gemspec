@@ -23,7 +23,13 @@ Gem::Specification.new do |spec|
     "source_code_uri"   => "https://github.com/bensheldon/good_job",
   }
 
-  spec.files = Dir["lib/**/*", "LICENSE.txt", "README.md"]
+  spec.files = Dir[
+    "engine/**/*",
+    "lib/**/*",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE.txt",
+  ]
   spec.bindir = "exe"
   spec.executables = %w[good_job]
 
@@ -50,6 +56,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "capybara"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "dotenv"
+  spec.add_development_dependency "erb_lint"
   spec.add_development_dependency "foreman"
   spec.add_development_dependency "gem-release"
   spec.add_development_dependency "github_changelog_generator"

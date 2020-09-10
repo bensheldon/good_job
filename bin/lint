@@ -29,7 +29,19 @@ FileUtils.chdir GEM_ROOT do
 
   system! "bundle exec rubocop #{flags.join(' ')}"
 
-  puts "\n== Markdown Lint =="
+  puts "\n== ERB Lint =="
+  if options[:nofix]
+    system!("bundle exec erblint engine/app/views")
+  else
+    # Must run twice to run all linters
+    # https://github.com/Shopify/erb-lint/issues/145
+    puts "Running ERB Lint with autocorrectable linters"
+    system!("bundle exec erblint --autocorrect engine/app/views")
 
+    puts "\nRunning ERB Lint with all linters"
+    system!("bundle exec erblint engine/app/views")
+  end
+
+  puts "\n== Markdown Lint =="
   system! "bundle exec mdl --style .mdstyle.rb README.md"
 end
