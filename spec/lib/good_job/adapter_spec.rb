@@ -32,7 +32,7 @@ RSpec.describe GoodJob::Adapter do
         allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
 
         scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
-        adapter = described_class.new(execution_mode: :async, scheduler: scheduler)
+        adapter = described_class.new(execution_mode: :async, scheduler: scheduler, poll_interval: -1)
 
         adapter.enqueue(active_job)
 

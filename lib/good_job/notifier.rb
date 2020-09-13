@@ -75,7 +75,7 @@ module GoodJob # :nodoc:
     # If +wait+ is +true+, the notifier will wait for background thread to shutdown.
     # If +wait+ is +false+, this method will return immediately even though threads may still be running.
     # Use {#shutdown?} to determine whether threads have stopped.
-    # @param wait [Boolean] Wait for actively executing jobs to finish
+    # @param wait [Boolean] Wait for actively executing threads to finish
     # @return [void]
     def shutdown(wait: true)
       return unless @pool.running?
