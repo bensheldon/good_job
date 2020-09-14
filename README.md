@@ -335,7 +335,7 @@ By default, GoodJob creates a single thread execution pool that will execute job
 - Multiple execution pools within a single process:
 
     ```bash
-    $ bundle exec good_job --queues=transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;* --max-threads=5
+    $ bundle exec good_job --queues="transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;*" --max-threads=5
     ```
 
     This configuration will result in a single process with 4 isolated thread execution pools. Isolated execution pools are separated with a semicolon (`;`) and queue names and thread counts with a colon (`:`)
@@ -360,11 +360,11 @@ By default, GoodJob creates a single thread execution pool that will execute job
 
     # Separate dyno types
     worker: bundle exec good_job --max-threads=5
-    transactional_worker: bundle exec good_job --queues=transactional_messages --max-threads=2
-    batch_worker: bundle exec good_job --queues=batch_processing --max-threads=1
+    transactional_worker: bundle exec good_job --queues="transactional_messages" --max-threads=2
+    batch_worker: bundle exec good_job --queues="batch_processing" --max-threads=1
 
     # Combined multi-process dyno
-    combined_worker: bundle exec good_job --max-threads=5 & bundle exec good_job --queues=transactional_messages --max-threads=2 & bundle exec good_job --queues=batch_processing --max-threads=1 & wait -n
+    combined_worker: bundle exec good_job --max-threads=5 & bundle exec good_job --queues="transactional_messages" --max-threads=2 & bundle exec good_job --queues="batch_processing" --max-threads=1 & wait -n
     ```
 
     Running multiple processes can optimize for CPU performance at the expense of greater memory and system resource usage.
