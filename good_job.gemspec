@@ -1,5 +1,7 @@
-$LOAD_PATH.push File.expand_path("lib", __dir__)
-$LOAD_PATH.push File.expand_path("engine/lib", __dir__)
+require_paths = ["lib", "engine/lib"]
+require_paths.each do |require_path|
+  $LOAD_PATH.push File.expand_path(require_path, __dir__)
+end
 
 # Maintain your gem's version:
 require "good_job/version"
@@ -30,6 +32,7 @@ Gem::Specification.new do |spec|
     "CHANGELOG.md",
     "LICENSE.txt",
   ]
+  spec.require_paths = require_paths
   spec.bindir = "exe"
   spec.executables = %w[good_job]
 
