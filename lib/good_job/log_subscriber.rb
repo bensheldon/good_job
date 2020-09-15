@@ -25,8 +25,7 @@ module GoodJob
     end
 
     # @macro notification_responder
-    def timer_task_finished(event)
-      # FIXME: This method does not match any good_job notifications.
+    def finished_timer_task(event)
       exception = event.payload[:error]
       return unless exception
 
@@ -36,8 +35,7 @@ module GoodJob
     end
 
     # @macro notification_responder
-    def job_finished(event)
-      # FIXME: This method does not match any good_job notifications.
+    def finished_job_task(event)
       exception = event.payload[:error]
       return unless exception
 
