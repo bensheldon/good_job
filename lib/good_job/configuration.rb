@@ -5,6 +5,13 @@ module GoodJob
   # set options to get the final values for each option.
   #
   class Configuration
+    # Default number of threads to use per {Scheduler}
+    DEFAULT_MAX_THREADS = 5
+    # Default number of seconds between polls for jobs
+    DEFAULT_POLL_INTERVAL = 1
+    # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs}
+    DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 24 * 60 * 60
+
     # @!attribute [r] options
     #   The options that were explicitly set when initializing +Configuration+.
     #   @return [Hash]
@@ -69,7 +76,7 @@ module GoodJob
         options[:max_threads] ||
         env['GOOD_JOB_MAX_THREADS'] ||
         env['RAILS_MAX_THREADS'] ||
-        ActiveRecord::Base.connection_pool.size
+        DEFAULT_MAX_THREADS
       ).to_i
     end
 
@@ -92,7 +99,7 @@ module GoodJob
       (
         options[:poll_interval] ||
         env['GOOD_JOB_POLL_INTERVAL'] ||
-        1
+        DEFAULT_POLL_INTERVAL
       ).to_i
     end
 
@@ -100,7 +107,7 @@ module GoodJob
       (
         options[:before_seconds_ago] ||
         env['GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO'] ||
-        24 * 60 * 60
+        DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO
       ).to_i
     end
   end
