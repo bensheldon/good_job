@@ -193,28 +193,16 @@ module GoodJob
       raise PreviouslyPerformedError, 'Cannot perform a job that has already been performed' if finished_at
 
       GoodJob::CurrentExecution.reset
-      result = nil
-      rescued_error = nil
-      error = nil
 
       self.performed_at = Time.current
       save! unless destroy_after
 
-      params = serialized_params.merge(
-        "provider_job_id" => id
-      )
-
-      begin
-        ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, process_id: GoodJob::CurrentExecution.process_id, thread_name: GoodJob::CurrentExecution.thread_name }) do
-          result = ActiveJob::Base.execute(params)
-        end
-      rescue StandardError => e
-        rescued_error = e
-      end
+      result, rescued_error = execute
 
       retry_or_discard_error = GoodJob::CurrentExecution.error_on_retry ||
                                GoodJob::CurrentExecution.error_on_discard
 
+      error = nil
       if rescued_error
         error = rescued_error
       elsif result.is_a?(Exception)
@@ -240,6 +228,20 @@ module GoodJob
       end
 
       [result, error]
+    end
+
+    private
+
+    def execute
+      params = serialized_params.merge(
+        "provider_job_id" => id
+      )
+
+      ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, process_id: GoodJob::CurrentExecution.process_id, thread_name: GoodJob::CurrentExecution.thread_name }) do
+        [ActiveJob::Base.execute(params), nil]
+      end
+    rescue StandardError => e
+      [nil, e]
     end
   end
 end
