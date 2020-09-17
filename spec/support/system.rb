@@ -16,11 +16,9 @@ module SystemTestHelpers
     :dismiss_modal,
   ].each do |driver_method|
     define_method(driver_method) do |text = nil, **options, &blk|
-      begin
-        super(text, **options, &blk)
-      rescue Capybara::NotSupportedByDriverError
-        blk.call
-      end
+      super(text, **options, &blk)
+    rescue Capybara::NotSupportedByDriverError
+      blk.call
     end
   end
 end
