@@ -209,10 +209,12 @@ module GoodJob
 
       if rescued_error && GoodJob.reperform_jobs_on_standard_error
         save!
+      elsif rescued_error && GoodJob.preserve_job_records == :on_error
+        update!(finished_at: Time.current)
       else
         self.finished_at = Time.current
 
-        if GoodJob.preserve_job_records
+        if GoodJob.preserve_job_records == true
           save!
         else
           destroy!

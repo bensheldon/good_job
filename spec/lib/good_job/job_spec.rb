@@ -201,6 +201,12 @@ RSpec.describe GoodJob::Job do
       expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
+    it 'destroys the job when preserving record only on error' do
+      allow(GoodJob).to receive(:preserve_job_records).and_return(:on_error)
+      good_job.perform
+      expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+
     it 'can preserve the job' do
       allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
@@ -300,6 +306,17 @@ RSpec.describe GoodJob::Job do
           it 'can preserve the job' do
             allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
+            good_job.perform
+
+            expect(good_job.reload).to have_attributes(
+              error: "ExpectedError: Raised expected error",
+              performed_at: within(1.second).of(Time.current),
+              finished_at: within(1.second).of(Time.current)
+            )
+          end
+
+          it 'preserves the job when preserving record only on error' do
+            allow(GoodJob).to receive(:preserve_job_records).and_return(:on_error)
             good_job.perform
 
             expect(good_job.reload).to have_attributes(
