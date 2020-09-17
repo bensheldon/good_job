@@ -147,15 +147,13 @@ RSpec.describe GoodJob::Job do
             # Similar to Sentry monitor's implementation
             # https://github.com/getsentry/raven-ruby/blob/20b260a6d04e0ca01d5cddbd9728e6fc8ae9a90c/lib/raven/integrations/rails/active_job.rb#L21-L31
             ExampleJob.around_perform do |_job, block|
-              begin
-                block.call
-              rescue StandardError => e
-                next if rescue_with_handler(e)
+              block.call
+            rescue StandardError => e
+              next if rescue_with_handler(e)
 
-                raise e
-              ensure
-                nil
-              end
+              raise e
+            ensure
+              nil
             end
           end
 
