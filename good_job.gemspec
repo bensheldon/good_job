@@ -47,11 +47,11 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.5.0"
 
-  spec.add_dependency "activejob", ">= 5.1.0"
-  spec.add_dependency "activerecord", ">= 5.1.0"
+  spec.add_dependency "activejob", ">= 5.2.0"
+  spec.add_dependency "activerecord", ">= 5.2.0"
   spec.add_dependency "concurrent-ruby", ">= 1.0.2"
   spec.add_dependency "pg", ">= 1.0.0"
-  spec.add_dependency "railties", ">= 5.1.0"
+  spec.add_dependency "railties", ">= 5.2.0"
   spec.add_dependency "thor", ">= 0.14.1"
   spec.add_dependency "zeitwerk", ">= 2.0"
 
