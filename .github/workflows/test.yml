@@ -8,6 +8,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       BUNDLE_JOBS: 4
       BUNDLE_RETRY: 3
@@ -43,6 +44,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       matrix:
         ruby: [2.5, 2.6, 2.7]
