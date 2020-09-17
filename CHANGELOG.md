@@ -1,5 +1,40 @@
 # Changelog
 
+## [v1.2.5](https://github.com/bensheldon/good_job/tree/v1.2.5) (2020-09-17)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.4...v1.2.5)
+
+**Implemented enhancements:**
+
+- Use Zeitwerk for auto-loading [\#87](https://github.com/bensheldon/good_job/issues/87)
+
+**Fixed bugs:**
+
+- `poll-interval=-1` does not disable polling as intended [\#133](https://github.com/bensheldon/good_job/issues/133)
+
+**Closed issues:**
+
+- Lint - Introduce line character limits [\#122](https://github.com/bensheldon/good_job/issues/122)
+- Jobs are not processed in multi schema setup. Apartment + GoodJob \( post 1.1.2 \) [\#117](https://github.com/bensheldon/good_job/issues/117)
+- Host a documentation sprint [\#48](https://github.com/bensheldon/good_job/issues/48)
+
+**Merged pull requests:**
+
+- Test GoodJob against Rails HEAD [\#144](https://github.com/bensheldon/good_job/pull/144) ([bensheldon](https://github.com/bensheldon))
+- Update Gemspec to reflect that GoodJob is not compatible with Rails 5.1 [\#143](https://github.com/bensheldon/good_job/pull/143) ([bensheldon](https://github.com/bensheldon))
+- Drop Ruby 2.4 support [\#142](https://github.com/bensheldon/good_job/pull/142) ([morgoth](https://github.com/morgoth))
+- Prevent jobs hanging [\#141](https://github.com/bensheldon/good_job/pull/141) ([morgoth](https://github.com/morgoth))
+- Remove arguments from perform method [\#140](https://github.com/bensheldon/good_job/pull/140) ([morgoth](https://github.com/morgoth))
+- Extract "execute" method to reduce "perform" method complexity [\#138](https://github.com/bensheldon/good_job/pull/138) ([morgoth](https://github.com/morgoth))
+- Correct example on how to configure multiple queues by command line. [\#135](https://github.com/bensheldon/good_job/pull/135) ([morgoth](https://github.com/morgoth))
+- Add explicit require\_paths to gemspec for engine [\#134](https://github.com/bensheldon/good_job/pull/134) ([bensheldon](https://github.com/bensheldon))
+- Spike on data dashboard; pull in full Bootstrap CSS and JS [\#131](https://github.com/bensheldon/good_job/pull/131) ([bensheldon](https://github.com/bensheldon))
+- Update ActionMailer Job class, to match the default [\#130](https://github.com/bensheldon/good_job/pull/130) ([morgoth](https://github.com/morgoth))
+- Add initial Engine scaffold [\#125](https://github.com/bensheldon/good_job/pull/125) ([bensheldon](https://github.com/bensheldon))
+- Use `connection.quote\_table\_name` and add spacing for SQL concatenation [\#124](https://github.com/bensheldon/good_job/pull/124) ([bensheldon](https://github.com/bensheldon))
+- Zeitwerk Loader Implementation [\#123](https://github.com/bensheldon/good_job/pull/123) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
+- Update code-level documentation [\#111](https://github.com/bensheldon/good_job/pull/111) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.2.4](https://github.com/bensheldon/good_job/tree/v1.2.4) (2020-09-01)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.3...v1.2.4)
@@ -88,7 +123,6 @@
 **Merged pull requests:**
 
 - Document GoodJob module [\#83](https://github.com/bensheldon/good_job/pull/83) ([bensheldon](https://github.com/bensheldon))
-- Add Postgres LISTEN/NOTIFY support [\#82](https://github.com/bensheldon/good_job/pull/82) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.1.4](https://github.com/bensheldon/good_job/tree/v1.1.4) (2020-08-19)
 
@@ -101,6 +135,7 @@
 
 **Merged pull requests:**
 
+- Add Postgres LISTEN/NOTIFY support [\#82](https://github.com/bensheldon/good_job/pull/82) ([bensheldon](https://github.com/bensheldon))
 - Allow Schedulers to filter \#create\_thread to avoid flood of queries when running async with multiple schedulers [\#81](https://github.com/bensheldon/good_job/pull/81) ([bensheldon](https://github.com/bensheldon))
 - Fully name scheduler threadpools and thread names; refactor CLI STDOUT [\#80](https://github.com/bensheldon/good_job/pull/80) ([bensheldon](https://github.com/bensheldon))
 
@@ -182,6 +217,10 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.0.1...v1.0.2)
 
+**Fixed bugs:**
+
+- Fix counting of available execution threads [\#58](https://github.com/bensheldon/good_job/pull/58) ([bensheldon](https://github.com/bensheldon))
+
 **Merged pull requests:**
 
 - Add migration generator [\#56](https://github.com/bensheldon/good_job/pull/56) ([thedanbob](https://github.com/thedanbob))
@@ -202,10 +241,6 @@
 ## [v0.9.0](https://github.com/bensheldon/good_job/tree/v0.9.0) (2020-07-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.2...v0.9.0)
-
-**Fixed bugs:**
-
-- Fix counting of available execution threads [\#58](https://github.com/bensheldon/good_job/pull/58) ([bensheldon](https://github.com/bensheldon))
 
 **Merged pull requests:**
 
@@ -287,7 +322,6 @@
 
 - Improve ActiveRecord usage for advisory locking [\#24](https://github.com/bensheldon/good_job/pull/24) ([bensheldon](https://github.com/bensheldon))
 - Remove support for Rails 5.1 [\#23](https://github.com/bensheldon/good_job/pull/23) ([bensheldon](https://github.com/bensheldon))
-- Clean up Gemspec [\#15](https://github.com/bensheldon/good_job/pull/15) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.3.0](https://github.com/bensheldon/good_job/tree/v0.3.0) (2020-03-22)
 
@@ -315,10 +349,12 @@
 
 **Merged pull requests:**
 
+- Clean up Gemspec [\#15](https://github.com/bensheldon/good_job/pull/15) ([bensheldon](https://github.com/bensheldon))
 - Set up Rubocop [\#14](https://github.com/bensheldon/good_job/pull/14) ([bensheldon](https://github.com/bensheldon))
 - Add pg gem as explicit dependency [\#13](https://github.com/bensheldon/good_job/pull/13) ([bensheldon](https://github.com/bensheldon))
 - Bump nokogiri from 1.10.7 to 1.10.9 [\#12](https://github.com/bensheldon/good_job/pull/12) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Add Appraisal with tests for Rails 5.1, 5.2, 6.0 [\#11](https://github.com/bensheldon/good_job/pull/11) ([bensheldon](https://github.com/bensheldon))
+- Use Rails.logger and ActiveSupport::Notifications for logging instead of puts [\#10](https://github.com/bensheldon/good_job/pull/10) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.2.0](https://github.com/bensheldon/good_job/tree/v0.2.0) (2020-03-06)
 
@@ -326,7 +362,6 @@
 
 **Merged pull requests:**
 
-- Use Rails.logger and ActiveSupport::Notifications for logging instead of puts [\#10](https://github.com/bensheldon/good_job/pull/10) ([bensheldon](https://github.com/bensheldon))
 - Remove minitest files [\#9](https://github.com/bensheldon/good_job/pull/9) ([bensheldon](https://github.com/bensheldon))
 - Use scheduled\_at and priority for scheduling [\#8](https://github.com/bensheldon/good_job/pull/8) ([bensheldon](https://github.com/bensheldon))
 - Create Github Action workflow for PRs and Issues [\#7](https://github.com/bensheldon/good_job/pull/7) ([bensheldon](https://github.com/bensheldon))
