@@ -177,25 +177,17 @@ module GoodJob
     end
 
     # Execute the ActiveJob job this {Job} represents.
-    # @param destroy_after [Boolean]
-    #   Whether to destroy the {Job} record after executing it if the job did
-    #   not need to be reperformed. Defaults to the value of
-    #   {GoodJob.preserve_job_records}.
-    # @param reperform_on_standard_error [Boolean]
-    #   Whether to re-queue the job to execute again if it raised an instance
-    #   of +StandardError+. Defaults to the value of
-    #   {GoodJob.reperform_jobs_on_standard_error}.
     # @return [Array<(Object, Exception)>]
     #   An array of the return value of the job's +#perform+ method and the
     #   exception raised by the job, if any. If the job completed successfully,
     #   the second array entry (the exception) will be +nil+ and vice versa.
-    def perform(destroy_after: !GoodJob.preserve_job_records, reperform_on_standard_error: GoodJob.reperform_jobs_on_standard_error)
+    def perform
       raise PreviouslyPerformedError, 'Cannot perform a job that has already been performed' if finished_at
 
       GoodJob::CurrentExecution.reset
 
       self.performed_at = Time.current
-      save! unless destroy_after
+      save! if GoodJob.preserve_job_records
 
       result, rescued_error = execute
 
@@ -215,15 +207,15 @@ module GoodJob
       error_message = "#{error.class}: #{error.message}" if error
       self.error = error_message
 
-      if rescued_error && reperform_on_standard_error
+      if rescued_error && GoodJob.reperform_jobs_on_standard_error
         save!
       else
         self.finished_at = Time.current
 
-        if destroy_after
-          destroy!
-        else
+        if GoodJob.preserve_job_records
           save!
+        else
+          destroy!
         end
       end
 
