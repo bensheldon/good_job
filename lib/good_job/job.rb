@@ -189,21 +189,21 @@ module GoodJob
       self.performed_at = Time.current
       save! if GoodJob.preserve_job_records
 
-      result, rescued_error = execute
+      result, unhandled_error = execute
 
       result_error = nil
       result, result_error = nil, result if result.is_a?(Exception) # rubocop:disable Style/ParallelAssignment
 
-      job_error = rescued_error ||
+      job_error = unhandled_error ||
                   result_error ||
                   GoodJob::CurrentExecution.error_on_retry ||
                   GoodJob::CurrentExecution.error_on_discard
 
       self.error = "#{job_error.class}: #{job_error.message}" if job_error
 
-      if rescued_error && GoodJob.reperform_jobs_on_standard_error
+      if unhandled_error && GoodJob.reperform_jobs_on_standard_error
         save!
-      elsif GoodJob.preserve_job_records == true || (GoodJob.preserve_job_records == :on_error && rescued_error)
+      elsif GoodJob.preserve_job_records == true || (GoodJob.preserve_job_records == :on_unhandled_error && unhandled_error)
         update!(finished_at: Time.current)
       else
         destroy!

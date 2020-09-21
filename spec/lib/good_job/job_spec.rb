@@ -202,7 +202,7 @@ RSpec.describe GoodJob::Job do
     end
 
     it 'destroys the job when preserving record only on error' do
-      allow(GoodJob).to receive(:preserve_job_records).and_return(:on_error)
+      allow(GoodJob).to receive(:preserve_job_records).and_return(:on_unhandled_error)
       good_job.perform
       expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
     end
@@ -316,7 +316,7 @@ RSpec.describe GoodJob::Job do
           end
 
           it 'preserves the job when preserving record only on error' do
-            allow(GoodJob).to receive(:preserve_job_records).and_return(:on_error)
+            allow(GoodJob).to receive(:preserve_job_records).and_return(:on_unhandled_error)
             good_job.perform
 
             expect(good_job.reload).to have_attributes(
