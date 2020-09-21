@@ -192,7 +192,10 @@ module GoodJob
       result, unhandled_error = execute
 
       result_error = nil
-      result, result_error = nil, result if result.is_a?(Exception) # rubocop:disable Style/ParallelAssignment
+      if result.is_a?(Exception)
+        result_error = result
+        result = nil
+      end
 
       job_error = unhandled_error ||
                   result_error ||
@@ -203,8 +206,9 @@ module GoodJob
 
       if unhandled_error && GoodJob.reperform_jobs_on_standard_error
         save!
-      elsif GoodJob.preserve_job_records == true || (GoodJob.preserve_job_records == :on_unhandled_error && unhandled_error)
-        update!(finished_at: Time.current)
+      elsif GoodJob.preserve_job_records == true || (unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error)
+        self.finished_at = Time.current
+        save!
       else
         destroy!
       end
