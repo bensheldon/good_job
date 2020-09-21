@@ -27,23 +27,34 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <%= link_to "All jobs", root_path, class: ["nav-link", ("active" if current_page?(root_path))] %>
+            <%= link_to root_path, class: ["nav-link", ("active" if current_page?(root_path))] do %>
+              All jobs <span class="badge badge-secondary">More views coming soon</span>
+            <% end %>
           </li>
-          <li class="nav-item">
-            <%= link_to "Upcoming Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Finished Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Errored Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
-          </li>
+
+          <!-- Coming Soon
+            <li class="nav-item">
+              <%= link_to "Upcoming Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Finished Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
+            </li>
+            <li class="nav-item">
+              <%= link_to "Errored Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
+            </li>
+          -->
         </ul>
       </div>
     </div>
   </nav>
 
   <div class="container">
+    <div class="card border-warning text-dark my-3">
+      <div class="card-body">
+        <p class="card-text">🚧 GoodJob's dashboard is a work in progress. Please contribute ideas and code on <a href="https://github.com/bensheldon/good_job/issues" target="_blank" rel="nofollow noopener noreferrer">Github</a>.</p>
+      </div>
+    </div>
+
     <%= yield %>
   </div>
 </body>

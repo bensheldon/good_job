@@ -33,6 +33,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         - [`good_job cleanup_preserved_jobs`](#good_job-cleanup_preserved_jobs)
     - [Adapter options](#adapter-options)
     - [Global options](#global-options)
+    - [Dashboard](#dashboard)
 - [Go deeper](#go-deeper)
     - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
         - [Exceptions](#exceptions)
@@ -220,6 +221,41 @@ GoodJob.preserve_job_records = true
 GoodJob.reperform_jobs_on_standard_error = false
 GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
 ```
+
+### Dashboard
+
+_🚧 GoodJob's dashboard is a work in progress. Please contribute ideas and code on [Github](https://github.com/bensheldon/good_job/issues)._
+
+GoodJob includes a Dashboard as a mountable `Rails::Engine`.
+
+1. Explicitly require the Engine code at the top of your `config/application.rb` file, immediately after Rails is required. This is necessary because the mountable engine is an optional feature of GoodJob.
+
+    ```ruby
+    # config/application.rb
+    require_relative 'boot'
+
+    require 'rails/all'
+    require 'good_job/engine' # <= Add this line
+    # ...
+    ```
+
+1. Mount the engine in your `config/routes.rb` file. The following will mount it at `http://example.com/good_job`.
+
+    ```ruby
+    # config/routes.rb
+    # ...
+    mount GoodJob::Engine => 'good_job'
+    ```
+
+    Because jobs can potentially contain sensitive information, you should authorize access. For example, using Devise's `authenticate` helper, that might look like:
+
+    ```ruby
+    # config/routes.rb
+    # ...
+    authenticate :user, ->(user) { user.admin? } do
+      mount GoodJob::Engine => 'good_job'
+    end
+    ```
 
 ## Go deeper
 
