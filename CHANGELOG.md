@@ -1,5 +1,30 @@
 # Changelog
 
+## [v1.2.6](https://github.com/bensheldon/good_job/tree/v1.2.6) (2020-09-29)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.5...v1.2.6)
+
+**Implemented enhancements:**
+
+- Preserve only failed jobs [\#136](https://github.com/bensheldon/good_job/issues/136)
+- Add `GoodJob.preserve\_job\_records = :on\_unhandled\_error` option to only preserve jobs that errored [\#145](https://github.com/bensheldon/good_job/pull/145) ([morgoth](https://github.com/morgoth))
+
+**Fixed bugs:**
+
+- Fix LogSubscriber notifications for finished\_timer\_task and finished\_job\_task [\#148](https://github.com/bensheldon/good_job/pull/148) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- run-once guarantee? [\#151](https://github.com/bensheldon/good_job/issues/151)
+
+**Merged pull requests:**
+
+- Add info how to setup basic auth for engine [\#153](https://github.com/bensheldon/good_job/pull/153) ([morgoth](https://github.com/morgoth))
+- Add documentation for Dashboard Rails::Engine [\#149](https://github.com/bensheldon/good_job/pull/149) ([bensheldon](https://github.com/bensheldon))
+- Style cleanup to Job error handling [\#147](https://github.com/bensheldon/good_job/pull/147) ([bensheldon](https://github.com/bensheldon))
+- Replace gerund titles in Readme [\#146](https://github.com/bensheldon/good_job/pull/146) ([bensheldon](https://github.com/bensheldon))
+- Only allow Scheduler to be initialized with max\_threads and poll\_interval; remove full access to pool and timer\_task options [\#137](https://github.com/bensheldon/good_job/pull/137) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.2.5](https://github.com/bensheldon/good_job/tree/v1.2.5) (2020-09-17)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.4...v1.2.5)
@@ -7,10 +32,15 @@
 **Implemented enhancements:**
 
 - Use Zeitwerk for auto-loading [\#87](https://github.com/bensheldon/good_job/issues/87)
+- Spike on data dashboard; pull in full Bootstrap CSS and JS [\#131](https://github.com/bensheldon/good_job/pull/131) ([bensheldon](https://github.com/bensheldon))
 
 **Fixed bugs:**
 
 - `poll-interval=-1` does not disable polling as intended [\#133](https://github.com/bensheldon/good_job/issues/133)
+- Update Gemspec to reflect that GoodJob is not compatible with Rails 5.1 [\#143](https://github.com/bensheldon/good_job/pull/143) ([bensheldon](https://github.com/bensheldon))
+- Prevent jobs hanging [\#141](https://github.com/bensheldon/good_job/pull/141) ([morgoth](https://github.com/morgoth))
+- Add explicit require\_paths to gemspec for engine [\#134](https://github.com/bensheldon/good_job/pull/134) ([bensheldon](https://github.com/bensheldon))
+- Use `connection.quote\_table\_name` and add spacing for SQL concatenation [\#124](https://github.com/bensheldon/good_job/pull/124) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
@@ -21,17 +51,12 @@
 **Merged pull requests:**
 
 - Test GoodJob against Rails HEAD [\#144](https://github.com/bensheldon/good_job/pull/144) ([bensheldon](https://github.com/bensheldon))
-- Update Gemspec to reflect that GoodJob is not compatible with Rails 5.1 [\#143](https://github.com/bensheldon/good_job/pull/143) ([bensheldon](https://github.com/bensheldon))
 - Drop Ruby 2.4 support [\#142](https://github.com/bensheldon/good_job/pull/142) ([morgoth](https://github.com/morgoth))
-- Prevent jobs hanging [\#141](https://github.com/bensheldon/good_job/pull/141) ([morgoth](https://github.com/morgoth))
 - Remove arguments from perform method [\#140](https://github.com/bensheldon/good_job/pull/140) ([morgoth](https://github.com/morgoth))
 - Extract "execute" method to reduce "perform" method complexity [\#138](https://github.com/bensheldon/good_job/pull/138) ([morgoth](https://github.com/morgoth))
 - Correct example on how to configure multiple queues by command line. [\#135](https://github.com/bensheldon/good_job/pull/135) ([morgoth](https://github.com/morgoth))
-- Add explicit require\_paths to gemspec for engine [\#134](https://github.com/bensheldon/good_job/pull/134) ([bensheldon](https://github.com/bensheldon))
-- Spike on data dashboard; pull in full Bootstrap CSS and JS [\#131](https://github.com/bensheldon/good_job/pull/131) ([bensheldon](https://github.com/bensheldon))
 - Update ActionMailer Job class, to match the default [\#130](https://github.com/bensheldon/good_job/pull/130) ([morgoth](https://github.com/morgoth))
 - Add initial Engine scaffold [\#125](https://github.com/bensheldon/good_job/pull/125) ([bensheldon](https://github.com/bensheldon))
-- Use `connection.quote\_table\_name` and add spacing for SQL concatenation [\#124](https://github.com/bensheldon/good_job/pull/124) ([bensheldon](https://github.com/bensheldon))
 - Zeitwerk Loader Implementation [\#123](https://github.com/bensheldon/good_job/pull/123) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Update code-level documentation [\#111](https://github.com/bensheldon/good_job/pull/111) ([bensheldon](https://github.com/bensheldon))
 
@@ -42,6 +67,11 @@
 **Implemented enhancements:**
 
 - Add environment variable to mirror `cleanup\_preserved\_jobs --before-seconds-ago=SECONDS` [\#110](https://github.com/bensheldon/good_job/issues/110)
+- Allow env variable config for cleanups [\#114](https://github.com/bensheldon/good_job/pull/114) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
+
+**Fixed bugs:**
+
+- Better table name detection for Job queries [\#119](https://github.com/bensheldon/good_job/pull/119) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 
 **Closed issues:**
 
@@ -52,9 +82,7 @@
 **Merged pull requests:**
 
 - Remove unused PgLocks class [\#120](https://github.com/bensheldon/good_job/pull/120) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
-- Better table name detection for Job queries [\#119](https://github.com/bensheldon/good_job/pull/119) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Fix readme CommandLine option links [\#115](https://github.com/bensheldon/good_job/pull/115) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
-- Allow env variable config for cleanups [\#114](https://github.com/bensheldon/good_job/pull/114) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Have YARD render markdown files with GFM \(Github Flavored Markdown\) [\#113](https://github.com/bensheldon/good_job/pull/113) ([bensheldon](https://github.com/bensheldon))
 - Add markdownlint to lint readme [\#109](https://github.com/bensheldon/good_job/pull/109) ([bensheldon](https://github.com/bensheldon))
 - Remove unused method in PgLocks [\#107](https://github.com/bensheldon/good_job/pull/107) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
@@ -354,7 +382,6 @@
 - Add pg gem as explicit dependency [\#13](https://github.com/bensheldon/good_job/pull/13) ([bensheldon](https://github.com/bensheldon))
 - Bump nokogiri from 1.10.7 to 1.10.9 [\#12](https://github.com/bensheldon/good_job/pull/12) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Add Appraisal with tests for Rails 5.1, 5.2, 6.0 [\#11](https://github.com/bensheldon/good_job/pull/11) ([bensheldon](https://github.com/bensheldon))
-- Use Rails.logger and ActiveSupport::Notifications for logging instead of puts [\#10](https://github.com/bensheldon/good_job/pull/10) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.2.0](https://github.com/bensheldon/good_job/tree/v0.2.0) (2020-03-06)
 
@@ -362,6 +389,7 @@
 
 **Merged pull requests:**
 
+- Use Rails.logger and ActiveSupport::Notifications for logging instead of puts [\#10](https://github.com/bensheldon/good_job/pull/10) ([bensheldon](https://github.com/bensheldon))
 - Remove minitest files [\#9](https://github.com/bensheldon/good_job/pull/9) ([bensheldon](https://github.com/bensheldon))
 - Use scheduled\_at and priority for scheduling [\#8](https://github.com/bensheldon/good_job/pull/8) ([bensheldon](https://github.com/bensheldon))
 - Create Github Action workflow for PRs and Issues [\#7](https://github.com/bensheldon/good_job/pull/7) ([bensheldon](https://github.com/bensheldon))
