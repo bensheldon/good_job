@@ -257,6 +257,16 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
     end
     ```
 
+    Another option is using basic auth like this:
+
+    ```ruby
+    # config/initializers/good_job.rb
+    GoodJob::Engine.middleware.use(Rack::Auth::Basic) do |username, password|
+      ActiveSupport::SecurityUtils.secure_compare(Rails.application.credentials.good_job_username, username) &&
+        ActiveSupport::SecurityUtils.secure_compare(Rails.application.credentials.good_job_password, password)
+    end
+    ```
+
 ## Go deeper
 
 ### Exceptions, retries, and reliability
