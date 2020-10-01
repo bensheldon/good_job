@@ -213,7 +213,7 @@ Good Job’s general behavior can also be configured via several attributes dire
 
 - **`GoodJob.logger`** ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger`.
 - **`GoodJob.preserve_job_records`** (boolean) keeps job records in your database even after jobs are completed. (Default: `false`)
-- **`GoodJob.reperform_jobs_on_standard_error`** (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `true`)
+- **`GoodJob.retry_on_unhandled_error`** (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `true`)
 - **`GoodJob.on_thread_error`** (proc, lambda, or callable) will be called when an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake.
 
 You’ll generally want to configure these in `config/initializers/good_job.rb`, like so:
@@ -221,7 +221,7 @@ You’ll generally want to configure these in `config/initializers/good_job.rb`,
 ```ruby
 # config/initializers/good_job.rb
 GoodJob.preserve_job_records = true
-GoodJob.reperform_jobs_on_standard_error = false
+GoodJob.retry_on_unhandled_error = false
 GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
 ```
 
@@ -304,7 +304,7 @@ When using `retry_on` with _a limited number of retries_, the final exception wi
 
 ```ruby
 # config/initializers/good_job.rb
-GoodJob.reperform_jobs_on_standard_error = false
+GoodJob.retry_on_unhandled_error = false
 ```
 
 Alternatively, pass a block to `retry_on` to handle the final exception instead of raising it to GoodJob:
