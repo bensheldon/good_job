@@ -204,7 +204,7 @@ module GoodJob
 
       self.error = "#{job_error.class}: #{job_error.message}" if job_error
 
-      if unhandled_error && GoodJob.reperform_jobs_on_standard_error
+      if unhandled_error && GoodJob.retry_on_unhandled_error
         save!
       elsif GoodJob.preserve_job_records == true || (unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error)
         self.finished_at = Time.current

@@ -37,14 +37,30 @@ module GoodJob
   #   @return [Boolean]
   mattr_accessor :preserve_job_records, default: false
 
-  # @!attribute [rw] reperform_jobs_on_standard_error
+  # @!attribute [rw] retry_on_unhandled_error
   #   @!scope class
   #   Whether to re-perform a job when a type of +StandardError+ is raised to GoodJob (default: +true+).
   #   If +true+, causes jobs to be re-queued and retried if they raise an instance of +StandardError+.
   #   If +false+, jobs will be discarded or marked as finished if they raise an instance of +StandardError+.
   #   Instances of +Exception+, like +SIGINT+, will *always* be retried, regardless of this attribute's value.
   #   @return [Boolean]
-  mattr_accessor :reperform_jobs_on_standard_error, default: true
+  mattr_accessor :retry_on_unhandled_error, default: true
+
+  # @deprecated Use {GoodJob#retry_on_unhandled_error} instead.
+  def self.reperform_jobs_on_standard_error
+    ActiveSupport::Deprecation.warn(
+      "Calling 'GoodJob.reperform_jobs_on_standard_error' is deprecated. Please use 'retry_on_unhandled_error'"
+    )
+    retry_on_unhandled_error
+  end
+
+  # @deprecated Use {GoodJob#retry_on_unhandled_error=} instead.
+  def self.reperform_jobs_on_standard_error=(value)
+    ActiveSupport::Deprecation.warn(
+      "Setting 'GoodJob.reperform_jobs_on_standard_error=' is deprecated. Please use 'retry_on_unhandled_error='"
+    )
+    self.retry_on_unhandled_error = value
+  end
 
   # @!attribute [rw] on_thread_error
   #   @!scope class

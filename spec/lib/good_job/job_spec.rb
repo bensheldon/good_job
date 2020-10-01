@@ -268,7 +268,7 @@ RSpec.describe GoodJob::Job do
       describe 'GoodJob.reperform_jobs_on_standard_error behavior' do
         context 'when true' do
           before do
-            allow(GoodJob).to receive(:reperform_jobs_on_standard_error).and_return(true)
+            allow(GoodJob).to receive(:retry_on_unhandled_error).and_return(true)
           end
 
           it 'leaves the job record unfinished' do
@@ -293,7 +293,7 @@ RSpec.describe GoodJob::Job do
 
         context 'when false' do
           before do
-            allow(GoodJob).to receive(:reperform_jobs_on_standard_error).and_return(false)
+            allow(GoodJob).to receive(:retry_on_unhandled_error).and_return(false)
           end
 
           it 'destroys the job' do
