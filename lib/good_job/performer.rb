@@ -28,11 +28,15 @@ module GoodJob
     #   Used to determine whether the performer should be used in GoodJob's
     #   current state. GoodJob state is a +Hash+ that will be passed as the
     #   first argument to +filter+ and includes info like the current queue.
-    def initialize(target, method_name, name: nil, filter: nil)
+    # @param next_at_method [Symbol]
+    #   The name of a method on +target+ that returns timestamps of when next
+    #   tasks may be available.
+    def initialize(target, method_name, name: nil, filter: nil, next_at_method: nil)
       @target = target
       @method_name = method_name
       @name = name
       @filter = filter
+      @next_at_method_name = next_at_method
     end
 
     # Find and perform any eligible jobs.
@@ -55,6 +59,15 @@ module GoodJob
       return true unless @filter.respond_to?(:call)
 
       @filter.call(state)
+    end
+
+    # The Returns timestamps of when next tasks may be available.
+    # @param count [Integer] number of timestamps to return.
+    # @return [Array<(Time, Timestamp)>, nil]
+    def next_at(count = 1)
+      return unless @next_at_method_name
+
+      @target.public_send(@next_at_method_name, count)
     end
   end
 end

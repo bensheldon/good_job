@@ -82,6 +82,7 @@ module GoodJob
   def self.shutdown(wait: true)
     Notifier.instances.each { |notifier| notifier.shutdown(wait: wait) }
     Scheduler.instances.each { |scheduler| scheduler.shutdown(wait: wait) }
+    Timer.instances.each { |timer| timer.shutdown(wait: wait) }
   end
 
   # Tests whether jobs have stopped executing.

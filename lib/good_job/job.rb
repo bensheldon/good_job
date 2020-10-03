@@ -66,6 +66,12 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(Time.current)).or(where(scheduled_at: nil)) }
 
+    # Order jobs by scheduled (unscheduled or soonest first).
+    # @!method schedule_ordered
+    # @!scope class
+    # @return [ActiveRecord::Relation]
+    scope :schedule_ordered, -> { order('scheduled_at ASC NULLS FIRST, created_at ASC') }
+
     # Order jobs by priority (highest priority first).
     # @!method priority_ordered
     # @!scope class
@@ -145,6 +151,12 @@ module GoodJob
       end
 
       [good_job, result, error] if good_job
+    end
+
+    # Fetches the scheduled execution time of the next eligible Job(s).
+    # @return [Array<(DateTime)>]
+    def self.next_at(count = 1)
+      advisory_unlocked.unfinished.schedule_ordered.limit(count).pluck(:created_at, :scheduled_at).map { |timestamps| timestamps.compact.max }
     end
 
     # Places an ActiveJob job on a queue by creating a new {Job} record.

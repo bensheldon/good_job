@@ -78,8 +78,12 @@ module GoodJob
         end
       end
 
-      executed_locally = execute_async? && @scheduler.create_thread(queue_name: good_job.queue_name)
-      Notifier.notify(queue_name: good_job.queue_name) unless executed_locally
+      job_state = {
+        queue_name: good_job.queue_name,
+        scheduled_at: good_job.scheduled_at&.to_i,
+      }
+      executed_locally = execute_async? && @scheduler.create_thread(job_state)
+      Notifier.notify(job_state) unless executed_locally
 
       good_job
     end

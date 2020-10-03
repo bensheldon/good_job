@@ -84,6 +84,15 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  describe '.next_at' do
+    let(:active_job) { ExampleJob.new }
+    let!(:good_job) { described_class.enqueue(active_job) }
+
+    it 'returns an array of timestamps' do
+      expect(described_class.next_at).to eq [good_job.created_at]
+    end
+  end
+
   describe '.queue_parser' do
     it 'creates an intermediary hash' do
       result = described_class.queue_parser('first,second')

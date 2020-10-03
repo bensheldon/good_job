@@ -51,7 +51,13 @@ module GoodJob # :nodoc:
             true
           end
         end
-        job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: queue_string, filter: job_filter)
+        job_performer = GoodJob::Performer.new(
+          job_query,
+          :perform_with_advisory_lock,
+          name: queue_string,
+          filter: job_filter,
+          next_at_method: :next_at
+        )
 
         GoodJob::Scheduler.new(job_performer, max_threads: max_threads)
       end
@@ -71,6 +77,7 @@ module GoodJob # :nodoc:
       self.class.instances << self
 
       @performer = performer
+      @timer_wake = GoodJob::Timer.new([self, :create_thread])
 
       @pool_options = DEFAULT_POOL_OPTIONS.dup
       @pool_options[:max_threads] = max_threads if max_threads.present?
@@ -122,7 +129,19 @@ module GoodJob # :nodoc:
     #   Returns +false+ if the performer decides not to attempt to execute a task based on the +state+ that is passed to it.
     def create_thread(state = nil)
       return nil unless @pool.running? && @pool.ready_worker_count.positive?
-      return false if state && !@performer.next?(state)
+
+      if state
+        return false unless @performer.next?(state)
+
+        if state[:scheduled_at]
+          scheduled_at = Time.zone.at(state[:scheduled_at])
+
+          if scheduled_at > Time.current
+            @timer_wake.push(scheduled_at)
+            return true
+          end
+        end
+      end
 
       future = Concurrent::Future.new(args: [@performer], executor: @pool) do |performer|
         output = nil
@@ -141,7 +160,12 @@ module GoodJob # :nodoc:
     def task_observer(time, output, thread_error)
       GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
       instrument("finished_job_task", { result: output, error: thread_error, time: time })
-      create_thread if output
+      if output
+        create_thread
+      elsif @performer.respond_to?(:next_at)
+        next_at = @performer.next_at(1).first
+        @timer_wake.push(next_at) if next_at
+      end
     end
 
     private
