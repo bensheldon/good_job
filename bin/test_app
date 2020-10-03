@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+APP_PATH = File.expand_path('../spec/test_app/config/application', __dir__)
+require_relative '../spec/test_app/config/boot'
+require 'rails/commands'
