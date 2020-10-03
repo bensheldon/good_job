@@ -15,23 +15,6 @@ RSpec.describe GoodJob::Scheduler do
       stub_const 'THREAD_HAS_RUN', Concurrent::AtomicBoolean.new(false)
     end
 
-    context 'when on timer thread' do
-      it 'calls GoodJob.on_thread_error' do
-        allow_any_instance_of(described_class).to receive(:create_thread) do
-          THREAD_HAS_RUN.make_true
-          raise "Whoops"
-        end
-
-        scheduler = described_class.new(performer)
-
-        sleep_until { THREAD_HAS_RUN.true? }
-
-        expect(error_proc).to have_received(:call).with(an_instance_of(RuntimeError).and(having_attributes(message: 'Whoops')))
-
-        scheduler.shutdown
-      end
-    end
-
     context 'when on task thread' do
       it 'calls GoodJob.on_thread_error' do
         allow(performer).to receive(:next) do
@@ -40,6 +23,7 @@ RSpec.describe GoodJob::Scheduler do
         end
 
         scheduler = described_class.new(performer)
+        scheduler.create_thread
         sleep_until { THREAD_HAS_RUN.true? }
 
         expect(error_proc).to have_received(:call).with(an_instance_of(RuntimeError).and(having_attributes(message: 'Whoops')))
@@ -66,7 +50,6 @@ RSpec.describe GoodJob::Scheduler do
 
       scheduler.shutdown
 
-      expect(scheduler.instance_variable_get(:@timer).running?).to be false
       expect(scheduler.instance_variable_get(:@pool).running?).to be false
     end
   end
@@ -78,7 +61,6 @@ RSpec.describe GoodJob::Scheduler do
 
       scheduler.restart
 
-      expect(scheduler.instance_variable_get(:@timer).running?).to be true
       expect(scheduler.instance_variable_get(:@pool).running?).to be true
     end
   end

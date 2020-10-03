@@ -50,8 +50,11 @@ RSpec.describe 'Schedule Integration' do
     end
 
     it 'pops items off of the queue and runs them' do
+      max_threads = 5
+
       performer = GoodJob::Performer.new(GoodJob::Job.all, :perform_with_advisory_lock)
-      scheduler = GoodJob::Scheduler.new(performer)
+      scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
+      max_threads.times { scheduler.create_thread }
 
       sleep_until(max: 20, increments_of: 0.5) { GoodJob::Job.count == 0 }
 
@@ -87,6 +90,7 @@ RSpec.describe 'Schedule Integration' do
     it "handles and retries jobs with errors" do
       performer = GoodJob::Performer.new(GoodJob::Job.all, :perform_with_advisory_lock)
       scheduler = GoodJob::Scheduler.new(performer)
+      scheduler.create_thread
 
       sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.count == 0 }
 

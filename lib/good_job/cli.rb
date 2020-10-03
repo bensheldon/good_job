@@ -45,11 +45,13 @@ module GoodJob
                   desc: "Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 5)"
     def start
       set_up_application!
+      configuration = GoodJob::Configuration.new(options)
 
       notifier = GoodJob::Notifier.new
-      configuration = GoodJob::Configuration.new(options)
+      poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
       scheduler = GoodJob::Scheduler.from_configuration(configuration)
       notifier.recipients << [scheduler, :create_thread]
+      poller.recipients << [scheduler, :create_thread]
 
       @stop_good_job_executable = false
       %w[INT TERM].each do |signal|
@@ -62,6 +64,7 @@ module GoodJob
       end
 
       notifier.shutdown
+      poller.shutdown
       scheduler.shutdown
     end
 

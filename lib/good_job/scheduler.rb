@@ -26,14 +26,6 @@ module GoodJob # :nodoc:
       fallback_policy: :discard,
     }.freeze
 
-    # Defaults for instance of Concurrent::TimerTask.
-    # The timer controls how and when sleeping threads check for new work.
-    DEFAULT_TIMER_OPTIONS = {
-      execution_interval: Configuration::DEFAULT_POLL_INTERVAL,
-      timeout_interval: 1,
-      run_now: true,
-    }.freeze
-
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated Schedulers in the current process.
@@ -41,7 +33,6 @@ module GoodJob # :nodoc:
     cattr_reader :instances, default: [], instance_reader: false
 
     # Creates GoodJob::Scheduler(s) and Performers from a GoodJob::Configuration instance.
-    # TODO: move this to GoodJob::Configuration
     # @param configuration [GoodJob::Configuration]
     # @return [GoodJob::Scheduler, GoodJob::MultiScheduler]
     def self.from_configuration(configuration)
@@ -62,7 +53,7 @@ module GoodJob # :nodoc:
         end
         job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: queue_string, filter: job_filter)
 
-        GoodJob::Scheduler.new(job_performer, max_threads: max_threads, poll_interval: configuration.poll_interval)
+        GoodJob::Scheduler.new(job_performer, max_threads: max_threads)
       end
 
       if schedulers.size > 1
@@ -73,23 +64,19 @@ module GoodJob # :nodoc:
     end
 
     # @param performer [GoodJob::Performer]
-    # @param max_threads [Numeric, nil] the number of execution threads to use
-    # @param poll_interval [Numeric, nil] the number of seconds between polls for jobs
-    def initialize(performer, max_threads: nil, poll_interval: nil)
+    # @param max_threads [Numeric, nil] number of seconds between polls for jobs
+    def initialize(performer, max_threads: nil)
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
 
       self.class.instances << self
 
       @performer = performer
 
-      @timer_options = DEFAULT_TIMER_OPTIONS.dup
-      @timer_options[:execution_interval] = poll_interval if poll_interval.present?
-
       @pool_options = DEFAULT_POOL_OPTIONS.dup
       @pool_options[:max_threads] = max_threads if max_threads.present?
-      @pool_options[:name] = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@pool_options[:max_threads]} poll_interval=#{@timer_options[:execution_interval]})"
+      @pool_options[:name] = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@pool_options[:max_threads]})"
 
-      create_pools
+      create_pool
     end
 
     # Shut down the scheduler.
@@ -100,28 +87,20 @@ module GoodJob # :nodoc:
     # @param wait [Boolean] Wait for actively executing jobs to finish
     # @return [void]
     def shutdown(wait: true)
-      @_shutdown = true
+      return unless @pool&.running?
 
       instrument("scheduler_shutdown_start", { wait: wait })
       instrument("scheduler_shutdown", { wait: wait }) do
-        if @timer&.running?
-          @timer.shutdown
-          @timer.wait_for_termination if wait
-          # TODO: Should be killed if wait is not true
-        end
-
-        if @pool&.running?
-          @pool.shutdown
-          @pool.wait_for_termination if wait
-          # TODO: Should be killed if wait is not true
-        end
+        @pool.shutdown
+        @pool.wait_for_termination if wait
+        # TODO: Should be killed if wait is not true
       end
     end
 
     # Tests whether the scheduler is shutdown.
     # @return [true, false, nil]
     def shutdown?
-      @_shutdown
+      !@pool&.running?
     end
 
     # Restart the Scheduler.
@@ -131,8 +110,7 @@ module GoodJob # :nodoc:
     def restart(wait: true)
       instrument("scheduler_restart_pools") do
         shutdown(wait: wait) unless shutdown?
-        create_pools
-        @_shutdown = false
+        create_pool
       end
     end
 
@@ -157,14 +135,6 @@ module GoodJob # :nodoc:
       true
     end
 
-    # Invoked on completion of TimerTask task.
-    # @!visibility private
-    # @return [void]
-    def timer_observer(time, executed_task, thread_error)
-      GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
-      instrument("finished_timer_task", { result: executed_task, error: thread_error, time: time })
-    end
-
     # Invoked on completion of ThreadPoolExecutor task
     # @!visibility private
     # @return [void]
@@ -176,14 +146,9 @@ module GoodJob # :nodoc:
 
     private
 
-    def create_pools
-      instrument("scheduler_create_pools", { performer_name: @performer.name, max_threads: @pool_options[:max_threads], poll_interval: @timer_options[:execution_interval] }) do
+    def create_pool
+      instrument("scheduler_create_pool", { performer_name: @performer.name, max_threads: @pool_options[:max_threads] }) do
         @pool = ThreadPoolExecutor.new(@pool_options)
-        next unless @timer_options[:execution_interval].positive?
-
-        @timer = Concurrent::TimerTask.new(@timer_options) { create_thread }
-        @timer.add_observer(self, :timer_observer)
-        @timer.execute
       end
     end
 

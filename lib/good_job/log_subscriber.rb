@@ -45,14 +45,13 @@ module GoodJob
     end
 
     # @macro notification_responder
-    def scheduler_create_pools(event)
+    def scheduler_create_pool(event)
       max_threads = event.payload[:max_threads]
-      poll_interval = event.payload[:poll_interval]
       performer_name = event.payload[:performer_name]
       process_id = event.payload[:process_id]
 
       info(tags: [process_id]) do
-        "GoodJob started scheduler with queues=#{performer_name} max_threads=#{max_threads} poll_interval=#{poll_interval}."
+        "GoodJob started scheduler with queues=#{performer_name} max_threads=#{max_threads}."
       end
     end
 

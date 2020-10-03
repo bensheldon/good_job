@@ -43,8 +43,10 @@ module GoodJob
 
       if @execution_mode == :async # rubocop:disable Style/GuardClause
         @notifier = notifier || GoodJob::Notifier.new
+        @poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
         @scheduler = scheduler || GoodJob::Scheduler.from_configuration(configuration)
         @notifier.recipients << [@scheduler, :create_thread]
+        @poller.recipients << [@scheduler, :create_thread]
       end
     end
 
@@ -88,6 +90,7 @@ module GoodJob
     # @return [void]
     def shutdown(wait: true)
       @notifier&.shutdown(wait: wait)
+      @poller&.shutdown(wait: wait)
       @scheduler&.shutdown(wait: wait)
     end
 
