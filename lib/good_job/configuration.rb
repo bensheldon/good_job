@@ -8,7 +8,7 @@ module GoodJob
     # Default number of threads to use per {Scheduler}
     DEFAULT_MAX_THREADS = 5
     # Default number of seconds between polls for jobs
-    DEFAULT_POLL_INTERVAL = 1
+    DEFAULT_POLL_INTERVAL = 5
     # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs}
     DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 24 * 60 * 60
 
