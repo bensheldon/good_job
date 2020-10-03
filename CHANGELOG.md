@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.3.0](https://github.com/bensheldon/good_job/tree/v1.3.0) (2020-10-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.6...v1.3.0)
+
+**Merged pull requests:**
+
+- Lengthen default poll interval from 1 to 5 seconds [\#156](https://github.com/bensheldon/good_job/pull/156) ([bensheldon](https://github.com/bensheldon))
+- Rename reperform\_jobs\_on\_standard\_error to retry\_on\_unhandled\_error [\#154](https://github.com/bensheldon/good_job/pull/154) ([morgoth](https://github.com/morgoth))
+
 ## [v1.2.6](https://github.com/bensheldon/good_job/tree/v1.2.6) (2020-09-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.5...v1.2.6)
