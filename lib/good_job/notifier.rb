@@ -34,7 +34,7 @@ module GoodJob # :nodoc:
     # @param message [#to_json]
     def self.notify(message)
       connection = ActiveRecord::Base.connection
-      connection.exec_query <<~SQL
+      connection.exec_query <<~SQL.squish
         NOTIFY #{CHANNEL}, #{connection.quote(message.to_json)}
       SQL
     end

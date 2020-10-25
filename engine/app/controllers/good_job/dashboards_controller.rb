@@ -4,7 +4,7 @@ module GoodJob
       @jobs = GoodJob::Job.display_all(after_scheduled_at: params[:after_scheduled_at], after_id: params[:after_id])
                           .limit(params.fetch(:limit, 10))
 
-      job_data = GoodJob::Job.connection.exec_query Arel.sql(<<~SQL)
+      job_data = GoodJob::Job.connection.exec_query Arel.sql(<<~SQL.squish)
         SELECT *
         FROM generate_series(
           date_trunc('hour', NOW() - '1 day'::interval),

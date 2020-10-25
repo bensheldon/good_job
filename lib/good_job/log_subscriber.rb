@@ -165,12 +165,12 @@ module GoodJob
       # @return [Logger]
       def logger
         @_logger ||= begin
-                      logger = Logger.new(StringIO.new)
-                      loggers.each do |each_logger|
-                        logger.extend(ActiveSupport::Logger.broadcast(each_logger))
-                      end
-                      logger
-                    end
+          logger = Logger.new(StringIO.new)
+          loggers.each do |each_logger|
+            logger.extend(ActiveSupport::Logger.broadcast(each_logger))
+          end
+          logger
+        end
       end
 
       # Reset {LogSubscriber.logger} and force it to rebuild a new shortcut to
@@ -191,11 +191,12 @@ module GoodJob
     # @return [void]
     def tag_logger(*tags, &block)
       tags = tags.dup.unshift("GoodJob").compact
+      good_job_tag = ["ActiveJob"].freeze
 
       self.class.loggers.inject(block) do |inner, each_logger|
         if each_logger.respond_to?(:tagged)
           tags_for_logger = if each_logger.formatter.current_tags.include?("ActiveJob")
-                              ["ActiveJob"] + tags
+                              good_job_tag + tags
                             else
                               tags
                             end

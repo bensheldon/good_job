@@ -75,6 +75,9 @@ RSpec/MultipleDescribes:
 RSpec/NestedGroups:
   Enabled: false
 
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
 Style/Documentation:
   Enabled: false
 

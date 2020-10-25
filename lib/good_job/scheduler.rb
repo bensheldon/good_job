@@ -44,7 +44,7 @@ module GoodJob # :nodoc:
         parsed = GoodJob::Job.queue_parser(queue_string)
         job_filter = proc do |state|
           if parsed[:exclude]
-            !parsed[:exclude].include? state[:queue_name]
+            parsed[:exclude].exclude?(state[:queue_name])
           elsif parsed[:include]
             parsed[:include].include? state[:queue_name]
           else

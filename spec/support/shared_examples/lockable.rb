@@ -16,7 +16,7 @@ RSpec.shared_examples 'lockable' do
     it 'generates appropriate SQL' do
       query = described_class.where(priority: 99).order(priority: :desc).limit(2).advisory_lock
 
-      expect(normalize_sql(query.to_sql)).to eq normalize_sql(<<~SQL)
+      expect(normalize_sql(query.to_sql)).to eq normalize_sql(<<~SQL.squish)
         SELECT "good_jobs".*
         FROM "good_jobs"
         WHERE "good_jobs"."id" IN (
