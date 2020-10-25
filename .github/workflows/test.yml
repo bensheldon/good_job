@@ -21,15 +21,20 @@ jobs:
       # Dependencies
       - name: Install missing libs (This is slated to be added to the base image soon!)
         run: sudo apt-get -yqq install libpq-dev
+      - name: "Set Ruby version"
+        id: ruby_version
+        run: echo "::set-output name=value::$(cat .ruby-version)"
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ steps.ruby_version.outputs.value }}
       - name: Ruby gem cache
         uses: actions/cache@v1
         with:
           path: vendor/bundle
-          key: v1-${{ runner.os }}-gems-${{ hashFiles('**/good_job.gemspec') }}-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Appraisals') }}
+          key: v1-bundler-${{ runner.os }}-${{ steps.ruby_version.outputs.value }}-${{ hashFiles('**/good_job.gemspec') }}-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Appraisals') }}
           restore-keys: |
-            v1-${{ runner.os }}-gems-
+            v1-bundler-${{ runner.os }}-${{ steps.ruby_version.outputs.value }}-
       - name: Install bundler
         run: gem update --system && gem install bundler -v $(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -1 | tr -d " ")
       - name: Install Gemfile gems
@@ -81,9 +86,9 @@ jobs:
         uses: actions/cache@v1
         with:
           path: vendor/bundle
-          key: v1-${{ runner.os }}-gems-${{ hashFiles('**/good_job.gemspec') }}-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Appraisals') }}
+          key: v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-${{ hashFiles('**/good_job.gemspec') }}-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Appraisals') }}
           restore-keys: |
-            v1-${{ runner.os }}-gems-
+            v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-
       - name: Install bundler
         run: gem update --system && gem install bundler --default -v $(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -1 | tr -d " ")
       - name: Install Gemfile gems
