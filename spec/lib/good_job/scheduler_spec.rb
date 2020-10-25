@@ -86,6 +86,12 @@ RSpec.describe GoodJob::Scheduler do
 
       expect(scheduler.create_thread(queue_name: 'elephant')).to eq false
     end
+
+    it 'will schedule in the future' do
+      configuration = GoodJob::Configuration.new({ queues: 'mice:2' })
+      scheduler = described_class.from_configuration(configuration)
+      expect(scheduler.create_thread(queue_name: 'mice', scheduled_at: 1.second.from_now)).to eq true
+    end
   end
 
   describe '.from_configuration' do

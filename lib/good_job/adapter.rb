@@ -76,10 +76,15 @@ module GoodJob
         ensure
           good_job.advisory_unlock
         end
-      end
+      else
+        job_state = {
+          queue_name: good_job.queue_name,
+          scheduled_at: good_job.scheduled_at,
+        }
 
-      executed_locally = execute_async? && @scheduler.create_thread(queue_name: good_job.queue_name)
-      Notifier.notify(queue_name: good_job.queue_name) unless executed_locally
+        executed_locally = execute_async? && @scheduler.create_thread(job_state)
+        Notifier.notify(job_state) unless executed_locally
+      end
 
       good_job
     end

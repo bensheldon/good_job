@@ -1,7 +1,3 @@
-require "concurrent/executor/thread_pool_executor"
-require "concurrent/timer_task"
-require "concurrent/utility/processor_counter"
-
 module GoodJob # :nodoc:
   #
   # Schedulers are generic thread pools that are responsible for
@@ -22,7 +18,7 @@ module GoodJob # :nodoc:
       max_threads: Configuration::DEFAULT_MAX_THREADS,
       auto_terminate: true,
       idletime: 60,
-      max_queue: -1,
+      max_queue: 0,
       fallback_policy: :discard,
     }.freeze
 
@@ -76,6 +72,8 @@ module GoodJob # :nodoc:
       @pool_options[:max_threads] = max_threads if max_threads.present?
       @pool_options[:name] = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@pool_options[:max_threads]})"
 
+      @scheduled_task_queue = ScheduledTaskQueue.new(max_size: @pool_options[:max_threads])
+
       create_pool
     end
 
@@ -121,18 +119,46 @@ module GoodJob # :nodoc:
     #   Returns +true+ if the performer started executing work.
     #   Returns +false+ if the performer decides not to attempt to execute a task based on the +state+ that is passed to it.
     def create_thread(state = nil)
-      return nil unless @pool.running? && @pool.ready_worker_count.positive?
-      return false if state && !@performer.next?(state)
+      return nil unless @pool.running?
 
-      future = Concurrent::Future.new(args: [@performer], executor: @pool) do |performer|
-        output = nil
-        Rails.application.executor.wrap { output = performer.next }
-        output
+      if state
+        return false unless @performer.next?(state)
+
+        if state[:scheduled_at]
+          scheduled_at = if state[:scheduled_at].is_a? String
+                           Time.zone.parse state[:scheduled_at]
+                         else
+                           state[:scheduled_at]
+                         end
+        end
       end
-      future.add_observer(self, :task_observer)
-      future.execute
 
-      true
+      if scheduled_at && scheduled_at > Time.current
+        task = CustomConcurrent::ScheduledTask.new(scheduled_at, args: [@performer], executor: @pool) do |performer|
+          output = nil
+          Rails.application.executor.wrap { output = performer.next }
+          output
+        end
+
+        if @scheduled_task_queue.push(task)
+          task.add_observer(self, :task_observer)
+          task.execute
+        end
+
+        true
+      elsif @pool.ready_worker_count.positive?
+        task = Concurrent::Future.new(args: [@performer], executor: @pool) do |performer|
+          output = nil
+          Rails.application.executor.wrap { output = performer.next }
+          output
+        end
+        task.add_observer(self, :task_observer)
+        task.execute
+
+        true
+      else
+        nil
+      end
     end
 
     # Invoked on completion of ThreadPoolExecutor task
@@ -141,14 +167,21 @@ module GoodJob # :nodoc:
     def task_observer(time, output, thread_error)
       GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
       instrument("finished_job_task", { result: output, error: thread_error, time: time })
-      create_thread if output
+
+      if output
+        create_thread
+      elsif @performer.respond_to?(:next_at)
+        @scheduled_task_queue.max_size - @scheduled_task_queue.size
+        Array(@performer.next_at(
+        @timer_wake.push(next_at) if next_at
+      end
     end
 
     private
 
     def create_pool
       instrument("scheduler_create_pool", { performer_name: @performer.name, max_threads: @pool_options[:max_threads] }) do
-        @pool = ThreadPoolExecutor.new(@pool_options)
+        @pool = CustomConcurrent::ThreadPoolExecutor.new(@pool_options)
       end
     end
 
@@ -160,22 +193,6 @@ module GoodJob # :nodoc:
                                       })
 
       ActiveSupport::Notifications.instrument("#{name}.good_job", payload, &block)
-    end
-  end
-
-  # Custom sub-class of +Concurrent::ThreadPoolExecutor+ to add additional worker status.
-  # @private
-  class ThreadPoolExecutor < Concurrent::ThreadPoolExecutor
-    # Number of inactive threads available to execute tasks.
-    # https://github.com/ruby-concurrency/concurrent-ruby/issues/684#issuecomment-427594437
-    # @return [Integer]
-    def ready_worker_count
-      synchronize do
-        workers_still_to_be_created = @max_length - @pool.length
-        workers_created_but_waiting = @ready.length
-
-        workers_still_to_be_created + workers_created_but_waiting
-      end
     end
   end
 end
