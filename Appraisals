@@ -12,6 +12,9 @@ appraise "rails-6.1" do
   gem "rails", "~> 6.1"
 end
 
-appraise "rails-head" do
-  gem "rails", github: "rails/rails", branch: "master"
+unless RUBY_PLATFORM.include?('java')
+  # activerecord-jdbcpostgresql-adapter does not have a compatible version
+  appraise "rails-head" do
+    gem "rails", github: "rails/rails", branch: "master"
+  end
 end

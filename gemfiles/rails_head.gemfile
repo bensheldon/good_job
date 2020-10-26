@@ -2,15 +2,21 @@
 
 source "https://rubygems.org"
 
+gem "activerecord-jdbcpostgresql-adapter", platforms: [:jruby]
+gem "pg", platforms: [:mri, :mingw, :x64_mingw]
 gem "rails", branch: "master", git: "https://github.com/rails/rails.git"
 
-group :lint do
-  gem "erb_lint", ">= 0.0.35"
-  gem "mdl"
-  gem "rubocop"
-  gem "rubocop-performance"
-  gem "rubocop-rails"
-  gem "rubocop-rspec"
+platforms :ruby do
+  gem "rbtrace"
+
+  group :lint do
+    gem "erb_lint", ">= 0.0.35"
+    gem "mdl"
+    gem "rubocop"
+    gem "rubocop-performance"
+    gem "rubocop-rails"
+    gem "rubocop-rspec"
+  end
 end
 
 gemspec path: "../"

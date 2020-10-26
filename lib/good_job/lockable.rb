@@ -157,7 +157,8 @@ module GoodJob
         SELECT 1 AS one
         WHERE pg_try_advisory_lock(('x'||substr(md5($1 || $2::text), 1, 16))::bit(64)::bigint)
       SQL
-      self.class.connection.exec_query(query, 'GoodJob::Lockable Advisory Lock', [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]).any?
+      binds = [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]
+      ActiveRecord::Base.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).any?
     end
 
     # Releases an advisory lock on this record if it is locked by this database
@@ -169,7 +170,8 @@ module GoodJob
         SELECT 1 AS one
         WHERE pg_advisory_unlock(('x'||substr(md5($1 || $2::text), 1, 16))::bit(64)::bigint)
       SQL
-      self.class.connection.exec_query(query, 'GoodJob::Lockable Advisory Unlock', [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]).any?
+      binds = [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]
+      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Unlock', binds).any?
     end
 
     # Acquires an advisory lock on this record or raises
@@ -212,9 +214,10 @@ module GoodJob
         WHERE pg_locks.locktype = 'advisory'
           AND pg_locks.objsubid = 1
           AND pg_locks.classid = ('x' || substr(md5($1 || $2::text), 1, 16))::bit(32)::int
-          AND pg_locks.objid = (('x' || substr(md5($1 || $2::text), 1, 16))::bit(64) << 32)::bit(32)::int
+          AND pg_locks.objid = (('x' || substr(md5($3 || $4::text), 1, 16))::bit(64) << 32)::bit(32)::int
       SQL
-      self.class.connection.exec_query(query, 'GoodJob::Lockable Advisory Locked?', [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]).any?
+      binds = [[nil, self.class.table_name], [nil, send(self.class.primary_key)], [nil, self.class.table_name], [nil, send(self.class.primary_key)]]
+      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Locked?', binds).any?
     end
 
     # Tests whether this record is locked by the current database session.
@@ -226,10 +229,11 @@ module GoodJob
         WHERE pg_locks.locktype = 'advisory'
           AND pg_locks.objsubid = 1
           AND pg_locks.classid = ('x' || substr(md5($1 || $2::text), 1, 16))::bit(32)::int
-          AND pg_locks.objid = (('x' || substr(md5($1 || $2::text), 1, 16))::bit(64) << 32)::bit(32)::int
+          AND pg_locks.objid = (('x' || substr(md5($3 || $4::text), 1, 16))::bit(64) << 32)::bit(32)::int
           AND pg_locks.pid = pg_backend_pid()
       SQL
-      self.class.connection.exec_query(query, 'GoodJob::Lockable Owns Advisory Lock?', [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]).any?
+      binds = [[nil, self.class.table_name], [nil, send(self.class.primary_key)], [nil, self.class.table_name], [nil, send(self.class.primary_key)]]
+      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Owns Advisory Lock?', binds).any?
     end
 
     # Releases all advisory locks on the record that are held by the current
@@ -244,6 +248,15 @@ module GoodJob
     def sanitize_sql_for_conditions(*args)
       # Made public in Rails 5.2
       self.class.send(:sanitize_sql_for_conditions, *args)
+    end
+
+    def pg_or_jdbc_query(query)
+      if Concurrent.on_jruby?
+        # Replace $1 bind parameters with ?
+        query.gsub(/\$\d*/, '?')
+      else
+        query
+      end
     end
   end
 end

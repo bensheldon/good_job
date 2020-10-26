@@ -18,7 +18,7 @@ RSpec.describe GoodJob::Notifier do
     end
   end
 
-  describe '#listen' do
+  describe '#listen', skip_if_java: true do
     it 'loops until it receives a command' do
       stub_const 'RECEIVED_MESSAGE', Concurrent::AtomicBoolean.new(false)
 

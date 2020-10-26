@@ -67,9 +67,10 @@ RSpec.describe GoodJob::Scheduler do
 
   describe '#create_thread' do
     it 'returns false if there are no threads available' do
-      configuration = GoodJob::Configuration.new({ queues: 'mice:0' })
+      configuration = GoodJob::Configuration.new({ queues: 'mice:1' })
       scheduler = described_class.from_configuration(configuration)
 
+      scheduler.create_thread(queue_name: 'mice')
       expect(scheduler.create_thread(queue_name: 'mice')).to eq nil
     end
 

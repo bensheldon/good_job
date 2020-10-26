@@ -11,14 +11,18 @@ gemspec
 # Git. Remember to move these dependencies to your gemspec before releasing
 # your gem to rubygems.org.
 
-# To use a debugger
-# gem 'byebug', group: [:development, :test]
-#
-group :lint do
-  gem "erb_lint", ">= 0.0.35"
-  gem "mdl"
-  gem "rubocop"
-  gem "rubocop-performance"
-  gem "rubocop-rails"
-  gem "rubocop-rspec"
+gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
+gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
+
+platforms :ruby do
+  gem "rbtrace"
+
+  group :lint do
+    gem "erb_lint", ">= 0.0.35"
+    gem "mdl"
+    gem "rubocop"
+    gem "rubocop-performance"
+    gem "rubocop-rails"
+    gem "rubocop-rspec"
+  end
 end

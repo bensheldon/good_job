@@ -9,6 +9,8 @@ module GoodJob # :nodoc:
   # When a message is received, the notifier passes the message to each of its recipients.
   #
   class Notifier
+    AdapterCannotListenError = Class.new(StandardError)
+
     # Default Postgres channel for LISTEN/NOTIFY
     CHANNEL = 'good_job'.freeze
     # Defaults for instance of Concurrent::ThreadPoolExecutor
@@ -94,6 +96,8 @@ module GoodJob # :nodoc:
     # @!visibility private
     # @return [void]
     def listen_observer(_time, _result, thread_error)
+      return if thread_error.is_a? AdapterCannotListenError
+
       if thread_error
         GoodJob.on_thread_error.call(thread_error) if GoodJob.on_thread_error.respond_to?(:call)
         ActiveSupport::Notifications.instrument("notifier_notify_error.good_job", { error: thread_error })
@@ -149,6 +153,8 @@ module GoodJob # :nodoc:
         ActiveRecord::Base.connection_pool.remove(conn)
       end
       pg_conn = ar_conn.raw_connection
+      raise AdapterCannotListenError unless pg_conn.respond_to? :wait_for_notify
+
       pg_conn.async_exec("SET application_name = #{pg_conn.escape_identifier(self.class.name)}").clear
       yield pg_conn
     ensure
