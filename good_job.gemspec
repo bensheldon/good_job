@@ -68,6 +68,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "mdl"
   spec.add_development_dependency "pry-rails"
   spec.add_development_dependency "puma"
+  spec.add_development_dependency "rails"
   spec.add_development_dependency "rbtrace"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "rubocop"
