@@ -147,7 +147,7 @@ module GoodJob # :nodoc:
       pg_conn.exec("SET application_name = #{pg_conn.escape_identifier(self.class.name)}")
       yield pg_conn
     ensure
-      ar_conn.disconnect!
+      ar_conn&.disconnect!
     end
   end
 end
