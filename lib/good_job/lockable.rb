@@ -56,7 +56,7 @@ module GoodJob
       # @example Get the records that have a session awaiting a lock:
       #   MyLockableRecord.joins_advisory_locks.where("pg_locks.granted = ?", false)
       scope :joins_advisory_locks, (lambda do
-        join_sql = <<~SQL
+        join_sql = <<~SQL.squish
           LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'
             AND pg_locks.objsubid = 1
             AND pg_locks.classid = ('x' || substr(md5(:table_name || #{quoted_table_name}.#{quoted_primary_key}::text), 1, 16))::bit(32)::int
@@ -140,10 +140,10 @@ module GoodJob
     # all remaining locks).
     # @return [Boolean] whether the lock was acquired.
     def advisory_lock
-      where_sql = <<~SQL
+      where_sql = <<~SQL.squish
         pg_try_advisory_lock(('x' || substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
       SQL
-      self.class.unscoped.where(where_sql, { table_name: self.class.table_name, id: send(self.class.primary_key) }).exists?
+      self.class.unscoped.exists?([where_sql, { table_name: self.class.table_name, id: send(self.class.primary_key) }])
     end
 
     # Releases an advisory lock on this record if it is locked by this database
@@ -151,10 +151,10 @@ module GoodJob
     # {#advisory_unlock} and {#advisory_lock} the same number of times.
     # @return [Boolean] whether the lock was released.
     def advisory_unlock
-      where_sql = <<~SQL
+      where_sql = <<~SQL.squish
         pg_advisory_unlock(('x' || substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
       SQL
-      self.class.unscoped.where(where_sql, { table_name: self.class.table_name, id: send(self.class.primary_key) }).exists?
+      self.class.unscoped.exists?([where_sql, { table_name: self.class.table_name, id: send(self.class.primary_key) }])
     end
 
     # Acquires an advisory lock on this record or raises
@@ -191,13 +191,13 @@ module GoodJob
     # Tests whether this record has an advisory lock on it.
     # @return [Boolean]
     def advisory_locked?
-      self.class.unscoped.advisory_locked.where(id: send(self.class.primary_key)).exists?
+      self.class.unscoped.advisory_locked.exists?(id: send(self.class.primary_key))
     end
 
     # Tests whether this record is locked by the current database session.
     # @return [Boolean]
     def owns_advisory_lock?
-      self.class.unscoped.owns_advisory_locked.where(id: send(self.class.primary_key)).exists?
+      self.class.unscoped.owns_advisory_locked.exists?(id: send(self.class.primary_key))
     end
 
     # Releases all advisory locks on the record that are held by the current
