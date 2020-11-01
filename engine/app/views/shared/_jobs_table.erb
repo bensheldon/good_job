@@ -6,8 +6,8 @@
       <th>Job Class</th>
       <th>Queue</th>
       <th>Scheduled At</th>
-      <th>ActiveJob Params</th>
       <th>Error</th>
+      <th>ActiveJob Params</th>
     </thead>
     <tbody>
       <% jobs.each do |job| %>
@@ -17,8 +17,8 @@
           <td><%= job.serialized_params['job_class'] %></td>
           <td><%= job.queue_name %></td>
           <td><%= job.scheduled_at || job.created_at %></td>
-          <td><%= job.serialized_params %></td>
           <td><%= job.error %></td>
+          <td><pre><%= JSON.pretty_generate(job.serialized_params) %></pre></td>
         </tr>
       <% end %>
     </tbody>
