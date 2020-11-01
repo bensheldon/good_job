@@ -1,12 +1,42 @@
 # Changelog
 
+## [v1.3.1](https://github.com/bensheldon/good_job/tree/v1.3.1) (2020-11-01)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.0...v1.3.1)
+
+**Implemented enhancements:**
+
+- Extract polling from scheduler into Polling object [\#128](https://github.com/bensheldon/good_job/issues/128)
+- Format serialized params to ease reading [\#170](https://github.com/bensheldon/good_job/pull/170) ([morgoth](https://github.com/morgoth))
+
+**Fixed bugs:**
+
+- Don't disconnect a nil activerecord connection [\#161](https://github.com/bensheldon/good_job/pull/161) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Propose addition of GoodJob to queue-shootout benchmarks [\#40](https://github.com/bensheldon/good_job/issues/40)
+
+**Merged pull requests:**
+
+- Ensure Rails is a development dependency [\#169](https://github.com/bensheldon/good_job/pull/169) ([bensheldon](https://github.com/bensheldon))
+- Fix Ruby 2.7 GH action by setting default bundler explicitly [\#166](https://github.com/bensheldon/good_job/pull/166) ([bensheldon](https://github.com/bensheldon))
+- Cache ruby version explicitly in Github Action [\#165](https://github.com/bensheldon/good_job/pull/165) ([bensheldon](https://github.com/bensheldon))
+- Update development dependencies, rubocop [\#164](https://github.com/bensheldon/good_job/pull/164) ([bensheldon](https://github.com/bensheldon))
+- Fix intended constant hierarchy of GoodJob::Scheduler::ThreadPoolExecutor [\#158](https://github.com/bensheldon/good_job/pull/158) ([bensheldon](https://github.com/bensheldon))
+- Add bin/test\_app executable for Rails debugging [\#157](https://github.com/bensheldon/good_job/pull/157) ([bensheldon](https://github.com/bensheldon))
+- Extract Scheduler polling behavior to its own object [\#152](https://github.com/bensheldon/good_job/pull/152) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.3.0](https://github.com/bensheldon/good_job/tree/v1.3.0) (2020-10-03)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.2.6...v1.3.0)
 
-**Merged pull requests:**
+**Implemented enhancements:**
 
 - Lengthen default poll interval from 1 to 5 seconds [\#156](https://github.com/bensheldon/good_job/pull/156) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
 - Rename reperform\_jobs\_on\_standard\_error to retry\_on\_unhandled\_error [\#154](https://github.com/bensheldon/good_job/pull/154) ([morgoth](https://github.com/morgoth))
 
 ## [v1.2.6](https://github.com/bensheldon/good_job/tree/v1.2.6) (2020-09-29)
