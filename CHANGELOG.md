@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.3.2](https://github.com/bensheldon/good_job/tree/v1.3.2) (2020-11-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.1...v1.3.2)
+
+**Fixed bugs:**
+
+- \(bug\) MultiScheduler polling bug [\#171](https://github.com/bensheldon/good_job/issues/171)
+- MultiScheduler should delegate to all schedulers when state is nil [\#172](https://github.com/bensheldon/good_job/pull/172) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.3.1](https://github.com/bensheldon/good_job/tree/v1.3.1) (2020-11-01)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.0...v1.3.1)
