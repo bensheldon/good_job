@@ -26,14 +26,23 @@ module GoodJob
     # Delegates to {Scheduler#create_thread}.
     def create_thread(state = nil)
       results = []
-      any_true = schedulers.any? do |scheduler|
-        scheduler.create_thread(state).tap { |result| results << result }
+
+      if state
+        schedulers.any? do |scheduler|
+          scheduler.create_thread(state).tap { |result| results << result }
+        end
+      else
+        schedulers.each do |scheduler|
+          results << scheduler.create_thread(state)
+        end
       end
 
-      if any_true
+      if results.any?
         true
-      else
-        results.any? { |result| result == false } ? false : nil
+      elsif results.any? { |result| result == false }
+        false
+      else # rubocop:disable Style/EmptyElse
+        nil
       end
     end
   end
