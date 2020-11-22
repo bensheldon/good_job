@@ -2,13 +2,36 @@
   <%= render 'shared/chart', chart_data: @chart %>
 </div>
 
-<% if @jobs.present? %>
-  <%= render 'shared/jobs_table', jobs: @jobs %>
+<div class='card mb-2'>
+  <div class='card-body d-flex flex-wrap'>
+    <div class='mr-4'>
+      <small>Filter by job class</small>
+      <br>
+      <% @filter.job_classes.each do |name, count| %>
+        <a href='<%= request.path + "?#{@filter.to_query(job_class: name)}" %>' class='btn btn-sm btn-outline-secondary <%= "active" if params[:job_class] == name %>'>
+          <%= name %> (<%= count %>)
+        </a>
+      <% end %>
+    </div>
+    <div>
+      <small>Filter by state</small>
+      <br>
+      <% @filter.states.each do |name, count| %>
+        <a href='<%= request.path + "?#{@filter.to_query(state: name)}" %>' class='btn btn-sm btn-outline-secondary <%= "active" if params[:state] == name %>'>
+          <%= name %> (<%= count %>)
+        </a>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<% if @filter.jobs.present? %>
+  <%= render 'shared/jobs_table', jobs: @filter.jobs %>
 
   <nav aria-label="Job pagination">
     <ul class="pagination">
       <li class="page-item">
-        <%= link_to({ after_scheduled_at: (@jobs.last.scheduled_at || @jobs.last.created_at), after_id: @jobs.last.id }, class: "page-link") do %>
+        <%= link_to({ after_scheduled_at: (@filter.last.scheduled_at || @filter.last.created_at), after_id: @filter.last.id }, class: "page-link") do %>
           Next jobs <span aria-hidden="true">&raquo;</span>
         <% end %>
       </li>
