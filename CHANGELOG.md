@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.3.3](https://github.com/bensheldon/good_job/tree/v1.3.3) (2020-12-01)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.2...v1.3.3)
+
+**Merged pull requests:**
+
+- UI: Admin UI with filters and space efficient layout [\#173](https://github.com/bensheldon/good_job/pull/173) ([zealot128](https://github.com/zealot128))
+
 ## [v1.3.2](https://github.com/bensheldon/good_job/tree/v1.3.2) (2020-11-12)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.1...v1.3.2)
@@ -147,6 +155,7 @@
 **Merged pull requests:**
 
 - stop depending on all rails libs [\#104](https://github.com/bensheldon/good_job/pull/104) ([thilo](https://github.com/thilo))
+- Use more ActiveRecord in Lockable and not connection.execute [\#102](https://github.com/bensheldon/good_job/pull/102) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.2.2](https://github.com/bensheldon/good_job/tree/v1.2.2) (2020-08-27)
 
@@ -167,7 +176,6 @@
 
 **Merged pull requests:**
 
-- Use more ActiveRecord in Lockable and not connection.execute [\#102](https://github.com/bensheldon/good_job/pull/102) ([bensheldon](https://github.com/bensheldon))
 - Run CI tests on Ruby 2.5, 2.6, and 2.7 [\#101](https://github.com/bensheldon/good_job/pull/101) ([arku](https://github.com/arku))
 - Return to using executor.wrap around Scheduler execution task [\#99](https://github.com/bensheldon/good_job/pull/99) ([bensheldon](https://github.com/bensheldon))
 - Fix Ruby 2.7 keyword arguments warning [\#98](https://github.com/bensheldon/good_job/pull/98) ([arku](https://github.com/arku))
