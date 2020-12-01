@@ -1,8 +1,57 @@
 module GoodJob
   class DashboardsController < GoodJob::BaseController
-    def index
-      @jobs = GoodJob::Job.display_all(after_scheduled_at: params[:after_scheduled_at], after_id: params[:after_id])
+    class JobFilter
+      attr_accessor :params
+
+      def initialize(params)
+        @params = params
+      end
+
+      def last
+        @_last ||= jobs.last
+      end
+
+      def jobs
+        sql = GoodJob::Job.display_all(after_scheduled_at: params[:after_scheduled_at], after_id: params[:after_id])
                           .limit(params.fetch(:limit, 10))
+        if params[:job_class] # rubocop:disable Style/IfUnlessModifier
+          sql = sql.where("serialized_params->>'job_class' = ?", params[:job_class])
+        end
+        if params[:state]
+          case params[:state]
+          when 'finished'
+            sql = sql.finished
+          when 'unfinished'
+            sql = sql.unfinished
+          when 'errors'
+            sql = sql.where.not(error: nil)
+          end
+        end
+        sql
+      end
+
+      def states
+        {
+          'finished' => GoodJob::Job.finished.count,
+          'unfinished' => GoodJob::Job.unfinished.count,
+          'errors' => GoodJob::Job.where.not(error: nil).count,
+        }
+      end
+
+      def job_classes
+        GoodJob::Job.group("serialized_params->>'job_class'").count
+      end
+
+      def to_query(override)
+        {
+          state: params[:state],
+          job_class: params[:job_class],
+        }.merge(override).delete_if { |_, v| v.nil? }.to_query
+      end
+    end
+
+    def index
+      @filter = JobFilter.new(params)
 
       job_data = GoodJob::Job.connection.exec_query Arel.sql(<<~SQL.squish)
         SELECT *
