@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.3.4](https://github.com/bensheldon/good_job/tree/v1.3.4) (2020-12-02)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.3...v1.3.4)
+
+**Merged pull requests:**
+
+- Fix job ordering. [\#174](https://github.com/bensheldon/good_job/pull/174) ([morgoth](https://github.com/morgoth))
+
 ## [v1.3.3](https://github.com/bensheldon/good_job/tree/v1.3.3) (2020-12-01)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.2...v1.3.3)
@@ -113,7 +121,6 @@
 - Correct example on how to configure multiple queues by command line. [\#135](https://github.com/bensheldon/good_job/pull/135) ([morgoth](https://github.com/morgoth))
 - Update ActionMailer Job class, to match the default [\#130](https://github.com/bensheldon/good_job/pull/130) ([morgoth](https://github.com/morgoth))
 - Add initial Engine scaffold [\#125](https://github.com/bensheldon/good_job/pull/125) ([bensheldon](https://github.com/bensheldon))
-- Zeitwerk Loader Implementation [\#123](https://github.com/bensheldon/good_job/pull/123) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Update code-level documentation [\#111](https://github.com/bensheldon/good_job/pull/111) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.2.4](https://github.com/bensheldon/good_job/tree/v1.2.4) (2020-09-01)
@@ -137,6 +144,7 @@
 
 **Merged pull requests:**
 
+- Zeitwerk Loader Implementation [\#123](https://github.com/bensheldon/good_job/pull/123) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Remove unused PgLocks class [\#120](https://github.com/bensheldon/good_job/pull/120) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Fix readme CommandLine option links [\#115](https://github.com/bensheldon/good_job/pull/115) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Have YARD render markdown files with GFM \(Github Flavored Markdown\) [\#113](https://github.com/bensheldon/good_job/pull/113) ([bensheldon](https://github.com/bensheldon))
@@ -155,7 +163,6 @@
 **Merged pull requests:**
 
 - stop depending on all rails libs [\#104](https://github.com/bensheldon/good_job/pull/104) ([thilo](https://github.com/thilo))
-- Use more ActiveRecord in Lockable and not connection.execute [\#102](https://github.com/bensheldon/good_job/pull/102) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.2.2](https://github.com/bensheldon/good_job/tree/v1.2.2) (2020-08-27)
 
@@ -176,6 +183,7 @@
 
 **Merged pull requests:**
 
+- Use more ActiveRecord in Lockable and not connection.execute [\#102](https://github.com/bensheldon/good_job/pull/102) ([bensheldon](https://github.com/bensheldon))
 - Run CI tests on Ruby 2.5, 2.6, and 2.7 [\#101](https://github.com/bensheldon/good_job/pull/101) ([arku](https://github.com/arku))
 - Return to using executor.wrap around Scheduler execution task [\#99](https://github.com/bensheldon/good_job/pull/99) ([bensheldon](https://github.com/bensheldon))
 - Fix Ruby 2.7 keyword arguments warning [\#98](https://github.com/bensheldon/good_job/pull/98) ([arku](https://github.com/arku))
@@ -326,10 +334,6 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.2...v0.9.0)
 
-**Merged pull requests:**
-
-- Allow preservation of finished job records [\#46](https://github.com/bensheldon/good_job/pull/46) ([bensheldon](https://github.com/bensheldon))
-
 ## [v0.8.2](https://github.com/bensheldon/good_job/tree/v0.8.2) (2020-07-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.1...v0.8.2)
@@ -357,6 +361,7 @@
 
 **Merged pull requests:**
 
+- Allow preservation of finished job records [\#46](https://github.com/bensheldon/good_job/pull/46) ([bensheldon](https://github.com/bensheldon))
 - Replace Adapter inline boolean kwarg with execution\_mode instead [\#41](https://github.com/bensheldon/good_job/pull/41) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.7.0](https://github.com/bensheldon/good_job/tree/v0.7.0) (2020-07-16)
