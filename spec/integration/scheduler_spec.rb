@@ -56,7 +56,7 @@ RSpec.describe 'Schedule Integration' do
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       max_threads.times { scheduler.create_thread }
 
-      sleep_until(max: 20, increments_of: 0.5) { GoodJob::Job.count == 0 }
+      sleep_until(max: 30, increments_of: 0.5) { GoodJob::Job.count == 0 }
 
       rerun_jobs = {}
 

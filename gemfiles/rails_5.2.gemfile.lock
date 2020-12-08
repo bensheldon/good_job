@@ -95,7 +95,7 @@ GEM
       rainbow
       rubocop (~> 0.79)
       smart_properties
-    erubi (1.9.0)
+    erubi (1.10.0)
     faraday (1.1.0)
       multipart-post (>= 1.2, < 3)
       ruby2_keywords
@@ -121,7 +121,7 @@ GEM
       rexml
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
-    loofah (2.7.0)
+    loofah (2.8.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -261,7 +261,7 @@ GEM
     thor (1.0.1)
     thread_safe (0.3.6)
     tomlrb (1.3.0)
-    tzinfo (1.2.7)
+    tzinfo (1.2.8)
       thread_safe (~> 0.1)
     unicode-display_width (1.7.0)
     websocket-driver (0.7.3)
