@@ -13,3 +13,12 @@ gemspec
 
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
+#
+group :lint do
+  gem "erb_lint"
+  gem "mdl"
+  gem "rubocop"
+  gem "rubocop-performance"
+  gem "rubocop-rails"
+  gem "rubocop-rspec"
+end

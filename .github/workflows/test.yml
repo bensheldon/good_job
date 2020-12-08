@@ -92,9 +92,9 @@ jobs:
       - name: Install bundler
         run: gem update --system && gem install bundler --default -v $(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -1 | tr -d " ")
       - name: Install Gemfile gems
-        run: bundle install
+        run: bundle install --without lint
       - name: Install Appraisal gems
-        run: bundle exec appraisal install --path $BUNDLE_PATH
+        run: bundle exec appraisal install --without lint --path $BUNDLE_PATH
       # /Dependencies
 
       - name: Set up test database
