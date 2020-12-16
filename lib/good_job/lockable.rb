@@ -151,10 +151,11 @@ module GoodJob
     # {#advisory_unlock} and {#advisory_lock} the same number of times.
     # @return [Boolean] whether the lock was released.
     def advisory_unlock
-      where_sql = <<~SQL.squish
-        pg_advisory_unlock(('x' || substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
+      query = <<~SQL.squish
+        SELECT 1 AS one
+        WHERE pg_advisory_unlock(('x'||substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
       SQL
-      self.class.unscoped.exists?([where_sql, { table_name: self.class.table_name, id: send(self.class.primary_key) }])
+      self.class.connection.execute(sanitize_sql_for_conditions([query, { table_name: self.class.table_name, id: send(self.class.primary_key) }])).ntuples.positive?
     end
 
     # Acquires an advisory lock on this record or raises
