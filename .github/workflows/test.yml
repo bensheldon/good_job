@@ -53,6 +53,7 @@ jobs:
     strategy:
       matrix:
         ruby: [2.5, 2.6, 2.7]
+        pg: [12.5, 10.8]
     env:
       PGHOST: localhost
       PGUSER: test_app
@@ -63,11 +64,12 @@ jobs:
       DISABLE_SPRING: 1
     services:
       postgres:
-        image: postgres:10.8
+        image: postgres:${{ matrix.pg }}
         env:
           POSTGRES_USER: test_app
           POSTGRES_DB: test_app_test
           POSTGRES_PASSWORD: ""
+          POSTGRES_HOST_AUTH_METHOD: trust
         ports: ["5432:5432"]
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 

@@ -25,7 +25,7 @@ RSpec.describe GoodJob::Lockable do
         SELECT "good_jobs".*
         FROM "good_jobs"
         WHERE "good_jobs"."id" IN (
-          WITH "rows" AS (
+          WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
             SELECT "good_jobs"."id"
             FROM "good_jobs"
             WHERE "good_jobs"."priority" = 99
