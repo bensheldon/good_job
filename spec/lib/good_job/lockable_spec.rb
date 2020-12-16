@@ -1,4 +1,9 @@
-RSpec.shared_examples 'lockable' do
+require 'rails_helper'
+
+RSpec.describe GoodJob::Lockable do
+  let(:model_class) { GoodJob::Job }
+  let(:job) { model_class.create! }
+
   describe '.advisory_lock' do
     around do |example|
       RSpec.configure do |config|
@@ -14,7 +19,7 @@ RSpec.shared_examples 'lockable' do
     end
 
     it 'generates appropriate SQL' do
-      query = described_class.where(priority: 99).order(priority: :desc).limit(2).advisory_lock
+      query = model_class.where(priority: 99).order(priority: :desc).limit(2).advisory_lock
 
       expect(normalize_sql(query.to_sql)).to eq normalize_sql(<<~SQL.squish)
         SELECT "good_jobs".*
@@ -37,21 +42,31 @@ RSpec.shared_examples 'lockable' do
 
     it 'returns first row of the query with a lock' do
       expect(job).not_to be_advisory_locked
-      result_job = described_class.advisory_lock.first
+      result_job = model_class.advisory_lock.first
       expect(result_job).to eq job
       expect(job).to be_advisory_locked
+
+      job.advisory_unlock
     end
   end
 
   describe '.with_advisory_lock' do
     it 'opens a block with a lock' do
       records = nil
-      described_class.limit(2).with_advisory_lock do |results|
+      model_class.limit(2).with_advisory_lock do |results|
         records = results
         expect(records).to all be_advisory_locked
       end
 
       expect(records).to all be_advisory_unlocked
+      expect(PgLock.advisory_lock.count).to eq 0
+    end
+
+    it 'does not leak advisory locks' do
+      model_class.limit(2).with_advisory_lock do |results|
+        records = results
+        expect(records).to all be_advisory_locked
+      end
     end
   end
 
@@ -63,6 +78,8 @@ RSpec.shared_examples 'lockable' do
 
       other_thread_owns_advisory_lock = Concurrent::Promises.future(job, &:owns_advisory_lock?).value!
       expect(other_thread_owns_advisory_lock).to be false
+
+      job.advisory_unlock
     end
   end
 
@@ -82,6 +99,17 @@ RSpec.shared_examples 'lockable' do
       expect do
         job.advisory_unlock
       end.not_to change(job, :advisory_locked?).from(true)
+
+      job.advisory_unlock
+    end
+
+    it 'unlocks the record even after the record is destroyed' do
+      job.advisory_lock!
+      job.destroy!
+
+      expect do
+        job.advisory_unlock
+      end.to change(PgLock, :count).by(-1)
     end
   end
 
@@ -98,11 +126,13 @@ RSpec.shared_examples 'lockable' do
 
   describe 'create_with_lock' do
     it 'causes the job to be saved and locked' do
-      job = described_class.new
+      job = model_class.new
       job.create_with_advisory_lock = true
       job.save!
 
       expect(job).to be_advisory_locked
+
+      job.advisory_unlock
     end
   end
 
@@ -113,5 +143,7 @@ RSpec.shared_examples 'lockable' do
     expect do
       Concurrent::Promises.future(job, &:advisory_lock!).value!
     end.to raise_error GoodJob::Lockable::RecordAlreadyAdvisoryLockedError
+
+    job.advisory_unlock
   end
 end

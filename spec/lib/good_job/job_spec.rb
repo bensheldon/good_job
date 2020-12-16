@@ -19,8 +19,6 @@ RSpec.describe GoodJob::Job do
     end)
   end
 
-  it_behaves_like 'lockable'
-
   describe '.enqueue' do
     let(:active_job) { ExampleJob.new }
 
@@ -52,6 +50,8 @@ RSpec.describe GoodJob::Job do
 
       locked_good_job = described_class.enqueue(active_job, create_with_advisory_lock: true)
       expect(locked_good_job.advisory_locked?).to eq true
+
+      locked_good_job.advisory_unlock
     end
   end
 
