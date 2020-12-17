@@ -32,11 +32,18 @@ module GoodJob
         original_query = self
 
         cte_table = Arel::Table.new(:rows)
-        composed_cte = Arel::Nodes::As.new(cte_table, original_query.select(primary_key).except(:limit).arel)
+        cte_query = original_query.select(primary_key).except(:limit)
+        cte_type = if supports_cte_materialization_specifiers?
+                     'MATERIALIZED'
+                   else
+                     ''
+                   end
+
+        composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::SqlLiteral.new([cte_type, "(", cte_query.to_sql, ")"].join(' ')))
 
         query = cte_table.project(cte_table[:id])
-                  .with(composed_cte)
-                  .where(Arel.sql(sanitize_sql_for_conditions(["pg_try_advisory_lock(('x' || substr(md5(:table_name || #{connection.quote_table_name(cte_table.name)}.#{quoted_primary_key}::text), 1, 16))::bit(64)::bigint)", { table_name: table_name }])))
+                         .with(composed_cte)
+                         .where(Arel.sql(sanitize_sql_for_conditions(["pg_try_advisory_lock(('x' || substr(md5(:table_name || #{connection.quote_table_name(cte_table.name)}.#{quoted_primary_key}::text), 1, 16))::bit(64)::bigint)", { table_name: table_name }])))
 
         limit = original_query.arel.ast.limit
         query.limit = limit.value if limit.present?
@@ -131,6 +138,12 @@ module GoodJob
         ensure
           records.each(&:advisory_unlock)
         end
+      end
+
+      def supports_cte_materialization_specifiers?
+        return @supports_cte_materialization_specifiers if defined?(@supports_cte_materialization_specifiers)
+
+        @supports_cte_materialization_specifiers = ActiveRecord::Base.connection.postgresql_version >= 120000
       end
     end
 
