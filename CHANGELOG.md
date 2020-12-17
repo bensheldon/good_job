@@ -1,12 +1,27 @@
 # Changelog
 
+## [v1.3.5](https://github.com/bensheldon/good_job/tree/v1.3.5) (2020-12-17)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.4...v1.3.5)
+
+**Closed issues:**
+
+- not running jobs [\#168](https://github.com/bensheldon/good_job/issues/168)
+- how to run good\_job on a separate machine  [\#162](https://github.com/bensheldon/good_job/issues/162)
+
+**Merged pull requests:**
+
+-  Ensure advisory lock CTE is MATERIALIZED on Postgres v12+ [\#179](https://github.com/bensheldon/good_job/pull/179) ([bensheldon](https://github.com/bensheldon))
+- Ensure that deleted jobs are unlocked [\#178](https://github.com/bensheldon/good_job/pull/178) ([bensheldon](https://github.com/bensheldon))
+- Add Appraisal for Rails 6.1-rc2 [\#175](https://github.com/bensheldon/good_job/pull/175) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.3.4](https://github.com/bensheldon/good_job/tree/v1.3.4) (2020-12-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.3...v1.3.4)
 
 **Merged pull requests:**
 
-- Fix job ordering. [\#174](https://github.com/bensheldon/good_job/pull/174) ([morgoth](https://github.com/morgoth))
+- Fix job ordering for Rails 6.1 [\#174](https://github.com/bensheldon/good_job/pull/174) ([morgoth](https://github.com/morgoth))
 
 ## [v1.3.3](https://github.com/bensheldon/good_job/tree/v1.3.3) (2020-12-01)
 
@@ -121,6 +136,7 @@
 - Correct example on how to configure multiple queues by command line. [\#135](https://github.com/bensheldon/good_job/pull/135) ([morgoth](https://github.com/morgoth))
 - Update ActionMailer Job class, to match the default [\#130](https://github.com/bensheldon/good_job/pull/130) ([morgoth](https://github.com/morgoth))
 - Add initial Engine scaffold [\#125](https://github.com/bensheldon/good_job/pull/125) ([bensheldon](https://github.com/bensheldon))
+- Zeitwerk Loader Implementation [\#123](https://github.com/bensheldon/good_job/pull/123) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Update code-level documentation [\#111](https://github.com/bensheldon/good_job/pull/111) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.2.4](https://github.com/bensheldon/good_job/tree/v1.2.4) (2020-09-01)
@@ -144,7 +160,6 @@
 
 **Merged pull requests:**
 
-- Zeitwerk Loader Implementation [\#123](https://github.com/bensheldon/good_job/pull/123) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Remove unused PgLocks class [\#120](https://github.com/bensheldon/good_job/pull/120) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Fix readme CommandLine option links [\#115](https://github.com/bensheldon/good_job/pull/115) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 - Have YARD render markdown files with GFM \(Github Flavored Markdown\) [\#113](https://github.com/bensheldon/good_job/pull/113) ([bensheldon](https://github.com/bensheldon))
@@ -334,6 +349,10 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.2...v0.9.0)
 
+**Merged pull requests:**
+
+- Allow preservation of finished job records [\#46](https://github.com/bensheldon/good_job/pull/46) ([bensheldon](https://github.com/bensheldon))
+
 ## [v0.8.2](https://github.com/bensheldon/good_job/tree/v0.8.2) (2020-07-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.1...v0.8.2)
@@ -361,7 +380,6 @@
 
 **Merged pull requests:**
 
-- Allow preservation of finished job records [\#46](https://github.com/bensheldon/good_job/pull/46) ([bensheldon](https://github.com/bensheldon))
 - Replace Adapter inline boolean kwarg with execution\_mode instead [\#41](https://github.com/bensheldon/good_job/pull/41) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.7.0](https://github.com/bensheldon/good_job/tree/v0.7.0) (2020-07-16)
@@ -410,7 +428,6 @@
 **Merged pull requests:**
 
 - Improve ActiveRecord usage for advisory locking [\#24](https://github.com/bensheldon/good_job/pull/24) ([bensheldon](https://github.com/bensheldon))
-- Remove support for Rails 5.1 [\#23](https://github.com/bensheldon/good_job/pull/23) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.3.0](https://github.com/bensheldon/good_job/tree/v0.3.0) (2020-03-22)
 
@@ -429,6 +446,7 @@
 
 **Merged pull requests:**
 
+- Remove support for Rails 5.1 [\#23](https://github.com/bensheldon/good_job/pull/23) ([bensheldon](https://github.com/bensheldon))
 - Gracefully shutdown Scheduler when executable receives TERM or INT [\#17](https://github.com/bensheldon/good_job/pull/17) ([bensheldon](https://github.com/bensheldon))
 - Update Appraisals [\#16](https://github.com/bensheldon/good_job/pull/16) ([bensheldon](https://github.com/bensheldon))
 

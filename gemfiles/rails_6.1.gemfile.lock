@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    good_job (1.3.4)
+    good_job (1.3.5)
       activejob (>= 5.2.0)
       activerecord (>= 5.2.0)
       concurrent-ruby (>= 1.0.2)
@@ -78,6 +78,15 @@ GEM
       bundler
       rake
       thor (>= 0.14.0)
+    ast (2.4.1)
+    better_html (1.0.15)
+      actionview (>= 4.0)
+      activesupport (>= 4.0)
+      ast (~> 2.0)
+      erubi (~> 1.4)
+      html_tokenizer (~> 0.0.6)
+      parser (>= 2.4)
+      smart_properties
     builder (3.2.4)
     capybara (3.34.0)
       addressable
@@ -87,6 +96,7 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (~> 1.5)
       xpath (~> 3.2)
+    chef-utils (16.7.61)
     childprocess (3.0.0)
     coderay (1.1.3)
     concurrent-ruby (1.1.7)
@@ -94,6 +104,14 @@ GEM
     database_cleaner (1.8.5)
     diff-lcs (1.4.4)
     dotenv (2.7.6)
+    erb_lint (0.0.35)
+      activesupport
+      better_html (~> 1.0.7)
+      html_tokenizer
+      parser (>= 2.7.1.4)
+      rainbow
+      rubocop (~> 0.79)
+      smart_properties
     erubi (1.10.0)
     faraday (1.1.0)
       multipart-post (>= 1.2, < 3)
@@ -113,6 +131,7 @@ GEM
       retriable (~> 3.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
+    html_tokenizer (0.0.7)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
     kramdown (2.3.0)
@@ -126,11 +145,22 @@ GEM
       mini_mime (>= 0.1.1)
     marcel (0.3.3)
       mimemagic (~> 0.3.2)
+    mdl (0.11.0)
+      kramdown (~> 2.3)
+      kramdown-parser-gfm (~> 1.1)
+      mixlib-cli (~> 2.1, >= 2.1.1)
+      mixlib-config (>= 2.2.1, < 4)
+      mixlib-shellout
     method_source (1.0.0)
     mimemagic (0.3.5)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.14.2)
+    mixlib-cli (2.1.8)
+    mixlib-config (3.0.9)
+      tomlrb
+    mixlib-shellout (3.2.2)
+      chef-utils
     msgpack (1.3.3)
     multi_json (1.15.0)
     multipart-post (2.1.1)
@@ -141,6 +171,9 @@ GEM
       faraday (>= 0.9)
       sawyer (~> 0.8.0, >= 0.5.3)
     optimist (3.0.1)
+    parallel (1.20.1)
+    parser (2.7.2.0)
+      ast (~> 2.4.1)
     pg (1.2.3)
     pry (0.13.1)
       coderay (~> 1.1)
@@ -205,6 +238,28 @@ GEM
       rspec-mocks (~> 3.9)
       rspec-support (~> 3.9)
     rspec-support (3.10.0)
+    rubocop (0.93.1)
+      parallel (~> 1.10)
+      parser (>= 2.7.1.5)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8)
+      rexml
+      rubocop-ast (>= 0.6.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 2.0)
+    rubocop-ast (1.3.0)
+      parser (>= 2.7.1.5)
+    rubocop-performance (1.9.1)
+      rubocop (>= 0.90.0, < 2.0)
+      rubocop-ast (>= 0.4.0)
+    rubocop-rails (2.9.0)
+      activesupport (>= 4.2.0)
+      rack (>= 1.1)
+      rubocop (>= 0.90.0, < 2.0)
+    rubocop-rspec (1.44.1)
+      rubocop (~> 0.87)
+      rubocop-ast (>= 0.7.1)
+    ruby-progressbar (1.10.1)
     ruby2_keywords (0.0.2)
     rubyzip (2.3.0)
     sawyer (0.8.2)
@@ -214,6 +269,7 @@ GEM
       childprocess (>= 0.5, < 4.0)
       rubyzip (>= 1.2.2)
     sigdump (0.2.4)
+    smart_properties (1.15.0)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -222,8 +278,10 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     thor (1.0.1)
+    tomlrb (2.0.0)
     tzinfo (2.0.3)
       concurrent-ruby (~> 1.0)
+    unicode-display_width (1.7.0)
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -242,17 +300,23 @@ DEPENDENCIES
   capybara
   database_cleaner
   dotenv
+  erb_lint
   foreman
   gem-release
   github_changelog_generator
   good_job!
   kramdown
   kramdown-parser-gfm
+  mdl
   pry-rails
   puma
   rails (~> 6.1.pre.rc2)
   rbtrace
   rspec-rails
+  rubocop
+  rubocop-performance
+  rubocop-rails
+  rubocop-rspec
   selenium-webdriver
   sigdump
   yard
