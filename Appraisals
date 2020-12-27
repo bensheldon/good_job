@@ -1,5 +1,7 @@
-appraise "rails-5.2" do
-  gem "rails", "~> 5.2.0"
+if Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3')
+  appraise "rails-5.2" do
+    gem "rails", "~> 5.2.0"
+  end
 end
 
 appraise "rails-6.0" do
