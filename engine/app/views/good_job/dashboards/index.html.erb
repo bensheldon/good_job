@@ -8,18 +8,30 @@
       <small>Filter by job class</small>
       <br>
       <% @filter.job_classes.each do |name, count| %>
-        <a href='<%= request.path + "?#{@filter.to_query(job_class: name)}" %>' class='btn btn-sm btn-outline-secondary <%= "active" if params[:job_class] == name %>'>
-          <%= name %> (<%= count %>)
-        </a>
+        <% if params[:job_class] == name %>
+          <%= link_to(root_path(@filter.to_params(job_class: nil)), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
+            <%= name %> (<%= count %>)
+          <% end %>
+        <% else %>
+          <%= link_to(root_path(@filter.to_params(job_class: name)), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
+            <%= name %> (<%= count %>)
+          <% end %>
+        <% end %>
       <% end %>
     </div>
     <div>
       <small>Filter by state</small>
       <br>
       <% @filter.states.each do |name, count| %>
-        <a href='<%= request.path + "?#{@filter.to_query(state: name)}" %>' class='btn btn-sm btn-outline-secondary <%= "active" if params[:state] == name %>'>
-          <%= name %> (<%= count %>)
-        </a>
+        <% if params[:state] == name %>
+          <%= link_to(root_path(@filter.to_params(state: nil)), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
+            <%= name %> (<%= count %>)
+          <% end %>
+        <% else %>
+          <%= link_to(root_path(@filter.to_params(state: name)), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
+            <%= name %> (<%= count %>)
+          <% end %>
+        <% end %>
       <% end %>
     </div>
   </div>
@@ -28,7 +40,7 @@
 <% if @filter.jobs.present? %>
   <%= render 'shared/jobs_table', jobs: @filter.jobs %>
 
-  <nav aria-label="Job pagination">
+  <nav aria-label="Job pagination" class="mt-3">
     <ul class="pagination">
       <li class="page-item">
         <%= link_to({ after_scheduled_at: (@filter.last.scheduled_at || @filter.last.created_at), after_id: @filter.last.id }, class: "page-link") do %>

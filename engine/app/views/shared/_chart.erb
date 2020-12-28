@@ -1,7 +1,7 @@
 <div id="chart"></div>
 
 <script>
-  new Chartist.Line('#chart', <%= raw chart_data.to_json %>, {
+  new Chartist.Line('#chart', <%== chart_data.to_json %>, {
     height: '300px',
     fullWidth: true,
     chartPadding: {

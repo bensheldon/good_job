@@ -42,11 +42,11 @@ module GoodJob
         GoodJob::Job.group("serialized_params->>'job_class'").count
       end
 
-      def to_query(override)
+      def to_params(override)
         {
           state: params[:state],
           job_class: params[:job_class],
-        }.merge(override).delete_if { |_, v| v.nil? }.to_query
+        }.merge(override).delete_if { |_, v| v.nil? }
       end
     end
 
