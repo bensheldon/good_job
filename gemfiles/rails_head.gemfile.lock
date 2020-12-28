@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/rails/rails.git
-  revision: ef61c9c8a378b076d85be0c95cc83863c5a88401
+  revision: e7d207f02fe8bf6e351de7da106839b0ab14bbea
   branch: master
   specs:
     actioncable (6.2.0.alpha)
@@ -219,7 +219,7 @@ GEM
     rails-html-sanitizer (1.3.0)
       loofah (~> 2.3)
     rainbow (3.0.0)
-    rake (13.0.1)
+    rake (13.0.3)
     rbtrace (0.4.14)
       ffi (>= 1.0.6)
       msgpack (>= 0.4.3)
@@ -285,7 +285,7 @@ GEM
       sprockets (>= 3.0.0)
     thor (1.0.1)
     tomlrb (2.0.0)
-    tzinfo (2.0.3)
+    tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (1.7.0)
     websocket-driver (0.7.3)
@@ -329,4 +329,4 @@ DEPENDENCIES
   yard-activesupport-concern
 
 BUNDLED WITH
-   2.1.4
+   2.2.3
