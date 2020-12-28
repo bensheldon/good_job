@@ -52,7 +52,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        ruby: [2.5, 2.6, 2.7]
+        ruby: [2.5, 2.6, 2.7, 3.0]
         pg: [12.5, 10.8]
     env:
       PGHOST: localhost
@@ -110,3 +110,9 @@ jobs:
         with:
           name: screenshots
           path: spec/test_app/tmp/screenshots
+      - name: Archive Rails logs
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: rails_logs
+          path: spec/test_app/log

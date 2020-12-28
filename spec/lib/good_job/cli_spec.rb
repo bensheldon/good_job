@@ -13,7 +13,6 @@ RSpec.describe GoodJob::CLI do
 
   describe '#start' do
     it 'initializes a scheduler' do
-      allow(GoodJob::Scheduler).to receive(:new).and_call_original
       allow(Kernel).to receive(:loop)
 
       cli = described_class.new([], {}, {})
