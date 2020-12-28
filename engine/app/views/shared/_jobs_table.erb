@@ -1,26 +1,28 @@
-<div class="table-responsive">
-  <table class="table table-bordered table-hover table-sm">
-    <thead>
-      <th>GoodJob ID</th>
-      <th>ActiveJob ID</th>
-      <th>Job Class</th>
-      <th>Queue</th>
-      <th>Scheduled At</th>
-      <th>Error</th>
-      <th>ActiveJob Params</th>
-    </thead>
-    <tbody>
-      <% jobs.each do |job| %>
-        <tr id="<%= dom_id(job) %>">
-          <td><%= link_to job.id, active_job_path(job.serialized_params['job_id'], anchor: dom_id(job)) %></td>
-          <td><%= link_to job.serialized_params['job_id'], active_job_path(job.serialized_params['job_id']) %></td>
-          <td><%= job.serialized_params['job_class'] %></td>
-          <td><%= job.queue_name %></td>
-          <td><%= job.scheduled_at || job.created_at %></td>
-          <td><%= job.error %></td>
-          <td><pre><%= JSON.pretty_generate(job.serialized_params) %></pre></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+<div class="card my-3">
+  <div class="table-responsive">
+    <table class="table card-table table-bordered table-hover table-sm mb-0">
+      <thead>
+        <th>GoodJob ID</th>
+        <th>ActiveJob ID</th>
+        <th>Job Class</th>
+        <th>Queue</th>
+        <th>Scheduled At</th>
+        <th>Error</th>
+        <th>ActiveJob Params</th>
+      </thead>
+      <tbody>
+        <% jobs.each do |job| %>
+          <tr id="<%= dom_id(job) %>">
+            <td><%= link_to job.id, active_job_path(job.serialized_params['job_id'], anchor: dom_id(job)) %></td>
+            <td><%= link_to job.serialized_params['job_id'], active_job_path(job.serialized_params['job_id']) %></td>
+            <td><%= job.serialized_params['job_class'] %></td>
+            <td><%= job.queue_name %></td>
+            <td><%= job.scheduled_at || job.created_at %></td>
+            <td><%= job.error %></td>
+            <td><pre><%= JSON.pretty_generate(job.serialized_params) %></pre></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 </div>
