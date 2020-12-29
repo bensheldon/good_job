@@ -32,5 +32,19 @@ RSpec.describe GoodJob::Notifier do
 
       expect(RECEIVED_MESSAGE.true?).to eq true
     end
+
+    it 'raises exception to GoodJob.on_thread_error' do
+      stub_const('ExpectedError', Class.new(StandardError))
+      on_thread_error = instance_double(Proc, call: nil)
+      allow(GoodJob).to receive(:on_thread_error).and_return(on_thread_error)
+      allow(JSON).to receive(:parse).and_raise ExpectedError
+
+      notifier = described_class.new
+      sleep_until(max: 5, increments_of: 0.5) { notifier.listening? }
+      described_class.notify(true)
+      notifier.shutdown
+
+      expect(on_thread_error).to have_received(:call).at_least(:once).with instance_of(ExpectedError)
+    end
   end
 end

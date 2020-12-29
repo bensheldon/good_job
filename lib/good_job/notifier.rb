@@ -90,6 +90,18 @@ module GoodJob # :nodoc:
       !@pool.running?
     end
 
+    # Invoked on completion of ThreadPoolExecutor task
+    # @!visibility private
+    # @return [void]
+    def listen_observer(_time, _result, thread_error)
+      if thread_error
+        GoodJob.on_thread_error.call(thread_error) if GoodJob.on_thread_error.respond_to?(:call)
+        ActiveSupport::Notifications.instrument("notifier_notify_error.good_job", { error: thread_error })
+      end
+
+      listen unless shutdown?
+    end
+
     private
 
     def create_pool
@@ -120,23 +132,16 @@ module GoodJob # :nodoc:
               listening.make_false
             end
           end
-        end
-      rescue StandardError => e
-        ActiveSupport::Notifications.instrument("notifier_notify_error.good_job", { error: e })
-        raise
-      ensure
-        @listening.make_false
-        ActiveSupport::Notifications.instrument("notifier_unlisten.good_job") do
-          conn.async_exec "UNLISTEN *"
+        ensure
+          listening.make_false
+          ActiveSupport::Notifications.instrument("notifier_unlisten.good_job") do
+            conn.async_exec "UNLISTEN *"
+          end
         end
       end
 
       future.add_observer(self, :listen_observer)
       future.execute
-    end
-
-    def listen_observer(_time, _result, _thread_error)
-      listen unless shutdown?
     end
 
     def with_listen_connection
