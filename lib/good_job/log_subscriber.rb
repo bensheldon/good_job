@@ -218,13 +218,13 @@ module GoodJob
     #
     %w(info debug warn error fatal unknown).each do |level|
       class_eval <<-METHOD, __FILE__, __LINE__ + 1
-        def #{level}(progname = nil, tags: [], &block)
-          return unless logger
-
-          tag_logger(*tags) do
-            logger.#{level}(progname, &block)
-          end
-        end
+        def #{level}(progname = nil, tags: [], &block)   # def info(progname = nil, tags: [], &block)
+          return unless logger                           #   return unless logger
+                                                         #
+          tag_logger(*tags) do                           #   tag_logger(*tags) do
+            logger.#{level}(progname, &block)            #     logger.info(progname, &block)
+          end                                            #   end
+        end                                              #
       METHOD
     end
   end

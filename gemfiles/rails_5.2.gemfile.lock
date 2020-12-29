@@ -282,7 +282,7 @@ DEPENDENCIES
   capybara
   database_cleaner
   dotenv
-  erb_lint
+  erb_lint (>= 0.0.35)
   foreman
   gem-release
   github_changelog_generator

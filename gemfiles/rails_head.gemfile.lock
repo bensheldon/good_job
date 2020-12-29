@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/rails/rails.git
-  revision: e7d207f02fe8bf6e351de7da106839b0ab14bbea
+  revision: 771eab696b25a266705861e248059a53b029a559
   branch: master
   specs:
     actioncable (6.2.0.alpha)
@@ -306,7 +306,7 @@ DEPENDENCIES
   capybara
   database_cleaner
   dotenv
-  erb_lint
+  erb_lint (>= 0.0.35)
   foreman
   gem-release
   github_changelog_generator
