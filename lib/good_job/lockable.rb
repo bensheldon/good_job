@@ -205,7 +205,15 @@ module GoodJob
     # Tests whether this record has an advisory lock on it.
     # @return [Boolean]
     def advisory_locked?
-      self.class.unscoped.advisory_locked.exists?(id: send(self.class.primary_key))
+      query = <<~SQL.squish
+        SELECT 1 AS one
+        FROM pg_locks
+        WHERE pg_locks.locktype = 'advisory'
+          AND pg_locks.objsubid = 1
+          AND pg_locks.classid = ('x' || substr(md5(:table_name || :id::text), 1, 16))::bit(32)::int
+          AND pg_locks.objid = (('x' || substr(md5(:table_name || :id::text), 1, 16))::bit(64) << 32)::bit(32)::int
+      SQL
+      self.class.connection.execute(sanitize_sql_for_conditions([query, { table_name: self.class.table_name, id: send(self.class.primary_key) }])).ntuples.positive?
     end
 
     # Tests whether this record is locked by the current database session.
