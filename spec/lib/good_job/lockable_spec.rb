@@ -109,7 +109,26 @@ RSpec.describe GoodJob::Lockable do
 
       expect do
         job.advisory_unlock
-      end.to change(PgLock, :count).by(-1)
+      end.to change(job, :advisory_locked?).from(true).to(false)
+    end
+  end
+
+  describe '#advisory_locked?' do
+    it 'reflects whether the record is locked' do
+      expect(job.advisory_locked?).to eq false
+      job.advisory_lock
+      expect(job.advisory_locked?).to eq true
+      job.advisory_unlock
+      expect(job.advisory_locked?).to eq false
+    end
+
+    it 'is accurate even if the job has been destroyed' do
+      job.advisory_lock
+      expect(job.advisory_locked?).to eq true
+      job.destroy!
+      expect(job.advisory_locked?).to eq true
+      job.advisory_unlock
+      expect(job.advisory_locked?).to eq false
     end
   end
 
