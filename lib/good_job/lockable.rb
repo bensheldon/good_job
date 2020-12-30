@@ -141,9 +141,9 @@ module GoodJob
       end
 
       def supports_cte_materialization_specifiers?
-        return @supports_cte_materialization_specifiers if defined?(@supports_cte_materialization_specifiers)
+        return @_supports_cte_materialization_specifiers if defined?(@_supports_cte_materialization_specifiers)
 
-        @supports_cte_materialization_specifiers = ActiveRecord::Base.connection.postgresql_version >= 120000
+        @_supports_cte_materialization_specifiers = ActiveRecord::Base.connection.postgresql_version >= 120000
       end
     end
 

@@ -5,7 +5,7 @@ source "https://rubygems.org"
 gem "rails", "~> 5.2.0"
 
 group :lint do
-  gem "erb_lint"
+  gem "erb_lint", ">= 0.0.35"
   gem "mdl"
   gem "rubocop"
   gem "rubocop-performance"

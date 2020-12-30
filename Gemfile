@@ -15,7 +15,7 @@ gemspec
 # gem 'byebug', group: [:development, :test]
 #
 group :lint do
-  gem "erb_lint"
+  gem "erb_lint", ">= 0.0.35"
   gem "mdl"
   gem "rubocop"
   gem "rubocop-performance"

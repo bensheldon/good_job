@@ -58,9 +58,7 @@ module GoodJob
     def rails_execution_mode
       if execution_mode(default: nil)
         execution_mode
-      elsif Rails.env.development?
-        :inline
-      elsif Rails.env.test?
+      elsif Rails.env.development? || Rails.env.test?
         :inline
       else
         :external
