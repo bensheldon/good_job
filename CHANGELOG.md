@@ -1,8 +1,36 @@
 # Changelog
 
+## [v1.3.6](https://github.com/bensheldon/good_job/tree/v1.3.6) (2020-12-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.5...v1.3.6)
+
+**Implemented enhancements:**
+
+- Call GoodJob.on\_thread\_error when Notifier thread raises exception [\#185](https://github.com/bensheldon/good_job/pull/185) ([bensheldon](https://github.com/bensheldon))
+- Improve dashboard UI, fix button state, add unfiltering [\#181](https://github.com/bensheldon/good_job/pull/181) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Replace ActiveRecord execute usage and avoid potential memory leakage [\#187](https://github.com/bensheldon/good_job/issues/187)
+- Does good\_job hold on to advisory locks for finished jobs? [\#177](https://github.com/bensheldon/good_job/issues/177)
+
+**Merged pull requests:**
+
+- Run tests with Rails default configuration to enable Zeitwerk [\#190](https://github.com/bensheldon/good_job/pull/190) ([bensheldon](https://github.com/bensheldon))
+- Update all Lockable queries to use exec\_query instead of execute; clear async\_exec results [\#189](https://github.com/bensheldon/good_job/pull/189) ([bensheldon](https://github.com/bensheldon))
+- Have Lockable\#advisory\_locked? directly query pg\_locks table [\#188](https://github.com/bensheldon/good_job/pull/188) ([bensheldon](https://github.com/bensheldon))
+- Update development gems, including Rails v6.1 and Rails HEAD [\#186](https://github.com/bensheldon/good_job/pull/186) ([bensheldon](https://github.com/bensheldon))
+- Update Appraisals for Rails 6.1 [\#183](https://github.com/bensheldon/good_job/pull/183) ([bensheldon](https://github.com/bensheldon))
+- Add Ruby 3 to CI test matrix [\#182](https://github.com/bensheldon/good_job/pull/182) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.3.5](https://github.com/bensheldon/good_job/tree/v1.3.5) (2020-12-17)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.4...v1.3.5)
+
+**Fixed bugs:**
+
+-  Ensure advisory lock CTE is MATERIALIZED on Postgres v12+ [\#179](https://github.com/bensheldon/good_job/pull/179) ([bensheldon](https://github.com/bensheldon))
+- Ensure that deleted jobs are unlocked [\#178](https://github.com/bensheldon/good_job/pull/178) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
@@ -11,15 +39,13 @@
 
 **Merged pull requests:**
 
--  Ensure advisory lock CTE is MATERIALIZED on Postgres v12+ [\#179](https://github.com/bensheldon/good_job/pull/179) ([bensheldon](https://github.com/bensheldon))
-- Ensure that deleted jobs are unlocked [\#178](https://github.com/bensheldon/good_job/pull/178) ([bensheldon](https://github.com/bensheldon))
 - Add Appraisal for Rails 6.1-rc2 [\#175](https://github.com/bensheldon/good_job/pull/175) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.3.4](https://github.com/bensheldon/good_job/tree/v1.3.4) (2020-12-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.3...v1.3.4)
 
-**Merged pull requests:**
+**Fixed bugs:**
 
 - Fix job ordering for Rails 6.1 [\#174](https://github.com/bensheldon/good_job/pull/174) ([morgoth](https://github.com/morgoth))
 
@@ -27,7 +53,7 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.2...v1.3.3)
 
-**Merged pull requests:**
+**Implemented enhancements:**
 
 - UI: Admin UI with filters and space efficient layout [\#173](https://github.com/bensheldon/good_job/pull/173) ([zealot128](https://github.com/zealot128))
 
@@ -428,6 +454,7 @@
 **Merged pull requests:**
 
 - Improve ActiveRecord usage for advisory locking [\#24](https://github.com/bensheldon/good_job/pull/24) ([bensheldon](https://github.com/bensheldon))
+- Remove support for Rails 5.1 [\#23](https://github.com/bensheldon/good_job/pull/23) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.3.0](https://github.com/bensheldon/good_job/tree/v0.3.0) (2020-03-22)
 
@@ -446,7 +473,6 @@
 
 **Merged pull requests:**
 
-- Remove support for Rails 5.1 [\#23](https://github.com/bensheldon/good_job/pull/23) ([bensheldon](https://github.com/bensheldon))
 - Gracefully shutdown Scheduler when executable receives TERM or INT [\#17](https://github.com/bensheldon/good_job/pull/17) ([bensheldon](https://github.com/bensheldon))
 - Update Appraisals [\#16](https://github.com/bensheldon/good_job/pull/16) ([bensheldon](https://github.com/bensheldon))
 
