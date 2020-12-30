@@ -9,7 +9,7 @@ require "good_job"
 module TestApp
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    # config.load_defaults 6.0
+    config.load_defaults Gem::Version.new(Rails.version).segments.slice(0..1).join('.').to_f
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
