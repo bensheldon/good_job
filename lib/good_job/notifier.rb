@@ -112,7 +112,7 @@ module GoodJob # :nodoc:
       future = Concurrent::Future.new(args: [@recipients, @pool, @listening], executor: @pool) do |recipients, pool, listening|
         with_listen_connection do |conn|
           ActiveSupport::Notifications.instrument("notifier_listen.good_job") do
-            conn.async_exec "LISTEN #{CHANNEL}"
+            conn.async_exec("LISTEN #{CHANNEL}").clear
           end
 
           ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
@@ -135,7 +135,7 @@ module GoodJob # :nodoc:
         ensure
           listening.make_false
           ActiveSupport::Notifications.instrument("notifier_unlisten.good_job") do
-            conn.async_exec "UNLISTEN *"
+            conn.async_exec("UNLISTEN *").clear
           end
         end
       end
@@ -149,7 +149,7 @@ module GoodJob # :nodoc:
         ActiveRecord::Base.connection_pool.remove(conn)
       end
       pg_conn = ar_conn.raw_connection
-      pg_conn.exec("SET application_name = #{pg_conn.escape_identifier(self.class.name)}")
+      pg_conn.async_exec("SET application_name = #{pg_conn.escape_identifier(self.class.name)}").clear
       yield pg_conn
     ensure
       ar_conn&.disconnect!

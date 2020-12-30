@@ -14,7 +14,7 @@ RSpec.describe 'Schedule Integration' do
       def perform(*_args, **_kwargs)
         thread_name = Thread.current.name || Thread.current.object_id
 
-        RUN_JOBS << provider_job_id
+        RUN_JOBS << [provider_job_id, job_id, thread_name]
         THREAD_JOBS[thread_name] << provider_job_id
       end
     end)
@@ -42,6 +42,7 @@ RSpec.describe 'Schedule Integration' do
 
   context 'when there are a large number of jobs' do
     let(:number_of_jobs) { 1000 }
+    let(:max_threads) { 5 }
 
     let!(:good_jobs) do
       number_of_jobs.times do |i|
@@ -50,37 +51,24 @@ RSpec.describe 'Schedule Integration' do
     end
 
     it 'pops items off of the queue and runs them' do
-      max_threads = 5
-
       performer = GoodJob::Performer.new(GoodJob::Job.all, :perform_with_advisory_lock)
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       max_threads.times { scheduler.create_thread }
 
       sleep_until(max: 30, increments_of: 0.5) { GoodJob::Job.count == 0 }
-
-      rerun_jobs = {}
-
-      if RUN_JOBS.size != number_of_jobs
-        jobs = THREAD_JOBS.values.flatten
-
-        jobs_tally = jobs.each_with_object(Hash.new(0)) do |job_id, hash|
-          hash[job_id] += 1
-        end
-
-        rerun_jobs = jobs_tally.select { |_key, value| value > 1 }
-
-        rerun_jobs.each do |job_id, tally|
-          rerun_threads = THREAD_JOBS.select { |_thread, thread_jobs| thread_jobs.include? job_id }.keys
-
-          puts "Ran job id #{job_id} for #{tally} times on threads #{rerun_threads}"
-        end
-      end
-
       scheduler.shutdown
 
       expect(GoodJob::Job.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Job.all.map(&:id)}" }
-      expect(rerun_jobs).to eq({})
-      expect(RUN_JOBS.size).to eq number_of_jobs
+      expect(RUN_JOBS.size).to eq(number_of_jobs), lambda {
+        jobs_tally = RUN_JOBS.each_with_object(Hash.new(0)) do |(provider_job_id, _job_id, _thread_name), hash|
+          hash[provider_job_id] += 1
+        end
+
+        rerun_provider_job_ids = jobs_tally.select { |_key, value| value > 1 }.keys
+        rerun_jobs = RUN_JOBS.select { |(provider_job_id, _job_id, _thread_name)| rerun_provider_job_ids.include? provider_job_id }
+
+        "Expected run jobs(#{RUN_JOBS.size}) to equal number of jobs (#{number_of_jobs}). Instead ran jobs multiple times:\n#{PP.pp(rerun_jobs, '')}"
+      }
     end
   end
 

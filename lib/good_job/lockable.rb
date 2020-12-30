@@ -153,10 +153,11 @@ module GoodJob
     # all remaining locks).
     # @return [Boolean] whether the lock was acquired.
     def advisory_lock
-      where_sql = <<~SQL.squish
-        pg_try_advisory_lock(('x' || substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
+      query = <<~SQL.squish
+        SELECT 1 AS one
+        WHERE pg_try_advisory_lock(('x'||substr(md5($1 || $2::text), 1, 16))::bit(64)::bigint)
       SQL
-      self.class.unscoped.exists?([where_sql, { table_name: self.class.table_name, id: send(self.class.primary_key) }])
+      self.class.connection.exec_query(query, 'GoodJob::Lockable Advisory Lock', [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]).any?
     end
 
     # Releases an advisory lock on this record if it is locked by this database
@@ -166,9 +167,9 @@ module GoodJob
     def advisory_unlock
       query = <<~SQL.squish
         SELECT 1 AS one
-        WHERE pg_advisory_unlock(('x'||substr(md5(:table_name || :id::text), 1, 16))::bit(64)::bigint)
+        WHERE pg_advisory_unlock(('x'||substr(md5($1 || $2::text), 1, 16))::bit(64)::bigint)
       SQL
-      self.class.connection.execute(sanitize_sql_for_conditions([query, { table_name: self.class.table_name, id: send(self.class.primary_key) }])).ntuples.positive?
+      self.class.connection.exec_query(query, 'GoodJob::Lockable Advisory Unlock', [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]).any?
     end
 
     # Acquires an advisory lock on this record or raises
@@ -210,16 +211,25 @@ module GoodJob
         FROM pg_locks
         WHERE pg_locks.locktype = 'advisory'
           AND pg_locks.objsubid = 1
-          AND pg_locks.classid = ('x' || substr(md5(:table_name || :id::text), 1, 16))::bit(32)::int
-          AND pg_locks.objid = (('x' || substr(md5(:table_name || :id::text), 1, 16))::bit(64) << 32)::bit(32)::int
+          AND pg_locks.classid = ('x' || substr(md5($1 || $2::text), 1, 16))::bit(32)::int
+          AND pg_locks.objid = (('x' || substr(md5($1 || $2::text), 1, 16))::bit(64) << 32)::bit(32)::int
       SQL
-      self.class.connection.execute(sanitize_sql_for_conditions([query, { table_name: self.class.table_name, id: send(self.class.primary_key) }])).ntuples.positive?
+      self.class.connection.exec_query(query, 'GoodJob::Lockable Advisory Locked?', [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]).any?
     end
 
     # Tests whether this record is locked by the current database session.
     # @return [Boolean]
     def owns_advisory_lock?
-      self.class.unscoped.owns_advisory_locked.exists?(id: send(self.class.primary_key))
+      query = <<~SQL.squish
+        SELECT 1 AS one
+        FROM pg_locks
+        WHERE pg_locks.locktype = 'advisory'
+          AND pg_locks.objsubid = 1
+          AND pg_locks.classid = ('x' || substr(md5($1 || $2::text), 1, 16))::bit(32)::int
+          AND pg_locks.objid = (('x' || substr(md5($1 || $2::text), 1, 16))::bit(64) << 32)::bit(32)::int
+          AND pg_locks.pid = pg_backend_pid()
+      SQL
+      self.class.connection.exec_query(query, 'GoodJob::Lockable Owns Advisory Lock?', [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]).any?
     end
 
     # Releases all advisory locks on the record that are held by the current
