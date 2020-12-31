@@ -79,7 +79,7 @@ RSpec.describe 'Adapter Integration' do
         expect(RUN_JOBS).not_to include(elephant_ajob.provider_job_id)
       end
 
-      it 'invokes the notifier if the job is not locally runnable' do
+      it 'invokes the notifier if the job is not locally runnable', skip_if_java: true do
         # Create another adapter but do not attach it
         elephant_adapter = GoodJob::Adapter.new execution_mode: :async, queues: 'elephants:1', poll_interval: -1
         sleep_until { GoodJob::Notifier.instances.all?(&:listening?) }

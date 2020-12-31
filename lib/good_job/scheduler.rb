@@ -22,7 +22,7 @@ module GoodJob # :nodoc:
       max_threads: Configuration::DEFAULT_MAX_THREADS,
       auto_terminate: true,
       idletime: 60,
-      max_queue: -1,
+      max_queue: 0,
       fallback_policy: :discard,
     }.freeze
 
@@ -170,10 +170,13 @@ module GoodJob # :nodoc:
       # @return [Integer]
       def ready_worker_count
         synchronize do
-          workers_still_to_be_created = @max_length - @pool.length
-          workers_created_but_waiting = @ready.length
-
-          workers_still_to_be_created + workers_created_but_waiting
+          if Concurrent.on_jruby?
+            @executor.getMaximumPoolSize - @executor.getActiveCount
+          else
+            workers_still_to_be_created = @max_length - @pool.length
+            workers_created_but_waiting = @ready.length
+            workers_still_to_be_created + workers_created_but_waiting
+          end
         end
       end
     end
