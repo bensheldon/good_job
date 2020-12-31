@@ -234,6 +234,8 @@ GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
 
 ### Dashboard
 
+![Dashboard UI](https://github.com/bensheldon/good_job/raw/main/SCREENSHOT.png)
+
 _🚧 GoodJob's dashboard is a work in progress. Please contribute ideas and code on [Github](https://github.com/bensheldon/good_job/issues)._
 
 GoodJob includes a Dashboard as a mountable `Rails::Engine`.

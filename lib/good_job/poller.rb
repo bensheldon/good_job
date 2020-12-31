@@ -19,6 +19,9 @@ module GoodJob # :nodoc:
     #   @return [array<GoodJob:Poller>]
     cattr_reader :instances, default: [], instance_reader: false
 
+    # Creates GoodJob::Poller from a GoodJob::Configuration instance.
+    # @param configuration [GoodJob::Configuration]
+    # @return [GoodJob::Poller]
     def self.from_configuration(configuration)
       GoodJob::Poller.new(poll_interval: configuration.poll_interval)
     end

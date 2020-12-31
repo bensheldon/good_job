@@ -9,6 +9,7 @@ module GoodJob # :nodoc:
   # When a message is received, the notifier passes the message to each of its recipients.
   #
   class Notifier
+    # Raised if the Database adapter does not implement LISTEN.
     AdapterCannotListenError = Class.new(StandardError)
 
     # Default Postgres channel for LISTEN/NOTIFY
