@@ -101,6 +101,9 @@ module GoodJob
       ).to_i
     end
 
+    # Number of seconds to preserve jobs when using the +good_job cleanup_preserved_jobs+ CLI command.
+    # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
+    # @return [Boolean]
     def cleanup_preserved_jobs_before_seconds_ago
       (
         options[:before_seconds_ago] ||
