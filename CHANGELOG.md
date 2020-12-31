@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.4.0](https://github.com/bensheldon/good_job/tree/v1.4.0) (2020-12-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.6...v1.4.0)
+
+**Implemented enhancements:**
+
+- Add JRuby support [\#167](https://github.com/bensheldon/good_job/pull/167) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- JRuby Support [\#160](https://github.com/bensheldon/good_job/issues/160)
+
 ## [v1.3.6](https://github.com/bensheldon/good_job/tree/v1.3.6) (2020-12-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.5...v1.3.6)
@@ -89,7 +101,6 @@
 - Fix Ruby 2.7 GH action by setting default bundler explicitly [\#166](https://github.com/bensheldon/good_job/pull/166) ([bensheldon](https://github.com/bensheldon))
 - Cache ruby version explicitly in Github Action [\#165](https://github.com/bensheldon/good_job/pull/165) ([bensheldon](https://github.com/bensheldon))
 - Update development dependencies, rubocop [\#164](https://github.com/bensheldon/good_job/pull/164) ([bensheldon](https://github.com/bensheldon))
-- Fix intended constant hierarchy of GoodJob::Scheduler::ThreadPoolExecutor [\#158](https://github.com/bensheldon/good_job/pull/158) ([bensheldon](https://github.com/bensheldon))
 - Add bin/test\_app executable for Rails debugging [\#157](https://github.com/bensheldon/good_job/pull/157) ([bensheldon](https://github.com/bensheldon))
 - Extract Scheduler polling behavior to its own object [\#152](https://github.com/bensheldon/good_job/pull/152) ([bensheldon](https://github.com/bensheldon))
 
@@ -124,6 +135,7 @@
 
 **Merged pull requests:**
 
+- Fix intended constant hierarchy of GoodJob::Scheduler::ThreadPoolExecutor [\#158](https://github.com/bensheldon/good_job/pull/158) ([bensheldon](https://github.com/bensheldon))
 - Add info how to setup basic auth for engine [\#153](https://github.com/bensheldon/good_job/pull/153) ([morgoth](https://github.com/morgoth))
 - Add documentation for Dashboard Rails::Engine [\#149](https://github.com/bensheldon/good_job/pull/149) ([bensheldon](https://github.com/bensheldon))
 - Style cleanup to Job error handling [\#147](https://github.com/bensheldon/good_job/pull/147) ([bensheldon](https://github.com/bensheldon))
