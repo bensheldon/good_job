@@ -1,5 +1,21 @@
 # Changelog
 
+## [v1.4.1](https://github.com/bensheldon/good_job/tree/v1.4.1) (2021-01-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.4.0...v1.4.1)
+
+**Fixed bugs:**
+
+- Do not add lib/generators to Zeitwerk autoloader [\#192](https://github.com/bensheldon/good_job/pull/192) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Issues with Heroku and Good Job [\#184](https://github.com/bensheldon/good_job/issues/184)
+
+**Merged pull requests:**
+
+- Add missing YARD docs and Dashboard screenshot [\#191](https://github.com/bensheldon/good_job/pull/191) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.4.0](https://github.com/bensheldon/good_job/tree/v1.4.0) (2020-12-31)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.6...v1.4.0)
@@ -7,10 +23,6 @@
 **Implemented enhancements:**
 
 - Add JRuby support [\#167](https://github.com/bensheldon/good_job/pull/167) ([bensheldon](https://github.com/bensheldon))
-
-**Closed issues:**
-
-- JRuby Support [\#160](https://github.com/bensheldon/good_job/issues/160)
 
 ## [v1.3.6](https://github.com/bensheldon/good_job/tree/v1.3.6) (2020-12-30)
 
@@ -101,6 +113,7 @@
 - Fix Ruby 2.7 GH action by setting default bundler explicitly [\#166](https://github.com/bensheldon/good_job/pull/166) ([bensheldon](https://github.com/bensheldon))
 - Cache ruby version explicitly in Github Action [\#165](https://github.com/bensheldon/good_job/pull/165) ([bensheldon](https://github.com/bensheldon))
 - Update development dependencies, rubocop [\#164](https://github.com/bensheldon/good_job/pull/164) ([bensheldon](https://github.com/bensheldon))
+- Fix intended constant hierarchy of GoodJob::Scheduler::ThreadPoolExecutor [\#158](https://github.com/bensheldon/good_job/pull/158) ([bensheldon](https://github.com/bensheldon))
 - Add bin/test\_app executable for Rails debugging [\#157](https://github.com/bensheldon/good_job/pull/157) ([bensheldon](https://github.com/bensheldon))
 - Extract Scheduler polling behavior to its own object [\#152](https://github.com/bensheldon/good_job/pull/152) ([bensheldon](https://github.com/bensheldon))
 
@@ -111,9 +124,6 @@
 **Implemented enhancements:**
 
 - Lengthen default poll interval from 1 to 5 seconds [\#156](https://github.com/bensheldon/good_job/pull/156) ([bensheldon](https://github.com/bensheldon))
-
-**Merged pull requests:**
-
 - Rename reperform\_jobs\_on\_standard\_error to retry\_on\_unhandled\_error [\#154](https://github.com/bensheldon/good_job/pull/154) ([morgoth](https://github.com/morgoth))
 
 ## [v1.2.6](https://github.com/bensheldon/good_job/tree/v1.2.6) (2020-09-29)
@@ -135,7 +145,6 @@
 
 **Merged pull requests:**
 
-- Fix intended constant hierarchy of GoodJob::Scheduler::ThreadPoolExecutor [\#158](https://github.com/bensheldon/good_job/pull/158) ([bensheldon](https://github.com/bensheldon))
 - Add info how to setup basic auth for engine [\#153](https://github.com/bensheldon/good_job/pull/153) ([morgoth](https://github.com/morgoth))
 - Add documentation for Dashboard Rails::Engine [\#149](https://github.com/bensheldon/good_job/pull/149) ([bensheldon](https://github.com/bensheldon))
 - Style cleanup to Job error handling [\#147](https://github.com/bensheldon/good_job/pull/147) ([bensheldon](https://github.com/bensheldon))
@@ -224,11 +233,13 @@
 **Implemented enhancements:**
 
 - Run Github Action tests against Ruby 2.5, 2.6, 2.7 [\#100](https://github.com/bensheldon/good_job/issues/100)
+- Name the thread pools [\#96](https://github.com/bensheldon/good_job/pull/96) ([sj26](https://github.com/sj26))
 
 **Fixed bugs:**
 
 - Freezes puma on code change [\#95](https://github.com/bensheldon/good_job/issues/95)
 - Ruby 2.7 keyword arguments warning [\#93](https://github.com/bensheldon/good_job/issues/93)
+- Return to using executor.wrap around Scheduler execution task [\#99](https://github.com/bensheldon/good_job/pull/99) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
@@ -238,10 +249,8 @@
 
 - Use more ActiveRecord in Lockable and not connection.execute [\#102](https://github.com/bensheldon/good_job/pull/102) ([bensheldon](https://github.com/bensheldon))
 - Run CI tests on Ruby 2.5, 2.6, and 2.7 [\#101](https://github.com/bensheldon/good_job/pull/101) ([arku](https://github.com/arku))
-- Return to using executor.wrap around Scheduler execution task [\#99](https://github.com/bensheldon/good_job/pull/99) ([bensheldon](https://github.com/bensheldon))
 - Fix Ruby 2.7 keyword arguments warning [\#98](https://github.com/bensheldon/good_job/pull/98) ([arku](https://github.com/arku))
 - Remove executor/reloader for less interlocking [\#97](https://github.com/bensheldon/good_job/pull/97) ([sj26](https://github.com/sj26))
-- Name the thread pools [\#96](https://github.com/bensheldon/good_job/pull/96) ([sj26](https://github.com/sj26))
 - Add test for `rails g good\_job:install` [\#94](https://github.com/bensheldon/good_job/pull/94) ([arku](https://github.com/arku))
 
 ## [v1.2.1](https://github.com/bensheldon/good_job/tree/v1.2.1) (2020-08-21)
@@ -499,6 +508,7 @@
 - Add pg gem as explicit dependency [\#13](https://github.com/bensheldon/good_job/pull/13) ([bensheldon](https://github.com/bensheldon))
 - Bump nokogiri from 1.10.7 to 1.10.9 [\#12](https://github.com/bensheldon/good_job/pull/12) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Add Appraisal with tests for Rails 5.1, 5.2, 6.0 [\#11](https://github.com/bensheldon/good_job/pull/11) ([bensheldon](https://github.com/bensheldon))
+- Use Rails.logger and ActiveSupport::Notifications for logging instead of puts [\#10](https://github.com/bensheldon/good_job/pull/10) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.2.0](https://github.com/bensheldon/good_job/tree/v0.2.0) (2020-03-06)
 
@@ -506,7 +516,6 @@
 
 **Merged pull requests:**
 
-- Use Rails.logger and ActiveSupport::Notifications for logging instead of puts [\#10](https://github.com/bensheldon/good_job/pull/10) ([bensheldon](https://github.com/bensheldon))
 - Remove minitest files [\#9](https://github.com/bensheldon/good_job/pull/9) ([bensheldon](https://github.com/bensheldon))
 - Use scheduled\_at and priority for scheduling [\#8](https://github.com/bensheldon/good_job/pull/8) ([bensheldon](https://github.com/bensheldon))
 - Create Github Action workflow for PRs and Issues [\#7](https://github.com/bensheldon/good_job/pull/7) ([bensheldon](https://github.com/bensheldon))
