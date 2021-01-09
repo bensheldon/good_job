@@ -1,16 +1,15 @@
 require "rails"
-
 require "active_job"
 require "active_job/queue_adapters"
 
 require "zeitwerk"
-
-loader = Zeitwerk::Loader.for_gem
-loader.inflector.inflect(
-  'cli' => "CLI"
-)
-loader.push_dir(File.join(__dir__, ["generators"]))
-loader.setup
+Zeitwerk::Loader.for_gem.tap do |loader|
+  loader.inflector.inflect({
+                             "cli" => "CLI",
+                           })
+  loader.ignore(File.join(File.dirname(__FILE__), "generators"))
+  loader.setup
+end
 
 require "good_job/railtie"
 
