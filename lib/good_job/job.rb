@@ -30,7 +30,7 @@ module GoodJob
     def self.queue_parser(string)
       string = string.presence || '*'
 
-      if string.first == '-'
+      if string[0] == '-'
         exclude_queues = true
         string = string[1..-1]
       end
