@@ -44,7 +44,7 @@ RSpec.describe GoodJob::CLI do
         allow(ActiveRecord::Base.connection_pool).to receive(:size).and_return(1)
 
         cli.start
-        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Performer), max_threads: 4)
+        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::JobPerformer), max_threads: 4)
       end
     end
 
@@ -64,9 +64,9 @@ RSpec.describe GoodJob::CLI do
         end
 
         cli.start
-        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::Performer), a_kind_of(Hash))
+        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::JobPerformer), a_kind_of(Hash))
 
-        performer_query = performer.instance_variable_get(:@target)
+        performer_query = performer.send(:job_query)
         expect(performer_query.to_sql).to eq GoodJob::Job.where(queue_name: %w[mice elephant]).to_sql
       end
     end

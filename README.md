@@ -207,9 +207,9 @@ config.good_job.poll_interval = 30 # seconds
 
 # ...or all at once.
 config.good_job = {
-  execution_mode = :async,
-  max_threads = 5,
-  poll_interval = 30,
+  execution_mode: :async,
+  max_threads: 5,
+  poll_interval: 30,
 }
 ```
 

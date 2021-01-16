@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Scheduler do
-  let(:performer) { instance_double(GoodJob::Performer, next: nil, name: '') }
+  let(:performer) { instance_double(GoodJob::JobPerformer, next: nil, name: '') }
 
   after do
     described_class.instances.each(&:shutdown)
