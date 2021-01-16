@@ -20,13 +20,22 @@ module GoodJob
     # @param max_threads [nil, Integer] sets the number of threads per scheduler to use when +execution_mode+ is set to +:async+. The +queues+ parameter can specify a number of threads for each group of queues which will override this value. You can also set this with the environment variable +GOOD_JOB_MAX_THREADS+. Defaults to +5+.
     # @param queues [nil, String] determines which queues to execute jobs from when +execution_mode+ is set to +:async+. See {file:README.md#optimize-queues-threads-and-processes} for more details on the format of this string. You can also set this with the environment variable +GOOD_JOB_QUEUES+. Defaults to +"*"+.
     # @param poll_interval [nil, Integer] sets the number of seconds between polls for jobs when +execution_mode+ is set to +:async+. You can also set this with the environment variable +GOOD_JOB_POLL_INTERVAL+. Defaults to +1+.
-    # @param scheduler [nil, Scheduler] (deprecated) a scheduler to be managed by the adapter
-    # @param notifier [nil, Notifier] (deprecated) a notifier to be managed by the adapter
-    # @param inline [nil, Boolean] (deprecated) whether to run in inline execution mode
-    def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil, scheduler: nil, notifier: nil, inline: false)
-      if inline && execution_mode.nil?
-        ActiveSupport::Deprecation.warn('GoodJob::Adapter#new(inline: true) is deprecated; use GoodJob::Adapter.new(execution_mode: :inline) instead')
-        execution_mode = :inline
+    def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil)
+      if caller[0..4].find { |c| c.include?("/config/application.rb") || c.include?("/config/environments/") }
+        ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+          GoodJob no longer recommends creating a GoodJob::Adapter instance:
+
+              config.active_job.queue_adapter = GoodJob::Adapter.new...
+
+          Instead, configure GoodJob through configuration:
+
+              config.active_job.queue_adapter = :good_job
+              config.good_job.execution_mode = :#{execution_mode}
+              config.good_job.max_threads = #{max_threads}
+              config.good_job.poll_interval = #{poll_interval}
+              # etc...
+
+        DEPRECATION
       end
 
       configuration = GoodJob::Configuration.new(
@@ -42,9 +51,9 @@ module GoodJob
       raise ArgumentError, "execution_mode: must be one of #{EXECUTION_MODES.join(', ')}." unless EXECUTION_MODES.include?(@execution_mode)
 
       if @execution_mode == :async # rubocop:disable Style/GuardClause
-        @notifier = notifier || GoodJob::Notifier.new
+        @notifier = GoodJob::Notifier.new
         @poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
-        @scheduler = scheduler || GoodJob::Scheduler.from_configuration(configuration)
+        @scheduler = GoodJob::Scheduler.from_configuration(configuration)
         @notifier.recipients << [@scheduler, :create_thread]
         @poller.recipients << [@scheduler, :create_thread]
       end
@@ -107,12 +116,6 @@ module GoodJob
     # Whether in +:inline+ execution mode.
     def execute_inline?
       @execution_mode == :inline
-    end
-
-    # (deprecated) Whether in +:inline+ execution mode.
-    def inline?
-      ActiveSupport::Deprecation.warn('GoodJob::Adapter::inline? is deprecated; use GoodJob::Adapter::execute_inline? instead')
-      execute_inline?
     end
   end
 end
