@@ -40,19 +40,7 @@ module GoodJob # :nodoc:
         queue_string, max_threads = queue_string_and_max_threads.split(':')
         max_threads = (max_threads || configuration.max_threads).to_i
 
-        job_query = GoodJob::Job.queue_string(queue_string)
-        parsed = GoodJob::Job.queue_parser(queue_string)
-        job_filter = proc do |state|
-          if parsed[:exclude]
-            parsed[:exclude].exclude?(state[:queue_name])
-          elsif parsed[:include]
-            parsed[:include].include? state[:queue_name]
-          else
-            true
-          end
-        end
-        job_performer = GoodJob::Performer.new(job_query, :perform_with_advisory_lock, name: queue_string, filter: job_filter)
-
+        job_performer = GoodJob::JobPerformer.new(queue_string)
         GoodJob::Scheduler.new(job_performer, max_threads: max_threads)
       end
 
@@ -63,7 +51,7 @@ module GoodJob # :nodoc:
       end
     end
 
-    # @param performer [GoodJob::Performer]
+    # @param performer [GoodJob::JobPerformer]
     # @param max_threads [Numeric, nil] number of seconds between polls for jobs
     def initialize(performer, max_threads: nil)
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)

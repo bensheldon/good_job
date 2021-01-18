@@ -1,8 +1,12 @@
 module GoodJob
   # Ruby on Rails integration.
   class Railtie < ::Rails::Railtie
-    initializer "good_job.logger" do
-      ActiveSupport.on_load(:good_job) { self.logger = ::Rails.logger }
+    config.good_job = ActiveSupport::OrderedOptions.new
+
+    initializer "good_job.logger" do |_app|
+      ActiveSupport.on_load(:good_job) do
+        self.logger = ::Rails.logger
+      end
       GoodJob::LogSubscriber.attach_to :good_job
     end
 

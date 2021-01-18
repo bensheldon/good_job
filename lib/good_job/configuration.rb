@@ -45,6 +45,8 @@ module GoodJob
     def execution_mode(default: :external)
       if options[:execution_mode]
         options[:execution_mode]
+      elsif rails_config[:execution_mode]
+        rails_config[:execution_mode]
       elsif env['GOOD_JOB_EXECUTION_MODE'].present?
         env['GOOD_JOB_EXECUTION_MODE'].to_sym
       else
@@ -72,6 +74,7 @@ module GoodJob
     def max_threads
       (
         options[:max_threads] ||
+        rails_config[:max_threads] ||
         env['GOOD_JOB_MAX_THREADS'] ||
         env['RAILS_MAX_THREADS'] ||
         DEFAULT_MAX_THREADS
@@ -85,6 +88,7 @@ module GoodJob
     # @return [String]
     def queue_string
       options[:queues] ||
+        rails_config[:queues] ||
         env['GOOD_JOB_QUEUES'] ||
         '*'
     end
@@ -96,6 +100,7 @@ module GoodJob
     def poll_interval
       (
         options[:poll_interval] ||
+        rails_config[:poll_interval] ||
         env['GOOD_JOB_POLL_INTERVAL'] ||
         DEFAULT_POLL_INTERVAL
       ).to_i
@@ -107,9 +112,16 @@ module GoodJob
     def cleanup_preserved_jobs_before_seconds_ago
       (
         options[:before_seconds_ago] ||
+        rails_config[:cleanup_preserved_jobs_before_seconds_ago] ||
         env['GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO'] ||
         DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO
       ).to_i
+    end
+
+    private
+
+    def rails_config
+      Rails.application.config.good_job
     end
   end
 end

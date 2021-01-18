@@ -35,8 +35,8 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Command-line options](#command-line-options)
         - [`good_job start`](#good_job-start)
         - [`good_job cleanup_preserved_jobs`](#good_job-cleanup_preserved_jobs)
-    - [Adapter options](#adapter-options)
-    - [Global options](#global-options)
+    - [Configuration options](#configuration-options)
+    - [Global options](#global-options)pter
     - [Dashboard](#dashboard)
 - [Go deeper](#go-deeper)
     - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
@@ -189,9 +189,31 @@ If you are preserving job records this way, use this command regularly
 to delete old records and preserve space in your database.
 ```
 
-### Adapter options
+### Configuration options
 
-To use GoodJob, you can set `config.active_job.queue_adapter` to a `:good_job` or to an instance of `GoodJob::Adapter`, which you can configure with several options:
+To use GoodJob, you can set `config.active_job.queue_adapter` to a `:good_job`.
+
+Additional configuration can be provided via `config.good_job.OPTION = ...` for example:
+
+```ruby
+# config/application.rb
+
+config.active_job.queue_adapter = :good_job
+
+# Configure options individually...
+config.good_job.execution_mode = :async
+config.good_job.max_threads = 5
+config.good_job.poll_interval = 30 # seconds
+
+# ...or all at once.
+config.good_job = {
+  execution_mode: :async,
+  max_threads: 5,
+  poll_interval: 30,
+}
+```
+
+Available configuration options are:
 
 - `execution_mode` (symbol) specifies how and where jobs should be executed. You can also set this with the environment variable `GOOD_JOB_EXECUTION_MODE`. It can be any one of:
     - `:inline` executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
@@ -201,17 +223,21 @@ To use GoodJob, you can set `config.active_job.queue_adapter` to a `:good_job` o
 - `queues` (string) determines which queues to execute jobs from when `execution_mode` is set to `:async`. See the description of `good_job start` for more details on the format of this string. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`.
 
-Using the symbol instead of explicitly configuring the options above (i.e. setting `config.active_job.queue_adapter = :good_job`) is equivalent to:
+By default, GoodJob configures the following execution modes per environment:
 
 ```ruby
+
 # config/environments/development.rb
-config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+config.active_job.queue_adapter = :good_job
+config.good_job.execution_mode = :inline
 
 # config/environments/test.rb
-config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+config.active_job.queue_adapter = :good_job
+config.good_job.execution_mode = :inline
 
 # config/environments/production.rb
-config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+config.active_job.queue_adapter = :good_job
+config.good_job.execution_mode = :external
 ```
 
 ### Global options
@@ -442,14 +468,24 @@ pool: <%= [ENV.fetch("RAILS_MAX_THREADS", 5).to_i, ENV.fetch("GOOD_JOB_MAX_THREA
 
 GoodJob can execute jobs "async" in the same process as the webserver (e.g. `bin/rail s`). GoodJob's async execution mode offers benefits of economy by not requiring a separate job worker process, but with the tradeoff of increased complexity. Async mode can be configured in two ways:
 
-- Directly configure the ActiveJob adapter:
+- Via Rails configuration:
 
     ```ruby
     # config/environments/production.rb
-    config.active_job.queue_adapter = GoodJob::Adapter.new(execution_mode: :async, max_threads: 4, poll_interval: 30)
+    config.active_job.queue_adapter = :good_job
+
+    # To change the execution mode
+    config.good_job.execution_mode = :async
+
+    # Or with more configuration
+    config.good_job = {
+      execution_mode: :async,
+      max_threads: 4,
+      poll_interval: 30
+    }
     ```
 
-- Or, when using `...queue_adapter = :good_job`, via environment variables:
+- Or, with environment variables:
 
     ```bash
     $ GOOD_JOB_EXECUTION_MODE=async GOOD_JOB_MAX_THREADS=4 GOOD_JOB_POLL_INTERVAL=30 bin/rails server
