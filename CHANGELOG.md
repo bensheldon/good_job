@@ -1,5 +1,24 @@
 # Changelog
 
+## [v1.5.0](https://github.com/bensheldon/good_job/tree/v1.5.0) (2021-01-17)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.4.1...v1.5.0)
+
+**Implemented enhancements:**
+
+- Create Web UI Dashboard [\#50](https://github.com/bensheldon/good_job/issues/50)
+
+**Closed issues:**
+
+- JRuby Support [\#160](https://github.com/bensheldon/good_job/issues/160)
+
+**Merged pull requests:**
+
+- Update bundler version to 2.2.5 [\#200](https://github.com/bensheldon/good_job/pull/200) ([bensheldon](https://github.com/bensheldon))
+- Configure GoodJob via `Rails.application.config` instead of recommending `GoodJob::Adapter.new` [\#199](https://github.com/bensheldon/good_job/pull/199) ([bensheldon](https://github.com/bensheldon))
+- Update GH Test Matrix with minimum & latest JRuby version [\#197](https://github.com/bensheldon/good_job/pull/197) ([tedhexaflow](https://github.com/tedhexaflow))
+- Fix JRuby version number [\#193](https://github.com/bensheldon/good_job/pull/193) ([tedhexaflow](https://github.com/tedhexaflow))
+
 ## [v1.4.1](https://github.com/bensheldon/good_job/tree/v1.4.1) (2021-01-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.4.0...v1.4.1)
@@ -22,6 +41,7 @@
 
 **Implemented enhancements:**
 
+- Format serialized params to ease reading [\#170](https://github.com/bensheldon/good_job/pull/170) ([morgoth](https://github.com/morgoth))
 - Add JRuby support [\#167](https://github.com/bensheldon/good_job/pull/167) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.3.6](https://github.com/bensheldon/good_job/tree/v1.3.6) (2020-12-30)
@@ -97,7 +117,6 @@
 **Implemented enhancements:**
 
 - Extract polling from scheduler into Polling object [\#128](https://github.com/bensheldon/good_job/issues/128)
-- Format serialized params to ease reading [\#170](https://github.com/bensheldon/good_job/pull/170) ([morgoth](https://github.com/morgoth))
 
 **Fixed bugs:**
 
@@ -508,7 +527,6 @@
 - Add pg gem as explicit dependency [\#13](https://github.com/bensheldon/good_job/pull/13) ([bensheldon](https://github.com/bensheldon))
 - Bump nokogiri from 1.10.7 to 1.10.9 [\#12](https://github.com/bensheldon/good_job/pull/12) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Add Appraisal with tests for Rails 5.1, 5.2, 6.0 [\#11](https://github.com/bensheldon/good_job/pull/11) ([bensheldon](https://github.com/bensheldon))
-- Use Rails.logger and ActiveSupport::Notifications for logging instead of puts [\#10](https://github.com/bensheldon/good_job/pull/10) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.2.0](https://github.com/bensheldon/good_job/tree/v0.2.0) (2020-03-06)
 
@@ -516,6 +534,7 @@
 
 **Merged pull requests:**
 
+- Use Rails.logger and ActiveSupport::Notifications for logging instead of puts [\#10](https://github.com/bensheldon/good_job/pull/10) ([bensheldon](https://github.com/bensheldon))
 - Remove minitest files [\#9](https://github.com/bensheldon/good_job/pull/9) ([bensheldon](https://github.com/bensheldon))
 - Use scheduled\_at and priority for scheduling [\#8](https://github.com/bensheldon/good_job/pull/8) ([bensheldon](https://github.com/bensheldon))
 - Create Github Action workflow for PRs and Issues [\#7](https://github.com/bensheldon/good_job/pull/7) ([bensheldon](https://github.com/bensheldon))
