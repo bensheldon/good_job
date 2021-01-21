@@ -15,6 +15,6 @@ end
 unless RUBY_PLATFORM.include?('java')
   # activerecord-jdbcpostgresql-adapter does not have a compatible version
   appraise "rails-head" do
-    gem "rails", github: "rails/rails", branch: "master"
+    gem "rails", github: "rails/rails", branch: "main"
   end
 end

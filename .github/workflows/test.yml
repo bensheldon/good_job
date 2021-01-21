@@ -28,6 +28,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ steps.ruby_version.outputs.value }}
+          bundler: none
       - name: Ruby gem cache
         uses: actions/cache@v1
         with:
@@ -84,6 +85,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
+          bundler: none
       - name: Ruby gem cache
         uses: actions/cache@v1
         with:
