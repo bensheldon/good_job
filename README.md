@@ -152,6 +152,8 @@ Options:
   [--max-threads=COUNT]      # Maximum number of threads to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
   [--queues=QUEUE_LIST]      # Queues to work from. (env var: GOOD_JOB_QUEUES, default: *)
   [--poll-interval=SECONDS]  # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 1)
+  [--daemonize]              # Run as a background daemon (default: false)
+  [--pidfile=PIDFILE]        # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
 
 Executes queued jobs.
 
@@ -159,6 +161,7 @@ All options can be configured with environment variables.
 See option descriptions for the matching environment variable name.
 
 == Configuring queues
+
 Separate multiple queues with commas; exclude queues with a leading minus;
 separate isolated execution pools with semicolons and threads with colons.
 ```
