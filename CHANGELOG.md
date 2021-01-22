@@ -1,6 +1,25 @@
 # Changelog
 
-## [v1.5.0](https://github.com/bensheldon/good_job/tree/v1.5.0) (2021-01-17)
+## [v1.6.0](https://github.com/bensheldon/good_job/tree/v1.6.0) (2021-01-21)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.5.0...v1.6.0)
+
+**Implemented enhancements:**
+
+- Running as a daemon [\#88](https://github.com/bensheldon/good_job/issues/88)
+- Add daemonize option to CLI [\#202](https://github.com/bensheldon/good_job/pull/202) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Rails 6.1 & async - `queue\_parser': undefined method `first' for "\*":String \(NoMethodError\) [\#195](https://github.com/bensheldon/good_job/issues/195)
+
+**Merged pull requests:**
+
+- Add scripts directory for benchmarking and dev tasks [\#204](https://github.com/bensheldon/good_job/pull/204) ([bensheldon](https://github.com/bensheldon))
+- Fix YARD attr\_ declarations for documentation [\#203](https://github.com/bensheldon/good_job/pull/203) ([bensheldon](https://github.com/bensheldon))
+- Remove Appraisal gemfile locks [\#201](https://github.com/bensheldon/good_job/pull/201) ([bensheldon](https://github.com/bensheldon))
+
+## [v1.5.0](https://github.com/bensheldon/good_job/tree/v1.5.0) (2021-01-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.4.1...v1.5.0)
 
@@ -41,7 +60,6 @@
 
 **Implemented enhancements:**
 
-- Format serialized params to ease reading [\#170](https://github.com/bensheldon/good_job/pull/170) ([morgoth](https://github.com/morgoth))
 - Add JRuby support [\#167](https://github.com/bensheldon/good_job/pull/167) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.3.6](https://github.com/bensheldon/good_job/tree/v1.3.6) (2020-12-30)
@@ -117,6 +135,7 @@
 **Implemented enhancements:**
 
 - Extract polling from scheduler into Polling object [\#128](https://github.com/bensheldon/good_job/issues/128)
+- Format serialized params to ease reading [\#170](https://github.com/bensheldon/good_job/pull/170) ([morgoth](https://github.com/morgoth))
 
 **Fixed bugs:**
 
