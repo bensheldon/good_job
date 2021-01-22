@@ -8,3 +8,4 @@ spec/test_app/tmp/
 .env
 doc
 .yardoc
+gemfiles/*.gemfile.lock
