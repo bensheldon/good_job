@@ -42,10 +42,9 @@ task :release, [:version_bump] do |_t, args|
 
   puts "\n== Updating Gemfile.lock version =="
   system! "bundle install"
-  system! "bundle exec appraisal install"
 
   puts "\n== Creating git commit  =="
-  system! "git add lib/good_job/version.rb CHANGELOG.md Gemfile.lock gemfiles/*.gemfile.lock"
+  system! "git add lib/good_job/version.rb CHANGELOG.md Gemfile.lock"
   system! "git commit -m \"Release good_job v#{GoodJob::VERSION}\""
   system! "git tag v#{GoodJob::VERSION}"
 
