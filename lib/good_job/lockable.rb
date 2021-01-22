@@ -92,8 +92,6 @@ module GoodJob
       # @return [ActiveRecord::Relation]
       scope :owns_advisory_locked, -> { joins_advisory_locks.where('"pg_locks"."pid" = pg_backend_pid()') }
 
-      # @!attribute [r] create_with_advisory_lock
-      # @return [Boolean]
       # Whether an advisory lock should be acquired in the same transaction
       # that created the record.
       #
@@ -107,6 +105,8 @@ module GoodJob
       #   record = MyLockableRecord.create(create_with_advisory_lock: true)
       #   record.advisory_locked?
       #   => true
+      #
+      # @return [Boolean]
       attr_accessor :create_with_advisory_lock
 
       after_create -> { advisory_lock }, if: :create_with_advisory_lock

@@ -12,16 +12,15 @@ module GoodJob
     # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs}
     DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 24 * 60 * 60
 
-    # @!attribute [r] options
-    #   The options that were explicitly set when initializing +Configuration+.
-    #   @return [Hash]
-    #
-    # @!attribute [r] env
-    #   The environment from which to read GoodJob's environment variables. By
-    #   default, this is the current process's environment, but it can be set
-    #   to something else in {#initialize}.
-    #   @return [Hash]
-    attr_reader :options, :env
+    # The options that were explicitly set when initializing +Configuration+.
+    # @return [Hash]
+    attr_reader :options
+
+    # The environment from which to read GoodJob's environment variables. By
+    # default, this is the current process's environment, but it can be set
+    # to something else in {#initialize}.
+    # @return [Hash]
+    attr_reader :env
 
     # @param options [Hash] Any explicitly specified configuration options to
     #   use. Keys are symbols that match the various methods on this class.
