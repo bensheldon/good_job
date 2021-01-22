@@ -8,7 +8,9 @@ module GoodJob
     # Default number of threads to use per {Scheduler}
     DEFAULT_MAX_THREADS = 5
     # Default number of seconds between polls for jobs
-    DEFAULT_POLL_INTERVAL = 5
+    DEFAULT_POLL_INTERVAL = 10
+    # Default number of threads to use per {Scheduler}
+    DEFAULT_MAX_CACHE = 10000
     # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs}
     DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 24 * 60 * 60
 
@@ -42,7 +44,9 @@ module GoodJob
     #   Value to use if none was specified in the configuration.
     # @return [Symbol]
     def execution_mode(default: :external)
-      if options[:execution_mode]
+      if defined?(GOOD_JOB_WITHIN_CLI) && GOOD_JOB_WITHIN_CLI
+        :external
+      elsif options[:execution_mode]
         options[:execution_mode]
       elsif rails_config[:execution_mode]
         rails_config[:execution_mode]
@@ -102,6 +106,19 @@ module GoodJob
         rails_config[:poll_interval] ||
         env['GOOD_JOB_POLL_INTERVAL'] ||
         DEFAULT_POLL_INTERVAL
+      ).to_i
+    end
+
+    # The maximum number of future-scheduled jobs to store in memory.
+    # Storing future-scheduled jobs in memory reduces execution latency
+    # at the cost of increased memory usage. 10,000 stored jobs = ~20MB.
+    # @return [Integer]
+    def max_cache
+      (
+        options[:max_cache] ||
+          rails_config[:max_cache] ||
+          env['GOOD_JOB_MAX_CACHE'] ||
+          DEFAULT_MAX_CACHE
       ).to_i
     end
 

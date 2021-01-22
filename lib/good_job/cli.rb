@@ -49,6 +49,10 @@ module GoodJob
                   type: :numeric,
                   banner: 'SECONDS',
                   desc: "Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 5)"
+    method_option :max_cache,
+                  type: :numeric,
+                  banner: 'COUNT',
+                  desc: "Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)"
     method_option :daemonize,
                   type: :boolean,
                   desc: "Run as a background daemon (default: false)"

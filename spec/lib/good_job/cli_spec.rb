@@ -44,7 +44,13 @@ RSpec.describe GoodJob::CLI do
         allow(ActiveRecord::Base.connection_pool).to receive(:size).and_return(1)
 
         cli.start
-        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::JobPerformer), max_threads: 4)
+
+        expect(GoodJob::Scheduler).to have_received(:new).with(
+          a_kind_of(GoodJob::JobPerformer),
+          max_threads: 4,
+          max_cache: GoodJob::Configuration::DEFAULT_MAX_CACHE,
+          warm_cache_on_initialize: true
+        )
       end
     end
 

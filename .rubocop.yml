@@ -46,6 +46,9 @@ Naming/MemoizedInstanceVariableName:
 Rails/RakeEnvironment:
   Enabled: false
 
+Rails/ApplicationJob:
+  Enabled: false
+
 Rails/ApplicationRecord:
   Enabled: false
 

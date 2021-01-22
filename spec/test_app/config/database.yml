@@ -24,7 +24,7 @@ default: &default
 
 development:
   <<: *default
-  database: test_app_development
+  database: <%= ENV["CI"] ? "test_app_test" : "test_app_development" %>
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
@@ -81,4 +81,4 @@ test:
 #
 production:
   <<: *default
-  database: test_app_production
+  database: <%= ENV["CI"] ? "test_app_test" : "test_app_development" %>

@@ -7,6 +7,8 @@ gem "pg", platforms: [:mri, :mingw, :x64_mingw]
 gem "rails", "~> 6.0.0"
 
 platforms :ruby do
+  gem "memory_profiler"
+  gem "pry-byebug"
   gem "rbtrace"
 
   group :lint do

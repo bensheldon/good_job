@@ -72,6 +72,12 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :priority_ordered, -> { order('priority DESC NULLS LAST') }
 
+    # Order jobs by scheduled (unscheduled or soonest first).
+    # @!method schedule_ordered
+    # @!scope class
+    # @return [ActiveRecord::Relation]
+    scope :schedule_ordered, -> { order(Arel.sql('COALESCE(scheduled_at, created_at) ASC')) }
+
     # Get Jobs were completed before the given timestamp. If no timestamp is
     # provided, get all jobs that have been completed. By default, GoodJob
     # deletes jobs after they are completed and this will find no jobs.
@@ -145,6 +151,23 @@ module GoodJob
       end
 
       [good_job, result, error] if good_job
+    end
+
+    # Fetches the scheduled execution time of the next eligible Job(s).
+    # @return [Array<(DateTime)>]
+    def self.next_scheduled_at(after: nil, limit: 100, now_limit: nil)
+      query = advisory_unlocked.unfinished.schedule_ordered
+
+      after ||= Time.current
+      after_query = query.where('scheduled_at > ?', after).or query.where(scheduled_at: nil).where('created_at > ?', after)
+      after_at = after_query.limit(limit).pluck(:scheduled_at, :created_at).map { |timestamps| timestamps.compact.first }
+
+      if now_limit&.positive?
+        now_query = query.where('scheduled_at < ?', Time.current).or query.where(scheduled_at: nil)
+        now_at = now_query.limit(now_limit).pluck(:scheduled_at, :created_at).map { |timestamps| timestamps.compact.first }
+      end
+
+      Array(now_at) + after_at
     end
 
     # Places an ActiveJob job on a queue by creating a new {Job} record.

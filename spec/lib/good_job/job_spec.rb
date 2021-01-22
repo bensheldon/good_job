@@ -6,7 +6,7 @@ RSpec.describe GoodJob::Job do
   before do
     stub_const "RUN_JOBS", Concurrent::Array.new
     stub_const 'ExpectedError', Class.new(StandardError)
-    stub_const 'ExampleJob', (Class.new(ApplicationJob) do
+    stub_const 'ExampleJob', (Class.new(ActiveJob::Base) do
       self.queue_name = 'test'
       self.priority = 50
 
@@ -117,6 +117,46 @@ RSpec.describe GoodJob::Job do
     it 'accepts empty strings' do
       query = described_class.queue_string('')
       expect(query.to_sql).to eq described_class.all.to_sql
+    end
+  end
+
+  describe '.next_scheduled_at' do
+    let(:active_job) { ExampleJob.new }
+
+    it 'returns an empty array when nothing is scheduled' do
+      expect(described_class.all.next_scheduled_at).to eq []
+    end
+
+    it 'returns previously scheduled and unscheduled jobs' do
+      described_class.enqueue(active_job, scheduled_at: 1.day.ago)
+      travel_to 5.minutes.ago do
+        described_class.enqueue(active_job, scheduled_at: nil)
+      end
+
+      expect(described_class.all.next_scheduled_at(now_limit: 5)).to contain_exactly(
+        within(2.seconds).of(1.day.ago),
+        within(2.seconds).of(5.minutes.ago)
+      )
+    end
+
+    it 'returns future scheduled jobs' do
+      2.times do
+        described_class.enqueue(active_job, scheduled_at: 1.day.from_now)
+      end
+
+      expect(described_class.all.next_scheduled_at(limit: 1)).to contain_exactly(
+        within(2.seconds).of(1.day.from_now)
+      )
+    end
+
+    it 'contains both past and future jobs' do
+      2.times { described_class.enqueue(active_job, scheduled_at: 1.day.ago) }
+      2.times { described_class.enqueue(active_job, scheduled_at: 1.day.from_now) }
+
+      expect(described_class.all.next_scheduled_at(limit: 1, now_limit: 1)).to contain_exactly(
+        within(2.seconds).of(1.day.ago),
+        within(2.seconds).of(1.day.from_now)
+      )
     end
   end
 

@@ -50,10 +50,10 @@ module GoodJob
       @execution_mode = configuration.execution_mode
       raise ArgumentError, "execution_mode: must be one of #{EXECUTION_MODES.join(', ')}." unless EXECUTION_MODES.include?(@execution_mode)
 
-      if @execution_mode == :async # rubocop:disable Style/GuardClause
+      if execute_async? # rubocop:disable Style/GuardClause
         @notifier = GoodJob::Notifier.new
         @poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
-        @scheduler = GoodJob::Scheduler.from_configuration(configuration)
+        @scheduler = GoodJob::Scheduler.from_configuration(configuration, warm_cache_on_initialize: Rails.application.initialized?)
         @notifier.recipients << [@scheduler, :create_thread]
         @poller.recipients << [@scheduler, :create_thread]
       end
@@ -85,10 +85,13 @@ module GoodJob
         ensure
           good_job.advisory_unlock
         end
-      end
+      else
+        job_state = { queue_name: good_job.queue_name }
+        job_state[:scheduled_at] = good_job.scheduled_at if good_job.scheduled_at
 
-      executed_locally = execute_async? && @scheduler.create_thread(queue_name: good_job.queue_name)
-      Notifier.notify(queue_name: good_job.queue_name) unless executed_locally
+        executed_locally = execute_async? && @scheduler.create_thread(job_state)
+        Notifier.notify(job_state) unless executed_locally
+      end
 
       good_job
     end
