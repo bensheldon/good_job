@@ -8,7 +8,7 @@ module GoodJob # :nodoc:
   # periodically checking for available tasks, executing tasks within a thread,
   # and efficiently scaling active threads.
   #
-  # Every scheduler has a single {Performer} that will execute tasks.
+  # Every scheduler has a single {JobPerformer} that will execute tasks.
   # The scheduler is responsible for calling its performer efficiently across threads managed by an instance of +Concurrent::ThreadPoolExecutor+.
   # If a performer does not have work, the thread will go to sleep.
   # The scheduler maintains an instance of +Concurrent::TimerTask+, which wakes sleeping threads and causes them to check whether the performer has new work.
