@@ -15,6 +15,8 @@ gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 
 platforms :ruby do
+  gem "memory_profiler"
+  gem "pry-byebug"
   gem "rbtrace"
 
   group :lint do
