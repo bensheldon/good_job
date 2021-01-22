@@ -15,6 +15,11 @@ module GoodJob
     # Requiring this loads the application's configuration and classes.
     RAILS_ENVIRONMENT_RB = File.expand_path("config/environment.rb")
 
+    # @!visibility private
+    def self.exit_on_failure?
+      true
+    end
+
     # @!macro thor.desc
     #   @!method $1
     #   @return [void]
@@ -27,7 +32,8 @@ module GoodJob
       See option descriptions for the matching environment variable name.
 
       == Configuring queues
-      \x5Separate multiple queues with commas; exclude queues with a leading minus;
+
+      Separate multiple queues with commas; exclude queues with a leading minus;
       separate isolated execution pools with semicolons and threads with colons.
 
     DESCRIPTION
@@ -43,9 +49,17 @@ module GoodJob
                   type: :numeric,
                   banner: 'SECONDS',
                   desc: "Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 5)"
+    method_option :daemonize,
+                  type: :boolean,
+                  desc: "Run as a background daemon (default: false)"
+    method_option :pidfile,
+                  type: :string,
+                  desc: "Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)"
     def start
       set_up_application!
       configuration = GoodJob::Configuration.new(options)
+
+      Daemon.new(pidfile: configuration.pidfile).daemonize if configuration.daemonize?
 
       notifier = GoodJob::Notifier.new
       poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)

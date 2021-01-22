@@ -108,7 +108,7 @@ module GoodJob
 
     # Number of seconds to preserve jobs when using the +good_job cleanup_preserved_jobs+ CLI command.
     # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
-    # @return [Boolean]
+    # @return [Integer]
     def cleanup_preserved_jobs_before_seconds_ago
       (
         options[:before_seconds_ago] ||
@@ -116,6 +116,20 @@ module GoodJob
         env['GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO'] ||
         DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO
       ).to_i
+    end
+
+    # Tests whether to daemonize the process.
+    # @return [Boolean]
+    def daemonize?
+      options[:daemonize] || false
+    end
+
+    # Path of the pidfile to create when running as a daemon.
+    # @return [Pathname,String]
+    def pidfile
+      options[:pidfile] ||
+        env['GOOD_JOB_PIDFILE'] ||
+        Rails.application.root.join('tmp', 'pids', 'good_job.pid')
     end
 
     private
