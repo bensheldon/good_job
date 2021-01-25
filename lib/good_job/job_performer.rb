@@ -39,6 +39,8 @@ module GoodJob
     # @return [Boolean] whether the performer's {#next} method should be
     #   called in the current state.
     def next?(state = {})
+      return true unless state[:queue_name]
+
       if parsed_queues[:exclude]
         parsed_queues[:exclude].exclude?(state[:queue_name])
       elsif parsed_queues[:include]
@@ -46,6 +48,14 @@ module GoodJob
       else
         true
       end
+    end
+
+    # The Returns timestamps of when next tasks may be available.
+    # @param count [Integer] number of timestamps to return
+    # @param count [DateTime, Time, nil] jobs scheduled after this time
+    # @return [Array<(Time, Timestamp)>, nil]
+    def next_at(after: nil, limit: nil, now_limit: nil)
+      job_query.next_scheduled_at(after: after, limit: limit, now_limit: now_limit)
     end
 
     private

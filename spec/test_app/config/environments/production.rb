@@ -80,14 +80,23 @@ Rails.application.configure do
   # require 'syslog/logger'
   # config.logger = ActiveSupport::TaggedLogging.new(Syslog::Logger.new 'app-name')
 
-  if ENV["RAILS_LOG_TO_STDOUT"].present?
-    logger           = ActiveSupport::Logger.new(STDOUT)
-    logger.formatter = config.log_formatter
-    config.logger    = ActiveSupport::TaggedLogging.new(logger)
-  end
+  # Log to STDOUT
+  logger           = ActiveSupport::Logger.new(STDOUT)
+  logger.formatter = config.log_formatter
+  config.logger    = ActiveSupport::TaggedLogging.new(logger)
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  config.active_job.queue_adapter = :good_job
+  if ENV['GOOD_JOB_EXECUTION_MODE']
+    config.good_job.execution_mode = ENV['GOOD_JOB_EXECUTION_MODE'].to_sym
+  elsif Rails.const_defined?("Server")
+    config.good_job.execution_mode = :async
+    config.good_job.poll_interval = 30
+  elsif Rails.const_defined?("Console")
+    config.good_job.execution_mode = :external
+  end
 
   # Inserts middleware to perform automatic connection switching.
   # The `database_selector` hash is used to pass options to the DatabaseSelector

@@ -85,4 +85,18 @@ RSpec.describe 'Schedule Integration' do
       scheduler.shutdown
     end
   end
+
+  context 'when there are existing and future scheduled jobs' do
+    before do
+      2.times { ExampleJob.set(wait_until: 5.minutes.ago).perform_later }
+      2.times { ExampleJob.set(wait_until: 2.seconds.from_now).perform_later }
+    end
+
+    it 'warms up and schedules them in a cache' do
+      performer = GoodJob::JobPerformer.new('*')
+      scheduler = GoodJob::Scheduler.new(performer, max_threads: 5, max_cache: 5)
+      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.count == 0 }
+      scheduler.shutdown
+    end
+  end
 end

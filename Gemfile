@@ -13,6 +13,7 @@ gemspec
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
+gem 'rails'
 
 platforms :ruby do
   gem "memory_profiler"

@@ -3,8 +3,8 @@ require 'rails_helper'
 
 RSpec.describe GoodJob::Adapter do
   let(:adapter) { described_class.new }
-  let(:active_job) { instance_double(ApplicationJob) }
-  let(:good_job) { instance_double(GoodJob::Job, queue_name: 'default') }
+  let(:active_job) { instance_double(ActiveJob::Base) }
+  let(:good_job) { instance_double(GoodJob::Job, queue_name: 'default', scheduled_at: nil) }
 
   describe '#initialize' do
     it 'guards against improper execution modes' do

@@ -19,5 +19,9 @@ module GoodJob
         GoodJob::CurrentExecution.error_on_discard = event.payload[:error]
       end
     end
+
+    config.after_initialize do
+      GoodJob::Scheduler.instances.each(&:warm_cache)
+    end
   end
 end

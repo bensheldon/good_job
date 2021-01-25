@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Scheduler do
-  let(:performer) { instance_double(GoodJob::JobPerformer, next: nil, name: '') }
+  let(:performer) { instance_double(GoodJob::JobPerformer, next: nil, name: '', next_at: []) }
 
   after do
     described_class.instances.each(&:shutdown)
@@ -13,6 +13,7 @@ RSpec.describe GoodJob::Scheduler do
     before do
       allow(GoodJob).to receive(:on_thread_error).and_return(error_proc)
       stub_const 'THREAD_HAS_RUN', Concurrent::AtomicBoolean.new(false)
+      stub_const 'ERROR_TRIGGERED', Concurrent::AtomicBoolean.new(false)
     end
 
     context 'when on task thread' do
@@ -22,9 +23,14 @@ RSpec.describe GoodJob::Scheduler do
           raise "Whoops"
         end
 
+        allow(error_proc).to receive(:call) do
+          ERROR_TRIGGERED.make_true
+        end
+
         scheduler = described_class.new(performer)
         scheduler.create_thread
         sleep_until { THREAD_HAS_RUN.true? }
+        sleep_until { ERROR_TRIGGERED.true? }
 
         expect(error_proc).to have_received(:call).with(an_instance_of(RuntimeError).and(having_attributes(message: 'Whoops')))
 
@@ -86,6 +92,24 @@ RSpec.describe GoodJob::Scheduler do
       scheduler = described_class.from_configuration(configuration)
 
       expect(scheduler.create_thread(queue_name: 'elephant')).to eq false
+    end
+  end
+
+  describe '#stats' do
+    it 'contains information about the scheduler' do
+      max_threads = 7
+      max_cache = 13
+      scheduler = described_class.new(performer, max_threads: max_threads, max_cache: max_cache)
+
+      expect(scheduler.stats).to eq({
+                                      name: performer.name,
+                                      max_threads: max_threads,
+                                      active_threads: 0,
+                                      inactive_threads: max_threads,
+                                      max_cache: max_cache,
+                                      cache_count: 0,
+                                      cache_remaining: max_cache,
+                                    })
     end
   end
 
