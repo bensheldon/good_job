@@ -1,6 +1,14 @@
 # Changelog
 
-## [v1.6.0](https://github.com/bensheldon/good_job/tree/v1.6.0) (2021-01-21)
+## [v1.7.0](https://github.com/bensheldon/good_job/tree/v1.7.0) (2021-01-25)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.6.0...v1.7.0)
+
+**Merged pull requests:**
+
+- Cache scheduled jobs in memory so they can be executed without polling [\#205](https://github.com/bensheldon/good_job/pull/205) ([bensheldon](https://github.com/bensheldon))
+
+## [v1.6.0](https://github.com/bensheldon/good_job/tree/v1.6.0) (2021-01-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.5.0...v1.6.0)
 
