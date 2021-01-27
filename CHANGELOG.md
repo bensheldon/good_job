@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.7.1](https://github.com/bensheldon/good_job/tree/v1.7.1) (2021-01-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.7.0...v1.7.1)
+
+**Closed issues:**
+
+- Unexpected behavior with max\_threads = 1 [\#208](https://github.com/bensheldon/good_job/issues/208)
+
+**Merged pull requests:**
+
+- Scheduler should always push a new task on completion of previous task, regardless of available thread calculation [\#209](https://github.com/bensheldon/good_job/pull/209) ([bensheldon](https://github.com/bensheldon))
+- Fix equality typo in development.rb of test\_app [\#207](https://github.com/bensheldon/good_job/pull/207) ([reczy](https://github.com/reczy))
+
 ## [v1.7.0](https://github.com/bensheldon/good_job/tree/v1.7.0) (2021-01-25)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.6.0...v1.7.0)
@@ -101,6 +114,7 @@
 
 -  Ensure advisory lock CTE is MATERIALIZED on Postgres v12+ [\#179](https://github.com/bensheldon/good_job/pull/179) ([bensheldon](https://github.com/bensheldon))
 - Ensure that deleted jobs are unlocked [\#178](https://github.com/bensheldon/good_job/pull/178) ([bensheldon](https://github.com/bensheldon))
+- Fix job ordering for Rails 6.1 [\#174](https://github.com/bensheldon/good_job/pull/174) ([morgoth](https://github.com/morgoth))
 
 **Closed issues:**
 
@@ -114,10 +128,6 @@
 ## [v1.3.4](https://github.com/bensheldon/good_job/tree/v1.3.4) (2020-12-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.3...v1.3.4)
-
-**Fixed bugs:**
-
-- Fix job ordering for Rails 6.1 [\#174](https://github.com/bensheldon/good_job/pull/174) ([morgoth](https://github.com/morgoth))
 
 ## [v1.3.3](https://github.com/bensheldon/good_job/tree/v1.3.3) (2020-12-01)
 
