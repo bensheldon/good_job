@@ -105,10 +105,10 @@ RSpec.describe GoodJob::Scheduler do
                                       name: performer.name,
                                       max_threads: max_threads,
                                       active_threads: 0,
-                                      inactive_threads: max_threads,
+                                      available_threads: max_threads,
                                       max_cache: max_cache,
-                                      cache_count: 0,
-                                      cache_remaining: max_cache,
+                                      active_cache: 0,
+                                      available_cache: max_cache,
                                     })
     end
   end

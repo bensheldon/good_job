@@ -41,7 +41,7 @@ RSpec.describe 'Schedule Integration' do
   let(:adapter) { GoodJob::Adapter.new }
 
   context 'when there are a large number of jobs' do
-    let(:number_of_jobs) { 1000 }
+    let(:number_of_jobs) { 500 }
     let(:max_threads) { 5 }
 
     let!(:good_jobs) do
@@ -69,6 +69,28 @@ RSpec.describe 'Schedule Integration' do
 
         "Expected run jobs(#{RUN_JOBS.size}) to equal number of jobs (#{number_of_jobs}). Instead ran jobs multiple times:\n#{PP.pp(rerun_jobs, '')}"
       }
+    end
+  end
+
+  context 'when a single thread' do
+    let(:max_threads) { 1 }
+    let(:number_of_jobs) { 50 }
+
+    let!(:good_jobs) do
+      number_of_jobs.times do |i|
+        ExampleJob.perform_later(i)
+      end
+    end
+
+    it 'executes all jobs' do
+      performer = GoodJob::JobPerformer.new('*')
+      scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
+      scheduler.create_thread
+
+      sleep_until(max: 10, increments_of: 0.5) do
+        GoodJob::Job.count == 0
+      end
+      scheduler.shutdown
     end
   end
 

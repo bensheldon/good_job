@@ -23,7 +23,7 @@ module GoodJob # :nodoc:
       max_threads: Configuration::DEFAULT_MAX_THREADS,
       auto_terminate: true,
       idletime: 60,
-      max_queue: 1, # ideally zero, but 0 == infinite
+      max_queue: Configuration::DEFAULT_MAX_THREADS,
       fallback_policy: :discard,
     }.freeze
 
@@ -71,7 +71,10 @@ module GoodJob # :nodoc:
 
       @max_cache = max_cache || 0
       @pool_options = DEFAULT_POOL_OPTIONS.dup
-      @pool_options[:max_threads] = max_threads if max_threads.present?
+      if max_threads.present?
+        @pool_options[:max_threads] = max_threads
+        @pool_options[:max_queue] = max_threads
+      end
       @pool_options[:name] = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@pool_options[:max_threads]})"
 
       create_pool
@@ -163,7 +166,7 @@ module GoodJob # :nodoc:
     def task_observer(time, output, thread_error)
       GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
       instrument("finished_job_task", { result: output, error: thread_error, time: time })
-      create_thread if output
+      create_task if output
     end
 
     def warm_cache
@@ -181,11 +184,11 @@ module GoodJob # :nodoc:
       {
         name: @performer.name,
         max_threads: @pool_options[:max_threads],
-        active_threads: @pool.ready_worker_count - @pool_options[:max_threads],
-        inactive_threads: @pool.ready_worker_count,
+        active_threads: @pool_options[:max_threads] - @pool.ready_worker_count,
+        available_threads: @pool.ready_worker_count,
         max_cache: @max_cache,
-        cache_count: cache_count,
-        cache_remaining: remaining_cache_count,
+        active_cache: cache_count,
+        available_cache: remaining_cache_count,
       }
     end
 
@@ -198,6 +201,16 @@ module GoodJob # :nodoc:
         @timer_set = Concurrent::TimerSet.new
         @pool = ThreadPoolExecutor.new(@pool_options)
       end
+    end
+
+    def create_task(delay = 0)
+      future = Concurrent::ScheduledTask.new(delay, args: [@performer], executor: @pool, timer_set: timer_set) do |performer|
+        output = nil
+        Rails.application.executor.wrap { output = performer.next }
+        output
+      end
+      future.add_observer(self, :task_observer)
+      future.execute
     end
 
     def instrument(name, payload = {}, &block)
