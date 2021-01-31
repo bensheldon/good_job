@@ -13,6 +13,8 @@ module GoodJob
     DEFAULT_MAX_CACHE = 10000
     # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs}
     DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 24 * 60 * 60
+    # Default to always wait for jobs to finish for {#shutdown}
+    DEFAULT_SHUTDOWN_TIMEOUT = -1
 
     # The options that were explicitly set when initializing +Configuration+.
     # @return [Hash]
@@ -77,10 +79,10 @@ module GoodJob
     def max_threads
       (
         options[:max_threads] ||
-        rails_config[:max_threads] ||
-        env['GOOD_JOB_MAX_THREADS'] ||
-        env['RAILS_MAX_THREADS'] ||
-        DEFAULT_MAX_THREADS
+          rails_config[:max_threads] ||
+          env['GOOD_JOB_MAX_THREADS'] ||
+          env['RAILS_MAX_THREADS'] ||
+          DEFAULT_MAX_THREADS
       ).to_i
     end
 
@@ -103,9 +105,9 @@ module GoodJob
     def poll_interval
       (
         options[:poll_interval] ||
-        rails_config[:poll_interval] ||
-        env['GOOD_JOB_POLL_INTERVAL'] ||
-        DEFAULT_POLL_INTERVAL
+          rails_config[:poll_interval] ||
+          env['GOOD_JOB_POLL_INTERVAL'] ||
+          DEFAULT_POLL_INTERVAL
       ).to_i
     end
 
@@ -122,15 +124,27 @@ module GoodJob
       ).to_i
     end
 
+    # The number of seconds to wait for jobs to finish when shutting down
+    # before stopping the thread. +-1+ is forever.
+    # @return [Numeric]
+    def shutdown_timeout
+      (
+        options[:shutdown_timeout] ||
+          rails_config[:shutdown_timeout] ||
+          env['GOOD_JOB_SHUTDOWN_TIMEOUT'] ||
+          DEFAULT_SHUTDOWN_TIMEOUT
+      ).to_f
+    end
+
     # Number of seconds to preserve jobs when using the +good_job cleanup_preserved_jobs+ CLI command.
     # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
     # @return [Integer]
     def cleanup_preserved_jobs_before_seconds_ago
       (
         options[:before_seconds_ago] ||
-        rails_config[:cleanup_preserved_jobs_before_seconds_ago] ||
-        env['GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO'] ||
-        DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO
+          rails_config[:cleanup_preserved_jobs_before_seconds_ago] ||
+          env['GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO'] ||
+          DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO
       ).to_i
     end
 

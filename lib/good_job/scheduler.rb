@@ -16,8 +16,8 @@ module GoodJob # :nodoc:
   #
   class Scheduler
     # Defaults for instance of Concurrent::ThreadPoolExecutor
-    # The thread pool is where work is performed.
-    DEFAULT_POOL_OPTIONS = {
+    # The thread pool executor is where work is performed.
+    DEFAULT_EXECUTOR_OPTIONS = {
       name: name,
       min_threads: 0,
       max_threads: Configuration::DEFAULT_MAX_THREADS,
@@ -30,7 +30,7 @@ module GoodJob # :nodoc:
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated Schedulers in the current process.
-    #   @return [array<GoodJob:Scheduler>]
+    #   @return [Array<GoodJob:Scheduler>]
     cattr_reader :instances, default: [], instance_reader: false
 
     # Creates GoodJob::Scheduler(s) and Performers from a GoodJob::Configuration instance.
@@ -70,66 +70,76 @@ module GoodJob # :nodoc:
       @performer = performer
 
       @max_cache = max_cache || 0
-      @pool_options = DEFAULT_POOL_OPTIONS.dup
+      @executor_options = DEFAULT_EXECUTOR_OPTIONS.dup
       if max_threads.present?
-        @pool_options[:max_threads] = max_threads
-        @pool_options[:max_queue] = max_threads
+        @executor_options[:max_threads] = max_threads
+        @executor_options[:max_queue] = max_threads
       end
-      @pool_options[:name] = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@pool_options[:max_threads]})"
+      @executor_options[:name] = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@executor_options[:max_threads]})"
 
-      create_pool
+      create_executor
       warm_cache if warm_cache_on_initialize
     end
 
-    # Shut down the scheduler.
-    # This stops all threads in the pool.
-    # If +wait+ is +true+, the scheduler will wait for any active tasks to finish.
-    # If +wait+ is +false+, this method will return immediately even though threads may still be running.
-    # Use {#shutdown?} to determine whether threads have stopped.
-    # @param wait [Boolean] Wait for actively executing jobs to finish
-    # @return [void]
-    def shutdown(wait: true)
-      return unless @pool&.running?
-
-      instrument("scheduler_shutdown_start", { wait: wait })
-      instrument("scheduler_shutdown", { wait: wait }) do
-        @timer_set.shutdown
-
-        @pool.shutdown
-        @pool.wait_for_termination if wait
-        # TODO: Should be killed if wait is not true
-      end
-    end
+    # Tests whether the scheduler is running.
+    # @return [true, false, nil]
+    delegate :running?, to: :executor, allow_nil: true
 
     # Tests whether the scheduler is shutdown.
     # @return [true, false, nil]
-    def shutdown?
-      !@pool&.running?
+    delegate :shutdown?, to: :executor, allow_nil: true
+
+    # Shut down the scheduler.
+    # This stops all threads in the thread pool.
+    # Use {#shutdown?} to determine whether threads have stopped.
+    # @param timeout [nil, Numeric] Seconds to wait for actively executing jobs to finish
+    #
+    #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
+    #   * +-1+, the scheduler will wait until the shutdown is complete.
+    #   * +0+, the scheduler will immediately shutdown and stop any active tasks.
+    #   * A positive number will wait that many seconds before stopping any remaining active tasks.
+    # @return [void]
+    def shutdown(timeout: -1)
+      return if executor.nil? || executor.shutdown?
+
+      instrument("scheduler_shutdown_start", { timeout: timeout })
+      instrument("scheduler_shutdown", { timeout: timeout }) do
+        if executor.running?
+          @timer_set.shutdown
+          executor.shutdown
+        end
+
+        if executor.shuttingdown? && timeout
+          executor_wait = timeout.negative? ? nil : timeout
+          executor.kill unless executor.wait_for_termination(executor_wait)
+        end
+      end
     end
 
     # Restart the Scheduler.
     # When shutdown, start; or shutdown and start.
-    # @param wait [Boolean] Wait for actively executing jobs to finish
+    # @param timeout [nil, Numeric] Seconds to wait for actively executing jobs to finish; shares same values as {#shutdown}.
     # @return [void]
-    def restart(wait: true)
+    def restart(timeout: -1)
       instrument("scheduler_restart_pools") do
-        shutdown(wait: wait) unless shutdown?
-        create_pool
+        shutdown(timeout: timeout) if running?
+        create_executor
         warm_cache
       end
     end
 
     # Wakes a thread to allow the performer to execute a task.
-    # @param state [nil, Object] Contextual information for the performer. See {Performer#next?}.
+    # @param state [nil, Object] Contextual information for the performer. See {JobPerformer#next?}.
     # @return [nil, Boolean] Whether work was started.
-    #   Returns +nil+ if the scheduler is unable to take new work, for example if the thread pool is shut down or at capacity.
-    #   Returns +true+ if the performer started executing work.
-    #   Returns +false+ if the performer decides not to attempt to execute a task based on the +state+ that is passed to it.
+    #
+    #   * +nil+ if the scheduler is unable to take new work, for example if the thread pool is shut down or at capacity.
+    #   * +true+ if the performer started executing work.
+    #   * +false+ if the performer decides not to attempt to execute a task based on the +state+ that is passed to it.
     def create_thread(state = nil)
-      return nil unless @pool.running?
+      return nil unless executor.running?
 
       if state
-        return false unless @performer.next?(state)
+        return false unless performer.next?(state)
 
         if state[:scheduled_at]
           scheduled_at = if state[:scheduled_at].is_a? String
@@ -144,18 +154,12 @@ module GoodJob # :nodoc:
       delay ||= 0
       run_now = delay <= 0.01
       if run_now
-        return nil unless @pool.ready_worker_count.positive?
+        return nil unless executor.ready_worker_count.positive?
       elsif @max_cache.positive?
         return nil unless remaining_cache_count.positive?
       end
 
-      future = Concurrent::ScheduledTask.new(delay, args: [@performer], executor: @pool, timer_set: timer_set) do |performer|
-        output = nil
-        Rails.application.executor.wrap { output = performer.next }
-        output
-      end
-      future.add_observer(self, :task_observer)
-      future.execute
+      create_task(delay)
 
       run_now ? true : nil
     end
@@ -169,23 +173,14 @@ module GoodJob # :nodoc:
       create_task if output
     end
 
-    def warm_cache
-      return if @max_cache.zero?
-
-      @performer.next_at(
-        limit: @max_cache,
-        now_limit: @pool_options[:max_threads]
-      ).each do |scheduled_at|
-        create_thread({ scheduled_at: scheduled_at })
-      end
-    end
-
+    # Information about the Scheduler
+    # @return [Hash]
     def stats
       {
-        name: @performer.name,
-        max_threads: @pool_options[:max_threads],
-        active_threads: @pool_options[:max_threads] - @pool.ready_worker_count,
-        available_threads: @pool.ready_worker_count,
+        name: performer.name,
+        max_threads: @executor_options[:max_threads],
+        active_threads: @executor_options[:max_threads] - executor.ready_worker_count,
+        available_threads: executor.ready_worker_count,
         max_cache: @max_cache,
         active_cache: cache_count,
         available_cache: remaining_cache_count,
@@ -194,19 +189,30 @@ module GoodJob # :nodoc:
 
     private
 
-    attr_reader :timer_set
+    attr_reader :performer, :executor, :timer_set
 
-    def create_pool
-      instrument("scheduler_create_pool", { performer_name: @performer.name, max_threads: @pool_options[:max_threads] }) do
+    def create_executor
+      instrument("scheduler_create_pool", { performer_name: performer.name, max_threads: @executor_options[:max_threads] }) do
         @timer_set = Concurrent::TimerSet.new
-        @pool = ThreadPoolExecutor.new(@pool_options)
+        @executor = ThreadPoolExecutor.new(@executor_options)
+      end
+    end
+
+    def warm_cache
+      return if @max_cache.zero?
+
+      performer.next_at(
+        limit: @max_cache,
+        now_limit: @executor_options[:max_threads]
+      ).each do |scheduled_at|
+        create_thread({ scheduled_at: scheduled_at })
       end
     end
 
     def create_task(delay = 0)
-      future = Concurrent::ScheduledTask.new(delay, args: [@performer], executor: @pool, timer_set: timer_set) do |performer|
+      future = Concurrent::ScheduledTask.new(delay, args: [performer], executor: executor, timer_set: timer_set) do |thr_performer|
         output = nil
-        Rails.application.executor.wrap { output = performer.next }
+        Rails.application.executor.wrap { output = thr_performer.next }
         output
       end
       future.add_observer(self, :task_observer)

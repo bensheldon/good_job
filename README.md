@@ -149,12 +149,13 @@ Usage:
   good_job start
 
 Options:
-  [--max-threads=COUNT]      # Maximum number of threads to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
-  [--queues=QUEUE_LIST]      # Queues to work from. (env var: GOOD_JOB_QUEUES, default: *)
-  [--poll-interval=SECONDS]  # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 1)
-  [--max-cache=COUNT]        # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
-  [--daemonize]              # Run as a background daemon (default: false)
-  [--pidfile=PIDFILE]        # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
+  [--max-threads=COUNT]        # Maximum number of threads to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
+  [--queues=QUEUE_LIST]        # Queues to work from. (env var: GOOD_JOB_QUEUES, default: *)
+  [--poll-interval=SECONDS]    # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 1)
+  [--max-cache=COUNT]          # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
+  [--shutdown-timeout=SECONDS] # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
+  [--daemonize]                # Run as a background daemon (default: false)
+  [--pidfile=PIDFILE]          # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
 
 Executes queued jobs.
 
@@ -208,12 +209,15 @@ config.active_job.queue_adapter = :good_job
 config.good_job.execution_mode = :async
 config.good_job.max_threads = 5
 config.good_job.poll_interval = 30 # seconds
+config.good_job.shutdown_timeout = 25 # seconds
+
 
 # ...or all at once.
 config.good_job = {
   execution_mode: :async,
   max_threads: 5,
   poll_interval: 30,
+  shutdown_timeout: 25,
 }
 ```
 
@@ -227,6 +231,7 @@ Available configuration options are:
 - `queues` (string) determines which queues to execute jobs from when `execution_mode` is set to `:async`. See the description of `good_job start` for more details on the format of this string. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`.
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
+- `shutdown_timeout` (float) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 
 By default, GoodJob configures the following execution modes per environment:
 

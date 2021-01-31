@@ -53,6 +53,10 @@ module GoodJob
                   type: :numeric,
                   banner: 'COUNT',
                   desc: "Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)"
+    method_option :shutdown_timeout,
+                  type: :numeric,
+                  banner: 'SECONDS',
+                  desc: "Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))"
     method_option :daemonize,
                   type: :boolean,
                   desc: "Run as a background daemon (default: false)"
@@ -81,9 +85,8 @@ module GoodJob
         break if @stop_good_job_executable || scheduler.shutdown? || notifier.shutdown?
       end
 
-      notifier.shutdown
-      poller.shutdown
-      scheduler.shutdown
+      executors = [notifier, poller, scheduler]
+      GoodJob._shutdown_all(executors, timeout: configuration.shutdown_timeout)
     end
 
     default_task :start

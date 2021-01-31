@@ -6,6 +6,7 @@ RSpec.configure do |config|
   config.after do
     GoodJob.shutdown
     GoodJob::Notifier.instances.clear
+    GoodJob::Poller.instances.clear
     GoodJob::Scheduler.instances.clear
   end
 end
