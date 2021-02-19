@@ -15,6 +15,8 @@ module GoodJob
 
     self.table_name = 'good_jobs'.freeze
 
+    attr_readonly :serialized_params
+
     # Parse a string representing a group of queues into a more readable data
     # structure.
     # @return [Hash]

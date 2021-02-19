@@ -204,6 +204,26 @@ RSpec.describe GoodJob::Job do
           expect(error).to be_an_instance_of ExpectedError
         end
 
+        context 'when there is an retry handler with exhausted attempts' do
+          before do
+            ExampleJob.retry_on(ExpectedError, attempts: 1)
+
+            original_attr_readonly = described_class._attr_readonly
+            described_class._attr_readonly = Set.new
+
+            good_job.serialized_params["exception_executions"] = { "[ExpectedError]" => 1 }
+            good_job.save!
+
+            described_class._attr_readonly = original_attr_readonly
+          end
+
+          it 'does not modify the good_job serialized params' do
+            expect do
+              good_job.perform
+            end.not_to change { good_job.reload.serialized_params["exception_executions"]["[ExpectedError]"] }
+          end
+        end
+
         context 'when error monitoring service intercepts exception' do
           before do
             # Similar to Sentry monitor's implementation
