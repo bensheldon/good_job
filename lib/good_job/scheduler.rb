@@ -187,17 +187,6 @@ module GoodJob # :nodoc:
       }
     end
 
-    private
-
-    attr_reader :performer, :executor, :timer_set
-
-    def create_executor
-      instrument("scheduler_create_pool", { performer_name: performer.name, max_threads: @executor_options[:max_threads] }) do
-        @timer_set = Concurrent::TimerSet.new
-        @executor = ThreadPoolExecutor.new(@executor_options)
-      end
-    end
-
     def warm_cache
       return if @max_cache.zero?
 
@@ -206,6 +195,17 @@ module GoodJob # :nodoc:
         now_limit: @executor_options[:max_threads]
       ).each do |scheduled_at|
         create_thread({ scheduled_at: scheduled_at })
+      end
+    end
+
+    private
+
+    attr_reader :performer, :executor, :timer_set
+
+    def create_executor
+      instrument("scheduler_create_pool", { performer_name: performer.name, max_threads: @executor_options[:max_threads] }) do
+        @timer_set = Concurrent::TimerSet.new
+        @executor = ThreadPoolExecutor.new(@executor_options)
       end
     end
 
