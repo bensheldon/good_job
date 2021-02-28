@@ -54,9 +54,8 @@ RSpec.describe GoodJob::Scheduler do
     it 'shuts down the theadpools' do
       scheduler = described_class.new(performer)
 
-      scheduler.shutdown
-
-      expect(scheduler.instance_variable_get(:@pool).running?).to be false
+      expect { scheduler.shutdown }
+        .to change(scheduler, :running?).from(true).to(false)
     end
   end
 
@@ -65,9 +64,8 @@ RSpec.describe GoodJob::Scheduler do
       scheduler = described_class.new(performer)
       scheduler.shutdown
 
-      scheduler.restart
-
-      expect(scheduler.instance_variable_get(:@pool).running?).to be true
+      expect { scheduler.restart }
+        .to change(scheduler, :running?).from(false).to(true)
     end
   end
 
@@ -121,14 +119,20 @@ RSpec.describe GoodJob::Scheduler do
 
         all_scheduler, rodents_scheduler, elephants_scheduler = multi_scheduler.schedulers
 
-        expect(all_scheduler.instance_variable_get(:@performer).name).to eq '*'
-        expect(all_scheduler.instance_variable_get(:@pool_options)[:max_threads]).to eq 1
+        expect(all_scheduler.stats).to include(
+          name: '*',
+          max_threads: 1
+        )
 
-        expect(rodents_scheduler.instance_variable_get(:@performer).name).to eq 'mice,ferrets'
-        expect(rodents_scheduler.instance_variable_get(:@pool_options)[:max_threads]).to eq 2
+        expect(rodents_scheduler.stats).to include(
+          name: 'mice,ferrets',
+          max_threads: 2
+        )
 
-        expect(elephants_scheduler.instance_variable_get(:@performer).name).to eq 'elephant'
-        expect(elephants_scheduler.instance_variable_get(:@pool_options)[:max_threads]).to eq 4
+        expect(elephants_scheduler.stats).to include(
+          name: 'elephant',
+          max_threads: 4
+        )
       end
     end
   end

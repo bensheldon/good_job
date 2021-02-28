@@ -51,8 +51,9 @@ module GoodJob
     end
 
     # The Returns timestamps of when next tasks may be available.
-    # @param count [Integer] number of timestamps to return
-    # @param count [DateTime, Time, nil] jobs scheduled after this time
+    # @param after [DateTime, Time, nil] future jobs scheduled after this time
+    # @param limit [Integer] number of future timestamps to return
+    # @param now_limit [Integer] number of past timestamps to return
     # @return [Array<(Time, Timestamp)>, nil]
     def next_at(after: nil, limit: nil, now_limit: nil)
       job_query.next_scheduled_at(after: after, limit: limit, now_limit: now_limit)

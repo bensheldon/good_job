@@ -16,7 +16,7 @@ module GoodJob # :nodoc:
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated Pollers in the current process.
-    #   @return [array<GoodJob:Poller>]
+    #   @return [Array<GoodJob:Poller>]
     cattr_reader :instances, default: [], instance_reader: false
 
     # Creates GoodJob::Poller from a GoodJob::Configuration instance.
@@ -40,35 +40,44 @@ module GoodJob # :nodoc:
 
       self.class.instances << self
 
-      create_pool
+      create_timer
     end
 
-    # Shut down the poller.
-    # If +wait+ is +true+, the poller will wait for background thread to shutdown.
-    # If +wait+ is +false+, this method will return immediately even though threads may still be running.
-    # Use {#shutdown?} to determine whether threads have stopped.
-    # @param wait [Boolean] Wait for actively executing threads to finish
-    # @return [void]
-    def shutdown(wait: true)
-      return unless @timer&.running?
-
-      @timer.shutdown
-      @timer.wait_for_termination if wait
-    end
-
-    # Tests whether the poller is shutdown.
+    # Tests whether the timer is running.
     # @return [true, false, nil]
-    def shutdown?
-      !@timer&.running?
+    delegate :running?, to: :timer, allow_nil: true
+
+    # Tests whether the timer is shutdown.
+    # @return [true, false, nil]
+    delegate :shutdown?, to: :timer, allow_nil: true
+
+    # Shut down the notifier.
+    # Use {#shutdown?} to determine whether threads have stopped.
+    # @param timeout [nil, Numeric] Seconds to wait for active threads.
+    #
+    #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
+    #   * +-1+, the scheduler will wait until the shutdown is complete.
+    #   * +0+, the scheduler will immediately shutdown and stop any threads.
+    #   * A positive number will wait that many seconds before stopping any remaining active threads.
+    # @return [void]
+    def shutdown(timeout: -1)
+      return if timer.nil? || timer.shutdown?
+
+      timer.shutdown if timer.running?
+
+      if timer.shuttingdown? && timeout # rubocop:disable Style/GuardClause
+        timer_wait = timeout.negative? ? nil : timeout
+        timer.kill unless timer.wait_for_termination(timer_wait)
+      end
     end
 
     # Restart the poller.
     # When shutdown, start; or shutdown and start.
-    # @param wait [Boolean] Wait for background thread to finish
+    # @param timeout [nil, Numeric] Seconds to wait; shares same values as {#shutdown}.
     # @return [void]
-    def restart(wait: true)
-      shutdown(wait: wait)
-      create_pool
+    def restart(timeout: -1)
+      shutdown(timeout: timeout) if running?
+      create_timer
     end
 
     # Invoked on completion of TimerTask task.
@@ -81,7 +90,9 @@ module GoodJob # :nodoc:
 
     private
 
-    def create_pool
+    attr_reader :timer
+
+    def create_timer
       return if @timer_options[:execution_interval] <= 0
 
       @timer = Concurrent::TimerTask.new(@timer_options) do

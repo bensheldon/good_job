@@ -38,7 +38,7 @@ module GoodJob
         DEPRECATION
       end
 
-      configuration = GoodJob::Configuration.new(
+      @configuration = GoodJob::Configuration.new(
         {
           execution_mode: execution_mode,
           queues: queues,
@@ -47,13 +47,12 @@ module GoodJob
         }
       )
 
-      @execution_mode = configuration.execution_mode
-      raise ArgumentError, "execution_mode: must be one of #{EXECUTION_MODES.join(', ')}." unless EXECUTION_MODES.include?(@execution_mode)
+      raise ArgumentError, "execution_mode: must be one of #{EXECUTION_MODES.join(', ')}." unless EXECUTION_MODES.include?(@configuration.execution_mode)
 
       if execute_async? # rubocop:disable Style/GuardClause
         @notifier = GoodJob::Notifier.new
-        @poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
-        @scheduler = GoodJob::Scheduler.from_configuration(configuration, warm_cache_on_initialize: Rails.application.initialized?)
+        @poller = GoodJob::Poller.new(poll_interval: @configuration.poll_interval)
+        @scheduler = GoodJob::Scheduler.from_configuration(@configuration, warm_cache_on_initialize: Rails.application.initialized?)
         @notifier.recipients << [@scheduler, :create_thread]
         @poller.recipients << [@scheduler, :create_thread]
       end
@@ -96,29 +95,48 @@ module GoodJob
       good_job
     end
 
-    # Gracefully stop processing jobs.
-    # Waits for termination by default.
-    # @param wait [Boolean] Whether to wait for shut down.
+    # Shut down the thread pool executors.
+    # @param timeout [nil, Numeric] Seconds to wait for active threads.
+    #
+    #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
+    #   * +-1+, the scheduler will wait until the shutdown is complete.
+    #   * +0+, the scheduler will immediately shutdown and stop any threads.
+    #   * A positive number will wait that many seconds before stopping any remaining active threads.
+    # @param wait [Boolean] Deprecated. Use +timeout:+ instead.
     # @return [void]
-    def shutdown(wait: true)
-      @notifier&.shutdown(wait: wait)
-      @poller&.shutdown(wait: wait)
-      @scheduler&.shutdown(wait: wait)
+    def shutdown(timeout: :default, wait: nil)
+      timeout = if wait.present?
+                  ActiveSupport::Deprecation.warn(
+                    "Using `GoodJob::Adapter.shutdown` with `wait:` kwarg is deprecated; use `timeout:` kwarg instead e.g. GoodJob::Adapter.shutdown(timeout: #{wait ? '-1' : 'nil'})"
+                  )
+                  wait ? -1 : nil
+                else
+                  timeout
+                end
+
+      timeout = if timeout == :default
+                  @configuration.shutdown_timeout
+                else
+                  timeout
+                end
+
+      executables = [@notifier, @poller, @scheduler].compact
+      GoodJob._shutdown_all(executables, timeout: timeout)
     end
 
     # Whether in +:async+ execution mode.
     def execute_async?
-      @execution_mode == :async
+      @configuration.execution_mode == :async
     end
 
     # Whether in +:external+ execution mode.
     def execute_externally?
-      @execution_mode == :external
+      @configuration.execution_mode == :external
     end
 
     # Whether in +:inline+ execution mode.
     def execute_inline?
-      @execution_mode == :inline
+      @configuration.execution_mode == :inline
     end
   end
 end

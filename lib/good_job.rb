@@ -78,15 +78,26 @@ module GoodJob
   # See the {file:README.md#executing-jobs-async--in-process} for more explanation and examples.
   # @param wait [Boolean] whether to wait for shutdown
   # @return [void]
-  def self.shutdown(wait: true)
-    Notifier.instances.each { |notifier| notifier.shutdown(wait: wait) }
-    Scheduler.instances.each { |scheduler| scheduler.shutdown(wait: wait) }
+  def self.shutdown(timeout: -1, wait: nil)
+    timeout = if wait.present?
+                ActiveSupport::Deprecation.warn(
+                  "Using `GoodJob.shutdown` with `wait:` kwarg is deprecated; use `timeout:` kwarg instead e.g. GoodJob.shutdown(timeout: #{wait ? '-1' : 'nil'})"
+                )
+                wait ? -1 : nil
+              else
+                timeout
+              end
+
+    executables = Array(Notifier.instances) + Array(Poller.instances) + Array(Scheduler.instances)
+    _shutdown_all(executables, timeout: timeout)
   end
 
   # Tests whether jobs have stopped executing.
   # @return [Boolean] whether background threads are shut down
   def self.shutdown?
-    Notifier.instances.all?(&:shutdown?) && Scheduler.instances.all?(&:shutdown?)
+    Notifier.instances.all?(&:shutdown?) &&
+      Poller.instances.all?(&:shutdown?) &&
+      Scheduler.instances.all?(&:shutdown?)
   end
 
   # Stops and restarts executing jobs.
@@ -95,9 +106,25 @@ module GoodJob
   # For example, you should use +shutdown+ and +restart+ when using async execution mode with Puma.
   # See the {file:README.md#executing-jobs-async--in-process} for more explanation and examples.
   # @return [void]
-  def self.restart
-    Notifier.instances.each(&:restart)
-    Scheduler.instances.each(&:restart)
+  def self.restart(timeout: -1)
+    executables = Array(Notifier.instances) + Array(Poller.instances) + Array(Scheduler.instances)
+    _shutdown_all(executables, :restart, timeout: timeout)
+  end
+
+  # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler})
+  # @param executables [Array<(Notifier, Poller, Scheduler)>] Objects to shut down.
+  # @param method_name [:symbol] Method to call, e.g. +:shutdown+ or +:restart+.
+  # @param timeout [nil,Numeric]
+  # @return [void]
+  def self._shutdown_all(executables, method_name = :shutdown, timeout: -1)
+    if timeout.positive?
+      executables.each { |executable| executable.send(method_name, timeout: nil) }
+
+      stop_at = Time.current + timeout
+      executables.each { |executable| executable.send(method_name, timeout: [stop_at - Time.current, 0].max) }
+    else
+      executables.each { |executable| executable.send(method_name, timeout: timeout) }
+    end
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)
