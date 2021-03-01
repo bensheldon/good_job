@@ -2,6 +2,14 @@
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 
+if RUBY_PLATFORM.include?('java')
+  # Workaround for issue in I18n/JRuby combo.
+  # See https://github.com/jruby/jruby/issues/6547 and
+  # https://github.com/ruby-i18n/i18n/issues/555
+  require "i18n/backend"
+  require "i18n/backend/simple"
+end
+
 require File.expand_path('test_app/config/environment', __dir__)
 
 # Prevent database truncation if the environment is production
