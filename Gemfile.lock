@@ -1,3 +1,13 @@
+GIT
+  remote: https://github.com/excid3/appraisal.git
+  revision: 8bb003b273ae074356dc67b59ecc67c8ae2f3a27
+  branch: fix-bundle-env
+  specs:
+    appraisal (2.3.0)
+      bundler
+      rake
+      thor (>= 0.14.0)
+
 PATH
   remote: .
   specs:
@@ -78,10 +88,6 @@ GEM
       zeitwerk (~> 2.3)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    appraisal (2.4.0)
-      bundler
-      rake
-      thor (>= 0.14.0)
     ast (2.4.2)
     better_html (1.0.16)
       actionview (>= 4.0)
@@ -177,6 +183,7 @@ GEM
     mixlib-shellout (3.2.5)
       chef-utils
     msgpack (1.4.2)
+    msgpack (1.4.2-java)
     multi_json (1.15.0)
     multipart-post (2.1.1)
     nio4r (2.5.5)
@@ -333,7 +340,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord-jdbcpostgresql-adapter
-  appraisal
+  appraisal!
   capybara
   database_cleaner
   dotenv

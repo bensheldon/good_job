@@ -19,31 +19,12 @@ jobs:
         uses: actions/checkout@v2
 
       # Dependencies
-      - name: Install missing libs (This is slated to be added to the base image soon!)
-        run: sudo apt-get -yqq install libpq-dev
-      - name: "Set Ruby version"
-        id: ruby_version
-        run: echo "::set-output name=value::$(cat .ruby-version)"
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ steps.ruby_version.outputs.value }}
-          bundler: none
-      - name: Ruby gem cache
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: v1-bundler-${{ runner.os }}-${{ steps.ruby_version.outputs.value }}-${{ hashFiles('**/good_job.gemspec') }}-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Appraisals') }}
-          restore-keys: |
-            v1-bundler-${{ runner.os }}-${{ steps.ruby_version.outputs.value }}-
-      - name: Install bundler
-        run: gem update --system && gem install bundler -v $(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -1 | tr -d " ")
-      - name: Install Gemfile gems
-        run: bundle install
-      - name: Install Appraisal gems
-        run: bundle exec appraisal install --path $BUNDLE_PATH
-      # /Dependencies
+          bundler-cache: true
 
+      # Lint
       - name: Run linter
         run: bin/lint --nofix
 
@@ -54,7 +35,10 @@ jobs:
     strategy:
       matrix:
         ruby: [2.5, 2.6, 2.7, 3.0, jruby-9.2.13.0, jruby-9.2.14.0]
-        pg: [12.5, 10.8]
+        pg: [12.5]
+        include:
+          - ruby: 2.7
+            pg: 10.8
     env:
       PGHOST: localhost
       PGUSER: test_app
@@ -62,6 +46,7 @@ jobs:
       BUNDLE_JOBS: 4
       BUNDLE_RETRY: 3
       BUNDLE_PATH: vendor/bundle
+      BUNDLE_WITHOUT: "lint"
       DISABLE_SPRING: 1
     services:
       postgres:
@@ -77,35 +62,25 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Update .ruby-version with matrix value
+        run: echo "${{ matrix.ruby }}" >| .ruby-version
 
       # Dependencies
-      - name: Install missing libs (This is slated to be added to the base image soon!)
-        run: sudo apt-get -yqq install libpq-dev
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ${{ matrix.ruby }}
-          bundler: none
-      - name: Ruby gem cache
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-${{ hashFiles('**/good_job.gemspec') }}-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Appraisals') }}
-          restore-keys: |
-            v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-
-      - name: Install bundler
-        run: gem update --system && gem install bundler --default -v $(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -1 | tr -d " ")
-      - name: Install Gemfile gems
-        run: bundle install --without lint
+          bundler-cache: true
       - name: Install Appraisal gems
-        run: bundle exec appraisal install --without lint --path $BUNDLE_PATH
-      # /Dependencies
+        run: bundle exec appraisal install
 
+      # Test
       - name: Set up test database
         run: bin/rails db:test:prepare
         working-directory: spec/test_app
       - name: Run tests
-        run: bundle exec appraisal bin/rspec
+        run: bundle exec appraisal rspec
+
+      # Archive
       - name: Archive system spec screenshots
         uses: actions/upload-artifact@v2
         if: failure()
