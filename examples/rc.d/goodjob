@@ -11,7 +11,7 @@
 #
 # Requirements:
 #
-# This file should be placed to: /usr/local/etc/rc.d/goodjob
+# This file should be placed into: /usr/local/etc/rc.d/goodjob
 #
 # Add the following lines to /etc/rc.conf to enable goodjob:
 #
