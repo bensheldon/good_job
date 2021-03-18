@@ -54,7 +54,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "thor", ">= 0.14.1"
   spec.add_dependency "zeitwerk", ">= 2.0"
 
-  spec.add_development_dependency "appraisal"
   spec.add_development_dependency "capybara"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "dotenv"

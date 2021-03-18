@@ -1,8 +1,34 @@
 # Changelog
 
+## [v1.8.0](https://github.com/bensheldon/good_job/tree/v1.8.0) (2021-03-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.7.1...v1.8.0)
+
+**Implemented enhancements:**
+
+- Wait then stop on shutdown [\#126](https://github.com/bensheldon/good_job/issues/126)
+- Add shutdown-timeout option to configure the wait for jobs to gracefully finish before stopping them [\#213](https://github.com/bensheldon/good_job/pull/213) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Ensure Job\#serialized\_params are immutable [\#218](https://github.com/bensheldon/good_job/pull/218) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Run GoodJob on puma boot [\#91](https://github.com/bensheldon/good_job/issues/91)
+- ActiveRecord::ConnectionNotEstablished when using async mode [\#89](https://github.com/bensheldon/good_job/issues/89)
+
+**Merged pull requests:**
+
+- Update bundler and Appraisals so Rails HEAD is locked to Ruby version \>= 2.7 [\#219](https://github.com/bensheldon/good_job/pull/219) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.7.1](https://github.com/bensheldon/good_job/tree/v1.7.1) (2021-01-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.7.0...v1.7.1)
+
+**Fixed bugs:**
+
+- Scheduler should always push a new task on completion of previous task, regardless of available thread calculation [\#209](https://github.com/bensheldon/good_job/pull/209) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
@@ -10,14 +36,13 @@
 
 **Merged pull requests:**
 
-- Scheduler should always push a new task on completion of previous task, regardless of available thread calculation [\#209](https://github.com/bensheldon/good_job/pull/209) ([bensheldon](https://github.com/bensheldon))
 - Fix equality typo in development.rb of test\_app [\#207](https://github.com/bensheldon/good_job/pull/207) ([reczy](https://github.com/reczy))
 
 ## [v1.7.0](https://github.com/bensheldon/good_job/tree/v1.7.0) (2021-01-25)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.6.0...v1.7.0)
 
-**Merged pull requests:**
+**Implemented enhancements:**
 
 - Cache scheduled jobs in memory so they can be executed without polling [\#205](https://github.com/bensheldon/good_job/pull/205) ([bensheldon](https://github.com/bensheldon))
 
@@ -47,6 +72,7 @@
 **Implemented enhancements:**
 
 - Create Web UI Dashboard [\#50](https://github.com/bensheldon/good_job/issues/50)
+- Configure GoodJob via `Rails.application.config` instead of recommending `GoodJob::Adapter.new` [\#199](https://github.com/bensheldon/good_job/pull/199) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
@@ -55,7 +81,6 @@
 **Merged pull requests:**
 
 - Update bundler version to 2.2.5 [\#200](https://github.com/bensheldon/good_job/pull/200) ([bensheldon](https://github.com/bensheldon))
-- Configure GoodJob via `Rails.application.config` instead of recommending `GoodJob::Adapter.new` [\#199](https://github.com/bensheldon/good_job/pull/199) ([bensheldon](https://github.com/bensheldon))
 - Update GH Test Matrix with minimum & latest JRuby version [\#197](https://github.com/bensheldon/good_job/pull/197) ([tedhexaflow](https://github.com/tedhexaflow))
 - Fix JRuby version number [\#193](https://github.com/bensheldon/good_job/pull/193) ([tedhexaflow](https://github.com/tedhexaflow))
 
@@ -74,6 +99,7 @@
 **Merged pull requests:**
 
 - Add missing YARD docs and Dashboard screenshot [\#191](https://github.com/bensheldon/good_job/pull/191) ([bensheldon](https://github.com/bensheldon))
+- Update all Lockable queries to use exec\_query instead of execute; clear async\_exec results [\#189](https://github.com/bensheldon/good_job/pull/189) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.4.0](https://github.com/bensheldon/good_job/tree/v1.4.0) (2020-12-31)
 
@@ -100,7 +126,6 @@
 **Merged pull requests:**
 
 - Run tests with Rails default configuration to enable Zeitwerk [\#190](https://github.com/bensheldon/good_job/pull/190) ([bensheldon](https://github.com/bensheldon))
-- Update all Lockable queries to use exec\_query instead of execute; clear async\_exec results [\#189](https://github.com/bensheldon/good_job/pull/189) ([bensheldon](https://github.com/bensheldon))
 - Have Lockable\#advisory\_locked? directly query pg\_locks table [\#188](https://github.com/bensheldon/good_job/pull/188) ([bensheldon](https://github.com/bensheldon))
 - Update development gems, including Rails v6.1 and Rails HEAD [\#186](https://github.com/bensheldon/good_job/pull/186) ([bensheldon](https://github.com/bensheldon))
 - Update Appraisals for Rails 6.1 [\#183](https://github.com/bensheldon/good_job/pull/183) ([bensheldon](https://github.com/bensheldon))
@@ -114,7 +139,6 @@
 
 -  Ensure advisory lock CTE is MATERIALIZED on Postgres v12+ [\#179](https://github.com/bensheldon/good_job/pull/179) ([bensheldon](https://github.com/bensheldon))
 - Ensure that deleted jobs are unlocked [\#178](https://github.com/bensheldon/good_job/pull/178) ([bensheldon](https://github.com/bensheldon))
-- Fix job ordering for Rails 6.1 [\#174](https://github.com/bensheldon/good_job/pull/174) ([morgoth](https://github.com/morgoth))
 
 **Closed issues:**
 
@@ -128,6 +152,10 @@
 ## [v1.3.4](https://github.com/bensheldon/good_job/tree/v1.3.4) (2020-12-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.3.3...v1.3.4)
+
+**Fixed bugs:**
+
+- Fix job ordering for Rails 6.1 [\#174](https://github.com/bensheldon/good_job/pull/174) ([morgoth](https://github.com/morgoth))
 
 ## [v1.3.3](https://github.com/bensheldon/good_job/tree/v1.3.3) (2020-12-01)
 
@@ -268,7 +296,6 @@
 - Have YARD render markdown files with GFM \(Github Flavored Markdown\) [\#113](https://github.com/bensheldon/good_job/pull/113) ([bensheldon](https://github.com/bensheldon))
 - Add markdownlint to lint readme [\#109](https://github.com/bensheldon/good_job/pull/109) ([bensheldon](https://github.com/bensheldon))
 - Remove unused method in PgLocks [\#107](https://github.com/bensheldon/good_job/pull/107) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
-- Re-organize Readme: frontload configuration, add Table of Contents  [\#106](https://github.com/bensheldon/good_job/pull/106) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.2.3](https://github.com/bensheldon/good_job/tree/v1.2.3) (2020-08-27)
 
@@ -303,6 +330,7 @@
 
 **Merged pull requests:**
 
+- Re-organize Readme: frontload configuration, add Table of Contents  [\#106](https://github.com/bensheldon/good_job/pull/106) ([bensheldon](https://github.com/bensheldon))
 - Use more ActiveRecord in Lockable and not connection.execute [\#102](https://github.com/bensheldon/good_job/pull/102) ([bensheldon](https://github.com/bensheldon))
 - Run CI tests on Ruby 2.5, 2.6, and 2.7 [\#101](https://github.com/bensheldon/good_job/pull/101) ([arku](https://github.com/arku))
 - Fix Ruby 2.7 keyword arguments warning [\#98](https://github.com/bensheldon/good_job/pull/98) ([arku](https://github.com/arku))
@@ -435,6 +463,7 @@
 
 - Add migration generator [\#56](https://github.com/bensheldon/good_job/pull/56) ([thedanbob](https://github.com/thedanbob))
 - Fix migration script in readme [\#55](https://github.com/bensheldon/good_job/pull/55) ([thedanbob](https://github.com/thedanbob))
+- Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.0.1](https://github.com/bensheldon/good_job/tree/v1.0.1) (2020-07-22)
 
@@ -472,10 +501,6 @@
 ## [v0.8.1](https://github.com/bensheldon/good_job/tree/v0.8.1) (2020-07-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.0...v0.8.1)
-
-**Merged pull requests:**
-
-- Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.8.0](https://github.com/bensheldon/good_job/tree/v0.8.0) (2020-07-17)
 

@@ -36,7 +36,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         - [`good_job start`](#good_job-start)
         - [`good_job cleanup_preserved_jobs`](#good_job-cleanup_preserved_jobs)
     - [Configuration options](#configuration-options)
-    - [Global options](#global-options)pter
+    - [Global options](#global-options)
     - [Dashboard](#dashboard)
 - [Go deeper](#go-deeper)
     - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
