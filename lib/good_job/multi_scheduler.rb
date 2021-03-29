@@ -44,7 +44,7 @@ module GoodJob
 
       if results.any?
         true
-      elsif results.any? { |result| result == false }
+      elsif results.any?(false)
         false
       else # rubocop:disable Style/EmptyElse
         nil
