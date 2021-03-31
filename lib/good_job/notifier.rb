@@ -30,7 +30,7 @@ module GoodJob # :nodoc:
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated Notifiers in the current process.
-    #   @return [Array<GoodJob:Adapter>]
+    #   @return [Array<GoodJob::Adapter>]
     cattr_reader :instances, default: [], instance_reader: false
 
     # Send a message via Postgres NOTIFY

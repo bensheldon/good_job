@@ -54,7 +54,7 @@ module GoodJob
     # @param after [DateTime, Time, nil] future jobs scheduled after this time
     # @param limit [Integer] number of future timestamps to return
     # @param now_limit [Integer] number of past timestamps to return
-    # @return [Array<(Time, Timestamp)>, nil]
+    # @return [Array<(Time, DateTime)>, nil]
     def next_at(after: nil, limit: nil, now_limit: nil)
       job_query.next_scheduled_at(after: after, limit: limit, now_limit: now_limit)
     end
