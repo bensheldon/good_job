@@ -5,6 +5,8 @@ module GoodJob
   # set options to get the final values for each option.
   #
   class Configuration
+    # Valid execution modes.
+    EXECUTION_MODES = [:async, :async_all, :async_server, :external, :inline].freeze
     # Default number of threads to use per {Scheduler}
     DEFAULT_MAX_THREADS = 5
     # Default number of seconds between polls for jobs
@@ -13,7 +15,7 @@ module GoodJob
     DEFAULT_MAX_CACHE = 10000
     # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs}
     DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 24 * 60 * 60
-    # Default to always wait for jobs to finish for {#shutdown}
+    # Default to always wait for jobs to finish for {Adapter#shutdown}
     DEFAULT_SHUTDOWN_TIMEOUT = -1
 
     # The options that were explicitly set when initializing +Configuration+.
@@ -35,41 +37,48 @@ module GoodJob
       @env = env
     end
 
-    # Specifies how and where jobs should be executed. See {Adapter#initialize}
-    # for more details on possible values.
-    #
-    # When running inside a Rails app, you may want to use
-    # {#rails_execution_mode}, which takes the current Rails environment into
-    # account when determining the final value.
-    #
-    # @param default [Symbol]
-    #   Value to use if none was specified in the configuration.
-    # @return [Symbol]
-    def execution_mode(default: :external)
-      if defined?(GOOD_JOB_WITHIN_CLI) && GOOD_JOB_WITHIN_CLI
-        :external
-      elsif options[:execution_mode]
-        options[:execution_mode]
-      elsif rails_config[:execution_mode]
-        rails_config[:execution_mode]
-      elsif env['GOOD_JOB_EXECUTION_MODE'].present?
-        env['GOOD_JOB_EXECUTION_MODE'].to_sym
-      else
-        default
-      end
+    def validate!
+      raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
     end
 
-    # Like {#execution_mode}, but takes the current Rails environment into
-    # account (e.g. in the +test+ environment, it falls back to +:inline+).
+    # Specifies how and where jobs should be executed. See {Adapter#initialize}
+    # for more details on possible values.
     # @return [Symbol]
-    def rails_execution_mode
-      if execution_mode(default: nil)
-        execution_mode
-      elsif Rails.env.development? || Rails.env.test?
-        :inline
-      else
-        :external
+    def execution_mode
+      return @_execution_mode if @_execution_mode
+
+      mode = if defined?(GOOD_JOB_WITHIN_EXE) && GOOD_JOB_WITHIN_EXE
+               :external
+             elsif options[:execution_mode]
+               options[:execution_mode]
+             elsif rails_config[:execution_mode]
+               rails_config[:execution_mode]
+             elsif env['GOOD_JOB_EXECUTION_MODE'].present?
+               env['GOOD_JOB_EXECUTION_MODE']
+             end
+      mode = mode.to_sym if mode
+
+      if mode == :async
+        ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+          GoodJob's execution mode configuration option `:async` has been deprecated. Replace with:
+
+          - `:async_server`: for async only within the web-process (`$ rails server`)
+          - `:async_all`: For async in all processes (equivalent to `async`).
+
+          In future versions, `:async` will behave like `:async_server. For more details:
+          https://github.com/bensheldon/good_job#configuration-options
+        DEPRECATION
+
+        mode = :async_all
       end
+
+      @_execution_mode = if mode
+                           mode
+                         elsif Rails.env.development? || Rails.env.test?
+                           :inline
+                         else
+                           :external
+                         end
     end
 
     # Indicates the number of threads to use per {Scheduler}. Note that

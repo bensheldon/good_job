@@ -3,15 +3,25 @@ require 'rails_helper'
 
 RSpec.describe GoodJob::Configuration do
   describe '#execution_mode' do
-    it 'defaults to :external' do
-      configuration = described_class.new({})
-      expect(configuration.execution_mode).to eq :external
+    context 'when in development' do
+      before do
+        allow(Rails).to receive(:env) { "development".inquiry }
+      end
+
+      it 'defaults to :inline' do
+        configuration = described_class.new({})
+        expect(configuration.execution_mode).to eq :inline
+      end
     end
 
-    context 'when an explicit default is passed' do
-      it 'falls back to the default' do
+    context 'when in production' do
+      before do
+        allow(Rails).to receive(:env) { "production".inquiry }
+      end
+
+      it 'defaults to :external' do
         configuration = described_class.new({})
-        expect(configuration.execution_mode(default: :truck)).to eq :truck
+        expect(configuration.execution_mode).to eq :external
       end
     end
   end
