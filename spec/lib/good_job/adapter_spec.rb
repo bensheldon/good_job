@@ -47,7 +47,7 @@ RSpec.describe GoodJob::Adapter do
         scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
         allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
 
-        adapter = described_class.new(execution_mode: :async_all, poll_interval: -1)
+        adapter = described_class.new(execution_mode: :async, poll_interval: -1)
         adapter.enqueue(active_job)
 
         expect(scheduler).to have_received(:create_thread)
@@ -79,7 +79,7 @@ RSpec.describe GoodJob::Adapter do
 
   describe '#execute_async?' do
     context 'when execution mode async_all' do
-      let(:adapter) { described_class.new(execution_mode: :async_all) }
+      let(:adapter) { described_class.new(execution_mode: :async) }
 
       it 'returns true' do
         expect(adapter.execute_async?).to eq true
@@ -105,7 +105,7 @@ RSpec.describe GoodJob::Adapter do
           hide_const("Rails::Server")
         end
 
-        it 'returns true' do
+        it 'returns false' do
           expect(adapter.execute_async?).to eq false
           expect(adapter.execute_externally?).to eq true
         end

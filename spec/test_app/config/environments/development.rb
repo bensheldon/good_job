@@ -67,7 +67,7 @@ Rails.application.configure do
     config.good_job.execution_mode = :async_server
   end
 
-  if config.good_job.execution_mode.in? [:async_all, :async_server, :async]
+  if config.good_job.execution_mode.in? [:async_server, :async]
     config.good_job.poll_interval = 30
   end
 end
