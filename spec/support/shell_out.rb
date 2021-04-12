@@ -2,6 +2,7 @@ require 'open3'
 
 class ShellOut
   WaitTimeout = Class.new(StandardError)
+  PROCESS_EXIT = "[PROCESS EXIT]".freeze
 
   def self.command(command, env: {}, &block)
     new.command(command, env: env, &block)
@@ -43,14 +44,14 @@ class ShellOut
           Process.kill('TERM', pid)
           wait_thr.value
         rescue Errno::ESRCH
-          puts "Process already exited."
+          @output << PROCESS_EXIT
         end
       end
 
       stdout_future.value
       stderr_future.value
 
-      output
+      @output
     end
   end
 end
