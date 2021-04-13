@@ -45,26 +45,23 @@ module GoodJob
     # for more details on possible values.
     # @return [Symbol]
     def execution_mode
-      return @_execution_mode if @_execution_mode
+      @_execution_mode ||= begin
+        mode = if defined?(GOOD_JOB_WITHIN_EXE) && GOOD_JOB_WITHIN_EXE
+                 :external
+               else
+                 options[:execution_mode] ||
+                   rails_config[:execution_mode] ||
+                   env['GOOD_JOB_EXECUTION_MODE']
+               end
 
-      mode = if defined?(GOOD_JOB_WITHIN_EXE) && GOOD_JOB_WITHIN_EXE
-               :external
-             elsif options[:execution_mode]
-               options[:execution_mode]
-             elsif rails_config[:execution_mode]
-               rails_config[:execution_mode]
-             elsif env['GOOD_JOB_EXECUTION_MODE'].present?
-               env['GOOD_JOB_EXECUTION_MODE']
-             end
-      mode = mode.to_sym if mode
-
-      @_execution_mode = if mode
-                           mode
-                         elsif Rails.env.development? || Rails.env.test?
-                           :inline
-                         else
-                           :external
-                         end
+        if mode
+          mode.to_sym
+        elsif Rails.env.development? || Rails.env.test?
+          :inline
+        else
+          :external
+        end
+      end
     end
 
     # Indicates the number of threads to use per {Scheduler}. Note that
