@@ -4,13 +4,15 @@ module GoodJob
   #
   class Adapter
     # Valid execution modes.
-    EXECUTION_MODES = [:async, :external, :inline].freeze
+    EXECUTION_MODES = [:async, :async_server, :external, :inline].freeze
 
     # @param execution_mode [nil, Symbol] specifies how and where jobs should be executed. You can also set this with the environment variable +GOOD_JOB_EXECUTION_MODE+.
     #
     #  - +:inline+ executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
     #  - +:external+ causes the adapter to enqueue jobs, but not execute them. When using this option (the default for production environments), you'll need to use the command-line tool to actually execute your jobs.
-    #  - +:async+ causes the adapter to execute you jobs in separate threads in whatever process queued them (usually the web process). This is akin to running the command-line tool's code inside your web server. It can be more economical for small workloads (you don't need a separate machine or environment for running your jobs), but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.
+    #  - +:async_server+ executes jobs in separate threads within the Rails webserver process (`bundle exec rails server`). It can be more economical for small workloads because you don't need a separate machine or environment for running your jobs, but if your web server is under heavy load or your jobs require a lot of resources, you should choose +:external+ instead.
+    #    When not in the Rails webserver, jobs will execute in +:external+ mode to ensure jobs are not executed within `rails console`, `rails db:migrate`, `rails assets:prepare`, etc.
+    #  - +:async+ executes jobs in any Rails process.
     #
     #  The default value depends on the Rails environment:
     #
@@ -46,8 +48,7 @@ module GoodJob
           poll_interval: poll_interval,
         }
       )
-
-      raise ArgumentError, "execution_mode: must be one of #{EXECUTION_MODES.join(', ')}." unless EXECUTION_MODES.include?(@configuration.execution_mode)
+      @configuration.validate!
 
       if execute_async? # rubocop:disable Style/GuardClause
         @notifier = GoodJob::Notifier.new
@@ -126,17 +127,30 @@ module GoodJob
 
     # Whether in +:async+ execution mode.
     def execute_async?
-      @configuration.execution_mode == :async
+      @configuration.execution_mode == :async ||
+        @configuration.execution_mode == :async_server && in_server_process?
     end
 
     # Whether in +:external+ execution mode.
     def execute_externally?
-      @configuration.execution_mode == :external
+      @configuration.execution_mode == :external ||
+        @configuration.execution_mode == :async_server && !in_server_process?
     end
 
     # Whether in +:inline+ execution mode.
     def execute_inline?
       @configuration.execution_mode == :inline
+    end
+
+    private
+
+    # Whether running in a web server process.
+    def in_server_process?
+      return @_in_server_process if defined? @_in_server_process
+
+      @_in_server_process = Rails.const_defined?('Server') ||
+                            caller.grep(%r{config.ru}).any? || # EXAMPLE: config.ru:3:in `block in <main>' OR config.ru:3:in `new_from_string'
+                            (Concurrent.on_jruby? && caller.grep(%r{jruby/rack/rails_booter}).any?) # EXAMPLE: uri:classloader:/jruby/rack/rails_booter.rb:83:in `load_environment'
     end
   end
 end

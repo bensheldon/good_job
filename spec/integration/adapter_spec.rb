@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Adapter Integration' do
-  let(:adapter) { GoodJob::Adapter.new }
+  let(:adapter) { GoodJob::Adapter.new(execution_mode: :external) }
 
   around do |example|
     original_adapter = ActiveJob::Base.queue_adapter

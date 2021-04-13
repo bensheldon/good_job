@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 require 'good_job/cli'
-GOOD_JOB_WITHIN_CLI = true
+GOOD_JOB_WITHIN_EXE = true
 GOOD_JOB_LOG_TO_STDOUT = true
 GoodJob::CLI.start(ARGV)

@@ -52,6 +52,10 @@ Rails/ApplicationJob:
 Rails/ApplicationRecord:
   Enabled: false
 
+Rails/Inquiry:
+  Exclude:
+    - spec/**/*
+
 RSpec/AnyInstance:
   Enabled: false
 

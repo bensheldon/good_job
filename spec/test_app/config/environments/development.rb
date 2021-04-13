@@ -63,13 +63,11 @@ Rails.application.configure do
   config.active_job.queue_adapter = :good_job
   if ENV['GOOD_JOB_EXECUTION_MODE']
     config.good_job.execution_mode = ENV['GOOD_JOB_EXECUTION_MODE'].to_sym
-  elsif Rails.const_defined?("Server")
-    config.good_job.execution_mode = :async
-  elsif Rails.const_defined?("Console")
-    config.good_job.execution_mode = :external
+  else
+    config.good_job.execution_mode = :async_server
   end
 
-  if config.good_job.execution_mode == :async
+  if config.good_job.execution_mode.in? [:async_server, :async]
     config.good_job.poll_interval = 30
   end
 end

@@ -119,10 +119,10 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - GoodJob can also be configured to execute jobs within the web server process to save on resources. This is useful for low-workloads when economy is paramount.
 
         ```
-        $ GOOD_JOB_EXECUTION_MODE=async rails server
+        $ GOOD_JOB_EXECUTION_MODE=async_server rails server
         ```
 
-        Additional configuration is likely necessary, see the reference below for async configuration.
+        Additional configuration is likely necessary, see the reference below for f configuration.
 
 ## Compatibility
 
@@ -206,7 +206,7 @@ Additional configuration can be provided via `config.good_job.OPTION = ...` for 
 config.active_job.queue_adapter = :good_job
 
 # Configure options individually...
-config.good_job.execution_mode = :async
+config.good_job.execution_mode = :async_server
 config.good_job.max_threads = 5
 config.good_job.poll_interval = 30 # seconds
 config.good_job.shutdown_timeout = 25 # seconds
@@ -214,7 +214,7 @@ config.good_job.shutdown_timeout = 25 # seconds
 
 # ...or all at once.
 config.good_job = {
-  execution_mode: :async,
+  execution_mode: :async_server,
   max_threads: 5,
   poll_interval: 30,
   shutdown_timeout: 25,
@@ -226,10 +226,11 @@ Available configuration options are:
 - `execution_mode` (symbol) specifies how and where jobs should be executed. You can also set this with the environment variable `GOOD_JOB_EXECUTION_MODE`. It can be any one of:
     - `:inline` executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
     - `:external` causes the adapter to enqueue jobs, but not execute them. When using this option (the default for production environments), you’ll need to use the command-line tool to actually execute your jobs.
-    - `:async` causes the adapter to execute you jobs in separate threads in whatever process queued them (usually the web process). This is akin to running the command-line tool’s code inside your web server. It can be more economical for small workloads (you don’t need a separate machine or environment for running your jobs), but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.
-- `max_threads` (integer) sets the maximum number of threads to use when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
-- `queues` (string) determines which queues to execute jobs from when `execution_mode` is set to `:async`. See the description of `good_job start` for more details on the format of this string. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
-- `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`.
+    - `:async_server` executes jobs in separate threads within the Rails webserver process (`bundle exec rails server`). It can be more economical for small workloads because you don’t need a separate machine or environment for running your jobs, but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.  When not in the Rails webserver, jobs will execute in `:external` mode to ensure jobs are not executed within `rails console`, `rails db:migrate`, `rails assets:prepare`, etc.
+    - `:async` executes jobs in separate threads in _any_ Rails process.
+- `max_threads` (integer) sets the maximum number of threads to use when `execution_mode` is set to `:async` or `:async_server`. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
+- `queues` (string) determines which queues to execute jobs from when `execution_mode` is set to `:async` or `:async_server`. See the description of `good_job start` for more details on the format of this string. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
+- `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async` or `:async_server`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`.
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
 - `shutdown_timeout` (float) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 
@@ -485,11 +486,11 @@ GoodJob can execute jobs "async" in the same process as the webserver (e.g. `bin
     config.active_job.queue_adapter = :good_job
 
     # To change the execution mode
-    config.good_job.execution_mode = :async
+    config.good_job.execution_mode = :async_server
 
     # Or with more configuration
     config.good_job = {
-      execution_mode: :async,
+      execution_mode: :async_server,
       max_threads: 4,
       poll_interval: 30
     }
@@ -498,7 +499,7 @@ GoodJob can execute jobs "async" in the same process as the webserver (e.g. `bin
 - Or, with environment variables:
 
     ```bash
-    $ GOOD_JOB_EXECUTION_MODE=async GOOD_JOB_MAX_THREADS=4 GOOD_JOB_POLL_INTERVAL=30 bin/rails server
+    $ GOOD_JOB_EXECUTION_MODE=async_server GOOD_JOB_MAX_THREADS=4 GOOD_JOB_POLL_INTERVAL=30 bin/rails server
     ```
 
 Depending on your application configuration, you may need to take additional steps:

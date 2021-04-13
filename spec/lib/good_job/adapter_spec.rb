@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Adapter do
-  let(:adapter) { described_class.new }
+  let(:adapter) { described_class.new(execution_mode: :external) }
   let(:active_job) { instance_double(ActiveJob::Base) }
   let(:good_job) { instance_double(GoodJob::Job, queue_name: 'default', scheduled_at: nil) }
 
@@ -74,6 +74,42 @@ RSpec.describe GoodJob::Adapter do
   describe '#shutdown' do
     it 'is callable' do
       adapter.shutdown
+    end
+  end
+
+  describe '#execute_async?' do
+    context 'when execution mode async_all' do
+      let(:adapter) { described_class.new(execution_mode: :async) }
+
+      it 'returns true' do
+        expect(adapter.execute_async?).to eq true
+      end
+    end
+
+    context 'when execution mode async_server' do
+      let(:adapter) { described_class.new(execution_mode: :async_server) }
+
+      context 'when Rails::Server is defined' do
+        before do
+          stub_const("Rails::Server", Class.new)
+        end
+
+        it 'returns true' do
+          expect(adapter.execute_async?).to eq true
+          expect(adapter.execute_externally?).to eq false
+        end
+      end
+
+      context 'when Rails::Server is not defined' do
+        before do
+          hide_const("Rails::Server")
+        end
+
+        it 'returns false' do
+          expect(adapter.execute_async?).to eq false
+          expect(adapter.execute_externally?).to eq true
+        end
+      end
     end
   end
 end
