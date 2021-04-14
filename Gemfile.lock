@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/AaronC81/sord.git
+  revision: 97c28d6589257e4fc3939241243db4c236a6f1b9
+  specs:
+    sord (3.0.1)
+      commander (~> 4.5)
+      parlour (~> 5.0)
+      sorbet-runtime
+      yard
+
+GIT
   remote: https://github.com/excid3/appraisal.git
   revision: 8bb003b273ae074356dc67b59ecc67c8ae2f3a27
   branch: fix-bundle-env
@@ -203,7 +213,6 @@ GEM
     mixlib-shellout (3.2.5)
       chef-utils
     msgpack (1.4.2)
-    msgpack (1.4.2-java)
     multi_json (1.15.0)
     multipart-post (2.1.1)
     nio4r (2.5.7)
@@ -345,7 +354,6 @@ GEM
       sorbet-static (= 0.5.6371)
     sorbet-runtime (0.5.6371)
     sorbet-runtime-stub (0.2.0)
-    sorbet-static (0.5.6371-java)
     sorbet-static (0.5.6371-universal-darwin-14)
     sorbet-static (0.5.6371-universal-darwin-15)
     sorbet-static (0.5.6371-universal-darwin-16)
@@ -354,11 +362,6 @@ GEM
     sorbet-static (0.5.6371-universal-darwin-19)
     sorbet-static (0.5.6371-universal-darwin-20)
     sorbet-static (0.5.6371-x86_64-linux)
-    sord (3.0.1)
-      commander (~> 4.5)
-      parlour (~> 5.0)
-      sorbet-runtime
-      yard
     spoom (1.1.0)
       colorize
       sorbet (>= 0.5.6347)
@@ -435,7 +438,7 @@ DEPENDENCIES
   sigdump
   sorbet
   sorbet-runtime
-  sord
+  sord!
   tapioca
   yard
   yard-activesupport-concern

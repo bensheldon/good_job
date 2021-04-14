@@ -255,6 +255,7 @@ module GoodJob
 
     private
 
+    # @return [Array<(Object, Exception)>]
     def execute
       params = serialized_params.merge(
         "provider_job_id" => id

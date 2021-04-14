@@ -26,7 +26,7 @@ module GoodJob
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def finished_timer_task(event)
       exception = event.payload[:error]
       return unless exception
@@ -36,7 +36,7 @@ module GoodJob
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def finished_job_task(event)
       exception = event.payload[:error]
       return unless exception
@@ -46,7 +46,7 @@ module GoodJob
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def scheduler_create_pool(event)
       max_threads = event.payload[:max_threads]
       performer_name = event.payload[:performer_name]
@@ -57,7 +57,7 @@ module GoodJob
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def scheduler_shutdown_start(event)
       process_id = event.payload[:process_id]
 
@@ -66,7 +66,7 @@ module GoodJob
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def scheduler_shutdown(event)
       process_id = event.payload[:process_id]
 
@@ -75,7 +75,7 @@ module GoodJob
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def scheduler_restart_pools(event)
       process_id = event.payload[:process_id]
 
@@ -84,7 +84,7 @@ module GoodJob
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def perform_job(event)
       good_job = event.payload[:good_job]
       process_id = event.payload[:process_id]
@@ -95,14 +95,14 @@ module GoodJob
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def notifier_listen(event) # rubocop:disable Lint/UnusedMethodArgument
       info do
         "Notifier subscribed with LISTEN"
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def notifier_notified(event)
       payload = event.payload[:payload]
 
@@ -111,7 +111,7 @@ module GoodJob
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def notifier_notify_error(event)
       error = event.payload[:error]
 
@@ -120,14 +120,14 @@ module GoodJob
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def notifier_unlisten(event) # rubocop:disable Lint/UnusedMethodArgument
       info do
         "Notifier unsubscribed with UNLISTEN"
       end
     end
 
-    # @macro notification_responder
+    # @!macro notification_responder
     def cleanup_preserved_jobs(event)
       timestamp = event.payload[:timestamp]
       deleted_records_count = event.payload[:deleted_records_count]

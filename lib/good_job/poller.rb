@@ -31,7 +31,7 @@ module GoodJob # :nodoc:
     # @return [Array<#call, Array(Object, Symbol)>]
     attr_reader :recipients
 
-    # @param recipients [Array<#call, Array(Object, Symbol)>]
+    # @param recipients [Array<Proc, #call, Array(Object, Symbol)>]
     # @param poll_interval [Hash] number of seconds between polls
     def initialize(*recipients, poll_interval: nil)
       @recipients = Concurrent::Array.new(recipients)
@@ -83,6 +83,9 @@ module GoodJob # :nodoc:
 
     # Invoked on completion of TimerTask task.
     # @!visibility private
+    # @param time [Integer]
+    # @param executed_task [Object]
+    # @param thread_error [Exception]
     # @return [void]
     def timer_observer(time, executed_task, thread_error)
       GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
@@ -91,8 +94,10 @@ module GoodJob # :nodoc:
 
     private
 
+    # @return [Concurrent::TimerTask]
     attr_reader :timer
 
+    # @return [void]
     def create_timer
       return if @timer_options[:execution_interval] <= 0
 

@@ -22,7 +22,7 @@ platforms :ruby do
   gem "rbtrace"
   gem "sorbet"
   gem "sorbet-runtime"
-  gem "sord"
+  gem "sord", github: "AaronC81/sord" # https://github.com/AaronC81/sord/pull/127b
   gem "tapioca"
 
   group :lint do
