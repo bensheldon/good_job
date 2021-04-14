@@ -187,6 +187,8 @@ module GoodJob # :nodoc:
       }
     end
 
+    # Preload existing runnable and future-scheduled jobs
+    # @return [void]
     def warm_cache
       return if @max_cache.zero?
 
@@ -259,10 +261,14 @@ module GoodJob # :nodoc:
     # Custom sub-class of +Concurrent::TimerSet+ for additional behavior.
     # @private
     class TimerSet < Concurrent::TimerSet
+      # Number of scheduled jobs in the queue
+      # @return [Integer]
       def length
         @queue.length
       end
 
+      # Clear the queue
+      # @return [void]
       def reset
         synchronize { @queue.clear }
       end
