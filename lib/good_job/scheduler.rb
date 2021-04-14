@@ -30,7 +30,7 @@ module GoodJob # :nodoc:
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated Schedulers in the current process.
-    #   @return [Array<GoodJob:Scheduler>]
+    #   @return [Array<GoodJob::Scheduler>]
     cattr_reader :instances, default: [], instance_reader: false
 
     # Creates GoodJob::Scheduler(s) and Performers from a GoodJob::Configuration instance.
