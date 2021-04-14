@@ -204,7 +204,7 @@ module GoodJob # :nodoc:
 
     def create_executor
       instrument("scheduler_create_pool", { performer_name: performer.name, max_threads: @executor_options[:max_threads] }) do
-        @timer_set = Concurrent::TimerSet.new
+        @timer_set = TimerSet.new
         @executor = ThreadPoolExecutor.new(@executor_options)
       end
     end
@@ -230,7 +230,7 @@ module GoodJob # :nodoc:
     end
 
     def cache_count
-      timer_set.instance_variable_get(:@queue).length
+      timer_set.length
     end
 
     def remaining_cache_count
@@ -253,6 +253,18 @@ module GoodJob # :nodoc:
             workers_still_to_be_created + workers_created_but_waiting
           end
         end
+      end
+    end
+
+    # Custom sub-class of +Concurrent::TimerSet+ for additional behavior.
+    # @private
+    class TimerSet < Concurrent::TimerSet
+      def length
+        @queue.length
+      end
+
+      def reset
+        synchronize { @queue.clear }
       end
     end
   end
