@@ -1,3 +1,4 @@
+# typed: false
 module GoodJob
   #
   # Adds Postgres advisory locking capabilities to an ActiveRecord record.
@@ -244,11 +245,6 @@ module GoodJob
     end
 
     private
-
-    def sanitize_sql_for_conditions(*args)
-      # Made public in Rails 5.2
-      self.class.send(:sanitize_sql_for_conditions, *args)
-    end
 
     def pg_or_jdbc_query(query)
       if Concurrent.on_jruby?

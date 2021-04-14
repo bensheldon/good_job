@@ -1,3 +1,4 @@
+# typed: true
 require 'concurrent/delay'
 
 module GoodJob

@@ -1,3 +1,4 @@
+# typed: true
 module GoodJob
   #
   # +GoodJob::Configuration+ provides normalized configuration information to

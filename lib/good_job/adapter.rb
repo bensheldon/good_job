@@ -1,3 +1,4 @@
+# typed: true
 module GoodJob
   #
   # ActiveJob Adapter.
@@ -23,7 +24,7 @@ module GoodJob
     # @param queues [nil, String] determines which queues to execute jobs from when +execution_mode+ is set to +:async+. See {file:README.md#optimize-queues-threads-and-processes} for more details on the format of this string. You can also set this with the environment variable +GOOD_JOB_QUEUES+. Defaults to +"*"+.
     # @param poll_interval [nil, Integer] sets the number of seconds between polls for jobs when +execution_mode+ is set to +:async+. You can also set this with the environment variable +GOOD_JOB_POLL_INTERVAL+. Defaults to +1+.
     def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil)
-      if caller[0..4].find { |c| c.include?("/config/application.rb") || c.include?("/config/environments/") }
+      if caller[0..4]&.find { |c| c.include?("/config/application.rb") || c.include?("/config/environments/") }
         ActiveSupport::Deprecation.warn(<<~DEPRECATION)
           GoodJob no longer recommends creating a GoodJob::Adapter instance:
 

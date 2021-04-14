@@ -1,3 +1,4 @@
+# typed: true
 require 'active_support/core_ext/module/attribute_accessors_per_thread'
 
 module GoodJob
@@ -31,7 +32,7 @@ module GoodJob
 
     # @return [String] Current thread name
     def self.thread_name
-      (Thread.current.name || Thread.current.object_id).to_s
+      (T.unsafe(Thread.current.name) || Thread.current.object_id).to_s
     end
   end
 end

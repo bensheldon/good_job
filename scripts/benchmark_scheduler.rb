@@ -1,3 +1,4 @@
+# typed: true
 #
 # $ bundle exec ruby scripts/benchmark_scheduler.rb
 #

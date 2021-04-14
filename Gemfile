@@ -20,6 +20,10 @@ platforms :ruby do
   gem "memory_profiler"
   gem "pry-byebug"
   gem "rbtrace"
+  gem "sorbet"
+  gem "sorbet-runtime"
+  gem "sord"
+  gem "tapioca"
 
   group :lint do
     gem "erb_lint", ">= 0.0.35"
@@ -28,5 +32,6 @@ platforms :ruby do
     gem "rubocop-performance"
     gem "rubocop-rails"
     gem "rubocop-rspec"
+    gem "rubocop-sorbet"
   end
 end

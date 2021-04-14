@@ -1,3 +1,4 @@
+# typed: true
 require 'concurrent/atomic/atomic_boolean'
 
 module GoodJob # :nodoc:

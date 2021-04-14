@@ -1,3 +1,6 @@
+# typed: true
+require "sorbet-runtime-stub" unless defined?(T)
+
 require "rails"
 require "active_job"
 require "active_job/queue_adapters"
@@ -55,6 +58,7 @@ module GoodJob
   mattr_accessor :retry_on_unhandled_error, default: true
 
   # @deprecated Use {GoodJob#retry_on_unhandled_error} instead.
+  # @return [Boolean]
   def self.reperform_jobs_on_standard_error
     ActiveSupport::Deprecation.warn(
       "Calling 'GoodJob.reperform_jobs_on_standard_error' is deprecated. Please use 'retry_on_unhandled_error'"
@@ -63,6 +67,8 @@ module GoodJob
   end
 
   # @deprecated Use {GoodJob#retry_on_unhandled_error=} instead.
+  # @param value [Boolean]
+  # @return [Boolean]
   def self.reperform_jobs_on_standard_error=(value)
     ActiveSupport::Deprecation.warn(
       "Setting 'GoodJob.reperform_jobs_on_standard_error=' is deprecated. Please use 'retry_on_unhandled_error='"
@@ -77,7 +83,7 @@ module GoodJob
   #   @example Send errors to Sentry
   #     # config/initializers/good_job.rb
   #     GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
-  #   @return [#call, nil]
+  #   @return [Proc, nil]
   mattr_accessor :on_thread_error, default: nil
 
   # Stop executing jobs.
@@ -85,6 +91,7 @@ module GoodJob
   # When forking processes you should shut down these background threads before forking, and restart them after forking.
   # For example, you should use +shutdown+ and +restart+ when using async execution mode with Puma.
   # See the {file:README.md#executing-jobs-async--in-process} for more explanation and examples.
+  # @param timeout [nil, Numeric] Seconds to wait for active threads to finish
   # @param wait [Boolean] whether to wait for shutdown
   # @return [void]
   def self.shutdown(timeout: -1, wait: nil)
@@ -114,6 +121,7 @@ module GoodJob
   # When forking processes you should shut down these background threads before forking, and restart them after forking.
   # For example, you should use +shutdown+ and +restart+ when using async execution mode with Puma.
   # See the {file:README.md#executing-jobs-async--in-process} for more explanation and examples.
+  # @param timeout [nil, Numeric] Seconds to wait for active threads to finish.
   # @return [void]
   def self.restart(timeout: -1)
     executables = Array(Notifier.instances) + Array(Poller.instances) + Array(Scheduler.instances)

@@ -1,3 +1,4 @@
+# typed: true
 require "concurrent/executor/thread_pool_executor"
 require "concurrent/executor/timer_set"
 require "concurrent/scheduled_task"
@@ -204,6 +205,7 @@ module GoodJob # :nodoc:
 
     attr_reader :performer, :executor, :timer_set
 
+    # @return [void]
     def create_executor
       instrument("scheduler_create_pool", { performer_name: performer.name, max_threads: @executor_options[:max_threads] }) do
         @timer_set = TimerSet.new
@@ -211,9 +213,11 @@ module GoodJob # :nodoc:
       end
     end
 
+    # @param delay [Integer]
+    # @return [void]
     def create_task(delay = 0)
       future = Concurrent::ScheduledTask.new(delay, args: [performer], executor: executor, timer_set: timer_set) do |thr_performer|
-        output = nil
+        output = T.let(nil, T.untyped)
         Rails.application.executor.wrap { output = thr_performer.next }
         output
       end
@@ -221,6 +225,9 @@ module GoodJob # :nodoc:
       future.execute
     end
 
+    # @param name [String]
+    # @param payload [Hash]
+    # @return [void]
     def instrument(name, payload = {}, &block)
       payload = payload.reverse_merge({
                                         scheduler: self,

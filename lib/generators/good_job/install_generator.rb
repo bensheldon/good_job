@@ -1,3 +1,4 @@
+# typed: false
 require 'rails/generators'
 require 'rails/generators/active_record'
 

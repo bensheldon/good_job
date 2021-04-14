@@ -1,3 +1,4 @@
+# typed: true
 module GoodJob
   #
   # Manages daemonization of the current process.

@@ -1,3 +1,4 @@
+# typed: true
 module GoodJob
   class DashboardsController < GoodJob::BaseController
     class JobFilter

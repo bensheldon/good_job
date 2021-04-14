@@ -1,3 +1,4 @@
+# typed: true
 module GoodJob
   class ActiveJobsController < GoodJob::BaseController
     def show

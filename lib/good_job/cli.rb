@@ -1,4 +1,8 @@
+# typed: true
 require 'thor'
+
+GOOD_JOB_WITHIN_EXE = false
+GOOD_JOB_LOG_TO_STDOUT = false
 
 module GoodJob
   #
@@ -94,7 +98,7 @@ module GoodJob
 
       Kernel.loop do
         sleep 0.1
-        break if @stop_good_job_executable || scheduler.shutdown? || notifier.shutdown?
+        break if T.unsafe(@stop_good_job_executable) || scheduler.shutdown? || notifier.shutdown?
       end
 
       executors = [notifier, poller, scheduler]

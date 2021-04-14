@@ -1,3 +1,4 @@
+# typed: true
 module GoodJob
   #
   # Listens to GoodJob notifications and logs them.
@@ -14,6 +15,7 @@ module GoodJob
 
     # @!macro notification_responder
     #   Responds to the +$0.good_job+ notification.
+    #   @param event [ActiveSupport::Notifications::Event]
     #   @return [void]
     def create(event)
       # FIXME: This method does not match any good_job notifications.
@@ -94,7 +96,7 @@ module GoodJob
     end
 
     # @macro notification_responder
-    def notifier_listen(_event)
+    def notifier_listen(event) # rubocop:disable Lint/UnusedMethodArgument
       info do
         "Notifier subscribed with LISTEN"
       end
@@ -119,7 +121,7 @@ module GoodJob
     end
 
     # @macro notification_responder
-    def notifier_unlisten(_event)
+    def notifier_unlisten(event) # rubocop:disable Lint/UnusedMethodArgument
       info do
         "Notifier unsubscribed with UNLISTEN"
       end

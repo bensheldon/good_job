@@ -29,6 +29,9 @@ FileUtils.chdir GEM_ROOT do
 
   system! "bundle exec rubocop #{flags.join(' ')}"
 
+  puts "\n== Sorbet Type Checking =="
+  system! "bundle exec srb tc"
+
   puts "\n== ERB Lint =="
   if options[:nofix]
     system!("bundle exec erblint engine/app/views")

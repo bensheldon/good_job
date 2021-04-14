@@ -1,3 +1,4 @@
+# typed: true
 module GoodJob
   #
   # Represents a request to perform an +ActiveJob+ job.
@@ -19,6 +20,7 @@ module GoodJob
 
     # Parse a string representing a group of queues into a more readable data
     # structure.
+    # @param string [String] Queue string
     # @return [Hash]
     #   How to match a given queue. It can have the following keys and values:
     #   - +{ all: true }+ indicates that all queues match.
@@ -140,9 +142,9 @@ module GoodJob
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
     def self.perform_with_advisory_lock
-      good_job = nil
-      result = nil
-      error = nil
+      good_job = T.let(nil, T.nilable(GoodJob::Job))
+      result = T.let(nil, T.untyped)
+      error = T.let(nil, T.nilable(Exception))
 
       unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock do |good_jobs|
         good_job = good_jobs.first
@@ -156,6 +158,9 @@ module GoodJob
     end
 
     # Fetches the scheduled execution time of the next eligible Job(s).
+    # @param after [DateTime]
+    # @param limit [Integer]
+    # @param now_limit [nil, Integer]
     # @return [Array<(DateTime)>]
     def self.next_scheduled_at(after: nil, limit: 100, now_limit: nil)
       query = advisory_unlocked.unfinished.schedule_ordered
@@ -182,7 +187,8 @@ module GoodJob
     # @return [Job]
     #   The new {Job} instance representing the queued ActiveJob job.
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
-      good_job = nil
+      good_job = T.let(nil, T.nilable(GoodJob::Job))
+
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         good_job = GoodJob::Job.new(
           queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
