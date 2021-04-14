@@ -46,7 +46,7 @@ module GoodJob
     # @return [Symbol]
     def execution_mode
       @_execution_mode ||= begin
-        mode = if defined?(GOOD_JOB_WITHIN_EXE) && GOOD_JOB_WITHIN_EXE
+        mode = if GoodJob::CLI.within_exe?
                  :external
                else
                  options[:execution_mode] ||

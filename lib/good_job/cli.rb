@@ -15,9 +15,21 @@ module GoodJob
     # Requiring this loads the application's configuration and classes.
     RAILS_ENVIRONMENT_RB = File.expand_path("config/environment.rb")
 
-    # @!visibility private
-    def self.exit_on_failure?
-      true
+    class << self
+      # Whether the CLI is running from the executable
+      # @return [Boolean, nil]
+      attr_accessor :within_exe
+      alias within_exe? within_exe
+
+      # Whether to log to STDOUT
+      # @return [Boolean, nil]
+      attr_accessor :log_to_stdout
+      alias log_to_stdout? log_to_stdout
+
+      # @!visibility private
+      def exit_on_failure?
+        true
+      end
     end
 
     # @!macro thor.desc
@@ -136,7 +148,7 @@ module GoodJob
       # Rails or from the application can be set up here.
       def set_up_application!
         require RAILS_ENVIRONMENT_RB
-        return unless defined?(GOOD_JOB_LOG_TO_STDOUT) && GOOD_JOB_LOG_TO_STDOUT && !ActiveSupport::Logger.logger_outputs_to?(GoodJob.logger, $stdout)
+        return unless GoodJob::CLI.log_to_stdout? && !ActiveSupport::Logger.logger_outputs_to?(GoodJob.logger, $stdout)
 
         GoodJob::LogSubscriber.loggers << ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
         GoodJob::LogSubscriber.reset_logger
