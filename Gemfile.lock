@@ -235,6 +235,7 @@ GEM
     parser (3.0.0.0)
       ast (~> 2.4.1)
     pg (1.2.3)
+    polyfill (1.9.0)
     protocol-hpack (1.4.2)
     protocol-http (0.21.0)
     protocol-http1 (0.13.2)
@@ -342,6 +343,7 @@ GEM
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.4)
     rubyzip (2.3.0)
+    safe_type (1.1.1)
     sawyer (0.8.2)
       addressable (>= 2.3.5)
       faraday (> 0.8, < 2.0)
@@ -352,6 +354,16 @@ GEM
     smart_properties (1.15.0)
     sorbet (0.5.6371)
       sorbet-static (= 0.5.6371)
+    sorbet-coerce (0.4.0)
+      polyfill (~> 1.8)
+      safe_type (~> 1.1, >= 1.1.1)
+      sorbet-runtime (>= 0.4.4704)
+    sorbet-rails (0.7.3)
+      method_source (>= 0.9.2)
+      parlour (>= 4.0.1)
+      parser (>= 2.7)
+      sorbet-coerce (>= 0.2.6)
+      sorbet-runtime (>= 0.5)
     sorbet-runtime (0.5.6371)
     sorbet-runtime-stub (0.2.0)
     sorbet-static (0.5.6371-universal-darwin-14)
@@ -437,6 +449,7 @@ DEPENDENCIES
   selenium-webdriver
   sigdump
   sorbet
+  sorbet-rails
   sorbet-runtime
   sord!
   tapioca

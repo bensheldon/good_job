@@ -1,9 +1,6 @@
 # typed: true
 require 'thor'
 
-GOOD_JOB_WITHIN_EXE = false
-GOOD_JOB_LOG_TO_STDOUT = false
-
 module GoodJob
   #
   # Implements the +good_job+ command-line tool, which executes jobs and

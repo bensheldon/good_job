@@ -197,13 +197,13 @@ module GoodJob
 
       self.class.loggers.inject(block) do |inner, each_logger|
         if each_logger.respond_to?(:tagged)
-          tags_for_logger = if each_logger.formatter.current_tags.include?("ActiveJob")
+          tags_for_logger = if T.unsafe(each_logger.formatter).current_tags.include?("ActiveJob")
                               good_job_tag + tags
                             else
                               tags
                             end
 
-          proc { each_logger.tagged(*tags_for_logger, &inner) }
+          proc { T.unsafe(each_logger).tagged(*tags_for_logger, &inner) }
         else
           inner
         end

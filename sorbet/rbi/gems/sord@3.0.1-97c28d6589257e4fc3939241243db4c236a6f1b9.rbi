@@ -18,6 +18,7 @@ class Sord::Generator
   def add_namespace(item); end
   def count_method; end
   def count_namespace; end
+  def fix_default_if_unary_minus(default); end
   def generate; end
   def object_count; end
   def populate; end

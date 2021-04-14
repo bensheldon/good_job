@@ -1540,13 +1540,13 @@
 # wrong constant name <Class:NullSessionHash>
 # wrong constant name handle_unverified_request
 # wrong constant name initialize
-# uninitialized constant #<Class:0x00007fb1119efd08>::DOMAIN_REGEXP
+# uninitialized constant #<Class:0x00007fee8a2119e0>::DOMAIN_REGEXP
 # Did you mean?  ActionController::RequestForgeryProtection::ProtectionMethods::NullSession::NullCookieJar::DOMAIN_REGEXP
-# uninitialized constant #<Class:0x00007fb1119efd08>::Elem
+# uninitialized constant #<Class:0x00007fee8a2119e0>::Elem
 # wrong constant name write
 # wrong constant name <static-init>
-# uninitialized constant #<Class:0x00007fb10e2d8400>::Elem
-# uninitialized constant #<Class:0x00007fb10e2d8400>::Unspecified
+# uninitialized constant #<Class:0x00007fee86a80530>::Elem
+# uninitialized constant #<Class:0x00007fee86a80530>::Unspecified
 # Did you mean?  ActionController::RequestForgeryProtection::ProtectionMethods::NullSession::NullSessionHash::Unspecified
 # wrong constant name initialize
 # wrong constant name <static-init>
@@ -1866,6 +1866,9 @@
 # wrong constant name <static-init>
 # uninitialized constant ActionMailbox::InboundEmail(Table doesn't exist)::ACTIONS
 # Did you mean?  ActionMailbox::InboundEmail::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # uninitialized constant ActionMailbox::InboundEmail(Table doesn't exist)::CALLBACKS
 # Did you mean?  ActionMailbox::InboundEmail::Callbacks
 #                ActionMailbox::Callbacks
@@ -1877,6 +1880,7 @@
 # Did you mean?  ActionMailbox::InboundEmail::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # wrong constant name <Class:Incineratable>
 # uninitialized constant ActionMailbox::InboundEmail(Table doesn't exist)::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  ActionMailbox::InboundEmail::MAX_PASSWORD_LENGTH_ALLOWED
@@ -1888,6 +1892,7 @@
 # uninitialized constant ActionMailbox::InboundEmail(Table doesn't exist)::RESTRICTED_CLASS_METHODS
 # Did you mean?  ActionMailbox::InboundEmail::RESTRICTED_CLASS_METHODS
 # wrong constant name <Class:Routable>
+# wrong constant name <Class:Status>
 # uninitialized constant ActionMailbox::InboundEmail(Table doesn't exist)::UNASSIGNABLE_KEYS
 # Did you mean?  ActionMailbox::InboundEmail::UNASSIGNABLE_KEYS
 # wrong constant name autosave_associated_records_for_raw_email_attachment
@@ -1895,6 +1900,84 @@
 # wrong constant name mail
 # wrong constant name processed?
 # wrong constant name source
+# wrong constant name typed_status
+# wrong constant name typed_status=
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::ClassMethods
+#                ActionMailbox::InboundEmail::ClassMethods
+#                ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::CLAUSE_METHODS
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ActionMailbox::InboundEmail::ClassMethods
+#                ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+#                ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::Elem
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+#                ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::FROZEN_EMPTY_HASH
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+#                ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::INVALID_METHODS_FOR_DELETE_ALL
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::MULTI_VALUE_METHODS
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::NILCLASS_STRING
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::ONE_AS_ONE
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::ORDER_IGNORE_MESSAGE
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::SINGLE_VALUE_METHODS
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::STRUCTURAL_VALUE_METHODS
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::VALID_DIRECTIONS
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::VALID_UNSCOPING_VALUES
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant #<Class:0x00007fee7d58c1b8>::VALUE_METHODS
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+#                ActionMailbox::InboundEmail::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Relation::ClassMethods
+#                ActionMailbox::InboundEmail::ClassMethods
+#                ActionMailbox::InboundEmail::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::Elem
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionMailbox::InboundEmail::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ActionMailbox::InboundEmail::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
 # wrong constant name build_raw_email_attachment
 # wrong constant name create_raw_email_attachment
 # wrong constant name create_raw_email_attachment!
@@ -1907,6 +1990,18 @@
 # wrong constant name reload_raw_email_attachment
 # wrong constant name reload_raw_email_blob
 # wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name bounced
+# wrong constant name delivered
+# wrong constant name failed
+# wrong constant name not_bounced
+# wrong constant name not_delivered
+# wrong constant name not_failed
+# wrong constant name not_pending
+# wrong constant name not_processing
+# wrong constant name pending
+# wrong constant name processing
+# wrong constant name with_attached_raw_email
 # wrong constant name <static-init>
 # wrong constant name <Class:Incineration>
 # wrong constant name incinerate
@@ -1922,6 +2017,9 @@
 # wrong constant name route
 # wrong constant name route_later
 # wrong constant name <static-init>
+# undefined singleton method `sealed_subclasses' for `ActionMailbox::InboundEmail::Status'
+# wrong constant name <static-init>
+# wrong constant name sealed_subclasses
 # wrong constant name <static-init>
 # wrong constant name bounced
 # wrong constant name delivered
@@ -2042,6 +2140,9 @@
 # wrong constant name <static-init>
 # uninitialized constant ActionMailbox::Record(abstract)::ACTIONS
 # Did you mean?  ActionMailbox::Record::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # uninitialized constant ActionMailbox::Record(abstract)::CALLBACKS
 # Did you mean?  ActionMailbox::Record::Callbacks
 #                ActionMailbox::Callbacks
@@ -2053,6 +2154,7 @@
 # Did you mean?  ActionMailbox::Record::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # uninitialized constant ActionMailbox::Record(abstract)::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  ActionMailbox::Record::MAX_PASSWORD_LENGTH_ALLOWED
 # uninitialized constant ActionMailbox::Record(abstract)::MINIMUM_TOKEN_LENGTH
@@ -2063,6 +2165,70 @@
 # Did you mean?  ActionMailbox::Record::RESTRICTED_CLASS_METHODS
 # uninitialized constant ActionMailbox::Record(abstract)::UNASSIGNABLE_KEYS
 # Did you mean?  ActionMailbox::Record::UNASSIGNABLE_KEYS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ActionMailbox::Record::ActiveRecord_AssociationRelation::ClassMethods
+#                ActionMailbox::Record::ClassMethods
+#                ActionMailbox::Record::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionMailbox::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ActionMailbox::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionMailbox::Record::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ActionMailbox::Record::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# Did you mean?  ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ActionMailbox::Record::ClassMethods
+#                ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::Elem
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# Did you mean?  ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# Did you mean?  ActionMailbox::Record::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ActionMailbox::Record::ActiveRecord_Relation::ClassMethods
+#                ActionMailbox::Record::ClassMethods
+#                ActionMailbox::Record::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::Elem
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionMailbox::Record::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActionMailbox::Record::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionMailbox::Record::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ActionMailbox::Record::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
@@ -2657,6 +2823,9 @@
 # wrong constant name <static-init>
 # uninitialized constant ActionText::Record(abstract)::ACTIONS
 # Did you mean?  ActionText::Record::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # uninitialized constant ActionText::Record(abstract)::CALLBACKS
 # Did you mean?  ActionText::Record::Callbacks
 #                ActionText::Record::Callback
@@ -2667,6 +2836,7 @@
 # Did you mean?  ActionText::Record::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # uninitialized constant ActionText::Record(abstract)::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  ActionText::Record::MAX_PASSWORD_LENGTH_ALLOWED
 # uninitialized constant ActionText::Record(abstract)::MINIMUM_TOKEN_LENGTH
@@ -2677,6 +2847,70 @@
 # Did you mean?  ActionText::Record::RESTRICTED_CLASS_METHODS
 # uninitialized constant ActionText::Record(abstract)::UNASSIGNABLE_KEYS
 # Did you mean?  ActionText::Record::UNASSIGNABLE_KEYS
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ActionText::Record::ActiveRecord_AssociationRelation::ClassMethods
+#                ActionText::Record::ClassMethods
+#                ActionText::Record::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionText::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ActionText::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionText::Record::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ActionText::Record::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# Did you mean?  ActionText::Record::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ActionText::Record::ClassMethods
+#                ActionText::Record::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::Elem
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionText::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# Did you mean?  ActionText::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionText::Record::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# Did you mean?  ActionText::Record::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ActionText::Record::ActiveRecord_Relation::ClassMethods
+#                ActionText::Record::ClassMethods
+#                ActionText::Record::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::Elem
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionText::Record::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActionText::Record::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionText::Record::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ActionText::Record::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
@@ -2687,6 +2921,9 @@
 # wrong constant name <static-init>
 # uninitialized constant ActionText::RichText(Table doesn't exist)::ACTIONS
 # Did you mean?  ActionText::RichText::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # uninitialized constant ActionText::RichText(Table doesn't exist)::CALLBACKS
 # Did you mean?  ActionText::RichText::Callbacks
 #                ActionText::RichText::Callback
@@ -2698,6 +2935,7 @@
 # wrong constant name <Class:EmbedsAttachmentsAssociationExtension>
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # uninitialized constant ActionText::RichText(Table doesn't exist)::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  ActionText::RichText::MAX_PASSWORD_LENGTH_ALLOWED
 # uninitialized constant ActionText::RichText(Table doesn't exist)::MINIMUM_TOKEN_LENGTH
@@ -2719,6 +2957,69 @@
 # wrong constant name to_s
 # wrong constant name validate_associated_records_for_embeds_attachments
 # wrong constant name validate_associated_records_for_embeds_blobs
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ActionText::RichText::ActiveRecord_AssociationRelation::ClassMethods
+#                ActionText::RichText::ClassMethods
+#                ActionText::RichText::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionText::RichText::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ActionText::RichText::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionText::RichText::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ActionText::RichText::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# Did you mean?  ActionText::RichText::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ActionText::RichText::ClassMethods
+#                ActionText::RichText::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::Elem
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionText::RichText::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# Did you mean?  ActionText::RichText::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionText::RichText::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# Did you mean?  ActionText::RichText::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ActionText::RichText::ActiveRecord_Relation::ClassMethods
+#                ActionText::RichText::ClassMethods
+#                ActionText::RichText::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::Elem
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActionText::RichText::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActionText::RichText::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActionText::RichText::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ActionText::RichText::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
 # wrong constant name purge
 # wrong constant name purge_later
 # wrong constant name <static-init>
@@ -2736,6 +3037,8 @@
 # wrong constant name record=
 # wrong constant name reload_record
 # wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name with_attached_embeds
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name after_add_for_embeds_attachments
@@ -2956,6 +3259,8 @@
 # wrong constant name attachment_reflections
 # wrong constant name attachment_reflections=
 # wrong constant name attachment_reflections?
+# wrong constant name inherited
+# wrong constant name sbr_old_inherited
 # wrong constant name <Class:AlterTable>
 # wrong constant name <Class:Column>
 # wrong constant name <Class:ColumnMethods>
@@ -3285,9 +3590,9 @@
 #                ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::MoneyDecoder::TIMESTAMP_DB_LOCAL
 # wrong constant name decode
 # wrong constant name <static-init>
-# uninitialized constant #<Class:0x00007fb118396158>::DEFAULT_STATEMENT_LIMIT
+# uninitialized constant #<Class:0x00007fee86f176e8>::DEFAULT_STATEMENT_LIMIT
 # Did you mean?  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::StatementPool::DEFAULT_STATEMENT_LIMIT
-# uninitialized constant #<Class:0x00007fb118396158>::Elem
+# uninitialized constant #<Class:0x00007fee86f176e8>::Elem
 # wrong constant name initialize
 # wrong constant name next_key
 # wrong constant name <static-init>
@@ -3307,6 +3612,18 @@
 # wrong constant name length
 # wrong constant name <static-init>
 # wrong constant name postgresql_connection
+# wrong constant name <Class:ConflictTypedEnumNameError>
+# wrong constant name <Class:MultipleEnumsDefinedError>
+# uninitialized constant ActiveRecord::Enum::RUBYGEMS_ACTIVATION_MONITOR
+# wrong constant name _define_enum
+# wrong constant name _define_typed_enum
+# wrong constant name extract_enum_values
+# wrong constant name gen_typed_enum_values
+# wrong constant name old_enum
+# wrong constant name typed_enum
+# wrong constant name typed_enum_reflections
+# wrong constant name <static-init>
+# wrong constant name <static-init>
 # wrong constant name collect?
 # wrong constant name <Class:Base>
 # wrong constant name <Class:Migration>
@@ -3319,29 +3636,110 @@
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
-# uninitialized constant #<Class:0x00007fb104668de0>::ACTIONS
+# uninitialized constant #<Class:0x00007fee7ed25db0>::ACTIONS
 # Did you mean?  ActiveRecord::InternalMetadata::ACTIONS
-# uninitialized constant #<Class:0x00007fb104668de0>::CALLBACKS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
+# uninitialized constant #<Class:0x00007fee7ed25db0>::CALLBACKS
 # Did you mean?  ActiveRecord::InternalMetadata::Callbacks
 #                ActiveRecord::Callbacks
 #                ActiveRecord::InternalMetadata::Callback
 #                ActiveRecord::InternalMetadata::CALLBACKS
-# uninitialized constant #<Class:0x00007fb104668de0>::CALLBACK_FILTER_TYPES
+# uninitialized constant #<Class:0x00007fee7ed25db0>::CALLBACK_FILTER_TYPES
 # Did you mean?  ActiveRecord::InternalMetadata::CALLBACK_FILTER_TYPES
-# uninitialized constant #<Class:0x00007fb104668de0>::CALL_COMPILABLE_REGEXP
+# uninitialized constant #<Class:0x00007fee7ed25db0>::CALL_COMPILABLE_REGEXP
 # Did you mean?  ActiveRecord::InternalMetadata::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
-# uninitialized constant #<Class:0x00007fb104668de0>::MAX_PASSWORD_LENGTH_ALLOWED
+# wrong constant name <Class:GeneratedRelationMethods>
+# uninitialized constant #<Class:0x00007fee7ed25db0>::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  ActiveRecord::InternalMetadata::MAX_PASSWORD_LENGTH_ALLOWED
-# uninitialized constant #<Class:0x00007fb104668de0>::MINIMUM_TOKEN_LENGTH
+# uninitialized constant #<Class:0x00007fee7ed25db0>::MINIMUM_TOKEN_LENGTH
 # Did you mean?  ActiveRecord::InternalMetadata::MINIMUM_TOKEN_LENGTH
-# uninitialized constant #<Class:0x00007fb104668de0>::NAME_COMPILABLE_REGEXP
+# uninitialized constant #<Class:0x00007fee7ed25db0>::NAME_COMPILABLE_REGEXP
 # Did you mean?  ActiveRecord::InternalMetadata::NAME_COMPILABLE_REGEXP
-# uninitialized constant #<Class:0x00007fb104668de0>::RESTRICTED_CLASS_METHODS
+# uninitialized constant #<Class:0x00007fee7ed25db0>::RESTRICTED_CLASS_METHODS
 # Did you mean?  ActiveRecord::InternalMetadata::RESTRICTED_CLASS_METHODS
-# uninitialized constant #<Class:0x00007fb104668de0>::UNASSIGNABLE_KEYS
+# uninitialized constant #<Class:0x00007fee7ed25db0>::UNASSIGNABLE_KEYS
 # Did you mean?  ActiveRecord::InternalMetadata::UNASSIGNABLE_KEYS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::ClassMethods
+#                ActiveRecord::InternalMetadata::ClassMethods
+#                ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant #<Class:0x00007fee7ed241e0>::CLAUSE_METHODS
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ActiveRecord::InternalMetadata::ClassMethods
+#                ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+#                ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# uninitialized constant #<Class:0x00007fee7ed241e0>::Elem
+# uninitialized constant #<Class:0x00007fee7ed241e0>::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+#                ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant #<Class:0x00007fee7ed241e0>::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+#                ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant #<Class:0x00007fee7ed241e0>::INVALID_METHODS_FOR_DELETE_ALL
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant #<Class:0x00007fee7ed241e0>::MULTI_VALUE_METHODS
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7ed241e0>::NILCLASS_STRING
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant #<Class:0x00007fee7ed241e0>::ONE_AS_ONE
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant #<Class:0x00007fee7ed241e0>::ORDER_IGNORE_MESSAGE
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant #<Class:0x00007fee7ed241e0>::SINGLE_VALUE_METHODS
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7ed241e0>::STRUCTURAL_VALUE_METHODS
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7ed241e0>::VALID_DIRECTIONS
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant #<Class:0x00007fee7ed241e0>::VALID_UNSCOPING_VALUES
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant #<Class:0x00007fee7ed241e0>::VALUE_METHODS
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+#                ActiveRecord::InternalMetadata::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Relation::ClassMethods
+#                ActiveRecord::InternalMetadata::ClassMethods
+#                ActiveRecord::InternalMetadata::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::Elem
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveRecord::InternalMetadata::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ActiveRecord::InternalMetadata::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # uninitialized constant ActiveRecord::Point::Elem
@@ -3359,8 +3757,21 @@
 # wrong constant name db_runtime=
 # wrong constant name <static-init>
 # wrong constant name <static-init>
+# uninitialized constant ActiveRecord::Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveRecord::Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveRecord::Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveRecord::Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveRecord::Relation::NILCLASS_STRING
+# uninitialized constant ActiveRecord::Relation::ONE_AS_ONE
+# uninitialized constant ActiveRecord::Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveRecord::Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveRecord::Relation::VALID_DIRECTIONS
+# uninitialized constant ActiveRecord::Relation::VALID_UNSCOPING_VALUES
 # uninitialized constant ActiveRecord::SchemaMigration(version: string)::ACTIONS
 # Did you mean?  ActiveRecord::SchemaMigration::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # uninitialized constant ActiveRecord::SchemaMigration(version: string)::CALLBACKS
 # Did you mean?  ActiveRecord::SchemaMigration::Callbacks
 #                ActiveRecord::Callbacks
@@ -3372,6 +3783,7 @@
 # Did you mean?  ActiveRecord::SchemaMigration::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # uninitialized constant ActiveRecord::SchemaMigration(version: string)::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  ActiveRecord::SchemaMigration::MAX_PASSWORD_LENGTH_ALLOWED
 # uninitialized constant ActiveRecord::SchemaMigration(version: string)::MINIMUM_TOKEN_LENGTH
@@ -3382,9 +3794,92 @@
 # Did you mean?  ActiveRecord::SchemaMigration::RESTRICTED_CLASS_METHODS
 # uninitialized constant ActiveRecord::SchemaMigration(version: string)::UNASSIGNABLE_KEYS
 # Did you mean?  ActiveRecord::SchemaMigration::UNASSIGNABLE_KEYS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::ClassMethods
+#                ActiveRecord::SchemaMigration::ClassMethods
+#                ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant #<Class:0x00007fee7d7bd298>::CLAUSE_METHODS
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ActiveRecord::SchemaMigration::ClassMethods
+#                ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+#                ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# uninitialized constant #<Class:0x00007fee7d7bd298>::Elem
+# uninitialized constant #<Class:0x00007fee7d7bd298>::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+#                ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant #<Class:0x00007fee7d7bd298>::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+#                ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant #<Class:0x00007fee7d7bd298>::INVALID_METHODS_FOR_DELETE_ALL
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant #<Class:0x00007fee7d7bd298>::MULTI_VALUE_METHODS
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7d7bd298>::NILCLASS_STRING
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant #<Class:0x00007fee7d7bd298>::ONE_AS_ONE
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant #<Class:0x00007fee7d7bd298>::ORDER_IGNORE_MESSAGE
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant #<Class:0x00007fee7d7bd298>::SINGLE_VALUE_METHODS
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7d7bd298>::STRUCTURAL_VALUE_METHODS
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7d7bd298>::VALID_DIRECTIONS
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant #<Class:0x00007fee7d7bd298>::VALID_UNSCOPING_VALUES
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant #<Class:0x00007fee7d7bd298>::VALUE_METHODS
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+#                ActiveRecord::SchemaMigration::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Relation::ClassMethods
+#                ActiveRecord::SchemaMigration::ClassMethods
+#                ActiveRecord::SchemaMigration::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::Elem
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveRecord::SchemaMigration::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ActiveRecord::SchemaMigration::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name suppressed
+# wrong constant name enum_calls
+# wrong constant name get_enum_call
+# wrong constant name store_enum_call
+# undefined singleton method `instance' for `ActiveRecordOverrides'
+# wrong constant name <static-init>
+# wrong constant name instance
 # wrong constant name <Class:AnalyzeJob>
 # wrong constant name <Class:Analyzer>
 # wrong constant name <Class:Attached>
@@ -3543,6 +4038,9 @@
 # wrong constant name <static-init>
 # uninitialized constant ActiveStorage::Attachment(Table doesn't exist)::ACTIONS
 # Did you mean?  ActiveStorage::Attachment::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # uninitialized constant ActiveStorage::Attachment(Table doesn't exist)::CALLBACKS
 # Did you mean?  ActiveStorage::Attachment::Callbacks
 #                ActiveStorage::Attachment::Callback
@@ -3553,6 +4051,7 @@
 # Did you mean?  ActiveStorage::Attachment::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # uninitialized constant ActiveStorage::Attachment(Table doesn't exist)::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  ActiveStorage::Attachment::MAX_PASSWORD_LENGTH_ALLOWED
 # uninitialized constant ActiveStorage::Attachment(Table doesn't exist)::MINIMUM_TOKEN_LENGTH
@@ -3569,6 +4068,82 @@
 # wrong constant name purge_later
 # wrong constant name signed_id
 # wrong constant name validate_associated_records_for_blob
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_AssociationRelation::ClassMethods
+#                ActiveStorage::Attachment::ClassMethods
+#                ActiveStorage::Attachment::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ActiveStorage::Attachment::ClassMethods
+#                ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+#                ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::Elem
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+#                ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+#                ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::INVALID_METHODS_FOR_DELETE_ALL
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::MULTI_VALUE_METHODS
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::NILCLASS_STRING
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::ONE_AS_ONE
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::ORDER_IGNORE_MESSAGE
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::SINGLE_VALUE_METHODS
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::STRUCTURAL_VALUE_METHODS
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::VALID_DIRECTIONS
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::VALID_UNSCOPING_VALUES
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant #<Class:0x00007fee7f4f37b8>::VALUE_METHODS
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+#                ActiveStorage::Attachment::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Relation::ClassMethods
+#                ActiveStorage::Attachment::ClassMethods
+#                ActiveStorage::Attachment::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::Elem
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveStorage::Attachment::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ActiveStorage::Attachment::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
 # wrong constant name blob
 # wrong constant name blob=
 # wrong constant name build_blob
@@ -3578,6 +4153,7 @@
 # wrong constant name record=
 # wrong constant name reload_blob
 # wrong constant name reload_record
+# wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
@@ -3598,6 +4174,9 @@
 # wrong constant name <static-init>
 # uninitialized constant ActiveStorage::Blob(Table doesn't exist)::ACTIONS
 # Did you mean?  ActiveStorage::Blob::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # wrong constant name <Class:Analyzable>
 # uninitialized constant ActiveStorage::Blob(Table doesn't exist)::CALLBACKS
 # Did you mean?  ActiveStorage::Blob::Callbacks
@@ -3609,6 +4188,7 @@
 # Did you mean?  ActiveStorage::Blob::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # wrong constant name <Class:Identifiable>
 # uninitialized constant ActiveStorage::Blob(Table doesn't exist)::LOCATOR_NAME
 # Did you mean?  ActiveStorage::Blob::LOCATOR_NAME
@@ -3654,6 +4234,69 @@
 # wrong constant name validate_associated_records_for_attachments
 # wrong constant name validate_associated_records_for_variant_records
 # wrong constant name video?
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_AssociationRelation::ClassMethods
+#                ActiveStorage::Blob::ClassMethods
+#                ActiveStorage::Blob::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ActiveStorage::Blob::ClassMethods
+#                ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::Elem
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_Relation::ClassMethods
+#                ActiveStorage::Blob::ClassMethods
+#                ActiveStorage::Blob::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::Elem
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveStorage::Blob::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ActiveStorage::Blob::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
 # wrong constant name analyze
 # wrong constant name analyze_later
 # wrong constant name analyzed?
@@ -3678,6 +4321,9 @@
 # wrong constant name variant_records
 # wrong constant name variant_records=
 # wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name unattached
+# wrong constant name with_attached_preview_image
 # wrong constant name <static-init>
 # wrong constant name identified?
 # wrong constant name identify
@@ -3867,6 +4513,9 @@
 # wrong constant name <static-init>
 # uninitialized constant ActiveStorage::Record(abstract)::ACTIONS
 # Did you mean?  ActiveStorage::Record::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # uninitialized constant ActiveStorage::Record(abstract)::CALLBACKS
 # Did you mean?  ActiveStorage::Record::Callbacks
 #                ActiveStorage::Record::Callback
@@ -3877,6 +4526,7 @@
 # Did you mean?  ActiveStorage::Record::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # uninitialized constant ActiveStorage::Record(abstract)::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  ActiveStorage::Record::MAX_PASSWORD_LENGTH_ALLOWED
 # uninitialized constant ActiveStorage::Record(abstract)::MINIMUM_TOKEN_LENGTH
@@ -3887,6 +4537,70 @@
 # Did you mean?  ActiveStorage::Record::RESTRICTED_CLASS_METHODS
 # uninitialized constant ActiveStorage::Record(abstract)::UNASSIGNABLE_KEYS
 # Did you mean?  ActiveStorage::Record::UNASSIGNABLE_KEYS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::Record::ActiveRecord_AssociationRelation::ClassMethods
+#                ActiveStorage::Record::ClassMethods
+#                ActiveStorage::Record::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::Record::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveStorage::Record::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ActiveStorage::Record::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ActiveStorage::Record::ClassMethods
+#                ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::Elem
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# Did you mean?  ActiveStorage::Record::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::Record::ActiveRecord_Relation::ClassMethods
+#                ActiveStorage::Record::ClassMethods
+#                ActiveStorage::Record::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::Elem
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::Record::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::Record::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveStorage::Record::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ActiveStorage::Record::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
@@ -3989,6 +4703,9 @@
 # wrong constant name <static-init>
 # uninitialized constant ActiveStorage::VariantRecord(Table doesn't exist)::ACTIONS
 # Did you mean?  ActiveStorage::VariantRecord::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # uninitialized constant ActiveStorage::VariantRecord(Table doesn't exist)::CALLBACKS
 # Did you mean?  ActiveStorage::VariantRecord::Callbacks
 #                ActiveStorage::VariantRecord::Callback
@@ -3999,6 +4716,7 @@
 # Did you mean?  ActiveStorage::VariantRecord::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # uninitialized constant ActiveStorage::VariantRecord(Table doesn't exist)::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  ActiveStorage::VariantRecord::MAX_PASSWORD_LENGTH_ALLOWED
 # uninitialized constant ActiveStorage::VariantRecord(Table doesn't exist)::MINIMUM_TOKEN_LENGTH
@@ -4012,6 +4730,82 @@
 # wrong constant name autosave_associated_records_for_blob
 # wrong constant name autosave_associated_records_for_image_attachment
 # wrong constant name autosave_associated_records_for_image_blob
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::ClassMethods
+#                ActiveStorage::VariantRecord::ClassMethods
+#                ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant #<Class:0x00007fee698dc2f0>::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ActiveStorage::VariantRecord::ClassMethods
+#                ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+#                ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# uninitialized constant #<Class:0x00007fee698dc2f0>::Elem
+# uninitialized constant #<Class:0x00007fee698dc2f0>::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+#                ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant #<Class:0x00007fee698dc2f0>::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+#                ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant #<Class:0x00007fee698dc2f0>::INVALID_METHODS_FOR_DELETE_ALL
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant #<Class:0x00007fee698dc2f0>::MULTI_VALUE_METHODS
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee698dc2f0>::NILCLASS_STRING
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant #<Class:0x00007fee698dc2f0>::ONE_AS_ONE
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant #<Class:0x00007fee698dc2f0>::ORDER_IGNORE_MESSAGE
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant #<Class:0x00007fee698dc2f0>::SINGLE_VALUE_METHODS
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee698dc2f0>::STRUCTURAL_VALUE_METHODS
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant #<Class:0x00007fee698dc2f0>::VALID_DIRECTIONS
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant #<Class:0x00007fee698dc2f0>::VALID_UNSCOPING_VALUES
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant #<Class:0x00007fee698dc2f0>::VALUE_METHODS
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+#                ActiveStorage::VariantRecord::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Relation::ClassMethods
+#                ActiveStorage::VariantRecord::ClassMethods
+#                ActiveStorage::VariantRecord::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::Elem
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ActiveStorage::VariantRecord::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ActiveStorage::VariantRecord::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
 # wrong constant name blob
 # wrong constant name blob=
 # wrong constant name build_blob
@@ -4030,6 +4824,8 @@
 # wrong constant name reload_image_attachment
 # wrong constant name reload_image_blob
 # wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name with_attached_image
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name with_attached_image
@@ -4139,6 +4935,9 @@
 # uninitialized constant ApplicationMailer::PROTECTED_IVARS
 # uninitialized constant ApplicationRecord(abstract)::ACTIONS
 # Did you mean?  ApplicationRecord::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # uninitialized constant ApplicationRecord(abstract)::CALLBACKS
 # Did you mean?  ApplicationRecord::Callbacks
 #                ApplicationRecord::Callback
@@ -4149,6 +4948,7 @@
 # Did you mean?  ApplicationRecord::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # uninitialized constant ApplicationRecord(abstract)::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  ApplicationRecord::MAX_PASSWORD_LENGTH_ALLOWED
 # uninitialized constant ApplicationRecord(abstract)::MINIMUM_TOKEN_LENGTH
@@ -4159,6 +4959,70 @@
 # Did you mean?  ApplicationRecord::RESTRICTED_CLASS_METHODS
 # uninitialized constant ApplicationRecord(abstract)::UNASSIGNABLE_KEYS
 # Did you mean?  ApplicationRecord::UNASSIGNABLE_KEYS
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  ApplicationRecord::ActiveRecord_AssociationRelation::ClassMethods
+#                ApplicationRecord::ClassMethods
+#                ApplicationRecord::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ApplicationRecord::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  ApplicationRecord::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant ApplicationRecord::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  ApplicationRecord::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# Did you mean?  ApplicationRecord::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                ApplicationRecord::ClassMethods
+#                ApplicationRecord::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::Elem
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# Did you mean?  ApplicationRecord::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# Did you mean?  ApplicationRecord::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant ApplicationRecord::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# Did you mean?  ApplicationRecord::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  ApplicationRecord::ActiveRecord_Relation::ClassMethods
+#                ApplicationRecord::ClassMethods
+#                ApplicationRecord::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::Elem
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  ApplicationRecord::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  ApplicationRecord::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant ApplicationRecord::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  ApplicationRecord::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name abbrev
@@ -4213,8 +5077,8 @@
 # uninitialized constant BigDecimal::PETABYTE
 # Did you mean?  BigDecimal::TERABYTE
 # uninitialized constant BigDecimal::TERABYTE
-# Did you mean?  BigDecimal::PETABYTE
-#                BigDecimal::EXABYTE
+# Did you mean?  BigDecimal::EXABYTE
+#                BigDecimal::PETABYTE
 # wrong constant name clone
 # wrong constant name to_digits
 # wrong constant name interpret_loosely
@@ -5159,12 +6023,12 @@
 # Did you mean?  Bundler::URI::SCHEME
 # uninitialized constant Bundler::URI::FTP::TBLDECWWWCOMP_
 # Did you mean?  Bundler::URI::FTP::TBLENCWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::FTP::TBLENCWWWCOMP_
 # Did you mean?  Bundler::URI::FTP::TBLDECWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::FTP::UNSAFE
 # Did you mean?  Bundler::URI::UNSAFE
 # uninitialized constant Bundler::URI::FTP::URI_REF
@@ -5225,12 +6089,12 @@
 # Did you mean?  Bundler::URI::SCHEME
 # uninitialized constant Bundler::URI::File::TBLDECWWWCOMP_
 # Did you mean?  Bundler::URI::File::TBLENCWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::File::TBLENCWWWCOMP_
 # Did you mean?  Bundler::URI::File::TBLDECWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::File::UNSAFE
 # Did you mean?  Bundler::URI::UNSAFE
 # uninitialized constant Bundler::URI::File::URI_REF
@@ -5294,12 +6158,12 @@
 # Did you mean?  Bundler::URI::SCHEME
 # uninitialized constant Bundler::URI::Generic::TBLDECWWWCOMP_
 # Did you mean?  Bundler::URI::Generic::TBLENCWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::Generic::TBLENCWWWCOMP_
 # Did you mean?  Bundler::URI::Generic::TBLDECWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::Generic::UNSAFE
 # Did you mean?  Bundler::URI::UNSAFE
 # uninitialized constant Bundler::URI::Generic::URI_REF
@@ -5413,12 +6277,12 @@
 # Did you mean?  Bundler::URI::SCHEME
 # uninitialized constant Bundler::URI::HTTP::TBLDECWWWCOMP_
 # Did you mean?  Bundler::URI::HTTP::TBLENCWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::HTTP::TBLENCWWWCOMP_
 # Did you mean?  Bundler::URI::HTTP::TBLDECWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::HTTP::UNSAFE
 # Did you mean?  Bundler::URI::UNSAFE
 # uninitialized constant Bundler::URI::HTTP::URI_REF
@@ -5477,12 +6341,12 @@
 # Did you mean?  Bundler::URI::SCHEME
 # uninitialized constant Bundler::URI::HTTPS::TBLDECWWWCOMP_
 # Did you mean?  Bundler::URI::HTTPS::TBLENCWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::HTTPS::TBLENCWWWCOMP_
 # Did you mean?  Bundler::URI::HTTPS::TBLDECWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::HTTPS::UNSAFE
 # Did you mean?  Bundler::URI::UNSAFE
 # uninitialized constant Bundler::URI::HTTPS::URI_REF
@@ -5541,12 +6405,12 @@
 # Did you mean?  Bundler::URI::SCHEME
 # uninitialized constant Bundler::URI::LDAP::TBLDECWWWCOMP_
 # Did you mean?  Bundler::URI::LDAP::TBLENCWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::LDAP::TBLENCWWWCOMP_
 # Did you mean?  Bundler::URI::LDAP::TBLDECWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::LDAP::UNSAFE
 # Did you mean?  Bundler::URI::UNSAFE
 # uninitialized constant Bundler::URI::LDAP::URI_REF
@@ -5628,12 +6492,12 @@
 # Did you mean?  Bundler::URI::LDAPS::SCOPE_ONE
 # uninitialized constant Bundler::URI::LDAPS::TBLDECWWWCOMP_
 # Did you mean?  Bundler::URI::LDAPS::TBLENCWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::LDAPS::TBLENCWWWCOMP_
 # Did you mean?  Bundler::URI::LDAPS::TBLDECWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::LDAPS::UNSAFE
 # Did you mean?  Bundler::URI::UNSAFE
 # uninitialized constant Bundler::URI::LDAPS::URI_REF
@@ -5690,12 +6554,12 @@
 # Did you mean?  Bundler::URI::SCHEME
 # uninitialized constant Bundler::URI::MailTo::TBLDECWWWCOMP_
 # Did you mean?  Bundler::URI::MailTo::TBLENCWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::MailTo::TBLENCWWWCOMP_
 # Did you mean?  Bundler::URI::MailTo::TBLDECWWWCOMP_
-#                Bundler::URI::TBLENCWWWCOMP_
 #                Bundler::URI::TBLDECWWWCOMP_
+#                Bundler::URI::TBLENCWWWCOMP_
 # uninitialized constant Bundler::URI::MailTo::UNSAFE
 # Did you mean?  Bundler::URI::UNSAFE
 # uninitialized constant Bundler::URI::MailTo::URI_REF
@@ -6128,8 +6992,8 @@
 # uninitialized constant Date::Infinity::PETABYTE
 # Did you mean?  Date::Infinity::TERABYTE
 # uninitialized constant Date::Infinity::TERABYTE
-# Did you mean?  Date::Infinity::PETABYTE
-#                Date::Infinity::EXABYTE
+# Did you mean?  Date::Infinity::EXABYTE
+#                Date::Infinity::PETABYTE
 # wrong constant name initialize
 # wrong constant name class_name
 # wrong constant name class_names
@@ -6622,8 +7486,8 @@
 # uninitialized constant FFI::ArrayType::DOUBLE
 # uninitialized constant FFI::ArrayType::FLOAT
 # Did you mean?  Float
-#                FFI::ArrayType::FLOAT64
 #                FFI::ArrayType::FLOAT32
+#                FFI::ArrayType::FLOAT64
 # uninitialized constant FFI::ArrayType::FLOAT32
 # Did you mean?  Float
 #                FFI::ArrayType::FLOAT64
@@ -6810,8 +7674,8 @@
 # uninitialized constant FFI::FunctionType::DOUBLE
 # uninitialized constant FFI::FunctionType::FLOAT
 # Did you mean?  Float
-#                FFI::FunctionType::FLOAT64
 #                FFI::FunctionType::FLOAT32
+#                FFI::FunctionType::FLOAT64
 # uninitialized constant FFI::FunctionType::FLOAT32
 # Did you mean?  Float
 #                FFI::FunctionType::FLOAT64
@@ -7050,8 +7914,8 @@
 # uninitialized constant FFI::StructByValue::DOUBLE
 # uninitialized constant FFI::StructByValue::FLOAT
 # Did you mean?  Float
-#                FFI::StructByValue::FLOAT64
 #                FFI::StructByValue::FLOAT32
+#                FFI::StructByValue::FLOAT64
 # uninitialized constant FFI::StructByValue::FLOAT32
 # Did you mean?  Float
 #                FFI::StructByValue::FLOAT64
@@ -7166,8 +8030,8 @@
 # wrong constant name <Class:Enum>
 # uninitialized constant FFI::StructLayout::FLOAT
 # Did you mean?  Float
-#                FFI::StructLayout::FLOAT64
 #                FFI::StructLayout::FLOAT32
+#                FFI::StructLayout::FLOAT64
 # uninitialized constant FFI::StructLayout::FLOAT32
 # Did you mean?  Float
 #                FFI::StructLayout::FLOAT64
@@ -7353,17 +8217,17 @@
 # Did you mean?  FFI::Type::DOUBLE
 # uninitialized constant FFI::Type::Builtin::FLOAT
 # Did you mean?  Float
-#                FFI::Type::FLOAT64
 #                FFI::Type::FLOAT32
 #                FFI::Type::FLOAT
-#                FFI::Type::Builtin::FLOAT32
+#                FFI::Type::FLOAT64
 #                FFI::Type::Builtin::FLOAT64
+#                FFI::Type::Builtin::FLOAT32
 # uninitialized constant FFI::Type::Builtin::FLOAT32
 # Did you mean?  Float
 #                FFI::Type::FLOAT32
 #                FFI::Type::Builtin::FLOAT64
-#                FFI::Type::FLOAT64
 #                FFI::Type::FLOAT
+#                FFI::Type::FLOAT64
 # uninitialized constant FFI::Type::Builtin::FLOAT64
 # Did you mean?  Float
 #                FFI::Type::FLOAT64
@@ -7409,11 +8273,11 @@
 #                FFI::Type::UINT8
 #                FFI::Type::INT
 # uninitialized constant FFI::Type::Builtin::LONG
-# Did you mean?  FFI::Type::Builtin::ULONG
-#                FFI::Type::Builtin::SLONG
+# Did you mean?  FFI::Type::Builtin::SLONG
 #                FFI::Type::ULONG
 #                FFI::Type::SLONG
 #                FFI::Type::LONG
+#                FFI::Type::Builtin::ULONG
 # uninitialized constant FFI::Type::Builtin::LONGDOUBLE
 # Did you mean?  FFI::Type::LONGDOUBLE
 # uninitialized constant FFI::Type::Builtin::LONG_LONG
@@ -7576,17 +8440,17 @@
 # Did you mean?  FFI::Type::DOUBLE
 # uninitialized constant FFI::Type::Mapped::FLOAT
 # Did you mean?  Float
-#                FFI::Type::FLOAT64
 #                FFI::Type::FLOAT32
 #                FFI::Type::FLOAT
-#                FFI::Type::Mapped::FLOAT32
+#                FFI::Type::FLOAT64
 #                FFI::Type::Mapped::FLOAT64
+#                FFI::Type::Mapped::FLOAT32
 # uninitialized constant FFI::Type::Mapped::FLOAT32
 # Did you mean?  Float
 #                FFI::Type::FLOAT32
 #                FFI::Type::Mapped::FLOAT64
-#                FFI::Type::FLOAT64
 #                FFI::Type::FLOAT
+#                FFI::Type::FLOAT64
 # uninitialized constant FFI::Type::Mapped::FLOAT64
 # Did you mean?  Float
 #                FFI::Type::FLOAT64
@@ -7632,11 +8496,11 @@
 #                FFI::Type::UINT8
 #                FFI::Type::INT
 # uninitialized constant FFI::Type::Mapped::LONG
-# Did you mean?  FFI::Type::Mapped::ULONG
-#                FFI::Type::Mapped::SLONG
+# Did you mean?  FFI::Type::Mapped::SLONG
 #                FFI::Type::ULONG
 #                FFI::Type::SLONG
 #                FFI::Type::LONG
+#                FFI::Type::Mapped::ULONG
 # uninitialized constant FFI::Type::Mapped::LONGDOUBLE
 # Did you mean?  FFI::Type::LONGDOUBLE
 # uninitialized constant FFI::Type::Mapped::LONG_LONG
@@ -7828,8 +8692,8 @@
 # uninitialized constant Float::PETABYTE
 # Did you mean?  Float::TERABYTE
 # uninitialized constant Float::TERABYTE
-# Did you mean?  Float::PETABYTE
-#                Float::EXABYTE
+# Did you mean?  Float::EXABYTE
+#                Float::PETABYTE
 # wrong constant name _compile_method
 # wrong constant name _delegator_method
 # wrong constant name _valid_method?
@@ -8218,6 +9082,28 @@
 # wrong constant name plugin_suffix_pattern
 # wrong constant name plugin_suffix_regexp
 # wrong constant name plugindir
+# wrong constant name _routes
+# wrong constant name create_job_path
+# wrong constant name create_job_url
+# wrong constant name good_job_path
+# wrong constant name good_job_url
+# wrong constant name rails_info_path
+# wrong constant name rails_info_properties_path
+# wrong constant name rails_info_properties_url
+# wrong constant name rails_info_routes_path
+# wrong constant name rails_info_routes_url
+# wrong constant name rails_info_url
+# wrong constant name rails_mailers_path
+# wrong constant name rails_mailers_url
+# wrong constant name <static-init>
+# wrong constant name _routes
+# wrong constant name full_url_for
+# wrong constant name optimize_routes_generation?
+# wrong constant name polymorphic_path
+# wrong constant name polymorphic_url
+# wrong constant name route_for
+# wrong constant name url_for
+# wrong constant name url_options
 # uninitialized constant GetoptLong
 # uninitialized constant GetoptLong
 # uninitialized constant GlobalID::Railtie::ABSTRACT_RAILTIES
@@ -8246,27 +9132,27 @@
 # uninitialized constant GoodJob::InstallGenerator::WARNINGS
 # Did you mean?  Warning
 # wrong constant name next_migration_number
-# uninitialized constant #<Class:0x00007fb11a3c3890>::ACTIONS
+# uninitialized constant #<Class:0x00007fee92af5ec8>::ACTIONS
 # Did you mean?  GoodJob::Job::ACTIONS
-# uninitialized constant #<Class:0x00007fb11a3c3890>::CALLBACKS
+# uninitialized constant #<Class:0x00007fee92af5ec8>::CALLBACKS
 # Did you mean?  GoodJob::Job::Callbacks
 #                GoodJob::Job::Callback
 #                GoodJob::Job::CALLBACKS
-# uninitialized constant #<Class:0x00007fb11a3c3890>::CALLBACK_FILTER_TYPES
+# uninitialized constant #<Class:0x00007fee92af5ec8>::CALLBACK_FILTER_TYPES
 # Did you mean?  GoodJob::Job::CALLBACK_FILTER_TYPES
-# uninitialized constant #<Class:0x00007fb11a3c3890>::CALL_COMPILABLE_REGEXP
+# uninitialized constant #<Class:0x00007fee92af5ec8>::CALL_COMPILABLE_REGEXP
 # Did you mean?  GoodJob::Job::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
-# uninitialized constant #<Class:0x00007fb11a3c3890>::MAX_PASSWORD_LENGTH_ALLOWED
+# uninitialized constant #<Class:0x00007fee92af5ec8>::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  GoodJob::Job::MAX_PASSWORD_LENGTH_ALLOWED
-# uninitialized constant #<Class:0x00007fb11a3c3890>::MINIMUM_TOKEN_LENGTH
+# uninitialized constant #<Class:0x00007fee92af5ec8>::MINIMUM_TOKEN_LENGTH
 # Did you mean?  GoodJob::Job::MINIMUM_TOKEN_LENGTH
-# uninitialized constant #<Class:0x00007fb11a3c3890>::NAME_COMPILABLE_REGEXP
+# uninitialized constant #<Class:0x00007fee92af5ec8>::NAME_COMPILABLE_REGEXP
 # Did you mean?  GoodJob::Job::NAME_COMPILABLE_REGEXP
-# uninitialized constant #<Class:0x00007fb11a3c3890>::RESTRICTED_CLASS_METHODS
+# uninitialized constant #<Class:0x00007fee92af5ec8>::RESTRICTED_CLASS_METHODS
 # Did you mean?  GoodJob::Job::RESTRICTED_CLASS_METHODS
-# uninitialized constant #<Class:0x00007fb11a3c3890>::UNASSIGNABLE_KEYS
+# uninitialized constant #<Class:0x00007fee92af5ec8>::UNASSIGNABLE_KEYS
 # Did you mean?  GoodJob::Job::UNASSIGNABLE_KEYS
 # wrong constant name create_with_advisory_lock
 # wrong constant name create_with_advisory_lock=
@@ -9269,6 +10155,9 @@
 # wrong constant name rc_file_generators
 # wrong constant name run_config
 # wrong constant name setup
+# wrong constant name assert
+# wrong constant name get_type
+# wrong constant name <static-init>
 # uninitialized constant Integer::EXABYTE
 # Did you mean?  Integer::TERABYTE
 #                Integer::MEGABYTE
@@ -9279,14 +10168,21 @@
 # uninitialized constant Integer::PETABYTE
 # Did you mean?  Integer::TERABYTE
 # uninitialized constant Integer::TERABYTE
-# Did you mean?  Integer::PETABYTE
-#                Integer::EXABYTE
+# Did you mean?  Integer::EXABYTE
+#                Integer::PETABYTE
 # wrong constant name multiple_of?
 # wrong constant name ordinal
 # wrong constant name ordinalize
 # wrong constant name to_bn
+# wrong constant name escape_slash
+# wrong constant name escape_slash=
+# wrong constant name escape_slash?
 # wrong constant name from_state
 # wrong constant name initialize
+# wrong constant name create_fast_state
+# wrong constant name create_pretty_state
+# wrong constant name load_file
+# wrong constant name load_file!
 # uninitialized constant Jacobian
 # uninitialized constant Jacobian
 # uninitialized constant Kconv
@@ -11269,7 +12165,7 @@
 # wrong constant name start
 # wrong constant name start=
 # wrong constant name <Class:ContentTransferEncodingStruct>
-# uninitialized constant #<Class:0x00007fb112279e38>::Elem
+# uninitialized constant #<Class:0x00007fee8a1ac338>::Elem
 # wrong constant name encoding
 # wrong constant name encoding=
 # wrong constant name error
@@ -12658,8 +13554,8 @@
 # uninitialized constant Matrix::Scalar::PETABYTE
 # Did you mean?  Matrix::Scalar::TERABYTE
 # uninitialized constant Matrix::Scalar::TERABYTE
-# Did you mean?  Matrix::Scalar::PETABYTE
-#                Matrix::Scalar::EXABYTE
+# Did you mean?  Matrix::Scalar::EXABYTE
+#                Matrix::Scalar::PETABYTE
 # wrong constant name initialize
 # wrong constant name <static-init>
 # wrong constant name <Class:Time>
@@ -13634,6 +14530,9 @@
 # wrong constant name make_symlink
 # uninitialized constant PgLock(Table doesn't exist)::ACTIONS
 # Did you mean?  PgLock::ACTIONS
+# wrong constant name <Class:ActiveRecord_AssociationRelation>
+# wrong constant name <Class:ActiveRecord_Associations_CollectionProxy>
+# wrong constant name <Class:ActiveRecord_Relation>
 # uninitialized constant PgLock(Table doesn't exist)::CALLBACKS
 # Did you mean?  PgLock::Callbacks
 #                PgLock::Callback
@@ -13644,6 +14543,7 @@
 # Did you mean?  PgLock::CALL_COMPILABLE_REGEXP
 # wrong constant name <Class:GeneratedAssociationMethods>
 # wrong constant name <Class:GeneratedAttributeMethods>
+# wrong constant name <Class:GeneratedRelationMethods>
 # uninitialized constant PgLock(Table doesn't exist)::MAX_PASSWORD_LENGTH_ALLOWED
 # Did you mean?  PgLock::MAX_PASSWORD_LENGTH_ALLOWED
 # uninitialized constant PgLock(Table doesn't exist)::MINIMUM_TOKEN_LENGTH
@@ -13654,11 +14554,387 @@
 # Did you mean?  PgLock::RESTRICTED_CLASS_METHODS
 # uninitialized constant PgLock(Table doesn't exist)::UNASSIGNABLE_KEYS
 # Did you mean?  PgLock::UNASSIGNABLE_KEYS
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# Did you mean?  PgLock::ActiveRecord_AssociationRelation::ClassMethods
+#                PgLock::ClassMethods
+#                PgLock::ActiveRecord_AssociationRelation::VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::Elem
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# Did you mean?  PgLock::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::FROZEN_EMPTY_HASH
+# Did you mean?  PgLock::ActiveRecord_AssociationRelation::FROZEN_EMPTY_ARRAY
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::MULTI_VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::NILCLASS_STRING
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::ONE_AS_ONE
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::ORDER_IGNORE_MESSAGE
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::SINGLE_VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::VALID_DIRECTIONS
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::VALID_UNSCOPING_VALUES
+# uninitialized constant PgLock::ActiveRecord_AssociationRelation::VALUE_METHODS
+# Did you mean?  PgLock::ActiveRecord_AssociationRelation::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# Did you mean?  PgLock::ActiveRecord_Associations_CollectionProxy::ClassMethods
+#                PgLock::ClassMethods
+#                PgLock::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::Elem
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# Did you mean?  PgLock::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_HASH
+# Did you mean?  PgLock::ActiveRecord_Associations_CollectionProxy::FROZEN_EMPTY_ARRAY
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::MULTI_VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::NILCLASS_STRING
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::ONE_AS_ONE
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::ORDER_IGNORE_MESSAGE
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::SINGLE_VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::STRUCTURAL_VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::VALID_DIRECTIONS
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::VALID_UNSCOPING_VALUES
+# uninitialized constant PgLock::ActiveRecord_Associations_CollectionProxy::VALUE_METHODS
+# Did you mean?  PgLock::ActiveRecord_Associations_CollectionProxy::CLAUSE_METHODS
+# wrong constant name <static-init>
+# uninitialized constant PgLock::ActiveRecord_Relation::CLAUSE_METHODS
+# Did you mean?  PgLock::ActiveRecord_Relation::ClassMethods
+#                PgLock::ClassMethods
+#                PgLock::ActiveRecord_Relation::VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_Relation::Elem
+# uninitialized constant PgLock::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# Did you mean?  PgLock::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# uninitialized constant PgLock::ActiveRecord_Relation::FROZEN_EMPTY_HASH
+# Did you mean?  PgLock::ActiveRecord_Relation::FROZEN_EMPTY_ARRAY
+# uninitialized constant PgLock::ActiveRecord_Relation::INVALID_METHODS_FOR_DELETE_ALL
+# uninitialized constant PgLock::ActiveRecord_Relation::MULTI_VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_Relation::NILCLASS_STRING
+# uninitialized constant PgLock::ActiveRecord_Relation::ONE_AS_ONE
+# uninitialized constant PgLock::ActiveRecord_Relation::ORDER_IGNORE_MESSAGE
+# uninitialized constant PgLock::ActiveRecord_Relation::SINGLE_VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_Relation::STRUCTURAL_VALUE_METHODS
+# uninitialized constant PgLock::ActiveRecord_Relation::VALID_DIRECTIONS
+# uninitialized constant PgLock::ActiveRecord_Relation::VALID_UNSCOPING_VALUES
+# uninitialized constant PgLock::ActiveRecord_Relation::VALUE_METHODS
+# Did you mean?  PgLock::ActiveRecord_Relation::CLAUSE_METHODS
+# wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name <static-init>
 # wrong constant name advisory_lock
 # wrong constant name others
 # wrong constant name owns
+# wrong constant name <static-init>
+# wrong constant name advisory_lock
+# wrong constant name others
+# wrong constant name owns
+# wrong constant name <Class:InternalUtils>
+# wrong constant name <Class:Module>
+# wrong constant name <Class:V2_2>
+# wrong constant name <Class:V2_3>
+# wrong constant name <Class:V2_4>
+# wrong constant name <Class:V2_5>
+# wrong constant name <Class:V2_6>
+# wrong constant name <static-init>
+# wrong constant name create_module
+# wrong constant name current_ruby_version
+# wrong constant name ignore_warnings
+# wrong constant name keep_only_these_methods!
+# wrong constant name methods_to_keep
+# wrong constant name modules_to_use
+# wrong constant name namify_arguments
+# wrong constant name polyfill_versions_to_use
+# wrong constant name to_f
+# wrong constant name to_hash
+# wrong constant name to_int
+# wrong constant name to_str
+# wrong constant name <Class:MezpFbnVtZXJhYmxlPT5bIiNjaHVua193aGlsZSJdLCA6dmVyc2lvbj0_1IjIuNCJ9>
+# wrong constant name <Class:MezpIYXNoPT5bIiNzbGljZSJdfQ__>
+# wrong constant name <Class:MezpJbnRlZ2VyPT5bIiNjZWlsIiwgIiNmbG9vciIsICIjcm91bmQiLCAiI3RydW5jYXRlIl0sIDp2ZXJzaW9uPT4iMi40In0_>
+# wrong constant name <Class:MezpLZXJuZWw9PlsiI3lpZWxkX3NlbGYiXSwgOnZlcnNpb249PiIyLjUifQ__>
+# wrong constant name <Class:MezpOdW1lcmljPT5bIiNkdXAiXSwgOnZlcnNpb249PiIyLjQifQ__>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <Class:Enumerable>
+# wrong constant name <Class:Kernel>
+# wrong constant name <Class:Math>
+# wrong constant name <Class:Prime>
+# wrong constant name <Class:Vector>
+# wrong constant name max
+# wrong constant name max_by
+# wrong constant name min
+# wrong constant name min_by
+# wrong constant name slice_after
+# wrong constant name slice_when
+# wrong constant name <static-init>
+# wrong constant name itself
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name log
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name prime?
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name +@
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <Class:Array>
+# wrong constant name <Class:Enumerable>
+# wrong constant name <Class:Enumerator>
+# wrong constant name <Class:Hash>
+# wrong constant name <Class:Kernel>
+# wrong constant name <Class:Numeric>
+# wrong constant name <Class:Prime>
+# wrong constant name <Class:String>
+# wrong constant name <Class:Struct>
+# wrong constant name bsearch_index
+# wrong constant name dig
+# wrong constant name <static-init>
+# wrong constant name chunk_while
+# wrong constant name grep_v
+# wrong constant name slice_before
+# wrong constant name <static-init>
+# wrong constant name <Class:Lazy>
+# wrong constant name grep_v
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <
+# wrong constant name <=
+# wrong constant name >
+# wrong constant name >=
+# wrong constant name dig
+# wrong constant name fetch_values
+# wrong constant name to_proc
+# wrong constant name <static-init>
+# wrong constant name loop
+# wrong constant name <static-init>
+# wrong constant name negative?
+# wrong constant name positive?
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name prime?
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name +@
+# wrong constant name -@
+# wrong constant name <Class:ClassMethods>
+# wrong constant name new
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name dig
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <Class:Array>
+# wrong constant name <Class:Comparable>
+# wrong constant name <Class:Dir>
+# wrong constant name <Class:Enumerable>
+# wrong constant name <Class:Enumerator>
+# wrong constant name <Class:File>
+# wrong constant name <Class:Float>
+# wrong constant name <Class:Hash>
+# wrong constant name <Class:IO>
+# wrong constant name <Class:IPAddr>
+# wrong constant name <Class:Integer>
+# wrong constant name <Class:MatchData>
+# wrong constant name <Class:Numeric>
+# wrong constant name <Class:Object>
+# wrong constant name <Class:Pathname>
+# wrong constant name <Class:Regexp>
+# wrong constant name <Class:String>
+# wrong constant name <Class:StringIO>
+# wrong constant name <Class:Symbol>
+# wrong constant name concat
+# wrong constant name sum
+# wrong constant name <static-init>
+# wrong constant name clamp
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name empty?
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name chunk
+# wrong constant name sum
+# wrong constant name uniq
+# wrong constant name <static-init>
+# wrong constant name <Class:Lazy>
+# wrong constant name chunk_while
+# wrong constant name uniq
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name empty?
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name ceil
+# wrong constant name floor
+# wrong constant name truncate
+# wrong constant name <static-init>
+# wrong constant name compact
+# wrong constant name compact!
+# wrong constant name transform_values
+# wrong constant name transform_values!
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name each_line
+# wrong constant name gets
+# wrong constant name lines
+# wrong constant name readline
+# wrong constant name readlines
+# wrong constant name foreach
+# wrong constant name readlines
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <=>
+# wrong constant name ==
+# wrong constant name <static-init>
+# wrong constant name ceil
+# wrong constant name digits
+# wrong constant name floor
+# wrong constant name round
+# wrong constant name truncate
+# wrong constant name <static-init>
+# wrong constant name named_captures
+# wrong constant name values_at
+# wrong constant name <static-init>
+# wrong constant name clone
+# wrong constant name dup
+# wrong constant name finite?
+# wrong constant name infinite?
+# wrong constant name <static-init>
+# wrong constant name clone
+# wrong constant name <static-init>
+# wrong constant name empty?
+# wrong constant name <static-init>
+# wrong constant name match?
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name casecmp?
+# wrong constant name concat
+# wrong constant name each_line
+# wrong constant name lines
+# wrong constant name match?
+# wrong constant name prepend
+# wrong constant name unpack1
+# wrong constant name new
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name each_line
+# wrong constant name gets
+# wrong constant name lines
+# wrong constant name readline
+# wrong constant name readlines
+# wrong constant name foreach
+# wrong constant name readlines
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name casecmp?
+# wrong constant name match
+# wrong constant name match?
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <Class:Array>
+# wrong constant name <Class:BigDecimal>
+# wrong constant name <Class:Dir>
+# wrong constant name <Class:Enumerable>
+# wrong constant name <Class:Hash>
+# wrong constant name <Class:Integer>
+# wrong constant name <Class:Kernel>
+# wrong constant name <Class:Set>
+# wrong constant name <Class:String>
+# wrong constant name <Class:Struct>
+# wrong constant name <Class:Time>
+# wrong constant name append
+# wrong constant name prepend
+# wrong constant name <static-init>
+# wrong constant name clone
+# wrong constant name dup
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name children
+# wrong constant name each_child
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name all?
+# wrong constant name any?
+# wrong constant name none?
+# wrong constant name one?
+# wrong constant name <static-init>
+# wrong constant name slice
+# wrong constant name transform_keys
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name allbits?
+# wrong constant name anybits?
+# wrong constant name ceil
+# wrong constant name floor
+# wrong constant name nobits?
+# wrong constant name round
+# wrong constant name truncate
+# wrong constant name sqrt
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name yield_self
+# wrong constant name <static-init>
+# wrong constant name ===
+# wrong constant name to_s
+# wrong constant name <static-init>
+# wrong constant name casecmp
+# wrong constant name casecmp?
+# wrong constant name delete_prefix
+# wrong constant name delete_prefix!
+# wrong constant name delete_suffix
+# wrong constant name delete_suffix!
+# wrong constant name each_grapheme_cluster
+# wrong constant name grapheme_clusters
+# wrong constant name start_with?
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name new
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <Class:ClassMethods>
+# wrong constant name at
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <Class:Array>
+# wrong constant name <Class:Enumerable>
+# wrong constant name <Class:Hash>
+# wrong constant name <Class:Kernel>
+# wrong constant name <Class:OpenStruct>
+# wrong constant name <Class:String>
+# wrong constant name <Class:Struct>
+# wrong constant name difference
+# wrong constant name to_h
+# wrong constant name union
+# wrong constant name <static-init>
+# wrong constant name to_h
+# wrong constant name <static-init>
+# wrong constant name merge
+# wrong constant name merge!
+# wrong constant name to_h
+# wrong constant name update
+# wrong constant name <static-init>
+# uninitialized constant Polyfill::V2_6::Kernel::Complex
+# uninitialized constant Polyfill::V2_6::Kernel::Float
+# uninitialized constant Polyfill::V2_6::Kernel::Integer
+# uninitialized constant Polyfill::V2_6::Kernel::Rational
+# wrong constant name then
+# wrong constant name <static-init>
+# wrong constant name to_h
+# wrong constant name <static-init>
+# wrong constant name split
+# wrong constant name <static-init>
+# wrong constant name to_h
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name get
 # uninitialized constant Prime
 # uninitialized constant Prime
 # wrong constant name <<
@@ -14639,7 +15915,7 @@
 # wrong constant name puts
 # wrong constant name summarize
 # wrong constant name <static-init>
-# uninitialized constant #<Class:0x00007fb1183605d0>::Elem
+# uninitialized constant #<Class:0x00007fee86d1bdf8>::Elem
 # wrong constant name initialize
 # wrong constant name too_many_warnings_message
 # wrong constant name type
@@ -14657,7 +15933,7 @@
 # wrong constant name puts
 # wrong constant name summarize
 # wrong constant name <static-init>
-# uninitialized constant #<Class:0x00007fb118360918>::Elem
+# uninitialized constant #<Class:0x00007fee86d28b48>::Elem
 # wrong constant name initialize
 # wrong constant name too_many_warnings_message
 # wrong constant name type
@@ -15195,7 +16471,7 @@
 # wrong constant name <static-init>
 # wrong constant name wrap
 # wrong constant name <static-init>
-# uninitialized constant #<Class:0x00007fb11810a218>::Elem
+# uninitialized constant #<Class:0x00007fee89d3a160>::Elem
 # wrong constant name <static-init>
 # uninitialized constant RSpec::Core::Notifications::PendingExampleFixedNotification::Elem
 # wrong constant name <static-init>
@@ -16075,7 +17351,7 @@
 # wrong constant name <static-init>
 # wrong constant name worse_than?
 # wrong constant name +
-# uninitialized constant #<Class:0x00007fb117969928>::Elem
+# uninitialized constant #<Class:0x00007fee89f9db00>::Elem
 # wrong constant name candidate?
 # wrong constant name ideal?
 # wrong constant name indeterminate_actual_indexes
@@ -18266,32 +19542,32 @@
 # Did you mean?  Ripper::EVENTS
 # uninitialized constant Ripper::Lexer::EXPR_ARG
 # Did you mean?  Ripper::EXPR_BEG
-#                Ripper::Lexer::EXPR_BEG
 #                Ripper::EXPR_ARG
+#                Ripper::Lexer::EXPR_BEG
 # uninitialized constant Ripper::Lexer::EXPR_ARG_ANY
 # Did you mean?  Ripper::EXPR_ARG_ANY
-#                Ripper::Lexer::EXPR_END_ANY
-#                Ripper::EXPR_BEG_ANY
-#                Ripper::EXPR_END_ANY
 #                Ripper::Lexer::EXPR_BEG_ANY
+#                Ripper::EXPR_END_ANY
+#                Ripper::EXPR_BEG_ANY
+#                Ripper::Lexer::EXPR_END_ANY
 # uninitialized constant Ripper::Lexer::EXPR_BEG
-# Did you mean?  Ripper::EXPR_BEG
-#                Ripper::Lexer::EXPR_ARG
+# Did you mean?  Ripper::Lexer::EXPR_ARG
+#                Ripper::EXPR_BEG
 #                Ripper::EXPR_ARG
 # uninitialized constant Ripper::Lexer::EXPR_BEG_ANY
-# Did you mean?  Ripper::EXPR_ARG_ANY
+# Did you mean?  Ripper::EXPR_END_ANY
+#                Ripper::EXPR_BEG_ANY
 #                Ripper::Lexer::EXPR_END_ANY
 #                Ripper::Lexer::EXPR_ARG_ANY
-#                Ripper::EXPR_BEG_ANY
-#                Ripper::EXPR_END_ANY
+#                Ripper::EXPR_ARG_ANY
 # uninitialized constant Ripper::Lexer::EXPR_CLASS
 # Did you mean?  Ripper::EXPR_CLASS
 # uninitialized constant Ripper::Lexer::EXPR_CMDARG
 # Did you mean?  Ripper::Lexer::EXPR_ARG
 #                Ripper::EXPR_ARG
+#                Ripper::Lexer::EXPR_ENDARG
 #                Ripper::EXPR_ENDARG
 #                Ripper::EXPR_CMDARG
-#                Ripper::Lexer::EXPR_ENDARG
 # uninitialized constant Ripper::Lexer::EXPR_DOT
 # Did you mean?  Ripper::EXPR_DOT
 # uninitialized constant Ripper::Lexer::EXPR_END
@@ -18307,23 +19583,23 @@
 #                Ripper::Lexer::EXPR_ENDFN
 #                Ripper::EXPR_ENDFN
 #                Ripper::Lexer::EXPR_CMDARG
-#                Ripper::EXPR_ENDARG
 #                Ripper::EXPR_CMDARG
-#                Ripper::Lexer::EXPR_END_ANY
+#                Ripper::EXPR_ENDARG
 #                Ripper::EXPR_END_ANY
+#                Ripper::Lexer::EXPR_END_ANY
 # uninitialized constant Ripper::Lexer::EXPR_ENDFN
 # Did you mean?  Ripper::EXPR_END
 #                Ripper::EXPR_ENDFN
-#                Ripper::EXPR_ENDARG
 #                Ripper::Lexer::EXPR_ENDARG
-#                Ripper::EXPR_END_ANY
+#                Ripper::EXPR_ENDARG
 #                Ripper::Lexer::EXPR_END_ANY
-# uninitialized constant Ripper::Lexer::EXPR_END_ANY
-# Did you mean?  Ripper::EXPR_ARG_ANY
-#                Ripper::Lexer::EXPR_ARG_ANY
-#                Ripper::EXPR_BEG_ANY
 #                Ripper::EXPR_END_ANY
+# uninitialized constant Ripper::Lexer::EXPR_END_ANY
+# Did you mean?  Ripper::EXPR_BEG_ANY
+#                Ripper::EXPR_END_ANY
+#                Ripper::Lexer::EXPR_ARG_ANY
 #                Ripper::Lexer::EXPR_BEG_ANY
+#                Ripper::EXPR_ARG_ANY
 #                Ripper::Lexer::EXPR_ENDFN
 #                Ripper::EXPR_ENDFN
 #                Ripper::Lexer::EXPR_ENDARG
@@ -18331,8 +19607,8 @@
 # uninitialized constant Ripper::Lexer::EXPR_FITEM
 # Did you mean?  Ripper::EXPR_FITEM
 # uninitialized constant Ripper::Lexer::EXPR_FNAME
-# Did you mean?  Ripper::EXPR_NONE
-#                Ripper::Lexer::EXPR_NONE
+# Did you mean?  Ripper::Lexer::EXPR_NONE
+#                Ripper::EXPR_NONE
 #                Ripper::EXPR_FNAME
 # uninitialized constant Ripper::Lexer::EXPR_LABEL
 # Did you mean?  Ripper::EXPR_BEG
@@ -18344,17 +19620,17 @@
 # Did you mean?  Ripper::EXPR_LABEL
 #                Ripper::EXPR_LABELED
 # uninitialized constant Ripper::Lexer::EXPR_MID
-# Did you mean?  Ripper::Lexer::EXPR_END
+# Did you mean?  Ripper::EXPR_END
+#                Ripper::Lexer::EXPR_END
 #                Ripper::EXPR_MID
-#                Ripper::EXPR_END
 # uninitialized constant Ripper::Lexer::EXPR_NONE
 # Did you mean?  Ripper::EXPR_END
 #                Ripper::Lexer::EXPR_DOT
 #                Ripper::Lexer::EXPR_END
 #                Ripper::EXPR_DOT
 #                Ripper::EXPR_NONE
-#                Ripper::EXPR_FNAME
 #                Ripper::Lexer::EXPR_FNAME
+#                Ripper::EXPR_FNAME
 # uninitialized constant Ripper::Lexer::EXPR_VALUE
 # Did you mean?  Ripper::EXPR_VALUE
 # wrong constant name <Class:Elem>
@@ -18409,32 +19685,32 @@
 # Did you mean?  Ripper::EVENTS
 # uninitialized constant Ripper::SexpBuilder::EXPR_ARG
 # Did you mean?  Ripper::EXPR_BEG
-#                Ripper::SexpBuilder::EXPR_BEG
 #                Ripper::EXPR_ARG
+#                Ripper::SexpBuilder::EXPR_BEG
 # uninitialized constant Ripper::SexpBuilder::EXPR_ARG_ANY
 # Did you mean?  Ripper::EXPR_ARG_ANY
-#                Ripper::SexpBuilder::EXPR_END_ANY
-#                Ripper::EXPR_BEG_ANY
-#                Ripper::EXPR_END_ANY
 #                Ripper::SexpBuilder::EXPR_BEG_ANY
+#                Ripper::EXPR_END_ANY
+#                Ripper::EXPR_BEG_ANY
+#                Ripper::SexpBuilder::EXPR_END_ANY
 # uninitialized constant Ripper::SexpBuilder::EXPR_BEG
-# Did you mean?  Ripper::EXPR_BEG
-#                Ripper::SexpBuilder::EXPR_ARG
+# Did you mean?  Ripper::SexpBuilder::EXPR_ARG
+#                Ripper::EXPR_BEG
 #                Ripper::EXPR_ARG
 # uninitialized constant Ripper::SexpBuilder::EXPR_BEG_ANY
-# Did you mean?  Ripper::EXPR_ARG_ANY
+# Did you mean?  Ripper::EXPR_END_ANY
+#                Ripper::EXPR_BEG_ANY
 #                Ripper::SexpBuilder::EXPR_END_ANY
 #                Ripper::SexpBuilder::EXPR_ARG_ANY
-#                Ripper::EXPR_BEG_ANY
-#                Ripper::EXPR_END_ANY
+#                Ripper::EXPR_ARG_ANY
 # uninitialized constant Ripper::SexpBuilder::EXPR_CLASS
 # Did you mean?  Ripper::EXPR_CLASS
 # uninitialized constant Ripper::SexpBuilder::EXPR_CMDARG
 # Did you mean?  Ripper::SexpBuilder::EXPR_ARG
 #                Ripper::EXPR_ARG
+#                Ripper::SexpBuilder::EXPR_ENDARG
 #                Ripper::EXPR_ENDARG
 #                Ripper::EXPR_CMDARG
-#                Ripper::SexpBuilder::EXPR_ENDARG
 # uninitialized constant Ripper::SexpBuilder::EXPR_DOT
 # Did you mean?  Ripper::EXPR_DOT
 # uninitialized constant Ripper::SexpBuilder::EXPR_END
@@ -18450,23 +19726,23 @@
 #                Ripper::SexpBuilder::EXPR_ENDFN
 #                Ripper::EXPR_ENDFN
 #                Ripper::SexpBuilder::EXPR_CMDARG
-#                Ripper::EXPR_ENDARG
 #                Ripper::EXPR_CMDARG
-#                Ripper::SexpBuilder::EXPR_END_ANY
+#                Ripper::EXPR_ENDARG
 #                Ripper::EXPR_END_ANY
+#                Ripper::SexpBuilder::EXPR_END_ANY
 # uninitialized constant Ripper::SexpBuilder::EXPR_ENDFN
 # Did you mean?  Ripper::EXPR_END
 #                Ripper::EXPR_ENDFN
-#                Ripper::EXPR_ENDARG
 #                Ripper::SexpBuilder::EXPR_ENDARG
-#                Ripper::EXPR_END_ANY
+#                Ripper::EXPR_ENDARG
 #                Ripper::SexpBuilder::EXPR_END_ANY
-# uninitialized constant Ripper::SexpBuilder::EXPR_END_ANY
-# Did you mean?  Ripper::EXPR_ARG_ANY
-#                Ripper::SexpBuilder::EXPR_ARG_ANY
-#                Ripper::EXPR_BEG_ANY
 #                Ripper::EXPR_END_ANY
+# uninitialized constant Ripper::SexpBuilder::EXPR_END_ANY
+# Did you mean?  Ripper::EXPR_BEG_ANY
+#                Ripper::EXPR_END_ANY
+#                Ripper::SexpBuilder::EXPR_ARG_ANY
 #                Ripper::SexpBuilder::EXPR_BEG_ANY
+#                Ripper::EXPR_ARG_ANY
 #                Ripper::SexpBuilder::EXPR_ENDFN
 #                Ripper::EXPR_ENDFN
 #                Ripper::SexpBuilder::EXPR_ENDARG
@@ -18474,8 +19750,8 @@
 # uninitialized constant Ripper::SexpBuilder::EXPR_FITEM
 # Did you mean?  Ripper::EXPR_FITEM
 # uninitialized constant Ripper::SexpBuilder::EXPR_FNAME
-# Did you mean?  Ripper::EXPR_NONE
-#                Ripper::SexpBuilder::EXPR_NONE
+# Did you mean?  Ripper::SexpBuilder::EXPR_NONE
+#                Ripper::EXPR_NONE
 #                Ripper::EXPR_FNAME
 # uninitialized constant Ripper::SexpBuilder::EXPR_LABEL
 # Did you mean?  Ripper::EXPR_BEG
@@ -18487,17 +19763,17 @@
 # Did you mean?  Ripper::EXPR_LABEL
 #                Ripper::EXPR_LABELED
 # uninitialized constant Ripper::SexpBuilder::EXPR_MID
-# Did you mean?  Ripper::SexpBuilder::EXPR_END
+# Did you mean?  Ripper::EXPR_END
+#                Ripper::SexpBuilder::EXPR_END
 #                Ripper::EXPR_MID
-#                Ripper::EXPR_END
 # uninitialized constant Ripper::SexpBuilder::EXPR_NONE
 # Did you mean?  Ripper::EXPR_END
 #                Ripper::SexpBuilder::EXPR_DOT
 #                Ripper::SexpBuilder::EXPR_END
 #                Ripper::EXPR_DOT
 #                Ripper::EXPR_NONE
-#                Ripper::EXPR_FNAME
 #                Ripper::SexpBuilder::EXPR_FNAME
+#                Ripper::EXPR_FNAME
 # uninitialized constant Ripper::SexpBuilder::EXPR_VALUE
 # Did you mean?  Ripper::EXPR_VALUE
 # uninitialized constant Ripper::SexpBuilder::PARSER_EVENTS
@@ -18703,32 +19979,32 @@
 # Did you mean?  Ripper::EVENTS
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_ARG
 # Did you mean?  Ripper::EXPR_BEG
-#                Ripper::SexpBuilderPP::EXPR_BEG
 #                Ripper::EXPR_ARG
+#                Ripper::SexpBuilderPP::EXPR_BEG
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_ARG_ANY
 # Did you mean?  Ripper::EXPR_ARG_ANY
-#                Ripper::SexpBuilderPP::EXPR_END_ANY
-#                Ripper::EXPR_BEG_ANY
-#                Ripper::EXPR_END_ANY
 #                Ripper::SexpBuilderPP::EXPR_BEG_ANY
+#                Ripper::EXPR_END_ANY
+#                Ripper::EXPR_BEG_ANY
+#                Ripper::SexpBuilderPP::EXPR_END_ANY
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_BEG
-# Did you mean?  Ripper::EXPR_BEG
-#                Ripper::SexpBuilderPP::EXPR_ARG
+# Did you mean?  Ripper::SexpBuilderPP::EXPR_ARG
+#                Ripper::EXPR_BEG
 #                Ripper::EXPR_ARG
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_BEG_ANY
-# Did you mean?  Ripper::EXPR_ARG_ANY
+# Did you mean?  Ripper::EXPR_END_ANY
+#                Ripper::EXPR_BEG_ANY
 #                Ripper::SexpBuilderPP::EXPR_END_ANY
 #                Ripper::SexpBuilderPP::EXPR_ARG_ANY
-#                Ripper::EXPR_BEG_ANY
-#                Ripper::EXPR_END_ANY
+#                Ripper::EXPR_ARG_ANY
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_CLASS
 # Did you mean?  Ripper::EXPR_CLASS
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_CMDARG
 # Did you mean?  Ripper::SexpBuilderPP::EXPR_ARG
 #                Ripper::EXPR_ARG
+#                Ripper::SexpBuilderPP::EXPR_ENDARG
 #                Ripper::EXPR_ENDARG
 #                Ripper::EXPR_CMDARG
-#                Ripper::SexpBuilderPP::EXPR_ENDARG
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_DOT
 # Did you mean?  Ripper::EXPR_DOT
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_END
@@ -18744,23 +20020,23 @@
 #                Ripper::SexpBuilderPP::EXPR_ENDFN
 #                Ripper::EXPR_ENDFN
 #                Ripper::SexpBuilderPP::EXPR_CMDARG
-#                Ripper::EXPR_ENDARG
 #                Ripper::EXPR_CMDARG
-#                Ripper::SexpBuilderPP::EXPR_END_ANY
+#                Ripper::EXPR_ENDARG
 #                Ripper::EXPR_END_ANY
+#                Ripper::SexpBuilderPP::EXPR_END_ANY
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_ENDFN
 # Did you mean?  Ripper::EXPR_END
 #                Ripper::EXPR_ENDFN
-#                Ripper::EXPR_ENDARG
 #                Ripper::SexpBuilderPP::EXPR_ENDARG
-#                Ripper::EXPR_END_ANY
+#                Ripper::EXPR_ENDARG
 #                Ripper::SexpBuilderPP::EXPR_END_ANY
-# uninitialized constant Ripper::SexpBuilderPP::EXPR_END_ANY
-# Did you mean?  Ripper::EXPR_ARG_ANY
-#                Ripper::SexpBuilderPP::EXPR_ARG_ANY
-#                Ripper::EXPR_BEG_ANY
 #                Ripper::EXPR_END_ANY
+# uninitialized constant Ripper::SexpBuilderPP::EXPR_END_ANY
+# Did you mean?  Ripper::EXPR_BEG_ANY
+#                Ripper::EXPR_END_ANY
+#                Ripper::SexpBuilderPP::EXPR_ARG_ANY
 #                Ripper::SexpBuilderPP::EXPR_BEG_ANY
+#                Ripper::EXPR_ARG_ANY
 #                Ripper::SexpBuilderPP::EXPR_ENDFN
 #                Ripper::EXPR_ENDFN
 #                Ripper::SexpBuilderPP::EXPR_ENDARG
@@ -18768,8 +20044,8 @@
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_FITEM
 # Did you mean?  Ripper::EXPR_FITEM
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_FNAME
-# Did you mean?  Ripper::EXPR_NONE
-#                Ripper::SexpBuilderPP::EXPR_NONE
+# Did you mean?  Ripper::SexpBuilderPP::EXPR_NONE
+#                Ripper::EXPR_NONE
 #                Ripper::EXPR_FNAME
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_LABEL
 # Did you mean?  Ripper::EXPR_BEG
@@ -18781,17 +20057,17 @@
 # Did you mean?  Ripper::EXPR_LABEL
 #                Ripper::EXPR_LABELED
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_MID
-# Did you mean?  Ripper::SexpBuilderPP::EXPR_END
+# Did you mean?  Ripper::EXPR_END
+#                Ripper::SexpBuilderPP::EXPR_END
 #                Ripper::EXPR_MID
-#                Ripper::EXPR_END
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_NONE
 # Did you mean?  Ripper::EXPR_END
 #                Ripper::SexpBuilderPP::EXPR_DOT
 #                Ripper::SexpBuilderPP::EXPR_END
 #                Ripper::EXPR_DOT
 #                Ripper::EXPR_NONE
-#                Ripper::EXPR_FNAME
 #                Ripper::SexpBuilderPP::EXPR_FNAME
+#                Ripper::EXPR_FNAME
 # uninitialized constant Ripper::SexpBuilderPP::EXPR_VALUE
 # Did you mean?  Ripper::EXPR_VALUE
 # uninitialized constant Ripper::SexpBuilderPP::PARSER_EVENTS
@@ -18880,6 +20156,91 @@
 # uninitialized constant SDBM
 # uninitialized constant SDBMError
 # uninitialized constant SDBMError
+# wrong constant name <Class:Boolean>
+# wrong constant name <Class:BooleanMixin>
+# wrong constant name <Class:CoercionError>
+# wrong constant name <Class:Converter>
+# wrong constant name <Class:Date>
+# wrong constant name <Class:DateTime>
+# wrong constant name <Class:EmptyValueError>
+# wrong constant name <Class:Float>
+# wrong constant name <Class:Integer>
+# wrong constant name <Class:InvalidRuleError>
+# wrong constant name <Class:Rule>
+# wrong constant name <Class:String>
+# wrong constant name <Class:Symbol>
+# wrong constant name <Class:Time>
+# wrong constant name <Class:ValidationError>
+# wrong constant name initialize
+# wrong constant name <static-init>
+# wrong constant name default
+# wrong constant name <static-init>
+# wrong constant name desired_type
+# wrong constant name initialize
+# wrong constant name key
+# wrong constant name value
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name to_bool
+# wrong constant name to_date
+# wrong constant name to_date_time
+# wrong constant name to_false
+# wrong constant name to_float
+# wrong constant name to_int
+# wrong constant name to_time
+# wrong constant name to_true
+# wrong constant name to_type
+# wrong constant name initialize
+# wrong constant name <static-init>
+# wrong constant name default
+# wrong constant name strict
+# wrong constant name initialize
+# wrong constant name <static-init>
+# wrong constant name default
+# wrong constant name strict
+# wrong constant name desired_type
+# wrong constant name initialize
+# wrong constant name key
+# wrong constant name <static-init>
+# wrong constant name initialize
+# wrong constant name <static-init>
+# wrong constant name default
+# wrong constant name strict
+# wrong constant name initialize
+# wrong constant name <static-init>
+# wrong constant name default
+# wrong constant name strict
+# wrong constant name initialize
+# wrong constant name <static-init>
+# wrong constant name after
+# wrong constant name before
+# wrong constant name coerce
+# wrong constant name initialize
+# wrong constant name is_valid?
+# wrong constant name <static-init>
+# wrong constant name coerce
+# wrong constant name default
+# wrong constant name strict
+# wrong constant name initialize
+# wrong constant name <static-init>
+# wrong constant name default
+# wrong constant name strict
+# wrong constant name initialize
+# wrong constant name <static-init>
+# wrong constant name default
+# wrong constant name strict
+# wrong constant name initialize
+# wrong constant name <static-init>
+# wrong constant name default
+# wrong constant name strict
+# wrong constant name desired_type
+# wrong constant name initialize
+# wrong constant name key
+# wrong constant name value
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name coerce
+# wrong constant name coerce!
 # uninitialized constant Scanf
 # uninitialized constant Scanf
 # wrong constant name base36
@@ -18957,6 +20318,166 @@
 # Did you mean?  TRUE
 # uninitialized constant Socket::WRONLY
 # Did you mean?  Socket::RDONLY
+# wrong constant name <Class:Config>
+# wrong constant name <Class:CustomFinderMethods>
+# wrong constant name <Class:JobRbiFormatter>
+# wrong constant name <Class:MailerRbiFormatter>
+# wrong constant name <Class:ModelColumnUtils>
+# wrong constant name <Class:ModelPlugins>
+# wrong constant name <Class:ModelRbiFormatter>
+# wrong constant name <Class:ModelUtils>
+# wrong constant name <Class:PluckToTStruct>
+# wrong constant name <Class:Railtie>
+# wrong constant name <Class:SorbetUtils>
+# wrong constant name <Class:TypedEnumConfig>
+# wrong constant name <Class:Utils>
+# wrong constant name enabled_gem_plugins
+# wrong constant name enabled_gem_plugins=
+# wrong constant name enabled_model_plugins
+# wrong constant name enabled_model_plugins=
+# wrong constant name enabled_plugins
+# wrong constant name extra_helper_includes
+# wrong constant name extra_helper_includes=
+# wrong constant name initialize
+# wrong constant name job_generator_class
+# wrong constant name job_generator_class=
+# wrong constant name mailer_generator_class
+# wrong constant name mailer_generator_class=
+# wrong constant name <static-init>
+# wrong constant name find_by_id
+# wrong constant name find_by_id!
+# wrong constant name find_n
+# wrong constant name first_n
+# wrong constant name last_n
+# wrong constant name <static-init>
+# wrong constant name generate_rbi
+# wrong constant name initialize
+# wrong constant name job_class
+# wrong constant name populate_rbi
+# wrong constant name rbi_generator
+# wrong constant name <static-init>
+# wrong constant name generate_rbi
+# wrong constant name initialize
+# wrong constant name mailer_class
+# wrong constant name populate_rbi
+# wrong constant name rbi_generator
+# wrong constant name <static-init>
+# wrong constant name <Class:ColumnType>
+# wrong constant name active_record_type_to_sorbet_type
+# wrong constant name attribute_has_unconditional_presence_validation?
+# wrong constant name model_class
+# wrong constant name nilable_column?
+# wrong constant name time_zone_aware_column?
+# wrong constant name type_for_column_def
+# wrong constant name array_type
+# wrong constant name base_type
+# wrong constant name initialize
+# wrong constant name nilable
+# wrong constant name to_s
+# wrong constant name <static-init>
+# wrong constant name inherited
+# wrong constant name <static-init>
+# wrong constant name <Class:ActiveRecordAssoc>
+# wrong constant name <Class:ActiveRecordAttribute>
+# wrong constant name <Class:ActiveRecordEnum>
+# wrong constant name <Class:ActiveRecordNamedScope>
+# wrong constant name <Class:ActiveRecordQuerying>
+# wrong constant name <Class:ActiveRecordSerializedAttribute>
+# wrong constant name <Class:ActiveRelationWhereNot>
+# wrong constant name <Class:ActiveStorageMethods>
+# wrong constant name <Class:Base>
+# wrong constant name <Class:CustomFinderMethods>
+# wrong constant name <Class:EnumerableCollections>
+# uninitialized constant SorbetRails::ModelPlugins::RUBYGEMS_ACTIVATION_MONITOR
+# wrong constant name <Class:UnrecognizedPluginName>
+# wrong constant name get_plugin_by_name
+# wrong constant name get_plugins
+# wrong constant name register_plugin
+# wrong constant name register_plugin_by_name
+# wrong constant name set_plugins
+# wrong constant name assoc_should_be_untyped?
+# wrong constant name polymorphic_assoc?
+# wrong constant name populate_collection_assoc_getter_setter
+# wrong constant name populate_single_assoc_getter_setter
+# wrong constant name relation_should_be_untyped?
+# wrong constant name <static-init>
+# wrong constant name generate_enum_methods
+# wrong constant name value_type_for_attr_writer
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name any_serialized_columns?
+# wrong constant name attr_types_for_coder
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name create_has_many_methods
+# wrong constant name create_has_one_methods
+# wrong constant name <static-init>
+# wrong constant name available_classes
+# wrong constant name serialization_coder_for_column
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name available_classes
+# wrong constant name generate_base_rbi
+# wrong constant name generate_rbi
+# wrong constant name initialize
+# wrong constant name run_plugins
+# wrong constant name <static-init>
+# wrong constant name add_relation_query_method
+# wrong constant name exists_class_method?
+# wrong constant name exists_instance_method?
+# wrong constant name habtm_class?
+# wrong constant name model_assoc_proxy_class_name
+# wrong constant name model_assoc_relation_class_name
+# wrong constant name model_class_name
+# wrong constant name model_module_name
+# wrong constant name model_query_methods_returning_assoc_relation_module_name
+# wrong constant name model_query_methods_returning_relation_module_name
+# wrong constant name model_relation_class_name
+# wrong constant name model_relation_type_alias
+# wrong constant name model_relation_type_class_name
+# wrong constant name <static-init>
+# wrong constant name pluck_to_tstruct
+# wrong constant name <static-init>
+# uninitialized constant SorbetRails::Railtie::ABSTRACT_RAILTIES
+# wrong constant name <static-init>
+# wrong constant name <Class:ParsedParamDef>
+# uninitialized constant SorbetRails::SorbetUtils::RUBYGEMS_ACTIVATION_MONITOR
+# wrong constant name <Class:UnexpectedParam>
+# wrong constant name default
+# wrong constant name default=
+# wrong constant name initialize
+# wrong constant name kind
+# wrong constant name name
+# wrong constant name prefix
+# wrong constant name prefix=
+# wrong constant name suffix
+# wrong constant name suffix=
+# wrong constant name type_str
+# wrong constant name <static-init>
+# wrong constant name inherited
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name extract_default_value_for_params!
+# wrong constant name get_ordered_parameters_with_type
+# wrong constant name node_to_s
+# wrong constant name parameters_from_method_def
+# wrong constant name class_name
+# wrong constant name initialize
+# wrong constant name strict_mode
+# wrong constant name <static-init>
+# wrong constant name inherited
+# wrong constant name <static-init>
+# wrong constant name rails_eager_load_all!
+# wrong constant name valid_method_name?
+# wrong constant name <static-init>
+# wrong constant name config
+# wrong constant name configure
+# wrong constant name register_configured_plugins
 # uninitialized constant SortedSet::InspectKey
 # wrong constant name initialize
 # wrong constant name setup
@@ -19886,6 +21407,7 @@
 # wrong constant name T.noreturn
 # wrong constant name T.noreturn
 # wrong constant name T.untyped
+# wrong constant name <static-init>
 # wrong constant name initialize
 # wrong constant name seconds
 # wrong constant name <static-init>
@@ -19921,6 +21443,22 @@
 # Did you mean?  TracePoint
 # uninitialized constant Tracer
 # Did you mean?  TracePoint
+# wrong constant name <static-init>
+# wrong constant name <Class:CoercionError>
+# wrong constant name <Class:Configuration>
+# wrong constant name <Class:Converter>
+# wrong constant name <Class:ShapeError>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name raise_coercion_error
+# wrong constant name raise_coercion_error=
+# wrong constant name from
+# wrong constant name initialize
+# wrong constant name new
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name <static-init>
+# wrong constant name []
 # wrong constant name buffer_open
 # wrong constant name new2
 # uninitialized constant URI::File::ABS_PATH

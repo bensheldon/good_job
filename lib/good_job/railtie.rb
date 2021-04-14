@@ -22,7 +22,7 @@ module GoodJob
     end
 
     config.after_initialize do
-      GoodJob::Scheduler.instances.each(&:warm_cache)
+      T.must(GoodJob::Scheduler.instances).each(&:warm_cache)
     end
   end
 end

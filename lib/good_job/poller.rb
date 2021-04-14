@@ -17,7 +17,7 @@ module GoodJob # :nodoc:
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated Pollers in the current process.
-    #   @return [Array<GoodJob::Poller>]
+    #   @return [Array<GoodJob::Poller>, nil]
     cattr_reader :instances, default: [], instance_reader: false
 
     # Creates GoodJob::Poller from a GoodJob::Configuration instance.
@@ -32,14 +32,14 @@ module GoodJob # :nodoc:
     attr_reader :recipients
 
     # @param recipients [Array<Proc, #call, Array(Object, Symbol)>]
-    # @param poll_interval [Hash] number of seconds between polls
+    # @param poll_interval [Integer, nil] number of seconds between polls
     def initialize(*recipients, poll_interval: nil)
       @recipients = Concurrent::Array.new(recipients)
 
       @timer_options = DEFAULT_TIMER_OPTIONS.dup
       @timer_options[:execution_interval] = poll_interval if poll_interval.present?
 
-      self.class.instances << self
+      T.must(self.class.instances) << self
 
       create_timer
     end
@@ -74,7 +74,7 @@ module GoodJob # :nodoc:
 
     # Restart the poller.
     # When shutdown, start; or shutdown and start.
-    # @param timeout [nil, Numeric] Seconds to wait; shares same values as {#shutdown}.
+    # @param timeout [Numeric, nil] Seconds to wait; shares same values as {#shutdown}.
     # @return [void]
     def restart(timeout: -1)
       shutdown(timeout: timeout) if running?
@@ -84,11 +84,11 @@ module GoodJob # :nodoc:
     # Invoked on completion of TimerTask task.
     # @!visibility private
     # @param time [Integer]
-    # @param executed_task [Object]
-    # @param thread_error [Exception]
+    # @param executed_task [Object, nil]
+    # @param thread_error [Exception, nil]
     # @return [void]
     def timer_observer(time, executed_task, thread_error)
-      GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
+      T.must(GoodJob.on_thread_error).call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
       ActiveSupport::Notifications.instrument("finished_timer_task", { result: executed_task, error: thread_error, time: time })
     end
 

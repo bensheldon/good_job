@@ -136,32 +136,28 @@ module GoodJob
 
     # Finds the next eligible Job, acquire an advisory lock related to it, and
     # executes the job.
-    # @return [Array<(GoodJob::Job, Object, Exception)>, nil]
+    # @return [ExecutionResult, nil]
     #   If a job was executed, returns an array with the {Job} record, the
     #   return value for the job's +#perform+ method, and the exception the job
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
     def self.perform_with_advisory_lock
-      good_job = T.let(nil, T.nilable(GoodJob::Job))
-      result = T.let(nil, T.untyped)
-      error = T.let(nil, T.nilable(Exception))
-
       unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock do |good_jobs|
         good_job = good_jobs.first
         # TODO: Determine why some records are fetched without an advisory lock at all
         break unless good_job&.executable?
 
-        result, error = good_job.perform
+        result = good_job.perform
+        result.good_job = good_job
+        result
       end
-
-      [good_job, result, error] if good_job
     end
 
     # Fetches the scheduled execution time of the next eligible Job(s).
     # @param after [DateTime]
     # @param limit [Integer]
-    # @param now_limit [nil, Integer]
-    # @return [Array<(DateTime)>]
+    # @param now_limit [Integer, nil]
+    # @return [Array<DateTime>]
     def self.next_scheduled_at(after: nil, limit: 100, now_limit: nil)
       query = advisory_unlocked.unfinished.schedule_ordered
 
@@ -187,8 +183,6 @@ module GoodJob
     # @return [Job]
     #   The new {Job} instance representing the queued ActiveJob job.
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
-      good_job = T.let(nil, T.nilable(GoodJob::Job))
-
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         good_job = GoodJob::Job.new(
           queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
@@ -202,49 +196,37 @@ module GoodJob
 
         good_job.save!
         active_job.provider_job_id = good_job.id
-      end
 
-      good_job
+        good_job
+      end
     end
 
     # Execute the ActiveJob job this {Job} represents.
-    # @return [Array<(Object, Exception)>]
+    # @return [ExecutionResult]
     #   An array of the return value of the job's +#perform+ method and the
     #   exception raised by the job, if any. If the job completed successfully,
     #   the second array entry (the exception) will be +nil+ and vice versa.
     def perform
       raise PreviouslyPerformedError, 'Cannot perform a job that has already been performed' if finished_at
 
-      GoodJob::CurrentExecution.reset
-
       self.performed_at = Time.current
       save! if GoodJob.preserve_job_records
 
-      result, unhandled_error = execute
+      result = execute
 
-      result_error = nil
-      if result.is_a?(Exception)
-        result_error = result
-        result = nil
-      end
-
-      job_error = unhandled_error ||
-                  result_error ||
-                  GoodJob::CurrentExecution.error_on_retry ||
-                  GoodJob::CurrentExecution.error_on_discard
-
+      job_error = result.handled_error || result.unhandled_error
       self.error = "#{job_error.class}: #{job_error.message}" if job_error
 
-      if unhandled_error && GoodJob.retry_on_unhandled_error
+      if result.unhandled_error && GoodJob.retry_on_unhandled_error
         save!
-      elsif GoodJob.preserve_job_records == true || (unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error)
+      elsif GoodJob.preserve_job_records == true || (result.unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error)
         self.finished_at = Time.current
         save!
       else
         destroy!
       end
 
-      [result, job_error]
+      result
     end
 
     # Tests whether this job is safe to be executed by this thread.
@@ -255,17 +237,48 @@ module GoodJob
 
     private
 
-    # @return [Array<(Object, Exception)>]
+    # @return [ExecutionResult]
     def execute
       params = serialized_params.merge(
         "provider_job_id" => id
       )
 
+      GoodJob::CurrentExecution.reset
       ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, process_id: GoodJob::CurrentExecution.process_id, thread_name: GoodJob::CurrentExecution.thread_name }) do
-        [ActiveJob::Base.execute(params), nil]
+        value = ActiveJob::Base.execute(params)
+
+        if value.is_a?(Exception)
+          handled_error = value
+          value = nil
+        end
+        handled_error ||= GoodJob::CurrentExecution.error_on_retry || GoodJob::CurrentExecution.error_on_discard
+
+        ExecutionResult.new(value: value, handled_error: handled_error)
+      rescue StandardError => e
+        ExecutionResult.new(value: nil, unhandled_error: e)
       end
-    rescue StandardError => e
-      [nil, e]
+    end
+
+    # Store the results of job execution
+    class ExecutionResult
+      # @return [Job, nil]
+      attr_accessor :good_job
+      # @return [Object, nil]
+      attr_reader :value
+      # @return [Exception, nil]
+      attr_reader :handled_error
+      # @return [Exception, nil]
+      attr_reader :unhandled_error
+
+      # @param value [Object, nil]
+      # @param handled_error [Exception, nil]
+      # @param unhandled_error [Exception, nil]
+      def initialize(value:, good_job: nil, handled_error: nil, unhandled_error: nil)
+        @value = value
+        @good_job = good_job
+        @handled_error = handled_error
+        @unhandled_error = unhandled_error
+      end
     end
   end
 end

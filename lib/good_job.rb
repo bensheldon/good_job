@@ -33,7 +33,7 @@ module GoodJob
   #   @!scope class
   #   The logger used by GoodJob (default: +Rails.logger+).
   #   Use this to redirect logs to a special location or file.
-  #   @return [Logger]
+  #   @return [Logger, nil]
   #   @example Output GoodJob logs to a file:
   #     GoodJob.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new("log/my_logs.log"))
   mattr_accessor :logger, default: ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
@@ -45,7 +45,7 @@ module GoodJob
   #   If you want to preserve jobs for latter inspection, set this to +true+.
   #   If you want to preserve only jobs that finished with error for latter inspection, set this to +:on_unhandled_error+.
   #   If +true+, you will need to clean out jobs using the +good_job cleanup_preserved_jobs+ CLI command.
-  #   @return [Boolean]
+  #   @return [Boolean, nil]
   mattr_accessor :preserve_job_records, default: false
 
   # @!attribute [rw] retry_on_unhandled_error
@@ -54,11 +54,11 @@ module GoodJob
   #   If +true+, causes jobs to be re-queued and retried if they raise an instance of +StandardError+.
   #   If +false+, jobs will be discarded or marked as finished if they raise an instance of +StandardError+.
   #   Instances of +Exception+, like +SIGINT+, will *always* be retried, regardless of this attribute's value.
-  #   @return [Boolean]
+  #   @return [Boolean, nil]
   mattr_accessor :retry_on_unhandled_error, default: true
 
   # @deprecated Use {GoodJob#retry_on_unhandled_error} instead.
-  # @return [Boolean]
+  # @return [Boolean, nil]
   def self.reperform_jobs_on_standard_error
     ActiveSupport::Deprecation.warn(
       "Calling 'GoodJob.reperform_jobs_on_standard_error' is deprecated. Please use 'retry_on_unhandled_error'"
@@ -91,17 +91,17 @@ module GoodJob
   # When forking processes you should shut down these background threads before forking, and restart them after forking.
   # For example, you should use +shutdown+ and +restart+ when using async execution mode with Puma.
   # See the {file:README.md#executing-jobs-async--in-process} for more explanation and examples.
-  # @param timeout [nil, Numeric] Seconds to wait for active threads to finish
-  # @param wait [Boolean] whether to wait for shutdown
+  # @param timeout [Numeric, nil] Seconds to wait for active threads to finish
+  # @param wait [Boolean, nil] whether to wait for shutdown
   # @return [void]
   def self.shutdown(timeout: -1, wait: nil)
-    timeout = if wait.present?
+    timeout = if wait.nil?
+                timeout
+              else
                 ActiveSupport::Deprecation.warn(
                   "Using `GoodJob.shutdown` with `wait:` kwarg is deprecated; use `timeout:` kwarg instead e.g. GoodJob.shutdown(timeout: #{wait ? '-1' : 'nil'})"
                 )
                 wait ? -1 : nil
-              else
-                timeout
               end
 
     executables = Array(Notifier.instances) + Array(Poller.instances) + Array(Scheduler.instances)
@@ -111,9 +111,9 @@ module GoodJob
   # Tests whether jobs have stopped executing.
   # @return [Boolean] whether background threads are shut down
   def self.shutdown?
-    Notifier.instances.all?(&:shutdown?) &&
-      Poller.instances.all?(&:shutdown?) &&
-      Scheduler.instances.all?(&:shutdown?)
+    T.must(Notifier.instances).all?(&:shutdown?) &&
+      T.must(Poller.instances).all?(&:shutdown?) &&
+      T.must(Scheduler.instances).all?(&:shutdown?)
   end
 
   # Stops and restarts executing jobs.
@@ -121,7 +121,7 @@ module GoodJob
   # When forking processes you should shut down these background threads before forking, and restart them after forking.
   # For example, you should use +shutdown+ and +restart+ when using async execution mode with Puma.
   # See the {file:README.md#executing-jobs-async--in-process} for more explanation and examples.
-  # @param timeout [nil, Numeric] Seconds to wait for active threads to finish.
+  # @param timeout [Numeric, nil] Seconds to wait for active threads to finish.
   # @return [void]
   def self.restart(timeout: -1)
     executables = Array(Notifier.instances) + Array(Poller.instances) + Array(Scheduler.instances)
@@ -129,11 +129,13 @@ module GoodJob
   end
 
   # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler})
-  # @param executables [Array<(Notifier, Poller, Scheduler)>] Objects to shut down.
+  # @param executables [Array<Notifier, Poller, Scheduler, MultiScheduler>] Objects to shut down.
   # @param method_name [:symbol] Method to call, e.g. +:shutdown+ or +:restart+.
   # @param timeout [nil,Numeric]
   # @return [void]
   def self._shutdown_all(executables, method_name = :shutdown, timeout: -1)
+    timeout = -1 if timeout.nil?
+
     if timeout.positive?
       executables.each { |executable| executable.send(method_name, timeout: nil) }
 

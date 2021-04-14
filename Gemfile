@@ -21,6 +21,7 @@ platforms :ruby do
   gem "pry-byebug"
   gem "rbtrace"
   gem "sorbet"
+  gem "sorbet-rails"
   gem "sorbet-runtime"
   gem "sord", github: "AaronC81/sord" # https://github.com/AaronC81/sord/pull/127b
   gem "tapioca"
