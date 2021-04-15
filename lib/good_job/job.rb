@@ -2,7 +2,7 @@ module GoodJob
   #
   # Represents a request to perform an +ActiveJob+ job.
   #
-  class Job < ActiveRecord::Base
+  class Job < BaseRecord
     include Lockable
 
     # Raised if something attempts to execute a previously completed Job again.
