@@ -1,6 +1,38 @@
 # Changelog
 
-## [v1.8.0](https://github.com/bensheldon/good_job/tree/v1.8.0) (2021-03-03)
+## [v1.9.0](https://github.com/bensheldon/good_job/tree/v1.9.0) (2021-04-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.8.0...v1.9.0)
+
+**Implemented enhancements:**
+
+- Add `async_server` option to run async only in Rails web server process [\#230](https://github.com/bensheldon/good_job/pull/230) ([bensheldon](https://github.com/bensheldon))
+- FreeBSD startup script [\#221](https://github.com/bensheldon/good_job/pull/221) ([lauer](https://github.com/lauer))
+
+**Fixed bugs:**
+
+- Fix instrumentation of GoodJob::Poller finished\_timer\_task event [\#233](https://github.com/bensheldon/good_job/pull/233) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Cannot run db:migrate when execution mode is :async [\#229](https://github.com/bensheldon/good_job/issues/229)
+- How do you enqueue a job to be executed immediately outside of Rails \(eg. creating a new record of good\_jobs in Postgresql\)? [\#225](https://github.com/bensheldon/good_job/issues/225)
+- Feature Ideas [\#220](https://github.com/bensheldon/good_job/issues/220)
+- Goodjob startup script for FreeBSD [\#214](https://github.com/bensheldon/good_job/issues/214)
+- Only start async mode executors when server is running [\#194](https://github.com/bensheldon/good_job/issues/194)
+
+**Merged pull requests:**
+
+- Move executable flags from constants to accessors on GoodJob::CLI [\#234](https://github.com/bensheldon/good_job/pull/234) ([bensheldon](https://github.com/bensheldon))
+- Add custom Scheduler::TimerSet [\#232](https://github.com/bensheldon/good_job/pull/232) ([bensheldon](https://github.com/bensheldon))
+- Fix assorted constant references in YARD documentation [\#231](https://github.com/bensheldon/good_job/pull/231) ([bensheldon](https://github.com/bensheldon))
+- Update GH Test Matrix with latest JRuby 9.2.17.0 [\#228](https://github.com/bensheldon/good_job/pull/228) ([tedhexaflow](https://github.com/tedhexaflow))
+- Update gem dependencies [\#227](https://github.com/bensheldon/good_job/pull/227) ([bensheldon](https://github.com/bensheldon))
+- Remove leftover text from Readme [\#226](https://github.com/bensheldon/good_job/pull/226) ([weh](https://github.com/weh))
+- Fix appraisal and bundler version CI conflicts [\#224](https://github.com/bensheldon/good_job/pull/224) ([bensheldon](https://github.com/bensheldon))
+- Update GH Test Matrix with latest JRuby [\#223](https://github.com/bensheldon/good_job/pull/223) ([tedhexaflow](https://github.com/tedhexaflow))
+
+## [v1.8.0](https://github.com/bensheldon/good_job/tree/v1.8.0) (2021-03-04)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.7.1...v1.8.0)
 
@@ -57,7 +89,7 @@
 
 **Closed issues:**
 
-- Rails 6.1 & async - `queue\_parser': undefined method `first' for "\*":String \(NoMethodError\) [\#195](https://github.com/bensheldon/good_job/issues/195)
+- Rails 6.1 & async - `queue_parser': undefined method `first' for "\*":String \(NoMethodError\) [\#195](https://github.com/bensheldon/good_job/issues/195)
 
 **Merged pull requests:**
 
@@ -99,7 +131,6 @@
 **Merged pull requests:**
 
 - Add missing YARD docs and Dashboard screenshot [\#191](https://github.com/bensheldon/good_job/pull/191) ([bensheldon](https://github.com/bensheldon))
-- Update all Lockable queries to use exec\_query instead of execute; clear async\_exec results [\#189](https://github.com/bensheldon/good_job/pull/189) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.4.0](https://github.com/bensheldon/good_job/tree/v1.4.0) (2020-12-31)
 
@@ -126,6 +157,7 @@
 **Merged pull requests:**
 
 - Run tests with Rails default configuration to enable Zeitwerk [\#190](https://github.com/bensheldon/good_job/pull/190) ([bensheldon](https://github.com/bensheldon))
+- Update all Lockable queries to use exec\_query instead of execute; clear async\_exec results [\#189](https://github.com/bensheldon/good_job/pull/189) ([bensheldon](https://github.com/bensheldon))
 - Have Lockable\#advisory\_locked? directly query pg\_locks table [\#188](https://github.com/bensheldon/good_job/pull/188) ([bensheldon](https://github.com/bensheldon))
 - Update development gems, including Rails v6.1 and Rails HEAD [\#186](https://github.com/bensheldon/good_job/pull/186) ([bensheldon](https://github.com/bensheldon))
 - Update Appraisals for Rails 6.1 [\#183](https://github.com/bensheldon/good_job/pull/183) ([bensheldon](https://github.com/bensheldon))
@@ -217,7 +249,7 @@
 **Implemented enhancements:**
 
 - Preserve only failed jobs [\#136](https://github.com/bensheldon/good_job/issues/136)
-- Add `GoodJob.preserve\_job\_records = :on\_unhandled\_error` option to only preserve jobs that errored [\#145](https://github.com/bensheldon/good_job/pull/145) ([morgoth](https://github.com/morgoth))
+- Add `GoodJob.preserve_job_records = :on_unhandled_error` option to only preserve jobs that errored [\#145](https://github.com/bensheldon/good_job/pull/145) ([morgoth](https://github.com/morgoth))
 
 **Fixed bugs:**
 
@@ -250,7 +282,7 @@
 - Update Gemspec to reflect that GoodJob is not compatible with Rails 5.1 [\#143](https://github.com/bensheldon/good_job/pull/143) ([bensheldon](https://github.com/bensheldon))
 - Prevent jobs hanging [\#141](https://github.com/bensheldon/good_job/pull/141) ([morgoth](https://github.com/morgoth))
 - Add explicit require\_paths to gemspec for engine [\#134](https://github.com/bensheldon/good_job/pull/134) ([bensheldon](https://github.com/bensheldon))
-- Use `connection.quote\_table\_name` and add spacing for SQL concatenation [\#124](https://github.com/bensheldon/good_job/pull/124) ([bensheldon](https://github.com/bensheldon))
+- Use `connection.quote_table_name` and add spacing for SQL concatenation [\#124](https://github.com/bensheldon/good_job/pull/124) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
@@ -276,7 +308,7 @@
 
 **Implemented enhancements:**
 
-- Add environment variable to mirror `cleanup\_preserved\_jobs --before-seconds-ago=SECONDS` [\#110](https://github.com/bensheldon/good_job/issues/110)
+- Add environment variable to mirror `cleanup_preserved_jobs --before-seconds-ago=SECONDS` [\#110](https://github.com/bensheldon/good_job/issues/110)
 - Allow env variable config for cleanups [\#114](https://github.com/bensheldon/good_job/pull/114) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
 
 **Fixed bugs:**
@@ -296,6 +328,7 @@
 - Have YARD render markdown files with GFM \(Github Flavored Markdown\) [\#113](https://github.com/bensheldon/good_job/pull/113) ([bensheldon](https://github.com/bensheldon))
 - Add markdownlint to lint readme [\#109](https://github.com/bensheldon/good_job/pull/109) ([bensheldon](https://github.com/bensheldon))
 - Remove unused method in PgLocks [\#107](https://github.com/bensheldon/good_job/pull/107) ([gadimbaylisahil](https://github.com/gadimbaylisahil))
+- Re-organize Readme: frontload configuration, add Table of Contents  [\#106](https://github.com/bensheldon/good_job/pull/106) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.2.3](https://github.com/bensheldon/good_job/tree/v1.2.3) (2020-08-27)
 
@@ -326,16 +359,15 @@
 
 **Closed issues:**
 
-- Add test for `rails g good\_job:install` [\#57](https://github.com/bensheldon/good_job/issues/57)
+- Add test for `rails g good_job:install` [\#57](https://github.com/bensheldon/good_job/issues/57)
 
 **Merged pull requests:**
 
-- Re-organize Readme: frontload configuration, add Table of Contents  [\#106](https://github.com/bensheldon/good_job/pull/106) ([bensheldon](https://github.com/bensheldon))
 - Use more ActiveRecord in Lockable and not connection.execute [\#102](https://github.com/bensheldon/good_job/pull/102) ([bensheldon](https://github.com/bensheldon))
 - Run CI tests on Ruby 2.5, 2.6, and 2.7 [\#101](https://github.com/bensheldon/good_job/pull/101) ([arku](https://github.com/arku))
 - Fix Ruby 2.7 keyword arguments warning [\#98](https://github.com/bensheldon/good_job/pull/98) ([arku](https://github.com/arku))
 - Remove executor/reloader for less interlocking [\#97](https://github.com/bensheldon/good_job/pull/97) ([sj26](https://github.com/sj26))
-- Add test for `rails g good\_job:install` [\#94](https://github.com/bensheldon/good_job/pull/94) ([arku](https://github.com/arku))
+- Add test for `rails g good_job:install` [\#94](https://github.com/bensheldon/good_job/pull/94) ([arku](https://github.com/arku))
 
 ## [v1.2.1](https://github.com/bensheldon/good_job/tree/v1.2.1) (2020-08-21)
 
@@ -463,7 +495,6 @@
 
 - Add migration generator [\#56](https://github.com/bensheldon/good_job/pull/56) ([thedanbob](https://github.com/thedanbob))
 - Fix migration script in readme [\#55](https://github.com/bensheldon/good_job/pull/55) ([thedanbob](https://github.com/thedanbob))
-- Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.0.1](https://github.com/bensheldon/good_job/tree/v1.0.1) (2020-07-22)
 
@@ -502,6 +533,10 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.8.0...v0.8.1)
 
+**Merged pull requests:**
+
+- Move where\(scheduled\_at: Time.current\) into dynamic part of GoodJob::Job::Performer [\#42](https://github.com/bensheldon/good_job/pull/42) ([bensheldon](https://github.com/bensheldon))
+
 ## [v0.8.0](https://github.com/bensheldon/good_job/tree/v0.8.0) (2020-07-17)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v0.7.0...v0.8.0)
@@ -539,7 +574,7 @@
 - Update Github Action Workflow for Backlog Project Board [\#35](https://github.com/bensheldon/good_job/pull/35) ([bensheldon](https://github.com/bensheldon))
 - Add configuration options to good\_job executable [\#33](https://github.com/bensheldon/good_job/pull/33) ([bensheldon](https://github.com/bensheldon))
 - Extract Job querying behavior out of Scheduler [\#31](https://github.com/bensheldon/good_job/pull/31) ([bensheldon](https://github.com/bensheldon))
-- Allow configuration of Rails queue adapter with `:good\_job` [\#28](https://github.com/bensheldon/good_job/pull/28) ([bensheldon](https://github.com/bensheldon))
+- Allow configuration of Rails queue adapter with `:good_job` [\#28](https://github.com/bensheldon/good_job/pull/28) ([bensheldon](https://github.com/bensheldon))
 
 ## [v0.5.0](https://github.com/bensheldon/good_job/tree/v0.5.0) (2020-07-13)
 
