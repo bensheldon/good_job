@@ -17,6 +17,9 @@ require "good_job/railtie"
 #
 # +GoodJob+ is the top-level namespace and exposes configuration attributes.
 module GoodJob
+  # TODO: explain me
+  mattr_accessor :active_record_parent_class, default: "ActiveRecord::Base"
+
   # @!attribute [rw] logger
   #   @!scope class
   #   The logger used by GoodJob (default: +Rails.logger+).

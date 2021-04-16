@@ -36,7 +36,7 @@ module GoodJob # :nodoc:
     # Send a message via Postgres NOTIFY
     # @param message [#to_json]
     def self.notify(message)
-      connection = ActiveRecord::Base.connection
+      connection = Job.connection
       connection.exec_query <<~SQL.squish
         NOTIFY #{CHANNEL}, #{connection.quote(message.to_json)}
       SQL
@@ -159,8 +159,8 @@ module GoodJob # :nodoc:
     end
 
     def with_listen_connection
-      ar_conn = ActiveRecord::Base.connection_pool.checkout.tap do |conn|
-        ActiveRecord::Base.connection_pool.remove(conn)
+      ar_conn = Job.connection_pool.checkout.tap do |conn|
+        Job.connection_pool.remove(conn)
       end
       pg_conn = ar_conn.raw_connection
       raise AdapterCannotListenError unless pg_conn.respond_to? :wait_for_notify
