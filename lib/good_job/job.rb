@@ -1,7 +1,8 @@
 module GoodJob
-  #
-  # Represents a request to perform an +ActiveJob+ job.
-  #
+  # ActiveRecord model that represents an +ActiveJob+ job.
+  # Parent class can be configured with +GoodJob.active_record_parent_class+.
+  # @!parse
+  #   class Job < ActiveRecord::Base; end
   class Job < Object.const_get(GoodJob.active_record_parent_class)
     include Lockable
 

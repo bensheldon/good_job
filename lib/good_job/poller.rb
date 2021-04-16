@@ -54,7 +54,6 @@ module GoodJob # :nodoc:
     # Shut down the notifier.
     # Use {#shutdown?} to determine whether threads have stopped.
     # @param timeout [nil, Numeric] Seconds to wait for active threads.
-    #
     #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
     #   * +-1+, the scheduler will wait until the shutdown is complete.
     #   * +0+, the scheduler will immediately shutdown and stop any threads.

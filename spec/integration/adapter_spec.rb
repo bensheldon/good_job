@@ -70,7 +70,7 @@ RSpec.describe 'Adapter Integration' do
       let(:adapter) { GoodJob::Adapter.new execution_mode: :async, queues: 'mice:1', poll_interval: -1 }
 
       it 'Jobs are directly handed to the performer, if they match the queues' do
-        elephant_ajob = ExampleJob.set(queue: 'elepehants').perform_later
+        elephant_ajob = ExampleJob.set(queue: 'elephants').perform_later
         mice_ajob = ExampleJob.set(queue: 'mice').perform_later
 
         sleep_until { RUN_JOBS.include? mice_ajob.provider_job_id }

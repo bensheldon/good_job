@@ -85,6 +85,11 @@ module GoodJob
   # When forking processes you should shut down these background threads before forking, and restart them after forking.
   # For example, you should use +shutdown+ and +restart+ when using async execution mode with Puma.
   # See the {file:README.md#executing-jobs-async--in-process} for more explanation and examples.
+  # @param timeout [nil, Numeric] Seconds to wait for actively executing jobs to finish
+  #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
+  #   * +-1+, the scheduler will wait until the shutdown is complete.
+  #   * +0+, the scheduler will immediately shutdown and stop any active tasks.
+  #   * +1..+, the scheduler will wait that many seconds before stopping any remaining active tasks.
   # @param wait [Boolean] whether to wait for shutdown
   # @return [void]
   def self.shutdown(timeout: -1, wait: nil)
