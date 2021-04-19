@@ -17,6 +17,15 @@ require "good_job/railtie"
 #
 # +GoodJob+ is the top-level namespace and exposes configuration attributes.
 module GoodJob
+  # @!attribute [rw] active_record_parent_class
+  #   @!scope class
+  #   The ActiveRecord parent class inherited by +GoodJob::Job+ (default: +ActiveRecord::Base+).
+  #   Use this when using multiple databases or other custom ActiveRecord configuration.
+  #   @return [ActiveRecord::Base]
+  #   @example Change the base class:
+  #     GoodJob.active_record_parent_class = "CustomApplicationRecord"
+  mattr_accessor :active_record_parent_class, default: "ActiveRecord::Base"
+
   # @!attribute [rw] logger
   #   @!scope class
   #   The logger used by GoodJob (default: +Rails.logger+).

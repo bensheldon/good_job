@@ -143,7 +143,7 @@ module GoodJob
       def supports_cte_materialization_specifiers?
         return @_supports_cte_materialization_specifiers if defined?(@_supports_cte_materialization_specifiers)
 
-        @_supports_cte_materialization_specifiers = ActiveRecord::Base.connection.postgresql_version >= 120000
+        @_supports_cte_materialization_specifiers = connection.postgresql_version >= 120000
       end
     end
 
@@ -158,7 +158,7 @@ module GoodJob
         WHERE pg_try_advisory_lock(('x'||substr(md5($1 || $2::text), 1, 16))::bit(64)::bigint)
       SQL
       binds = [[nil, self.class.table_name], [nil, send(self.class.primary_key)]]
-      ActiveRecord::Base.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).any?
+      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).any?
     end
 
     # Releases an advisory lock on this record if it is locked by this database
