@@ -255,6 +255,7 @@ config.good_job.execution_mode = :external
 
 Good Job’s general behavior can also be configured via several attributes directly on the `GoodJob` module:
 
+- **`GoodJob.active_record_parent_class`** (string) The ActiveRecord parent class inherited by GoodJob's ActiveRecord model `GoodJob::Job` (defaults to `"ActiveRecord::Base"`). Configure this when using [multiple databases with ActiveRecord](https://guides.rubyonrails.org/active_record_multiple_databases.html) or when other custom configuration is necessary for the ActiveRecord model to connect to the Postgres database. _The value must be a String to avoid premature initialization of ActiveRecord._
 - **`GoodJob.logger`** ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger`.
 - **`GoodJob.preserve_job_records`** (boolean) keeps job records in your database even after jobs are completed. (Default: `false`)
 - **`GoodJob.retry_on_unhandled_error`** (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `true`)
@@ -264,6 +265,7 @@ You’ll generally want to configure these in `config/initializers/good_job.rb`,
 
 ```ruby
 # config/initializers/good_job.rb
+GoodJob.active_record_parent_class = "ApplicationRecord"
 GoodJob.preserve_job_records = true
 GoodJob.retry_on_unhandled_error = false
 GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
