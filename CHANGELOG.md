@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.9.1](https://github.com/bensheldon/good_job/tree/v1.9.1) (2021-04-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.0...v1.9.1)
+
+**Merged pull requests:**
+
+- Allow to specify parent class for active record [\#238](https://github.com/bensheldon/good_job/pull/238) ([morgoth](https://github.com/morgoth))
+
 ## [v1.9.0](https://github.com/bensheldon/good_job/tree/v1.9.0) (2021-04-16)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.8.0...v1.9.0)
