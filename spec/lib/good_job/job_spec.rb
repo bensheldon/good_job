@@ -68,19 +68,19 @@ RSpec.describe GoodJob::Job do
       expect { good_job_2.reload }.not_to raise_error
     end
 
-    it 'returns the good_job, result, and error object if there is a result; nil if not' do
-      worked_good_job, worked_result, worked_error = described_class.all.perform_with_advisory_lock
+    it 'returns the result or nil if not' do
+      result = described_class.all.perform_with_advisory_lock
 
-      expect(worked_good_job).to eq good_job
-      expect(worked_result).to eq 'a string'
-      expect(worked_error).to eq nil
+      expect(result).to be_a GoodJob::ExecutionResult
+      expect(result.value).to eq 'a string'
+      expect(result.unhandled_error).to eq nil
 
-      e_good_job = described_class.enqueue(ExampleJob.new(true, raise_error: true))
-      errored_good_job, errored_result, errored_error = described_class.all.perform_with_advisory_lock
+      described_class.enqueue(ExampleJob.new(true, raise_error: true))
+      errored_result = described_class.all.perform_with_advisory_lock
 
-      expect(errored_good_job).to eq e_good_job
-      expect(errored_result).to eq nil
-      expect(errored_error).to be_an ExpectedError
+      expect(result).to be_a GoodJob::ExecutionResult
+      expect(errored_result.value).to eq nil
+      expect(errored_result.unhandled_error).to be_an ExpectedError
     end
   end
 
@@ -188,20 +188,20 @@ RSpec.describe GoodJob::Job do
 
     describe 'return value' do
       it 'returns the results of the job' do
-        result, error = good_job.perform
+        result = good_job.perform
 
-        expect(result).to eq "a string"
-        expect(error).to be_nil
+        expect(result.value).to eq "a string"
+        expect(result.unhandled_error).to be_nil
       end
 
       context 'when there is an error' do
         let(:active_job) { ExampleJob.new("whoops", raise_error: true) }
 
         it 'returns the error' do
-          result, error = good_job.perform
+          result = good_job.perform
 
-          expect(result).to eq nil
-          expect(error).to be_an_instance_of ExpectedError
+          expect(result.value).to eq nil
+          expect(result.unhandled_error).to be_an_instance_of ExpectedError
         end
 
         context 'when there is an retry handler with exhausted attempts' do
@@ -240,10 +240,10 @@ RSpec.describe GoodJob::Job do
           end
 
           it 'returns the error' do
-            result, error = good_job.perform
+            result = good_job.perform
 
-            expect(result).to eq nil
-            expect(error).to be_an_instance_of ExpectedError
+            expect(result.value).to eq nil
+            expect(result.unhandled_error).to be_an_instance_of ExpectedError
           end
 
           if Gem::Version.new(Rails.version) > Gem::Version.new("6")
@@ -254,10 +254,10 @@ RSpec.describe GoodJob::Job do
               end
 
               it 'returns the error' do
-                result, error = good_job.perform
+                result = good_job.perform
 
-                expect(result).to eq nil
-                expect(error).to be_an_instance_of ExpectedError
+                expect(result.value).to eq nil
+                expect(result.handled_error).to be_an_instance_of ExpectedError
               end
             end
 
@@ -267,10 +267,10 @@ RSpec.describe GoodJob::Job do
               end
 
               it 'returns the error' do
-                result, error = good_job.perform
+                result = good_job.perform
 
-                expect(result).to eq nil
-                expect(error).to be_an_instance_of ExpectedError
+                expect(result.value).to eq nil
+                expect(result.handled_error).to be_an_instance_of ExpectedError
               end
             end
           end
@@ -312,10 +312,10 @@ RSpec.describe GoodJob::Job do
       end
 
       it 'returns the results of the job' do
-        result, error = good_job.perform
+        result = good_job.perform
 
-        expect(result).to be_nil
-        expect(error).to be_a(ExpectedError)
+        expect(result.value).to be_nil
+        expect(result.handled_error).to be_a(ExpectedError)
       end
 
       it 'destroys the job' do
@@ -341,10 +341,10 @@ RSpec.describe GoodJob::Job do
       let(:active_job) { ExampleJob.new("a string", raise_error: true) }
 
       it 'returns the results of the job' do
-        result, error = good_job.perform
+        result = good_job.perform
 
-        expect(result).to be_nil
-        expect(error).to be_a(ExpectedError)
+        expect(result.value).to eq nil
+        expect(result.unhandled_error).to be_a(ExpectedError)
       end
 
       describe 'GoodJob.reperform_jobs_on_standard_error behavior' do
