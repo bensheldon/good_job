@@ -3,7 +3,7 @@ module GoodJob
   #
   # Represents a request to perform an +ActiveJob+ job.
   #
-  class Job < Object.const_get(GoodJob.active_record_parent_class)
+  class Job < Object.const_get(GoodJob.active_record_parent_class) # rubocop:disable Sorbet/ConstantsFromStrings
     include Lockable
 
     # Raised if something attempts to execute a previously completed Job again.
