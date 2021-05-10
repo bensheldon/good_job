@@ -83,7 +83,7 @@ module GoodJob
 
       notifier = GoodJob::Notifier.new
       poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
-      scheduler = GoodJob::Scheduler.from_configuration(configuration)
+      scheduler = GoodJob::Scheduler.from_configuration(configuration, warm_cache_on_initialize: true)
       notifier.recipients << [scheduler, :create_thread]
       poller.recipients << [scheduler, :create_thread]
 

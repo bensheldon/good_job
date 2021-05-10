@@ -4,7 +4,7 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = false
 
   config.after do
-    GoodJob.shutdown(timeout: 0)
+    GoodJob.shutdown(timeout: -1)
     GoodJob::Notifier.instances.clear
     GoodJob::Poller.instances.clear
     GoodJob::Scheduler.instances.clear

@@ -37,7 +37,7 @@ module GoodJob # :nodoc:
     # @param configuration [GoodJob::Configuration]
     # @param warm_cache_on_initialize [Boolean]
     # @return [GoodJob::Scheduler, GoodJob::MultiScheduler]
-    def self.from_configuration(configuration, warm_cache_on_initialize: true)
+    def self.from_configuration(configuration, warm_cache_on_initialize: false)
       schedulers = configuration.queue_string.split(';').map do |queue_string_and_max_threads|
         queue_string, max_threads = queue_string_and_max_threads.split(':')
         max_threads = (max_threads || configuration.max_threads).to_i
@@ -61,8 +61,8 @@ module GoodJob # :nodoc:
     # @param performer [GoodJob::JobPerformer]
     # @param max_threads [Numeric, nil] number of seconds between polls for jobs
     # @param max_cache [Numeric, nil] maximum number of scheduled jobs to cache in memory
-    # @param warm_cache_on_initialize [Boolean] whether to warm the cache immediately
-    def initialize(performer, max_threads: nil, max_cache: nil, warm_cache_on_initialize: true)
+    # @param warm_cache_on_initialize [Boolean] whether to warm the cache immediately, or manually by calling +warm_cache+
+    def initialize(performer, max_threads: nil, max_cache: nil, warm_cache_on_initialize: false)
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
 
       self.class.instances << self
@@ -93,7 +93,6 @@ module GoodJob # :nodoc:
     # This stops all threads in the thread pool.
     # Use {#shutdown?} to determine whether threads have stopped.
     # @param timeout [nil, Numeric] Seconds to wait for actively executing jobs to finish
-    #
     #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
     #   * +-1+, the scheduler will wait until the shutdown is complete.
     #   * +0+, the scheduler will immediately shutdown and stop any active tasks.
@@ -192,12 +191,24 @@ module GoodJob # :nodoc:
     def warm_cache
       return if @max_cache.zero?
 
-      performer.next_at(
-        limit: @max_cache,
-        now_limit: @executor_options[:max_threads]
-      ).each do |scheduled_at|
-        create_thread({ scheduled_at: scheduled_at })
+      future = Concurrent::Future.new(args: [self, @performer], executor: executor) do |thr_scheduler, thr_performer|
+        Rails.application.executor.wrap do
+          thr_performer.next_at(
+            limit: @max_cache,
+            now_limit: @executor_options[:max_threads]
+          ).each do |scheduled_at|
+            thr_scheduler.create_thread({ scheduled_at: scheduled_at })
+          end
+        end
       end
+
+      observer = lambda do |_time, _output, thread_error|
+        GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
+        create_task # If cache-warming exhausts the threads, ensure there isn't an executable task remaining
+      end
+      future.add_observer(observer, :call)
+
+      future.execute
     end
 
     private
@@ -213,9 +224,9 @@ module GoodJob # :nodoc:
 
     def create_task(delay = 0)
       future = Concurrent::ScheduledTask.new(delay, args: [performer], executor: executor, timer_set: timer_set) do |thr_performer|
-        output = nil
-        Rails.application.executor.wrap { output = thr_performer.next }
-        output
+        Rails.application.executor.wrap do
+          thr_performer.next
+        end
       end
       future.add_observer(self, :task_observer)
       future.execute
