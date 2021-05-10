@@ -1,5 +1,22 @@
 # Changelog
 
+## [v1.9.2](https://github.com/bensheldon/good_job/tree/v1.9.2) (2021-05-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.1...v1.9.2)
+
+**Fixed bugs:**
+
+- Run Scheduler\#warm\_cache operation in threadpool executor [\#242](https://github.com/bensheldon/good_job/pull/242) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Jobs not visible in dashboard [\#245](https://github.com/bensheldon/good_job/issues/245)
+
+**Merged pull requests:**
+
+- Use GoodJob::Job::ExecutionResult object instead of job execution returning an ordered array [\#241](https://github.com/bensheldon/good_job/pull/241) ([bensheldon](https://github.com/bensheldon))
+- Update development dependencies [\#240](https://github.com/bensheldon/good_job/pull/240) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.9.1](https://github.com/bensheldon/good_job/tree/v1.9.1) (2021-04-19)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.0...v1.9.1)
