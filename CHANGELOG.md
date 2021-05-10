@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.9.3](https://github.com/bensheldon/good_job/tree/v1.9.3) (2021-05-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.2...v1.9.3)
+
+**Implemented enhancements:**
+
+- Add async\_server detection for extensions of rack handler [\#246](https://github.com/bensheldon/good_job/pull/246) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Not processing unfinished jobs across server restarts using async\_server mode  [\#244](https://github.com/bensheldon/good_job/issues/244)
+- No connection pool for 'ActiveRecord::Base' found [\#236](https://github.com/bensheldon/good_job/issues/236)
+
 ## [v1.9.2](https://github.com/bensheldon/good_job/tree/v1.9.2) (2021-05-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.1...v1.9.2)
@@ -21,7 +34,7 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.0...v1.9.1)
 
-**Merged pull requests:**
+**Implemented enhancements:**
 
 - Allow to specify parent class for active record [\#238](https://github.com/bensheldon/good_job/pull/238) ([morgoth](https://github.com/morgoth))
 
