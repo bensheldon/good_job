@@ -96,13 +96,13 @@ module GoodJob
   # @param wait [Boolean] whether to wait for shutdown
   # @return [void]
   def self.shutdown(timeout: -1, wait: nil)
-    timeout = if wait.present?
+    timeout = if wait.nil?
+                timeout
+              else
                 ActiveSupport::Deprecation.warn(
                   "Using `GoodJob.shutdown` with `wait:` kwarg is deprecated; use `timeout:` kwarg instead e.g. GoodJob.shutdown(timeout: #{wait ? '-1' : 'nil'})"
                 )
                 wait ? -1 : nil
-              else
-                timeout
               end
 
     executables = Array(Notifier.instances) + Array(Poller.instances) + Array(Scheduler.instances)

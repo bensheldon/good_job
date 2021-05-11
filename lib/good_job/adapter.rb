@@ -105,13 +105,13 @@ module GoodJob
     # @param wait [Boolean, nil] Deprecated. Use +timeout:+ instead.
     # @return [void]
     def shutdown(timeout: :default, wait: nil)
-      timeout = if wait.present?
+      timeout = if wait.nil?
+                  timeout
+                else
                   ActiveSupport::Deprecation.warn(
                     "Using `GoodJob::Adapter.shutdown` with `wait:` kwarg is deprecated; use `timeout:` kwarg instead e.g. GoodJob::Adapter.shutdown(timeout: #{wait ? '-1' : 'nil'})"
                   )
                   wait ? -1 : nil
-                else
-                  timeout
                 end
 
       timeout = if timeout == :default
