@@ -245,11 +245,8 @@ module GoodJob
 
     private
 
-    def sanitize_sql_for_conditions(*args)
-      # Made public in Rails 5.2
-      self.class.send(:sanitize_sql_for_conditions, *args)
-    end
-
+    # @param query [String]
+    # @return [Boolean]
     def pg_or_jdbc_query(query)
       if Concurrent.on_jruby?
         # Replace $1 bind parameters with ?

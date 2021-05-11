@@ -24,7 +24,7 @@ module GoodJob
     end
 
     # Perform the next eligible job
-    # @return [nil, Object] Returns job result or +nil+ if no job was found
+    # @return [Object, nil] Returns job result or +nil+ if no job was found
     def next
       job_query.perform_with_advisory_lock
     end
@@ -54,7 +54,7 @@ module GoodJob
     # @param after [DateTime, Time, nil] future jobs scheduled after this time
     # @param limit [Integer] number of future timestamps to return
     # @param now_limit [Integer] number of past timestamps to return
-    # @return [Array<(Time, DateTime)>, nil]
+    # @return [Array<DateTime, Time>, nil]
     def next_at(after: nil, limit: nil, now_limit: nil)
       job_query.next_scheduled_at(after: after, limit: limit, now_limit: now_limit)
     end

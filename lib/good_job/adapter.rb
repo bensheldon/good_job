@@ -6,7 +6,7 @@ module GoodJob
     # Valid execution modes.
     EXECUTION_MODES = [:async, :async_server, :external, :inline].freeze
 
-    # @param execution_mode [nil, Symbol] specifies how and where jobs should be executed. You can also set this with the environment variable +GOOD_JOB_EXECUTION_MODE+.
+    # @param execution_mode [Symbol, nil] specifies how and where jobs should be executed. You can also set this with the environment variable +GOOD_JOB_EXECUTION_MODE+.
     #
     #  - +:inline+ executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
     #  - +:external+ causes the adapter to enqueue jobs, but not execute them. When using this option (the default for production environments), you'll need to use the command-line tool to actually execute your jobs.
@@ -19,9 +19,9 @@ module GoodJob
     #  - +development+ and +test+: +:inline+
     #  - +production+ and all other environments: +:external+
     #
-    # @param max_threads [nil, Integer] sets the number of threads per scheduler to use when +execution_mode+ is set to +:async+. The +queues+ parameter can specify a number of threads for each group of queues which will override this value. You can also set this with the environment variable +GOOD_JOB_MAX_THREADS+. Defaults to +5+.
-    # @param queues [nil, String] determines which queues to execute jobs from when +execution_mode+ is set to +:async+. See {file:README.md#optimize-queues-threads-and-processes} for more details on the format of this string. You can also set this with the environment variable +GOOD_JOB_QUEUES+. Defaults to +"*"+.
-    # @param poll_interval [nil, Integer] sets the number of seconds between polls for jobs when +execution_mode+ is set to +:async+. You can also set this with the environment variable +GOOD_JOB_POLL_INTERVAL+. Defaults to +1+.
+    # @param max_threads [Integer, nil] sets the number of threads per scheduler to use when +execution_mode+ is set to +:async+. The +queues+ parameter can specify a number of threads for each group of queues which will override this value. You can also set this with the environment variable +GOOD_JOB_MAX_THREADS+. Defaults to +5+.
+    # @param queues [String, nil] determines which queues to execute jobs from when +execution_mode+ is set to +:async+. See {file:README.md#optimize-queues-threads-and-processes} for more details on the format of this string. You can also set this with the environment variable +GOOD_JOB_QUEUES+. Defaults to +"*"+.
+    # @param poll_interval [Integer, nil] sets the number of seconds between polls for jobs when +execution_mode+ is set to +:async+. You can also set this with the environment variable +GOOD_JOB_POLL_INTERVAL+. Defaults to +1+.
     def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil)
       if caller[0..4].find { |c| c.include?("/config/application.rb") || c.include?("/config/environments/") }
         ActiveSupport::Deprecation.warn(<<~DEPRECATION)
@@ -70,7 +70,7 @@ module GoodJob
     # Enqueues an ActiveJob job to be run at a specific time.
     # For use by Rails; you should generally not call this directly.
     # @param active_job [ActiveJob::Base] the job to be enqueued from +#perform_later+
-    # @param timestamp [Integer] the epoch time to perform the job
+    # @param timestamp [Integer, nil] the epoch time to perform the job
     # @return [GoodJob::Job]
     def enqueue_at(active_job, timestamp)
       good_job = GoodJob::Job.enqueue(
@@ -97,13 +97,12 @@ module GoodJob
     end
 
     # Shut down the thread pool executors.
-    # @param timeout [nil, Numeric] Seconds to wait for active threads.
-    #
+    # @param timeout [nil, Numeric, Symbol] Seconds to wait for active threads.
     #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
     #   * +-1+, the scheduler will wait until the shutdown is complete.
     #   * +0+, the scheduler will immediately shutdown and stop any threads.
     #   * A positive number will wait that many seconds before stopping any remaining active threads.
-    # @param wait [Boolean] Deprecated. Use +timeout:+ instead.
+    # @param wait [Boolean, nil] Deprecated. Use +timeout:+ instead.
     # @return [void]
     def shutdown(timeout: :default, wait: nil)
       timeout = if wait.present?
@@ -126,18 +125,21 @@ module GoodJob
     end
 
     # Whether in +:async+ execution mode.
+    # @return [Boolean]
     def execute_async?
       @configuration.execution_mode == :async ||
         @configuration.execution_mode == :async_server && in_server_process?
     end
 
     # Whether in +:external+ execution mode.
+    # @return [Boolean]
     def execute_externally?
       @configuration.execution_mode == :external ||
         @configuration.execution_mode == :async_server && !in_server_process?
     end
 
     # Whether in +:inline+ execution mode.
+    # @return [Boolean]
     def execute_inline?
       @configuration.execution_mode == :inline
     end
@@ -145,6 +147,7 @@ module GoodJob
     private
 
     # Whether running in a web server process.
+    # @return [Boolean, nil]
     def in_server_process?
       return @_in_server_process if defined? @_in_server_process
 

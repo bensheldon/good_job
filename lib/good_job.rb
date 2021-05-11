@@ -30,7 +30,7 @@ module GoodJob
   #   @!scope class
   #   The logger used by GoodJob (default: +Rails.logger+).
   #   Use this to redirect logs to a special location or file.
-  #   @return [Logger]
+  #   @return [Logger, nil]
   #   @example Output GoodJob logs to a file:
   #     GoodJob.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new("log/my_logs.log"))
   mattr_accessor :logger, default: ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
@@ -42,7 +42,7 @@ module GoodJob
   #   If you want to preserve jobs for latter inspection, set this to +true+.
   #   If you want to preserve only jobs that finished with error for latter inspection, set this to +:on_unhandled_error+.
   #   If +true+, you will need to clean out jobs using the +good_job cleanup_preserved_jobs+ CLI command.
-  #   @return [Boolean]
+  #   @return [Boolean, nil]
   mattr_accessor :preserve_job_records, default: false
 
   # @!attribute [rw] retry_on_unhandled_error
@@ -51,10 +51,11 @@ module GoodJob
   #   If +true+, causes jobs to be re-queued and retried if they raise an instance of +StandardError+.
   #   If +false+, jobs will be discarded or marked as finished if they raise an instance of +StandardError+.
   #   Instances of +Exception+, like +SIGINT+, will *always* be retried, regardless of this attribute's value.
-  #   @return [Boolean]
+  #   @return [Boolean, nil]
   mattr_accessor :retry_on_unhandled_error, default: true
 
   # @deprecated Use {GoodJob#retry_on_unhandled_error} instead.
+  # @return [Boolean, nil]
   def self.reperform_jobs_on_standard_error
     ActiveSupport::Deprecation.warn(
       "Calling 'GoodJob.reperform_jobs_on_standard_error' is deprecated. Please use 'retry_on_unhandled_error'"
@@ -63,6 +64,8 @@ module GoodJob
   end
 
   # @deprecated Use {GoodJob#retry_on_unhandled_error=} instead.
+  # @param value [Boolean]
+  # @return [Boolean]
   def self.reperform_jobs_on_standard_error=(value)
     ActiveSupport::Deprecation.warn(
       "Setting 'GoodJob.reperform_jobs_on_standard_error=' is deprecated. Please use 'retry_on_unhandled_error='"
@@ -77,7 +80,7 @@ module GoodJob
   #   @example Send errors to Sentry
   #     # config/initializers/good_job.rb
   #     GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
-  #   @return [#call, nil]
+  #   @return [Proc, nil]
   mattr_accessor :on_thread_error, default: nil
 
   # Stop executing jobs.
@@ -119,6 +122,7 @@ module GoodJob
   # When forking processes you should shut down these background threads before forking, and restart them after forking.
   # For example, you should use +shutdown+ and +restart+ when using async execution mode with Puma.
   # See the {file:README.md#executing-jobs-async--in-process} for more explanation and examples.
+  # @param timeout [Numeric, nil] Seconds to wait for active threads to finish.
   # @return [void]
   def self.restart(timeout: -1)
     executables = Array(Notifier.instances) + Array(Poller.instances) + Array(Scheduler.instances)
@@ -126,7 +130,7 @@ module GoodJob
   end
 
   # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler})
-  # @param executables [Array<(Notifier, Poller, Scheduler)>] Objects to shut down.
+  # @param executables [Array<Notifier, Poller, Scheduler, MultiScheduler>] Objects to shut down.
   # @param method_name [:symbol] Method to call, e.g. +:shutdown+ or +:restart+.
   # @param timeout [nil,Numeric]
   # @return [void]

@@ -30,7 +30,7 @@ module GoodJob # :nodoc:
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated Schedulers in the current process.
-    #   @return [Array<GoodJob::Scheduler>]
+    #   @return [Array<GoodJob::Scheduler>, nil]
     cattr_reader :instances, default: [], instance_reader: false
 
     # Creates GoodJob::Scheduler(s) and Performers from a GoodJob::Configuration instance.
@@ -82,17 +82,17 @@ module GoodJob # :nodoc:
     end
 
     # Tests whether the scheduler is running.
-    # @return [true, false, nil]
+    # @return [Boolean, nil]
     delegate :running?, to: :executor, allow_nil: true
 
     # Tests whether the scheduler is shutdown.
-    # @return [true, false, nil]
+    # @return [Boolean, nil]
     delegate :shutdown?, to: :executor, allow_nil: true
 
     # Shut down the scheduler.
     # This stops all threads in the thread pool.
     # Use {#shutdown?} to determine whether threads have stopped.
-    # @param timeout [nil, Numeric] Seconds to wait for actively executing jobs to finish
+    # @param timeout [Numeric, nil] Seconds to wait for actively executing jobs to finish
     #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
     #   * +-1+, the scheduler will wait until the shutdown is complete.
     #   * +0+, the scheduler will immediately shutdown and stop any active tasks.
@@ -128,8 +128,8 @@ module GoodJob # :nodoc:
     end
 
     # Wakes a thread to allow the performer to execute a task.
-    # @param state [nil, Object] Contextual information for the performer. See {JobPerformer#next?}.
-    # @return [nil, Boolean] Whether work was started.
+    # @param state [Hash, nil] Contextual information for the performer. See {JobPerformer#next?}.
+    # @return [Boolean, nil] Whether work was started.
     #
     #   * +nil+ if the scheduler is unable to take new work, for example if the thread pool is shut down or at capacity.
     #   * +true+ if the performer started executing work.
@@ -215,6 +215,7 @@ module GoodJob # :nodoc:
 
     attr_reader :performer, :executor, :timer_set
 
+    # @return [void]
     def create_executor
       instrument("scheduler_create_pool", { performer_name: performer.name, max_threads: @executor_options[:max_threads] }) do
         @timer_set = TimerSet.new
@@ -222,6 +223,8 @@ module GoodJob # :nodoc:
       end
     end
 
+    # @param delay [Integer]
+    # @return [void]
     def create_task(delay = 0)
       future = Concurrent::ScheduledTask.new(delay, args: [performer], executor: executor, timer_set: timer_set) do |thr_performer|
         Rails.application.executor.wrap do
@@ -232,6 +235,9 @@ module GoodJob # :nodoc:
       future.execute
     end
 
+    # @param name [String]
+    # @param payload [Hash]
+    # @return [void]
     def instrument(name, payload = {}, &block)
       payload = payload.reverse_merge({
                                         scheduler: self,
