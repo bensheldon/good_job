@@ -13,6 +13,7 @@ module GoodJob
     end
 
     # Daemonizes the current process and writes out a pidfile.
+    # @return [void]
     def daemonize
       check_pid
       Process.daemon
@@ -21,6 +22,7 @@ module GoodJob
 
     private
 
+    # @return [void]
     def write_pid
       File.open(pidfile, ::File::CREAT | ::File::EXCL | ::File::WRONLY) { |f| f.write(Process.pid.to_s) }
       at_exit { File.delete(pidfile) if File.exist?(pidfile) }
@@ -29,10 +31,12 @@ module GoodJob
       retry
     end
 
+    # @return [void]
     def delete_pid
       File.delete(pidfile) if File.exist?(pidfile)
     end
 
+    # @return [void]
     def check_pid
       case pid_status(pidfile)
       when :running, :not_owned
@@ -42,6 +46,8 @@ module GoodJob
       end
     end
 
+    # @param pidfile [Pathname, String]
+    # @return [Symbol]
     def pid_status(pidfile)
       return :exited unless File.exist?(pidfile)
 

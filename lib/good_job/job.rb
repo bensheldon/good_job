@@ -235,7 +235,7 @@ module GoodJob
 
     private
 
-    # @return [GoodJob::ExecutionResult]
+    # @return [ExecutionResult]
     def execute
       params = serialized_params.merge(
         "provider_job_id" => id

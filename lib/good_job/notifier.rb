@@ -30,7 +30,7 @@ module GoodJob # :nodoc:
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated Notifiers in the current process.
-    #   @return [Array<GoodJob::Adapter>]
+    #   @return [Array<GoodJob::Notifier>, nil]
     cattr_reader :instances, default: [], instance_reader: false
 
     # Send a message via Postgres NOTIFY
@@ -64,17 +64,19 @@ module GoodJob # :nodoc:
     end
 
     # Tests whether the notifier is running.
+    # @!method running?
     # @return [true, false, nil]
     delegate :running?, to: :executor, allow_nil: true
 
     # Tests whether the scheduler is shutdown.
+    # @!method shutdown?
     # @return [true, false, nil]
     delegate :shutdown?, to: :executor, allow_nil: true
 
     # Shut down the notifier.
     # This stops the background LISTENing thread.
     # Use {#shutdown?} to determine whether threads have stopped.
-    # @param timeout [nil, Numeric] Seconds to wait for active threads.
+    # @param timeout [Numeric, nil] Seconds to wait for active threads.
     #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
     #   * +-1+, the scheduler will wait until the shutdown is complete.
     #   * +0+, the scheduler will immediately shutdown and stop any threads.
