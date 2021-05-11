@@ -10,7 +10,7 @@ MAX_CACHE = 10_000
 MAX_THREADS = 0
 JOBS_SIZE = 20_000
 
-class Performer
+class CustomPerformer < GoodJob::JobPerformer
   def name
     'script'
   end
@@ -28,7 +28,7 @@ class Performer
   end
 end
 
-scheduler = GoodJob::Scheduler.new(Performer.new, max_threads: MAX_THREADS, max_cache: MAX_CACHE)
+scheduler = GoodJob::Scheduler.new(CustomPerformer.new("*"), max_threads: MAX_THREADS, max_cache: MAX_CACHE)
 
 report = MemoryProfiler.report do
   JOBS_SIZE.times { scheduler.create_thread({ scheduled_at: Time.current + 100_000 }) }

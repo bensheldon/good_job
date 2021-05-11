@@ -84,9 +84,9 @@ module GoodJob
     # on the format of this string.
     # @return [String]
     def queue_string
-      options[:queues] ||
-        rails_config[:queues] ||
-        env['GOOD_JOB_QUEUES'] ||
+      options[:queues].presence ||
+        rails_config[:queues].presence ||
+        env['GOOD_JOB_QUEUES'].presence ||
         '*'
     end
 
