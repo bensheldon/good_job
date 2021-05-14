@@ -79,7 +79,7 @@ module GoodJob
       queue_names = job_data.map { |d| d['queue_name'] }.uniq
       labels = []
       queues_data = job_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
-        labels << timestamp
+        labels << timestamp.in_time_zone.to_s
         queue_names.each do |queue_name|
           (hash[queue_name] ||= []) << values.find { |d| d['queue_name'] == queue_name }&.[]('count')
         end
