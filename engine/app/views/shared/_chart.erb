@@ -6,11 +6,12 @@
     fullWidth: true,
     chartPadding: {
       right: 40,
-      top: 20
+      top: 20,
+      bottom: 20
     },
     axisX: {
       labelInterpolationFnc: function(value, index) {
-        return index % 3  === 0 ? value : null;
+        return index % 3 === 0 ? value : null;
       }
     },
     axisY: {
