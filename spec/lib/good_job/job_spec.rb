@@ -5,18 +5,18 @@ RSpec.describe GoodJob::Job do
 
   before do
     stub_const "RUN_JOBS", Concurrent::Array.new
-    stub_const 'ExpectedError', Class.new(StandardError)
     stub_const 'ExampleJob', (Class.new(ActiveJob::Base) do
       self.queue_name = 'test'
       self.priority = 50
 
       def perform(result_value = nil, raise_error: false)
         RUN_JOBS << provider_job_id
-        raise ExpectedError, "Raised expected error" if raise_error
+        raise ExampleJob::ExpectedError, "Raised expected error" if raise_error
 
         result_value
       end
     end)
+    stub_const 'ExampleJob::ExpectedError', Class.new(StandardError)
   end
 
   describe '.enqueue' do
@@ -80,7 +80,7 @@ RSpec.describe GoodJob::Job do
 
       expect(result).to be_a GoodJob::ExecutionResult
       expect(errored_result.value).to eq nil
-      expect(errored_result.unhandled_error).to be_an ExpectedError
+      expect(errored_result.unhandled_error).to be_an ExampleJob::ExpectedError
     end
   end
 
@@ -201,17 +201,17 @@ RSpec.describe GoodJob::Job do
           result = good_job.perform
 
           expect(result.value).to eq nil
-          expect(result.unhandled_error).to be_an_instance_of ExpectedError
+          expect(result.unhandled_error).to be_an_instance_of ExampleJob::ExpectedError
         end
 
         context 'when there is an retry handler with exhausted attempts' do
           before do
-            ExampleJob.retry_on(ExpectedError, attempts: 1)
+            ExampleJob.retry_on(ExampleJob::ExpectedError, attempts: 1)
 
             original_attr_readonly = described_class._attr_readonly
             described_class._attr_readonly = Set.new
 
-            good_job.serialized_params["exception_executions"] = { "[ExpectedError]" => 1 }
+            good_job.serialized_params["exception_executions"] = { "[ExampleJob::ExpectedError]" => 1 }
             good_job.save!
 
             described_class._attr_readonly = original_attr_readonly
@@ -220,7 +220,7 @@ RSpec.describe GoodJob::Job do
           it 'does not modify the good_job serialized params' do
             expect do
               good_job.perform
-            end.not_to change { good_job.reload.serialized_params["exception_executions"]["[ExpectedError]"] }
+            end.not_to change { good_job.reload.serialized_params["exception_executions"]["[ExampleJob::ExpectedError]"] }
           end
         end
 
@@ -243,7 +243,7 @@ RSpec.describe GoodJob::Job do
             result = good_job.perform
 
             expect(result.value).to eq nil
-            expect(result.unhandled_error).to be_an_instance_of ExpectedError
+            expect(result.unhandled_error).to be_an_instance_of ExampleJob::ExpectedError
           end
 
           if Gem::Version.new(Rails.version) > Gem::Version.new("6")
@@ -257,7 +257,7 @@ RSpec.describe GoodJob::Job do
                 result = good_job.perform
 
                 expect(result.value).to eq nil
-                expect(result.handled_error).to be_an_instance_of ExpectedError
+                expect(result.handled_error).to be_an_instance_of ExampleJob::ExpectedError
               end
             end
 
@@ -270,7 +270,7 @@ RSpec.describe GoodJob::Job do
                 result = good_job.perform
 
                 expect(result.value).to eq nil
-                expect(result.handled_error).to be_an_instance_of ExpectedError
+                expect(result.handled_error).to be_an_instance_of ExampleJob::ExpectedError
               end
             end
           end
@@ -315,7 +315,7 @@ RSpec.describe GoodJob::Job do
         result = good_job.perform
 
         expect(result.value).to be_nil
-        expect(result.handled_error).to be_a(ExpectedError)
+        expect(result.handled_error).to be_a(ExampleJob::ExpectedError)
       end
 
       it 'destroys the job' do
@@ -330,7 +330,7 @@ RSpec.describe GoodJob::Job do
         good_job.perform
 
         expect(good_job.reload).to have_attributes(
-          error: "ExpectedError: Raised expected error",
+          error: "ExampleJob::ExpectedError: Raised expected error",
           performed_at: within(1.second).of(Time.current),
           finished_at: within(1.second).of(Time.current)
         )
@@ -344,7 +344,7 @@ RSpec.describe GoodJob::Job do
         result = good_job.perform
 
         expect(result.value).to eq nil
-        expect(result.unhandled_error).to be_a(ExpectedError)
+        expect(result.unhandled_error).to be_a(ExampleJob::ExpectedError)
       end
 
       describe 'GoodJob.reperform_jobs_on_standard_error behavior' do
@@ -359,7 +359,7 @@ RSpec.describe GoodJob::Job do
             good_job.perform
 
             expect(good_job.reload).to have_attributes(
-              error: "ExpectedError: Raised expected error",
+              error: "ExampleJob::ExpectedError: Raised expected error",
               performed_at: within(1.second).of(Time.current),
               finished_at: nil
             )
@@ -391,7 +391,7 @@ RSpec.describe GoodJob::Job do
             good_job.perform
 
             expect(good_job.reload).to have_attributes(
-              error: "ExpectedError: Raised expected error",
+              error: "ExampleJob::ExpectedError: Raised expected error",
               performed_at: within(1.second).of(Time.current),
               finished_at: within(1.second).of(Time.current)
             )
@@ -402,7 +402,7 @@ RSpec.describe GoodJob::Job do
             good_job.perform
 
             expect(good_job.reload).to have_attributes(
-              error: "ExpectedError: Raised expected error",
+              error: "ExampleJob::ExpectedError: Raised expected error",
               performed_at: within(1.second).of(Time.current),
               finished_at: within(1.second).of(Time.current)
             )
