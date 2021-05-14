@@ -160,6 +160,25 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  describe '.display_all' do
+    let(:active_job) { ExampleJob.new }
+
+    it 'does not return jobs after last scheduled at' do
+      described_class.enqueue(active_job, scheduled_at: '2021-05-14 09:33:16 +0200')
+
+      expect(described_class.display_all(after_scheduled_at: Time.zone.parse('2021-05-14 09:33:16 +0200')).count).to eq(0)
+    end
+
+    it 'does not return jobs after last scheduled at and job id' do
+      described_class.enqueue(active_job, scheduled_at: '2021-05-14 09:33:16 +0200')
+      job_id = described_class.last!.id
+
+      expect(
+        described_class.display_all(after_scheduled_at: Time.zone.parse('2021-05-14 09:33:16 +0200'), after_id: job_id).count
+      ).to eq(0)
+    end
+  end
+
   describe '#executable?' do
     it 'is true when locked' do
       job.with_advisory_lock do
