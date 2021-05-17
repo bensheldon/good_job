@@ -1,8 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Job do
-  let(:job) { described_class.create! }
-
   before do
     stub_const "RUN_JOBS", Concurrent::Array.new
     stub_const 'ExampleJob', (Class.new(ActiveJob::Base) do
@@ -161,23 +159,25 @@ RSpec.describe GoodJob::Job do
   end
 
   describe '#executable?' do
+    let(:good_job) { described_class.create! }
+
     it 'is true when locked' do
-      job.with_advisory_lock do
-        expect(job.executable?).to eq true
+      good_job.with_advisory_lock do
+        expect(good_job.executable?).to eq true
       end
     end
 
     it 'is false when job no longer exists' do
-      job.with_advisory_lock do
-        job.destroy!
-        expect(job.executable?).to eq false
+      good_job.with_advisory_lock do
+        good_job.destroy!
+        expect(good_job.executable?).to eq false
       end
     end
 
     it 'is false when the job has finished' do
-      job.with_advisory_lock do
-        job.update! finished_at: Time.current
-        expect(job.executable?).to eq false
+      good_job.with_advisory_lock do
+        good_job.update! finished_at: Time.current
+        expect(good_job.executable?).to eq false
       end
     end
   end
@@ -196,6 +196,7 @@ RSpec.describe GoodJob::Job do
 
       context 'when there is an error' do
         let(:active_job) { ExampleJob.new("whoops", raise_error: true) }
+        let!(:good_job) { described_class.enqueue(active_job) }
 
         it 'returns the error' do
           result = good_job.perform
