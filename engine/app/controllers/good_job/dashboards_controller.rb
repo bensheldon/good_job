@@ -22,6 +22,8 @@ module GoodJob
             sql = sql.finished
           when 'unfinished'
             sql = sql.unfinished
+          when 'running'
+            sql = sql.running
           when 'errors'
             sql = sql.where.not(error: nil)
           end
@@ -33,6 +35,7 @@ module GoodJob
         {
           'finished' => GoodJob::Job.finished.count,
           'unfinished' => GoodJob::Job.unfinished.count,
+          'running' => GoodJob::Job.running.count,
           'errors' => GoodJob::Job.where.not(error: nil).count,
         }
       end

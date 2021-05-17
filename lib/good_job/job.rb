@@ -102,6 +102,12 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :finished, ->(timestamp = nil) { timestamp ? where(arel_table['finished_at'].lteq(timestamp)) : where.not(finished_at: nil) }
 
+    # Get Jobs that started but not finished yet.
+    # @!method running
+    # @!scope class
+    # @return [ActiveRecord::Relation]
+    scope :running, -> { where.not(performed_at: nil).where(finished_at: nil) }
+
     # Get Jobs on queues that match the given queue string.
     # @!method queue_string(string)
     # @!scope class
