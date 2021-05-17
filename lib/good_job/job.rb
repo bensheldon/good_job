@@ -50,6 +50,14 @@ module GoodJob
       end
     end
 
+    # Get Jobs with given class name
+    # @!method with_job_class
+    # @!scope class
+    # @param string [String]
+    #   Job class name
+    # @return [ActiveRecord::Relation]
+    scope :with_job_class, ->(job_class) { where("serialized_params->>'job_class' = ?", job_class) }
+
     # Get Jobs that have not yet been completed.
     # @!method unfinished
     # @!scope class
