@@ -14,9 +14,7 @@ module GoodJob
       def jobs
         sql = GoodJob::Job.display_all(after_scheduled_at: params[:after_scheduled_at], after_id: params[:after_id])
                           .limit(params.fetch(:limit, 10))
-        if params[:job_class] # rubocop:disable Style/IfUnlessModifier
-          sql = sql.where("serialized_params->>'job_class' = ?", params[:job_class])
-        end
+        sql = sql.with_job_class(params[:job_class]) if params[:job_class]
         if params[:state]
           case params[:state]
           when 'finished'
