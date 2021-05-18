@@ -1,5 +1,32 @@
 # Changelog
 
+## [v1.9.4](https://github.com/bensheldon/good_job/tree/v1.9.4) (2021-05-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.3...v1.9.4)
+
+**Implemented enhancements:**
+
+- Add "running" jobs state to Dashboard [\#253](https://github.com/bensheldon/good_job/pull/253) ([morgoth](https://github.com/morgoth))
+
+**Fixed bugs:**
+
+- Unify displaying timestamps [\#252](https://github.com/bensheldon/good_job/pull/252) ([morgoth](https://github.com/morgoth))
+- Fix dashboard jobs endless pagination with timezone handling [\#251](https://github.com/bensheldon/good_job/pull/251) ([morgoth](https://github.com/morgoth))
+
+**Closed issues:**
+
+- exception\_executions not counted correctly? [\#215](https://github.com/bensheldon/good_job/issues/215)
+- Document issues with PgBouncer and session-level Advisory Locks [\#52](https://github.com/bensheldon/good_job/issues/52)
+
+**Merged pull requests:**
+
+- Add handy scope for filtering by job class [\#259](https://github.com/bensheldon/good_job/pull/259) ([morgoth](https://github.com/morgoth))
+- Nest exception stub within job class and cleanup let! precedence to fix flakey JRuby tests [\#254](https://github.com/bensheldon/good_job/pull/254) ([bensheldon](https://github.com/bensheldon))
+- Move good\_job\_spec.rb to proper location in lib directory [\#250](https://github.com/bensheldon/good_job/pull/250) ([bensheldon](https://github.com/bensheldon))
+- Refactor deprecated wait parameter and assorted improvements [\#249](https://github.com/bensheldon/good_job/pull/249) ([bensheldon](https://github.com/bensheldon))
+- Update development dependencies \(Rails v6.1.3.2\) [\#248](https://github.com/bensheldon/good_job/pull/248) ([bensheldon](https://github.com/bensheldon))
+- Update YARD documentation param types and return values [\#239](https://github.com/bensheldon/good_job/pull/239) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.9.3](https://github.com/bensheldon/good_job/tree/v1.9.3) (2021-05-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.2...v1.9.3)
@@ -10,7 +37,7 @@
 
 **Closed issues:**
 
-- Not processing unfinished jobs across server restarts using async\_server mode  [\#244](https://github.com/bensheldon/good_job/issues/244)
+- Not processing unfinished jobs across server restarts using async\_server mode on Iodine server [\#244](https://github.com/bensheldon/good_job/issues/244)
 - No connection pool for 'ActiveRecord::Base' found [\#236](https://github.com/bensheldon/good_job/issues/236)
 
 ## [v1.9.2](https://github.com/bensheldon/good_job/tree/v1.9.2) (2021-05-10)
