@@ -6,13 +6,12 @@
   <%= csp_meta_tag %>
 
   <style>
-    <%== render file: GoodJob::Engine.root.join("app", "assets", "vendor", "bootstrap", "bootstrap.css") %>
+    <%== render file: GoodJob::Engine.root.join("app", "assets", "vendor", "bootstrap", "bootstrap.min.css") %>
     <%== render file: GoodJob::Engine.root.join("app", "assets", "vendor", "chartist", "chartist.css") %>
     <%== render file: GoodJob::Engine.root.join("app", "assets", "style.css") %>
   </style>
 
   <script>
-    <%== render file: GoodJob::Engine.root.join("app", "assets", "vendor", "bootstrap", "bootstrap-native.js") %>
     <%== render file: GoodJob::Engine.root.join("app", "assets", "vendor", "chartist", "chartist.js") %>
   </script>
 </head>
@@ -20,15 +19,15 @@
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
       <%= link_to "GoodJob 👍", root_path, class: 'navbar-brand mb-0 h1' %>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+        <ul class="navbar-nav me-auto">
           <li class="nav-item">
             <%= link_to root_path, class: ["nav-link", ("active" if current_page?(root_path))] do %>
-              All jobs <span class="badge badge-secondary">More views coming soon</span>
+              All jobs <span class="badge bg-secondary">More views coming soon</span>
             <% end %>
           </li>
 
