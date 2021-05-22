@@ -41,7 +41,14 @@ task :release, [:version_bump] do |_t, args|
   system! ENV, "bundle exec github_changelog_generator --user bensheldon --project good_job --future-release v#{GoodJob::VERSION}"
 
   puts "\n== Updating Gemfile.lock version =="
-  system! "bundle install"
+  system! "bundle update --conservative good_job"
+
+  puts "\n== Verifying Gemfile.lock =="
+  gemfile_lock = File.read(File.join(File.dirname(__FILE__), '.ruby-version'))
+  unless gemfile_lock.include?("jdbc-postgres")
+    puts "ABORTING...\nMissing JRuby library. Gemfile.lock has possibly been corrupted. Inspect the diff."
+    exit(1)
+  end
 
   puts "\n== Creating git commit  =="
   system! "git add lib/good_job/version.rb CHANGELOG.md Gemfile.lock"
