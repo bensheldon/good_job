@@ -44,7 +44,7 @@ task :release, [:version_bump] do |_t, args|
   system! "bundle update --conservative good_job"
 
   puts "\n== Verifying Gemfile.lock =="
-  gemfile_lock = File.read(File.join(File.dirname(__FILE__), '.ruby-version'))
+  gemfile_lock = File.read(File.join(File.dirname(__FILE__), 'Gemfile.lock'))
   unless gemfile_lock.include?("jdbc-postgres")
     puts "ABORTING...\nMissing JRuby library. Gemfile.lock has possibly been corrupted. Inspect the diff."
     exit(1)
