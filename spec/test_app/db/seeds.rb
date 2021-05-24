@@ -1,12 +1,14 @@
-datetime = 7.days.ago
-time_series =  (1.minute..90.minutes).to_a
+start_date = 7.days.ago
+time_increments = (1.minute..90.minutes).to_a
+job_classes = ['ExampleJob', 'OtherJob']
+queue_names = ["default", "mice", "elephants"]
 
 ActiveRecord::Base.transaction do
   loop do
     active_job_id = SecureRandom.uuid
-    job_class = ['ExampleJob', 'OtherJob'].sample
-    queue_name = ["default", "mice", "elephants"].sample
-    enqueued_at = datetime
+    job_class = job_classes.sample
+    queue_name = queue_names.sample
+    enqueued_at = start_date
 
     serialized_params = {
       job_id: active_job_id,
@@ -34,7 +36,7 @@ ActiveRecord::Base.transaction do
       error: nil
     )
 
-    datetime += time_series.sample
-    break if datetime > Time.current
+    start_date += time_increments.sample
+    break if start_date > Time.current
   end
 end
