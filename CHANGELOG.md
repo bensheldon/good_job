@@ -1,5 +1,19 @@
 # Changelog
 
+## [v1.9.5](https://github.com/bensheldon/good_job/tree/v1.9.5) (2021-05-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.4...v1.9.5)
+
+**Closed issues:**
+
+- Update from bootstrap 4 to bootstrap 5 [\#258](https://github.com/bensheldon/good_job/issues/258)
+
+**Merged pull requests:**
+
+- Serve Dashboard assets as discrete paths instead of inlining [\#262](https://github.com/bensheldon/good_job/pull/262) ([bensheldon](https://github.com/bensheldon))
+- Fix Gemfile.lock's missing JRuby dependencies; fix release script and add check [\#261](https://github.com/bensheldon/good_job/pull/261) ([bensheldon](https://github.com/bensheldon))
+- Update Dashboard to Bootstrap 5 [\#260](https://github.com/bensheldon/good_job/pull/260) ([morgoth](https://github.com/morgoth))
+
 ## [v1.9.4](https://github.com/bensheldon/good_job/tree/v1.9.4) (2021-05-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.3...v1.9.4)
