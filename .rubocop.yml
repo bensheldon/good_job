@@ -20,6 +20,7 @@ AllCops:
     - pkg/**/*
     - spec/test_app/**/*
     - vendor/**/*
+    - scripts/**/*
   NewCops: enable
 
 Layout/EmptyLineAfterMagicComment:
