@@ -14,7 +14,7 @@ module GoodJob
       def jobs
         after_scheduled_at = params[:after_scheduled_at].present? ? Time.zone.parse(params[:after_scheduled_at]) : nil
         sql = GoodJob::Job.display_all(after_scheduled_at: after_scheduled_at, after_id: params[:after_id])
-                          .limit(params.fetch(:limit, 10))
+                          .limit(params.fetch(:limit, 25))
         sql = sql.with_job_class(params[:job_class]) if params[:job_class]
         if params[:state]
           case params[:state]
