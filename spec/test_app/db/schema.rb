@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_19_011158) do
+ActiveRecord::Schema.define(version: 2021_05_24_175313) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -26,6 +26,7 @@ ActiveRecord::Schema.define(version: 2020_07_19_011158) do
     t.datetime "performed_at"
     t.datetime "finished_at"
     t.text "error"
+    t.index "(COALESCE(scheduled_at, created_at))", name: "index_good_jobs_on_COALESCE_scheduled_at_created_at", where: "(finished_at IS NULL)"
     t.index ["queue_name", "scheduled_at"], name: "index_good_jobs_on_queue_name_and_scheduled_at", where: "(finished_at IS NULL)"
     t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
   end

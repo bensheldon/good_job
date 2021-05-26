@@ -73,6 +73,9 @@ GEM
     activerecord-jdbcpostgresql-adapter (61.0-java)
       activerecord-jdbc-adapter (= 61.0)
       jdbc-postgres (>= 9.4, < 43)
+    activerecord-explain-analyze (0.1.0)
+      activerecord (>= 4)
+      pg
     activestorage (6.1.3.2)
       actionpack (= 6.1.3.2)
       activejob (= 6.1.3.2)
@@ -107,6 +110,7 @@ GEM
       async (~> 1.14)
     async-pool (0.3.6)
       async (~> 1.25)
+    benchmark-ips (2.8.4)
     better_html (1.0.16)
       actionview (>= 4.0)
       activesupport (>= 4.0)
@@ -373,8 +377,10 @@ PLATFORMS
   universal-java-11
 
 DEPENDENCIES
+  activerecord-explain-analyze
   activerecord-jdbcpostgresql-adapter
   appraisal!
+  benchmark-ips (= 2.8.4)
   capybara
   database_cleaner
   dotenv

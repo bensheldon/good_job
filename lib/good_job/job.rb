@@ -76,7 +76,13 @@ module GoodJob
     # @!method only_scheduled
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(Time.current)).or(where(scheduled_at: nil)) }
+    scope :only_scheduled, (lambda do |use_coalesce: false|
+      if use_coalesce
+        where('COALESCE(scheduled_at, created_at) <= ?', Time.current)
+      else
+        where(arel_table['scheduled_at'].lteq(Time.current)).or(where(scheduled_at: nil))
+      end
+    end)
 
     # Order jobs by priority (highest priority first).
     # @!method priority_ordered
