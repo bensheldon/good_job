@@ -19,7 +19,13 @@
             <td><%= job.queue_name %></td>
             <td><%= job.scheduled_at || job.created_at %></td>
             <td><%= job.error %></td>
-            <td><pre><%= JSON.pretty_generate(job.serialized_params) %></pre></td>
+            <td>
+              <%= tag.button "Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                data: {bs_toggle: "collapse", bs_target: "##{dom_id(job, 'params')}"},
+                aria: {expanded: false, controls: dom_id(job, "params")}
+              %>
+              <%= tag.pre JSON.pretty_generate(job.serialized_params), id: dom_id(job, "params"), class: "collapse" %>
+            </td>
           </tr>
         <% end %>
       </tbody>
