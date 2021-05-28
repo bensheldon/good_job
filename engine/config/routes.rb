@@ -1,6 +1,6 @@
 GoodJob::Engine.routes.draw do
   root to: 'dashboards#index'
-  resources :active_jobs, only: :show
+  resources :active_jobs, only: %i[show destroy]
 
   scope controller: :assets do
     get :bootstrap_css
