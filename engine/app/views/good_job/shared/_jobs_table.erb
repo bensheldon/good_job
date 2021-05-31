@@ -2,14 +2,22 @@
   <div class="table-responsive">
     <table class="table card-table table-bordered table-hover table-sm mb-0">
       <thead>
-        <th>GoodJob ID</th>
-        <th>ActiveJob ID</th>
-        <th>Job Class</th>
-        <th>Queue</th>
-        <th>Scheduled At</th>
-        <th>Error</th>
-        <th>ActiveJob Params</th>
-        <th>Actions</th>
+        <tr>
+          <th>GoodJob ID</th>
+          <th>ActiveJob ID</th>
+          <th>Job Class</th>
+          <th>Queue</th>
+          <th>Scheduled At</th>
+          <th>Error</th>
+          <th>
+            ActiveJob Params&nbsp;
+            <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                           data: { bs_toggle: "collapse", bs_target: ".job-params" },
+                           aria: { expanded: false, controls: jobs.map { |job| "##{dom_id(job, "params")}" }.join(" ") }
+            %>
+          </th>
+          <th>Actions</th>
+        </tr>
       </thead>
       <tbody>
         <% jobs.each do |job| %>
@@ -22,10 +30,10 @@
             <td class="text-break"><%= truncate(job.error, length: 1_000) %></td>
             <td>
               <%= tag.button "Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                data: {bs_toggle: "collapse", bs_target: "##{dom_id(job, 'params')}"},
-                aria: {expanded: false, controls: dom_id(job, "params")}
+                data: { bs_toggle: "collapse", bs_target: "##{dom_id(job, 'params')}" },
+                aria: { expanded: false, controls: dom_id(job, "params") }
               %>
-              <%= tag.pre JSON.pretty_generate(job.serialized_params), id: dom_id(job, "params"), class: "collapse" %>
+              <%= tag.pre JSON.pretty_generate(job.serialized_params), id: dom_id(job, "params"), class: "collapse job-params" %>
             </td>
             <td>
               <%= button_to job_path(job.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Delete job" do %>
