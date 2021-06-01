@@ -6,9 +6,9 @@ describe 'Dashboard', type: :system, js: true do
     expect(page).to have_content 'GoodJob 👍'
   end
 
-  # This requires storing job in database, but rest of the tests is using inline adapter
-  # Figure out how to workaround this
-  xit 'deletes job' do
+  it 'deletes job' do
+    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+
     ExampleJob.perform_later
 
     visit '/good_job'
