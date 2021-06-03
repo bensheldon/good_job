@@ -57,6 +57,10 @@ Rails/Inquiry:
   Exclude:
     - spec/**/*
 
+Rails/SkipsModelValidations:
+  Exclude:
+    - lib/generators/good_job/templates/update/migrations/**/*
+
 RSpec/AnyInstance:
   Enabled: false
 

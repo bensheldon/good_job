@@ -196,13 +196,30 @@ module GoodJob
     #   The new {Job} instance representing the queued ActiveJob job.
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
-        good_job = GoodJob::Job.new(
+        good_job_args = {
           queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
           priority: active_job.priority || DEFAULT_PRIORITY,
           serialized_params: active_job.serialize,
           scheduled_at: scheduled_at,
-          create_with_advisory_lock: create_with_advisory_lock
-        )
+          create_with_advisory_lock: create_with_advisory_lock,
+        }
+
+        if column_names.include?('active_job_id')
+          good_job_args[:active_job_id] = active_job.job_id
+        else
+          ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+            GoodJob has pending database migrations. To create the migration files, run:
+
+                rails generate good_job:update
+
+            To apply the migration files, run:
+
+                rails db:migrate
+
+          DEPRECATION
+        end
+
+        good_job = GoodJob::Job.new(**good_job_args)
 
         instrument_payload[:good_job] = good_job
 
