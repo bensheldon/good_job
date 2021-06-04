@@ -1,5 +1,19 @@
 # Changelog
 
+## [v1.9.6](https://github.com/bensheldon/good_job/tree/v1.9.6) (2021-06-04)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.5...v1.9.6)
+
+**Closed issues:**
+
+- Pause jobs during migration / maintenance? [\#257](https://github.com/bensheldon/good_job/issues/257)
+- How to properly report errors to error tracker service [\#159](https://github.com/bensheldon/good_job/issues/159)
+
+**Merged pull requests:**
+
+- Add deleting jobs from UI. [\#265](https://github.com/bensheldon/good_job/pull/265) ([morgoth](https://github.com/morgoth))
+- Collapse Dashboard params by default [\#263](https://github.com/bensheldon/good_job/pull/263) ([morgoth](https://github.com/morgoth))
+
 ## [v1.9.5](https://github.com/bensheldon/good_job/tree/v1.9.5) (2021-05-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.4...v1.9.5)
