@@ -9,6 +9,7 @@
         <th>Scheduled At</th>
         <th>Error</th>
         <th>ActiveJob Params</th>
+        <th>Actions</th>
       </thead>
       <tbody>
         <% jobs.each do |job| %>
@@ -25,6 +26,11 @@
                 aria: {expanded: false, controls: dom_id(job, "params")}
               %>
               <%= tag.pre JSON.pretty_generate(job.serialized_params), id: dom_id(job, "params"), class: "collapse" %>
+            </td>
+            <td>
+              <%= button_to job_path(job.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Delete job" do %>
+                <%= render "shared/icons/trash" %>
+              <% end %>
             </td>
           </tr>
         <% end %>
