@@ -17,6 +17,7 @@ gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 gem 'rails'
 
 platforms :ruby do
+  gem "activerecord-explain-analyze"
   gem "memory_profiler"
   gem "pry-byebug"
   gem "rbtrace"
