@@ -158,10 +158,7 @@ module GoodJob
     def self.perform_with_advisory_lock
       unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock do |good_jobs|
         good_job = good_jobs.first
-        # TODO: Determine why some records are fetched without an advisory lock at all
-        break unless good_job&.executable?
-
-        good_job.perform
+        good_job&.perform
       end
     end
 
@@ -239,12 +236,6 @@ module GoodJob
       end
 
       result
-    end
-
-    # Tests whether this job is safe to be executed by this thread.
-    # @return [Boolean]
-    def executable?
-      self.class.unscoped.unfinished.owns_advisory_locked.exists?(id: id)
     end
 
     private

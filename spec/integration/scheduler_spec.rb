@@ -38,19 +38,22 @@ RSpec.describe 'Schedule Integration' do
     end), transfer_nested_constants: true
   end
 
-  let(:adapter) { GoodJob::Adapter.new }
+  let(:adapter) { GoodJob::Adapter.new(execution_mode: :external) }
 
   context 'when there are a large number of jobs' do
-    let(:number_of_jobs) { 500 }
+    let(:number_of_jobs) { 1_000 }
     let(:max_threads) { 5 }
 
     let!(:good_jobs) do
-      number_of_jobs.times do |i|
-        ExampleJob.perform_later(i)
+      GoodJob::Job.transaction do
+        number_of_jobs.times do |i|
+          ExampleJob.perform_later(i)
+        end
       end
     end
 
     it 'pops items off of the queue and runs them' do
+      puts "TEST STARTS"
       performer = GoodJob::JobPerformer.new('*')
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       max_threads.times { scheduler.create_thread }

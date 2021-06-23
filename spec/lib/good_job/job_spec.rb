@@ -177,30 +177,6 @@ RSpec.describe GoodJob::Job do
     end
   end
 
-  describe '#executable?' do
-    let(:good_job) { described_class.create! }
-
-    it 'is true when locked' do
-      good_job.with_advisory_lock do
-        expect(good_job.executable?).to eq true
-      end
-    end
-
-    it 'is false when job no longer exists' do
-      good_job.with_advisory_lock do
-        good_job.destroy!
-        expect(good_job.executable?).to eq false
-      end
-    end
-
-    it 'is false when the job has finished' do
-      good_job.with_advisory_lock do
-        good_job.update! finished_at: Time.current
-        expect(good_job.executable?).to eq false
-      end
-    end
-  end
-
   describe '#perform' do
     let(:active_job) { ExampleJob.new("a string") }
     let!(:good_job) { described_class.enqueue(active_job) }

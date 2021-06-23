@@ -41,9 +41,14 @@ module GoodJob
 
         composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::SqlLiteral.new([cte_type, "(", cte_query.to_sql, ")"].join(' ')))
 
+        # In addition to an advisory lock, there is also a FOR UPDATE SKIP LOCKED
+        # because this causes the query to skip jobs that were completed (and deleted)
+        # by another session in the time since the table snapshot was taken.
+        # In rare cases under high concurrency levels, leaving this out can result in double executions.
         query = cte_table.project(cte_table[:id])
                          .with(composed_cte)
                          .where(Arel.sql(sanitize_sql_for_conditions(["pg_try_advisory_lock(('x' || substr(md5(:table_name || #{connection.quote_table_name(cte_table.name)}.#{quoted_primary_key}::text), 1, 16))::bit(64)::bigint)", { table_name: table_name }])))
+                         .lock(Arel.sql("FOR UPDATE SKIP LOCKED"))
 
         limit = original_query.arel.ast.limit
         query.limit = limit.value if limit.present?
