@@ -78,7 +78,9 @@ jobs:
         run: bin/rails db:test:prepare
         working-directory: spec/test_app
       - name: Run tests
-        run: bundle exec appraisal rspec
+        run: |
+          bundle exec appraisal rspec --require ./spec/support/pre_documentation_formatter.rb \
+                                      --format PreDocumentationFormatter
 
       # Archive
       - name: Archive system spec screenshots
