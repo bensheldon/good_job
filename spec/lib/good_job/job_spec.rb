@@ -28,6 +28,7 @@ RSpec.describe GoodJob::Job do
       end.to change(described_class, :count).by(1)
 
       expect(good_job).to have_attributes(
+        active_job_id: a_kind_of(String),
         serialized_params: a_kind_of(Hash),
         queue_name: 'test',
         priority: 50,

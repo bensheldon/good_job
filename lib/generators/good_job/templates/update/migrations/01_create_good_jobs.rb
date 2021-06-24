@@ -1,4 +1,4 @@
-class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
+class CreateGoodJobs < ActiveRecord::Migration[5.2]
   def change
     enable_extension 'pgcrypto'
 
@@ -14,7 +14,7 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       t.timestamps
     end
 
-    add_index :good_jobs, :scheduled_at, where: "(finished_at IS NULL)"
-    add_index :good_jobs, [:queue_name, :scheduled_at], where: "(finished_at IS NULL)"
+    add_index :good_jobs, :scheduled_at, where: "(finished_at IS NULL)", name: "index_good_jobs_on_scheduled_at"
+    add_index :good_jobs, [:queue_name, :scheduled_at], where: "(finished_at IS NULL)", name: :index_good_jobs_on_queue_name_and_scheduled_at
   end
 end

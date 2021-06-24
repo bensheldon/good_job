@@ -38,6 +38,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Configuration options](#configuration-options)
     - [Global options](#global-options)
     - [Dashboard](#dashboard)
+    - [Updating](#updating)
 - [Go deeper](#go-deeper)
     - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
         - [Exceptions](#exceptions)
@@ -317,6 +318,22 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
         ActiveSupport::SecurityUtils.secure_compare(Rails.application.credentials.good_job_password, password)
     end
     ```
+
+### Updating
+
+GoodJob follows semantic versioning, though updates may be encouraged through deprecation warnings in minor versions.
+
+To apply updates:
+
+```bash
+bin/rails g good_job:update
+```
+
+...and run the resulting migration:
+
+```bash
+bin/rails db:migrate
+```
 
 ## Go deeper
 
