@@ -4,11 +4,11 @@ module GoodJob
   # Thread-local attributes for passing values from Instrumentation.
   # (Cannot use ActiveSupport::CurrentAttributes because ActiveJob resets it)
   module CurrentExecution
-    # @!attribute [rw] error_on_retry
+    # @!attribute [rw] active_job_id
     #   @!scope class
-    #   Error captured by retry_on
-    #   @return [Exception, nil]
-    thread_mattr_accessor :error_on_retry
+    #   ActiveJob ID
+    #   @return [String, nil]
+    thread_mattr_accessor :active_job_id
 
     # @!attribute [rw] error_on_discard
     #   @!scope class
@@ -16,11 +16,18 @@ module GoodJob
     #   @return [Exception, nil]
     thread_mattr_accessor :error_on_discard
 
+    # @!attribute [rw] error_on_retry
+    #   @!scope class
+    #   Error captured by retry_on
+    #   @return [Exception, nil]
+    thread_mattr_accessor :error_on_retry
+
     # Resets attributes
     # @return [void]
     def self.reset
-      self.error_on_retry = nil
+      self.active_job_id = nil
       self.error_on_discard = nil
+      self.error_on_retry = nil
     end
 
     # @return [Integer] Current process ID

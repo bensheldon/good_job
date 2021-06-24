@@ -52,4 +52,19 @@ RSpec.describe GoodJob::CurrentExecution do
       expect(described_class.error_on_retry).to eq nil
     end
   end
+
+  describe '.active_job_id' do
+    it 'is assignable, thread-safe, and resettable' do
+      described_class.active_job_id = 'duck'
+
+      Thread.new do
+        described_class.active_job_id = 'bear'
+      end.join
+
+      expect(described_class.active_job_id).to eq 'duck'
+
+      described_class.reset
+      expect(described_class.active_job_id).to eq nil
+    end
+  end
 end

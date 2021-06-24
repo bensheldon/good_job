@@ -132,6 +132,12 @@ RSpec.describe GoodJob::Lockable do
 
       job.advisory_unlock(key: "alternative")
     end
+
+    it 'can lock alternative postgres functions' do
+      job.advisory_lock!(function: "pg_advisory_lock")
+      expect(job.advisory_locked?).to be true
+      job.advisory_unlock
+    end
   end
 
   describe '#advisory_unlock' do

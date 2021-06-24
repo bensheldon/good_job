@@ -38,6 +38,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Configuration options](#configuration-options)
     - [Global options](#global-options)
     - [Dashboard](#dashboard)
+    - [ActiveJob Concurrency](#activejob-concurrency)
     - [Updating](#updating)
 - [Go deeper](#go-deeper)
     - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
@@ -318,6 +319,35 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
         ActiveSupport::SecurityUtils.secure_compare(Rails.application.credentials.good_job_password, password)
     end
     ```
+
+### ActiveJob Concurrency
+
+GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_.
+
+**Note:** Limiting concurrency at _enqueue_ requires Rails 6.0+ because Rails 5.2 does not support `throw :abort` in ActiveJob callbacks.
+
+```ruby
+class MyJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
+  good_job_control_concurrency_with(
+    # Maximum number of jobs with the concurrency key to be concurrently enqueued
+    enqueue_limit: 2,
+
+    # Maximum number of jobs with the concurrency key to be concurrently performed
+    perform_limit: 1,
+
+    # A unique key to be globally locked against.
+    # Can be String or Lambda/Proc that is invoked in the context of the job.
+    # Note: Arguments passed to #perform_later must be accessed through `arguments` method.
+    key: -> { "Unique-#{arguments.first}" } #  MyJob.perform_later("Alice") => "Unique-Alice"
+  )
+
+  def perform(first_name)
+    # do work
+  end
+end
+```
 
 ### Updating
 
