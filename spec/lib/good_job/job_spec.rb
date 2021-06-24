@@ -1,22 +1,6 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Job do
-  before do
-    stub_const "RUN_JOBS", Concurrent::Array.new
-    stub_const 'ExampleJob', (Class.new(ActiveJob::Base) do
-      self.queue_name = 'test'
-      self.priority = 50
-
-      def perform(result_value = nil, raise_error: false)
-        RUN_JOBS << provider_job_id
-        raise ExampleJob::ExpectedError, "Raised expected error" if raise_error
-
-        result_value
-      end
-    end)
-    stub_const 'ExampleJob::ExpectedError', Class.new(StandardError)
-  end
-
   describe '.enqueue' do
     let(:active_job) { ExampleJob.new }
 
@@ -29,8 +13,8 @@ RSpec.describe GoodJob::Job do
 
       expect(good_job).to have_attributes(
         serialized_params: a_kind_of(Hash),
-        queue_name: 'test',
-        priority: 50,
+        queue_name: 'default',
+        priority: 0,
         scheduled_at: nil
       )
     end
@@ -54,7 +38,7 @@ RSpec.describe GoodJob::Job do
   end
 
   describe '.perform_with_advisory_lock' do
-    let(:active_job) { ExampleJob.new('a string') }
+    let(:active_job) { ExampleJob.new(result: 'a string') }
     let!(:good_job) { described_class.enqueue(active_job) }
 
     it 'performs one job' do
@@ -202,7 +186,7 @@ RSpec.describe GoodJob::Job do
   end
 
   describe '#perform' do
-    let(:active_job) { ExampleJob.new("a string") }
+    let(:active_job) { ExampleJob.new(result: "a string") }
     let!(:good_job) { described_class.enqueue(active_job) }
 
     describe 'return value' do
@@ -325,17 +309,13 @@ RSpec.describe GoodJob::Job do
     end
 
     context 'when ActiveJob rescues an error' do
-      let(:active_job) { ExampleJob.new("a string", raise_error: true) }
-
-      before do
-        ExampleJob.retry_on(StandardError, wait: 0, attempts: Float::INFINITY) { nil }
-      end
+      let(:active_job) { ExampleJob.new("a string", raise_error: :retryable) }
 
       it 'returns the results of the job' do
         result = good_job.perform
 
         expect(result.value).to be_nil
-        expect(result.handled_error).to be_a(ExampleJob::ExpectedError)
+        expect(result.handled_error).to be_a(ExampleJob::RetryableError)
       end
 
       it 'destroys the job' do
@@ -350,7 +330,7 @@ RSpec.describe GoodJob::Job do
         good_job.perform
 
         expect(good_job.reload).to have_attributes(
-          error: "ExampleJob::ExpectedError: Raised expected error",
+          error: "ExampleJob::RetryableError: Raised retryable error",
           performed_at: within(1.second).of(Time.current),
           finished_at: within(1.second).of(Time.current)
         )

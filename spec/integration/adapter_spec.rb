@@ -11,18 +11,6 @@ RSpec.describe 'Adapter Integration' do
     ActiveJob::Base.queue_adapter = original_adapter
   end
 
-  before do
-    stub_const "RUN_JOBS", Concurrent::Array.new
-    stub_const 'ExampleJob', (Class.new(ApplicationJob) do
-      self.queue_name = 'test'
-      self.priority = 50
-
-      def perform(*_args, **_kwargs)
-        RUN_JOBS << provider_job_id
-      end
-    end)
-  end
-
   after do
     adapter.shutdown
   end
@@ -38,7 +26,7 @@ RSpec.describe 'Adapter Integration' do
 
       it 'without a scheduled time' do
         expect do
-          ExampleJob.perform_later('first', 'second', keyword_arg: 'keyword_arg')
+          ExampleJob.set(queue: 'test', priority: 50).perform_later('first', 'second', keyword_arg: 'keyword_arg')
         end.to change(GoodJob::Job, :count).by(1)
 
         good_job = GoodJob::Job.last
@@ -57,7 +45,7 @@ RSpec.describe 'Adapter Integration' do
 
         good_job = GoodJob::Job.last
         expect(good_job).to have_attributes(
-          queue_name: 'test',
+          queue_name: 'default',
           priority: 100,
           scheduled_at: be_within(1.second).of(1.minute.from_now)
         )
@@ -73,10 +61,10 @@ RSpec.describe 'Adapter Integration' do
         elephant_ajob = ExampleJob.set(queue: 'elephants').perform_later
         mice_ajob = ExampleJob.set(queue: 'mice').perform_later
 
-        sleep_until { RUN_JOBS.include? mice_ajob.provider_job_id }
+        sleep_until { ExampleJob::RUN_JOBS.include? mice_ajob.provider_job_id }
 
-        expect(RUN_JOBS).to include(mice_ajob.provider_job_id)
-        expect(RUN_JOBS).not_to include(elephant_ajob.provider_job_id)
+        expect(ExampleJob::RUN_JOBS).to include(mice_ajob.provider_job_id)
+        expect(ExampleJob::RUN_JOBS).not_to include(elephant_ajob.provider_job_id)
       end
 
       it 'invokes the notifier if the job is not locally runnable', skip_if_java: true do
@@ -86,9 +74,9 @@ RSpec.describe 'Adapter Integration' do
 
         elephant_ajob = ExampleJob.set(queue: 'elephants').perform_later
 
-        sleep_until { RUN_JOBS.include? elephant_ajob.provider_job_id }
+        sleep_until { ExampleJob::RUN_JOBS.include? elephant_ajob.provider_job_id }
 
-        expect(RUN_JOBS).to include(elephant_ajob.provider_job_id)
+        expect(ExampleJob::RUN_JOBS).to include(elephant_ajob.provider_job_id)
 
         elephant_adapter.shutdown
       end
