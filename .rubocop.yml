@@ -107,6 +107,9 @@ Style/NumericLiterals:
 Style/PercentLiteralDelimiters:
   Enabled: false
 
+Style/QuotedSymbols:
+  Enabled: false
+
 Style/RegexpLiteral:
   Enabled: false
 
