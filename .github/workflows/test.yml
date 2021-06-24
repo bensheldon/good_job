@@ -70,6 +70,13 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+      - name: Ruby gem cache (including Appraisal gems)
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: v1-bundler-${{ runner.os }}-${{ steps.ruby_version.outputs.value }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            v1-bundler-${{ runner.os }}-${{ steps.ruby_version.outputs.value }}-
       - name: Install Appraisal gems
         run: bundle exec appraisal install
 
