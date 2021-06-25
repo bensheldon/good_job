@@ -1,6 +1,6 @@
 module GoodJob
   class AssetsController < ActionController::Base # rubocop:disable Rails/ApplicationController
-    skip_before_action :verify_authenticity_token
+    skip_before_action :verify_authenticity_token, raise: false
 
     before_action do
       expires_in 1.year, public: true
