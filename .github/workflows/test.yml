@@ -48,6 +48,7 @@ jobs:
       BUNDLE_PATH: vendor/bundle
       BUNDLE_WITHOUT: "lint"
       DISABLE_SPRING: 1
+      RAILS_LOG_TO_STDOUT: false
     services:
       postgres:
         image: postgres:${{ matrix.pg }}
@@ -70,13 +71,13 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-      - name: Ruby gem cache (including Appraisal gems)
+      - name: Cache Appraisal gems
         uses: actions/cache@v1
         with:
-          path: vendor/bundle
-          key: v1-bundler-${{ runner.os }}-${{ steps.ruby_version.outputs.value }}-${{ hashFiles('**/Gemfile.lock') }}
+          path: gemfiles/vendor/bundle
+          key: v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-${{ hashFiles('**/Gemfile.lock') }}
           restore-keys: |
-            v1-bundler-${{ runner.os }}-${{ steps.ruby_version.outputs.value }}-
+            v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-
       - name: Install Appraisal gems
         run: bundle exec appraisal install
 

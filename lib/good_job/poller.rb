@@ -5,11 +5,13 @@ module GoodJob # :nodoc:
   # Pollers regularly wake up execution threads to check for new work.
   #
   class Poller
+    TIMEOUT_INTERVAL = 5
+
     # Defaults for instance of Concurrent::TimerTask.
     # The timer controls how and when sleeping threads check for new work.
     DEFAULT_TIMER_OPTIONS = {
       execution_interval: Configuration::DEFAULT_POLL_INTERVAL,
-      timeout_interval: 1,
+      timeout_interval: TIMEOUT_INTERVAL,
       run_now: true,
     }.freeze
 
@@ -49,9 +51,11 @@ module GoodJob # :nodoc:
 
     # Tests whether the timer is shutdown.
     # @return [true, false, nil]
-    delegate :shutdown?, to: :timer, allow_nil: true
+    def shutdown?
+      timer ? timer.shutdown? : true
+    end
 
-    # Shut down the notifier.
+    # Shut down the poller.
     # Use {#shutdown?} to determine whether threads have stopped.
     # @param timeout [nil, Numeric] Seconds to wait for active threads.
     #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.

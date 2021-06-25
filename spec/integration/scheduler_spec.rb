@@ -5,6 +5,7 @@ RSpec.describe 'Schedule Integration' do
 
   before do
     ActiveJob::Base.queue_adapter = adapter
+    GoodJob.preserve_job_records = true
 
     stub_const "RUN_JOBS", Concurrent::Array.new
     stub_const "THREAD_JOBS", Concurrent::Hash.new(Concurrent::Array.new)
@@ -15,6 +16,21 @@ RSpec.describe 'Schedule Integration' do
 
       def perform(*_args, **_kwargs)
         thread_name = Thread.current.name || Thread.current.object_id
+
+        locks_count = PgLock.advisory_lock.owns.count
+        if locks_count > 1
+          puts "Thread #{thread_name} owns #{locks_count} locks."
+
+          puts "GoodJobs locked by this connection:"
+          GoodJob::Job.owns_advisory_locked.select('good_jobs.id', 'good_jobs.active_job_id', 'pg_locks.*').each do |good_job|
+            puts "  - GoodJob #{good_job.id} / ActiveJob #{good_job.active_job_id} / #{good_job.attributes.to_json}"
+          end
+
+          puts "All advisory locks by this connection:"
+          PgLock.advisory_lock.owns.each do |pg_lock|
+            puts "  -  #{pg_lock.attributes.to_json}"
+          end
+        end
 
         RUN_JOBS << [provider_job_id, job_id, thread_name]
         THREAD_JOBS[thread_name] << provider_job_id
@@ -44,23 +60,23 @@ RSpec.describe 'Schedule Integration' do
     let(:number_of_jobs) { 500 }
     let(:max_threads) { 5 }
 
-    let!(:good_jobs) do
+    it 'pops items off of the queue and runs them' do
+      expect(ActiveJob::Base.queue_adapter).to be_execute_externally
+
       GoodJob::Job.transaction do
         number_of_jobs.times do |i|
           ExampleJob.perform_later(i)
         end
       end
-    end
 
-    it 'pops items off of the queue and runs them' do
       performer = GoodJob::JobPerformer.new('*')
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       max_threads.times { scheduler.create_thread }
 
-      sleep_until(max: 30, increments_of: 0.5) { GoodJob::Job.count == 0 }
+      sleep_until(max: 30, increments_of: 0.5) { GoodJob::Job.unfinished.count == 0 }
       scheduler.shutdown
 
-      expect(GoodJob::Job.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Job.all.map(&:id)}" }
+      expect(GoodJob::Job.unfinished.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Job.unfinished.map(&:id)}" }
       expect(RUN_JOBS.size).to eq(number_of_jobs), lambda {
         jobs_tally = RUN_JOBS.each_with_object(Hash.new(0)) do |(provider_job_id, _job_id, _thread_name), hash|
           hash[provider_job_id] += 1
@@ -78,23 +94,24 @@ RSpec.describe 'Schedule Integration' do
     let(:max_threads) { 1 }
     let(:number_of_jobs) { 50 }
 
-    let!(:good_jobs) do
+    it 'executes all jobs' do
+      expect(ActiveJob::Base.queue_adapter).to be_execute_externally
+
       GoodJob::Job.transaction do
         number_of_jobs.times do |i|
           ExampleJob.perform_later(i)
         end
       end
-    end
 
-    it 'executes all jobs' do
       performer = GoodJob::JobPerformer.new('*')
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       scheduler.create_thread
 
       sleep_until(max: 10, increments_of: 0.5) do
-        GoodJob::Job.count == 0
+        GoodJob::Job.unfinished.count == 0
       end
       scheduler.shutdown
+      expect(scheduler).to be_shutdown
     end
   end
 
@@ -106,7 +123,7 @@ RSpec.describe 'Schedule Integration' do
       scheduler = GoodJob::Scheduler.new(performer)
       scheduler.create_thread
 
-      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.count == 0 }
+      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.unfinished.count == 0 }
 
       scheduler.shutdown
     end
@@ -122,8 +139,9 @@ RSpec.describe 'Schedule Integration' do
       performer = GoodJob::JobPerformer.new('*')
       scheduler = GoodJob::Scheduler.new(performer, max_threads: 5, max_cache: 5)
       scheduler.warm_cache
-      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.count == 0 }
+      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.unfinished.count == 0 }
       scheduler.shutdown
+      expect(scheduler).to be_shutdown
     end
   end
 end

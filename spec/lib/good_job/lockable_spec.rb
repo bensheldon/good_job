@@ -85,7 +85,7 @@ RSpec.describe GoodJob::Lockable do
   end
 
   describe '.with_advisory_lock' do
-    it 'opens a block with a lock' do
+    it 'opens a block with a lock that locks and unlocks records' do
       records = nil
       model_class.limit(2).with_advisory_lock do |results|
         records = results
@@ -96,11 +96,14 @@ RSpec.describe GoodJob::Lockable do
       expect(PgLock.advisory_lock.count).to eq 0
     end
 
-    it 'does not leak advisory locks' do
-      model_class.limit(2).with_advisory_lock do |results|
-        records = results
-        expect(records).to all be_advisory_locked
-      end
+    it 'can unlock all advisory locks on the session with `unlock_session: true`' do
+      another_record = model_class.create(create_with_advisory_lock: true)
+
+      model_class.where.not(id: another_record.id)
+                 .with_advisory_lock(unlock_session: true) { |_records| nil }
+
+      expect(another_record).not_to be_advisory_locked
+      expect(PgLock.advisory_lock.count).to eq 0
     end
   end
 
@@ -112,6 +115,14 @@ RSpec.describe GoodJob::Lockable do
 
       other_thread_owns_advisory_lock = Concurrent::Promises.future(job, &:owns_advisory_lock?).value!
       expect(other_thread_owns_advisory_lock).to be false
+
+      job.advisory_unlock
+    end
+
+    it 'returns true or false if the lock is acquired' do
+      expect(job.advisory_lock).to eq true
+
+      expect(Concurrent::Promises.future(job, &:advisory_lock).value!).to eq false
 
       job.advisory_unlock
     end
@@ -153,6 +164,18 @@ RSpec.describe GoodJob::Lockable do
         job.advisory_unlock
       end.to change(job, :advisory_locked?).from(true).to(false)
     end
+
+    it 'returns true or false if the unlock operation is successful' do
+      job.advisory_lock
+
+      expect(Concurrent::Promises.future(job, &:advisory_unlock).value!).to eq false
+      expect(job.advisory_unlock).to eq true
+
+      unless RUBY_PLATFORM.include?('java')
+        expect(POSTGRES_NOTICES.first).to include "you don't own a lock of type ExclusiveLock"
+        POSTGRES_NOTICES.clear
+      end
+    end
   end
 
   describe '#advisory_locked?' do
@@ -185,7 +208,17 @@ RSpec.describe GoodJob::Lockable do
     end
   end
 
-  describe 'create_with_lock' do
+  describe '.advisory_unlock_session' do
+    it 'unlocks all locks in the session' do
+      job.advisory_lock!
+
+      model_class.advisory_unlock_session
+
+      expect(job.advisory_locked?).to eq false
+    end
+  end
+
+  describe 'create_with_advisory_lock' do
     it 'causes the job to be saved and locked' do
       job = model_class.new
       job.create_with_advisory_lock = true

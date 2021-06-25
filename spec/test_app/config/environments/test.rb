@@ -6,4 +6,10 @@
 Rails.application.configure do
   config.cache_classes = false
   config.eager_load = false
+
+  if ActiveModel::Type::Boolean.new.cast(ENV['RAILS_LOG_TO_STDOUT'])
+    logger = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger = ActiveSupport::TaggedLogging.new(logger)
+  end
 end
