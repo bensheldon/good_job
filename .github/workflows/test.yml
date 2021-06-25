@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        ruby: [2.5, 2.6, 2.7, 3.0, jruby-9.2.13.0, jruby-9.2.17.0]
+        ruby: [2.5, 2.6, 2.7, 3.0, jruby-9.2.13.0, jruby-9.2.19.0]
         pg: [12.5]
         include:
           - ruby: 2.7
