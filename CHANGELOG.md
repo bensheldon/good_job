@@ -1,22 +1,52 @@
 # Changelog
 
+## [v1.10.0](https://github.com/bensheldon/good_job/tree/v1.10.0) (2021-06-29)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.6...v1.10.0)
+
+**Implemented enhancements:**
+
+- Add `rails g good_job:update` command to add idempotent migration files, including `active_job_id`, `concurrency_key`, `cron_key` columns [\#266](https://github.com/bensheldon/good_job/pull/266) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Use `pg_advisory_unlock_all` after each thread's job execution; fix Lockable return values; improve test stability [\#285](https://github.com/bensheldon/good_job/pull/285) ([bensheldon](https://github.com/bensheldon))
+- Dashboard AssetsController does not raise if verify\_authenticity\_token is not in the callback chain [\#284](https://github.com/bensheldon/good_job/pull/284) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- \[Question\] Dashboard assets not showing [\#282](https://github.com/bensheldon/good_job/issues/282)
+
+**Merged pull requests:**
+
+- Separately cache Appraisal gems in GH Action [\#280](https://github.com/bensheldon/good_job/pull/280) ([bensheldon](https://github.com/bensheldon))
+- Use custom RSpec doc formatter to show spec examples that are running [\#279](https://github.com/bensheldon/good_job/pull/279) ([bensheldon](https://github.com/bensheldon))
+- Update development dependencies [\#278](https://github.com/bensheldon/good_job/pull/278) ([bensheldon](https://github.com/bensheldon))
+- Fix Scheduler integration spec to ensure jobs are run in the Scheduler under test [\#276](https://github.com/bensheldon/good_job/pull/276) ([bensheldon](https://github.com/bensheldon))
+- Add example benchmark for job throughput [\#275](https://github.com/bensheldon/good_job/pull/275) ([bensheldon](https://github.com/bensheldon))
+- Allow Lockable to be passed custom column, key, and Postgres advisory lock/unlock function [\#273](https://github.com/bensheldon/good_job/pull/273) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.9.6](https://github.com/bensheldon/good_job/tree/v1.9.6) (2021-06-04)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.5...v1.9.6)
+
+**Implemented enhancements:**
+
+- Add deleting jobs from UI. [\#265](https://github.com/bensheldon/good_job/pull/265) ([morgoth](https://github.com/morgoth))
+- Collapse Dashboard params by default [\#263](https://github.com/bensheldon/good_job/pull/263) ([morgoth](https://github.com/morgoth))
 
 **Closed issues:**
 
 - Pause jobs during migration / maintenance? [\#257](https://github.com/bensheldon/good_job/issues/257)
 - How to properly report errors to error tracker service [\#159](https://github.com/bensheldon/good_job/issues/159)
 
-**Merged pull requests:**
-
-- Add deleting jobs from UI. [\#265](https://github.com/bensheldon/good_job/pull/265) ([morgoth](https://github.com/morgoth))
-- Collapse Dashboard params by default [\#263](https://github.com/bensheldon/good_job/pull/263) ([morgoth](https://github.com/morgoth))
-
 ## [v1.9.5](https://github.com/bensheldon/good_job/tree/v1.9.5) (2021-05-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.4...v1.9.5)
+
+**Implemented enhancements:**
+
+- Update Dashboard to Bootstrap 5 [\#260](https://github.com/bensheldon/good_job/pull/260) ([morgoth](https://github.com/morgoth))
 
 **Closed issues:**
 
@@ -26,7 +56,6 @@
 
 - Serve Dashboard assets as discrete paths instead of inlining [\#262](https://github.com/bensheldon/good_job/pull/262) ([bensheldon](https://github.com/bensheldon))
 - Fix Gemfile.lock's missing JRuby dependencies; fix release script and add check [\#261](https://github.com/bensheldon/good_job/pull/261) ([bensheldon](https://github.com/bensheldon))
-- Update Dashboard to Bootstrap 5 [\#260](https://github.com/bensheldon/good_job/pull/260) ([morgoth](https://github.com/morgoth))
 
 ## [v1.9.4](https://github.com/bensheldon/good_job/tree/v1.9.4) (2021-05-18)
 
