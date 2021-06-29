@@ -141,6 +141,7 @@ module GoodJob
       #
       # @param column [String, Symbol]  name of advisory lock or unlock function
       # @param function [String, Symbol] Postgres Advisory Lock function name to use
+      # @param unlock_session [Boolean] Whether to unlock all advisory locks in the session afterwards
       # @yield [Array<Lockable>] the records that were successfully locked.
       # @return [Object] the result of the block.
       #
@@ -148,16 +149,20 @@ module GoodJob
       #   MyLockableRecord.order(created_at: :asc).limit(2).with_advisory_lock do |record|
       #     do_something_with record
       #   end
-      def with_advisory_lock(column: advisory_lockable_column, function: advisory_lockable_function)
+      def with_advisory_lock(column: advisory_lockable_column, function: advisory_lockable_function, unlock_session: false)
         raise ArgumentError, "Must provide a block" unless block_given?
 
         records = advisory_lock(column: column, function: function).to_a
         begin
           yield(records)
         ensure
-          records.each do |record|
-            key = [table_name, record[advisory_lockable_column]].join
-            record.advisory_unlock(key: key, function: advisory_unlockable_function(function))
+          if unlock_session
+            advisory_unlock_session
+          else
+            records.each do |record|
+              key = [table_name, record[advisory_lockable_column]].join
+              record.advisory_unlock(key: key, function: advisory_unlockable_function(function))
+            end
           end
         end
       end
@@ -174,6 +179,24 @@ module GoodJob
       def advisory_unlockable_function(function = advisory_lockable_function)
         function.to_s.sub("_lock", "_unlock").sub("_try_", "_")
       end
+
+      # Unlocks all advisory locks active in the current database session/connection
+      # @return [void]
+      def advisory_unlock_session
+        connection.exec_query("SELECT pg_advisory_unlock_all()::text AS unlocked", 'GoodJob::Lockable Unlock Session').first[:unlocked]
+      end
+
+      # Converts SQL query strings between PG-compatible and JDBC-compatible syntax
+      # @param query [String]
+      # @return [Boolean]
+      def pg_or_jdbc_query(query)
+        if Concurrent.on_jruby?
+          # Replace $1 bind parameters with ?
+          query.gsub(/\$\d*/, '?')
+        else
+          query
+        end
+      end
     end
 
     # Acquires an advisory lock on this record if it is not already locked by
@@ -185,11 +208,10 @@ module GoodJob
     # @return [Boolean] whether the lock was acquired.
     def advisory_lock(key: lockable_key, function: advisory_lockable_function)
       query = <<~SQL.squish
-        SELECT 1 AS one
-        WHERE #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint)
+        SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint) AS locked
       SQL
       binds = [[nil, key]]
-      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).any?
+      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).first['locked']
     end
 
     # Releases an advisory lock on this record if it is locked by this database
@@ -200,11 +222,10 @@ module GoodJob
     # @return [Boolean] whether the lock was released.
     def advisory_unlock(key: lockable_key, function: self.class.advisory_unlockable_function(advisory_lockable_function))
       query = <<~SQL.squish
-        SELECT 1 AS one
-        WHERE #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint)
+        SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint) AS unlocked
       SQL
       binds = [[nil, key]]
-      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Unlock', binds).any?
+      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Unlock', binds).first['unlocked']
     end
 
     # Acquires an advisory lock on this record or raises
@@ -289,17 +310,6 @@ module GoodJob
       [self.class.table_name, self[self.class.advisory_lockable_column]].join
     end
 
-    private
-
-    # @param query [String]
-    # @return [Boolean]
-    def pg_or_jdbc_query(query)
-      if Concurrent.on_jruby?
-        # Replace $1 bind parameters with ?
-        query.gsub(/\$\d*/, '?')
-      else
-        query
-      end
-    end
+    delegate :pg_or_jdbc_query, to: :class
   end
 end

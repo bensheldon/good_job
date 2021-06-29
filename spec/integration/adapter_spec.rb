@@ -13,7 +13,7 @@ RSpec.describe 'Adapter Integration' do
 
   before do
     stub_const "RUN_JOBS", Concurrent::Array.new
-    stub_const 'ExampleJob', (Class.new(ApplicationJob) do
+    stub_const 'TestJob', (Class.new(ApplicationJob) do
       self.queue_name = 'test'
       self.priority = 50
 
@@ -30,7 +30,7 @@ RSpec.describe 'Adapter Integration' do
   describe 'enqueuing jobs' do
     describe '#perform_later' do
       it 'assigns a provider_job_id' do
-        enqueued_job = ExampleJob.perform_later
+        enqueued_job = TestJob.perform_later
         good_job = GoodJob::Job.find(enqueued_job.provider_job_id)
 
         expect(enqueued_job.provider_job_id).to eq good_job.id
@@ -38,7 +38,7 @@ RSpec.describe 'Adapter Integration' do
 
       it 'without a scheduled time' do
         expect do
-          ExampleJob.perform_later('first', 'second', keyword_arg: 'keyword_arg')
+          TestJob.perform_later('first', 'second', keyword_arg: 'keyword_arg')
         end.to change(GoodJob::Job, :count).by(1)
 
         good_job = GoodJob::Job.last
@@ -52,7 +52,7 @@ RSpec.describe 'Adapter Integration' do
 
       it 'with a scheduled time' do
         expect do
-          ExampleJob.set(wait: 1.minute, priority: 100).perform_later('first', 'second', keyword_arg: 'keyword_arg')
+          TestJob.set(wait: 1.minute, priority: 100).perform_later('first', 'second', keyword_arg: 'keyword_arg')
         end.to change(GoodJob::Job, :count).by(1)
 
         good_job = GoodJob::Job.last
@@ -67,11 +67,11 @@ RSpec.describe 'Adapter Integration' do
 
   describe 'Async execution mode' do
     context 'when Scheduler polling is disabled' do
-      let(:adapter) { GoodJob::Adapter.new execution_mode: :async, queues: 'mice:1', poll_interval: -1 }
+      let(:adapter) { GoodJob::Adapter.new execution_mode: :async, queues: 'mice:2', poll_interval: -1 }
 
       it 'Jobs are directly handed to the performer, if they match the queues' do
-        elephant_ajob = ExampleJob.set(queue: 'elephants').perform_later
-        mice_ajob = ExampleJob.set(queue: 'mice').perform_later
+        elephant_ajob = TestJob.set(queue: 'elephants').perform_later
+        mice_ajob = TestJob.set(queue: 'mice').perform_later
 
         sleep_until { RUN_JOBS.include? mice_ajob.provider_job_id }
 
@@ -84,7 +84,7 @@ RSpec.describe 'Adapter Integration' do
         elephant_adapter = GoodJob::Adapter.new execution_mode: :async, queues: 'elephants:1', poll_interval: -1
         sleep_until { GoodJob::Notifier.instances.all?(&:listening?) }
 
-        elephant_ajob = ExampleJob.set(queue: 'elephants').perform_later
+        elephant_ajob = TestJob.set(queue: 'elephants').perform_later
 
         sleep_until { RUN_JOBS.include? elephant_ajob.provider_job_id }
 

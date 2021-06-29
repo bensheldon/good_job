@@ -41,8 +41,9 @@ RSpec.describe GoodJob::Adapter do
     end
 
     context 'when async' do
-      it 'trigger an execution thread' do
+      it 'triggers an execution thread and the notifier' do
         allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
+        allow(GoodJob::Notifier).to receive(:notify)
 
         scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
         allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
@@ -51,6 +52,7 @@ RSpec.describe GoodJob::Adapter do
         adapter.enqueue(active_job)
 
         expect(scheduler).to have_received(:create_thread)
+        expect(GoodJob::Notifier).to have_received(:notify)
       end
     end
   end
