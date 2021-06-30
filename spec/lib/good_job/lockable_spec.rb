@@ -35,7 +35,6 @@ RSpec.describe GoodJob::Lockable do
           FROM "rows"
           WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || "rows"."id"::text), 1, 16))::bit(64)::bigint)
           LIMIT 2
-          FOR UPDATE SKIP LOCKED
         )
         ORDER BY "good_jobs"."priority" DESC
       SQL
@@ -58,7 +57,6 @@ RSpec.describe GoodJob::Lockable do
           FROM "rows"
           WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || "rows"."queue_name"::text), 1, 16))::bit(64)::bigint)
           LIMIT 2
-          FOR UPDATE SKIP LOCKED
         )
         ORDER BY "good_jobs"."priority" DESC
       SQL
