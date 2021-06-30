@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.10.1](https://github.com/bensheldon/good_job/tree/v1.10.1) (2021-06-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.10.0...v1.10.1)
+
+**Merged pull requests:**
+
+- Remove `FOR UPDATE SKIP LOCKED` from job locking sql statement [\#288](https://github.com/bensheldon/good_job/pull/288) ([bensheldon](https://github.com/bensheldon))
+- Update GH Test Matrix with latest JRuby 9.2.19.0 [\#283](https://github.com/bensheldon/good_job/pull/283) ([tedhexaflow](https://github.com/tedhexaflow))
+
 ## [v1.10.0](https://github.com/bensheldon/good_job/tree/v1.10.0) (2021-06-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.9.6...v1.10.0)
