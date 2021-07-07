@@ -1,5 +1,21 @@
 # Changelog
 
+## [v1.11.0](https://github.com/bensheldon/good_job/tree/v1.11.0) (2021-07-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.10.1...v1.11.0)
+
+**Implemented enhancements:**
+
+- Add concurrency extension for ActiveJob [\#281](https://github.com/bensheldon/good_job/pull/281) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Investigate GoodJob concurrency [\#289](https://github.com/bensheldon/good_job/issues/289)
+- Problem with migrating database on 1.10.0 [\#287](https://github.com/bensheldon/good_job/issues/287)
+- Support migration --database option for install task? [\#267](https://github.com/bensheldon/good_job/issues/267)
+- Add GoodJob to Ruby Toolbox [\#243](https://github.com/bensheldon/good_job/issues/243)
+- Custom advisory locks to prevent certain jobs from being worked on concurrently? [\#206](https://github.com/bensheldon/good_job/issues/206)
+
 ## [v1.10.1](https://github.com/bensheldon/good_job/tree/v1.10.1) (2021-06-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.10.0...v1.10.1)
