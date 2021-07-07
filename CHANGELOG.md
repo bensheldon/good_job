@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.11.1](https://github.com/bensheldon/good_job/tree/v1.11.1) (2021-07-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.11.0...v1.11.1)
+
+**Closed issues:**
+
+- Database connection required while loading the code on 1.10.x [\#291](https://github.com/bensheldon/good_job/issues/291)
+
+**Merged pull requests:**
+
+- Defer accessing ActiveRecord `primary_key` in Lockable [\#293](https://github.com/bensheldon/good_job/pull/293) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.11.0](https://github.com/bensheldon/good_job/tree/v1.11.0) (2021-07-07)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.10.1...v1.11.0)
