@@ -23,20 +23,20 @@ module GoodJob
 
     included do
       # Default column to be used when creating Advisory Locks
-      cattr_accessor(:advisory_lockable_column, instance_accessor: false) { primary_key }
+      class_attribute :advisory_lockable_column, instance_accessor: false, default: Concurrent::Delay.new { primary_key }
 
       # Default Postgres function to be used for Advisory Locks
-      cattr_accessor(:advisory_lockable_function) { "pg_try_advisory_lock" }
+      class_attribute :advisory_lockable_function, default: "pg_try_advisory_lock"
 
       # Attempt to acquire an advisory lock on the selected records and
       # return only those records for which a lock could be acquired.
-      # @!method advisory_lock(column: advisory_lockable_column, function: advisory_lockable_function)
+      # @!method advisory_lock(column: _advisory_lockable_column, function: advisory_lockable_function)
       # @!scope class
       # @param column [String, Symbol] column values to Advisory Lock against
       # @param function [String, Symbol]  Postgres Advisory Lock function name to use
       # @return [ActiveRecord::Relation]
       #   A relation selecting only the records that were locked.
-      scope :advisory_lock, (lambda do |column: advisory_lockable_column, function: advisory_lockable_function|
+      scope :advisory_lock, (lambda do |column: _advisory_lockable_column, function: advisory_lockable_function|
         original_query = self
 
         cte_table = Arel::Table.new(:rows)
@@ -64,13 +64,13 @@ module GoodJob
       #
       # For details on +pg_locks+, see
       # {https://www.postgresql.org/docs/current/view-pg-locks.html}.
-      # @!method joins_advisory_locks(column: advisory_lockable_column)
+      # @!method joins_advisory_locks(column: _advisory_lockable_column)
       # @!scope class
       # @param column [String, Symbol] column values to Advisory Lock against
       # @return [ActiveRecord::Relation]
       # @example Get the records that have a session awaiting a lock:
       #   MyLockableRecord.joins_advisory_locks.where("pg_locks.granted = ?", false)
-      scope :joins_advisory_locks, (lambda do |column: advisory_lockable_column|
+      scope :joins_advisory_locks, (lambda do |column: _advisory_lockable_column|
         join_sql = <<~SQL.squish
           LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'
             AND pg_locks.objsubid = 1
@@ -82,26 +82,26 @@ module GoodJob
       end)
 
       # Find records that do not have an advisory lock on them.
-      # @!method advisory_unlocked(column: advisory_lockable_column)
+      # @!method advisory_unlocked(column: _advisory_lockable_column)
       # @!scope class
       # @param column [String, Symbol] column values to Advisory Lock against
       # @return [ActiveRecord::Relation]
-      scope :advisory_unlocked, ->(column: advisory_lockable_column) { joins_advisory_locks(column: column).where(pg_locks: { locktype: nil }) }
+      scope :advisory_unlocked, ->(column: _advisory_lockable_column) { joins_advisory_locks(column: column).where(pg_locks: { locktype: nil }) }
 
       # Find records that have an advisory lock on them.
-      # @!method advisory_locked(column: advisory_lockable_column)
+      # @!method advisory_locked(column: _advisory_lockable_column)
       # @!scope class
       # @param column [String, Symbol] column values to Advisory Lock against
       # @return [ActiveRecord::Relation]
-      scope :advisory_locked, ->(column: advisory_lockable_column) { joins_advisory_locks(column: column).where.not(pg_locks: { locktype: nil }) }
+      scope :advisory_locked, ->(column: _advisory_lockable_column) { joins_advisory_locks(column: column).where.not(pg_locks: { locktype: nil }) }
 
       # Find records with advisory locks owned by the current Postgres
       # session/connection.
-      # @!method advisory_locked(column: advisory_lockable_column)
+      # @!method advisory_locked(column: _advisory_lockable_column)
       # @!scope class
       # @param column [String, Symbol] column values to Advisory Lock against
       # @return [ActiveRecord::Relation]
-      scope :owns_advisory_locked, ->(column: advisory_lockable_column) { joins_advisory_locks(column: column).where('"pg_locks"."pid" = pg_backend_pid()') }
+      scope :owns_advisory_locked, ->(column: _advisory_lockable_column) { joins_advisory_locks(column: column).where('"pg_locks"."pid" = pg_backend_pid()') }
 
       # Whether an advisory lock should be acquired in the same transaction
       # that created the record.
@@ -143,7 +143,7 @@ module GoodJob
       #   MyLockableRecord.order(created_at: :asc).limit(2).with_advisory_lock do |record|
       #     do_something_with record
       #   end
-      def with_advisory_lock(column: advisory_lockable_column, function: advisory_lockable_function, unlock_session: false)
+      def with_advisory_lock(column: _advisory_lockable_column, function: advisory_lockable_function, unlock_session: false)
         raise ArgumentError, "Must provide a block" unless block_given?
 
         records = advisory_lock(column: column, function: function).to_a
@@ -154,11 +154,17 @@ module GoodJob
             advisory_unlock_session
           else
             records.each do |record|
-              key = [table_name, record[advisory_lockable_column]].join
+              key = [table_name, record[_advisory_lockable_column]].join
               record.advisory_unlock(key: key, function: advisory_unlockable_function(function))
             end
           end
         end
+      end
+
+      # Allow advisory_lockable_column to be a `Concurrent::Delay`
+      def _advisory_lockable_column
+        column = advisory_lockable_column
+        column.respond_to?(:value) ? column.value : column
       end
 
       def supports_cte_materialization_specifiers?
@@ -308,7 +314,7 @@ module GoodJob
     # Default Advisory Lock key
     # @return [String]
     def lockable_key
-      [self.class.table_name, self[self.class.advisory_lockable_column]].join
+      [self.class.table_name, self[self.class._advisory_lockable_column]].join
     end
 
     delegate :pg_or_jdbc_query, to: :class
