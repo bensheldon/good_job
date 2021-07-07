@@ -201,9 +201,16 @@ module GoodJob
     # @param function [String, Symbol] Postgres Advisory Lock function name to use
     # @return [Boolean] whether the lock was acquired.
     def advisory_lock(key: lockable_key, function: advisory_lockable_function)
-      query = <<~SQL.squish
-        SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint) AS locked
-      SQL
+      query = if function.include? "_try_"
+                <<~SQL.squish
+                  SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint) AS locked
+                SQL
+              else
+                <<~SQL.squish
+                  SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint)::text AS locked
+                SQL
+              end
+
       binds = [[nil, key]]
       self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).first['locked']
     end

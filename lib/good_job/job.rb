@@ -219,6 +219,21 @@ module GoodJob
           DEPRECATION
         end
 
+        if column_names.include?('concurrency_key')
+          good_job_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
+        else
+          ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+            GoodJob has pending database migrations. To create the migration files, run:
+
+                rails generate good_job:update
+
+            To apply the migration files, run:
+
+                rails db:migrate
+
+          DEPRECATION
+        end
+
         good_job = GoodJob::Job.new(**good_job_args)
 
         instrument_payload[:good_job] = good_job
@@ -264,6 +279,10 @@ module GoodJob
       self.class.unscoped.unfinished.owns_advisory_locked.exists?(id: id)
     end
 
+    def active_job_id
+      super || serialized_params['job_id']
+    end
+
     private
 
     # @return [ExecutionResult]
@@ -273,6 +292,7 @@ module GoodJob
       )
 
       GoodJob::CurrentExecution.reset
+      GoodJob::CurrentExecution.active_job_id = active_job_id
       ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, process_id: GoodJob::CurrentExecution.process_id, thread_name: GoodJob::CurrentExecution.thread_name }) do
         value = ActiveJob::Base.execute(params)
 
