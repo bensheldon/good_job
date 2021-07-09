@@ -19,7 +19,7 @@
             <td><%= job.serialized_params['job_class'] %></td>
             <td><%= job.queue_name %></td>
             <td><%= job.scheduled_at || job.created_at %></td>
-            <td><%= job.error %></td>
+            <td class="text-break"><%= truncate(job.error, length: 1_000) %></td>
             <td>
               <%= tag.button "Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
                 data: {bs_toggle: "collapse", bs_target: "##{dom_id(job, 'params')}"},
