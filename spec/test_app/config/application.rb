@@ -19,6 +19,14 @@ module TestApp
 
     # config.middleware.insert_before Rack::Sendfile, ActionDispatch::DebugLocks
     config.log_level = :debug
+
+    config.good_job.cron = {
+      example: {
+        cron: '*/5 * * * * *', # every 5 seconds
+        class: 'ExampleJob',
+        description: "Enqueue ExampleJob every 5 seconds",
+      },
+    }
   end
 end
 

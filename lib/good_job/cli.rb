@@ -70,12 +70,16 @@ module GoodJob
                   type: :numeric,
                   banner: 'SECONDS',
                   desc: "Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))"
+    method_option :enable_cron,
+                  type: :boolean,
+                  desc: "Whether to run cron process (default: false)"
     method_option :daemonize,
                   type: :boolean,
                   desc: "Run as a background daemon (default: false)"
     method_option :pidfile,
                   type: :string,
                   desc: "Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)"
+
     def start
       set_up_application!
       configuration = GoodJob::Configuration.new(options)
@@ -87,7 +91,7 @@ module GoodJob
       scheduler = GoodJob::Scheduler.from_configuration(configuration, warm_cache_on_initialize: true)
       notifier.recipients << [scheduler, :create_thread]
       poller.recipients << [scheduler, :create_thread]
-
+      cron_manager = GoodJob::CronManager.new(configuration.cron, start_on_initialize: true) if configuration.enable_cron?
       @stop_good_job_executable = false
       %w[INT TERM].each do |signal|
         trap(signal) { @stop_good_job_executable = true }
@@ -98,7 +102,7 @@ module GoodJob
         break if @stop_good_job_executable || scheduler.shutdown? || notifier.shutdown?
       end
 
-      executors = [notifier, poller, scheduler]
+      executors = [notifier, poller, cron_manager, scheduler].compact
       GoodJob._shutdown_all(executors, timeout: configuration.shutdown_timeout)
     end
 
@@ -124,6 +128,7 @@ module GoodJob
                   type: :numeric,
                   banner: 'SECONDS',
                   desc: "Delete records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 86400)"
+
     def cleanup_preserved_jobs
       set_up_application!
 

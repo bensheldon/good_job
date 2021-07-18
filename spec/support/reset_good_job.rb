@@ -32,6 +32,9 @@ RSpec.configure do |config|
     expect(GoodJob::Poller.instances).to all be_shutdown
     GoodJob::Poller.instances.clear
 
+    expect(GoodJob::CronManager.instances).to all be_shutdown
+    GoodJob::CronManager.instances.clear
+
     expect(GoodJob::Scheduler.instances).to all be_shutdown
     GoodJob::Scheduler.instances.clear
 

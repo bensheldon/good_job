@@ -22,10 +22,12 @@ RSpec.describe 'Server modes', skip_if_java: true do
       env = {
         "RAILS_ENV" => "production",
         "GOOD_JOB_EXECUTION_MODE" => "async",
+        "GOOD_JOB_ENABLE_CRON" => "true",
       }
       ShellOut.command('bundle exec rails s', env: env) do |shell|
         wait_until(max: 30) do
           expect(shell.output).to include(/GoodJob started scheduler/)
+          expect(shell.output).to include(/GoodJob started cron/)
         end
       end
     end

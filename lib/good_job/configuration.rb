@@ -18,6 +18,8 @@ module GoodJob
     DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 24 * 60 * 60
     # Default to always wait for jobs to finish for {Adapter#shutdown}
     DEFAULT_SHUTDOWN_TIMEOUT = -1
+    # Default to not running cron
+    DEFAULT_ENABLE_CRON = false
 
     # The options that were explicitly set when initializing +Configuration+.
     # @return [Hash]
@@ -127,6 +129,28 @@ module GoodJob
           env['GOOD_JOB_SHUTDOWN_TIMEOUT'] ||
           DEFAULT_SHUTDOWN_TIMEOUT
       ).to_f
+    end
+
+    # Whether to run cron
+    # @return [Boolean]
+    def enable_cron
+      value = ActiveModel::Type::Boolean.new.cast(
+        options[:enable_cron] ||
+        rails_config[:enable_cron] ||
+        env['GOOD_JOB_ENABLE_CRON'] ||
+        false
+      )
+      value && cron.size.positive?
+    end
+    alias enable_cron? enable_cron
+
+    def cron
+      env_cron = JSON.parse(ENV['GOOD_JOB_CRON']) if ENV['GOOD_JOB_CRON'].present?
+
+      options[:cron] ||
+        rails_config[:cron] ||
+        env_cron ||
+        {}
     end
 
     # Number of seconds to preserve jobs when using the +good_job cleanup_preserved_jobs+ CLI command.

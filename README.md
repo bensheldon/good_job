@@ -38,7 +38,8 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Configuration options](#configuration-options)
     - [Global options](#global-options)
     - [Dashboard](#dashboard)
-    - [ActiveJob Concurrency](#activejob-concurrency)
+    - [ActiveJob concurrency](#activejob-concurrency)
+    - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
     - [Updating](#updating)
 - [Go deeper](#go-deeper)
     - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
@@ -156,6 +157,7 @@ Options:
   [--poll-interval=SECONDS]    # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 1)
   [--max-cache=COUNT]          # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
   [--shutdown-timeout=SECONDS] # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
+  [--enable-cron]              # Whether to run cron process (default: false)
   [--daemonize]                # Run as a background daemon (default: false)
   [--pidfile=PIDFILE]          # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
 
@@ -212,7 +214,8 @@ config.good_job.execution_mode = :async_server
 config.good_job.max_threads = 5
 config.good_job.poll_interval = 30 # seconds
 config.good_job.shutdown_timeout = 25 # seconds
-
+config.good_job.enable_cron = true
+config.good_job.cron = { example: { cron: '0 * * * *', class: 'ExampleJob'  } }
 
 # ...or all at once.
 config.good_job = {
@@ -220,6 +223,13 @@ config.good_job = {
   max_threads: 5,
   poll_interval: 30,
   shutdown_timeout: 25,
+  enable_cron: true,
+  cron: {
+    example: {
+      cron: '0 * * * *',
+      class: 'ExampleJob'
+    },
+  },
 }
 ```
 
@@ -235,6 +245,8 @@ Available configuration options are:
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async` or `:async_server`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`.
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
 - `shutdown_timeout` (float) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
+- `enable_cron` (boolean) whether to run cron process. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_CRON`.
+- `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
 
 By default, GoodJob configures the following execution modes per environment:
 
@@ -320,7 +332,7 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
     end
     ```
 
-### ActiveJob Concurrency
+### ActiveJob concurrency
 
 GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_.
 
@@ -347,6 +359,38 @@ class MyJob < ApplicationJob
     # do work
   end
 end
+```
+
+### Cron-style repeating/recurring jobs
+
+GoodJob can enqueue jobs on a recurring basis that can be used as a replacement for cron.
+
+Cron-style jobs are run on every GoodJob process (e.g. CLI or `async` execution mode) when `config.good_job.enable_cron = true`; use GoodJob's [ActiveJob concurrency](#activejob-concurrency) extension to limit the number of jobs that are enqueued.
+
+Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`).
+
+```ruby
+# config/environments/application.rb or a specific environment e.g. production.rb
+
+# Enable cron in this process; e.g. only run on the first Heroku worker process
+config.good_job.enable_cron = ENV['DYNO'] == 'worker.1' # or `true` or via $GOOD_JOB_ENABLE_CRON
+
+# Configure cron with a hash that has a unique key for each recurring job
+config.good_job.cron = {
+  # Every 15 minutes, enqueue `ExampleJob.set(priority: -10).perform_later(52, name: "Alice")`
+  frequent_task: { # each recurring job must have a unique key
+    cron: "*/15 * * * *", # cron-style scheduling format by fugit gem
+    class: "ExampleJob", # reference the Job class with a string
+    args: [42, { name: "Alice" }], # arguments to pass; can also be a proc e.g. `-> { { when: Time.now } }`
+    set: { priority: -10 }, # additional ActiveJob properties; can also be a lambda/proc e.g. `-> { { priority: [1,2].sample } }`
+    description: "Something helpful", # optional description that appears in Dashboard (coming soon!)
+  },
+  another_task: {
+    cron: "0 0,12 * * *",
+    class: "AnotherJob",
+  },
+  # etc.
+}
 ```
 
 ### Updating
