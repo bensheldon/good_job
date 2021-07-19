@@ -12,7 +12,7 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
-gem 'appraisal', github: "excid3/appraisal", branch: "fix-bundle-env" # https://github.com/thoughtbot/appraisal/pull/174
+gem 'appraisal', github: "bensheldon/appraisal", branch: "fix-bundle-env" # https://github.com/thoughtbot/appraisal/pull/174
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 gem 'rails'
 

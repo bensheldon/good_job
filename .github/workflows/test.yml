@@ -87,7 +87,7 @@ jobs:
         working-directory: spec/test_app
       - name: Run Unit tests
         run: |
-          bundle exec appraisal rspec --exclude-pattern "spec/system/**/*_spec.rb, spec/lib/generators/**/*_spec.rb" \
+          bundle exec appraisal rspec --exclude-pattern "spec/system/**/*_spec.rb, spec/generators/**/*_spec.rb" \
                                       --require ./spec/support/pre_documentation_formatter.rb \
                                       --format PreDocumentationFormatter
       - name: Run System tests
@@ -100,7 +100,7 @@ jobs:
         run: |
           bundle exec appraisal rspec --require ./spec/support/pre_documentation_formatter.rb \
                                       --format PreDocumentationFormatter \
-                                      spec/lib/generators
+                                      spec/generators
 
       # Archive
       - name: Archive system spec screenshots

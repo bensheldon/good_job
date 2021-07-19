@@ -13,7 +13,7 @@ if ruby_2
 end
 
 appraise "rails-6.1" do
-  gem "rails", "~> 6.1"
+  gem "rails", "~> 6.1.0"
 end
 
 if ruby_27_or_higher && !jruby
