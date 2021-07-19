@@ -15,6 +15,7 @@ module GoodJob
     DEFAULT_PRIORITY = 0
 
     self.table_name = 'good_jobs'.freeze
+    self.advisory_lockable_column = 'id'.freeze
 
     attr_readonly :serialized_params
 
