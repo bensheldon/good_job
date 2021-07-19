@@ -41,20 +41,20 @@ jobs:
             pg: 10.8
     env:
       PGHOST: localhost
-      PGUSER: test_app
+      PGUSER: good_job
       RAILS_ENV: test
       BUNDLE_JOBS: 4
       BUNDLE_RETRY: 3
       BUNDLE_PATH: vendor/bundle
-      BUNDLE_WITHOUT: "lint"
+      BUNDLE_WITHOUT: lint
       DISABLE_SPRING: 1
       RAILS_LOG_TO_STDOUT: false
     services:
       postgres:
         image: postgres:${{ matrix.pg }}
         env:
-          POSTGRES_USER: test_app
-          POSTGRES_DB: test_app_test
+          POSTGRES_USER: good_job
+          POSTGRES_DB: good_job_test
           POSTGRES_PASSWORD: ""
           POSTGRES_HOST_AUTH_METHOD: trust
         ports: ["5432:5432"]

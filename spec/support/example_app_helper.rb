@@ -8,6 +8,7 @@ module ExampleAppHelper
     FileUtils.cd(root_path) do
       system("rails new #{app_name} -d postgresql --no-assets --skip-action-text --skip-action-mailer --skip-action-mailbox --skip-action-cable --skip-git --skip-sprockets --skip-listen --skip-javascript --skip-turbolinks --skip-system-test --skip-test-unit --skip-bootsnap --skip-spring --skip-active-storage")
     end
+    FileUtils.cp(::Rails.root.join('config', 'database.yml'), "#{example_app_path}/config/database.yml")
 
     File.open("#{example_app_path}/Gemfile", 'a') do |f|
       f.puts "gem 'good_job'"
