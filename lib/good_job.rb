@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "rails"
 require "active_job"
 require "active_job/queue_adapters"

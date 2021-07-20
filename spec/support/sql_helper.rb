@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module SqlHelper
   def normalize_sql(sql)
     sql.gsub(/\s/, ' ').gsub(/([()])/, ' \1 ').squish

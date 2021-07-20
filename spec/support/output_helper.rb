@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module OutputHelper
   def quiet(&block)
     if ENV['LOUD'].present?

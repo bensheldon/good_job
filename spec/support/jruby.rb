@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.configure do |c|
   if RUBY_PLATFORM.include?('java')
     puts "Excluding System Tests in JRuby"

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module GoodJob
   #
   # +GoodJob::Configuration+ provides normalized configuration information to

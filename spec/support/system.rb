@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require "selenium-webdriver"
 
 Capybara.default_max_wait_time = 2

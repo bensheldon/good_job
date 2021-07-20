@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
   # Parent class can be configured with +GoodJob.active_record_parent_class+.
@@ -10,12 +11,12 @@ module GoodJob
     PreviouslyPerformedError = Class.new(StandardError)
 
     # ActiveJob jobs without a +queue_name+ attribute are placed on this queue.
-    DEFAULT_QUEUE_NAME = 'default'.freeze
+    DEFAULT_QUEUE_NAME = 'default'
     # ActiveJob jobs without a +priority+ attribute are given this priority.
     DEFAULT_PRIORITY = 0
 
-    self.table_name = 'good_jobs'.freeze
-    self.advisory_lockable_column = 'id'.freeze
+    self.table_name = 'good_jobs'
+    self.advisory_lockable_column = 'id'
 
     attr_readonly :serialized_params
 

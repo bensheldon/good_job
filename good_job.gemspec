@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require_paths = ["lib", "engine/lib"]
 require_paths.each do |require_path|
   $LOAD_PATH.push File.expand_path(require_path, __dir__)

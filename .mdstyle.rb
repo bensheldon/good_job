@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # https://github.com/markdownlint/markdownlint/blob/master/docs/RULES.md
 all
 rule 'MD007', indent: 4 # Unordered list indentation

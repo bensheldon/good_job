@@ -1,8 +1,9 @@
+# frozen_string_literal: true
 require 'open3'
 
 class ShellOut
   WaitTimeout = Class.new(StandardError)
-  PROCESS_EXIT = "[PROCESS EXIT]".freeze
+  PROCESS_EXIT = "[PROCESS EXIT]"
 
   def self.command(command, env: {}, &block)
     new.command(command, env: env, &block)

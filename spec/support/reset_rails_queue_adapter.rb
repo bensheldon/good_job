@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 RSpec.configure do |config|
   config.around do |example|
     original_adapter = ActiveJob::Base.queue_adapter

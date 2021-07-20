@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module GoodJob
   class JobsController < GoodJob::BaseController
     def destroy

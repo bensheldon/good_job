@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'concurrent/atomic/atomic_boolean'
 
 module GoodJob # :nodoc:
@@ -13,7 +14,7 @@ module GoodJob # :nodoc:
     AdapterCannotListenError = Class.new(StandardError)
 
     # Default Postgres channel for LISTEN/NOTIFY
-    CHANNEL = 'good_job'.freeze
+    CHANNEL = 'good_job'
     # Defaults for instance of Concurrent::ThreadPoolExecutor
     EXECUTOR_OPTIONS = {
       name: name,

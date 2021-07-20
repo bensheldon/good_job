@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module GoodJob
   #
   # Adds Postgres advisory locking capabilities to an ActiveRecord record.
