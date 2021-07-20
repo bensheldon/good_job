@@ -61,7 +61,14 @@ end
 
 module PostgresXidExtension
   def initialize_type_map(map = type_map)
-    register_class_with_limit map, 'xid', ActiveRecord::Type::String # OID 28
+    if respond_to?(:register_class_with_limit, true)
+      register_class_with_limit map, 'xid', ActiveRecord::Type::String # OID 28
+    else
+      # Rails 7 defines statically
+      # https://github.com/rails/rails/commit/d79fb963603658117fd1d639976c375ea2a8ada3
+      self.class.send :register_class_with_limit, map, 'xid', ActiveRecord::Type::String # OID 28
+    end
+
     super(map)
   end
 end
