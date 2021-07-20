@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 #
 # Raise an exception when Postgres writes a notice to $stderr
 #

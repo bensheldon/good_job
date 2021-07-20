@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 GoodJob::Engine.routes.draw do
   root to: 'dashboards#index'
   resources :active_jobs, only: %i[show]

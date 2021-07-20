@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class AddActiveJobIdConcurrencyKeyCronKeyToGoodJobs < ActiveRecord::Migration[5.2]
   def change
     reversible do |dir|

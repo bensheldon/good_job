@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module GoodJob
   # Stores the results of job execution
   class ExecutionResult

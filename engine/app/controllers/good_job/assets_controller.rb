@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module GoodJob
   class AssetsController < ActionController::Base # rubocop:disable Rails/ApplicationController
     skip_before_action :verify_authenticity_token, raise: false

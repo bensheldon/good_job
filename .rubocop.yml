@@ -99,9 +99,6 @@ Style/EmptyMethod:
 Style/FormatStringToken:
   EnforcedStyle: template
 
-Style/FrozenStringLiteralComment:
-  Enabled: false
-
 Style/MultilineBlockChain:
   Enabled: false
 

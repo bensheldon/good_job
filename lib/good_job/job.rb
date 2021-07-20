@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
   # Parent class can be configured with +GoodJob.active_record_parent_class+.
