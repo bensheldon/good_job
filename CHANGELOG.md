@@ -1,5 +1,23 @@
 # Changelog
 
+## [v1.11.2](https://github.com/bensheldon/good_job/tree/v1.11.2) (2021-07-20)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.11.1...v1.11.2)
+
+**Fixed bugs:**
+
+- Notifier waits to retry listening when database is unavailable [\#301](https://github.com/bensheldon/good_job/pull/301) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Handle database connection drops [\#296](https://github.com/bensheldon/good_job/issues/296)
+- Using the `async` worker results in `ActiveModel::UnknownAttributeError  unknown attribute 'create_with_advisory_lock' for GoodJob::Job`. [\#290](https://github.com/bensheldon/good_job/issues/290)
+
+**Merged pull requests:**
+
+- Rename development and test databases to be `good_job` [\#300](https://github.com/bensheldon/good_job/pull/300) ([bensheldon](https://github.com/bensheldon))
+- Move generators spec into top-level spec directory; update dependencies [\#299](https://github.com/bensheldon/good_job/pull/299) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.11.1](https://github.com/bensheldon/good_job/tree/v1.11.1) (2021-07-07)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.11.0...v1.11.1)
