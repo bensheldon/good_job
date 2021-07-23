@@ -1,0 +1,34 @@
+{
+  "name": "Day of the Shirt",
+  "description": "Daily pop-culture t-shirt sales",
+  "website": "https://dayoftheshirt.com/",
+  "repository": "https://github.com/bensheldon/dayoftheshirt-rails",
+  "env": {
+    "BUNDLE_WITHOUT": {
+      "description": "Install all Ruby gems, including dev dependencies",
+      "value": "_blank"
+    },
+    "RACK_ENV": {
+      "value": "production"
+    },
+    "RAILS_ENV": {
+      "value": "demo"
+    },
+    "SECRET_KEY_BASE": {
+      "generator": "secret"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/ruby"
+    }
+  ],
+  "addons": [
+    {
+      "plan": "heroku-postgresql"
+    }
+  ],
+  "scripts": {
+    "postdeploy": "bin/test_app_rake heroku:postdeploy"
+  }
+}

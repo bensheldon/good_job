@@ -7,6 +7,7 @@ end
 
 require 'dotenv/load'
 require_relative "lib/good_job/version"
+Rake.load_rakefile 'spec/test_app/Rakefile'
 
 require 'rdoc/task'
 
