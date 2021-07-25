@@ -82,3 +82,8 @@ test:
 production:
   <<: *default
   database: <%= ENV["CI"] ? "good_job_test" : "good_job_development" %>
+
+demo:
+  <<: *default
+  database: "good_job_demo"
+  url: <%= ENV['DATABASE_URL'] %>
