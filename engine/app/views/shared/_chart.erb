@@ -1,6 +1,6 @@
 <div id="chart"></div>
 
-<script>
+<%= javascript_tag nonce: true do %>
   new Chartist.Line('#chart', <%== chart_data.to_json %>, {
     height: '300px',
     fullWidth: true,
@@ -49,4 +49,4 @@
     tooltipEl.style.left = (event.offsetX || event.originalEvent.layerX) + tooltipEl.offsetWidth + 10 + 'px';
     tooltipEl.style.top = (event.offsetY || event.originalEvent.layerY) + tooltipEl.offsetHeight - 20 + 'px';
   }, true);
-</script>
+<% end %>
