@@ -5,10 +5,15 @@ GoodJob::Engine.routes.draw do
   resources :jobs, only: %i[destroy]
 
   scope controller: :assets do
-    get :bootstrap_css
-    get :bootstrap_js
-    get :chartist_css
-    get :chartist_js
-    get :style_css
+    constraints(format: :css) do
+      get :bootstrap, action: :bootstrap_css
+      get :chartist, action: :chartist_css
+      get :style, action: :style_css
+    end
+
+    constraints(format: :js) do
+      get :bootstrap, action: :bootstrap_js
+      get :chartist, action: :chartist_js
+    end
   end
 end
