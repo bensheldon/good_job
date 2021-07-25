@@ -1,5 +1,21 @@
 # Changelog
 
+## [v1.11.3](https://github.com/bensheldon/good_job/tree/v1.11.3) (2021-07-25)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.11.2...v1.11.3)
+
+**Closed issues:**
+
+- ERROR:  relation "good\_jobs" does not exist at character 454 [\#308](https://github.com/bensheldon/good_job/issues/308)
+- Add Frozen String Literal to all files [\#298](https://github.com/bensheldon/good_job/issues/298)
+- Support for good\_job without Rails? [\#295](https://github.com/bensheldon/good_job/issues/295)
+
+**Merged pull requests:**
+
+- Have prettier Dashboard asset urls e.g. `bootstrap.css` instead of `bootstrap_css.css` [\#306](https://github.com/bensheldon/good_job/pull/306) ([bensheldon](https://github.com/bensheldon))
+- Create dashboard demo app on Heroku [\#305](https://github.com/bensheldon/good_job/pull/305) ([bensheldon](https://github.com/bensheldon))
+- Add Frozen String Literal to all files [\#302](https://github.com/bensheldon/good_job/pull/302) ([tedhexaflow](https://github.com/tedhexaflow))
+
 ## [v1.11.2](https://github.com/bensheldon/good_job/tree/v1.11.2) (2021-07-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.11.1...v1.11.2)
@@ -22,13 +38,13 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.11.0...v1.11.1)
 
+**Fixed bugs:**
+
+- Defer accessing ActiveRecord `primary_key` in Lockable [\#293](https://github.com/bensheldon/good_job/pull/293) ([bensheldon](https://github.com/bensheldon))
+
 **Closed issues:**
 
 - Database connection required while loading the code on 1.10.x [\#291](https://github.com/bensheldon/good_job/issues/291)
-
-**Merged pull requests:**
-
-- Defer accessing ActiveRecord `primary_key` in Lockable [\#293](https://github.com/bensheldon/good_job/pull/293) ([bensheldon](https://github.com/bensheldon))
 
 ## [v1.11.0](https://github.com/bensheldon/good_job/tree/v1.11.0) (2021-07-07)
 
@@ -50,9 +66,12 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.10.0...v1.10.1)
 
-**Merged pull requests:**
+**Fixed bugs:**
 
 - Remove `FOR UPDATE SKIP LOCKED` from job locking sql statement [\#288](https://github.com/bensheldon/good_job/pull/288) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
 - Update GH Test Matrix with latest JRuby 9.2.19.0 [\#283](https://github.com/bensheldon/good_job/pull/283) ([tedhexaflow](https://github.com/tedhexaflow))
 
 ## [v1.10.0](https://github.com/bensheldon/good_job/tree/v1.10.0) (2021-06-29)
@@ -61,11 +80,11 @@
 
 **Implemented enhancements:**
 
+- Use `pg_advisory_unlock_all` after each thread's job execution; fix Lockable return values; improve test stability [\#285](https://github.com/bensheldon/good_job/pull/285) ([bensheldon](https://github.com/bensheldon))
 - Add `rails g good_job:update` command to add idempotent migration files, including `active_job_id`, `concurrency_key`, `cron_key` columns [\#266](https://github.com/bensheldon/good_job/pull/266) ([bensheldon](https://github.com/bensheldon))
 
 **Fixed bugs:**
 
-- Use `pg_advisory_unlock_all` after each thread's job execution; fix Lockable return values; improve test stability [\#285](https://github.com/bensheldon/good_job/pull/285) ([bensheldon](https://github.com/bensheldon))
 - Dashboard AssetsController does not raise if verify\_authenticity\_token is not in the callback chain [\#284](https://github.com/bensheldon/good_job/pull/284) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
