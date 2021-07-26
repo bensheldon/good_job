@@ -18,7 +18,7 @@ RSpec.describe GoodJob::Scheduler do
     end
 
     context 'when on task thread' do
-      it 'calls GoodJob.on_thread_error' do
+      it 'calls GoodJob.on_thread_error for thread errors' do
         allow(performer).to receive(:next) do
           THREAD_HAS_RUN.make_true
           raise "Whoops"
@@ -36,6 +36,24 @@ RSpec.describe GoodJob::Scheduler do
         expect(error_proc).to have_received(:call).with(an_instance_of(RuntimeError).and(having_attributes(message: 'Whoops')))
 
         scheduler.shutdown
+      end
+
+      it 'calls GoodJob.on_thread_error for unhandled_errors' do
+        allow(performer).to receive(:next) do
+          THREAD_HAS_RUN.make_true
+          GoodJob::ExecutionResult.new(value: nil, unhandled_error: StandardError.new("oopsy"))
+        end
+
+        allow(error_proc).to receive(:call) do
+          ERROR_TRIGGERED.make_true
+        end
+
+        scheduler = described_class.new(performer)
+        scheduler.create_thread
+        sleep_until { THREAD_HAS_RUN.true? }
+        sleep_until { ERROR_TRIGGERED.true? }
+
+        expect(error_proc).to have_received(:call).with(an_instance_of(StandardError).and(having_attributes(message: 'oopsy'))).at_least(:once)
       end
     end
   end
