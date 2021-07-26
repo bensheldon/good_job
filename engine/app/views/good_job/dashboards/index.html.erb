@@ -1,5 +1,5 @@
 <div class="card my-3 p-6">
-  <%= render 'shared/chart', chart_data: @chart %>
+  <%= render 'good_job/shared/chart', chart_data: @chart %>
 </div>
 
 <div class='card mb-2'>
@@ -38,7 +38,7 @@
 </div>
 
 <% if @filter.jobs.present? %>
-  <%= render 'shared/jobs_table', jobs: @filter.jobs %>
+  <%= render 'good_job/shared/jobs_table', jobs: @filter.jobs %>
 
   <nav aria-label="Job pagination" class="mt-3">
     <ul class="pagination">
