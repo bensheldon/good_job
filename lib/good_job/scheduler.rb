@@ -190,13 +190,15 @@ module GoodJob # :nodoc:
     # Preload existing runnable and future-scheduled jobs
     # @return [void]
     def warm_cache
-      return if @max_cache.zero?
+      return unless @max_cache.positive?
 
-      future = Concurrent::Future.new(args: [self, @performer], executor: executor) do |thr_scheduler, thr_performer|
+      future = Concurrent::Future.new(args: [self, @performer, @max_cache, @executor_options[:max_threads]]) do |thr_scheduler, thr_performer, thr_max_cache, thr_max_threads|
+        return unless thr_scheduler.running?
+
         Rails.application.executor.wrap do
           thr_performer.next_at(
-            limit: @max_cache,
-            now_limit: @executor_options[:max_threads]
+            limit: thr_max_cache,
+            now_limit: thr_max_threads
           ).each do |scheduled_at|
             thr_scheduler.create_thread({ scheduled_at: scheduled_at })
           end
@@ -205,7 +207,6 @@ module GoodJob # :nodoc:
 
       observer = lambda do |_time, _output, thread_error|
         GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
-        create_task # If cache-warming exhausts the threads, ensure there isn't an executable task remaining
       end
       future.add_observer(observer, :call)
 
