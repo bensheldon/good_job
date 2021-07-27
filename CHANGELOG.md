@@ -1,5 +1,19 @@
 # Changelog
 
+## [v1.12.0](https://github.com/bensheldon/good_job/tree/v1.12.0) (2021-07-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.11.3...v1.12.0)
+
+**Implemented enhancements:**
+
+- Add the ability to schedule repeating / recurring / cron-like jobs [\#53](https://github.com/bensheldon/good_job/issues/53)
+- Add cron-like support for recurring/repeating jobs [\#297](https://github.com/bensheldon/good_job/pull/297) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Place Dashboard shared view partials under `good_job` namespace [\#310](https://github.com/bensheldon/good_job/pull/310) ([bensheldon](https://github.com/bensheldon))
+- Ensure Dashboard inline javascript has CSP nonce for strict Content-Security Policy [\#309](https://github.com/bensheldon/good_job/pull/309) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.11.3](https://github.com/bensheldon/good_job/tree/v1.11.3) (2021-07-25)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.11.2...v1.11.3)
