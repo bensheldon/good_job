@@ -3,6 +3,7 @@ module GoodJob
   # Ruby on Rails integration.
   class Railtie < ::Rails::Railtie
     config.good_job = ActiveSupport::OrderedOptions.new
+    config.good_job.cron = {}
 
     initializer "good_job.logger" do |_app|
       ActiveSupport.on_load(:good_job) do
@@ -23,6 +24,7 @@ module GoodJob
 
     config.after_initialize do
       GoodJob::Scheduler.instances.each(&:warm_cache)
+      GoodJob::CronManager.instances.each(&:start)
     end
   end
 end

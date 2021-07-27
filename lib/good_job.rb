@@ -106,16 +106,13 @@ module GoodJob
                 wait ? -1 : nil
               end
 
-    executables = Array(Notifier.instances) + Array(Poller.instances) + Array(Scheduler.instances)
-    _shutdown_all(executables, timeout: timeout)
+    _shutdown_all(_executables, timeout: timeout)
   end
 
   # Tests whether jobs have stopped executing.
   # @return [Boolean] whether background threads are shut down
   def self.shutdown?
-    Notifier.instances.all?(&:shutdown?) &&
-      Poller.instances.all?(&:shutdown?) &&
-      Scheduler.instances.all?(&:shutdown?)
+    _executables.all?(&:shutdown?)
   end
 
   # Stops and restarts executing jobs.
@@ -126,8 +123,7 @@ module GoodJob
   # @param timeout [Numeric, nil] Seconds to wait for active threads to finish.
   # @return [void]
   def self.restart(timeout: -1)
-    executables = Array(Notifier.instances) + Array(Poller.instances) + Array(Scheduler.instances)
-    _shutdown_all(executables, :restart, timeout: timeout)
+    _shutdown_all(_executables, :restart, timeout: timeout)
   end
 
   # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler})
@@ -144,6 +140,15 @@ module GoodJob
     else
       executables.each { |executable| executable.send(method_name, timeout: timeout) }
     end
+  end
+
+  def self._executables
+    [].concat(
+      CronManager.instances,
+      Notifier.instances,
+      Poller.instances,
+      Scheduler.instances
+    )
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)

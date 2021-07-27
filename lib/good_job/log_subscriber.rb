@@ -58,6 +58,16 @@ module GoodJob
     end
 
     # @!macro notification_responder
+    def cron_manager_start(event)
+      cron_jobs = event.payload[:cron_jobs]
+      cron_jobs_count = cron_jobs.size
+
+      info do
+        "GoodJob started cron with #{cron_jobs_count} #{'jobs'.pluralize(cron_jobs_count)}."
+      end
+    end
+
+    # @!macro notification_responder
     def scheduler_shutdown_start(event)
       process_id = event.payload[:process_id]
 

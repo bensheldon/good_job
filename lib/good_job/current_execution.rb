@@ -11,6 +11,12 @@ module GoodJob
     #   @return [String, nil]
     thread_mattr_accessor :active_job_id
 
+    # @!attribute [rw] cron_key
+    #   @!scope class
+    #   Cron Key
+    #   @return [String, nil]
+    thread_mattr_accessor :cron_key
+
     # @!attribute [rw] error_on_discard
     #   @!scope class
     #   Error captured by discard_on

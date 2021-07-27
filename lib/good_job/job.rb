@@ -199,6 +199,7 @@ module GoodJob
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         good_job_args = {
+          cron_key: CurrentExecution.cron_key,
           queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
           priority: active_job.priority || DEFAULT_PRIORITY,
           serialized_params: active_job.serialize,
@@ -285,6 +286,25 @@ module GoodJob
       super || serialized_params['job_id']
     end
 
+    def cron_key
+      if self.class.column_names.include?('cron_key')
+        super
+      else
+        ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+          GoodJob has pending database migrations. To create the migration files, run:
+
+              rails generate good_job:update
+
+          To apply the migration files, run:
+
+              rails db:migrate
+
+        DEPRECATION
+
+        nil
+      end
+    end
+
     private
 
     # @return [ExecutionResult]
@@ -295,6 +315,7 @@ module GoodJob
 
       GoodJob::CurrentExecution.reset
       GoodJob::CurrentExecution.active_job_id = active_job_id
+      GoodJob::CurrentExecution.cron_key = cron_key
       ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, process_id: GoodJob::CurrentExecution.process_id, thread_name: GoodJob::CurrentExecution.thread_name }) do
         value = ActiveJob::Base.execute(params)
 

@@ -57,6 +57,8 @@ module GoodJob
         @scheduler = GoodJob::Scheduler.from_configuration(@configuration, warm_cache_on_initialize: Rails.application.initialized?)
         @notifier.recipients << [@scheduler, :create_thread]
         @poller.recipients << [@scheduler, :create_thread]
+
+        @cron_manager = GoodJob::CronManager.new(@configuration.cron, start_on_initialize: Rails.application.initialized?) if @configuration.enable_cron?
       end
     end
 
