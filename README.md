@@ -52,6 +52,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
     - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
+    - [PgBouncer compatibility](#pgbouncer-compatibility)
 - [Contribute](#contribute)
     - [Gem development](#gem-development)
     - [Release](#release)
@@ -685,6 +686,43 @@ It is also necessary to delete these preserved jobs from the database after a ce
 
     ```bash
     $ bundle exec good_job cleanup_preserved_jobs --before-seconds-ago=86400
+    ```
+
+### PgBouncer compatibility
+
+GoodJob is not compatible with PgBouncer in _transaction_ mode, but is compatible with PgBouncer's _connection_ mode. GoodJob uses connection-based advisory locks and LISTEN/NOTIFY, both of which require full database connections.
+
+A workaround to this limitation is to make a direct database connection available to GoodJob. With Rails 6.0's support for [multiple databases](https://guides.rubyonrails.org/active_record_multiple_databases.html), a direct connection to the database can be configured:
+
+1. Define a direct connection to your database that is not proxied through PgBouncer, for example:
+
+    ```yml
+    # config/database.yml
+
+    production:
+      primary:
+        url: postgres://pgbouncer_host/my_database
+      primary_direct:
+        url: postgres://database_host/my_database
+    ```
+
+2. Create a new ActiveRecord base class that uses the direct database connection
+
+    ```ruby
+    # app/models/application_direct_record.rb
+
+    class ApplicationDirectRecord < ActiveRecord::Base
+      self.abstract_class = true
+      connects_to database: :primary_direct
+    end
+    ```
+
+3. Configure GoodJob to use the newly created ActiveRecord base class:
+
+    ```ruby
+    # config/initializers/good_job.rb
+    
+    GoodJob.active_record_parent_class = "ApplicationDirectRecord"
     ```
 
 ## Contribute
