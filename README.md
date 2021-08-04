@@ -706,7 +706,7 @@ A workaround to this limitation is to make a direct database connection availabl
         url: postgres://database_host/my_database
     ```
 
-2. Create a new ActiveRecord base class that uses the direct database connection
+1. Create a new ActiveRecord base class that uses the direct database connection
 
     ```ruby
     # app/models/application_direct_record.rb
@@ -717,11 +717,11 @@ A workaround to this limitation is to make a direct database connection availabl
     end
     ```
 
-3. Configure GoodJob to use the newly created ActiveRecord base class:
+1. Configure GoodJob to use the newly created ActiveRecord base class:
 
     ```ruby
     # config/initializers/good_job.rb
-    
+
     GoodJob.active_record_parent_class = "ApplicationDirectRecord"
     ```
 
