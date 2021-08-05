@@ -44,7 +44,7 @@ RSpec.describe GoodJob::CronManager do
       cron_manager = described_class.new(schedules, start_on_initialize: true)
 
       wait_until(max: 5) do
-        expect(GoodJob::Job.count).to eq 3
+        expect(GoodJob::Job.count).to be > 3
       end
 
       good_job = GoodJob::Job.first

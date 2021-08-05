@@ -126,13 +126,13 @@ module GoodJob
     _shutdown_all(_executables, :restart, timeout: timeout)
   end
 
-  # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler})
-  # @param executables [Array<Notifier, Poller, Scheduler, MultiScheduler>] Objects to shut down.
+  # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager})
+  # @param executables [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager>] Objects to shut down.
   # @param method_name [:symbol] Method to call, e.g. +:shutdown+ or +:restart+.
   # @param timeout [nil,Numeric]
   # @return [void]
   def self._shutdown_all(executables, method_name = :shutdown, timeout: -1)
-    if timeout.positive?
+    if timeout.is_a?(Numeric) && timeout.positive?
       executables.each { |executable| executable.send(method_name, timeout: nil) }
 
       stop_at = Time.current + timeout
