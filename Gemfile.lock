@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    good_job (1.12.0)
+    good_job (1.12.1)
       activejob (>= 5.2.0)
       activerecord (>= 5.2.0)
       concurrent-ruby (>= 1.0.2)
@@ -72,10 +72,10 @@ GEM
     activerecord-explain-analyze (0.1.0)
       activerecord (>= 4)
       pg
-    activerecord-jdbc-adapter (61.0-java)
+    activerecord-jdbc-adapter (61.1-java)
       activerecord (~> 6.1.0)
-    activerecord-jdbcpostgresql-adapter (61.0-java)
-      activerecord-jdbc-adapter (= 61.0)
+    activerecord-jdbcpostgresql-adapter (61.1-java)
+      activerecord-jdbc-adapter (= 61.1)
       jdbc-postgres (>= 9.4, < 43)
     activestorage (6.1.4)
       actionpack (= 6.1.4)

@@ -1,5 +1,25 @@
 # Changelog
 
+## [v1.12.1](https://github.com/bensheldon/good_job/tree/v1.12.1) (2021-08-05)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.12.0...v1.12.1)
+
+**Fixed bugs:**
+
+- Ensure CLI can shutdown cleanly with multiple queues and timeout [\#319](https://github.com/bensheldon/good_job/pull/319) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Setting a shutdown timeout causes the CLI executor to throw an exception on shutdown. [\#318](https://github.com/bensheldon/good_job/issues/318)
+- PgBouncer and prepared statements [\#269](https://github.com/bensheldon/good_job/issues/269)
+- Question about locking internals [\#212](https://github.com/bensheldon/good_job/issues/212)
+- Encoding::UndefinedConversionError \("\xE2" from ASCII-8BIT to UTF-8\) [\#198](https://github.com/bensheldon/good_job/issues/198)
+- tools for managing a 'fleet' of processes [\#150](https://github.com/bensheldon/good_job/issues/150)
+
+**Merged pull requests:**
+
+- Fix Readme lint warnings [\#320](https://github.com/bensheldon/good_job/pull/320) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.12.0](https://github.com/bensheldon/good_job/tree/v1.12.0) (2021-07-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.11.3...v1.12.0)
