@@ -57,12 +57,22 @@ task :release, [:version_bump] do |_t, args|
   system! "git commit -m \"Release good_job v#{GoodJob::VERSION}\""
   system! "git tag v#{GoodJob::VERSION}"
 
-  puts "\n== Next steps =="
-  puts "Run the following commands:\n\n"
-  puts "  1. Push commit and tag to Github:"
-  puts "    $ git push origin && git push origin --tags"
-  puts "  2. Push to Rubygems.org:"
-  puts "    $ gem release"
+  require 'cgi'
+  changelog_anchor = "v#{GoodJob::VERSION.delete('.')}-#{Time.now.utc.strftime('%Y-%m-%d')}"
+  changelog_url = "https://github.com/bensheldon/good_job/blob/main/CHANGELOG.md##{changelog_anchor}"
+
+  puts <<~INSTRUCTIONS
+    == Next steps ==
+
+    Run the following commands:
+
+    1. Push commit and tag to Github:
+        $ git push origin && git push origin --tags
+    2. Push to Rubygems.org:
+        $ gem release
+    3. Author a Github Release:
+        https://github.com/bensheldon/good_job/releases/new?tag=v#{GoodJob::VERSION}&body=#{CGI.escape "[Changelog](#{changelog_url})"}
+  INSTRUCTIONS
 end
 
 require 'rspec/core/rake_task'
