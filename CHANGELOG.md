@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.12.2](https://github.com/bensheldon/good_job/tree/v1.12.2) (2021-08-13)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.12.1...v1.12.2)
+
+**Fixed bugs:**
+
+- Fixes for race conditions in ActiveJob concurrency extension [\#326](https://github.com/bensheldon/good_job/pull/326) ([codyrobbins](https://github.com/codyrobbins))
+
+**Merged pull requests:**
+
+- On gem release, add instructions to author a Github Release [\#324](https://github.com/bensheldon/good_job/pull/324) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.12.1](https://github.com/bensheldon/good_job/tree/v1.12.1) (2021-08-05)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.12.0...v1.12.1)
@@ -29,7 +41,7 @@
 - Add the ability to schedule repeating / recurring / cron-like jobs [\#53](https://github.com/bensheldon/good_job/issues/53)
 - Add cron-like support for recurring/repeating jobs [\#297](https://github.com/bensheldon/good_job/pull/297) ([bensheldon](https://github.com/bensheldon))
 
-**Merged pull requests:**
+**Fixed bugs:**
 
 - Place Dashboard shared view partials under `good_job` namespace [\#310](https://github.com/bensheldon/good_job/pull/310) ([bensheldon](https://github.com/bensheldon))
 - Ensure Dashboard inline javascript has CSP nonce for strict Content-Security Policy [\#309](https://github.com/bensheldon/good_job/pull/309) ([bensheldon](https://github.com/bensheldon))
