@@ -55,17 +55,13 @@ RSpec.describe GoodJob::CurrentExecution do
   end
 
   describe '.active_job_id' do
-    it 'is assignable, thread-safe, and resettable' do
-      described_class.active_job_id = 'duck'
+    let!(:good_job) { GoodJob::Job.create! active_job_id: SecureRandom.uuid }
 
-      Thread.new do
-        described_class.active_job_id = 'bear'
-      end.join
+    it 'delegates to good_job' do
+      expect(described_class.active_job_id).to be_nil
 
-      expect(described_class.active_job_id).to eq 'duck'
-
-      described_class.reset
-      expect(described_class.active_job_id).to eq nil
+      described_class.good_job = good_job
+      expect(described_class.active_job_id).to eq good_job.active_job_id
     end
   end
 end

@@ -3,6 +3,7 @@ THREAD_ERRORS = Concurrent::Array.new
 
 RSpec.configure do |config|
   config.before do
+    GoodJob::CurrentExecution.reset
     GoodJob.preserve_job_records = false
 
     PgLock.advisory_lock.owns.all?(&:unlock) if PgLock.advisory_lock.owns.count > 0

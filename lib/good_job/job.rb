@@ -52,6 +52,20 @@ module GoodJob
       end
     end
 
+    def self._migration_pending_warning
+      ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+        GoodJob has pending database migrations. To create the migration files, run:
+
+            rails generate good_job:update
+
+        To apply the migration files, run:
+
+            rails db:migrate
+
+      DEPRECATION
+      nil
+    end
+
     # Get Jobs with given class name
     # @!method with_job_class
     # @!scope class
@@ -109,6 +123,18 @@ module GoodJob
     # @!scope class
     # @return [ActiveRecord::Relation]
     scope :running, -> { where.not(performed_at: nil).where(finished_at: nil) }
+
+    # Get Jobs that do not have subsequent retries
+    # @!method running
+    # @!scope class
+    # @return [ActiveRecord::Relation]
+    scope :head, -> { where(retried_good_job_id: nil) }
+
+    # Get Jobs have errored that will not be retried further
+    # @!method running
+    # @!scope class
+    # @return [ActiveRecord::Relation]
+    scope :dead, -> { head.where.not(error: nil) }
 
     # Get Jobs on queues that match the given queue string.
     # @!method queue_string(string)
@@ -199,7 +225,6 @@ module GoodJob
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         good_job_args = {
-          cron_key: CurrentExecution.cron_key,
           queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
           priority: active_job.priority || DEFAULT_PRIORITY,
           serialized_params: active_job.serialize,
@@ -210,31 +235,23 @@ module GoodJob
         if column_names.include?('active_job_id')
           good_job_args[:active_job_id] = active_job.job_id
         else
-          ActiveSupport::Deprecation.warn(<<~DEPRECATION)
-            GoodJob has pending database migrations. To create the migration files, run:
-
-                rails generate good_job:update
-
-            To apply the migration files, run:
-
-                rails db:migrate
-
-          DEPRECATION
+          _migration_pending_warning
         end
 
         if column_names.include?('concurrency_key')
           good_job_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
         else
-          ActiveSupport::Deprecation.warn(<<~DEPRECATION)
-            GoodJob has pending database migrations. To create the migration files, run:
+          _migration_pending_warning
+        end
 
-                rails generate good_job:update
-
-            To apply the migration files, run:
-
-                rails db:migrate
-
-          DEPRECATION
+        if column_names.include?('cron_key')
+          if CurrentExecution.cron_key
+            good_job_args[:cron_key] = CurrentExecution.cron_key
+          elsif CurrentExecution.active_job_id == active_job.job_id
+            good_job_args[:cron_key] = CurrentExecution.good_job.cron_key
+          end
+        else
+          _migration_pending_warning
         end
 
         good_job = GoodJob::Job.new(**good_job_args)
@@ -243,6 +260,12 @@ module GoodJob
 
         good_job.save!
         active_job.provider_job_id = good_job.id
+
+        if column_names.include?('retried_good_job_id')
+          CurrentExecution.good_job.retried_good_job_id = good_job.id if CurrentExecution.good_job && CurrentExecution.good_job.active_job_id == active_job.job_id
+        else
+          _migration_pending_warning
+        end
 
         good_job
       end
@@ -283,24 +306,19 @@ module GoodJob
     end
 
     def active_job_id
-      super || serialized_params['job_id']
+      if self.class.column_names.include?('active_job_id')
+        super
+      else
+        self.class._migration_pending_warning
+        serialized_params['job_id']
+      end
     end
 
     def cron_key
       if self.class.column_names.include?('cron_key')
         super
       else
-        ActiveSupport::Deprecation.warn(<<~DEPRECATION)
-          GoodJob has pending database migrations. To create the migration files, run:
-
-              rails generate good_job:update
-
-          To apply the migration files, run:
-
-              rails db:migrate
-
-        DEPRECATION
-
+        self.class._migration_pending_warning
         nil
       end
     end
@@ -314,8 +332,7 @@ module GoodJob
       )
 
       GoodJob::CurrentExecution.reset
-      GoodJob::CurrentExecution.active_job_id = active_job_id
-      GoodJob::CurrentExecution.cron_key = cron_key
+      GoodJob::CurrentExecution.good_job = self
       ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, process_id: GoodJob::CurrentExecution.process_id, thread_name: GoodJob::CurrentExecution.thread_name }) do
         value = ActiveJob::Base.execute(params)
 
