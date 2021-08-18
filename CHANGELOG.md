@@ -1,5 +1,24 @@
 # Changelog
 
+## [v1.13.0](https://github.com/bensheldon/good_job/tree/v1.13.0) (2021-08-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.12.2...v1.13.0)
+
+**Implemented enhancements:**
+
+- Track if a GoodJob::Job has been subsequently retried [\#331](https://github.com/bensheldon/good_job/pull/331) ([bensheldon](https://github.com/bensheldon))
+- Wrap and truncate error message, which can be a huge text [\#294](https://github.com/bensheldon/good_job/pull/294) ([morgoth](https://github.com/morgoth))
+
+**Closed issues:**
+
+- Add hyphen to lock string. e.g. "table\_name-column" instead of "table\_namecolumn [\#334](https://github.com/bensheldon/good_job/issues/334)
+- Optimize db indexes in advance of v2.0.0 [\#332](https://github.com/bensheldon/good_job/issues/332)
+- wait\_until in development? [\#330](https://github.com/bensheldon/good_job/issues/330)
+- Race conditions in ActiveJob concurrency extension [\#325](https://github.com/bensheldon/good_job/issues/325)
+- Store in database if a job has been ActiveJob retried [\#321](https://github.com/bensheldon/good_job/issues/321)
+- Revisit and embrace concurrency control, scheduled jobs, and other extensions of ActiveJob [\#255](https://github.com/bensheldon/good_job/issues/255)
+- Why 1 million jobs per day? [\#222](https://github.com/bensheldon/good_job/issues/222)
+
 ## [v1.12.2](https://github.com/bensheldon/good_job/tree/v1.12.2) (2021-08-13)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.12.1...v1.12.2)
