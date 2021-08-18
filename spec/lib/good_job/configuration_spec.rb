@@ -10,6 +10,17 @@ RSpec.describe GoodJob::Configuration do
 
       it 'defaults to :inline' do
         configuration = described_class.new({})
+        expect(configuration.execution_mode).to eq :async
+      end
+    end
+
+    context 'when in test' do
+      before do
+        allow(Rails).to receive(:env) { "test".inquiry }
+      end
+
+      it 'defaults to :inline' do
+        configuration = described_class.new({})
         expect(configuration.execution_mode).to eq :inline
       end
     end

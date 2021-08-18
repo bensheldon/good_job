@@ -12,6 +12,8 @@ module GoodJob
     DEFAULT_MAX_THREADS = 5
     # Default number of seconds between polls for jobs
     DEFAULT_POLL_INTERVAL = 10
+    # Default poll interval for async in development environment
+    DEFAULT_DEVELOPMENT_ASYNC_POLL_INTERVAL = -1
     # Default number of threads to use per {Scheduler}
     DEFAULT_MAX_CACHE = 10000
     # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs}
@@ -58,19 +60,10 @@ module GoodJob
                end
 
         if mode
-          mode_sym = mode.to_sym
-          if mode_sym == :async
-            ActiveSupport::Deprecation.warn <<~DEPRECATION
-              The next major version of GoodJob will redefine the meaning of 'async'
-              execution mode to be equivalent to 'async_server' and only execute
-              within the webserver process.
-
-              To continue using the v1.0 semantics of 'async', use `async_all` instead.
-
-            DEPRECATION
-          end
-          mode_sym
-        elsif Rails.env.development? || Rails.env.test?
+          mode.to_sym
+        elsif Rails.env.development?
+          :async
+        elsif Rails.env.test?
           :inline
         else
           :external
@@ -109,12 +102,19 @@ module GoodJob
     # poll (using this interval) for new queued jobs to execute.
     # @return [Integer]
     def poll_interval
-      (
+      interval = (
         options[:poll_interval] ||
           rails_config[:poll_interval] ||
-          env['GOOD_JOB_POLL_INTERVAL'] ||
-          DEFAULT_POLL_INTERVAL
-      ).to_i
+          env['GOOD_JOB_POLL_INTERVAL']
+      )
+
+      if interval
+        interval.to_i
+      elsif Rails.env.development? && execution_mode.in?([:async, :async_all, :async_server])
+        DEFAULT_DEVELOPMENT_ASYNC_POLL_INTERVAL
+      else
+        DEFAULT_POLL_INTERVAL
+      end
     end
 
     # The maximum number of future-scheduled jobs to store in memory.
@@ -147,12 +147,13 @@ module GoodJob
     def enable_cron
       value = ActiveModel::Type::Boolean.new.cast(
         options[:enable_cron] ||
-        rails_config[:enable_cron] ||
-        env['GOOD_JOB_ENABLE_CRON'] ||
-        false
+          rails_config[:enable_cron] ||
+          env['GOOD_JOB_ENABLE_CRON'] ||
+          false
       )
       value && cron.size.positive?
     end
+
     alias enable_cron? enable_cron
 
     def cron

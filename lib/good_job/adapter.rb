@@ -4,16 +4,13 @@ module GoodJob
   # ActiveJob Adapter.
   #
   class Adapter
-    # Valid execution modes.
-    EXECUTION_MODES = [:async, :async_server, :external, :inline].freeze
-
     # @param execution_mode [Symbol, nil] specifies how and where jobs should be executed. You can also set this with the environment variable +GOOD_JOB_EXECUTION_MODE+.
     #
     #  - +:inline+ executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
     #  - +:external+ causes the adapter to enqueue jobs, but not execute them. When using this option (the default for production environments), you'll need to use the command-line tool to actually execute your jobs.
-    #  - +:async_server+ executes jobs in separate threads within the Rails webserver process (`bundle exec rails server`). It can be more economical for small workloads because you don't need a separate machine or environment for running your jobs, but if your web server is under heavy load or your jobs require a lot of resources, you should choose +:external+ instead.
+    #  - +:async+ (or +:async_server+) executes jobs in separate threads within the Rails webserver process (`bundle exec rails server`). It can be more economical for small workloads because you don't need a separate machine or environment for running your jobs, but if your web server is under heavy load or your jobs require a lot of resources, you should choose +:external+ instead.
     #    When not in the Rails webserver, jobs will execute in +:external+ mode to ensure jobs are not executed within `rails console`, `rails db:migrate`, `rails assets:prepare`, etc.
-    #  - +:async+ executes jobs in any Rails process.
+    #  - +:async_all+ executes jobs in any Rails process.
     #
     #  The default value depends on the Rails environment:
     #
@@ -130,15 +127,15 @@ module GoodJob
     # Whether in +:async+ execution mode.
     # @return [Boolean]
     def execute_async?
-      @configuration.execution_mode.in?([:async, :async_all]) ||
-        @configuration.execution_mode == :async_server && in_server_process?
+      @configuration.execution_mode == :async_all ||
+        @configuration.execution_mode.in?([:async, :async_server]) && in_server_process?
     end
 
     # Whether in +:external+ execution mode.
     # @return [Boolean]
     def execute_externally?
       @configuration.execution_mode == :external ||
-        @configuration.execution_mode == :async_server && !in_server_process?
+        @configuration.execution_mode.in?([:async, :async_server]) && !in_server_process?
     end
 
     # Whether in +:inline+ execution mode.
