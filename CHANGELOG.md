@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.13.1](https://github.com/bensheldon/good_job/tree/v1.13.1) (2021-08-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.13.0...v1.13.1)
+
+**Fixed bugs:**
+
+- Don’t attempt to enforce concurrency limits with other queue adapters [\#333](https://github.com/bensheldon/good_job/pull/333) ([codyrobbins](https://github.com/codyrobbins))
+
 ## [v1.13.0](https://github.com/bensheldon/good_job/tree/v1.13.0) (2021-08-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.12.2...v1.13.0)
