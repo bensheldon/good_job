@@ -10,6 +10,9 @@ module GoodJob
         class_attribute :good_job_concurrency_config, instance_accessor: false, default: {}
 
         around_enqueue do |job, block|
+          # Don't attempt to enforce concurrency limits with other queue adapters.
+          next(block.call) unless job.class.queue_adapter.is_a?(GoodJob::Adapter)
+
           # Always allow jobs to be retried because the current job's execution will complete momentarily
           next(block.call) if CurrentExecution.active_job_id == job.job_id
 
@@ -34,6 +37,9 @@ module GoodJob
         )
 
         before_perform do |job|
+          # Don't attempt to enforce concurrency limits with other queue adapters.
+          next unless job.class.queue_adapter.is_a?(GoodJob::Adapter)
+
           limit = job.class.good_job_concurrency_config.fetch(:perform_limit, Float::INFINITY)
           next if limit.blank? || (0...Float::INFINITY).exclude?(limit)
 
