@@ -51,7 +51,7 @@ module GoodJob
         composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::SqlLiteral.new([cte_type, "(", cte_query.to_sql, ")"].join(' ')))
         query = cte_table.project(cte_table[:id])
                          .with(composed_cte)
-                         .where(Arel.sql(sanitize_sql_for_conditions(["#{function}(('x' || substr(md5(:table_name || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)", { table_name: table_name }])))
+                         .where(Arel.sql(sanitize_sql_for_conditions(["#{function}(('x' || substr(md5(:table_name || '-' || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)", { table_name: table_name }])))
 
         limit = original_query.arel.ast.limit
         query.limit = limit.value if limit.present?
@@ -75,8 +75,8 @@ module GoodJob
         join_sql = <<~SQL.squish
           LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'
             AND pg_locks.objsubid = 1
-            AND pg_locks.classid = ('x' || substr(md5(:table_name || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(32)::int
-            AND pg_locks.objid = (('x' || substr(md5(:table_name || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64) << 32)::bit(32)::int
+            AND pg_locks.classid = ('x' || substr(md5(:table_name || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(32)::int
+            AND pg_locks.objid = (('x' || substr(md5(:table_name || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64) << 32)::bit(32)::int
         SQL
 
         joins(sanitize_sql_for_conditions([join_sql, { table_name: table_name }]))
@@ -315,7 +315,7 @@ module GoodJob
     # Default Advisory Lock key
     # @return [String]
     def lockable_key
-      [self.class.table_name, self[self.class._advisory_lockable_column]].join
+      "#{self.class.table_name}-#{self[self.class._advisory_lockable_column]}"
     end
 
     delegate :pg_or_jdbc_query, to: :class
