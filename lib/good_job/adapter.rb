@@ -130,7 +130,7 @@ module GoodJob
     # Whether in +:async+ execution mode.
     # @return [Boolean]
     def execute_async?
-      @configuration.execution_mode == :async ||
+      @configuration.execution_mode.in?([:async, :async_all]) ||
         @configuration.execution_mode == :async_server && in_server_process?
     end
 
