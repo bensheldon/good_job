@@ -7,7 +7,7 @@ module GoodJob
   #
   class Configuration
     # Valid execution modes.
-    EXECUTION_MODES = [:async, :async_server, :external, :inline].freeze
+    EXECUTION_MODES = [:async, :async_all, :async_server, :external, :inline].freeze
     # Default number of threads to use per {Scheduler}
     DEFAULT_MAX_THREADS = 5
     # Default number of seconds between polls for jobs
@@ -58,7 +58,18 @@ module GoodJob
                end
 
         if mode
-          mode.to_sym
+          mode_sym = mode.to_sym
+          if mode_sym == :async
+            ActiveSupport::Deprecation.warn <<~DEPRECATION
+              The next major version of GoodJob will redefine the meaning of 'async'
+              execution mode to be equivalent to 'async_server' and only execute
+              within the webserver process.
+
+              To continue using the v1.0 semantics of 'async', use `async_all` instead.
+
+            DEPRECATION
+          end
+          mode_sym
         elsif Rails.env.development? || Rails.env.test?
           :inline
         else

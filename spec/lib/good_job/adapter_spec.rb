@@ -80,8 +80,16 @@ RSpec.describe GoodJob::Adapter do
   end
 
   describe '#execute_async?' do
-    context 'when execution mode async_all' do
+    context 'when execution mode async' do
       let(:adapter) { described_class.new(execution_mode: :async) }
+
+      it 'returns true' do
+        expect(adapter.execute_async?).to eq true
+      end
+    end
+
+    context 'when execution mode async_all' do
+      let(:adapter) { described_class.new(execution_mode: :async_all) }
 
       it 'returns true' do
         expect(adapter.execute_async?).to eq true
