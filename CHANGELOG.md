@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.13.2](https://github.com/bensheldon/good_job/tree/v1.13.2) (2021-08-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.13.1...v1.13.2)
+
+**Merged pull requests:**
+
+- Add deprecation notice that `async` mode will be renamed `async_all` in GoodJob v2.0 [\#339](https://github.com/bensheldon/good_job/pull/339) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.13.1](https://github.com/bensheldon/good_job/tree/v1.13.1) (2021-08-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.13.0...v1.13.1)
