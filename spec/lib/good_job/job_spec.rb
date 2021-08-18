@@ -217,13 +217,37 @@ RSpec.describe GoodJob::Job do
 
       context 'when there is an error' do
         let(:active_job) { TestJob.new("whoops", raise_error: true) }
-        let!(:good_job) { described_class.enqueue(active_job) }
+        let!(:good_job) do
+          GoodJob::CurrentExecution.cron_key = "test_key"
+          good_job = described_class.enqueue(active_job)
+          GoodJob::CurrentExecution.cron_key = nil
+          good_job
+        end
 
         it 'returns the error' do
           result = good_job.perform
 
           expect(result.value).to eq nil
           expect(result.unhandled_error).to be_an_instance_of TestJob::ExpectedError
+        end
+
+        context 'when there is a retry handler' do
+          before do
+            ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+            allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+            TestJob.retry_on(TestJob::ExpectedError, attempts: 2)
+          end
+
+          it 'copies job info, including the cron key to the new record' do
+            new_record = described_class.order(created_at: :asc).last
+            expect(new_record.active_job_id).to eq good_job.active_job_id
+            expect(new_record.cron_key).to eq "test_key"
+          end
+
+          it 'records the new job UUID on the executing record' do
+            good_job.perform
+            expect(good_job.reload.retried_good_job_id).to be_present
+          end
         end
 
         context 'when there is an retry handler with exhausted attempts' do

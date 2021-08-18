@@ -16,6 +16,7 @@ class CreateGoodJobs < ActiveRecord::Migration[5.2]
       t.uuid :active_job_id
       t.text :concurrency_key
       t.text :cron_key
+      t.uuid :retried_good_job_id
     end
 
     add_index :good_jobs, :scheduled_at, where: "(finished_at IS NULL)", name: "index_good_jobs_on_scheduled_at"
