@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.99.0](https://github.com/bensheldon/good_job/tree/v1.99.0) (2021-08-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.13.2...v1.99.0)
+
+**Closed issues:**
+
+- Set Advisory Lock on ActiveJob job uuid instead of GoodJob's job uuid [\#272](https://github.com/bensheldon/good_job/issues/272)
+
+**Merged pull requests:**
+
+- Add upgrade instructions for v1 to v2 [\#345](https://github.com/bensheldon/good_job/pull/345) ([bensheldon](https://github.com/bensheldon))
+- Add transitional/temporary additional lock on good\_jobs-\[active\_job\_id\] [\#336](https://github.com/bensheldon/good_job/pull/336) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.13.2](https://github.com/bensheldon/good_job/tree/v1.13.2) (2021-08-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.13.1...v1.13.2)
