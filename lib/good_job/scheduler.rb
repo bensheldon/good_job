@@ -168,7 +168,9 @@ module GoodJob # :nodoc:
     # @!visibility private
     # @return [void]
     def task_observer(time, output, thread_error)
-      GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
+      error = thread_error || (output.is_a?(GoodJob::ExecutionResult) ? output.unhandled_error : nil)
+      GoodJob.on_thread_error.call(error) if error && GoodJob.on_thread_error.respond_to?(:call)
+
       instrument("finished_job_task", { result: output, error: thread_error, time: time })
       create_task if output
     end
