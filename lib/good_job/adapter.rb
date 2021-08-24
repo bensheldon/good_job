@@ -21,23 +21,6 @@ module GoodJob
     # @param queues [String, nil] determines which queues to execute jobs from when +execution_mode+ is set to +:async+. See {file:README.md#optimize-queues-threads-and-processes} for more details on the format of this string. You can also set this with the environment variable +GOOD_JOB_QUEUES+. Defaults to +"*"+.
     # @param poll_interval [Integer, nil] sets the number of seconds between polls for jobs when +execution_mode+ is set to +:async+. You can also set this with the environment variable +GOOD_JOB_POLL_INTERVAL+. Defaults to +1+.
     def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil)
-      if caller[0..4].find { |c| c.include?("/config/application.rb") || c.include?("/config/environments/") }
-        ActiveSupport::Deprecation.warn(<<~DEPRECATION)
-          GoodJob no longer recommends creating a GoodJob::Adapter instance:
-
-              config.active_job.queue_adapter = GoodJob::Adapter.new...
-
-          Instead, configure GoodJob through configuration:
-
-              config.active_job.queue_adapter = :good_job
-              config.good_job.execution_mode = :#{execution_mode}
-              config.good_job.max_threads = #{max_threads}
-              config.good_job.poll_interval = #{poll_interval}
-              # etc...
-
-        DEPRECATION
-      end
-
       @configuration = GoodJob::Configuration.new(
         {
           execution_mode: execution_mode,
@@ -102,18 +85,8 @@ module GoodJob
     #   * +-1+, the scheduler will wait until the shutdown is complete.
     #   * +0+, the scheduler will immediately shutdown and stop any threads.
     #   * A positive number will wait that many seconds before stopping any remaining active threads.
-    # @param wait [Boolean, nil] Deprecated. Use +timeout:+ instead.
     # @return [void]
-    def shutdown(timeout: :default, wait: nil)
-      timeout = if wait.nil?
-                  timeout
-                else
-                  ActiveSupport::Deprecation.warn(
-                    "Using `GoodJob::Adapter.shutdown` with `wait:` kwarg is deprecated; use `timeout:` kwarg instead e.g. GoodJob::Adapter.shutdown(timeout: #{wait ? '-1' : 'nil'})"
-                  )
-                  wait ? -1 : nil
-                end
-
+    def shutdown(timeout: :default)
       timeout = if timeout == :default
                   @configuration.shutdown_timeout
                 else

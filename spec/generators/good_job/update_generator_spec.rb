@@ -16,7 +16,8 @@ describe GoodJob::UpdateGenerator, type: :generator, skip_if_java: true do
       end
 
       expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_jobs.rb")).not_to be_empty
-      expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_add_active_job_id_index_and_concurrency_key_index_to_good_jobs.rb")).not_to be_empty
+      # TODO: replace this when migrations are re-added
+      # expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_add_active_job_id_index_and_concurrency_key_index_to_good_jobs.rb")).not_to be_empty
 
       quiet do
         run_in_example_app 'rails db:migrate'
@@ -24,7 +25,7 @@ describe GoodJob::UpdateGenerator, type: :generator, skip_if_java: true do
     end
   end
 
-  it 'produces an idempotentent schema.rb when run with install generator' do
+  it 'produces an idempotent schema.rb when run with install generator' do
     install_schema = ""
     update_after_install_schema = ""
     only_update_schema = ""

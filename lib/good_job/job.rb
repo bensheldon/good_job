@@ -52,20 +52,6 @@ module GoodJob
       end
     end
 
-    def self._migration_pending_warning
-      ActiveSupport::Deprecation.warn(<<~DEPRECATION)
-        GoodJob has pending database migrations. To create the migration files, run:
-
-            rails generate good_job:update
-
-        To apply the migration files, run:
-
-            rails db:migrate
-
-      DEPRECATION
-      nil
-    end
-
     # Get Jobs with given class name
     # @!method with_job_class
     # @!scope class
@@ -78,14 +64,7 @@ module GoodJob
     # @!method unfinished
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :unfinished, (lambda do
-      if column_names.include?('finished_at')
-        where(finished_at: nil)
-      else
-        ActiveSupport::Deprecation.warn('GoodJob expects a good_jobs.finished_at column to exist. Please see the GoodJob README.md for migration instructions.')
-        nil
-      end
-    end)
+    scope :unfinished, -> { where(finished_at: nil) }
 
     # Get Jobs that are not scheduled for a later time than now (i.e. jobs that
     # are not scheduled or scheduled for earlier than the current time).
@@ -231,6 +210,7 @@ module GoodJob
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         good_job_args = {
+          active_job_id: active_job.job_id,
           queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
           priority: active_job.priority || DEFAULT_PRIORITY,
           serialized_params: active_job.serialize,
@@ -238,26 +218,12 @@ module GoodJob
           create_with_advisory_lock: create_with_advisory_lock,
         }
 
-        if column_names.include?('active_job_id')
-          good_job_args[:active_job_id] = active_job.job_id
-        else
-          _migration_pending_warning
-        end
+        good_job_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
 
-        if column_names.include?('concurrency_key')
-          good_job_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
-        else
-          _migration_pending_warning
-        end
-
-        if column_names.include?('cron_key')
-          if CurrentExecution.cron_key
-            good_job_args[:cron_key] = CurrentExecution.cron_key
-          elsif CurrentExecution.active_job_id == active_job.job_id
-            good_job_args[:cron_key] = CurrentExecution.good_job.cron_key
-          end
-        else
-          _migration_pending_warning
+        if CurrentExecution.cron_key
+          good_job_args[:cron_key] = CurrentExecution.cron_key
+        elsif CurrentExecution.active_job_id == active_job.job_id
+          good_job_args[:cron_key] = CurrentExecution.good_job.cron_key
         end
 
         good_job = GoodJob::Job.new(**good_job_args)
@@ -267,11 +233,7 @@ module GoodJob
         good_job.save!
         active_job.provider_job_id = good_job.id
 
-        if column_names.include?('retried_good_job_id')
-          CurrentExecution.good_job.retried_good_job_id = good_job.id if CurrentExecution.good_job && CurrentExecution.good_job.active_job_id == active_job.job_id
-        else
-          _migration_pending_warning
-        end
+        CurrentExecution.good_job.retried_good_job_id = good_job.id if CurrentExecution.good_job && CurrentExecution.good_job.active_job_id == active_job.job_id
 
         good_job
       end
@@ -309,24 +271,6 @@ module GoodJob
     # @return [Boolean]
     def executable?
       self.class.unscoped.unfinished.owns_advisory_locked.exists?(id: id)
-    end
-
-    def active_job_id
-      if self.class.column_names.include?('active_job_id')
-        super
-      else
-        self.class._migration_pending_warning
-        serialized_params['job_id']
-      end
-    end
-
-    def cron_key
-      if self.class.column_names.include?('cron_key')
-        super
-      else
-        self.class._migration_pending_warning
-        nil
-      end
     end
 
     private

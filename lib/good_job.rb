@@ -55,25 +55,6 @@ module GoodJob
   #   @return [Boolean, nil]
   mattr_accessor :retry_on_unhandled_error, default: true
 
-  # @deprecated Use {GoodJob#retry_on_unhandled_error} instead.
-  # @return [Boolean, nil]
-  def self.reperform_jobs_on_standard_error
-    ActiveSupport::Deprecation.warn(
-      "Calling 'GoodJob.reperform_jobs_on_standard_error' is deprecated. Please use 'retry_on_unhandled_error'"
-    )
-    retry_on_unhandled_error
-  end
-
-  # @deprecated Use {GoodJob#retry_on_unhandled_error=} instead.
-  # @param value [Boolean]
-  # @return [Boolean]
-  def self.reperform_jobs_on_standard_error=(value)
-    ActiveSupport::Deprecation.warn(
-      "Setting 'GoodJob.reperform_jobs_on_standard_error=' is deprecated. Please use 'retry_on_unhandled_error='"
-    )
-    self.retry_on_unhandled_error = value
-  end
-
   # @!attribute [rw] on_thread_error
   #   @!scope class
   #   This callable will be called when an exception reaches GoodJob (default: +nil+).
@@ -96,16 +77,7 @@ module GoodJob
   #   * +1..+, the scheduler will wait that many seconds before stopping any remaining active tasks.
   # @param wait [Boolean] whether to wait for shutdown
   # @return [void]
-  def self.shutdown(timeout: -1, wait: nil)
-    timeout = if wait.nil?
-                timeout
-              else
-                ActiveSupport::Deprecation.warn(
-                  "Using `GoodJob.shutdown` with `wait:` kwarg is deprecated; use `timeout:` kwarg instead e.g. GoodJob.shutdown(timeout: #{wait ? '-1' : 'nil'})"
-                )
-                wait ? -1 : nil
-              end
-
+  def self.shutdown(timeout: -1)
     _shutdown_all(_executables, timeout: timeout)
   end
 
