@@ -67,7 +67,7 @@ RSpec.describe 'Adapter Integration' do
 
   describe 'Async execution mode' do
     context 'when Scheduler polling is disabled' do
-      let(:adapter) { GoodJob::Adapter.new execution_mode: :async, queues: 'mice:2', poll_interval: -1 }
+      let(:adapter) { GoodJob::Adapter.new execution_mode: :async_all, queues: 'mice:2', poll_interval: -1 }
 
       it 'Jobs are directly handed to the performer, if they match the queues' do
         elephant_ajob = TestJob.set(queue: 'elephants').perform_later
@@ -81,7 +81,7 @@ RSpec.describe 'Adapter Integration' do
 
       it 'invokes the notifier if the job is not locally runnable', skip_if_java: true do
         # Create another adapter but do not attach it
-        elephant_adapter = GoodJob::Adapter.new execution_mode: :async, queues: 'elephants:1', poll_interval: -1
+        elephant_adapter = GoodJob::Adapter.new execution_mode: :async_all, queues: 'elephants:1', poll_interval: -1
         sleep_until { GoodJob::Notifier.instances.all?(&:listening?) }
 
         elephant_ajob = TestJob.set(queue: 'elephants').perform_later

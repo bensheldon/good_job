@@ -15,11 +15,14 @@ describe ActiveJob::QueueAdapters::GoodJobAdapter do
     before { allow(Rails.env).to receive(:test?).and_return(false) }
 
     context 'when in development environment' do
-      before { allow(Rails.env).to receive(:development?).and_return(true) }
+      before do
+        allow(Rails.env).to receive(:development?).and_return(true)
+        stub_const("Rails::Server", Class.new)
+      end
 
-      it 'runs inline' do
+      it 'runs async' do
         adapter = described_class.new
-        expect(adapter.execute_inline?).to eq true
+        expect(adapter.execute_async?).to eq true
       end
     end
 

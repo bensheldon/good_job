@@ -48,7 +48,7 @@ RSpec.describe GoodJob::Adapter do
         scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
         allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
 
-        adapter = described_class.new(execution_mode: :async, poll_interval: -1)
+        adapter = described_class.new(execution_mode: :async_all, poll_interval: -1)
         adapter.enqueue(active_job)
 
         expect(scheduler).to have_received(:create_thread)
@@ -80,19 +80,37 @@ RSpec.describe GoodJob::Adapter do
   end
 
   describe '#execute_async?' do
-    context 'when execution mode async' do
-      let(:adapter) { described_class.new(execution_mode: :async) }
+    context 'when execution mode async_all' do
+      let(:adapter) { described_class.new(execution_mode: :async_all) }
 
       it 'returns true' do
         expect(adapter.execute_async?).to eq true
       end
     end
 
-    context 'when execution mode async_all' do
-      let(:adapter) { described_class.new(execution_mode: :async_all) }
+    context 'when execution mode async' do
+      let(:adapter) { described_class.new(execution_mode: :async) }
 
-      it 'returns true' do
-        expect(adapter.execute_async?).to eq true
+      context 'when Rails::Server is defined' do
+        before do
+          stub_const("Rails::Server", Class.new)
+        end
+
+        it 'returns true' do
+          expect(adapter.execute_async?).to eq true
+          expect(adapter.execute_externally?).to eq false
+        end
+      end
+
+      context 'when Rails::Server is not defined' do
+        before do
+          hide_const("Rails::Server")
+        end
+
+        it 'returns false' do
+          expect(adapter.execute_async?).to eq false
+          expect(adapter.execute_externally?).to eq true
+        end
       end
     end
 
