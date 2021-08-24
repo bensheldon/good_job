@@ -4,7 +4,11 @@ module GoodJob
     module Concurrency
       extend ActiveSupport::Concern
 
-      ConcurrencyExceededError = Class.new(StandardError)
+      class ConcurrencyExceededError < StandardError
+        def backtrace
+          [] # suppress backtrace
+        end
+      end
 
       included do
         class_attribute :good_job_concurrency_config, instance_accessor: false, default: {}
