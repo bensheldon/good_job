@@ -1,5 +1,19 @@
 # Changelog
 
+## [v2.0.1](https://github.com/bensheldon/good_job/tree/v2.0.1) (2021-08-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.0.0...v2.0.1)
+
+**Closed issues:**
+
+- Is there any value in seeing a backtrace for ConcurrencyExceededError? [\#347](https://github.com/bensheldon/good_job/issues/347)
+- Release GoodJob 2.0 [\#307](https://github.com/bensheldon/good_job/issues/307)
+- Unhandled ActiveJob errors should trigger GoodJob.on\_thread\_error [\#247](https://github.com/bensheldon/good_job/issues/247)
+
+**Merged pull requests:**
+
+- Suppress backtrace of ConcurrencyExceededError [\#348](https://github.com/bensheldon/good_job/pull/348) ([reczy](https://github.com/reczy))
+
 ## [v2.0.0](https://github.com/bensheldon/good_job/tree/v2.0.0) (2021-08-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.99.0...v2.0.0)
