@@ -35,6 +35,17 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(GoodJob::Job.where(concurrency_key: "Alice").count).to eq 2
         expect(GoodJob::Job.where(concurrency_key: "Bob").count).to eq 1
       end
+
+      it 'excludes jobs that are already executing/locked' do
+        expect(TestJob.perform_later(name: "Alice")).to be_present
+        expect(TestJob.perform_later(name: "Alice")).to be_present
+
+        # Lock one of the jobs
+        GoodJob::Job.first.with_advisory_lock do
+          # Third usage does enqueue
+          expect(TestJob.perform_later(name: "Alice")).to be_present
+        end
+      end
     end
 
     describe 'perform_limit' do
