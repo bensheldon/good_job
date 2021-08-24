@@ -16,7 +16,7 @@ module GoodJob
     DEFAULT_PRIORITY = 0
 
     self.table_name = 'good_jobs'
-    self.advisory_lockable_column = 'id'
+    self.advisory_lockable_column = 'active_job_id'
 
     attr_readonly :serialized_params
 

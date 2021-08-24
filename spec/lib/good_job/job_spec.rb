@@ -180,7 +180,7 @@ RSpec.describe GoodJob::Job do
   end
 
   describe '#executable?' do
-    let(:good_job) { described_class.create! }
+    let(:good_job) { described_class.create!(active_job_id: SecureRandom.uuid) }
 
     it 'is true when locked' do
       good_job.with_advisory_lock do

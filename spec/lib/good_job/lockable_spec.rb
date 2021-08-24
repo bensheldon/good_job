@@ -3,7 +3,7 @@ require 'rails_helper'
 
 RSpec.describe GoodJob::Lockable do
   let(:model_class) { GoodJob::Job }
-  let(:job) { model_class.create(queue_name: "default") }
+  let(:job) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default") }
 
   describe '.advisory_lock' do
     around do |example|
@@ -19,26 +19,32 @@ RSpec.describe GoodJob::Lockable do
       end
     end
 
-    it 'generates appropriate SQL' do
-      query = model_class.where(priority: 99).order(priority: :desc).limit(2).advisory_lock
+    context 'when using default lockable column' do
+      before do
+        allow(model_class).to receive(:advisory_lockable_column).and_return(:id)
+      end
 
-      expect(normalize_sql(query.to_sql)).to eq normalize_sql(<<~SQL.squish)
-        SELECT "good_jobs".*
-        FROM "good_jobs"
-        WHERE "good_jobs"."id" IN (
-          WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
-            SELECT "good_jobs"."id"
-            FROM "good_jobs"
-            WHERE "good_jobs"."priority" = 99
-            ORDER BY "good_jobs"."priority" DESC
+      it 'generates appropriate SQL' do
+        query = model_class.where(priority: 99).order(priority: :desc).limit(2).advisory_lock
+
+        expect(normalize_sql(query.to_sql)).to eq normalize_sql(<<~SQL.squish)
+          SELECT "good_jobs".*
+          FROM "good_jobs"
+          WHERE "good_jobs"."id" IN (
+            WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
+              SELECT "good_jobs"."id", "good_jobs"."id"
+              FROM "good_jobs"
+              WHERE "good_jobs"."priority" = 99
+              ORDER BY "good_jobs"."priority" DESC
+            )
+            SELECT "rows"."id"
+            FROM "rows"
+            WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || '-' || "rows"."id"::text), 1, 16))::bit(64)::bigint)
+            LIMIT 2
           )
-          SELECT "rows"."id"
-          FROM "rows"
-          WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || "rows"."id"::text), 1, 16))::bit(64)::bigint)
-          LIMIT 2
-        )
-        ORDER BY "good_jobs"."priority" DESC
-      SQL
+          ORDER BY "good_jobs"."priority" DESC
+        SQL
+      end
     end
 
     it 'can be customized with `lockable_column`' do
@@ -56,7 +62,7 @@ RSpec.describe GoodJob::Lockable do
           )
           SELECT "rows"."id"
           FROM "rows"
-          WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || "rows"."queue_name"::text), 1, 16))::bit(64)::bigint)
+          WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || '-' || "rows"."queue_name"::text), 1, 16))::bit(64)::bigint)
           LIMIT 2
         )
         ORDER BY "good_jobs"."priority" DESC
@@ -76,10 +82,10 @@ RSpec.describe GoodJob::Lockable do
       expect(job).not_to be_advisory_locked
       result_job = model_class.advisory_lock(column: :queue_name).first
       expect(result_job).to eq job
-      expect(job).to be_advisory_locked(key: "good_jobsdefault")
+      expect(job).to be_advisory_locked(key: "good_jobs-default")
       expect(job).not_to be_advisory_locked # on default key
 
-      job.advisory_unlock(key: "good_jobsdefault")
+      job.advisory_unlock(key: "good_jobs-default")
     end
   end
 
