@@ -219,6 +219,7 @@ config.good_job.poll_interval = 30 # seconds
 config.good_job.shutdown_timeout = 25 # seconds
 config.good_job.enable_cron = true
 config.good_job.cron = { example: { cron: '0 * * * *', class: 'ExampleJob'  } }
+config.good_job.queues = '*'
 
 # ...or all at once.
 config.good_job = {
@@ -233,6 +234,7 @@ config.good_job = {
       class: 'ExampleJob'
     },
   },
+  queues: '*',
 }
 ```
 
