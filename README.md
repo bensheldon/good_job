@@ -610,7 +610,7 @@ pool: <%= [ENV.fetch("RAILS_MAX_THREADS", 5).to_i, ENV.fetch("GOOD_JOB_MAX_THREA
 
 ### Execute jobs async / in-process
 
-GoodJob can execute jobs "async" in the same process as the web server (e.g. `bin/rail s`). GoodJob's async execution mode offers benefits of economy by not requiring a separate job worker process, but with the tradeoff of increased complexity. Async mode can be configured in two ways:
+GoodJob can execute jobs "async" in the same process as the web server (e.g. `bin/rails s`). GoodJob's async execution mode offers benefits of economy by not requiring a separate job worker process, but with the tradeoff of increased complexity. Async mode can be configured in two ways:
 
 - Via Rails configuration:
 
