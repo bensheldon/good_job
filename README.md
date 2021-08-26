@@ -128,7 +128,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         $ GOOD_JOB_EXECUTION_MODE=async rails server
         ```
 
-        Additional configuration is likely necessary, see the reference below for f configuration.
+        Additional configuration is likely necessary, see the reference below for configuration.
 
 ## Compatibility
 
@@ -243,7 +243,7 @@ Available configuration options are:
 - `execution_mode` (symbol) specifies how and where jobs should be executed. You can also set this with the environment variable `GOOD_JOB_EXECUTION_MODE`. It can be any one of:
     - `:inline` executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
     - `:external` causes the adapter to enqueue jobs, but not execute them. When using this option (the default for production environments), you’ll need to use the command-line tool to actually execute your jobs.
-    - `:async` (or `:async_server`) executes jobs in separate threads within the Rails webserver process (`bundle exec rails server`). It can be more economical for small workloads because you don’t need a separate machine or environment for running your jobs, but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.  When not in the Rails webserver, jobs will execute in `:external` mode to ensure jobs are not executed within `rails console`, `rails db:migrate`, `rails assets:prepare`, etc.
+    - `:async` (or `:async_server`) executes jobs in separate threads within the Rails web server process (`bundle exec rails server`). It can be more economical for small workloads because you don’t need a separate machine or environment for running your jobs, but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.  When not in the Rails web server, jobs will execute in `:external` mode to ensure jobs are not executed within `rails console`, `rails db:migrate`, `rails assets:prepare`, etc.
     - `:async_all` executes jobs in separate threads in _any_ Rails process.
 - `max_threads` (integer) sets the maximum number of threads to use when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
 - `queues` (string) determines which queues to execute jobs from when `execution_mode` is set to `:async`. See the description of `good_job start` for more details on the format of this string. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
@@ -389,7 +389,7 @@ config.good_job.enable_cron = ENV['DYNO'] == 'worker.1' # or `true` or via $GOOD
 
 # Configure cron with a hash that has a unique key for each recurring job
 config.good_job.cron = {
-  # Every 15 minutes, enqueue `ExampleJob.set(priority: -10).perform_later(52, name: "Alice")`
+  # Every 15 minutes, enqueue `ExampleJob.set(priority: -10).perform_later(42, name: "Alice")`
   frequent_task: { # each recurring job must have a unique key
     cron: "*/15 * * * *", # cron-style scheduling format by fugit gem
     class: "ExampleJob", # reference the Job class with a string
@@ -601,7 +601,7 @@ Keep in mind, queue operations and management is an advanced discipline. This st
 
 ### Database connections
 
-Each GoodJob execution thread requires its own database connection that is automatically checked out from Rails’s connection pool. _Allowing GoodJob to create more threads than available database connections can lead to timeouts and is not recommended._ For example:
+Each GoodJob execution thread requires its own database connection that is automatically checked out from Rails’ connection pool. _Allowing GoodJob to create more threads than available database connections can lead to timeouts and is not recommended._ For example:
 
 ```yaml
 # config/database.yml
@@ -610,7 +610,7 @@ pool: <%= [ENV.fetch("RAILS_MAX_THREADS", 5).to_i, ENV.fetch("GOOD_JOB_MAX_THREA
 
 ### Execute jobs async / in-process
 
-GoodJob can execute jobs "async" in the same process as the webserver (e.g. `bin/rail s`). GoodJob's async execution mode offers benefits of economy by not requiring a separate job worker process, but with the tradeoff of increased complexity. Async mode can be configured in two ways:
+GoodJob can execute jobs "async" in the same process as the web server (e.g. `bin/rails s`). GoodJob's async execution mode offers benefits of economy by not requiring a separate job worker process, but with the tradeoff of increased complexity. Async mode can be configured in two ways:
 
 - Via Rails configuration:
 
@@ -644,7 +644,7 @@ Depending on your application configuration, you may need to take additional ste
     pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i %>
     ```
 
-- When running Puma with workers (`WEB_CONCURRENCY > 0`) or another process-forking webserver, GoodJob's threadpool schedulers should be stopped before forking, restarted after fork, and cleanly shut down on exit. Stopping GoodJob's scheduler pre-fork is recommended to ensure that GoodJob does not continue executing jobs in the parent/controller process. For example, with Puma:
+- When running Puma with workers (`WEB_CONCURRENCY > 0`) or another process-forking web server, GoodJob's threadpool schedulers should be stopped before forking, restarted after fork, and cleanly shut down on exit. Stopping GoodJob's scheduler pre-fork is recommended to ensure that GoodJob does not continue executing jobs in the parent/controller process. For example, with Puma:
 
     ```ruby
     # config/puma.rb
