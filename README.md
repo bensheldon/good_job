@@ -601,7 +601,7 @@ Keep in mind, queue operations and management is an advanced discipline. This st
 
 ### Database connections
 
-Each GoodJob execution thread requires its own database connection that is automatically checked out from Rails’s connection pool. _Allowing GoodJob to create more threads than available database connections can lead to timeouts and is not recommended._ For example:
+Each GoodJob execution thread requires its own database connection that is automatically checked out from Rails’ connection pool. _Allowing GoodJob to create more threads than available database connections can lead to timeouts and is not recommended._ For example:
 
 ```yaml
 # config/database.yml
