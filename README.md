@@ -128,7 +128,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         $ GOOD_JOB_EXECUTION_MODE=async rails server
         ```
 
-        Additional configuration is likely necessary, see the reference below for f configuration.
+        Additional configuration is likely necessary, see the reference below for configuration.
 
 ## Compatibility
 
