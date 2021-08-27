@@ -86,6 +86,13 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     $ bin/rails db:migrate
     ```
 
+   Optional: If using Rails' multiple databases with the `migrations_paths` configuration option, use the `--database` option:
+
+    ```bash
+    bin/rails g good_job:install --database animals
+    bin/rails db:migrate:animals
+    ```
+
 1. Configure the ActiveJob adapter:
 
     ```ruby
@@ -419,6 +426,12 @@ To perform upgrades to the GoodJob database tables:
 
     ```bash
     bin/rails g good_job:update
+    ```
+
+   Optional: If using Rails' multiple databases with the `migrations_paths` configuration option, use the `--database` option:
+
+    ```bash
+    $ bin/rails g good_job:update --database animals
     ```
 
 1. Run the database migration locally
