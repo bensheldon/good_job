@@ -1,5 +1,54 @@
 # Changelog
 
+## [v1.99.1](https://github.com/bensheldon/good_job/tree/v1.99.1) (2021-08-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.0.1...v1.99.1)
+
+**Closed issues:**
+
+- Does Good job support delay method? [\#344](https://github.com/bensheldon/good_job/issues/344)
+
+**Merged pull requests:**
+
+- README style/typo fixes: "web server" and possessive "Rails'" [\#350](https://github.com/bensheldon/good_job/pull/350) ([aried3r](https://github.com/aried3r))
+- Add examples of setting config.good\_job.queues [\#349](https://github.com/bensheldon/good_job/pull/349) ([zachmargolis](https://github.com/zachmargolis))
+
+## [v2.0.1](https://github.com/bensheldon/good_job/tree/v2.0.1) (2021-08-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.0.0...v2.0.1)
+
+**Implemented enhancements:**
+
+- Suppress backtrace of ConcurrencyExceededError [\#348](https://github.com/bensheldon/good_job/pull/348) ([reczy](https://github.com/reczy))
+
+**Closed issues:**
+
+- Is there any value in seeing a backtrace for ConcurrencyExceededError? [\#347](https://github.com/bensheldon/good_job/issues/347)
+- Release GoodJob 2.0 [\#307](https://github.com/bensheldon/good_job/issues/307)
+- Unhandled ActiveJob errors should trigger GoodJob.on\_thread\_error [\#247](https://github.com/bensheldon/good_job/issues/247)
+
+## [v2.0.0](https://github.com/bensheldon/good_job/tree/v2.0.0) (2021-08-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.99.0...v2.0.0)
+
+**Implemented enhancements:**
+
+- Concurrency's enqueue\_limit should exclude performing jobs from count [\#317](https://github.com/bensheldon/good_job/issues/317)
+- Rename `:async` to `:async_all`; `:async_server` to `:async` and set as Development environment default; do not poll in async development [\#343](https://github.com/bensheldon/good_job/pull/343) ([bensheldon](https://github.com/bensheldon))
+- Exclude executing jobs from Concurrency's enqueue\_limit's count [\#342](https://github.com/bensheldon/good_job/pull/342) ([bensheldon](https://github.com/bensheldon))
+- Unhandled ActiveJob errors should trigger GoodJob.on\_thread\_error [\#312](https://github.com/bensheldon/good_job/pull/312) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Swap behavior of `async` with `async_server`; rename `async` execution mode to be `async_all`; default `async` in Development; [\#340](https://github.com/bensheldon/good_job/issues/340)
+- Add hyphen to lock key. e.g. "\[table\_name\]-\[column\]" instead of "\[table\_name\]\[column\]" [\#335](https://github.com/bensheldon/good_job/issues/335)
+- Use `async_server` as default execution mode in Development environment [\#139](https://github.com/bensheldon/good_job/issues/139)
+
+**Merged pull requests:**
+
+- Remove v1.0 deprecation notices and incremental migrations [\#338](https://github.com/bensheldon/good_job/pull/338) ([bensheldon](https://github.com/bensheldon))
+- Lock GoodJob::Job on active\_job\_id instead of the row id; adds separator hyphen to lock key [\#337](https://github.com/bensheldon/good_job/pull/337) ([bensheldon](https://github.com/bensheldon))
+
 ## [v1.99.0](https://github.com/bensheldon/good_job/tree/v1.99.0) (2021-08-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.13.2...v1.99.0)
