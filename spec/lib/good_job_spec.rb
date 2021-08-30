@@ -57,5 +57,13 @@ describe GoodJob do
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
     end
+
+    it 'is instrumented' do
+      allow(ActiveSupport::Notifications).to receive(:instrument).and_call_original
+
+      described_class.cleanup_preserved_jobs
+
+      expect(ActiveSupport::Notifications).to have_received(:instrument).at_least(:once)
+    end
   end
 end
