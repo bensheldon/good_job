@@ -725,7 +725,7 @@ It is also necessary to delete these preserved jobs from the database after a ce
 
     ```ruby
     GoodJob.cleanup_preserved_jobs # Will keep 1 day of job records by default.
-    GoodJob.cleanup_preserved_jobs(before_seconds_ago: 7.days.seconds) # It also takes custom arguments.
+    GoodJob.cleanup_preserved_jobs(older_than: 7.days) # It also takes custom arguments.
     ```
 
 - For example, using the `good_job` command-line utility:
