@@ -134,7 +134,7 @@ module GoodJob
 
       configuration = GoodJob::Configuration.new(options)
 
-      GoodJob.cleanup_preserved_jobs(before_seconds_ago: configuration.cleanup_preserved_jobs_before_seconds_ago)
+      GoodJob.cleanup_preserved_jobs(older_than: configuration.cleanup_preserved_jobs_before_seconds_ago)
     end
 
     no_commands do

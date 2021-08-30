@@ -122,13 +122,13 @@ module GoodJob
   # analyze or inspect job performance.
   # If you are preserving job records this way, use this method regularly to
   # delete old records and preserve space in your database.
-  # @params before_seconds_ago [nil,Numeric] Jobs olders than this will be deleted (default: +86400+).
+  # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs olders than this will be deleted (default: +86400+).
   # @return [Integer] Number of jobs that were deleted.
-  def self.cleanup_preserved_jobs(before_seconds_ago: nil)
-    before_seconds_ago ||= GoodJob::Configuration.new({}).cleanup_preserved_jobs_before_seconds_ago
-    timestamp = Time.current - before_seconds_ago
+  def self.cleanup_preserved_jobs(older_than: nil)
+    older_than ||= GoodJob::Configuration.new({}).cleanup_preserved_jobs_before_seconds_ago
+    timestamp = Time.current - older_than
 
-    ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { before_seconds_ago: before_seconds_ago, timestamp: timestamp }) do |payload|
+    ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
       deleted_records_count = GoodJob::Job.finished(timestamp).delete_all
 
       payload[:deleted_records_count] = deleted_records_count

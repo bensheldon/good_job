@@ -49,7 +49,7 @@ describe GoodJob do
     end
 
     it 'takes arguments' do
-      deleted_jobs_count = described_class.cleanup_preserved_jobs(before_seconds_ago: 10)
+      deleted_jobs_count = described_class.cleanup_preserved_jobs(older_than: 10.seconds)
 
       expect(deleted_jobs_count).to eq 2
 
