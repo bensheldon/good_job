@@ -184,7 +184,7 @@ separate isolated execution pools with semicolons and threads with colons.
 
 #### `good_job cleanup_preserved_jobs`
 
-`good_job cleanup_preserved_jobs` deletes preserved job records. See [`GoodJob.preserve_job_records` for when this command is useful.
+`good_job cleanup_preserved_jobs` deletes preserved job records. See `GoodJob.preserve_job_records` for when this command is useful.
 
 ```bash
 $ bundle exec good_job help cleanup_preserved_jobs
@@ -724,7 +724,8 @@ It is also necessary to delete these preserved jobs from the database after a ce
 - For example, in a Rake task:
 
     ```ruby
-    GoodJob::Job.finished(1.day.ago).delete_all
+    GoodJob.cleanup_preserved_jobs # Will keep 1 day of job records by default.
+    GoodJob.cleanup_preserved_jobs(older_than: 7.days) # It also takes custom arguments.
     ```
 
 - For example, using the `good_job` command-line utility:

@@ -134,16 +134,7 @@ module GoodJob
 
       configuration = GoodJob::Configuration.new(options)
 
-      timestamp = Time.current - configuration.cleanup_preserved_jobs_before_seconds_ago
-
-      ActiveSupport::Notifications.instrument(
-        "cleanup_preserved_jobs.good_job",
-        { before_seconds_ago: configuration.cleanup_preserved_jobs_before_seconds_ago, timestamp: timestamp }
-      ) do |payload|
-        deleted_records_count = GoodJob::Job.finished(timestamp).delete_all
-
-        payload[:deleted_records_count] = deleted_records_count
-      end
+      GoodJob.cleanup_preserved_jobs(older_than: configuration.cleanup_preserved_jobs_before_seconds_ago)
     end
 
     no_commands do

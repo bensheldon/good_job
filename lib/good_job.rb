@@ -42,7 +42,8 @@ module GoodJob
   #   By default, GoodJob deletes job records after the job is completed successfully.
   #   If you want to preserve jobs for latter inspection, set this to +true+.
   #   If you want to preserve only jobs that finished with error for latter inspection, set this to +:on_unhandled_error+.
-  #   If +true+, you will need to clean out jobs using the +good_job cleanup_preserved_jobs+ CLI command.
+  #   If +true+, you will need to clean out jobs using the +good_job cleanup_preserved_jobs+ CLI command or
+  #   by using +Goodjob.cleanup_preserved_jobs+.
   #   @return [Boolean, nil]
   mattr_accessor :preserve_job_records, default: false
 
@@ -111,6 +112,26 @@ module GoodJob
       executables.each { |executable| executable.send(method_name, timeout: [stop_at - Time.current, 0].max) }
     else
       executables.each { |executable| executable.send(method_name, timeout: timeout) }
+    end
+  end
+
+  # Deletes preserved job records.
+  # By default, GoodJob deletes job records when the job is performed and this
+  # method is not necessary. However, when `GoodJob.preserve_job_records = true`,
+  # the jobs will be preserved in the database. This is useful when wanting to
+  # analyze or inspect job performance.
+  # If you are preserving job records this way, use this method regularly to
+  # delete old records and preserve space in your database.
+  # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs olders than this will be deleted (default: +86400+).
+  # @return [Integer] Number of jobs that were deleted.
+  def self.cleanup_preserved_jobs(older_than: nil)
+    older_than ||= GoodJob::Configuration.new({}).cleanup_preserved_jobs_before_seconds_ago
+    timestamp = Time.current - older_than
+
+    ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
+      deleted_records_count = GoodJob::Job.finished(timestamp).delete_all
+
+      payload[:deleted_records_count] = deleted_records_count
     end
   end
 

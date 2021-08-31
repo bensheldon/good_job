@@ -16,7 +16,7 @@ module GoodJob
     DEFAULT_DEVELOPMENT_ASYNC_POLL_INTERVAL = -1
     # Default number of threads to use per {Scheduler}
     DEFAULT_MAX_CACHE = 10000
-    # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs}
+    # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs} and {GoodJob.cleanup_preserved_jobs}
     DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 24 * 60 * 60
     # Default to always wait for jobs to finish for {Adapter#shutdown}
     DEFAULT_SHUTDOWN_TIMEOUT = -1

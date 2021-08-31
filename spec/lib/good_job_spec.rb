@@ -32,4 +32,38 @@ describe GoodJob do
       end.to change(described_class, :shutdown?).from(true).to(false)
     end
   end
+
+  describe '.cleanup_preserved_jobs' do
+    let!(:recent_job) { GoodJob::Job.create!(finished_at: 12.hours.ago) }
+    let!(:old_unfinished_job) { GoodJob::Job.create!(scheduled_at: 2.days.ago, finished_at: nil) }
+    let!(:old_finished_job) { GoodJob::Job.create!(finished_at: 36.hours.ago) }
+
+    it 'deletes finished jobs' do
+      deleted_jobs_count = described_class.cleanup_preserved_jobs
+
+      expect(deleted_jobs_count).to eq 1
+
+      expect { recent_job.reload }.not_to raise_error
+      expect { old_unfinished_job.reload }.not_to raise_error
+      expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+
+    it 'takes arguments' do
+      deleted_jobs_count = described_class.cleanup_preserved_jobs(older_than: 10.seconds)
+
+      expect(deleted_jobs_count).to eq 2
+
+      expect { recent_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_unfinished_job.reload }.not_to raise_error
+      expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+
+    it 'is instrumented' do
+      allow(ActiveSupport::Notifications).to receive(:instrument).and_call_original
+
+      described_class.cleanup_preserved_jobs
+
+      expect(ActiveSupport::Notifications).to have_received(:instrument).at_least(:once)
+    end
+  end
 end
