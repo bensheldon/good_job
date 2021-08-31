@@ -14,3 +14,7 @@
 .tooltip.tooltip-hidden {
   opacity: 0;
 }
+
+.ct-label.ct-horizontal {
+  white-space: nowrap;
+}

@@ -1,5 +1,5 @@
 start_date = 7.days.ago
-time_increments = (1.minute..90.minutes).to_a
+time_increments = (1.minute..10.minutes).to_a
 job_classes = ['ExampleJob', 'OtherJob']
 queue_names = ["default", "mice", "elephants"]
 

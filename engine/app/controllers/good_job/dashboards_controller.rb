@@ -56,11 +56,11 @@ module GoodJob
     def index
       @filter = JobFilter.new(params)
 
-      job_data = GoodJob::Job.connection.exec_query Arel.sql(<<~SQL.squish)
+      count_query = Arel.sql(GoodJob::Job.pg_or_jdbc_query(<<~SQL.squish))
         SELECT *
         FROM generate_series(
-          date_trunc('hour', NOW() - '1 day'::interval),
-          date_trunc('hour', NOW()),
+          date_trunc('hour', $1::timestamp),
+          date_trunc('hour', $2::timestamp),
           '1 hour'
         ) timestamp
         LEFT JOIN (
@@ -76,13 +76,17 @@ module GoodJob
             ) sources
             GROUP BY date_trunc('hour', scheduled_at), queue_name
         ) sources ON sources.scheduled_at = timestamp
-        ORDER BY timestamp DESC
+        ORDER BY timestamp ASC
       SQL
+
+      current_time = Time.current
+      binds = [[nil, current_time - 1.day], [nil, current_time]]
+      job_data = GoodJob::Job.connection.exec_query(count_query, "GoodJob Dashboard Chart", binds)
 
       queue_names = job_data.map { |d| d['queue_name'] }.uniq
       labels = []
       queues_data = job_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
-        labels << timestamp.in_time_zone.to_s
+        labels << timestamp.in_time_zone.strftime('%H:%M %z')
         queue_names.each do |queue_name|
           (hash[queue_name] ||= []) << values.find { |d| d['queue_name'] == queue_name }&.[]('count')
         end
