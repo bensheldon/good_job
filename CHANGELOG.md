@@ -1,20 +1,41 @@
 # Changelog
 
+## [v2.0.4](https://github.com/bensheldon/good_job/tree/v2.0.4) (2021-08-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.0.3...v2.0.4)
+
+**Fixed bugs:**
+
+- Remove `NOW()` from Dashboard SQL; fix chart x-axis order left-to-right, old-to-new [\#355](https://github.com/bensheldon/good_job/pull/355) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Content security policy for dashboard; nest shared view partials; problematic NOW\(\) SQL in Dashboard query   [\#304](https://github.com/bensheldon/good_job/issues/304)
+
+**Merged pull requests:**
+
+- Update development dependencies and ruby to 2.7.4 [\#358](https://github.com/bensheldon/good_job/pull/358) ([bensheldon](https://github.com/bensheldon))
+- Add info about how to disable polling to README [\#357](https://github.com/bensheldon/good_job/pull/357) ([aried3r](https://github.com/aried3r))
+
 ## [v2.0.3](https://github.com/bensheldon/good_job/tree/v2.0.3) (2021-08-31)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.0.2...v2.0.3)
+
+**Implemented enhancements:**
+
+- Implement `GoodJob.cleanup_preserved_jobs`, fixes \#351 [\#356](https://github.com/bensheldon/good_job/pull/356) ([aried3r](https://github.com/aried3r))
 
 **Closed issues:**
 
 - Expose CLI `cleanup_preserved_jobs` functionality via `GoodJob`? [\#351](https://github.com/bensheldon/good_job/issues/351)
 
-**Merged pull requests:**
-
-- Implement `GoodJob.cleanup_preserved_jobs`, fixes \#351 [\#356](https://github.com/bensheldon/good_job/pull/356) ([aried3r](https://github.com/aried3r))
-
 ## [v2.0.2](https://github.com/bensheldon/good_job/tree/v2.0.2) (2021-08-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.99.1...v2.0.2)
+
+**Fixed bugs:**
+
+- v2.0: Generators support multiple databases: `--database` option, `migrations_paths`, custom `GoodJob.active_record_parent_class` [\#354](https://github.com/bensheldon/good_job/pull/354) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
@@ -22,7 +43,6 @@
 
 **Merged pull requests:**
 
-- v2.0: Generators support multiple databases: `--database` option, `migrations_paths`, custom `GoodJob.active_record_parent_class` [\#354](https://github.com/bensheldon/good_job/pull/354) ([bensheldon](https://github.com/bensheldon))
 - README style/typo fixes: "web server" and possessive "Rails'" [\#350](https://github.com/bensheldon/good_job/pull/350) ([aried3r](https://github.com/aried3r))
 - Add examples of setting config.good\_job.queues [\#349](https://github.com/bensheldon/good_job/pull/349) ([zachmargolis](https://github.com/zachmargolis))
 
