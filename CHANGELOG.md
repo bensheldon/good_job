@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.0.3](https://github.com/bensheldon/good_job/tree/v2.0.3) (2021-08-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.0.2...v2.0.3)
+
+**Closed issues:**
+
+- Expose CLI `cleanup_preserved_jobs` functionality via `GoodJob`? [\#351](https://github.com/bensheldon/good_job/issues/351)
+
+**Merged pull requests:**
+
+- Implement `GoodJob.cleanup_preserved_jobs`, fixes \#351 [\#356](https://github.com/bensheldon/good_job/pull/356) ([aried3r](https://github.com/aried3r))
+
 ## [v2.0.2](https://github.com/bensheldon/good_job/tree/v2.0.2) (2021-08-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.99.1...v2.0.2)
