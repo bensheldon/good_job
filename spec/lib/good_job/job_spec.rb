@@ -254,16 +254,11 @@ RSpec.describe GoodJob::Job do
           before do
             TestJob.retry_on(TestJob::ExpectedError, attempts: 1)
 
-            original_attr_readonly = described_class._attr_readonly
-            described_class._attr_readonly = Set.new
-
             good_job.serialized_params["exception_executions"] = { "[TestJob::ExpectedError]" => 1 }
             good_job.save!
-
-            described_class._attr_readonly = original_attr_readonly
           end
 
-          it 'does not modify the good_job serialized params' do
+          it 'does not modify the original good_job serialized params' do
             expect do
               good_job.perform
             end.not_to change { good_job.reload.serialized_params["exception_executions"]["[TestJob::ExpectedError]"] }
