@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.0.5](https://github.com/bensheldon/good_job/tree/v2.0.5) (2021-09-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.0.4...v2.0.5)
+
+**Closed issues:**
+
+- Serialized Params and ActiveJob extensions [\#362](https://github.com/bensheldon/good_job/issues/362)
+
+**Merged pull requests:**
+
+- `deep_dup` serialized job data instead of`attr_readonly` to prevent overwriting [\#363](https://github.com/bensheldon/good_job/pull/363) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.0.4](https://github.com/bensheldon/good_job/tree/v2.0.4) (2021-08-31)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.0.3...v2.0.4)
