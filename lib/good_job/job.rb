@@ -18,8 +18,6 @@ module GoodJob
     self.table_name = 'good_jobs'
     self.advisory_lockable_column = 'active_job_id'
 
-    attr_readonly :serialized_params
-
     # Parse a string representing a group of queues into a more readable data
     # structure.
     # @param string [String] Queue string
@@ -277,14 +275,14 @@ module GoodJob
 
     # @return [ExecutionResult]
     def execute
-      params = serialized_params.merge(
-        "provider_job_id" => id
-      )
-
       GoodJob::CurrentExecution.reset
       GoodJob::CurrentExecution.good_job = self
+
+      job_data = serialized_params.deep_dup
+      job_data["provider_job_id"] = id
+
       ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, process_id: GoodJob::CurrentExecution.process_id, thread_name: GoodJob::CurrentExecution.thread_name }) do
-        value = ActiveJob::Base.execute(params)
+        value = ActiveJob::Base.execute(job_data)
 
         if value.is_a?(Exception)
           handled_error = value
