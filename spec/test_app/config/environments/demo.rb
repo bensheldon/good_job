@@ -25,8 +25,14 @@ Rails.application.configure do
     },
     other_example: {
       description: "Enqueue an OtherJob occasionally",
-      cron: "* * * * *", # every minute
+      cron: "* * * * * *", # every second
       class: "OtherJob",
+      set: { queue: :default },
+    },
+    fragile_example: {
+      description: "Enqueue a FragileJob occasionally",
+      cron: "* * * * * *", # every second
+      class: "FragileJob",
       set: { queue: :default },
     },
     cleanup: {
@@ -34,6 +40,7 @@ Rails.application.configure do
       cron: "0 * * * *", # every hour
       class: "CleanupJob",
       set: { queue: :default },
+      args: { limit: 1000 },
     }
   }
 end
