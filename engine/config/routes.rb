@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 GoodJob::Engine.routes.draw do
   root to: 'dashboards#index'
+  get :cron_jobs, to: 'dashboards#cron_jobs'
   resources :active_jobs, only: %i[show]
   resources :jobs, only: %i[destroy]
 
