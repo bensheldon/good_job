@@ -3,7 +3,7 @@ require 'rails_helper'
 
 RSpec.describe GoodJob::Lockable do
   let(:model_class) { GoodJob::Job }
-  let(:job) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default") }
+  let!(:job) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default") }
 
   describe '.advisory_lock' do
     around do |example|
@@ -94,6 +94,8 @@ RSpec.describe GoodJob::Lockable do
       records = nil
       model_class.limit(2).with_advisory_lock do |results|
         records = results
+
+        expect(records).to include(job)
         expect(records).to all be_advisory_locked
       end
 

@@ -155,8 +155,7 @@ module GoodJob
             advisory_unlock_session
           else
             records.each do |record|
-              key = [table_name, record[_advisory_lockable_column]].join
-              record.advisory_unlock(key: key, function: advisory_unlockable_function(function))
+              record.advisory_unlock(key: record.lockable_column_key(column: column), function: advisory_unlockable_function(function))
             end
           end
         end
@@ -286,6 +285,13 @@ module GoodJob
       self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Locked?', binds).any?
     end
 
+    # Tests whether this record does not have an advisory lock on it.
+    # @param key [String, Symbol] Key to test lock against
+    # @return [Boolean]
+    def advisory_unlocked?(key: lockable_key)
+      !advisory_locked?(key: key)
+    end
+
     # Tests whether this record is locked by the current database session.
     # @param key [String, Symbol] Key to test lock against
     # @return [Boolean]
@@ -315,7 +321,13 @@ module GoodJob
     # Default Advisory Lock key
     # @return [String]
     def lockable_key
-      "#{self.class.table_name}-#{self[self.class._advisory_lockable_column]}"
+      lockable_column_key
+    end
+
+    # Default Advisory Lock key for column-based locking
+    # @return [String]
+    def lockable_column_key(column: self.class._advisory_lockable_column)
+      "#{self.class.table_name}-#{self[column]}"
     end
 
     delegate :pg_or_jdbc_query, to: :class
