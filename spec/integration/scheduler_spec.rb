@@ -11,7 +11,7 @@ RSpec.describe 'Schedule Integration' do
     stub_const "RUN_JOBS", Concurrent::Array.new
     stub_const "THREAD_JOBS", Concurrent::Hash.new(Concurrent::Array.new)
 
-    stub_const 'ExampleJob', (Class.new(ApplicationJob) do
+    stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       self.queue_name = 'test'
       self.priority = 50
 
@@ -41,7 +41,7 @@ RSpec.describe 'Schedule Integration' do
     end)
 
     stub_const 'RetryableError', Class.new(StandardError)
-    stub_const 'ErrorJob', (Class.new(ApplicationJob) do
+    stub_const 'ErrorJob', (Class.new(ActiveJob::Base) do
       self.queue_name = 'test'
       self.priority = 50
       retry_on(RetryableError, wait: 0, attempts: 3) do |job, error|
@@ -68,7 +68,7 @@ RSpec.describe 'Schedule Integration' do
 
       GoodJob::Job.transaction do
         number_of_jobs.times do |i|
-          ExampleJob.perform_later(i)
+          TestJob.perform_later(i)
         end
       end
 
@@ -102,7 +102,7 @@ RSpec.describe 'Schedule Integration' do
 
       GoodJob::Job.transaction do
         number_of_jobs.times do |i|
-          ExampleJob.perform_later(i)
+          TestJob.perform_later(i)
         end
       end
 
@@ -134,8 +134,8 @@ RSpec.describe 'Schedule Integration' do
 
   context 'when there are existing and future scheduled jobs' do
     before do
-      2.times { ExampleJob.set(wait_until: 5.minutes.ago).perform_later }
-      2.times { ExampleJob.set(wait_until: 2.seconds.from_now).perform_later }
+      2.times { TestJob.set(wait_until: 5.minutes.ago).perform_later }
+      2.times { TestJob.set(wait_until: 2.seconds.from_now).perform_later }
     end
 
     it 'warms up and schedules them in a cache' do

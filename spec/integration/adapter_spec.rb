@@ -13,7 +13,7 @@ RSpec.describe 'Adapter Integration' do
 
   before do
     stub_const "RUN_JOBS", Concurrent::Array.new
-    stub_const 'TestJob', (Class.new(ApplicationJob) do
+    stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       self.queue_name = 'test'
       self.priority = 50
 
