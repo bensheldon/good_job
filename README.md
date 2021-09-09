@@ -348,17 +348,20 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
 
 GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.
 
-**Note:** Limiting concurrency at _enqueue_ requires Rails 6.0+ because Rails 5.2 does not support `throw :abort` in ActiveJob callbacks.
+**Note:** Limiting concurrency at _enqueue_ requires Rails 6.0+ because Rails 5.2 cannot halt ActiveJob callbacks.
 
 ```ruby
 class MyJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
 
   good_job_control_concurrency_with(
-    # Maximum number of jobs with the concurrency key to be concurrently enqueued
-    enqueue_limit: 2,
+    # Maximum number of unfinished jobs to allow with the concurrency key
+    total_limit: 1,
 
-    # Maximum number of jobs with the concurrency key to be concurrently performed
+    # Or, if more control is needed:
+    # Maximum number of jobs with the concurrency key to be concurrently enqueued (excludes performing jobs)
+    enqueue_limit: 2,
+    # Maximum number of jobs with the concurrency key to be concurrently performed (excludes enqueued jobs)
     perform_limit: 1,
 
     # A unique key to be globally locked against.
