@@ -3,7 +3,9 @@ require 'open3'
 
 class ShellOut
   WaitTimeout = Class.new(StandardError)
+  KILL_TIMEOUT = 5
   PROCESS_EXIT = "[PROCESS EXIT]"
+  PROCESS_KILL = "[PROCESS KILL]"
 
   def self.command(command, env: {}, &block)
     new.command(command, env: env, &block)
@@ -42,8 +44,13 @@ class ShellOut
         yield(self)
       ensure
         begin
-          Process.kill('TERM', pid)
-          wait_thr.value
+          Timeout.timeout(KILL_TIMEOUT) do
+            Process.kill('TERM', pid)
+            Process.waitpid(pid, Process::WNOHANG)
+          end
+        rescue Timeout::Error
+          Process.kill("KILL", pid)
+          @output << PROCESS_KILL
         rescue Errno::ESRCH
           @output << PROCESS_EXIT
         end
@@ -51,6 +58,7 @@ class ShellOut
 
       stdout_future.value
       stderr_future.value
+      wait_thr.value
 
       @output
     end
