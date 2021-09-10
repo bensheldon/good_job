@@ -685,6 +685,38 @@ Depending on your application configuration, you may need to take additional ste
 
   GoodJob is compatible with Puma's `preload_app!` method.
 
+  For Passenger:
+
+    ```Ruby
+    if defined? PhusionPassenger
+      PhusionPassenger.on_event :starting_worker_process do |forked|
+        # If `forked` is true, we're in smart spawning mode.
+        # https://www.phusionpassenger.com/docs/advanced_guides/in_depth/ruby/spawn_methods.html#smart-spawning-hooks
+        if forked
+          GoodJob.logger.info { 'Starting Passenger worker process.' }
+          GoodJob.restart
+        end
+      end
+
+      PhusionPassenger.on_event :stopping_worker_process do
+        GoodJob.logger.info { 'Stopping Passenger worker process.' }
+        GoodJob.shutdown
+      end
+    end
+
+    # GoodJob also starts in the Passenger preloader process. This one does not
+    # trigger the above events, thus we catch it with `Kernel#at_exit`.
+    PRELOADER_PID = Process.pid
+    at_exit do
+      if Process.pid == PRELOADER_PID
+        GoodJob.logger.info { 'Passenger AppPreloader shutting down.' }
+        GoodJob.shutdown
+      end
+    end
+    ```
+
+  If you are using cron-style jobs, you might also want to look at your Passenger configuration, especially at [`passenger_pool_idle_time`](https://www.phusionpassenger.com/library/config/nginx/reference/#passenger_pool_idle_time) and [`passenger_min_instances`](https://www.phusionpassenger.com/library/config/nginx/reference/#passenger_min_instances) to make sure there's always at least once process running that can execute cron-style scheduled jobs. See also [Passenger's optimization guide](https://www.phusionpassenger.com/library/config/nginx/optimization/#minimizing-process-spawning) for more information.
+
 ### Migrate to GoodJob from a different ActiveJob backend
 
 If your application is already using an ActiveJob backend, you will need to install GoodJob to enqueue and perform newly created jobs _and_ finish performing pre-existing jobs on the previous backend.
