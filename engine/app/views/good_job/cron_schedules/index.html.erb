@@ -1,4 +1,4 @@
-<% if @cron_jobs.present? %>
+<% if @cron_schedules.present? %>
   <div class="card my-3">
     <div class="table-responsive">
       <table class="table card-table table-bordered table-hover table-sm mb-0">
@@ -10,7 +10,7 @@
           <th>Next execution</th>
         </thead>
         <tbody>
-          <% @cron_jobs.each do |job_key, job| %>
+          <% @cron_schedules.each do |job_key, job| %>
             <tr>
               <td class="font-monospace"><%= job_key %></td>
               <td class="font-monospace"><%= job[:cron] %></td>

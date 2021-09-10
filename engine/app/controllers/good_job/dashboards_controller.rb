@@ -102,10 +102,5 @@ module GoodJob
         end,
       }
     end
-
-    def cron_jobs
-      configuration = GoodJob::Configuration.new({})
-      @cron_jobs = configuration.cron
-    end
   end
 end
