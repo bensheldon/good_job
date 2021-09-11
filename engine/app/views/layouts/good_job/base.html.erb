@@ -23,9 +23,15 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto">
           <li class="nav-item">
-            <%= link_to root_path, class: ["nav-link", ("active" if current_page?(root_path))] do %>
-              All jobs <span class="badge bg-secondary">More views coming soon</span>
-            <% end %>
+            <%= link_to "All Jobs", root_path, class: ["nav-link", ("active" if current_page?(root_path))] %>
+          </li>
+          <li class="nav-item">
+            <%= link_to "Cron Schedules", cron_schedules_path, class: ["nav-link", ("active" if current_page?(root_path))] %>
+          </li>
+          <li class="nav-item">
+            <div class="nav-link">
+              <span class="badge bg-secondary">More views coming soon</span>
+            </div>
           </li>
 
           <!-- Coming Soon
