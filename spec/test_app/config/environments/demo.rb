@@ -12,12 +12,15 @@ Rails.application.configure do
   config.good_job.cron = {
     frequent_example: {
       description: "Enqueue an ExampleJob with a random sample of configuration",
-      cron: "*/5 * * * * *", # every 5 seconds
+      cron: "* * * * * *",
       class: "ExampleJob",
-      args: [],
+      args: (lambda do
+        type = [:success, :error_once, :error_five_times, :dead].sample
+        [type.to_s]
+      end),
       set: (lambda do
         queue = [:default, :elephants, :mice].sample
-        delay = (0..60).to_a.sample
+        delay = [0, (0..60).to_a.sample].sample
         priority = [-10, 0, 10].sample
 
         { wait: delay, queue: queue, priority: priority }
@@ -25,22 +28,14 @@ Rails.application.configure do
     },
     other_example: {
       description: "Enqueue an OtherJob occasionally",
-      cron: "* * * * * *", # every second
+      cron: "*/15 * * * * *",
       class: "OtherJob",
       set: { queue: :default },
     },
-    fragile_example: {
-      description: "Enqueue a FragileJob occasionally",
-      cron: "* * * * * *", # every second
-      class: "FragileJob",
-      set: { queue: :default },
-    },
     cleanup: {
-      description: "Delete old jobs every hour",
-      cron: "0 * * * *", # every hour
+      description: "Delete old jobs.",
+      cron: "*/15 * * * *",
       class: "CleanupJob",
-      set: { queue: :default },
-      args: { limit: 1000 },
     }
   }
 end
