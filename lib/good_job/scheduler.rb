@@ -244,8 +244,8 @@ module GoodJob # :nodoc:
     def instrument(name, payload = {}, &block)
       payload = payload.reverse_merge({
                                         scheduler: self,
-                                        process_id: GoodJob::CurrentExecution.process_id,
-                                        thread_name: GoodJob::CurrentExecution.thread_name,
+                                        process_id: GoodJob::CurrentThread.process_id,
+                                        thread_name: GoodJob::CurrentThread.thread_name,
                                       })
 
       ActiveSupport::Notifications.instrument("#{name}.good_job", payload, &block)

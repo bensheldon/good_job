@@ -1,1 +1,3 @@
-<%= render 'good_job/shared/jobs_table', jobs: @jobs %>
+<h1>ActiveJob ID: <code><%= @executions.first.id %></code></h1>
+
+<%= render 'good_job/shared/executions_table', executions: @executions %>

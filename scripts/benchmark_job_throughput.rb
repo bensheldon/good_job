@@ -13,9 +13,9 @@ booleans = [true, false]
 priorities = (1..10).to_a
 scheduled_minutes = (-60..60).to_a
 
-GoodJob::Job.delete_all
+GoodJob::Execution.delete_all
 puts "Seeding database"
-jobs_data = Array.new(10_000) do |i|
+executions_data = Array.new(10_000) do |i|
   puts "Initializing seed record ##{i}" if (i % 1_000).zero?
   {
     queue_name: 'default',
@@ -28,22 +28,22 @@ jobs_data = Array.new(10_000) do |i|
   }
 end
 puts "Inserting seed records into the database...\n"
-GoodJob::Job.insert_all(jobs_data)
+GoodJob::Execution.insert_all(executions_data)
 
 # ActiveRecord::Base.connection.execute('SET enable_seqscan = OFF')
-# puts GoodJob::Job.unfinished.priority_ordered.only_scheduled(use_coalesce: true).limit(1).advisory_lock.explain(analyze: true)
+# puts GoodJob::Execution.unfinished.priority_ordered.only_scheduled(use_coalesce: true).limit(1).advisory_lock.explain(analyze: true)
 # exit!
 
 Benchmark.ips do |x|
   x.report("with priority") do
-    GoodJob::Job.unfinished.priority_ordered.only_scheduled(use_coalesce: true).limit(1).with_advisory_lock do |good_jobs|
-      # good_jobs.first&.destroy!
+    GoodJob::Execution.unfinished.priority_ordered.only_scheduled(use_coalesce: true).limit(1).with_advisory_lock do |executions|
+      # executions.first&.destroy!
     end
   end
 
   x.report("without priority") do
-    GoodJob::Job.unfinished.only_scheduled(use_coalesce: true).limit(1).with_advisory_lock do |good_jobs|
-      # good_jobs.first&.destroy!
+    GoodJob::Execution.unfinished.only_scheduled(use_coalesce: true).limit(1).with_advisory_lock do |executions|
+      # executions.first&.destroy!
     end
   end
 

@@ -45,7 +45,7 @@ module GoodJob
     # Enqueues the ActiveJob job to be performed.
     # For use by Rails; you should generally not call this directly.
     # @param active_job [ActiveJob::Base] the job to be enqueued from +#perform_later+
-    # @return [GoodJob::Job]
+    # @return [GoodJob::Execution]
     def enqueue(active_job)
       enqueue_at(active_job, nil)
     end
@@ -54,9 +54,9 @@ module GoodJob
     # For use by Rails; you should generally not call this directly.
     # @param active_job [ActiveJob::Base] the job to be enqueued from +#perform_later+
     # @param timestamp [Integer, nil] the epoch time to perform the job
-    # @return [GoodJob::Job]
+    # @return [GoodJob::Execution]
     def enqueue_at(active_job, timestamp)
-      good_job = GoodJob::Job.enqueue(
+      execution = GoodJob::Execution.enqueue(
         active_job,
         scheduled_at: timestamp ? Time.zone.at(timestamp) : nil,
         create_with_advisory_lock: execute_inline?
@@ -64,19 +64,19 @@ module GoodJob
 
       if execute_inline?
         begin
-          good_job.perform
+          execution.perform
         ensure
-          good_job.advisory_unlock
+          execution.advisory_unlock
         end
       else
-        job_state = { queue_name: good_job.queue_name }
-        job_state[:scheduled_at] = good_job.scheduled_at if good_job.scheduled_at
+        job_state = { queue_name: execution.queue_name }
+        job_state[:scheduled_at] = execution.scheduled_at if execution.scheduled_at
 
         executed_locally = execute_async? && @scheduler.create_thread(job_state)
         Notifier.notify(job_state) unless executed_locally
       end
 
-      good_job
+      execution
     end
 
     # Shut down the thread pool executors.

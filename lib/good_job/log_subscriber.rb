@@ -19,10 +19,10 @@ module GoodJob
     #   @return [void]
     def create(event)
       # FIXME: This method does not match any good_job notifications.
-      good_job = event.payload[:good_job]
+      execution = event.payload[:execution]
 
       debug do
-        "GoodJob created job resource with id #{good_job.id}"
+        "GoodJob created job resource with id #{execution.id}"
       end
     end
 
@@ -96,12 +96,12 @@ module GoodJob
 
     # @!macro notification_responder
     def perform_job(event)
-      good_job = event.payload[:good_job]
+      execution = event.payload[:execution]
       process_id = event.payload[:process_id]
       thread_name = event.payload[:thread_name]
 
       info(tags: [process_id, thread_name]) do
-        "Executed GoodJob #{good_job.id}"
+        "Executed GoodJob #{execution.id}"
       end
     end
 

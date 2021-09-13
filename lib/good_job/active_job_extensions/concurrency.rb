@@ -18,7 +18,7 @@ module GoodJob
           next(block.call) unless job.class.queue_adapter.is_a?(GoodJob::Adapter)
 
           # Always allow jobs to be retried because the current job's execution will complete momentarily
-          next(block.call) if CurrentExecution.active_job_id == job.job_id
+          next(block.call) if CurrentThread.active_job_id == job.job_id
 
           enqueue_limit = job.class.good_job_concurrency_config[:enqueue_limit]
           total_limit = job.class.good_job_concurrency_config[:total_limit]
@@ -30,12 +30,12 @@ module GoodJob
           key = job.good_job_concurrency_key
           next(block.call) if key.blank?
 
-          GoodJob::Job.new.with_advisory_lock(key: key, function: "pg_advisory_lock") do
+          GoodJob::Execution.new.with_advisory_lock(key: key, function: "pg_advisory_lock") do
             enqueue_concurrency = if enqueue_limit
                                     # TODO: Why is `unscoped` necessary? Nested scope is bleeding into subsequent query?
-                                    GoodJob::Job.unscoped.where(concurrency_key: key).unfinished.advisory_unlocked.count
+                                    GoodJob::Execution.unscoped.where(concurrency_key: key).unfinished.advisory_unlocked.count
                                   else
-                                    GoodJob::Job.unscoped.where(concurrency_key: key).unfinished.count
+                                    GoodJob::Execution.unscoped.where(concurrency_key: key).unfinished.count
                                   end
 
             # The job has not yet been enqueued, so check if adding it will go over the limit
@@ -62,8 +62,8 @@ module GoodJob
           key = job.good_job_concurrency_key
           next if key.blank?
 
-          GoodJob::Job.new.with_advisory_lock(key: key, function: "pg_advisory_lock") do
-            allowed_active_job_ids = GoodJob::Job.unscoped.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(perform_limit).pluck(:active_job_id)
+          GoodJob::Execution.new.with_advisory_lock(key: key, function: "pg_advisory_lock") do
+            allowed_active_job_ids = GoodJob::Execution.unscoped.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(perform_limit).pluck(:active_job_id)
             # The current job has already been locked and will appear in the previous query
             raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include? job.job_id
           end

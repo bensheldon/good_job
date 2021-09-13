@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module GoodJob
   class DashboardsController < GoodJob::BaseController
-    class JobFilter
+    class ExecutionFilter
       attr_accessor :params
 
       def initialize(params)
@@ -9,14 +9,14 @@ module GoodJob
       end
 
       def last
-        @_last ||= jobs.last
+        @_last ||= executions.last
       end
 
-      def jobs
+      def executions
         after_scheduled_at = params[:after_scheduled_at].present? ? Time.zone.parse(params[:after_scheduled_at]) : nil
-        sql = GoodJob::Job.display_all(after_scheduled_at: after_scheduled_at, after_id: params[:after_id])
-                          .limit(params.fetch(:limit, 25))
-        sql = sql.with_job_class(params[:job_class]) if params[:job_class]
+        sql = GoodJob::Execution.display_all(after_scheduled_at: after_scheduled_at, after_id: params[:after_id])
+                                .limit(params.fetch(:limit, 25))
+        sql = sql.job_class(params[:job_class]) if params[:job_class]
         if params[:state]
           case params[:state]
           when 'finished'
@@ -34,15 +34,16 @@ module GoodJob
 
       def states
         {
-          'finished' => GoodJob::Job.finished.count,
-          'unfinished' => GoodJob::Job.unfinished.count,
-          'running' => GoodJob::Job.running.count,
-          'errors' => GoodJob::Job.where.not(error: nil).count,
+          'finished' => GoodJob::Execution.finished.count,
+          'unfinished' => GoodJob::Execution.unfinished.count,
+          'running' => GoodJob::Execution.running.count,
+          'errors' => GoodJob::Execution.where.not(error: nil).count,
         }
       end
 
       def job_classes
-        GoodJob::Job.group("serialized_params->>'job_class'").count
+        GoodJob::Execution.group("serialized_params->>'job_class'").count
+                          .sort_by { |name, _count| name }
       end
 
       def to_params(override)
@@ -54,9 +55,9 @@ module GoodJob
     end
 
     def index
-      @filter = JobFilter.new(params)
+      @filter = ExecutionFilter.new(params)
 
-      count_query = Arel.sql(GoodJob::Job.pg_or_jdbc_query(<<~SQL.squish))
+      count_query = Arel.sql(GoodJob::Execution.pg_or_jdbc_query(<<~SQL.squish))
         SELECT *
         FROM generate_series(
           date_trunc('hour', $1::timestamp),
@@ -81,11 +82,11 @@ module GoodJob
 
       current_time = Time.current
       binds = [[nil, current_time - 1.day], [nil, current_time]]
-      job_data = GoodJob::Job.connection.exec_query(count_query, "GoodJob Dashboard Chart", binds)
+      executions_data = GoodJob::Execution.connection.exec_query(count_query, "GoodJob Dashboard Chart", binds)
 
-      queue_names = job_data.map { |d| d['queue_name'] }.uniq
+      queue_names = executions_data.map { |d| d['queue_name'] }.uniq
       labels = []
-      queues_data = job_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
+      queues_data = executions_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
         labels << timestamp.in_time_zone.strftime('%H:%M %z')
         queue_names.each do |queue_name|
           (hash[queue_name] ||= []) << values.find { |d| d['queue_name'] == queue_name }&.[]('count')

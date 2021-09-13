@@ -20,7 +20,7 @@ require "good_job/railtie"
 module GoodJob
   # @!attribute [rw] active_record_parent_class
   #   @!scope class
-  #   The ActiveRecord parent class inherited by +GoodJob::Job+ (default: +ActiveRecord::Base+).
+  #   The ActiveRecord parent class inherited by +GoodJob::Execution+ (default: +ActiveRecord::Base+).
   #   Use this when using multiple databases or other custom ActiveRecord configuration.
   #   @return [ActiveRecord::Base]
   #   @example Change the base class:
@@ -129,7 +129,7 @@ module GoodJob
     timestamp = Time.current - older_than
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
-      deleted_records_count = GoodJob::Job.finished(timestamp).delete_all
+      deleted_records_count = GoodJob::Execution.finished(timestamp).delete_all
 
       payload[:deleted_records_count] = deleted_records_count
     end

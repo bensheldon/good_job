@@ -14,8 +14,8 @@ module GoodJob
     def initialize(queue_string)
       @queue_string = queue_string
 
-      @job_query = Concurrent::Delay.new { GoodJob::Job.queue_string(queue_string) }
-      @parsed_queues = Concurrent::Delay.new { GoodJob::Job.queue_parser(queue_string) }
+      @job_query = Concurrent::Delay.new { GoodJob::Execution.queue_string(queue_string) }
+      @parsed_queues = Concurrent::Delay.new { GoodJob::Execution.queue_parser(queue_string) }
     end
 
     # A meaningful name to identify the performer in logs and for debugging.

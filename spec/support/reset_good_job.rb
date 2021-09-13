@@ -3,7 +3,7 @@ THREAD_ERRORS = Concurrent::Array.new
 
 RSpec.configure do |config|
   config.before do
-    GoodJob::CurrentExecution.reset
+    GoodJob::CurrentThread.reset
     GoodJob.preserve_job_records = false
 
     PgLock.advisory_lock.owns.all?(&:unlock) if PgLock.advisory_lock.owns.count > 0
@@ -101,13 +101,13 @@ class PgLock < ActiveRecord::Base
     query = <<~SQL.squish
       SELECT pg_advisory_unlock(($1::bigint << 32) + $2::bigint) AS unlocked
     SQL
-    self.class.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', [[nil, classid], [nil, objid]]).first['unlocked']
+    self.class.connection.exec_query(GoodJob::Execution.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', [[nil, classid], [nil, objid]]).first['unlocked']
   end
 
   def unlock!
     query = <<~SQL.squish
       SELECT pg_terminate_backend(#{self[:pid]}) AS terminated
     SQL
-    self.class.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Terminate Backend Lock', []).first['terminated']
+    self.class.connection.exec_query(GoodJob::Execution.pg_or_jdbc_query(query), 'PgLock Terminate Backend Lock', []).first['terminated']
   end
 end
