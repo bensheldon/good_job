@@ -1,0 +1,7 @@
+<div class="card my-3 p-6">
+  <%= render 'good_job/shared/chart', chart_data: @filter.chart_data %>
+</div>
+
+<%= render 'good_job/shared/filter', filter: @filter %>
+
+<%= render 'good_job/shared/jobs_table', jobs: @filter.records %>

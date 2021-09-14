@@ -23,12 +23,12 @@
         <% executions.each do |execution| %>
           <tr id="<%= dom_id(execution) %>">
             <td>
-              <%= link_to active_job_path(execution.serialized_params['job_id']) do %>
+              <%= link_to job_path(execution.serialized_params['job_id']) do %>
                 <code><%= execution.active_job_id %></code>
               <% end %>
             </td>
             <td>
-              <%= link_to active_job_path(execution.active_job_id, anchor: dom_id(execution)) do %>
+              <%= link_to job_path(execution.active_job_id, anchor: dom_id(execution)) do %>
                 <code><%= execution.id %></code>
               <% end %>
             </td>

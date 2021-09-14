@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 module GoodJob
-  class ActiveJobsController < GoodJob::BaseController
+  class JobsController < GoodJob::BaseController
+    def index
+      @filter = JobsFilter.new(params)
+    end
+
     def show
       @executions = GoodJob::Execution.active_job_id(params[:id])
                                       .order(Arel.sql("COALESCE(scheduled_at, created_at) DESC"))
