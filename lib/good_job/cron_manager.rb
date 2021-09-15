@@ -24,7 +24,7 @@ module GoodJob # :nodoc:
       GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
     end
 
-    # Job configuration to be scheduled
+    # Execution configuration to be scheduled
     # @return [Hash]
     attr_reader :schedules
 
@@ -90,8 +90,8 @@ module GoodJob # :nodoc:
         # Re-schedule the next cron task before executing the current task
         thr_scheduler.create_task(thr_cron_key)
 
-        CurrentExecution.reset
-        CurrentExecution.cron_key = thr_cron_key
+        CurrentThread.reset
+        CurrentThread.cron_key = thr_cron_key
 
         Rails.application.executor.wrap do
           schedule = thr_scheduler.schedules.fetch(thr_cron_key).with_indifferent_access

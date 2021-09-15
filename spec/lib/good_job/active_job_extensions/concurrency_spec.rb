@@ -31,7 +31,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       it "is inclusive of both performing and enqueued jobs" do
         expect(TestJob.perform_later(name: "Alice")).to be_present
 
-        GoodJob::Job.all.with_advisory_lock do
+        GoodJob::Execution.all.with_advisory_lock do
           expect(TestJob.perform_later(name: "Alice")).to eq false
         end
       end
@@ -55,8 +55,8 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         # Usage of different key does enqueue
         expect(TestJob.perform_later(name: "Bob")).to be_present
 
-        expect(GoodJob::Job.where(concurrency_key: "Alice").count).to eq 2
-        expect(GoodJob::Job.where(concurrency_key: "Bob").count).to eq 1
+        expect(GoodJob::Execution.where(concurrency_key: "Alice").count).to eq 2
+        expect(GoodJob::Execution.where(concurrency_key: "Bob").count).to eq 1
       end
 
       it 'excludes jobs that are already executing/locked' do
@@ -64,7 +64,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(TestJob.perform_later(name: "Alice")).to be_present
 
         # Lock one of the jobs
-        GoodJob::Job.first.with_advisory_lock do
+        GoodJob::Execution.first.with_advisory_lock do
           # Third usage does enqueue
           expect(TestJob.perform_later(name: "Alice")).to be_present
         end
@@ -89,12 +89,12 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         5.times { scheduler.create_thread }
 
         sleep_until(max: 10, increments_of: 0.5) do
-          GoodJob::Job.where(concurrency_key: "Alice").finished.count >= 1
+          GoodJob::Execution.where(concurrency_key: "Alice").finished.count >= 1
         end
         scheduler.shutdown
 
-        expect(GoodJob::Job.count).to be >= 1
-        expect(GoodJob::Job.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
+        expect(GoodJob::Execution.count).to be >= 1
+        expect(GoodJob::Execution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
       end
     end
   end

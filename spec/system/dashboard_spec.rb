@@ -15,8 +15,8 @@ describe 'Dashboard', type: :system, js: true do
     visit '/good_job'
     expect(page).to have_content 'ExampleJob'
 
-    click_button('Delete job')
-    expect(page).to have_content 'Job deleted'
+    click_button('Delete execution')
+    expect(page).to have_content 'Job execution deleted'
     expect(page).not_to have_content 'ExampleJob'
   end
 end

@@ -73,15 +73,15 @@ RSpec.describe GoodJob::CLI do
         expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::JobPerformer), a_kind_of(Hash))
 
         performer_query = performer.send(:job_query)
-        expect(performer_query.to_sql).to eq GoodJob::Job.where(queue_name: %w[mice elephant]).to_sql
+        expect(performer_query.to_sql).to eq GoodJob::Execution.where(queue_name: %w[mice elephant]).to_sql
       end
     end
   end
 
   describe '#cleanup_preserved_jobs' do
-    let!(:recent_job) { GoodJob::Job.create!(finished_at: 12.hours.ago) }
-    let!(:old_unfinished_job) { GoodJob::Job.create!(scheduled_at: 2.days.ago, finished_at: nil) }
-    let!(:old_finished_job) { GoodJob::Job.create!(finished_at: 36.hours.ago) }
+    let!(:recent_job) { GoodJob::Execution.create!(finished_at: 12.hours.ago) }
+    let!(:old_unfinished_job) { GoodJob::Execution.create!(scheduled_at: 2.days.ago, finished_at: nil) }
+    let!(:old_finished_job) { GoodJob::Execution.create!(finished_at: 36.hours.ago) }
 
     it 'deletes finished jobs' do
       cli = described_class.new([], { before_seconds_ago: 24.hours.to_i }, {})

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-RSpec.describe GoodJob::CurrentExecution do
+RSpec.describe GoodJob::CurrentThread do
   describe '.error_on_discard' do
     it 'maintains value across threads' do
       described_class.error_on_discard = 'apple'
@@ -55,13 +55,13 @@ RSpec.describe GoodJob::CurrentExecution do
   end
 
   describe '.active_job_id' do
-    let!(:good_job) { GoodJob::Job.create! active_job_id: SecureRandom.uuid }
+    let!(:execution) { GoodJob::Execution.create! active_job_id: SecureRandom.uuid }
 
     it 'delegates to good_job' do
       expect(described_class.active_job_id).to be_nil
 
-      described_class.good_job = good_job
-      expect(described_class.active_job_id).to eq good_job.active_job_id
+      described_class.execution = execution
+      expect(described_class.active_job_id).to eq execution.active_job_id
     end
   end
 end

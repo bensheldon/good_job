@@ -3,7 +3,7 @@ GoodJob::Engine.routes.draw do
   root to: 'dashboards#index'
   resources :cron_schedules, only: %i[index]
   resources :active_jobs, only: %i[show]
-  resources :jobs, only: %i[destroy]
+  resources :executions, only: %i[destroy]
 
   scope controller: :assets do
     constraints(format: :css) do

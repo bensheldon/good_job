@@ -12,12 +12,12 @@ RSpec.describe GoodJob::JobPerformer do
 
   describe '#next' do
     it 'calls GoodJob.perform_with_advisory_lock' do
-      allow(GoodJob::Job).to receive(:perform_with_advisory_lock)
+      allow(GoodJob::Execution).to receive(:perform_with_advisory_lock)
 
       job_performer = described_class.new('*')
       job_performer.next
 
-      expect(GoodJob::Job).to have_received(:perform_with_advisory_lock)
+      expect(GoodJob::Execution).to have_received(:perform_with_advisory_lock)
     end
   end
 

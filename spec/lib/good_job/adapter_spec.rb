@@ -4,7 +4,7 @@ require 'rails_helper'
 RSpec.describe GoodJob::Adapter do
   let(:adapter) { described_class.new(execution_mode: :external) }
   let(:active_job) { instance_double(ActiveJob::Base) }
-  let(:good_job) { instance_double(GoodJob::Job, queue_name: 'default', scheduled_at: nil) }
+  let(:good_job) { instance_double(GoodJob::Execution, queue_name: 'default', scheduled_at: nil) }
 
   describe '#initialize' do
     it 'guards against improper execution modes' do
@@ -15,12 +15,12 @@ RSpec.describe GoodJob::Adapter do
   end
 
   describe '#enqueue' do
-    it 'calls GoodJob::Job.enqueue with parameters' do
-      allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
+    it 'calls GoodJob::Execution.enqueue with parameters' do
+      allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
 
       adapter.enqueue(active_job)
 
-      expect(GoodJob::Job).to have_received(:enqueue).with(
+      expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
         create_with_advisory_lock: false,
         scheduled_at: nil
@@ -29,7 +29,7 @@ RSpec.describe GoodJob::Adapter do
 
     context 'when async' do
       it 'triggers an execution thread and the notifier' do
-        allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
+        allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
         allow(GoodJob::Notifier).to receive(:notify)
 
         scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
@@ -45,14 +45,14 @@ RSpec.describe GoodJob::Adapter do
   end
 
   describe '#enqueue_at' do
-    it 'calls GoodJob::Job.enqueue with parameters' do
-      allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
+    it 'calls GoodJob::Execution.enqueue with parameters' do
+      allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
 
       scheduled_at = 1.minute.from_now
 
       adapter.enqueue_at(active_job, scheduled_at.to_i)
 
-      expect(GoodJob::Job).to have_received(:enqueue).with(
+      expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
         create_with_advisory_lock: false,
         scheduled_at: scheduled_at.change(usec: 0)

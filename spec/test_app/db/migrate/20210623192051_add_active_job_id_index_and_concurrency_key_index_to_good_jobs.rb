@@ -17,14 +17,14 @@ class AddActiveJobIdIndexAndConcurrencyKeyIndexToGoodJobs < ActiveRecord::Migrat
     add_index :good_jobs, :concurrency_key, where: "(finished_at IS NULL)", algorithm: :concurrently, name: :index_good_jobs_on_concurrency_key_when_unfinished
     add_index :good_jobs, [:cron_key, :created_at], algorithm: :concurrently, name: :index_good_jobs_on_cron_key_and_created_at
 
-    return unless defined? GoodJob::Job
+    return unless defined? GoodJob::Execution
 
     reversible do |dir|
       dir.up do
         # Ensure that all `good_jobs` records have an active_job_id value
         start_time = Time.current
         loop do
-          break if GoodJob::Job.where(active_job_id: nil, finished_at: nil).where("created_at < ?", start_time).limit(UPDATE_BATCH_SIZE).update_all("active_job_id = (serialized_params->>'job_id')::uuid").zero?
+          break if GoodJob::Execution.where(active_job_id: nil, finished_at: nil).where("created_at < ?", start_time).limit(UPDATE_BATCH_SIZE).update_all("active_job_id = (serialized_params->>'job_id')::uuid").zero?
         end
       end
     end

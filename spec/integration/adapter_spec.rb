@@ -31,19 +31,19 @@ RSpec.describe 'Adapter Integration' do
     describe '#perform_later' do
       it 'assigns a provider_job_id' do
         enqueued_job = TestJob.perform_later
-        good_job = GoodJob::Job.find(enqueued_job.provider_job_id)
+        execution = GoodJob::Execution.find(enqueued_job.provider_job_id)
 
-        expect(enqueued_job.provider_job_id).to eq good_job.id
+        expect(enqueued_job.provider_job_id).to eq execution.id
       end
 
       it 'without a scheduled time' do
         expect do
           TestJob.perform_later('first', 'second', keyword_arg: 'keyword_arg')
-        end.to change(GoodJob::Job, :count).by(1)
+        end.to change(GoodJob::Execution, :count).by(1)
 
-        good_job = GoodJob::Job.last
-        expect(good_job).to be_present
-        expect(good_job).to have_attributes(
+        execution = GoodJob::Execution.last
+        expect(execution).to be_present
+        expect(execution).to have_attributes(
           queue_name: 'test',
           priority: 50,
           scheduled_at: nil
@@ -53,10 +53,10 @@ RSpec.describe 'Adapter Integration' do
       it 'with a scheduled time' do
         expect do
           TestJob.set(wait: 1.minute, priority: 100).perform_later('first', 'second', keyword_arg: 'keyword_arg')
-        end.to change(GoodJob::Job, :count).by(1)
+        end.to change(GoodJob::Execution, :count).by(1)
 
-        good_job = GoodJob::Job.last
-        expect(good_job).to have_attributes(
+        execution = GoodJob::Execution.last
+        expect(execution).to have_attributes(
           queue_name: 'test',
           priority: 100,
           scheduled_at: be_within(1.second).of(1.minute.from_now)

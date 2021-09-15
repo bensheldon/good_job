@@ -44,11 +44,11 @@ RSpec.describe GoodJob::CronManager do
       cron_manager = described_class.new(schedules, start_on_initialize: true)
 
       wait_until(max: 5) do
-        expect(GoodJob::Job.count).to be > 3
+        expect(GoodJob::Execution.count).to be > 3
       end
 
-      good_job = GoodJob::Job.first
-      expect(good_job).to have_attributes(
+      execution = GoodJob::Execution.first
+      expect(execution).to have_attributes(
         cron_key: 'example',
         priority: -10
       )
