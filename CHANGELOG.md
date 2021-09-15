@@ -1,5 +1,30 @@
 # Changelog
 
+## [v2.2.0](https://github.com/bensheldon/good_job/tree/v2.2.0) (2021-09-15)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.1.0...v2.2.0)
+
+**Implemented enhancements:**
+
+- Add dashboard for cron-style jobs [\#367](https://github.com/bensheldon/good_job/pull/367) ([aried3r](https://github.com/aried3r))
+
+**Fixed bugs:**
+
+- Fix Dashboard navigation active class for Scheduled Jobs [\#375](https://github.com/bensheldon/good_job/pull/375) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Rename `GoodJob::Job` to be `GoodJob::Execution` [\#376](https://github.com/bensheldon/good_job/issues/376)
+- More recognition in Rails community [\#370](https://github.com/bensheldon/good_job/issues/370)
+- Concurrency control for all queued jobs [\#366](https://github.com/bensheldon/good_job/issues/366)
+
+**Merged pull requests:**
+
+- Rename `GoodJob::Job` to `GoodJob::Execution` [\#377](https://github.com/bensheldon/good_job/pull/377) ([bensheldon](https://github.com/bensheldon))
+- Add example execution behavior \(errored, retried, dead\) to demo ExampleJob [\#374](https://github.com/bensheldon/good_job/pull/374) ([bensheldon](https://github.com/bensheldon))
+- Add Passenger info for running in async mode [\#373](https://github.com/bensheldon/good_job/pull/373) ([aried3r](https://github.com/aried3r))
+- Update bootstrap to latest 5.1.1 [\#372](https://github.com/bensheldon/good_job/pull/372) ([morgoth](https://github.com/morgoth))
+
 ## [v2.1.0](https://github.com/bensheldon/good_job/tree/v2.1.0) (2021-09-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.0.5...v2.1.0)
@@ -9,6 +34,10 @@
 - Add `total_limit:` option to GoodJob::Concurrency to be inclusive of counting both enqueued and performing jobs [\#369](https://github.com/bensheldon/good_job/pull/369) ([bensheldon](https://github.com/bensheldon))
 - Add button to toggle all job params in Dashboard [\#365](https://github.com/bensheldon/good_job/pull/365) ([bensheldon](https://github.com/bensheldon))
 
+**Fixed bugs:**
+
+- Fix unlock key for Lockable\#with\_advisory\_lock [\#368](https://github.com/bensheldon/good_job/pull/368) ([bensheldon](https://github.com/bensheldon))
+
 **Closed issues:**
 
 - Cron-like jobs not always executed, possible reasons? [\#359](https://github.com/bensheldon/good_job/issues/359)
@@ -16,7 +45,6 @@
 **Merged pull requests:**
 
 - When shelling out in tests, send SIGKILL if process does not exit [\#371](https://github.com/bensheldon/good_job/pull/371) ([bensheldon](https://github.com/bensheldon))
-- Fix unlock key for Lockable\#with\_advisory\_lock [\#368](https://github.com/bensheldon/good_job/pull/368) ([bensheldon](https://github.com/bensheldon))
 - Have all tests use stubbed TestJob [\#364](https://github.com/bensheldon/good_job/pull/364) ([bensheldon](https://github.com/bensheldon))
 
 ## [v2.0.5](https://github.com/bensheldon/good_job/tree/v2.0.5) (2021-09-06)
