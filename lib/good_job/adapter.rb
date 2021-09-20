@@ -101,14 +101,14 @@ module GoodJob
     # @return [Boolean]
     def execute_async?
       @configuration.execution_mode == :async_all ||
-        @configuration.execution_mode.in?([:async, :async_server]) && in_server_process?
+        (@configuration.execution_mode.in?([:async, :async_server]) && in_server_process?)
     end
 
     # Whether in +:external+ execution mode.
     # @return [Boolean]
     def execute_externally?
       @configuration.execution_mode == :external ||
-        @configuration.execution_mode.in?([:async, :async_server]) && !in_server_process?
+        (@configuration.execution_mode.in?([:async, :async_server]) && !in_server_process?)
     end
 
     # Whether in +:inline+ execution mode.

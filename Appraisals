@@ -20,6 +20,11 @@ end
 if ruby_27_or_higher && !jruby
   # Rails HEAD requires MRI 2.7+
   # activerecord-jdbcpostgresql-adapter does not have a compatible version
+
+  appraise "rails-7.0" do
+    gem "rails", "~> 7.0.0.alpha"
+  end
+
   appraise "rails-head" do
     gem "rails", github: "rails/rails", branch: "main"
   end
