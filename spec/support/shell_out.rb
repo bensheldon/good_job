@@ -5,7 +5,6 @@ class ShellOut
   WaitTimeout = Class.new(StandardError)
   KILL_TIMEOUT = 5
   PROCESS_EXIT = "[PROCESS EXIT]"
-  PROCESS_KILL = "[PROCESS KILL]"
 
   def self.command(command, env: {}, &block)
     new.command(command, env: env, &block)
@@ -28,6 +27,7 @@ class ShellOut
           line = fstdout.gets
           break unless line
 
+          Rails.logger.debug { "STDOUT: #{line}" }
           foutput << line
         end
       end
@@ -36,6 +36,7 @@ class ShellOut
           line = fstderr.gets
           break unless line
 
+          Rails.logger.debug { "STDERR: #{line}" }
           foutput << line
         end
       end
@@ -44,22 +45,28 @@ class ShellOut
         yield(self)
       ensure
         begin
-          Timeout.timeout(KILL_TIMEOUT) do
-            Process.kill('TERM', pid)
-            Process.waitpid(pid, Process::WNOHANG)
+          Rails.logger.debug { "Sending TERM to #{pid}" }
+          Process.kill('TERM', pid)
+
+          Concurrent::Promises.future(pid, @output) do |fpid|
+            sleep 5
+            Process.kill('KILL', fpid)
+          rescue Errno::ECHILD, Errno::ESRCH
+            nil
+          else
+            Rails.logger.debug { "TERM unsuccessful, sent KILL to #{pid}" }
           end
-        rescue Timeout::Error
-          Process.kill("KILL", pid)
-          @output << PROCESS_KILL
-        rescue Errno::ESRCH
+
+          Process.wait(pid)
+        rescue Errno::ECHILD, Errno::ESRCH
           @output << PROCESS_EXIT
         end
       end
-
+      status = wait_thr.value
       stdout_future.value
       stderr_future.value
-      wait_thr.value
 
+      Rails.logger.debug { "Command finished: #{status}" }
       @output
     end
   end
