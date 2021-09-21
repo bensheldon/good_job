@@ -99,6 +99,10 @@ Style/EmptyMethod:
 Style/FormatStringToken:
   EnforcedStyle: template
 
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - gemfiles/*.gemfile
+
 Style/MultilineBlockChain:
   Enabled: false
 
