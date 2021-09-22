@@ -388,7 +388,7 @@ RSpec.describe GoodJob::Execution do
         expect(result.unhandled_error).to be_a(TestJob::ExpectedError)
       end
 
-      describe 'GoodJob.reperform_jobs_on_standard_error behavior' do
+      describe 'GoodJob.retry_on_unhandled_error behavior' do
         context 'when true' do
           before do
             allow(GoodJob).to receive(:retry_on_unhandled_error).and_return(true)
