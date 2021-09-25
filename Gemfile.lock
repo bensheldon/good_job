@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    good_job (2.2.0)
+    good_job (2.3.0)
       activejob (>= 5.2.0)
       activerecord (>= 5.2.0)
       concurrent-ruby (>= 1.0.2)
@@ -227,7 +227,6 @@ GEM
     mixlib-shellout (3.2.5)
       chef-utils
     msgpack (1.4.2)
-    msgpack (1.4.2-java)
     multi_json (1.15.0)
     multipart-post (2.1.1)
     nio4r (2.5.8)

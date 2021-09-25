@@ -1,5 +1,20 @@
 # Changelog
 
+## [v2.3.0](https://github.com/bensheldon/good_job/tree/v2.3.0) (2021-09-25)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.2.0...v2.3.0)
+
+**Implemented enhancements:**
+
+- Create an ActiveJobJob model and Dashboard [\#383](https://github.com/bensheldon/good_job/pull/383) ([bensheldon](https://github.com/bensheldon))
+- Preserve page filter when deleting execution [\#381](https://github.com/bensheldon/good_job/pull/381) ([morgoth](https://github.com/morgoth))
+
+**Merged pull requests:**
+
+- Update GH Test Matrix with latest JRuby 9.3.0.0 [\#387](https://github.com/bensheldon/good_job/pull/387) ([tedhexaflow](https://github.com/tedhexaflow))
+- Improve test support's ShellOut command's process termination and add test logs [\#385](https://github.com/bensheldon/good_job/pull/385) ([bensheldon](https://github.com/bensheldon))
+- @bensheldon Add Rails 7 alpha to Appraisal; update development dependencies [\#384](https://github.com/bensheldon/good_job/pull/384) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.2.0](https://github.com/bensheldon/good_job/tree/v2.2.0) (2021-09-15)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.1.0...v2.2.0)
