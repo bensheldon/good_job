@@ -5,6 +5,7 @@ class ExampleJob < ApplicationJob
   retry_on DeadError, attempts: 3
 
   def perform(type = :success)
+    return unless type.respond_to?(:to_sym)
     type = type.to_sym
 
     if type == :success

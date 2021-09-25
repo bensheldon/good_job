@@ -1,0 +1,56 @@
+<div class="card my-3">
+  <div class="table-responsive">
+    <table class="table card-table table-bordered table-hover table-sm mb-0">
+      <thead>
+        <tr>
+          <th>ActiveJob ID</th>
+          <th>State</th>
+          <th>Job Class</th>
+          <th>Queue</th>
+          <th>Scheduled At</th>
+          <th>Executions</th>
+          <th>Error</th>
+          <th>
+            ActiveJob Params&nbsp;
+            <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                           data: { bs_toggle: "collapse", bs_target: ".job-params" },
+                           aria: { expanded: false, controls: jobs.map { |job| "##{dom_id(job, "params")}" }.join(" ") }
+            %>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% jobs.each do |job| %>
+          <tr id="<%= dom_id(job) %>">
+            <td>
+              <%= link_to job_path(job.id) do %>
+                <code><%= job.id %></code>
+              <% end %>
+            </td>
+            <td>
+              <span class="badge bg-secondary"><%= job.status %></span>
+            </td>
+            <td><%= job.job_class %></td>
+            <td><%= job.queue_name %></td>
+            <td><%= job.scheduled_at || job.created_at %></td>
+            <td><%= job.executions_count %></td>
+            <td class="text-break"><%= truncate(job.recent_error, length: 1_000) %></td>
+            <td>
+              <%= tag.button "Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                data: { bs_toggle: "collapse", bs_target: "##{dom_id(job, 'params')}" },
+                aria: { expanded: false, controls: dom_id(job, "params") }
+              %>
+              <%= tag.pre JSON.pretty_generate(job.serialized_params), id: dom_id(job, "params"), class: "collapse job-params" %>
+            </td>
+<!--            <td>-->
+              <%#= button_to execution_path(execution.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Delete execution" do %>
+                <%#= render "good_job/shared/icons/trash" %>
+              <%# end %>
+<!--            </td>-->
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

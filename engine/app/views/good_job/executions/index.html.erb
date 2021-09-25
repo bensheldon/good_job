@@ -1,0 +1,21 @@
+<div class="card my-3 p-6">
+  <%= render 'good_job/shared/chart', chart_data: @filter.chart_data %>
+</div>
+
+<%= render 'good_job/shared/filter', filter: @filter %>
+
+<% if @filter.records.present? %>
+  <%= render 'good_job/shared/executions_table', executions: @filter.records %>
+
+  <nav aria-label="Job pagination" class="mt-3">
+    <ul class="pagination">
+      <li class="page-item">
+        <%= link_to({ after_scheduled_at: (@filter.last.scheduled_at || @filter.last.created_at), after_id: @filter.last.id }, class: "page-link") do %>
+          Older executions <span aria-hidden="true">&raquo;</span>
+        <% end %>
+      </li>
+    </ul>
+  </nav>
+<% else %>
+  <em>No executions present.</em>
+<% end %>

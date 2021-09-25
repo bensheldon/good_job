@@ -61,4 +61,5 @@ Rails.application.configure do
   # config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   config.active_job.queue_adapter = :good_job
+  GoodJob.preserve_job_records = true
 end
