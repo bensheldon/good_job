@@ -8,38 +8,49 @@ describe ExampleJob do
   end
 
   describe "#perform" do
-    describe ":success" do
+    describe "SUCCESS_TYPE" do
       it 'completes successfully' do
-        active_job = described_class.perform_later('success')
+        active_job = described_class.perform_later(described_class::SUCCESS_TYPE)
         execution = GoodJob::Execution.find(active_job.provider_job_id)
         expect(execution.error).to be_nil
       end
     end
 
-    describe ":error_once" do
+    describe "ERROR_ONCE_TYPE" do
       it 'errors once then succeeds' do
-        active_job = described_class.perform_later('error_once')
+        active_job = described_class.perform_later(described_class::ERROR_ONCE_TYPE)
         executions = GoodJob::Execution.where(active_job_id: active_job.job_id).order(created_at: :asc)
         expect(executions.size).to eq 2
         expect(executions.last.error).to be_nil
       end
     end
 
-    describe ":error_five_times" do
+    describe "ERROR_FIVE_TIMES_TYPE" do
       it 'errors five times then succeeds' do
-        active_job = described_class.perform_later('error_five_times')
+        active_job = described_class.perform_later(described_class::ERROR_FIVE_TIMES_TYPE)
         executions = GoodJob::Execution.where(active_job_id: active_job.job_id).order(created_at: :asc)
         expect(executions.size).to eq 6
         expect(executions.last.error).to be_nil
       end
     end
 
-    describe ":dead" do
+    describe "DEAD_TYPE" do
       it 'errors but does not retry' do
-        active_job = described_class.perform_later('dead')
+        active_job = described_class.perform_later(described_class::DEAD_TYPE)
         executions = GoodJob::Execution.where(active_job_id: active_job.job_id).order(created_at: :asc)
         expect(executions.size).to eq 3
         expect(executions.last.error).to be_present
+      end
+    end
+
+    describe "SLOW_TYPE" do
+      it 'sleeps for period' do
+        expect_any_instance_of(Object).to receive(:sleep)
+
+        active_job = described_class.perform_later(described_class::SLOW_TYPE)
+
+        execution = GoodJob::Execution.find(active_job.provider_job_id)
+        expect(execution.error).to be_nil
       end
     end
   end

@@ -15,7 +15,7 @@ Rails.application.configure do
       cron: "* * * * * *",
       class: "ExampleJob",
       args: (lambda do
-        type = [:success, :error_once, :error_five_times, :dead].sample
+        type = ExampleJob::TYPES.sample
         [type.to_s]
       end),
       set: (lambda do
