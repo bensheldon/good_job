@@ -2,55 +2,36 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::CurrentThread do
-  describe '.error_on_discard' do
-    it 'maintains value across threads' do
-      described_class.error_on_discard = 'apple'
+  [
+    :cron_key,
+    :execution,
+    :error_on_discard,
+    :error_on_retry,
+  ].each do |accessor|
+    describe ".#{accessor}" do
+      it 'maintains value across threads' do
+        described_class.send "#{accessor}=", 'apple'
 
-      Thread.new do
-        described_class.error_on_discard = 'bear'
-      end.join
+        Thread.new do
+          described_class.send "#{accessor}=", 'bear'
+        end.join
 
-      expect(described_class.error_on_discard).to eq 'apple'
-    end
-
-    it 'maintains value across Rails execution wrapper' do
-      Rails.application.executor.wrap do
-        described_class.error_on_discard = 'apple'
+        expect(described_class.send(accessor)).to eq 'apple'
       end
 
-      expect(described_class.error_on_discard).to eq 'apple'
-    end
+      it 'maintains value across Rails reloader wrapper' do
+        Rails.application.reloader.wrap do
+          described_class.send "#{accessor}=", 'apple'
+        end
 
-    it 'is resettable' do
-      described_class.error_on_discard = 'apple'
-      described_class.reset
-      expect(described_class.error_on_discard).to eq nil
-    end
-  end
-
-  describe '.error_on_retry' do
-    it 'maintains value across threads' do
-      described_class.error_on_retry = 'apple'
-
-      Thread.new do
-        described_class.error_on_retry = 'bear'
-      end.join
-
-      expect(described_class.error_on_retry).to eq 'apple'
-    end
-
-    it 'maintains value across Rails execution wrapper' do
-      Rails.application.executor.wrap do
-        described_class.error_on_retry = 'apple'
+        expect(described_class.send(accessor)).to eq 'apple'
       end
 
-      expect(described_class.error_on_retry).to eq 'apple'
-    end
-
-    it 'is resettable' do
-      described_class.error_on_retry = 'apple'
-      described_class.reset
-      expect(described_class.error_on_retry).to eq nil
+      it 'is resettable' do
+        described_class.send "#{accessor}=", 'apple'
+        described_class.reset
+        expect(described_class.send(accessor)).to eq nil
+      end
     end
   end
 

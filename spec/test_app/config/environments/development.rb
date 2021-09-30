@@ -62,4 +62,24 @@ Rails.application.configure do
 
   config.active_job.queue_adapter = :good_job
   GoodJob.preserve_job_records = true
+
+  config.good_job.enable_cron = true
+  config.good_job.cron = {
+    frequent_example: {
+      description: "Enqueue an ExampleJob",
+      cron: "*/5 * * * * *",
+      class: "ExampleJob",
+      args: (lambda do
+        type = ExampleJob::SLOW_TYPE  # ExampleJob::TYPES.sample
+        [type.to_s]
+      end),
+      set: (lambda do
+        queue = [:default, :elephants, :mice].sample
+        delay = [0, (0..60).to_a.sample].sample
+        priority = [-10, 0, 10].sample
+
+        { wait: delay, queue: queue, priority: priority }
+      end),
+    },
+  }
 end
