@@ -1,5 +1,14 @@
 # Changelog
 
+## [v2.3.1](https://github.com/bensheldon/good_job/tree/v2.3.1) (2021-09-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.3.0...v2.3.1)
+
+**Merged pull requests:**
+
+- Log Cleanup thread tests, introduce "Slow" ExampleJob type, refactor ExampleJob types, run cron and log Postgres warnings in GoodJob Development harness [\#390](https://github.com/bensheldon/good_job/pull/390) ([bensheldon](https://github.com/bensheldon))
+- Wrap Scheduler task execution with Rails `reloader` instead of `executor` to avoid database connection changing during code reload [\#389](https://github.com/bensheldon/good_job/pull/389) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.3.0](https://github.com/bensheldon/good_job/tree/v2.3.0) (2021-09-25)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.2.0...v2.3.0)
