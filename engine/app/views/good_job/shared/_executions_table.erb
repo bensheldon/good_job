@@ -34,7 +34,7 @@
             </td>
             <td><%= execution.serialized_params['job_class'] %></td>
             <td><%= execution.queue_name %></td>
-            <td><%= execution.scheduled_at || execution.created_at %></td>
+            <td><%= relative_time(execution.scheduled_at || execution.created_at) %></td>
             <td class="text-break"><%= truncate(execution.error, length: 1_000) %></td>
             <td>
               <%= tag.button "Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",

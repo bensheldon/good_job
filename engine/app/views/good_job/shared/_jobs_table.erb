@@ -33,7 +33,7 @@
             </td>
             <td><%= job.job_class %></td>
             <td><%= job.queue_name %></td>
-            <td><%= job.scheduled_at || job.created_at %></td>
+            <td><%= relative_time(job.scheduled_at || job.created_at) %></td>
             <td><%= job.executions_count %></td>
             <td class="text-break"><%= truncate(job.recent_error, length: 1_000) %></td>
             <td>
