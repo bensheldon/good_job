@@ -9,7 +9,14 @@
             Set&nbsp;
             <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
                            data: { bs_toggle: "collapse", bs_target: ".job-properties" },
-                           aria: { expanded: false, controls: @cron_schedules.map { |job_key, _| "##{job_key.to_param}" }.join(" ") }
+                           aria: { expanded: false, controls: @cron_schedules.map { |job_key, _| "#{job_key.to_param}-properties" }.join(" ") }
+            %>
+          </th>
+          <th>
+            Args&nbsp;
+            <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                           data: { bs_toggle: "collapse", bs_target: ".job-args" },
+                           aria: { expanded: false, controls: @cron_schedules.map { |job_key, _| "#{job_key.to_param}-args" }.join(" ") }
             %>
           </th>
           <th>Class</th>
@@ -30,9 +37,24 @@
                     "Lambda/Callable"
                   when Hash
                     tag.button("Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                        data: { bs_toggle: "collapse", bs_target: "##{job_key.to_param}" },
-                        aria: { expanded: false, controls: job_key.to_param }) +
-                      tag.pre(JSON.pretty_generate(job[:set]), id: job_key.to_param, class: "collapse job-properties")
+                        data: { bs_toggle: "collapse", bs_target: "##{job_key.to_param}-properties" },
+                        aria: { expanded: false, controls: "#{job_key.to_param}-properties" }) +
+                      tag.pre(JSON.pretty_generate(job[:set]), id: "#{job_key.to_param}-properties", class: "collapse job-properties")
+                  end
+                %>
+              </td>
+              <td>
+                <%=
+                  case job[:args]
+                  when NilClass
+                    "None"
+                  when Proc
+                    "Lambda/Callable"
+                  when Hash
+                    tag.button("Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                        data: { bs_toggle: "collapse", bs_target: "##{job_key.to_param}-args" },
+                        aria: { expanded: false, controls: "#{job_key.to_param}-args" }) +
+                      tag.pre(JSON.pretty_generate(job[:args]), id: "#{job_key.to_param}-args", class: "collapse job-args")
                   end
                 %>
               </td>
