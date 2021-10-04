@@ -1,8 +1,8 @@
 {
-  "name": "Day of the Shirt",
-  "description": "Daily pop-culture t-shirt sales",
-  "website": "https://dayoftheshirt.com/",
-  "repository": "https://github.com/bensheldon/dayoftheshirt-rails",
+  "name": "Good Job demo app",
+  "description": "A multithreaded, Postgres-based ActiveJob backend for Ruby on Rails showcase",
+  "website": "https://github.com/bensheldon/good_job/",
+  "repository": "https://github.com/bensheldon/good_job/",
   "env": {
     "BUNDLE_WITHOUT": {
       "description": "Install all Ruby gems, including dev dependencies",
