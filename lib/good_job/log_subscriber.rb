@@ -59,11 +59,11 @@ module GoodJob
 
     # @!macro notification_responder
     def cron_manager_start(event)
-      cron_jobs = event.payload[:cron_jobs]
-      cron_jobs_count = cron_jobs.size
+      cron_entries = event.payload[:cron_entries]
+      cron_jobs_count = cron_entries.size
 
       info do
-        "GoodJob started cron with #{cron_jobs_count} #{'jobs'.pluralize(cron_jobs_count)}."
+        "GoodJob started cron with #{cron_jobs_count} #{'job'.pluralize(cron_jobs_count)}."
       end
     end
 

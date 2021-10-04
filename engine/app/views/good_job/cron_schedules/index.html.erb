@@ -1,4 +1,4 @@
-<% if @cron_schedules.present? %>
+<% if @cron_entries.present? %>
   <div class="card my-3">
     <div class="table-responsive">
       <table class="table card-table table-bordered table-hover table-sm mb-0">
@@ -9,14 +9,14 @@
             Set&nbsp;
             <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
                            data: { bs_toggle: "collapse", bs_target: ".job-properties" },
-                           aria: { expanded: false, controls: @cron_schedules.map { |job_key, _| "#{job_key.to_param}-properties" }.join(" ") }
+                           aria: { expanded: false, controls: @cron_entries.map { |cron_entry| dom_id(cron_entry, 'properties') }.join(" ") }
             %>
           </th>
           <th>
             Args&nbsp;
             <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
                            data: { bs_toggle: "collapse", bs_target: ".job-args" },
-                           aria: { expanded: false, controls: @cron_schedules.map { |job_key, _| "#{job_key.to_param}-args" }.join(" ") }
+                           aria: { expanded: false, controls: @cron_entries.map { |cron_entry| dom_id(cron_entry, 'args') }.join(" ") }
             %>
           </th>
           <th>Class</th>
@@ -24,43 +24,43 @@
           <th>Next scheduled</th>
         </thead>
         <tbody>
-          <% @cron_schedules.each do |job_key, job| %>
+          <% @cron_entries.each do |cron_entry| %>
             <tr>
-              <td class="font-monospace"><%= job_key %></td>
-              <td class="font-monospace"><%= job[:cron] %></td>
+              <td class="font-monospace"><%= cron_entry.key %></td>
+              <td class="font-monospace"><%= cron_entry.cron %></td>
               <td>
                 <%=
-                  case job[:set]
+                  case cron_entry.set
                   when NilClass
                     "None"
                   when Proc
                     "Lambda/Callable"
                   when Hash
                     tag.button("Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                        data: { bs_toggle: "collapse", bs_target: "##{job_key.to_param}-properties" },
-                        aria: { expanded: false, controls: "#{job_key.to_param}-properties" }) +
-                      tag.pre(JSON.pretty_generate(job[:set]), id: "#{job_key.to_param}-properties", class: "collapse job-properties")
+                        data: { bs_toggle: "collapse", bs_target: "##{dom_id(cron_entry, 'properties')}" },
+                        aria: { expanded: false, controls: dom_id(cron_entry, 'properties') }) +
+                      tag.pre(JSON.pretty_generate(cron_entry.set), id: dom_id(cron_entry, 'properties'), class: "collapse job-properties")
                   end
                 %>
               </td>
               <td>
                 <%=
-                  case job[:args]
+                  case cron_entry.args
                   when NilClass
                     "None"
                   when Proc
                     "Lambda/Callable"
                   when Hash
                     tag.button("Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                        data: { bs_toggle: "collapse", bs_target: "##{job_key.to_param}-args" },
-                        aria: { expanded: false, controls: "#{job_key.to_param}-args" }) +
-                      tag.pre(JSON.pretty_generate(job[:args]), id: "#{job_key.to_param}-args", class: "collapse job-args")
+                        data: { bs_toggle: "collapse", bs_target: "##{dom_id(cron_entry, 'args')}" },
+                        aria: { expanded: false, controls: dom_id(cron_entry, 'args') }) +
+                      tag.pre(JSON.pretty_generate(cron_entry.args), id: dom_id(cron_entry, 'args'), class: "collapse job-args")
                   end
                 %>
               </td>
-              <td class="font-monospace"><%= job[:class] %></td>
-              <td><%= job[:description] %></td>
-              <td><%= Fugit.parse_cron(job[:cron]).next_time.to_local_time %></td>
+              <td class="font-monospace"><%= cron_entry.job_class %></td>
+              <td><%= cron_entry.description %></td>
+              <td><%= cron_entry.next_at.to_local_time %></td>
             </tr>
           <% end %>
         </tbody>

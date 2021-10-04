@@ -3,7 +3,7 @@ module GoodJob
   class CronSchedulesController < GoodJob::BaseController
     def index
       configuration = GoodJob::Configuration.new({})
-      @cron_schedules = configuration.cron
+      @cron_entries = configuration.cron_entries
     end
   end
 end
