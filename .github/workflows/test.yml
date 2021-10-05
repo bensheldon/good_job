@@ -35,10 +35,24 @@ jobs:
     strategy:
       matrix:
         ruby: [2.5, 2.6, 2.7, 3.0, jruby-9.2, jruby-9.3]
-        pg: [12.5]
+        pg: [14]
         include:
-          - ruby: 2.7
-            pg: 10.8
+          - ruby: 3.0
+            pg: 10
+          - ruby: 3.0
+            pg: 11
+          - ruby: 3.0
+            pg: 12
+          - ruby: 3.0
+            pg: 13
+          - ruby: jruby-9.3
+            pg: 10
+          - ruby: jruby-9.3
+            pg: 11
+          - ruby: jruby-9.3
+            pg: 12
+          - ruby: jruby-9.3
+            pg: 13
     env:
       PGHOST: localhost
       PGUSER: good_job
