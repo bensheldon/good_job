@@ -576,42 +576,61 @@ end
 
 By default, GoodJob creates a single thread execution pool that will execute jobs from any queue. Depending on your application's workload, job types, and service level objectives, you may wish to optimize execution resources. For example, providing dedicated execution resources for transactional emails so they are not delayed by long-running batch jobs. Some options:
 
-- Multiple execution pools within a single process:
-
-    ```bash
-    $ bundle exec good_job --queues="transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;*" --max-threads=5
-    ```
-
-    This configuration will result in a single process with 4 isolated thread execution pools. Isolated execution pools are separated with a semicolon (`;`) and queue names and thread counts with a colon (`:`)
-
-    - `transactional_messages:2`: execute jobs enqueued on `transactional_messages` with up to 2 threads.
-    - `batch_processing:1` execute jobs enqueued on `batch_processing` with a single thread.
-    - `-transactional_messages,batch_processing`: execute jobs enqueued on _any_ queue _excluding_ `transactional_messages` or `batch_processing` with up to 2 threads.
-    - `*`: execute jobs on any queue on up to 5 threads, as configured by `--max-threads=5`
+- Multiple isolated execution pools within a single process:
 
     For moderate workloads, multiple isolated thread execution pools offers a good balance between congestion management and economy.
+
+    A pool is configured with the following syntax `<participating_queues>:<thread_count>`:
+
+    - `<participating_queues>`: either `queue1,queue2` (only those queues), `*` (all) or `-queue1,queue2` (all except those queues).
+    - `<thread_count>`: a count overriding for this specific pool the global `max-threads`.
+
+    Pool configurations are separated with a semicolon (;) in the `queues` configuration
+
+    ```bash
+    $ bundle exec good_job \
+        --queues="transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;*" \
+        --max-threads=5
+    ```
+
+    This configuration will result in a single process with 4 isolated thread execution pools.
+
+    - `transactional_messages:2`: execute jobs enqueued on `transactional_messages`, with up to 2 threads.
+    - `batch_processing:1` execute jobs enqueued on `batch_processing`, with a single thread.
+    - `-transactional_messages,batch_processing`: execute jobs enqueued on _any_ queue _excluding_ `transactional_messages` or `batch_processing`, with up to 2 threads.
+    - `*`: execute jobs on any queue, with up to 5 threads (as configured by `--max-threads=5`).
 
     Configuration can be injected by environment variables too:
 
     ```bash
-    $ GOOD_JOB_QUEUES="transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;*" GOOD_JOB_MAX_THREADS=5 bundle exec good_job
+    $ GOOD_JOB_QUEUES="transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;*" \
+      GOOD_JOB_MAX_THREADS=5 \
+      bundle exec good_job
     ```
 
-- Multiple processes; for example, on Heroku:
+- Multiple processes:
+
+    While multiple isolated thread execution pools offer a way to provide dedicated execution resources, those resources are bound to a single machine. To scale them independently, define several processes.
+
+    For example, this configuration on Heroku allows to customize the dyno count (instances), or type (CPU/RAM), per process type:
 
     ```procfile
     # Procfile
 
-    # Separate dyno types
+    # Separate process types
     worker: bundle exec good_job --max-threads=5
     transactional_worker: bundle exec good_job --queues="transactional_messages" --max-threads=2
     batch_worker: bundle exec good_job --queues="batch_processing" --max-threads=1
-
-    # Combined multi-process dyno
-    combined_worker: bundle exec good_job --max-threads=5 & bundle exec good_job --queues="transactional_messages" --max-threads=2 & bundle exec good_job --queues="batch_processing" --max-threads=1 & wait -n
     ```
 
-    Running multiple processes can optimize for CPU performance at the expense of greater memory and system resource usage.
+    To optimize for CPU performance at the expense of greater memory and system resource usage, while keeping a single process type (and thus a single dyno), combine several processes and wait for them:
+
+    ```procfile
+    # Procfile
+
+    # Combined multi-process
+    combined_worker: bundle exec good_job --max-threads=5 & bundle exec good_job --queues="transactional_messages" --max-threads=2 & bundle exec good_job --queues="batch_processing" --max-threads=1 & wait -n
+    ```
 
 Keep in mind, queue operations and management is an advanced discipline. This stuff is complex, especially for heavy workloads and unique processing requirements. Good job 👍
 
