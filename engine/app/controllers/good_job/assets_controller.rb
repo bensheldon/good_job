@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 module GoodJob
   class AssetsController < ActionController::Base # rubocop:disable Rails/ApplicationController

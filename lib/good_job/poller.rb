@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 require 'concurrent/atomic/atomic_boolean'
 

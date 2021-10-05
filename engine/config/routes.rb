@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 GoodJob::Engine.routes.draw do
   root to: redirect(path: 'jobs')
