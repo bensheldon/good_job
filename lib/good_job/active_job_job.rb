@@ -77,7 +77,7 @@ module GoodJob
     delegate :status, :last_status_at, to: :head_execution
 
     # This job's most recent {Execution}
-    # @param reload [Booelan] whether to reload executions
+    # @param reload [Boolean] whether to reload executions
     # @return [Execution]
     def head_execution(reload: false)
       executions.reload if reload

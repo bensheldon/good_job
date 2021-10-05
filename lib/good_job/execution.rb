@@ -1,4 +1,4 @@
-# typed: ignore
+# typed: false
 # frozen_string_literal: true
 module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
@@ -55,7 +55,7 @@ module GoodJob
     belongs_to :job, class_name: 'GoodJob::ActiveJobJob', foreign_key: 'active_job_id', primary_key: 'active_job_id', optional: true, inverse_of: :executions
 
     # Get Jobs with given ActiveJob ID
-    # @!method active_job_id
+    # @!method active_job_id(active_job_id)
     # @!scope class
     # @param active_job_id [String]
     #   ActiveJob ID
@@ -63,9 +63,9 @@ module GoodJob
     scope :active_job_id, ->(active_job_id) { where(active_job_id: active_job_id) }
 
     # Get Jobs with given class name
-    # @!method job_class
+    # @!method job_class(job_class)
     # @!scope class
-    # @param string [String]
+    # @param job_class [String]
     #   Execution class name
     # @return [ActiveRecord::Relation]
     scope :job_class, ->(job_class) { where("serialized_params->>'job_class' = ?", job_class) }

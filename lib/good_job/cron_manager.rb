@@ -18,7 +18,7 @@ module GoodJob # :nodoc:
     # Task observer for cron task
     # @param time [Time]
     # @param output [Object]
-    # @param thread_error [Exception]
+    # @param thread_error [Exception, nil]
     def self.task_observer(time, output, thread_error) # rubocop:disable Lint/UnusedMethodArgument
       return if thread_error.is_a? Concurrent::CancelledOperationError
 

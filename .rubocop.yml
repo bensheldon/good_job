@@ -4,6 +4,7 @@ require:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
+  - rubocop-sorbet
 
 inherit_mode:
   merge:
@@ -93,12 +94,16 @@ RSpec/NestedGroups:
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
+Sorbet/ConstantsFromStrings:
+  Enabled: false
+
 Sorbet/FalseSigil:
   Exclude:
     - .mdstyle.rb
     - .yard_support.rb
     - scripts/*
     - spec/**/*
+    - lib/generators/good_job/templates/**/*
 
 Style/Documentation:
   Enabled: false

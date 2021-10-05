@@ -135,7 +135,7 @@ module GoodJob
   # analyze or inspect job performance.
   # If you are preserving job records this way, use this method regularly to
   # destroy old records and preserve space in your database.
-  # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
+  # @param older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
   # @return [Integer] Number of jobs that were destroyed.
   def self.cleanup_preserved_jobs(older_than: nil)
     configuration = GoodJob::Configuration.new({})
