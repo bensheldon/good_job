@@ -230,6 +230,7 @@ module GoodJob # :nodoc:
     # @return [void]
     def create_task(delay = 0)
       future = Concurrent::ScheduledTask.new(delay, args: [performer], executor: executor, timer_set: timer_set) do |thr_performer|
+        Thread.current.name = Thread.current.name.sub("-worker-", "-thread-") if Thread.current.name
         Rails.application.reloader.wrap do
           thr_performer.next
         end
