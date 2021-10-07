@@ -4,7 +4,7 @@ module GoodJob
     protect_from_forgery with: :exception
 
     around_action do
-      I18n.with_locale(:en) { yield } 
+      I18n.with_locale(:en) { yield }
     end
   end
 end
