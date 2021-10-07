@@ -3,6 +3,8 @@ module GoodJob
   class BaseController < ActionController::Base # rubocop:disable Rails/ApplicationController
     protect_from_forgery with: :exception
 
-    before_action -> { I18n.locale = :en }
+    around_action do
+      I18n.with_locale(:en) { yield } 
+    end
   end
 end
