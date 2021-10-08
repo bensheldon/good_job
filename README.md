@@ -54,6 +54,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
     - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
+    - [Monitoring](#monitoring)
     - [PgBouncer compatibility](#pgbouncer-compatibility)
 - [Contribute](#contribute)
     - [Gem development](#gem-development)
@@ -787,6 +788,10 @@ It is also necessary to delete these preserved jobs from the database after a ce
     ```bash
     $ bundle exec good_job cleanup_preserved_jobs --before-seconds-ago=86400
     ```
+
+### Monitoring
+
+You can monitor ActiveJob using e.g. DataDog's [`dd-trace-rb`](https://github.com/DataDog/dd-trace-rb) starting with version 0.53.0 of the gem.
 
 ### PgBouncer compatibility
 
