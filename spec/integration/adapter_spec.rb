@@ -94,4 +94,28 @@ RSpec.describe 'Adapter Integration' do
       end
     end
   end
+
+  context 'when inline adapter' do
+    let(:adapter) { GoodJob::Adapter.new(execution_mode: :inline) }
+
+    before do
+      stub_const 'PERFORMED', []
+      stub_const 'JobError', Class.new(StandardError)
+      stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+        retry_on JobError, attempts: 3
+
+        def perform
+          PERFORMED << Time.current
+          raise JobError
+        end
+      end)
+    end
+
+    it 'raises unhandled exceptions' do
+      expect do
+        TestJob.perform_later
+      end.to raise_error JobError
+      expect(PERFORMED.size).to eq 3
+    end
+  end
 end

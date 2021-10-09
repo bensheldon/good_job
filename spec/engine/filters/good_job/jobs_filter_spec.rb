@@ -13,7 +13,11 @@ RSpec.describe GoodJob::JobsFilter do
 
     ExampleJob.set(queue: 'default').perform_later('success')
     ExampleJob.set(queue: 'mice').perform_later('error_once')
-    ExampleJob.set(queue: 'elephants').perform_later('dead')
+    begin
+      ExampleJob.set(queue: 'elephants').perform_later('dead')
+    rescue ExampleJob::DeadError
+      nil
+    end
 
     running_job = ExampleJob.perform_later('success')
     running_execution = GoodJob::Execution.find(running_job.provider_job_id)
