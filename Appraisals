@@ -22,10 +22,11 @@ if ruby_27_or_higher && !jruby
   # activerecord-jdbcpostgresql-adapter does not have a compatible version
 
   appraise "rails-7.0" do
-    gem "rails", "~> 7.0.0.alpha"
+    gem "rails", "~> 7.0.0.alpha2"
   end
 
-  appraise "rails-head" do
-    gem "rails", github: "rails/rails", branch: "main"
-  end
+  # https://github.com/rails/rails/issues/43422
+  # appraise "rails-head" do
+  #   gem "rails", github: "rails/rails", branch: "main"
+  # end
 end
