@@ -165,6 +165,10 @@ module GoodJob
         {}
     end
 
+    def cron_entries
+      cron.map { |cron_key, params| GoodJob::CronEntry.new(params.merge(key: cron_key)) }
+    end
+
     # Number of seconds to preserve jobs when using the +good_job cleanup_preserved_jobs+ CLI command.
     # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
     # @return [Integer]

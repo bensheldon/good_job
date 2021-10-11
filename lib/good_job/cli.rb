@@ -91,7 +91,9 @@ module GoodJob
       scheduler = GoodJob::Scheduler.from_configuration(configuration, warm_cache_on_initialize: true)
       notifier.recipients << [scheduler, :create_thread]
       poller.recipients << [scheduler, :create_thread]
-      cron_manager = GoodJob::CronManager.new(configuration.cron, start_on_initialize: true) if configuration.enable_cron?
+
+      cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true) if configuration.enable_cron?
+
       @stop_good_job_executable = false
       %w[INT TERM].each do |signal|
         trap(signal) { @stop_good_job_executable = true }

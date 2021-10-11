@@ -11,7 +11,7 @@ module GoodJob # :nodoc:
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated CronManagers in the current process.
-    #   @return [Array<GoodJob::CronManagers>, nil]
+    #   @return [Array<GoodJob::CronManager>, nil]
     cattr_reader :instances, default: [], instance_reader: false
 
     # Task observer for cron task
@@ -26,13 +26,13 @@ module GoodJob # :nodoc:
 
     # Execution configuration to be scheduled
     # @return [Hash]
-    attr_reader :schedules
+    attr_reader :cron_entries
 
-    # @param schedules [Hash]
+    # @param cron_entries [Array<CronEntry>]
     # @param start_on_initialize [Boolean]
-    def initialize(schedules = {}, start_on_initialize: false)
+    def initialize(cron_entries = [], start_on_initialize: false)
       @running = false
-      @schedules = schedules
+      @cron_entries = cron_entries
       @tasks = Concurrent::Hash.new
 
       self.class.instances << self
@@ -42,9 +42,11 @@ module GoodJob # :nodoc:
 
     # Schedule tasks that will enqueue jobs based on their schedule
     def start
-      ActiveSupport::Notifications.instrument("cron_manager_start.good_job", cron_jobs: @schedules) do
+      ActiveSupport::Notifications.instrument("cron_manager_start.good_job", cron_entries: cron_entries) do
         @running = true
-        schedules.each_key { |cron_key| create_task(cron_key) }
+        cron_entries.each do |cron_entry|
+          create_task(cron_entry)
+        end
       end
     end
 
@@ -78,36 +80,22 @@ module GoodJob # :nodoc:
     end
 
     # Enqueues a scheduled task
-    # @param cron_key [Symbol, String] the key within the schedule to use
-    def create_task(cron_key)
-      schedule = @schedules[cron_key]
-      return false if schedule.blank?
-
-      fugit = Fugit::Cron.parse(schedule.fetch(:cron))
-      delay = [(fugit.next_time - Time.current).to_f, 0].max
-
-      future = Concurrent::ScheduledTask.new(delay, args: [self, cron_key]) do |thr_scheduler, thr_cron_key|
+    # @param cron_entry [CronEntry] the CronEntry object to schedule
+    def create_task(cron_entry)
+      delay = [(cron_entry.next_at - Time.current).to_f, 0].max
+      future = Concurrent::ScheduledTask.new(delay, args: [self, cron_entry]) do |thr_scheduler, thr_cron_entry|
         # Re-schedule the next cron task before executing the current task
-        thr_scheduler.create_task(thr_cron_key)
-
-        CurrentThread.reset
-        CurrentThread.cron_key = thr_cron_key
+        thr_scheduler.create_task(thr_cron_entry)
 
         Rails.application.executor.wrap do
-          schedule = thr_scheduler.schedules.fetch(thr_cron_key).with_indifferent_access
-          job_class = schedule.fetch(:class).constantize
+          CurrentThread.reset
+          CurrentThread.cron_key = thr_cron_entry.key
 
-          job_set_value = schedule.fetch(:set, {})
-          job_set = job_set_value.respond_to?(:call) ? job_set_value.call : job_set_value
-
-          job_args_value = schedule.fetch(:args, [])
-          job_args = job_args_value.respond_to?(:call) ? job_args_value.call : job_args_value
-
-          job_class.set(job_set).perform_later(*job_args)
+          cron_entry.enqueue
         end
       end
 
-      @tasks[cron_key] = future
+      @tasks[cron_entry.key] = future
       future.add_observer(self.class, :task_observer)
       future.execute
     end

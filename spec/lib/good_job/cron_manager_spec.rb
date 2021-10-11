@@ -2,11 +2,11 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::CronManager do
-  let(:schedules) { {} }
+  let(:cron_entries) { [] }
 
   describe '#start' do
     it 'stops the cron manager' do
-      cron_manager = described_class.new(schedules, start_on_initialize: false)
+      cron_manager = described_class.new(cron_entries, start_on_initialize: false)
       expect do
         cron_manager.start
       end.to change(cron_manager, :running?).from(false).to true
@@ -15,7 +15,7 @@ RSpec.describe GoodJob::CronManager do
 
   describe '#stop' do
     it 'starts the cron manager' do
-      cron_manager = described_class.new(schedules, start_on_initialize: true)
+      cron_manager = described_class.new(cron_entries, start_on_initialize: true)
       expect do
         cron_manager.shutdown
       end.to change(cron_manager, :running?).from(true).to false
@@ -23,16 +23,17 @@ RSpec.describe GoodJob::CronManager do
   end
 
   describe 'schedules' do
-    let(:schedules) do
-      {
-        example: {
+    let(:cron_entries) do
+      [
+        GoodJob::CronEntry.new(
+          key: 'example',
           cron: "* * * * * *", # cron-style scheduling format by fugit gem, allows seconds resolution
           class: "TestJob", # reference the Job class with a string
           args: [42, { name: "Alice" }], # arguments to pass.  Could also allow a Proc for dynamic args, but problematic?
           set: { priority: -10 }, # additional ActiveJob properties. Could also allow a Proc for dynamic args, but problematic?
-          description: "Something helpful", # optional description that appears in Dashboard
-        },
-      }
+          description: "Something helpful" # optional description that appears in Dashboard
+        ),
+      ]
     end
 
     before do
@@ -41,7 +42,7 @@ RSpec.describe GoodJob::CronManager do
     end
 
     it 'executes the defined tasks' do
-      cron_manager = described_class.new(schedules, start_on_initialize: true)
+      cron_manager = described_class.new(cron_entries, start_on_initialize: true)
 
       wait_until(max: 5) do
         expect(GoodJob::Execution.count).to be > 3
