@@ -36,8 +36,14 @@ describe ExampleJob do
 
     describe "DEAD_TYPE" do
       it 'errors but does not retry' do
-        active_job = described_class.perform_later(described_class::DEAD_TYPE)
-        executions = GoodJob::Execution.where(active_job_id: active_job.job_id).order(created_at: :asc)
+        begin
+          described_class.perform_later(described_class::DEAD_TYPE)
+        rescue ExampleJob::DeadError
+          nil
+        end
+        active_job_id = GoodJob::Execution.last.active_job_id
+
+        executions = GoodJob::Execution.where(active_job_id: active_job_id).order(created_at: :asc)
         expect(executions.size).to eq 3
         expect(executions.last.error).to be_present
       end

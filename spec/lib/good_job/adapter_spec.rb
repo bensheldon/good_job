@@ -27,6 +27,33 @@ RSpec.describe GoodJob::Adapter do
       )
     end
 
+    context 'when inline' do
+      let(:adapter) { described_class.new(execution_mode: :inline) }
+
+      before do
+        stub_const 'PERFORMED', []
+        stub_const 'JobError', Class.new(StandardError)
+        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+          def perform(succeed: true)
+            PERFORMED << Time.current
+
+            raise JobError unless succeed
+          end
+        end)
+      end
+
+      it 'executes the job immediately' do
+        adapter.enqueue(TestJob.new(succeed: true))
+        expect(PERFORMED.size).to eq 1
+      end
+
+      it "raises unhandled exceptions" do
+        expect do
+          adapter.enqueue(TestJob.new(succeed: false))
+        end.to raise_error(JobError)
+      end
+    end
+
     context 'when async' do
       it 'triggers an execution thread and the notifier' do
         allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)

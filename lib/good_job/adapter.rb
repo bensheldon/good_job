@@ -64,10 +64,12 @@ module GoodJob
 
       if execute_inline?
         begin
-          execution.perform
+          result = execution.perform
         ensure
           execution.advisory_unlock
         end
+
+        raise result.unhandled_error if result.unhandled_error
       else
         job_state = { queue_name: execution.queue_name }
         job_state[:scheduled_at] = execution.scheduled_at if execution.scheduled_at
