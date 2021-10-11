@@ -1,5 +1,38 @@
 # Changelog
 
+## [v2.4.1](https://github.com/bensheldon/good_job/tree/v2.4.1) (2021-10-11)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.4.0...v2.4.1)
+
+**Implemented enhancements:**
+
+- Support Datadog APM / `dd-trace-rb` [\#323](https://github.com/bensheldon/good_job/issues/323)
+- Display info about used timezone. [\#398](https://github.com/bensheldon/good_job/pull/398) ([morgoth](https://github.com/morgoth))
+- Display cron schedules args in dashboard [\#396](https://github.com/bensheldon/good_job/pull/396) ([aried3r](https://github.com/aried3r))
+
+**Fixed bugs:**
+
+- Inline adapter should raise unhandled exceptions during execution [\#416](https://github.com/bensheldon/good_job/pull/416) ([bensheldon](https://github.com/bensheldon))
+- Enforce english locale in UI [\#407](https://github.com/bensheldon/good_job/pull/407) ([morgoth](https://github.com/morgoth))
+
+**Closed issues:**
+
+- Finished jobs don't show up as finished [\#415](https://github.com/bensheldon/good_job/issues/415)
+- Inline adapter should raise unhandled exceptions during execution [\#410](https://github.com/bensheldon/good_job/issues/410)
+- Rewrite Scheduler "worker" thread name to be `thread` [\#406](https://github.com/bensheldon/good_job/issues/406)
+- "WARNING: you don't own a lock of type ExclusiveLock" in Development [\#388](https://github.com/bensheldon/good_job/issues/388)
+- Improve Readme's "Optimize queues, threads, processes" section [\#132](https://github.com/bensheldon/good_job/issues/132)
+
+**Merged pull requests:**
+
+- Ignore Rails HEAD Appraisal until `rails new` fixed [\#419](https://github.com/bensheldon/good_job/pull/419) ([bensheldon](https://github.com/bensheldon))
+- Warn in Readme that configuration should not go into `config/initializers/*.rb` [\#418](https://github.com/bensheldon/good_job/pull/418) ([bensheldon](https://github.com/bensheldon))
+- Replace worker wording [\#409](https://github.com/bensheldon/good_job/pull/409) ([Hugo-Hache](https://github.com/Hugo-Hache))
+- Improve Readme's "Optimize queues, threads, processes" section [\#405](https://github.com/bensheldon/good_job/pull/405) ([Hugo-Hache](https://github.com/Hugo-Hache))
+- Update GH Test Matrix with more PG versions [\#401](https://github.com/bensheldon/good_job/pull/401) ([tedhexaflow](https://github.com/tedhexaflow))
+- Extract cron configuration hash into CronEntry ActiveModel objects [\#400](https://github.com/bensheldon/good_job/pull/400) ([bensheldon](https://github.com/bensheldon))
+- Remove errant copy-paste from app.json [\#397](https://github.com/bensheldon/good_job/pull/397) ([morgoth](https://github.com/morgoth))
+
 ## [v2.4.0](https://github.com/bensheldon/good_job/tree/v2.4.0) (2021-10-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.3.1...v2.4.0)
