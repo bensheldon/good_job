@@ -399,7 +399,7 @@ job.good_job_concurrency_key #=> "Unique-Alice"
 
 GoodJob can enqueue jobs on a recurring basis that can be used as a replacement for cron.
 
-Cron-style jobs are run on every GoodJob process (e.g. CLI or `async` execution mode) when `config.good_job.enable_cron = true`; use GoodJob's [ActiveJob concurrency](#activejob-concurrency) extension to limit the number of jobs that are enqueued.
+Cron-style jobs are run on every GoodJob process (e.g. CLI or `async` execution mode) when `config.good_job.enable_cron = true`, but GoodJob's cron uses unique indexes to ensure that only a single job is enqeued at the given time interval.
 
 Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`).
 

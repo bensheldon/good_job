@@ -3,6 +3,7 @@ require 'rails_helper'
 
 RSpec.describe GoodJob::CurrentThread do
   [
+    :cron_at,
     :cron_key,
     :execution,
     :error_on_discard,

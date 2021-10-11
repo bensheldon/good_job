@@ -5,6 +5,12 @@ module GoodJob
   # Thread-local attributes for passing values from Instrumentation.
   # (Cannot use ActiveSupport::CurrentAttributes because ActiveJob resets it)
   module CurrentThread
+    # @!attribute [rw] cron_at
+    #   @!scope class
+    #   Cron At
+    #   @return [DateTime, nil]
+    thread_mattr_accessor :cron_at
+
     # @!attribute [rw] cron_key
     #   @!scope class
     #   Cron Key
@@ -32,6 +38,7 @@ module GoodJob
     # Resets attributes
     # @return [void]
     def self.reset
+      self.cron_at = nil
       self.cron_key = nil
       self.execution = nil
       self.error_on_discard = nil
