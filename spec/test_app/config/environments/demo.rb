@@ -36,7 +36,6 @@ Rails.application.configure do
       description: "Delete old jobs.",
       cron: "*/15 * * * *",
       class: "CleanupJob",
-      args: { limit: 1_000 },
     },
   }
 end
