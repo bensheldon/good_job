@@ -19,5 +19,11 @@ module GoodJob
     def create_migration_file
       migration_template 'migrations/create_good_jobs.rb.erb', File.join(db_migrate_path, "create_good_jobs.rb")
     end
+
+    private
+
+    def migration_version
+      "[#{ActiveRecord::VERSION::STRING.to_f}]"
+    end
   end
 end

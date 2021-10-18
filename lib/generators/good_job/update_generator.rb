@@ -24,5 +24,11 @@ module GoodJob
         migration_template "migrations/#{template_file}", File.join(db_migrate_path, destination_file), skip: true
       end
     end
+
+    private
+
+    def migration_version
+      "[#{ActiveRecord::VERSION::STRING.to_f}]"
+    end
   end
 end
