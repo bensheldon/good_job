@@ -61,17 +61,17 @@ Rails.application.configure do
   # config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
   config.active_job.queue_adapter = :good_job
+  GoodJob.retry_on_unhandled_error = false
   GoodJob.preserve_job_records = true
 
-  config.good_job.enable_cron = true
+  config.good_job.enable_cron = ActiveModel::Type::Boolean.new.cast(ENV.fetch('GOOD_JOB_ENABLE_CRON', true))
   config.good_job.cron = {
     frequent_example: {
       description: "Enqueue an ExampleJob",
       cron: "*/5 * * * * *",
       class: "ExampleJob",
       args: (lambda do
-        type = ExampleJob::SLOW_TYPE  # ExampleJob::TYPES.sample
-        [type.to_s]
+        [ExampleJob::TYPES.sample.to_s]
       end),
       set: (lambda do
         queue = [:default, :elephants, :mice].sample

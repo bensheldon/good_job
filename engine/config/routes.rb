@@ -2,7 +2,13 @@
 GoodJob::Engine.routes.draw do
   root to: 'executions#index'
   resources :cron_schedules, only: %i[index]
-  resources :jobs, only: %i[index show]
+  resources :jobs, only: %i[index show] do
+    member do
+      put :discard
+      put :reschedule
+      put :retry
+    end
+  end
   resources :executions, only: %i[destroy]
 
   scope controller: :assets do

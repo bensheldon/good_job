@@ -15,8 +15,7 @@ Rails.application.configure do
       cron: "* * * * * *",
       class: "ExampleJob",
       args: (lambda do
-        type = ExampleJob::TYPES.sample
-        [type.to_s]
+        [ExampleJob::TYPES.sample.to_s]
       end),
       set: (lambda do
         queue = [:default, :elephants, :mice].sample
