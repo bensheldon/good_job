@@ -149,7 +149,7 @@ module GoodJob
 
         records = advisory_lock(column: column, function: function).to_a
         begin
-          yield(records)
+          unscoped { yield(records) }
         ensure
           if unlock_session
             advisory_unlock_session

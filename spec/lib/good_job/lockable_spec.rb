@@ -112,6 +112,14 @@ RSpec.describe GoodJob::Lockable do
       expect(another_record).not_to be_advisory_locked
       expect(PgLock.advisory_lock.count).to eq 0
     end
+
+    it 'does not leak relation scope into inner queries' do
+      sql = model_class.where(finished_at: nil).limit(1).with_advisory_lock do |_results|
+        model_class.all.to_sql
+      end
+
+      expect(sql).to eq 'SELECT "good_jobs".* FROM "good_jobs"'
+    end
   end
 
   describe '#advisory_lock' do
