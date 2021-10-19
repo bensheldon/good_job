@@ -174,13 +174,7 @@ module GoodJob
         break if execution.blank?
         break :unlocked unless execution&.executable?
 
-        begin
-          execution.with_advisory_lock(key: "good_jobs-#{execution.active_job_id}") do
-            execution.perform
-          end
-        rescue RecordAlreadyAdvisoryLockedError => e
-          ExecutionResult.new(value: nil, handled_error: e)
-        end
+        execution.perform
       end
     end
 
