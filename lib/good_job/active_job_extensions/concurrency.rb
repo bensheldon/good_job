@@ -32,10 +32,9 @@ module GoodJob
 
           GoodJob::Execution.new.with_advisory_lock(key: key, function: "pg_advisory_lock") do
             enqueue_concurrency = if enqueue_limit
-                                    # TODO: Why is `unscoped` necessary? Nested scope is bleeding into subsequent query?
-                                    GoodJob::Execution.unscoped.where(concurrency_key: key).unfinished.advisory_unlocked.count
+                                    GoodJob::Execution.where(concurrency_key: key).unfinished.advisory_unlocked.count
                                   else
-                                    GoodJob::Execution.unscoped.where(concurrency_key: key).unfinished.count
+                                    GoodJob::Execution.where(concurrency_key: key).unfinished.count
                                   end
 
             # The job has not yet been enqueued, so check if adding it will go over the limit
@@ -63,7 +62,7 @@ module GoodJob
           next if key.blank?
 
           GoodJob::Execution.new.with_advisory_lock(key: key, function: "pg_advisory_lock") do
-            allowed_active_job_ids = GoodJob::Execution.unscoped.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(perform_limit).pluck(:active_job_id)
+            allowed_active_job_ids = GoodJob::Execution.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(perform_limit).pluck(:active_job_id)
             # The current job has already been locked and will appear in the previous query
             raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include? job.job_id
           end
