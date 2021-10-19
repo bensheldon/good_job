@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    good_job (2.4.1)
+    good_job (2.4.2)
       activejob (>= 5.2.0)
       activerecord (>= 5.2.0)
       concurrent-ruby (>= 1.0.2)

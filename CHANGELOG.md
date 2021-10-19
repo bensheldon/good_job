@@ -1,5 +1,22 @@
 # Changelog
 
+## [v2.4.2](https://github.com/bensheldon/good_job/tree/v2.4.2) (2021-10-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.4.1...v2.4.2)
+
+**Implemented enhancements:**
+
+- Add migration version to install/update generator templates [\#426](https://github.com/bensheldon/good_job/pull/426) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Explicitly unscope queries within block yielded to Lockable.within\_advisory\_lock [\#429](https://github.com/bensheldon/good_job/pull/429) ([bensheldon](https://github.com/bensheldon))
+- Fix Demo CleanupJob args [\#427](https://github.com/bensheldon/good_job/pull/427) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Remove v1.99/v2 transitional extra advisory lock [\#428](https://github.com/bensheldon/good_job/pull/428) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.4.1](https://github.com/bensheldon/good_job/tree/v2.4.1) (2021-10-11)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.4.0...v2.4.1)
