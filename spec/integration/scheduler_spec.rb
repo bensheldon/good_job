@@ -18,9 +18,9 @@ RSpec.describe 'Schedule Integration' do
       def perform(*_args, **_kwargs)
         thread_name = Thread.current.name || Thread.current.object_id
 
-        expected_locks_per_thread = 2 # TODO: Temporary value for GoodJob v1.99. Should be reduced to 1 for GoodJob 2.0.
-
+        expected_locks_per_thread = 1
         locks_count = PgLock.advisory_lock.owns.count
+
         if locks_count > expected_locks_per_thread
           puts "Thread #{thread_name} owns #{locks_count} locks."
 
