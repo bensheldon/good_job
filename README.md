@@ -363,10 +363,18 @@ class MyJob < ApplicationJob
     total_limit: 1,
 
     # Or, if more control is needed:
-    # Maximum number of jobs with the concurrency key to be concurrently enqueued (excludes performing jobs)
+    # Maximum number of jobs with the concurrency key to be
+    # concurrently enqueued (excludes performing jobs)
     enqueue_limit: 2,
-    # Maximum number of jobs with the concurrency key to be concurrently performed (excludes enqueued jobs)
+
+    # Maximum number of jobs with the concurrency key to be
+    # concurrently performed (excludes enqueued jobs)
     perform_limit: 1,
+
+    # Note: Under heavy load, the total number of jobs may exceed the
+    # sum of `enqueue_limit` and `perform_limit` because of race conditions
+    # caused by imperfectly disjunctive states. If you need to constrain
+    # the total number of jobs, use `total_limit` instead. See #378.
 
     # A unique key to be globally locked against.
     # Can be String or Lambda/Proc that is invoked in the context of the job.
