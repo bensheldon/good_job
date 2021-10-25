@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module GoodJob
   class BaseFilter
+    DEFAULT_LIMIT = 25
+
     attr_accessor :params
 
     def initialize(params)
@@ -13,7 +15,7 @@ module GoodJob
       filtered_query.display_all(
         after_scheduled_at: after_scheduled_at,
         after_id: params[:after_id]
-      ).limit(params.fetch(:limit, 25))
+      ).limit(params.fetch(:limit, DEFAULT_LIMIT))
     end
 
     def last
@@ -38,8 +40,10 @@ module GoodJob
 
     def to_params(override)
       {
-        state: params[:state],
         job_class: params[:job_class],
+        limit: params[:limit],
+        queue_name: params[:queue_name],
+        state: params[:state],
       }.merge(override).delete_if { |_, v| v.nil? }
     end
 

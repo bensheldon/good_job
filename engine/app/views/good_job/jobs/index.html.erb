@@ -4,4 +4,17 @@
 
 <%= render 'good_job/shared/filter', filter: @filter %>
 
-<%= render 'good_job/shared/jobs_table', jobs: @filter.records %>
+<% if @filter.records.present? %>
+  <%= render 'good_job/shared/jobs_table', jobs: @filter.records %>
+  <nav aria-label="Job pagination" class="mt-3">
+    <ul class="pagination">
+      <li class="page-item">
+        <%= link_to(@filter.to_params(after_scheduled_at: (@filter.last.scheduled_at || @filter.last.created_at), after_id: @filter.last.id), class: "page-link") do %>
+          Older jobs <span aria-hidden="true">&raquo;</span>
+        <% end %>
+      </li>
+    </ul>
+  </nav>
+<% else %>
+  <em>No jobs present.</em>
+<% end %>
