@@ -43,11 +43,23 @@
               %>
               <%= tag.pre JSON.pretty_generate(job.serialized_params), id: dom_id(job, "params"), class: "collapse job-params" %>
             </td>
-<!--            <td>-->
-              <%#= button_to execution_path(execution.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Delete execution" do %>
-                <%#= render "good_job/shared/icons/trash" %>
-              <%# end %>
-<!--            </td>-->
+            <td>
+              <div class="text-nowrap">
+                <% job_reschedulable = job.status.in? [:scheduled, :retried, :queued] %>
+                <%= button_to reschedule_job_path(job.id), method: :put, class: "btn btn-sm #{job_reschedulable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_reschedulable, aria: { label: "Reschedule job" }, title: "Reschedule job" do %>
+                  <%= render "good_job/shared/icons/skip_forward" %>
+                <% end %>
+
+                <% job_discardable = job.status.in? [:scheduled, :retried, :queued] %>
+                <%= button_to discard_job_path(job.id), method: :put, class: "btn btn-sm #{job_discardable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_discardable, aria: { label: "Discard job" }, title: "Discard job" do %>
+                  <%= render "good_job/shared/icons/stop" %>
+                <% end %>
+
+                <%= button_to retry_job_path(job.id), method: :put, class: "btn btn-sm #{job.status == :discarded ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: job.status != :discarded, aria: { label: "Retry job" }, title: "Retry job" do %>
+                  <%= render "good_job/shared/icons/arrow_clockwise" %>
+                <% end %>
+              </div>
+            </td>
           </tr>
         <% end %>
       </tbody>

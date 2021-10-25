@@ -19,7 +19,9 @@ module GoodJob
     end
 
     def filtered_query
-      query = base_query
+      query = base_query.includes(:executions)
+                        .joins_advisory_locks.select('good_jobs.*', 'pg_locks.locktype AS locktype')
+
       query = query.job_class(params[:job_class]) if params[:job_class]
       query = query.where(queue_name: params[:queue_name]) if params[:queue_name]
 

@@ -1,12 +1,21 @@
 # frozen_string_literal: true
 module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
-  # Is the same record data as a {GoodJob::Execution} but only the most recent execution.
+  # There is not a table in the database whose discrete rows represents "Jobs".
+  # The +good_jobs+ table is a table of individual {GoodJob::Execution}s that share the same +active_job_id+.
+  # A single row from the +good_jobs+ table of executions is fetched to represent an ActiveJobJob
   # Parent class can be configured with +GoodJob.active_record_parent_class+.
   # @!parse
   #   class ActiveJob < ActiveRecord::Base; end
   class ActiveJobJob < Object.const_get(GoodJob.active_record_parent_class)
     include GoodJob::Lockable
+
+    # Raised when an inappropriate action is applied to a Job based on its state.
+    ActionForStateMismatchError = Class.new(StandardError)
+    # Raised when an action requires GoodJob to be the ActiveJob Queue Adapter but GoodJob is not.
+    AdapterNotGoodJobError = Class.new(StandardError)
+    # Attached to a Job's Execution when the Job is discarded.
+    DiscardJobError = Class.new(StandardError)
 
     self.table_name = 'good_jobs'
     self.primary_key = 'active_job_id'
@@ -56,27 +65,41 @@ module GoodJob
       query
     end)
 
+    # The job's ActiveJob UUID
+    # @return [String]
     def id
       active_job_id
     end
 
-    def _execution_id
-      attributes['id']
-    end
-
+    # The ActiveJob job class, as a string
+    # @return [String]
     def job_class
       serialized_params['job_class']
     end
 
+    # The status of the Job, based on the state of its most recent execution.
+    # There are 3 buckets of non-overlapping statuses:
+    #   1. The job will be executed
+    #     - queued: The job will execute immediately when an execution thread becomes available.
+    #     - scheduled: The job is scheduled to execute in the future.
+    #     - retried: The job previously errored on execution and will be re-executed in the future.
+    #   2. The job is being executed
+    #     - running: the job is actively being executed by an execution thread
+    #   3. The job will not execute
+    #     - finished: The job executed successfully
+    #     - discarded: The job previously errored on execution and will not be re-executed in the future.
+    #
+    # @return [Symbol]
     def status
-      if finished_at.present?
-        if error.present?
+      execution = head_execution
+      if execution.finished_at.present?
+        if execution.error.present?
           :discarded
         else
           :finished
         end
-      elsif (scheduled_at || created_at) > DateTime.current
-        if serialized_params.fetch('executions', 0) > 1
+      elsif (execution.scheduled_at || execution.created_at) > DateTime.current
+        if execution.serialized_params.fetch('executions', 0) > 1
           :retried
         else
           :scheduled
@@ -88,16 +111,25 @@ module GoodJob
       end
     end
 
-    def head_execution
+    # This job's most recent {Execution}
+    # @param reload [Booelan] whether to reload executions
+    # @return [Execution]
+    def head_execution(reload: false)
+      executions.reload if reload
+      executions.load # memoize the results
       executions.last
     end
 
+    # This job's initial/oldest {Execution}
+    # @return [Execution]
     def tail_execution
       executions.first
     end
 
+    # The number of times this job has been executed, according to ActiveJob's serialized state.
+    # @return [Numeric]
     def executions_count
-      aj_count = serialized_params.fetch('executions', 0)
+      aj_count = head_execution.serialized_params.fetch('executions', 0)
       # The execution count within serialized_params is not updated
       # once the underlying execution has been executed.
       if status.in? [:discarded, :finished, :running]
@@ -107,14 +139,21 @@ module GoodJob
       end
     end
 
+    # The number of times this job has been executed, according to the number of GoodJob {Execution} records.
+    # @return [Numeric]
     def preserved_executions_count
       executions.size
     end
 
+    # The most recent error message.
+    # If the job has been retried, the error will be fetched from the previous {Execution} record.
+    # @return [String]
     def recent_error
-      error.presence || executions[-2]&.error
+      head_execution.error || executions[-2]&.error
     end
 
+    # Tests whether the job is being executed right now.
+    # @return [Boolean]
     def running?
       # Avoid N+1 Query: `.joins_advisory_locks.select('good_jobs.*', 'pg_locks.locktype AS locktype')`
       if has_attribute?(:locktype)
@@ -122,6 +161,85 @@ module GoodJob
       else
         advisory_locked?
       end
+    end
+
+    # Retry a job that has errored and been discarded.
+    # This action will create a new job {Execution} record.
+    # @return [ActiveJob::Base]
+    def retry_job
+      with_advisory_lock do
+        execution = head_execution(reload: true)
+        active_job = execution.active_job
+
+        raise AdapterNotGoodJobError unless active_job.class.queue_adapter.is_a? GoodJob::Adapter
+        raise ActionForStateMismatchError unless status == :discarded
+
+        # Update the executions count because the previous execution will not have been preserved
+        # Do not update `exception_executions` because that comes from rescue_from's arguments
+        active_job.executions = (active_job.executions || 0) + 1
+
+        new_active_job = nil
+        GoodJob::CurrentThread.within do |current_thread|
+          current_thread.execution = execution
+
+          execution.class.transaction(joinable: false, requires_new: true) do
+            new_active_job = active_job.retry_job(wait: 0, error: error)
+            execution.save
+          end
+        end
+        new_active_job
+      end
+    end
+
+    # Discard a job so that it will not be executed further.
+    # This action will add a {DiscardJobError} to the job's {Execution} and mark it as finished.
+    # @return [void]
+    def discard_job(message)
+      with_advisory_lock do
+        raise ActionForStateMismatchError unless status.in? [:scheduled, :queued, :retried]
+
+        execution = head_execution(reload: true)
+        active_job = execution.active_job
+
+        job_error = GoodJob::ActiveJobJob::DiscardJobError.new(message)
+
+        update_execution = proc do
+          execution.update(
+            finished_at: Time.current,
+            error: [job_error.class, GoodJob::Execution::ERROR_MESSAGE_SEPARATOR, job_error.message].join
+          )
+        end
+
+        if active_job.respond_to?(:instrument)
+          active_job.send :instrument, :discard, error: job_error, &update_execution
+        else
+          update_execution.call
+        end
+      end
+    end
+
+    # Reschedule a scheduled job so that it executes immediately (or later) by the next available execution thread.
+    # @param scheduled_at [DateTime, Time] When to reschedule the job
+    # @return [void]
+    def reschedule_job(scheduled_at = Time.current)
+      with_advisory_lock do
+        raise ActionForStateMismatchError unless status.in? [:scheduled, :queued, :retried]
+
+        execution = head_execution(reload: true)
+        execution.update(scheduled_at: scheduled_at)
+      end
+    end
+
+    # Utility method to determine which execution record is used to represent this job
+    # @return [String]
+    def _execution_id
+      attributes['id']
+    end
+
+    # Utility method to test whether this job's underlying attributes represents its most recent execution.
+    # @return [Boolean]
+    def _head?
+      _execution_id == head_execution(reload: true).id
     end
   end
 end

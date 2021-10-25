@@ -52,5 +52,13 @@ module GoodJob
     def self.thread_name
       (Thread.current.name || Thread.current.object_id).to_s
     end
+
+    # @return [void]
+    def self.within
+      reset
+      yield(self)
+    ensure
+      reset
+    end
   end
 end

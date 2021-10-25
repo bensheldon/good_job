@@ -10,6 +10,9 @@ module GoodJob
     # Raised if something attempts to execute a previously completed Execution again.
     PreviouslyPerformedError = Class.new(StandardError)
 
+    # String separating Error Class from Error Message
+    ERROR_MESSAGE_SEPARATOR = ": "
+
     # ActiveJob jobs without a +queue_name+ attribute are placed on this queue.
     DEFAULT_QUEUE_NAME = 'default'
     # ActiveJob jobs without a +priority+ attribute are given this priority.
@@ -222,7 +225,7 @@ module GoodJob
 
         if CurrentThread.cron_key
           execution_args[:cron_key] = CurrentThread.cron_key
-        elsif CurrentThread.active_job_id == active_job.job_id
+        elsif CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
           execution_args[:cron_key] = CurrentThread.execution.cron_key
         end
 
@@ -233,7 +236,7 @@ module GoodJob
         execution.save!
         active_job.provider_job_id = execution.id
 
-        CurrentThread.execution.retried_good_job_id = execution.id if CurrentThread.execution && CurrentThread.execution.active_job_id == active_job.job_id
+        CurrentThread.execution.retried_good_job_id = execution.id if CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
 
         execution
       end
@@ -253,7 +256,7 @@ module GoodJob
       result = execute
 
       job_error = result.handled_error || result.unhandled_error
-      self.error = "#{job_error.class}: #{job_error.message}" if job_error
+      self.error = [job_error.class, ERROR_MESSAGE_SEPARATOR, job_error.message].join if job_error
 
       if result.unhandled_error && GoodJob.retry_on_unhandled_error
         save!
@@ -273,19 +276,27 @@ module GoodJob
       self.class.unscoped.unfinished.owns_advisory_locked.exists?(id: id)
     end
 
+    def active_job
+      ActiveJob::Base.deserialize(active_job_data)
+    end
+
     private
+
+    def active_job_data
+      serialized_params.deep_dup
+                       .tap do |job_data|
+        job_data["provider_job_id"] = id
+      end
+    end
 
     # @return [ExecutionResult]
     def execute
       GoodJob::CurrentThread.reset
       GoodJob::CurrentThread.execution = self
 
-      job_data = serialized_params.deep_dup
-      job_data["provider_job_id"] = id
-
       # DEPRECATION: Remove deprecated `good_job:` parameter in GoodJob v3
       ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, execution: self, process_id: GoodJob::CurrentThread.process_id, thread_name: GoodJob::CurrentThread.thread_name }) do
-        value = ActiveJob::Base.execute(job_data)
+        value = ActiveJob::Base.execute(active_job_data)
 
         if value.is_a?(Exception)
           handled_error = value
