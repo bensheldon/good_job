@@ -1,5 +1,28 @@
 # Changelog
 
+## [v2.5.0](https://github.com/bensheldon/good_job/tree/v2.5.0) (2021-10-25)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.4.2...v2.5.0)
+
+**Implemented enhancements:**
+
+- Add Reschedule, Discard, Retry Job buttons to Dashboard [\#425](https://github.com/bensheldon/good_job/pull/425) ([bensheldon](https://github.com/bensheldon))
+- Use unique index on \[cron\_key, cron\_at\] columns to prevent duplicate cron jobs from being enqueued [\#423](https://github.com/bensheldon/good_job/pull/423) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Dashboard fix preservation of `limit` and `queue_name` filter params; add pager to jobs [\#434](https://github.com/bensheldon/good_job/pull/434) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- PgLock state inspection is not isolated to current database  [\#431](https://github.com/bensheldon/good_job/issues/431)
+- Race condition with concurency control [\#378](https://github.com/bensheldon/good_job/issues/378)
+
+**Merged pull requests:**
+
+- Add Readme note about race conditions in Concurrency's `enqueue\_limit` and `perform\_limit [\#433](https://github.com/bensheldon/good_job/pull/433) ([bensheldon](https://github.com/bensheldon))
+- Test harness should only force-unlock db connections for the current database [\#430](https://github.com/bensheldon/good_job/pull/430) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.4.2](https://github.com/bensheldon/good_job/tree/v2.4.2) (2021-10-19)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.4.1...v2.4.2)
