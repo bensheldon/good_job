@@ -43,11 +43,13 @@ module GoodJob # :nodoc:
 
     def next_at
       fugit = Fugit::Cron.parse(cron)
-      fugit.next_time
+      fugit.next_time.to_t
     end
 
     def enqueue
       job_class.constantize.set(set_value).perform_later(*args_value)
+    rescue ActiveRecord::RecordNotUnique
+      false
     end
 
     private

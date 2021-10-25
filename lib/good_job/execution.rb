@@ -53,6 +53,16 @@ module GoodJob
       end
     end
 
+    def self._migration_pending_warning
+      ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+        GoodJob has pending database migrations. To create the migration files, run:
+            rails generate good_job:update
+        To apply the migration files, run:
+            rails db:migrate
+      DEPRECATION
+      nil
+    end
+
     # Get Jobs with given ActiveJob ID
     # @!method active_job_id
     # @!scope class
@@ -225,6 +235,14 @@ module GoodJob
 
         if CurrentThread.cron_key
           execution_args[:cron_key] = CurrentThread.cron_key
+
+          @cron_at_index = column_names.include?('cron_at') && connection.index_name_exists?(:good_jobs, :index_good_jobs_on_cron_key_and_cron_at) unless instance_variable_defined?(:@cron_at_index)
+
+          if @cron_at_index
+            execution_args[:cron_at] = CurrentThread.cron_at
+          else
+            _migration_pending_warning
+          end
         elsif CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
           execution_args[:cron_key] = CurrentThread.execution.cron_key
         end
