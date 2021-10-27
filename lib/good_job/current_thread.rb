@@ -5,6 +5,15 @@ module GoodJob
   # Thread-local attributes for passing values from Instrumentation.
   # (Cannot use ActiveSupport::CurrentAttributes because ActiveJob resets it)
   module CurrentThread
+    # Resettable accessors for thread-local values.
+    ACCESSORS = %i[
+      cron_at
+      cron_key
+      error_on_discard
+      error_on_retry
+      execution
+    ].freeze
+
     # @!attribute [rw] cron_at
     #   @!scope class
     #   Cron At
@@ -36,13 +45,20 @@ module GoodJob
     thread_mattr_accessor :execution
 
     # Resets attributes
+    # @param [Hash] values to assign
     # @return [void]
-    def self.reset
-      self.cron_at = nil
-      self.cron_key = nil
-      self.execution = nil
-      self.error_on_discard = nil
-      self.error_on_retry = nil
+    def self.reset(values = {})
+      ACCESSORS.each do |accessor|
+        send("#{accessor}=", values[accessor])
+      end
+    end
+
+    # Exports values to hash
+    # @return [Hash]
+    def self.to_h
+      ACCESSORS.each_with_object({}) do |accessor, hash|
+        hash[accessor] = send(accessor)
+      end
     end
 
     # @return [String] UUID of the currently executing GoodJob::Execution
@@ -60,12 +76,14 @@ module GoodJob
       (Thread.current.name || Thread.current.object_id).to_s
     end
 
+    # Wrap the yielded block with CurrentThread values and reset after the block
+    # @yield [self]
     # @return [void]
     def self.within
-      reset
+      original_values = to_h
       yield(self)
     ensure
-      reset
+      reset(original_values)
     end
   end
 end

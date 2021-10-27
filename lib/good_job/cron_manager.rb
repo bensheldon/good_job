@@ -89,11 +89,7 @@ module GoodJob # :nodoc:
         thr_scheduler.create_task(thr_cron_entry)
 
         Rails.application.executor.wrap do
-          CurrentThread.reset
-          CurrentThread.cron_key = thr_cron_entry.key
-          CurrentThread.cron_at = thr_cron_at
-
-          cron_entry.enqueue
+          cron_entry.enqueue(thr_cron_at)
         end
       end
 

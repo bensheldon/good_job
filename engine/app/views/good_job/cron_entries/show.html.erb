@@ -1,0 +1,4 @@
+<h1 class="mb-3">Cron Entry Key: <code><%= @cron_entry.id %></code></h1>
+
+<%= render 'good_job/shared/filter', filter: @jobs_filter %>
+<%= render 'good_job/jobs/table', jobs: @jobs_filter.records %>

@@ -12,7 +12,7 @@ module GoodJob
 
     private
 
-    def base_query
+    def default_base_query
       GoodJob::Execution.all
     end
 

@@ -157,7 +157,7 @@ module GoodJob
     alias enable_cron? enable_cron
 
     def cron
-      env_cron = JSON.parse(ENV['GOOD_JOB_CRON']) if ENV['GOOD_JOB_CRON'].present?
+      env_cron = JSON.parse(ENV['GOOD_JOB_CRON'], symbolize_names: true) if ENV['GOOD_JOB_CRON'].present?
 
       options[:cron] ||
         rails_config[:cron] ||

@@ -1,0 +1,51 @@
+<% if @cron_entries.present? %>
+  <div class="card my-3">
+    <div class="table-responsive">
+      <table class="table card-table table-bordered table-hover table-sm mb-0">
+        <thead>
+          <th>Key</th>
+          <th>Schedule</th>
+          <th>
+            Properties
+            <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                           data: { bs_toggle: "collapse", bs_target: ".cron-entry-properties" },
+                           aria: { expanded: false, controls: @cron_entries.map { |cron_entry| "##{dom_id(cron_entry, 'properties')}" }.join(" ") }
+            %>
+          </th>
+          <th>Description</th>
+          <th>Next scheduled</th>
+          <th>Last run</th>
+          <th>Actions</th>
+        </thead>
+        <tbody>
+          <% @cron_entries.each do |cron_entry| %>
+            <tr id="<%= dom_id(cron_entry) %>">
+              <td class="font-monospace"><%= cron_entry.key %></td>
+              <td class="font-monospace"><%= cron_entry.cron %></td>
+              <td>
+                <%= tag.button("Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                        data: { bs_toggle: "collapse", bs_target: "##{dom_id(cron_entry, 'properties')}" },
+                        aria: { expanded: false, controls: dom_id(cron_entry, 'properties') }) %>
+                <%= tag.pre(JSON.pretty_generate(cron_entry.display_properties), id: dom_id(cron_entry, 'properties'), class: "collapse cron-entry-properties") %>
+              </td>
+              <td><%= cron_entry.description %></td>
+              <td><%= cron_entry.next_at %></td>
+              <td>
+                <% if cron_entry.last_job.present? %>
+                  <%= link_to cron_entry.last_at, cron_entry_path(cron_entry), title: "Job #{cron_entry.last_job.id}" %>
+                <% end %>
+              </td>
+              <td>
+                <%= button_to enqueue_cron_entry_path(cron_entry.id), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Run cron entry now" }, title: "Run cron entry now", data: { confirm: "Confirm run cron entry now" } do %>
+                  <%= render "good_job/shared/icons/play" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <em>No cron schedules present.</em>
+<% end %>
