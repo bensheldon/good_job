@@ -46,16 +46,16 @@
             <td>
               <div class="text-nowrap">
                 <% job_reschedulable = job.status.in? [:scheduled, :retried, :queued] %>
-                <%= button_to reschedule_job_path(job.id), method: :put, class: "btn btn-sm #{job_reschedulable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_reschedulable, aria: { label: "Reschedule job" }, title: "Reschedule job" do %>
+                <%= button_to reschedule_job_path(job.id), method: :put, class: "btn btn-sm #{job_reschedulable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_reschedulable, aria: { label: "Reschedule job" }, title: "Reschedule job", data: { confirm: "Confirm reschedule" } do %>
                   <%= render "good_job/shared/icons/skip_forward" %>
                 <% end %>
 
                 <% job_discardable = job.status.in? [:scheduled, :retried, :queued] %>
-                <%= button_to discard_job_path(job.id), method: :put, class: "btn btn-sm #{job_discardable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_discardable, aria: { label: "Discard job" }, title: "Discard job" do %>
+                <%= button_to discard_job_path(job.id), method: :put, class: "btn btn-sm #{job_discardable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_discardable, aria: { label: "Discard job" }, title: "Discard job", data: { confirm: "Confirm discard" } do %>
                   <%= render "good_job/shared/icons/stop" %>
                 <% end %>
 
-                <%= button_to retry_job_path(job.id), method: :put, class: "btn btn-sm #{job.status == :discarded ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: job.status != :discarded, aria: { label: "Retry job" }, title: "Retry job" do %>
+                <%= button_to retry_job_path(job.id), method: :put, class: "btn btn-sm #{job.status == :discarded ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: job.status != :discarded, aria: { label: "Retry job" }, title: "Retry job", data: { confirm: "Confirm retry" } do %>
                   <%= render "good_job/shared/icons/arrow_clockwise" %>
                 <% end %>
               </div>

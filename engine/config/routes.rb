@@ -20,6 +20,7 @@ GoodJob::Engine.routes.draw do
 
     constraints(format: :js) do
       get :bootstrap, action: :bootstrap_js
+      get :rails_ujs, action: :rails_ujs_js
       get :chartist, action: :chartist_js
     end
   end

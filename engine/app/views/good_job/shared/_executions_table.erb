@@ -44,7 +44,7 @@
               <%= tag.pre JSON.pretty_generate(execution.serialized_params), id: dom_id(execution, "params"), class: "collapse job-params" %>
             </td>
             <td>
-              <%= button_to execution_path(execution.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Delete execution" do %>
+              <%= button_to execution_path(execution.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Delete execution", data: { confirm: "Confirm delete" } do %>
                 <%= render "good_job/shared/icons/trash" %>
               <% end %>
             </td>
