@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 GoodJob::Engine.routes.draw do
   root to: 'executions#index'
-  resources :cron_schedules, only: %i[index]
+
+  resources :cron_entries, only: %i[index show] do
+    member do
+      post :enqueue
+    end
+  end
+
   resources :jobs, only: %i[index show] do
     member do
       put :discard

@@ -5,7 +5,7 @@
 <%= render 'good_job/shared/filter', filter: @filter %>
 
 <% if @filter.records.present? %>
-  <%= render 'good_job/shared/executions_table', executions: @filter.records %>
+  <%= render 'good_job/executions/table', executions: @filter.records %>
 
   <nav aria-label="Job pagination" class="mt-3">
     <ul class="pagination">

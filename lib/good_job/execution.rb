@@ -309,22 +309,24 @@ module GoodJob
 
     # @return [ExecutionResult]
     def execute
-      GoodJob::CurrentThread.reset
-      GoodJob::CurrentThread.execution = self
+      GoodJob::CurrentThread.within do |current_thread|
+        current_thread.reset
+        current_thread.execution = self
 
-      # DEPRECATION: Remove deprecated `good_job:` parameter in GoodJob v3
-      ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, execution: self, process_id: GoodJob::CurrentThread.process_id, thread_name: GoodJob::CurrentThread.thread_name }) do
-        value = ActiveJob::Base.execute(active_job_data)
+        # DEPRECATION: Remove deprecated `good_job:` parameter in GoodJob v3
+        ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, execution: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do
+          value = ActiveJob::Base.execute(active_job_data)
 
-        if value.is_a?(Exception)
-          handled_error = value
-          value = nil
+          if value.is_a?(Exception)
+            handled_error = value
+            value = nil
+          end
+          handled_error ||= current_thread.error_on_retry || current_thread.error_on_discard
+
+          ExecutionResult.new(value: value, handled_error: handled_error)
+        rescue StandardError => e
+          ExecutionResult.new(value: nil, unhandled_error: e)
         end
-        handled_error ||= GoodJob::CurrentThread.error_on_retry || GoodJob::CurrentThread.error_on_discard
-
-        ExecutionResult.new(value: value, handled_error: handled_error)
-      rescue StandardError => e
-        ExecutionResult.new(value: nil, unhandled_error: e)
       end
     end
   end

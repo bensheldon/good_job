@@ -218,7 +218,7 @@ GEM
       mixlib-shellout
     memory_profiler (1.0.0)
     method_source (1.0.0)
-    mini_mime (1.1.1)
+    mini_mime (1.1.2)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
     mixlib-cli (2.1.8)
@@ -231,10 +231,10 @@ GEM
     multipart-post (2.1.1)
     nio4r (2.5.8)
     nio4r (2.5.8-java)
-    nokogiri (1.12.4)
+    nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
-    nokogiri (1.12.4-java)
+    nokogiri (1.12.5-java)
       racc (~> 1.4)
     octokit (4.21.0)
       faraday (>= 0.9)
@@ -269,8 +269,8 @@ GEM
     puma (5.5.0-java)
       nio4r (~> 2.0)
     raabro (1.4.0)
-    racc (1.5.2)
-    racc (1.5.2-java)
+    racc (1.6.0)
+    racc (1.6.0-java)
     rack (2.2.3)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -394,7 +394,7 @@ DEPENDENCIES
   activerecord-jdbcpostgresql-adapter
   appraisal!
   benchmark-ips
-  capybara
+  capybara (~> 3.35.0)
   database_cleaner
   dotenv
   erb_lint (>= 0.0.35)

@@ -57,7 +57,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "zeitwerk", ">= 2.0"
 
   spec.add_development_dependency "benchmark-ips"
-  spec.add_development_dependency "capybara"
+  spec.add_development_dependency "capybara", "~> 3.35.0" # Capybara 3.36 requires Ruby 2.6+, which is not compatible with JRuby 9.2 (MRI 2.5 compatible)
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "dotenv"
   spec.add_development_dependency "foreman"

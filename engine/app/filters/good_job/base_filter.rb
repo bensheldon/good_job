@@ -3,10 +3,11 @@ module GoodJob
   class BaseFilter
     DEFAULT_LIMIT = 25
 
-    attr_accessor :params
+    attr_accessor :params, :base_query
 
-    def initialize(params)
+    def initialize(params, base_query = nil)
       @params = params
+      @base_query = base_query || default_base_query
     end
 
     def records
@@ -24,13 +25,13 @@ module GoodJob
 
     def job_classes
       base_query.group("serialized_params->>'job_class'").count
-                .sort_by { |name, _count| name }
+                .sort_by { |name, _count| name.to_s }
                 .to_h
     end
 
     def queues
       base_query.group(:queue_name).count
-                .sort_by { |name, _count| name }
+                .sort_by { |name, _count| name.to_s }
                 .to_h
     end
 
@@ -94,7 +95,7 @@ module GoodJob
 
     private
 
-    def base_query
+    def default_base_query
       raise NotImplementedError
     end
 

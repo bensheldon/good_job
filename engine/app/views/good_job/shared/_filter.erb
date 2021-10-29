@@ -1,16 +1,15 @@
 <div class='card mb-2'>
   <div class='card-body d-flex flex-wrap'>
-
     <div class='me-4'>
       <small>Filter by job class</small>
       <br>
-      <% @filter.job_classes.each do |name, count| %>
+      <% filter.job_classes.each do |name, count| %>
         <% if params[:job_class] == name %>
-          <%= link_to(@filter.to_params(job_class: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
+          <%= link_to(filter.to_params(job_class: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
             <%= name %> (<%= count %>)
           <% end %>
         <% else %>
-          <%= link_to(@filter.to_params(job_class: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
+          <%= link_to(filter.to_params(job_class: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
             <%= name %> (<%= count %>)
           <% end %>
         <% end %>
@@ -20,13 +19,13 @@
     <div class='me-4'>
       <small>Filter by state</small>
       <br>
-      <% @filter.states.each do |name, count| %>
+      <% filter.states.each do |name, count| %>
         <% if params[:state] == name %>
-          <%= link_to(@filter.to_params(state: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
+          <%= link_to(filter.to_params(state: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
             <%= name %> (<%= count %>)
           <% end %>
         <% else %>
-          <%= link_to(@filter.to_params(state: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
+          <%= link_to(filter.to_params(state: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
             <%= name %> (<%= count %>)
           <% end %>
         <% end %>
@@ -36,13 +35,13 @@
     <div>
       <small>Filter by queue</small>
       <br>
-      <% @filter.queues.each do |name, count| %>
+      <% filter.queues.each do |name, count| %>
         <% if params[:queue_name] == name %>
-          <%= link_to(@filter.to_params(queue_name: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
+          <%= link_to(filter.to_params(queue_name: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
             <%= name %> (<%= count %>)
           <% end %>
         <% else %>
-          <%= link_to(@filter.to_params(queue_name: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
+          <%= link_to(filter.to_params(queue_name: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
             <%= name %> (<%= count %>)
           <% end %>
         <% end %>

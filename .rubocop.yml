@@ -12,6 +12,7 @@ inherit_mode:
 
 AllCops:
   TargetRubyVersion: 2.5
+  TargetRailsVersion: 5.2
   DisplayCopNames: true
   DisplayStyleGuide: true
   Include:
