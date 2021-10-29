@@ -22,7 +22,7 @@
       </thead>
       <tbody>
         <% jobs.each do |job| %>
-          <tr id="<%= dom_id(job) %>">
+          <tr class="<%= dom_class(job) %>" id="<%= dom_id(job) %>">
             <td>
               <%= link_to job_path(job.id) do %>
                 <code><%= job.id %></code>

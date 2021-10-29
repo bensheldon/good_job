@@ -1,6 +1,6 @@
 <div class='card mb-2'>
   <div class='card-body d-flex flex-wrap'>
-    <div class='me-4'>
+    <div class='mb-2 me-4'>
       <small>Filter by job class</small>
       <br>
       <% filter.job_classes.each do |name, count| %>
@@ -16,7 +16,7 @@
       <% end %>
     </div>
 
-    <div class='me-4'>
+    <div class='mb-2 me-4'>
       <small>Filter by state</small>
       <br>
       <% filter.states.each do |name, count| %>
@@ -32,7 +32,7 @@
       <% end %>
     </div>
 
-    <div>
+    <div class='mb-2 me-4'>
       <small>Filter by queue</small>
       <br>
       <% filter.queues.each do |name, count| %>
@@ -45,6 +45,21 @@
             <%= name %> (<%= count %>)
           <% end %>
         <% end %>
+      <% end %>
+    </div>
+
+    <div class="mb-2">
+      <%= form_with(url: "", method: :get, local: true) do |form| %>
+        <% filter.to_params(query: nil).each do |key, value| %>
+          <%= form.hidden_field(key.to_sym, value: value) %>
+        <% end %>
+
+        <small><%= form.label :query, "Search" %></small>
+        <div class="input-group input-group-sm">
+          <%= form.search_field :query, value: params[:query], class: "form-control" %>
+          <%= form.button "Search", type: "submit", name: nil, class: "btn btn-sm btn-outline-secondary" %>
+          <%= link_to "Clear", filter.to_params(query: nil), class: "btn btn-sm btn-outline-secondary" %>
+        </div>
       <% end %>
     </div>
   </div>

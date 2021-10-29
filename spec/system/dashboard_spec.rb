@@ -62,6 +62,18 @@ describe 'Dashboard', type: :system do
       unfinished_job
     end
 
+    describe 'filtering' do
+      it 'can search by argument' do
+        visit '/good_job'
+        click_on "All Jobs"
+
+        expect(page).to have_selector('.active_job_job', count: 2)
+        fill_in 'query', with: ExampleJob::DEAD_TYPE
+        click_on 'Search'
+        expect(page).to have_selector('.active_job_job', count: 1)
+      end
+    end
+
     it 'can retry discarded jobs' do
       visit '/good_job'
       click_on "All Jobs"

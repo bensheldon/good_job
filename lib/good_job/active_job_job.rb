@@ -8,7 +8,8 @@ module GoodJob
   # @!parse
   #   class ActiveJob < ActiveRecord::Base; end
   class ActiveJobJob < Object.const_get(GoodJob.active_record_parent_class)
-    include GoodJob::Lockable
+    include Filterable
+    include Lockable
 
     # Raised when an inappropriate action is applied to a Job based on its state.
     ActionForStateMismatchError = Class.new(StandardError)
@@ -46,24 +47,6 @@ module GoodJob
     scope :finished, -> { where.not(finished_at: nil).where(error: nil) }
     # Errored but will not be retried
     scope :discarded, -> { where.not(finished_at: nil).where.not(error: nil) }
-
-    # Get Jobs in display order with optional keyset pagination.
-    # @!method display_all(after_scheduled_at: nil, after_id: nil)
-    # @!scope class
-    # @param after_scheduled_at [DateTime, String, nil]
-    #   Display records scheduled after this time for keyset pagination
-    # @param after_id [Numeric, String, nil]
-    #   Display records after this ID for keyset pagination
-    # @return [ActiveRecord::Relation]
-    scope :display_all, (lambda do |after_scheduled_at: nil, after_id: nil|
-      query = order(Arel.sql('COALESCE(scheduled_at, created_at) DESC, id DESC'))
-      if after_scheduled_at.present? && after_id.present?
-        query = query.where(Arel.sql('(COALESCE(scheduled_at, created_at), id) < (:after_scheduled_at, :after_id)'), after_scheduled_at: after_scheduled_at, after_id: after_id)
-      elsif after_scheduled_at.present?
-        query = query.where(Arel.sql('(COALESCE(scheduled_at, created_at)) < (:after_scheduled_at)'), after_scheduled_at: after_scheduled_at)
-      end
-      query
-    end)
 
     # The job's ActiveJob UUID
     # @return [String]
