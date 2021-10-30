@@ -22,6 +22,12 @@ describe GoodJob::CronEntry do
       end
     end)
   end
+  
+  describe '#initialize' do
+    it 'raises an argument error if cron does not parse to a Fugit::Cron instance' do
+      expect { described_class.new(cron: '2017-12-12') }.to raise_error(ArgumentError)
+    end
+  end
 
   describe '#all' do
     it 'returns all entries' do
@@ -122,10 +128,5 @@ describe GoodJob::CronEntry do
     it 'returns an instance of Fugit::Cron' do
       expect(entry.fugit).to be_instance_of(Fugit::Cron)
     end
-    
-    it 'raises an argument error if the cron schedule does not parse to a Fugit::Cron instance' do
-      expect { described_class.new(cron: '2017-12-12').fugit }.to raise_error(ArgumentError)
-    end
   end
-
 end
