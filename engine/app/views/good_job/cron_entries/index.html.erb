@@ -21,7 +21,7 @@
           <% @cron_entries.each do |cron_entry| %>
             <tr id="<%= dom_id(cron_entry) %>">
               <td class="font-monospace"><%= cron_entry.key %></td>
-              <td class="font-monospace"><%= cron_entry.cron %></td>
+              <td class="font-monospace"><%= cron_entry.schedule %></td>
               <td>
                 <%= tag.button("Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
                         data: { bs_toggle: "collapse", bs_target: "##{dom_id(cron_entry, 'properties')}" },

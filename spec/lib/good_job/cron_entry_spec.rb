@@ -23,6 +23,12 @@ describe GoodJob::CronEntry do
     end)
   end
 
+  describe '#initialize' do
+    it 'raises an argument error if cron does not parse to a Fugit::Cron instance' do
+      expect { described_class.new(cron: '2017-12-12') }.to raise_error(ArgumentError)
+    end
+  end
+
   describe '#all' do
     it 'returns all entries' do
       expect(described_class.all).to be_a(Array)
@@ -48,6 +54,31 @@ describe GoodJob::CronEntry do
   describe '#next_at' do
     it 'returns a timestamp of the next time to run' do
       expect(entry.next_at).to eq(Time.current.at_beginning_of_minute + 1.minute)
+    end
+  end
+
+  describe 'schedule' do
+    it 'returns the cron expression' do
+      expect(entry.schedule).to eq('* * * * *')
+    end
+
+    it 'returns the cron expression for a schedule parsed using natual language' do
+      entry = described_class.new(cron: 'every weekday at five')
+      expect(entry.schedule).to eq('0 5 * * 1-5')
+    end
+  end
+
+  describe '#fugit' do
+    it 'parses the cron configuration using fugit' do
+      allow(Fugit).to receive(:parse).and_call_original
+
+      entry.fugit
+
+      expect(Fugit).to have_received(:parse).with('* * * * *')
+    end
+
+    it 'returns an instance of Fugit::Cron' do
+      expect(entry.fugit).to be_instance_of(Fugit::Cron)
     end
   end
 

@@ -25,6 +25,8 @@ module GoodJob # :nodoc:
 
     def initialize(params = {})
       @params = params
+
+      raise ArgumentError, "Invalid cron format: '#{cron}'" unless fugit.instance_of?(Fugit::Cron)
     end
 
     def key
@@ -55,8 +57,15 @@ module GoodJob # :nodoc:
     end
 
     def next_at
-      fugit = Fugit::Cron.parse(cron)
       fugit.next_time.to_t
+    end
+
+    def schedule
+      fugit.original
+    end
+
+    def fugit
+      @_fugit ||= Fugit.parse(cron)
     end
 
     def jobs
@@ -96,7 +105,7 @@ module GoodJob # :nodoc:
       {
         key: key,
         class: job_class,
-        cron: cron,
+        cron: schedule,
         set: display_property(set),
         args: display_property(args),
         description: display_property(description),
