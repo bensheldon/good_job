@@ -401,7 +401,7 @@ GoodJob can enqueue jobs on a recurring basis that can be used as a replacement 
 
 Cron-style jobs are run on every GoodJob process (e.g. CLI or `async` execution mode) when `config.good_job.enable_cron = true`, but GoodJob's cron uses unique indexes to ensure that only a single job is enqeued at the given time interval.
 
-Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`). The cron schedule can also be configured using the [fugit natual language parser](https://github.com/floraison/fugit#fugitnat) (e.g. `Fugit::Nat.parse("every 15 minutes")`).
+Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`) and natural language parsing (e.g. `every second`).
 
 ```ruby
 # config/environments/application.rb or a specific environment e.g. production.rb
@@ -413,7 +413,7 @@ config.good_job.enable_cron = ENV['DYNO'] == 'worker.1' # or `true` or via $GOOD
 config.good_job.cron = {
   # Every 15 minutes, enqueue `ExampleJob.set(priority: -10).perform_later(42, name: "Alice")`
   frequent_task: { # each recurring job must have a unique key
-    cron: "*/15 * * * *", # cron-style scheduling format or `Fugit::Nat.parse("every 15 minutes")`
+    cron: "*/15 * * * *", # cron-style scheduling format by fugit gem
     class: "ExampleJob", # reference the Job class with a string
     args: [42, { name: "Alice" }], # arguments to pass; can also be a proc e.g. `-> { { when: Time.now } }`
     set: { priority: -10 }, # additional ActiveJob properties; can also be a lambda/proc e.g. `-> { { priority: [1,2].sample } }`

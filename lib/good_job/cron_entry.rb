@@ -106,13 +106,17 @@ module GoodJob # :nodoc:
       }
     end
 
-    private
-
     def fugit
-      return cron if cron.instance_of?(Fugit::Cron)
-      
-      Fugit::Cron.parse(cron)
+      @fugit ||= begin
+        parsed_cron = Fugit.parse(cron)
+        
+        raise ArgumentError, "Invalid cron format: '#{cron}'" unless parsed_cron.instance_of?(Fugit::Cron)
+        
+        parsed_cron
+      end
     end
+    
+    private
 
     def set_value
       value = set || {}
