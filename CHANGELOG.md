@@ -1,5 +1,21 @@
 # Changelog
 
+## [v2.6.0](https://github.com/bensheldon/good_job/tree/v2.6.0) (2021-10-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.5.0...v2.6.0)
+
+**Implemented enhancements:**
+
+- Allow for cron schedules to be expressed using fugit natural language parsing [\#441](https://github.com/bensheldon/good_job/pull/441) ([jgrau](https://github.com/jgrau))
+- Add Rails UJS javascript to Dashboard along with confirmations [\#437](https://github.com/bensheldon/good_job/pull/437) ([bensheldon](https://github.com/bensheldon))
+- Reorganize Cron dashboard screen; add jobs drill-drown and enqueue-now action [\#436](https://github.com/bensheldon/good_job/pull/436) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Ability to express cron schedule using fugit natural language parser [\#439](https://github.com/bensheldon/good_job/issues/439)
+- Best way to ensure ordering of a queue. [\#402](https://github.com/bensheldon/good_job/issues/402)
+- ActiveJob concurrency raises FrozenError [\#386](https://github.com/bensheldon/good_job/issues/386)
+
 ## [v2.5.0](https://github.com/bensheldon/good_job/tree/v2.5.0) (2021-10-25)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.4.2...v2.5.0)
