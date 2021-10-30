@@ -49,6 +49,22 @@ describe GoodJob::CronEntry do
     it 'returns a timestamp of the next time to run' do
       expect(entry.next_at).to eq(Time.current.at_beginning_of_minute + 1.minute)
     end
+    
+    it 'accepts pre-parsed cron configuration' do
+      pre_parsed_entry = described_class.new(params.merge(cron: Fugit::Nat.parse('every minute')))
+      expect(pre_parsed_entry.next_at).to eq(Time.current.at_beginning_of_minute + 1.minute)
+    end
+  end
+  
+  describe 'schedule' do
+    it 'returns the cron expression' do
+      expect(entry.schedule).to eq('* * * * *')
+    end
+    
+    it 'returns the cron expression for a schedule parsed using natual language' do
+      entry = described_class.new(params.merge(cron: Fugit::Nat.parse('every weekday at five')))
+      expect(entry.schedule).to eq('0 5 * * 1-5')
+    end
   end
 
   describe '#enqueue' do

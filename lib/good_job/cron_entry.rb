@@ -55,8 +55,11 @@ module GoodJob # :nodoc:
     end
 
     def next_at
-      fugit = Fugit::Cron.parse(cron)
       fugit.next_time.to_t
+    end
+    
+    def schedule
+      fugit.original
     end
 
     def jobs
@@ -96,7 +99,7 @@ module GoodJob # :nodoc:
       {
         key: key,
         class: job_class,
-        cron: cron,
+        cron: schedule,
         set: display_property(set),
         args: display_property(args),
         description: display_property(description),
@@ -104,6 +107,12 @@ module GoodJob # :nodoc:
     end
 
     private
+
+    def fugit
+      return cron if cron.instance_of?(Fugit::Cron)
+      
+      Fugit::Cron.parse(cron)
+    end
 
     def set_value
       value = set || {}
