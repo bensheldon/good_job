@@ -39,13 +39,14 @@ module GoodJob
       raise NotImplementedError
     end
 
-    def to_params(override)
+    def to_params(override = {})
       {
         job_class: params[:job_class],
         limit: params[:limit],
         queue_name: params[:queue_name],
+        query: params[:query],
         state: params[:state],
-      }.merge(override).delete_if { |_, v| v.nil? }
+      }.merge(override).delete_if { |_, v| v.blank? }
     end
 
     def chart_data

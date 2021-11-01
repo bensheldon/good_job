@@ -22,8 +22,9 @@ module GoodJob
       query = base_query.includes(:executions)
                         .joins_advisory_locks.select('good_jobs.*', 'pg_locks.locktype AS locktype')
 
-      query = query.job_class(params[:job_class]) if params[:job_class]
-      query = query.where(queue_name: params[:queue_name]) if params[:queue_name]
+      query = query.job_class(params[:job_class]) if params[:job_class].present?
+      query = query.where(queue_name: params[:queue_name]) if params[:queue_name].present?
+      query = query.search(params['query']) if params[:query].present?
 
       if params[:state]
         case params[:state]
