@@ -18,3 +18,8 @@
 .ct-label.ct-horizontal {
   white-space: nowrap;
 }
+
+.chart-wrapper {
+  position: relative;
+  height: 200px;
+}

@@ -1,52 +1,25 @@
-<div id="chart"></div>
+<div class="chart-wrapper">
+  <canvas id="chart"></canvas>
+</div>
 
 <%= javascript_tag nonce: true do %>
-  new Chartist.Line('#chart', <%== chart_data.to_json %>, {
-    height: '300px',
-    fullWidth: true,
-    chartPadding: {
-      right: 40,
-      top: 20,
-      bottom: 20
+  const chartData = <%== chart_data.to_json %>;
+
+  const ctx = document.getElementById('chart').getContext('2d');
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: chartData.labels,
+      datasets: chartData.datasets
     },
-    axisX: {
-      labelInterpolationFnc: function(value, index) {
-        return index % 3 === 0 ? value : null;
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
       }
-    },
-    axisY: {
-      low: 0,
-      onlyInteger: true
     }
-  })
-
-  // https://www.smashingmagazine.com/2014/12/chartist-js-open-source-library-responsive-charts/
-  const chartEl = document.getElementById('chart');
-  const tooltipEl = document.createElement('div')
-
-  tooltipEl.classList.add('tooltip', 'tooltip-hidden');
-  chartEl.appendChild(tooltipEl);
-
-  document.body.addEventListener('mouseenter', function (event) {
-    if (!(event.target.matches && event.target.matches('.ct-point'))) return;
-
-    const seriesName = event.target.closest('.ct-series').getAttribute('ct:series-name');
-    const value = event.target.getAttribute('ct:value');
-
-    tooltipEl.innerText = seriesName + ': ' + value;
-    tooltipEl.classList.remove('tooltip-hidden');
-  }, true);
-
-  document.body.addEventListener('mouseleave', function (event) {
-    if (!(event.target.matches && event.target.matches('.ct-point'))) return;
-
-    tooltipEl.classList.add('tooltip-hidden');
-  }, true);
-
-  document.body.addEventListener('mousemove', function(event) {
-    if (!(event.target.matches && event.target.matches('.ct-point'))) return;
-
-    tooltipEl.style.left = (event.offsetX || event.originalEvent.layerX) + tooltipEl.offsetWidth + 10 + 'px';
-    tooltipEl.style.top = (event.offsetY || event.originalEvent.layerY) + tooltipEl.offsetHeight - 20 + 'px';
-  }, true);
+  });
 <% end %>

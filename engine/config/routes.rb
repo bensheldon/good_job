@@ -20,14 +20,14 @@ GoodJob::Engine.routes.draw do
   scope controller: :assets do
     constraints(format: :css) do
       get :bootstrap, action: :bootstrap_css
-      get :chartist, action: :chartist_css
       get :style, action: :style_css
     end
 
     constraints(format: :js) do
       get :bootstrap, action: :bootstrap_js
       get :rails_ujs, action: :rails_ujs_js
-      get :chartist, action: :chartist_js
+      get :chartjs, action: :chartjs_js
+      get :scripts, action: :scripts_js
     end
   end
 end

@@ -12,12 +12,6 @@ module GoodJob
       }
     end
 
-    private
-
-    def default_base_query
-      GoodJob::ActiveJobJob.all
-    end
-
     def filtered_query
       query = base_query.includes(:executions)
                         .joins_advisory_locks.select('good_jobs.*', 'pg_locks.locktype AS locktype')
@@ -44,6 +38,12 @@ module GoodJob
       end
 
       query
+    end
+
+    private
+
+    def default_base_query
+      GoodJob::ActiveJobJob.all
     end
   end
 end
