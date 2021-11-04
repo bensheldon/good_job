@@ -68,7 +68,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry-rails"
   spec.add_development_dependency "puma"
   spec.add_development_dependency "rspec-rails"
-  spec.add_development_dependency "selenium-webdriver"
+  spec.add_development_dependency "selenium-webdriver", "~> 3.142" # Selenium Webdriver 4.x requires Ruby 2.6+, which is not compatible with JRuby 9.2 (MRI 2.5 compatible)
   spec.add_development_dependency "sigdump"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "yard-activesupport-concern"
