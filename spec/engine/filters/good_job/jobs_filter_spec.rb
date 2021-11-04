@@ -62,12 +62,6 @@ RSpec.describe GoodJob::JobsFilter do
     end
   end
 
-  describe '#chart_data' do
-    it 'is a valid result' do
-      expect(filter.chart_data).to be_a Hash
-    end
-  end
-
   describe '#records' do
     it 'is a valid result' do
       expect(filter.records.size).to eq 4
@@ -101,7 +95,6 @@ RSpec.describe GoodJob::JobsFilter do
         expect(filter.job_classes).to be_a Hash
         expect(filter.queues).to be_a Hash
         expect(filter.states).to be_a Hash
-        expect(filter.chart_data).to be_a Hash
 
         expect(filter.records.to_a).to be_an Array
       end

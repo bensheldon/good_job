@@ -10,12 +10,6 @@ module GoodJob
       }
     end
 
-    private
-
-    def default_base_query
-      GoodJob::Execution.all
-    end
-
     def filtered_query
       query = base_query
       query = query.job_class(params[:job_class]) if params[:job_class].present?
@@ -36,6 +30,12 @@ module GoodJob
       end
 
       query
+    end
+
+    private
+
+    def default_base_query
+      GoodJob::Execution.all
     end
   end
 end

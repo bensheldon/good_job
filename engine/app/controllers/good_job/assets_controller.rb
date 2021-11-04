@@ -15,16 +15,16 @@ module GoodJob
       render file: GoodJob::Engine.root.join("app", "assets", "vendor", "bootstrap", "bootstrap.bundle.min.js")
     end
 
-    def chartist_css
-      render file: GoodJob::Engine.root.join("app", "assets", "vendor", "chartist", "chartist.css")
-    end
-
-    def chartist_js
-      render file: GoodJob::Engine.root.join("app", "assets", "vendor", "chartist", "chartist.js")
+    def chartjs_js
+      render file: GoodJob::Engine.root.join("app", "assets", "vendor", "chartjs", "chart.min.js")
     end
 
     def rails_ujs_js
       render file: GoodJob::Engine.root.join("app", "assets", "vendor", "rails_ujs.js")
+    end
+
+    def scripts_js
+      render file: GoodJob::Engine.root.join("app", "assets", "scripts.js")
     end
 
     def style_css

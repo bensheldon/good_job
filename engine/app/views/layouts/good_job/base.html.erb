@@ -6,11 +6,12 @@
   <%= csp_meta_tag %>
 
   <%= stylesheet_link_tag bootstrap_path(format: :css, v: GoodJob::VERSION) %>
-  <%= stylesheet_link_tag chartist_path(format: :css, v: GoodJob::VERSION) %>
   <%= stylesheet_link_tag style_path(format: :css, v: GoodJob::VERSION) %>
 
   <%= javascript_include_tag bootstrap_path(format: :js, v: GoodJob::VERSION) %>
-  <%= javascript_include_tag chartist_path(format: :js, v: GoodJob::VERSION) %>
+  <%= javascript_include_tag chartjs_path(format: :js, v: GoodJob::VERSION) %>
+  <%= javascript_include_tag scripts_path(format: :js, v: GoodJob::VERSION) %>
+
   <%= javascript_include_tag rails_ujs_path(format: :js, v: GoodJob::VERSION) %>
 </head>
 <body>
