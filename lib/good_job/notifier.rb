@@ -25,10 +25,17 @@ module GoodJob # :nodoc:
       max_queue: 1,
       fallback_policy: :discard,
     }.freeze
-    # Seconds to wait if database cannot be connected to
-    RECONNECT_INTERVAL = 5
     # Seconds to block while LISTENing for a message
     WAIT_INTERVAL = 1
+    # Seconds to wait if database cannot be connected to
+    RECONNECT_INTERVAL = 5
+    # Connection errors that will wait {RECONNECT_INTERVAL} before reconnecting
+    CONNECTION_ERRORS = %w[
+      ActiveRecord::ConnectionNotEstablished
+      ActiveRecord::StatementInvalid
+      PG::UnableToSend
+      PG::Error
+    ].freeze
 
     # @!attribute [r] instances
     #   @!scope class
@@ -115,15 +122,18 @@ module GoodJob # :nodoc:
       if thread_error
         GoodJob.on_thread_error.call(thread_error) if GoodJob.on_thread_error.respond_to?(:call)
         ActiveSupport::Notifications.instrument("notifier_notify_error.good_job", { error: thread_error })
+
+        connection_error = CONNECTION_ERRORS.any? do |error_string|
+          error_class = error_string.safe_constantize
+          next unless error_class
+
+          thread_error.is_a? error_class
+        end
       end
 
       return if shutdown?
 
-      if thread_error.is_a?(ActiveRecord::ConnectionNotEstablished) || thread_error.is_a?(ActiveRecord::StatementInvalid)
-        listen(delay: RECONNECT_INTERVAL)
-      else
-        listen
-      end
+      listen(delay: connection_error ? RECONNECT_INTERVAL : 0)
     end
 
     private
