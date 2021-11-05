@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.6.2](https://github.com/bensheldon/good_job/tree/v2.6.2) (2021-11-05)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.6.1...v2.6.2)
+
+**Fixed bugs:**
+
+- Rename Filterable\#search to Filterable\#search\_text to avoid name collision [\#451](https://github.com/bensheldon/good_job/pull/451) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- v2.6.1 is incompatible with gem thinking-sphinx [\#450](https://github.com/bensheldon/good_job/issues/450)
+
 ## [v2.6.1](https://github.com/bensheldon/good_job/tree/v2.6.1) (2021-11-05)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.6.0...v2.6.1)
