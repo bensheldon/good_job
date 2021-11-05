@@ -1,5 +1,33 @@
 # Changelog
 
+## [v2.6.1](https://github.com/bensheldon/good_job/tree/v2.6.1) (2021-11-05)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.6.0...v2.6.1)
+
+**Implemented enhancements:**
+
+- Allow job management \(retry, destroy\) through the Web UI [\#256](https://github.com/bensheldon/good_job/issues/256)
+- Add fulltext search filter [\#440](https://github.com/bensheldon/good_job/pull/440) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Unsubscribed LISTEN forever after database connection lost [\#303](https://github.com/bensheldon/good_job/issues/303)
+- Add `PG::UnableToSend` and `PG::Error` as a Notifier connection error [\#445](https://github.com/bensheldon/good_job/pull/445) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Question: what's the correct way to handle database connection pool size when using cron [\#443](https://github.com/bensheldon/good_job/issues/443)
+- Add a search bar to Dashboard [\#432](https://github.com/bensheldon/good_job/issues/432)
+- Hacktoberfest 2021 [\#393](https://github.com/bensheldon/good_job/issues/393)
+- Ideas for improvements to Cron [\#392](https://github.com/bensheldon/good_job/issues/392)
+- Fix flakey test that times out [\#382](https://github.com/bensheldon/good_job/issues/382)
+
+**Merged pull requests:**
+
+- Update development dependencies [\#447](https://github.com/bensheldon/good_job/pull/447) ([bensheldon](https://github.com/bensheldon))
+- Replace Chartist.js with Chart.js [\#444](https://github.com/bensheldon/good_job/pull/444) ([bensheldon](https://github.com/bensheldon))
+- Fix JRuby flake: "Scheduler\#create\_thread returns false if there are no threads available" [\#442](https://github.com/bensheldon/good_job/pull/442) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.6.0](https://github.com/bensheldon/good_job/tree/v2.6.0) (2021-10-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.5.0...v2.6.0)
