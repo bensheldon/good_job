@@ -24,12 +24,12 @@ module GoodJob
       end)
 
       # Search records by text query.
-      # @!method search(query)
+      # @!method search_text(query)
       # @!scope class
       # @param query [String]
       #   Search Query
       # @return [ActiveRecord::Relation]
-      scope :search, (lambda do |query|
+      scope :search_text, (lambda do |query|
         query = query.to_s.strip
         next if query.blank?
 

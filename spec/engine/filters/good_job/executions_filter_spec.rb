@@ -74,6 +74,16 @@ RSpec.describe GoodJob::ExecutionsFilter do
         expect(filter.records.size).to eq 1
       end
     end
+
+    context 'when filtered by search' do
+      before do
+        params[:query] = 'default'
+      end
+
+      it 'returns a limited set of results' do
+        expect(filter.records.size).to eq 2
+      end
+    end
   end
 
   %w[
