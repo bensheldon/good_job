@@ -109,9 +109,9 @@ GEM
       faraday
     async-io (1.32.2)
       async
-    async-pool (0.3.8)
+    async-pool (0.3.9)
       async (>= 1.25)
-    benchmark-ips (2.9.1)
+    benchmark-ips (2.9.2)
     better_html (1.0.16)
       actionview (>= 4.0)
       activesupport (>= 4.0)
@@ -130,7 +130,8 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
-    chef-utils (16.6.14)
+    chef-utils (17.7.29)
+      concurrent-ruby
     childprocess (3.0.0)
     coderay (1.1.3)
     concurrent-ruby (1.1.9)
@@ -154,7 +155,7 @@ GEM
       rubocop
       smart_properties
     erubi (1.10.0)
-    et-orbi (1.2.5)
+    et-orbi (1.2.6)
       tzinfo
     faraday (1.8.0)
       faraday-em_http (~> 1.0)
@@ -197,7 +198,7 @@ GEM
     globalid (0.5.2)
       activesupport (>= 5.0)
     html_tokenizer (0.0.7)
-    i18n (1.8.10)
+    i18n (1.8.11)
       concurrent-ruby (~> 1.0)
     jdbc-postgres (42.2.14)
     kramdown (2.3.1)
@@ -264,9 +265,9 @@ GEM
     pry-rails (0.3.9)
       pry (>= 0.10.4)
     public_suffix (4.0.6)
-    puma (5.5.0)
+    puma (5.5.2)
       nio4r (~> 2.0)
-    puma (5.5.0-java)
+    puma (5.5.2-java)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.6.0)
@@ -324,28 +325,27 @@ GEM
       rspec-expectations (~> 3.10)
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
-    rspec-support (3.10.2)
-    rubocop (1.21.0)
+    rspec-support (3.10.3)
+    rubocop (1.22.3)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml
-      rubocop-ast (>= 1.9.1, < 2.0)
+      rubocop-ast (>= 1.12.0, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.11.0)
+    rubocop-ast (1.12.0)
       parser (>= 3.0.1.1)
-    rubocop-performance (1.11.5)
+    rubocop-performance (1.12.0)
       rubocop (>= 1.7.0, < 2.0)
       rubocop-ast (>= 0.4.0)
-    rubocop-rails (2.12.2)
+    rubocop-rails (2.12.4)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.7.0, < 2.0)
-    rubocop-rspec (2.4.0)
-      rubocop (~> 1.0)
-      rubocop-ast (>= 1.1.0)
+    rubocop-rspec (2.5.0)
+      rubocop (~> 1.19)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
@@ -382,7 +382,7 @@ GEM
     yard (0.9.26)
     yard-activesupport-concern (0.0.1)
       yard (>= 0.8)
-    zeitwerk (2.4.2)
+    zeitwerk (2.5.1)
 
 PLATFORMS
   java
@@ -417,10 +417,10 @@ DEPENDENCIES
   rubocop-performance
   rubocop-rails
   rubocop-rspec
-  selenium-webdriver
+  selenium-webdriver (~> 3.142)
   sigdump
   yard
   yard-activesupport-concern
 
 BUNDLED WITH
-   2.2.26
+   2.2.30
