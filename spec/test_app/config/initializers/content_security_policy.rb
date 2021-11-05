@@ -26,18 +26,3 @@
 # For further information see the following documentation:
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only
 # Rails.application.config.content_security_policy_report_only = true
-
-Rails.application.config.content_security_policy do |policy|
-  policy.default_src :none
-  policy.connect_src :self
-  policy.base_uri :none
-  policy.font_src :self, :https, :data
-  policy.img_src :self, :https, :data
-  policy.object_src :none
-  policy.script_src :self
-  policy.style_src :self
-  policy.form_action :self
-  policy.frame_ancestors :self
-end
-
-Rails.application.config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
