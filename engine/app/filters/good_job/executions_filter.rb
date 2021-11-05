@@ -14,7 +14,7 @@ module GoodJob
       query = base_query
       query = query.job_class(params[:job_class]) if params[:job_class].present?
       query = query.where(queue_name: params[:queue_name]) if params[:queue_name].present?
-      query = query.search(params['query']) if params[:query].present?
+      query = query.search_text(params[:query]) if params[:query].present?
 
       if params[:state]
         case params[:state]
