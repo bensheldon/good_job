@@ -79,6 +79,9 @@ module GoodJob
     method_option :pidfile,
                   type: :string,
                   desc: "Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)"
+    method_option :probe_port,
+                  type: :numeric,
+                  desc: "Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)"
 
     def start
       set_up_application!
@@ -93,6 +96,10 @@ module GoodJob
       poller.recipients << [scheduler, :create_thread]
 
       cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true) if configuration.enable_cron?
+      if configuration.probe_port
+        probe_server = GoodJob::ProbeServer.new(port: configuration.probe_port)
+        probe_server.start
+      end
 
       @stop_good_job_executable = false
       %w[INT TERM].each do |signal|
@@ -106,6 +113,7 @@ module GoodJob
 
       executors = [notifier, poller, cron_manager, scheduler].compact
       GoodJob._shutdown_all(executors, timeout: configuration.shutdown_timeout)
+      probe_server&.stop
     end
 
     default_task :start
