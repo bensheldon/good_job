@@ -76,6 +76,24 @@ RSpec.describe GoodJob::CLI do
         expect(performer_query.to_sql).to eq GoodJob::Execution.where(queue_name: %w[mice elephant]).to_sql
       end
     end
+
+    describe 'probe-port' do
+      let(:probe_server) { instance_double GoodJob::ProbeServer, start: nil, stop: nil }
+
+      before do
+        allow(Kernel).to receive(:loop)
+        allow(GoodJob::ProbeServer).to receive(:new).and_return probe_server
+      end
+
+      it 'starts a ProbeServer' do
+        cli = described_class.new([], { probe_port: 3838 }, {})
+        cli.start
+
+        expect(GoodJob::ProbeServer).to have_received(:new).with(port: 3838)
+        expect(probe_server).to have_received(:start)
+        expect(probe_server).to have_received(:stop)
+      end
+    end
   end
 
   describe '#cleanup_preserved_jobs' do

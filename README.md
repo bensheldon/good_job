@@ -55,6 +55,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
     - [PgBouncer compatibility](#pgbouncer-compatibility)
+    - [CLI HTTP health check probes](#cli-http-healthcheck-probes)
 - [Contribute](#contribute)
     - [Gem development](#gem-development)
     - [Release](#release)
@@ -170,6 +171,7 @@ Options:
   [--enable-cron]              # Whether to run cron process (default: false)
   [--daemonize]                # Run as a background daemon (default: false)
   [--pidfile=PIDFILE]          # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
+  [--probe-port=PORT]          # Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)
 
 Executes queued jobs.
 
@@ -836,6 +838,61 @@ A workaround to this limitation is to make a direct database connection availabl
 
     GoodJob.active_record_parent_class = "ApplicationDirectRecord"
     ```
+
+### CLI HTTP health check probes
+
+GoodJob's CLI offers an http health check probe to better manage process lifecycle in containerized environments like Kubernetes:
+
+```bash
+# Run the CLI with a health check on port 7001
+good_job start --probe-port=7001
+
+# or via an environment variable
+GOOD_JOB_PROBE_PORT=7001 good_job start
+
+# Probe the status
+curl localhost:7001/status
+curl localhost:7001/status/started
+curl localhost:7001/status/connected
+```
+
+Multiple health checks are available at different paths:
+
+- `/` or `/status`: the CLI process is running
+- `/status/started`: the multithreaded job executor is running
+- `/status/connected`: the database connection is established
+
+This can be configured, for example with Kubernetes:
+
+```yaml
+spec:
+  containers:
+    - name: good_job
+      image: my_app:latest
+      env:
+        - name: RAILS_ENV
+          value: production
+        - name: GOOD_JOB_PROBE_PORT
+          value: 7001
+      command:
+          - good_job
+          - start
+      ports:
+        - name: probe-port
+          containerPort: 7001
+      startupProbe:
+        httpGet:
+          path: "/status/started"
+          port: probe-port
+        failureThreshold: 30
+        periodSeconds: 10
+      livenessProbe:
+        httpGet:
+          path: "/status/connected"
+          port: probe-port
+        failureThreshold: 1
+        periodSeconds: 10
+```
 
 ## Contribute
 

@@ -195,6 +195,13 @@ module GoodJob
         Rails.application.root.join('tmp', 'pids', 'good_job.pid')
     end
 
+    # Port of the probe server
+    # @return [nil,Integer]
+    def probe_port
+      options[:probe_port] ||
+        env['GOOD_JOB_PROBE_PORT']
+    end
+
     private
 
     def rails_config
