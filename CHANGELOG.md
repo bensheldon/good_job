@@ -1,5 +1,18 @@
 # Changelog
 
+## [v2.7.0](https://github.com/bensheldon/good_job/tree/v2.7.0) (2021-11-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.6.2...v2.7.0)
+
+**Implemented enhancements:**
+
+- Add http probe for CLI healthcheck/readiness/liveliness [\#452](https://github.com/bensheldon/good_job/pull/452) ([bensheldon](https://github.com/bensheldon))
+- Add explicit Content Security Policy \(CSP\) for Dashboard [\#449](https://github.com/bensheldon/good_job/pull/449) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Add a default Content-Security-Policy for the Dashboard [\#420](https://github.com/bensheldon/good_job/issues/420)
+
 ## [v2.6.2](https://github.com/bensheldon/good_job/tree/v2.6.2) (2021-11-05)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.6.1...v2.6.2)
