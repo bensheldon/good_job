@@ -55,7 +55,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
     - [PgBouncer compatibility](#pgbouncer-compatibility)
-    - [CLI HTTP health check probes](#cli-http-healthcheck-probes)
+    - [CLI HTTP health check probes](#cli-http-health-check-probes)
 - [Contribute](#contribute)
     - [Gem development](#gem-development)
     - [Release](#release)
