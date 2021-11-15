@@ -96,6 +96,7 @@ module GoodJob
       poller.recipients << [scheduler, :create_thread]
 
       cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true) if configuration.enable_cron?
+
       if configuration.probe_port
         probe_server = GoodJob::ProbeServer.new(port: configuration.probe_port)
         probe_server.start

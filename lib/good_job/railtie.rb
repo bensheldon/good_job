@@ -23,8 +23,7 @@ module GoodJob
     end
 
     config.after_initialize do
-      GoodJob::Scheduler.instances.each(&:warm_cache)
-      GoodJob::CronManager.instances.each(&:start)
+      GoodJob::Adapter.instances.each(&:start_async)
     end
   end
 end

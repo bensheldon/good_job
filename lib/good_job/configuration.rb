@@ -50,24 +50,22 @@ module GoodJob
     # for more details on possible values.
     # @return [Symbol]
     def execution_mode
-      @_execution_mode ||= begin
-        mode = if GoodJob::CLI.within_exe?
-                 :external
-               else
-                 options[:execution_mode] ||
-                   rails_config[:execution_mode] ||
-                   env['GOOD_JOB_EXECUTION_MODE']
-               end
+      mode = if GoodJob::CLI.within_exe?
+               :external
+             else
+               options[:execution_mode] ||
+                 rails_config[:execution_mode] ||
+                 env['GOOD_JOB_EXECUTION_MODE']
+             end
 
-        if mode
-          mode.to_sym
-        elsif Rails.env.development?
-          :async
-        elsif Rails.env.test?
-          :inline
-        else
-          :external
-        end
+      if mode
+        mode.to_sym
+      elsif Rails.env.development?
+        :async
+      elsif Rails.env.test?
+        :inline
+      else
+        :external
       end
     end
 
