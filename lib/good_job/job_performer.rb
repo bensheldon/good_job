@@ -13,9 +13,6 @@ module GoodJob
     # @param queue_string [String] Queues to execute jobs from
     def initialize(queue_string)
       @queue_string = queue_string
-
-      @job_query = Concurrent::Delay.new { GoodJob::Execution.queue_string(queue_string) }
-      @parsed_queues = Concurrent::Delay.new { GoodJob::Execution.queue_parser(queue_string) }
     end
 
     # A meaningful name to identify the performer in logs and for debugging.
@@ -65,11 +62,11 @@ module GoodJob
     attr_reader :queue_string
 
     def job_query
-      @job_query.value
+      @_job_query ||= GoodJob::Execution.queue_string(queue_string)
     end
 
     def parsed_queues
-      @parsed_queues.value
+      @_parsed_queues ||= GoodJob::Execution.queue_parser(queue_string)
     end
   end
 end

@@ -24,7 +24,7 @@ module GoodJob
 
     included do
       # Default column to be used when creating Advisory Locks
-      class_attribute :advisory_lockable_column, instance_accessor: false, default: Concurrent::Delay.new { primary_key }
+      class_attribute :advisory_lockable_column, instance_accessor: false, default: nil
 
       # Default Postgres function to be used for Advisory Locks
       class_attribute :advisory_lockable_function, default: "pg_try_advisory_lock"
@@ -161,10 +161,8 @@ module GoodJob
         end
       end
 
-      # Allow advisory_lockable_column to be a `Concurrent::Delay`
       def _advisory_lockable_column
-        column = advisory_lockable_column
-        column.respond_to?(:value) ? column.value : column
+        advisory_lockable_column || primary_key
       end
 
       def supports_cte_materialization_specifiers?
