@@ -9,3 +9,4 @@ spec/test_app/tmp/
 doc
 .yardoc
 gemfiles/*.gemfile.lock
+tmp/rspec_examples.txt
