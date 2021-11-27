@@ -216,8 +216,6 @@ To use GoodJob, you can set `config.active_job.queue_adapter` to a `:good_job`.
 
 Additional configuration can be provided via `config.good_job.OPTION = ...`.
 
-_Configuration **must** be placed into `config/application.rb` or `config/environments/{RAILS_ENV}.rb`; configuration may not work correctly if placed into `config/initializers/*.rb` because application initializers run _after_ gem initialization (see [Rails#36650](https://github.com/rails/rails/issues/36650) and [GoodJob#380](https://github.com/bensheldon/good_job/issues/380))._
-
 Configuration examples:
 
 ```ruby

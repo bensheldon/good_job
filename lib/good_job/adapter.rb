@@ -4,6 +4,12 @@ module GoodJob
   # ActiveJob Adapter.
   #
   class Adapter
+    # @!attribute [r] instances
+    #   @!scope class
+    #   List of all instantiated Adapters in the current process.
+    #   @return [Array<GoodJob::Adapter>, nil]
+    cattr_reader :instances, default: [], instance_reader: false
+
     # @param execution_mode [Symbol, nil] specifies how and where jobs should be executed. You can also set this with the environment variable +GOOD_JOB_EXECUTION_MODE+.
     #
     #  - +:inline+ executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
@@ -20,7 +26,8 @@ module GoodJob
     # @param max_threads [Integer, nil] sets the number of threads per scheduler to use when +execution_mode+ is set to +:async+. The +queues+ parameter can specify a number of threads for each group of queues which will override this value. You can also set this with the environment variable +GOOD_JOB_MAX_THREADS+. Defaults to +5+.
     # @param queues [String, nil] determines which queues to execute jobs from when +execution_mode+ is set to +:async+. See {file:README.md#optimize-queues-threads-and-processes} for more details on the format of this string. You can also set this with the environment variable +GOOD_JOB_QUEUES+. Defaults to +"*"+.
     # @param poll_interval [Integer, nil] sets the number of seconds between polls for jobs when +execution_mode+ is set to +:async+. You can also set this with the environment variable +GOOD_JOB_POLL_INTERVAL+. Defaults to +1+.
-    def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil)
+    # @param start_async_on_initialize [Boolean] whether to start the async scheduler when the adapter is initialized.
+    def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil, start_async_on_initialize: Rails.application.initialized?)
       @configuration = GoodJob::Configuration.new(
         {
           execution_mode: execution_mode,
@@ -30,16 +37,9 @@ module GoodJob
         }
       )
       @configuration.validate!
+      self.class.instances << self
 
-      if execute_async? # rubocop:disable Style/GuardClause
-        @notifier = GoodJob::Notifier.new
-        @poller = GoodJob::Poller.new(poll_interval: @configuration.poll_interval)
-        @scheduler = GoodJob::Scheduler.from_configuration(@configuration, warm_cache_on_initialize: Rails.application.initialized?)
-        @notifier.recipients << [@scheduler, :create_thread]
-        @poller.recipients << [@scheduler, :create_thread]
-
-        @cron_manager = GoodJob::CronManager.new(@configuration.cron_entries, start_on_initialize: Rails.application.initialized?) if @configuration.enable_cron?
-      end
+      start_async if start_async_on_initialize
     end
 
     # Enqueues the ActiveJob job to be performed.
@@ -74,7 +74,7 @@ module GoodJob
         job_state = { queue_name: execution.queue_name }
         job_state[:scheduled_at] = execution.scheduled_at if execution.scheduled_at
 
-        executed_locally = execute_async? && @scheduler.create_thread(job_state)
+        executed_locally = execute_async? && @scheduler&.create_thread(job_state)
         Notifier.notify(job_state) unless executed_locally
       end
 
@@ -97,6 +97,7 @@ module GoodJob
 
       executables = [@notifier, @poller, @scheduler].compact
       GoodJob._shutdown_all(executables, timeout: timeout)
+      @_async_started = false
     end
 
     # Whether in +:async+ execution mode.
@@ -117,6 +118,28 @@ module GoodJob
     # @return [Boolean]
     def execute_inline?
       @configuration.execution_mode == :inline
+    end
+
+    # Start async executors
+    # @return void
+    def start_async
+      return unless execute_async?
+
+      @notifier = GoodJob::Notifier.new
+      @poller = GoodJob::Poller.new(poll_interval: @configuration.poll_interval)
+      @scheduler = GoodJob::Scheduler.from_configuration(@configuration, warm_cache_on_initialize: true)
+      @notifier.recipients << [@scheduler, :create_thread]
+      @poller.recipients << [@scheduler, :create_thread]
+
+      @cron_manager = GoodJob::CronManager.new(@configuration.cron_entries, start_on_initialize: true) if @configuration.enable_cron?
+
+      @_async_started = true
+    end
+
+    # Whether the async executors are running
+    # @return [Boolean]
+    def async_started?
+      @_async_started
     end
 
     private
