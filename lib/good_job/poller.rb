@@ -91,7 +91,7 @@ module GoodJob # :nodoc:
     # @param thread_error [Exception, nil]
     # @return [void]
     def timer_observer(time, executed_task, thread_error)
-      GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
+      GoodJob._on_thread_error(thread_error) if thread_error
       ActiveSupport::Notifications.instrument("finished_timer_task", { result: executed_task, error: thread_error, time: time })
     end
 

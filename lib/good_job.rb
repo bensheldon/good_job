@@ -18,6 +18,8 @@ require "good_job/railtie"
 #
 # +GoodJob+ is the top-level namespace and exposes configuration attributes.
 module GoodJob
+  DEFAULT_LOGGER = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
+
   # @!attribute [rw] active_record_parent_class
   #   @!scope class
   #   The ActiveRecord parent class inherited by +GoodJob::Execution+ (default: +ActiveRecord::Base+).
@@ -34,7 +36,7 @@ module GoodJob
   #   @return [Logger, nil]
   #   @example Output GoodJob logs to a file:
   #     GoodJob.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new("log/my_logs.log"))
-  mattr_accessor :logger, default: ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
+  mattr_accessor :logger, default: DEFAULT_LOGGER
 
   # @!attribute [rw] preserve_job_records
   #   @!scope class
@@ -65,6 +67,13 @@ module GoodJob
   #     GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
   #   @return [Proc, nil]
   mattr_accessor :on_thread_error, default: nil
+
+  # Called with exception when a GoodJob thread raises an exception
+  # @param exception [Exception] Exception that was raised
+  # @return [void]
+  def self._on_thread_error(exception)
+    on_thread_error.call(exception) if on_thread_error.respond_to?(:call)
+  end
 
   # Stop executing jobs.
   # GoodJob does its work in pools of background threads.

@@ -1,11 +1,22 @@
+Rails.application.configure do
+  config.good_job.cron = {
+    example: {
+      cron: '*/5 * * * * *', # every 5 seconds
+      class: 'ExampleJob',
+      description: "Enqueue ExampleJob every 5 seconds",
+    },
+  }
+end
+
 case Rails.env
 when 'development'
+  ActiveJob::Base.queue_adapter = :good_job
+
   GoodJob.retry_on_unhandled_error = false
   GoodJob.preserve_job_records = true
   GoodJob.on_thread_error = -> (error) { Rails.logger.warn(error) }
 
   Rails.application.configure do
-    config.active_job.queue_adapter = :good_job
     config.good_job.enable_cron = ActiveModel::Type::Boolean.new.cast(ENV.fetch('GOOD_JOB_ENABLE_CRON', true))
     config.good_job.cron = {
       frequent_example: {
@@ -28,11 +39,12 @@ when 'development'
 when 'test'
   # test
 when 'demo'
+  ActiveJob::Base.queue_adapter = :good_job
+
   GoodJob.preserve_job_records = true
   GoodJob.retry_on_unhandled_error = false
 
   Rails.application.configure do
-    config.active_job.queue_adapter = :good_job
     config.good_job.execution_mode = :async
     config.good_job.poll_interval = 30
 
@@ -67,5 +79,5 @@ when 'demo'
     }
   end
 when 'production'
-  # production
+  ActiveJob::Base.queue_adapter = :good_job
 end

@@ -120,7 +120,7 @@ module GoodJob # :nodoc:
       return if thread_error.is_a? AdapterCannotListenError
 
       if thread_error
-        GoodJob.on_thread_error.call(thread_error) if GoodJob.on_thread_error.respond_to?(:call)
+        GoodJob._on_thread_error(thread_error)
         ActiveSupport::Notifications.instrument("notifier_notify_error.good_job", { error: thread_error })
 
         connection_error = CONNECTION_ERRORS.any? do |error_string|

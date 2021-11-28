@@ -97,7 +97,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 1. Configure the ActiveJob adapter:
 
     ```ruby
-    # config/application.rb
+    # config/application.rb or config/environments/{RAILS_ENV}.rb
     config.active_job.queue_adapter = :good_job
     ```
 
@@ -212,41 +212,48 @@ to delete old records and preserve space in your database.
 
 ### Configuration options
 
-To use GoodJob, you can set `config.active_job.queue_adapter` to a `:good_job`.
+ActiveJob configuration depends on where the code is placed:
 
-Additional configuration can be provided via `config.good_job.OPTION = ...`.
+- `config.active_job.queue_adapter = :good_job` within `config/application.rb` or `config/environments/*.rb`.
+- `ActiveJob::Base.queue_adapter = :good_job` within an initializer (e.g. `config/initializers/active_job.rb`).
+
+GoodJob configuration can be placed within Rails `config` directory for all environments (`config/application.rb`), within a particular environment (e.g. `config/environments/development.rb`), or within an initializer (e.g. `config/initializers/good_job.rb`).
 
 Configuration examples:
 
 ```ruby
-# config/application.rb
+Rails.application.configure do
+  # Configure options individually...
+  config.good_job.preserve_job_records = true
+  config.good_job.retry_on_unhandled_error = false
+  config.good_job.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
+  config.good_job.execution_mode = :async
+  config.good_job.max_threads = 5
+  config.good_job.poll_interval = 30 # seconds
+  config.good_job.shutdown_timeout = 25 # seconds
+  config.good_job.enable_cron = true
+  config.good_job.cron = { example: { cron: '0 * * * *', class: 'ExampleJob'  } }
+  config.good_job.queues = '*'
 
-config.active_job.queue_adapter = :good_job
-
-# Configure options individually...
-config.good_job.execution_mode = :async
-config.good_job.max_threads = 5
-config.good_job.poll_interval = 30 # seconds
-config.good_job.shutdown_timeout = 25 # seconds
-config.good_job.enable_cron = true
-config.good_job.cron = { example: { cron: '0 * * * *', class: 'ExampleJob'  } }
-config.good_job.queues = '*'
-
-# ...or all at once.
-config.good_job = {
-  execution_mode: :async,
-  max_threads: 5,
-  poll_interval: 30,
-  shutdown_timeout: 25,
-  enable_cron: true,
-  cron: {
-    example: {
-      cron: '0 * * * *',
-      class: 'ExampleJob'
+  # ...or all at once.
+  config.good_job = {
+    preserve_job_records: true,
+    retry_on_unhandled_error: false,
+    on_thread_error: -> (exception) { Raven.capture_exception(exception) },
+    execution_mode: :async,
+    max_threads: 5,
+    poll_interval: 30,
+    shutdown_timeout: 25,
+    enable_cron: true,
+    cron: {
+      example: {
+        cron: '0 * * * *',
+        class: 'ExampleJob'
+      },
     },
-  },
-  queues: '*',
-}
+    queues: '*',
+  }
+end
 ```
 
 Available configuration options are:
@@ -263,6 +270,14 @@ Available configuration options are:
 - `shutdown_timeout` (float) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 - `enable_cron` (boolean) whether to run cron process. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_CRON`.
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
+- `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
+- `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `false`)
+- `retry_on_unhandled_error` (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `true`)
+- `on_thread_error` (proc, lambda, or callable) will be called when an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake. Example:
+
+    ```ruby
+    config.good_job.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
+    ```
 
 By default, GoodJob configures the following execution modes per environment:
 
@@ -283,7 +298,7 @@ config.good_job.execution_mode = :external
 
 ### Global options
 
-Good Job’s general behavior can also be configured via several attributes directly on the `GoodJob` module:
+Good Job’s general behavior can also be configured via attributes directly on the `GoodJob` module:
 
 - **`GoodJob.active_record_parent_class`** (string) The ActiveRecord parent class inherited by GoodJob's ActiveRecord model `GoodJob::Job` (defaults to `"ActiveRecord::Base"`). Configure this when using [multiple databases with ActiveRecord](https://guides.rubyonrails.org/active_record_multiple_databases.html) or when other custom configuration is necessary for the ActiveRecord model to connect to the Postgres database. _The value must be a String to avoid premature initialization of ActiveRecord._
 - **`GoodJob.logger`** ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger`.

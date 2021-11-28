@@ -21,7 +21,7 @@ module GoodJob # :nodoc:
     def self.task_observer(time, output, thread_error) # rubocop:disable Lint/UnusedMethodArgument
       return if thread_error.is_a? Concurrent::CancelledOperationError
 
-      GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
+      GoodJob._on_thread_error(thread_error) if thread_error
     end
 
     # Execution configuration to be scheduled
