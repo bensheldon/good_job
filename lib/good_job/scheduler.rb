@@ -169,7 +169,7 @@ module GoodJob # :nodoc:
     # @return [void]
     def task_observer(time, output, thread_error)
       error = thread_error || (output.is_a?(GoodJob::ExecutionResult) ? output.unhandled_error : nil)
-      GoodJob.on_thread_error.call(error) if error && GoodJob.on_thread_error.respond_to?(:call)
+      GoodJob._on_thread_error(error) if error
 
       instrument("finished_job_task", { result: output, error: thread_error, time: time })
       create_task if output
@@ -206,7 +206,7 @@ module GoodJob # :nodoc:
       end
 
       observer = lambda do |_time, _output, thread_error|
-        GoodJob.on_thread_error.call(thread_error) if thread_error && GoodJob.on_thread_error.respond_to?(:call)
+        GoodJob._on_thread_error(thread_error) if thread_error
         create_task # If cache-warming exhausts the threads, ensure there isn't an executable task remaining
       end
       future.add_observer(observer, :call)
