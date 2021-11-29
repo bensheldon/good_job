@@ -215,7 +215,9 @@ module GoodJob
                 SQL
               end
 
-      binds = [[nil, key]]
+      binds = [
+        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
+      ]
       self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).first['locked']
     end
 
@@ -229,7 +231,9 @@ module GoodJob
       query = <<~SQL.squish
         SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint) AS unlocked
       SQL
-      binds = [[nil, key]]
+      binds = [
+        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
+      ]
       self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Unlock', binds).first['unlocked']
     end
 
@@ -279,7 +283,10 @@ module GoodJob
           AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
           AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
       SQL
-      binds = [[nil, key], [nil, key]]
+      binds = [
+        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
+        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
+      ]
       self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Locked?', binds).any?
     end
 
@@ -303,7 +310,10 @@ module GoodJob
           AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
           AND pg_locks.pid = pg_backend_pid()
       SQL
-      binds = [[nil, key], [nil, key]]
+      binds = [
+        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
+        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
+      ]
       self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Owns Advisory Lock?', binds).any?
     end
 
