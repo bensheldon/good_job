@@ -1,5 +1,19 @@
 # Changelog
 
+## [v2.7.2](https://github.com/bensheldon/good_job/tree/v2.7.2) (2021-11-29)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.7.1...v2.7.2)
+
+**Implemented enhancements:**
+
+- Allow GoodJob global configuration accessors to also be set via Rails config hash [\#460](https://github.com/bensheldon/good_job/pull/460) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Use `ActiveRecord::Relation::QueryAttribute` when setting up bindings for `exec_query` [\#461](https://github.com/bensheldon/good_job/pull/461) ([bensheldon](https://github.com/bensheldon))
+- Configure RSpec `config.example_status_persistence_file_path` [\#459](https://github.com/bensheldon/good_job/pull/459) ([bensheldon](https://github.com/bensheldon))
+- Defer async initialization until Rails fully initialized [\#454](https://github.com/bensheldon/good_job/pull/454) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.7.1](https://github.com/bensheldon/good_job/tree/v2.7.1) (2021-11-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.7.0...v2.7.1)
