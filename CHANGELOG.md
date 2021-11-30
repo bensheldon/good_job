@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.7.3](https://github.com/bensheldon/good_job/tree/v2.7.3) (2021-11-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.7.2...v2.7.3)
+
+**Fixed bugs:**
+
+- Logger error on 2.7.2 [\#463](https://github.com/bensheldon/good_job/issues/463)
+
+**Merged pull requests:**
+
+- Fix Railtie configuration assignment when Rails configuration is a Hash, not an OrderedOptions [\#464](https://github.com/bensheldon/good_job/pull/464) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.7.2](https://github.com/bensheldon/good_job/tree/v2.7.2) (2021-11-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.7.1...v2.7.2)
