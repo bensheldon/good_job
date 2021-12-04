@@ -38,4 +38,12 @@ RSpec.describe GoodJob::JobPerformer do
       expect(result).to eq false
     end
   end
+
+  describe '#cleanup' do
+    it 'calls GoodJob.cleanup_preserved_jobs' do
+      allow(GoodJob).to receive(:cleanup_preserved_jobs)
+      described_class.new('*').cleanup
+      expect(GoodJob).to have_received(:cleanup_preserved_jobs)
+    end
+  end
 end

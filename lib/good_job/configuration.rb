@@ -18,6 +18,10 @@ module GoodJob
     DEFAULT_MAX_CACHE = 10000
     # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs} and {GoodJob.cleanup_preserved_jobs}
     DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 24 * 60 * 60
+    # Default number of jobs to execute between preserved job cleanup runs
+    DEFAULT_CLEANUP_INTERVAL_JOBS = nil
+    # Default number of seconds to wait between preserved job cleanup runs
+    DEFAULT_CLEANUP_INTERVAL_SECONDS = nil
     # Default to always wait for jobs to finish for {Adapter#shutdown}
     DEFAULT_SHUTDOWN_TIMEOUT = -1
     # Default to not running cron
@@ -177,6 +181,28 @@ module GoodJob
           env['GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO'] ||
           DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO
       ).to_i
+    end
+
+    # Number of jobs a {Scheduler} will execute before cleaning up preserved jobs.
+    # @return [Integer, nil]
+    def cleanup_interval_jobs
+      value = (
+        rails_config[:cleanup_interval_jobs] ||
+          env['GOOD_JOB_CLEANUP_INTERVAL_JOBS'] ||
+          DEFAULT_CLEANUP_INTERVAL_JOBS
+      )
+      value.present? ? value.to_i : nil
+    end
+
+    # Number of seconds a {Scheduler} will wait before cleaning up preserved jobs.
+    # @return [Integer, nil]
+    def cleanup_interval_seconds
+      value = (
+        rails_config[:cleanup_interval_seconds] ||
+          env['GOOD_JOB_CLEANUP_INTERVAL_SECONDS'] ||
+          DEFAULT_CLEANUP_INTERVAL_SECONDS
+      )
+      value.present? ? value.to_i : nil
     end
 
     # Tests whether to daemonize the process.
