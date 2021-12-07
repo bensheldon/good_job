@@ -22,7 +22,8 @@ if ruby_27_or_higher && !jruby
   # activerecord-jdbcpostgresql-adapter does not have a compatible version
 
   appraise "rails-7.0" do
-    gem "rails", "~> 7.0.0.alpha2"
+    gem "rails", "~> 7.0.0.rc1"
+    gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
   end
 
   # https://github.com/rails/rails/issues/43422
