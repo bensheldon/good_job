@@ -1,5 +1,19 @@
 # Changelog
 
+## [v2.7.4](https://github.com/bensheldon/good_job/tree/v2.7.4) (2021-12-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.7.3...v2.7.4)
+
+**Closed issues:**
+
+- Add nonce: true to engine views  [\#467](https://github.com/bensheldon/good_job/issues/467)
+- Updating good\_job breaks my Rails 7 alpha 2 local development [\#462](https://github.com/bensheldon/good_job/issues/462)
+
+**Merged pull requests:**
+
+- Add nonce: true to javascript\_include\_tag in dashboard [\#468](https://github.com/bensheldon/good_job/pull/468) ([bouk](https://github.com/bouk))
+- Update appraisal for Rails 7.0.0.rc1 [\#466](https://github.com/bensheldon/good_job/pull/466) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.7.3](https://github.com/bensheldon/good_job/tree/v2.7.3) (2021-11-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.7.2...v2.7.3)
@@ -7,9 +21,6 @@
 **Fixed bugs:**
 
 - Logger error on 2.7.2 [\#463](https://github.com/bensheldon/good_job/issues/463)
-
-**Merged pull requests:**
-
 - Fix Railtie configuration assignment when Rails configuration is a Hash, not an OrderedOptions [\#464](https://github.com/bensheldon/good_job/pull/464) ([bensheldon](https://github.com/bensheldon))
 
 ## [v2.7.2](https://github.com/bensheldon/good_job/tree/v2.7.2) (2021-11-29)
