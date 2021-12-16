@@ -5,7 +5,7 @@ source "https://rubygems.org"
 gem "activerecord-jdbcpostgresql-adapter", platforms: [:jruby]
 gem "appraisal", branch: "fix-bundle-env", git: "https://github.com/bensheldon/appraisal.git"
 gem "pg", platforms: [:mri, :mingw, :x64_mingw]
-gem "rails", "~> 7.0.0.rc1"
+gem "rails", "~> 7.0.0"
 gem "selenium-webdriver", "~> 4.0"
 
 platforms :ruby do
