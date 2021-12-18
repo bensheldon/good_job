@@ -131,7 +131,7 @@ module GoodJob
   # analyze or inspect job performance.
   # If you are preserving job records this way, use this method regularly to
   # delete old records and preserve space in your database.
-  # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs olders than this will be deleted (default: +86400+).
+  # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be deleted (default: +86400+).
   # @return [Integer] Number of jobs that were deleted.
   def self.cleanup_preserved_jobs(older_than: nil)
     older_than ||= GoodJob::Configuration.new({}).cleanup_preserved_jobs_before_seconds_ago
