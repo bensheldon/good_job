@@ -1,10 +1,7 @@
 class CleanupJob < ApplicationJob
   self.queue_name = :cleanup
 
-  def perform(limit = 1_000)
-    earliest_job_to_preserve = GoodJob::Execution.finished.order(created_at: :desc).limit(limit).last
-    return if earliest_job_to_preserve.blank?
-
-    GoodJob::Execution.where("created_at < ?", earliest_job_to_preserve.created_at).delete_all
+  def perform(*args)
+    GoodJob.cleanup_preserved_jobs
   end
 end
