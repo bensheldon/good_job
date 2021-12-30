@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
-  # Parent class can be configured with +GoodJob.active_record_parent_class+.
-  # @!parse
-  #   class Execution < ActiveRecord::Base; end
-  class Execution < Object.const_get(GoodJob.active_record_parent_class)
+  class Execution < BaseRecord
     include Lockable
     include Filterable
 
@@ -52,16 +49,6 @@ module GoodJob
       else
         { include: queues }
       end
-    end
-
-    def self._migration_pending_warning
-      ActiveSupport::Deprecation.warn(<<~DEPRECATION)
-        GoodJob has pending database migrations. To create the migration files, run:
-            rails generate good_job:update
-        To apply the migration files, run:
-            rails db:migrate
-      DEPRECATION
-      nil
     end
 
     # Get Jobs with given ActiveJob ID
@@ -224,7 +211,7 @@ module GoodJob
           if @cron_at_index
             execution_args[:cron_at] = CurrentThread.cron_at
           else
-            _migration_pending_warning
+            migration_pending_warning!
           end
         elsif CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
           execution_args[:cron_key] = CurrentThread.execution.cron_key

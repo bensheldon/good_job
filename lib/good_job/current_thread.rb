@@ -68,7 +68,7 @@ module GoodJob
 
     # @return [Integer] Current process ID
     def self.process_id
-      Process.pid
+      ::Process.pid
     end
 
     # @return [String] Current thread name

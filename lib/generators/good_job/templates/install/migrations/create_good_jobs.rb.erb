@@ -21,6 +21,11 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       t.timestamp :cron_at
     end
 
+    create_table :good_job_processes, id: :uuid do |t|
+      t.timestamps
+      t.jsonb :state
+    end
+
     add_index :good_jobs, :scheduled_at, where: "(finished_at IS NULL)", name: "index_good_jobs_on_scheduled_at"
     add_index :good_jobs, [:queue_name, :scheduled_at], where: "(finished_at IS NULL)", name: :index_good_jobs_on_queue_name_and_scheduled_at
     add_index :good_jobs, [:active_job_id, :created_at], name: :index_good_jobs_on_active_job_id_and_created_at

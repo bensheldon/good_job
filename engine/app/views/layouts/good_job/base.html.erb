@@ -34,22 +34,13 @@
             <%= link_to "Cron Schedules", cron_entries_path, class: ["nav-link", ("active" if current_page?(cron_entries_path))] %>
           </li>
           <li class="nav-item">
+            <%= link_to "Processes", processes_path, class: ["nav-link", ("active" if current_page?(processes_path))] %>
+          </li>
+          <li class="nav-item">
             <div class="nav-link">
               <span class="badge bg-secondary">More views coming soon</span>
             </div>
           </li>
-
-          <!-- Coming Soon
-            <li class="nav-item">
-              <%= link_to "Upcoming Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
-            </li>
-            <li class="nav-item">
-              <%= link_to "Finished Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
-            </li>
-            <li class="nav-item">
-              <%= link_to "Errored Jobs", 'todo', class: ["nav-link", ("active" if current_page?('todo'))] %>
-            </li>
-          -->
         </ul>
         <div class="text-muted" title="Now is <%= Time.current %>">Times are displayed in <%= Time.current.zone %> timezone</div>
       </div>

@@ -61,6 +61,10 @@ module GoodJob # :nodoc:
       end
     end
 
+    # Human readable name of the scheduler that includes configuration values.
+    # @return [String]
+    attr_reader :name
+
     # @param performer [GoodJob::JobPerformer]
     # @param max_threads [Numeric, nil] number of seconds between polls for jobs
     # @param max_cache [Numeric, nil] maximum number of scheduled jobs to cache in memory
@@ -80,7 +84,8 @@ module GoodJob # :nodoc:
         @executor_options[:max_threads] = max_threads
         @executor_options[:max_queue] = max_threads
       end
-      @executor_options[:name] = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@executor_options[:max_threads]})"
+      @name = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@executor_options[:max_threads]})"
+      @executor_options[:name] = name
 
       @cleanup_tracker = CleanupTracker.new(cleanup_interval_seconds: cleanup_interval_seconds, cleanup_interval_jobs: cleanup_interval_jobs)
       create_executor

@@ -1,0 +1,40 @@
+<% if !GoodJob::Process.migrated? %>
+  <div class="card my-3">
+    <div class="card-body">
+      <p class="card-text">
+        <em>Feature unavailable because of pending database migration.</em>
+      </p>
+    </div>
+  </div>
+<% elsif @processes.present? %>
+  <div class="card my-3">
+    <div class="table-responsive">
+      <table class="table card-table table-bordered table-hover table-sm mb-0">
+        <thead>
+        <tr>
+          <th>Process UUID</th>
+          <th>Created At</th></th>
+          <th>State</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @processes.each do |process| %>
+          <tr class="<%= dom_class(process) %>" id="<%= dom_id(process) %>">
+            <td><%= process.id %></td>
+            <td><%= relative_time(process.created_at) %></td>
+            <td><%= tag.pre JSON.pretty_generate(process.state) %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% else %>
+  <div class="card my-3">
+    <div class="card-body">
+      <p class="card-text">
+        <em>No GoodJob processes found.</em>
+      </p>
+    </div>
+  </div>
+<% end %>
