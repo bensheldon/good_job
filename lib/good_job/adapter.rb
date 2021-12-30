@@ -121,7 +121,7 @@ module GoodJob
     end
 
     # Start async executors
-    # @return void
+    # @return [void]
     def start_async
       return unless execute_async?
 

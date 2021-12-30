@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Scheduler do
-  let(:performer) { instance_double(GoodJob::JobPerformer, next: nil, name: '', next_at: []) }
+  let(:performer) { instance_double(GoodJob::JobPerformer, next: nil, name: '', next_at: [], cleanup: nil) }
 
   after do
     described_class.instances.each(&:shutdown)
@@ -129,6 +129,25 @@ RSpec.describe GoodJob::Scheduler do
                                       active_cache: 0,
                                       available_cache: max_cache,
                                     })
+    end
+  end
+
+  describe '#cleanup' do
+    context 'when there are more than cleanup_interval_jobs' do
+      it 'runs cleanup' do
+        allow(GoodJob).to receive(:cleanup_preserved_jobs)
+        performed_jobs = 0
+        allow(performer).to receive(:next) do
+          performed_jobs += 1
+          performed_jobs < 4
+        end
+
+        scheduler = described_class.new(performer, cleanup_interval_jobs: 2)
+        2.times { scheduler.create_thread }
+        expect(performer).not_to have_received(:cleanup)
+        scheduler.create_thread
+        wait_until(max: 1) { expect(performer).to have_received(:cleanup) }
+      end
     end
   end
 
