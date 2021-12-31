@@ -1,8 +1,33 @@
 # Changelog
 
+## [v2.8.0](https://github.com/bensheldon/good_job/tree/v2.8.0) (2021-12-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.7.4...v2.8.0)
+
+**Implemented enhancements:**
+
+- GoodJob should automatically clean up after itself and delete old job records [\#412](https://github.com/bensheldon/good_job/issues/412)
+- Track processes in the database and on the Dashboard [\#472](https://github.com/bensheldon/good_job/pull/472) ([bensheldon](https://github.com/bensheldon))
+- Allow Scheduler to automatically clean up preserved jobs every N jobs or seconds [\#465](https://github.com/bensheldon/good_job/pull/465) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Is there a way to show how many worker/process is running currently [\#471](https://github.com/bensheldon/good_job/issues/471)
+- Jobs stuck in the unfinished state [\#448](https://github.com/bensheldon/good_job/issues/448)
+
+**Merged pull requests:**
+
+- Doublequote Ruby 3.0 in testing matrix [\#473](https://github.com/bensheldon/good_job/pull/473) ([bensheldon](https://github.com/bensheldon))
+- Have demo CleanupJob use GoodJob.cleanup\_preserved\_jobs [\#470](https://github.com/bensheldon/good_job/pull/470) ([bensheldon](https://github.com/bensheldon))
+- Test with Rails 7.0.0 [\#469](https://github.com/bensheldon/good_job/pull/469) ([aried3r](https://github.com/aried3r))
+
 ## [v2.7.4](https://github.com/bensheldon/good_job/tree/v2.7.4) (2021-12-16)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.7.3...v2.7.4)
+
+**Fixed bugs:**
+
+- Add nonce: true to javascript\_include\_tag in dashboard [\#468](https://github.com/bensheldon/good_job/pull/468) ([bouk](https://github.com/bouk))
 
 **Closed issues:**
 
@@ -11,7 +36,6 @@
 
 **Merged pull requests:**
 
-- Add nonce: true to javascript\_include\_tag in dashboard [\#468](https://github.com/bensheldon/good_job/pull/468) ([bouk](https://github.com/bouk))
 - Update appraisal for Rails 7.0.0.rc1 [\#466](https://github.com/bensheldon/good_job/pull/466) ([bensheldon](https://github.com/bensheldon))
 
 ## [v2.7.3](https://github.com/bensheldon/good_job/tree/v2.7.3) (2021-11-30)
