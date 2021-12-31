@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
     "documentation_uri" => "https://rdoc.info/github/bensheldon/good_job",
     "homepage_uri"      => spec.homepage,
     "source_code_uri"   => "https://github.com/bensheldon/good_job",
+    "rubygems_mfa_required" => "true",
   }
 
   spec.files = Dir[

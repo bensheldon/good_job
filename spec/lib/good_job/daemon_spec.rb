@@ -29,7 +29,7 @@ RSpec.describe GoodJob::Daemon, skip_if_java: true do
 
     context 'when a pidfile already exists' do
       before do
-        File.open(pidfile, "w") { |f| f.write(Process.pid) }
+        File.write(pidfile, Process.pid)
       end
 
       it 'aborts with a message' do

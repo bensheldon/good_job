@@ -149,7 +149,7 @@ module GoodJob
     def in_server_process?
       return @_in_server_process if defined? @_in_server_process
 
-      @_in_server_process = Rails.const_defined?('Server') ||
+      @_in_server_process = Rails.const_defined?(:Server) ||
                             caller.grep(%r{config.ru}).any? || # EXAMPLE: config.ru:3:in `block in <main>' OR config.ru:3:in `new_from_string'
                             caller.grep(%{/rack/handler/}).any? || # EXAMPLE: iodine-0.7.44/lib/rack/handler/iodine.rb:13:in `start'
                             (Concurrent.on_jruby? && caller.grep(%r{jruby/rack/rails_booter}).any?) # EXAMPLE: uri:classloader:/jruby/rack/rails_booter.rb:83:in `load_environment'
