@@ -8,6 +8,13 @@ RSpec.describe GoodJob::Scheduler do
     described_class.instances.each(&:shutdown)
   end
 
+  describe 'name' do
+    it 'is human readable and contains configuration values' do
+      scheduler = described_class.new(performer)
+      expect(scheduler.name).to eq('GoodJob::Scheduler(queues= max_threads=5)')
+    end
+  end
+
   context 'when thread error' do
     let(:error_proc) { double("Error Collector", call: nil) } # rubocop:disable RSpec/VerifiedDoubles
 

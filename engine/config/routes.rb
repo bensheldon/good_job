@@ -2,11 +2,7 @@
 GoodJob::Engine.routes.draw do
   root to: 'executions#index'
 
-  resources :cron_entries, only: %i[index show] do
-    member do
-      post :enqueue
-    end
-  end
+  resources :executions, only: %i[destroy]
 
   resources :jobs, only: %i[index show] do
     member do
@@ -15,7 +11,14 @@ GoodJob::Engine.routes.draw do
       put :retry
     end
   end
-  resources :executions, only: %i[destroy]
+
+  resources :cron_entries, only: %i[index show] do
+    member do
+      post :enqueue
+    end
+  end
+
+  resources :processes, only: %i[index]
 
   scope controller: :assets do
     constraints(format: :css) do

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'active_support/core_ext/module/attribute_accessors_per_thread'
 require 'concurrent/atomic/atomic_boolean'
 
 module GoodJob # :nodoc:
@@ -10,6 +11,11 @@ module GoodJob # :nodoc:
   # When a message is received, the notifier passes the message to each of its recipients.
   #
   class Notifier
+    include ActiveSupport::Callbacks
+    define_callbacks :listen, :unlisten
+
+    include Notifier::ProcessRegistration
+
     # Raised if the Database adapter does not implement LISTEN.
     AdapterCannotListenError = Class.new(StandardError)
 
@@ -42,6 +48,12 @@ module GoodJob # :nodoc:
     #   List of all instantiated Notifiers in the current process.
     #   @return [Array<GoodJob::Notifier>, nil]
     cattr_reader :instances, default: [], instance_reader: false
+
+    # @!attribute [rw] connection
+    #   @!scope class
+    #   ActiveRecord Connection that has been established for the Notifier.
+    #   @return [ActiveRecord::ConnectionAdapters::AbstractAdapter, nil]
+    thread_cattr_accessor :connection
 
     # Send a message via Postgres NOTIFY
     # @param message [#to_json]
@@ -146,30 +158,36 @@ module GoodJob # :nodoc:
 
     def listen(delay: 0)
       future = Concurrent::ScheduledTask.new(delay, args: [@recipients, executor, @listening], executor: @executor) do |thr_recipients, thr_executor, thr_listening|
-        with_listen_connection do |conn|
-          ActiveSupport::Notifications.instrument("notifier_listen.good_job") do
-            conn.async_exec("LISTEN #{CHANNEL}").clear
-          end
+        with_connection do
+          begin
+            run_callbacks :listen do
+              ActiveSupport::Notifications.instrument("notifier_listen.good_job") do
+                connection.execute("LISTEN #{CHANNEL}")
+              end
+              thr_listening.make_true
+            end
 
-          ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
-            thr_listening.make_true
-            while thr_executor.running?
-              conn.wait_for_notify(WAIT_INTERVAL) do |channel, _pid, payload|
-                next unless channel == CHANNEL
+            ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
+              while thr_executor.running?
+                wait_for_notify do |channel, payload|
+                  next unless channel == CHANNEL
 
-                ActiveSupport::Notifications.instrument("notifier_notified.good_job", { payload: payload })
-                parsed_payload = JSON.parse(payload, symbolize_names: true)
-                thr_recipients.each do |recipient|
-                  target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
-                  target.send(method_name, parsed_payload)
+                  ActiveSupport::Notifications.instrument("notifier_notified.good_job", { payload: payload })
+                  parsed_payload = JSON.parse(payload, symbolize_names: true)
+                  thr_recipients.each do |recipient|
+                    target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
+                    target.send(method_name, parsed_payload)
+                  end
                 end
               end
             end
           end
         ensure
-          thr_listening.make_false
-          ActiveSupport::Notifications.instrument("notifier_unlisten.good_job") do
-            conn.async_exec("UNLISTEN *").clear
+          run_callbacks :unlisten do
+            thr_listening.make_false
+            ActiveSupport::Notifications.instrument("notifier_unlisten.good_job") do
+              connection.execute("UNLISTEN *")
+            end
           end
         end
       end
@@ -178,17 +196,27 @@ module GoodJob # :nodoc:
       future.execute
     end
 
-    def with_listen_connection
-      ar_conn = Execution.connection_pool.checkout.tap do |conn|
+    def with_connection
+      self.connection = Execution.connection_pool.checkout.tap do |conn|
         Execution.connection_pool.remove(conn)
       end
-      pg_conn = ar_conn.raw_connection
-      raise AdapterCannotListenError unless pg_conn.respond_to? :wait_for_notify
+      connection.execute("SET application_name = #{connection.quote(self.class.name)}")
 
-      pg_conn.async_exec("SET application_name = #{pg_conn.escape_identifier(self.class.name)}").clear
-      yield pg_conn
+      yield
     ensure
-      ar_conn&.disconnect!
+      connection&.disconnect!
+      self.connection = nil
+    end
+
+    def wait_for_notify
+      raw_connection = connection.raw_connection
+      if raw_connection.respond_to?(:wait_for_notify)
+        raw_connection.wait_for_notify(WAIT_INTERVAL) do |channel, _pid, payload|
+          yield(channel, payload)
+        end
+      else
+        sleep WAIT_INTERVAL
+      end
     end
   end
 end

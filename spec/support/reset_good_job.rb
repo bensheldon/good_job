@@ -2,30 +2,27 @@
 THREAD_ERRORS = Concurrent::Array.new
 
 RSpec.configure do |config|
-  config.before do
+  config.around do |example|
     GoodJob::CurrentThread.reset
     GoodJob.preserve_job_records = false
 
     PgLock.current_database.advisory_lock.owns.all?(&:unlock) if PgLock.advisory_lock.owns.count > 0
     PgLock.current_database.advisory_lock.others.each(&:unlock!) if PgLock.advisory_lock.others.count > 0
     expect(PgLock.current_database.advisory_lock.count).to eq(0), "Existing advisory locks BEFORE test run"
-  end
 
-  config.around do |example|
     THREAD_ERRORS.clear
-
     Thread.current.name = "RSpec: #{example.description}"
     GoodJob.on_thread_error = lambda do |exception|
       THREAD_ERRORS << [Thread.current.name, exception]
     end
 
     example.run
-
-    expect(THREAD_ERRORS).to be_empty
   end
 
   config.after do
     GoodJob.shutdown(timeout: -1)
+
+    expect(THREAD_ERRORS).to be_empty
 
     expect(GoodJob::Notifier.instances).to all be_shutdown
     GoodJob::Notifier.instances.clear

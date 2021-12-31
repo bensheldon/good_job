@@ -4,10 +4,7 @@ module GoodJob
   # There is not a table in the database whose discrete rows represents "Jobs".
   # The +good_jobs+ table is a table of individual {GoodJob::Execution}s that share the same +active_job_id+.
   # A single row from the +good_jobs+ table of executions is fetched to represent an ActiveJobJob
-  # Parent class can be configured with +GoodJob.active_record_parent_class+.
-  # @!parse
-  #   class ActiveJob < ActiveRecord::Base; end
-  class ActiveJobJob < Object.const_get(GoodJob.active_record_parent_class)
+  class ActiveJobJob < BaseRecord
     include Filterable
     include Lockable
 

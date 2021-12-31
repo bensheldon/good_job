@@ -17,7 +17,7 @@ module GoodJob
     # @return [void]
     def daemonize
       check_pid
-      Process.daemon
+      ::Process.daemon
       write_pid
     end
 
@@ -25,7 +25,7 @@ module GoodJob
 
     # @return [void]
     def write_pid
-      File.open(pidfile, ::File::CREAT | ::File::EXCL | ::File::WRONLY) { |f| f.write(Process.pid.to_s) }
+      File.open(pidfile, ::File::CREAT | ::File::EXCL | ::File::WRONLY) { |f| f.write(::Process.pid.to_s) }
       at_exit { File.delete(pidfile) if File.exist?(pidfile) }
     rescue Errno::EEXIST
       check_pid
@@ -55,7 +55,7 @@ module GoodJob
       pid = ::File.read(pidfile).to_i
       return :dead if pid.zero?
 
-      Process.kill(0, pid) # check process status
+      ::Process.kill(0, pid) # check process status
       :running
     rescue Errno::ESRCH
       :dead
