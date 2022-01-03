@@ -51,6 +51,8 @@ module GoodJob
       end
     end
 
+    belongs_to :job, class_name: 'GoodJob::ActiveJobJob', foreign_key: 'active_job_id', primary_key: 'active_job_id', optional: true, inverse_of: :executions
+
     # Get Jobs with given ActiveJob ID
     # @!method active_job_id
     # @!scope class

@@ -19,7 +19,7 @@ module GoodJob
     self.primary_key = 'active_job_id'
     self.advisory_lockable_column = 'active_job_id'
 
-    has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id'
+    has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', inverse_of: :job
 
     # Only the most-recent unretried execution represents a "Job"
     default_scope { where(retried_good_job_id: nil) }
@@ -27,10 +27,16 @@ module GoodJob
     # Get Jobs with given class name
     # @!method job_class
     # @!scope class
-    # @param string [String]
-    #   Execution class name
+    # @param string [String] Execution class name
     # @return [ActiveRecord::Relation]
     scope :job_class, ->(job_class) { where("serialized_params->>'job_class' = ?", job_class) }
+
+    # Get Jobs finished before the given timestamp.
+    # @!method finished_before(timestamp)
+    # @!scope class
+    # @param timestamp (DateTime, Time)
+    # @return [ActiveRecord::Relation]
+    scope :finished_before, ->(timestamp) { where(arel_table['finished_at'].lteq(timestamp)) }
 
     # First execution will run in the future
     scope :scheduled, -> { where(finished_at: nil).where('COALESCE(scheduled_at, created_at) > ?', DateTime.current).where("(serialized_params->>'executions')::integer < 2") }
