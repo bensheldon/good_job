@@ -1,5 +1,22 @@
 # Changelog
 
+## [v2.8.1](https://github.com/bensheldon/good_job/tree/v2.8.1) (2022-01-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.8.0...v2.8.1)
+
+**Implemented enhancements:**
+
+- Add indexes to `good_jobs.finished_at` and have `GoodJob.cleanup_preserved_jobs` delete all executions for a given job [\#477](https://github.com/bensheldon/good_job/pull/477) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- finished\_at should be indexed and clean up should clean up all of a job's executions [\#476](https://github.com/bensheldon/good_job/issues/476)
+
+**Merged pull requests:**
+
+- Update development Ruby \(2.7.5\) and Rails \(6.1.4.4\) versions [\#475](https://github.com/bensheldon/good_job/pull/475) ([bensheldon](https://github.com/bensheldon))
+- Clean up server integration tests [\#474](https://github.com/bensheldon/good_job/pull/474) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.8.0](https://github.com/bensheldon/good_job/tree/v2.8.0) (2021-12-31)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.7.4...v2.8.0)
