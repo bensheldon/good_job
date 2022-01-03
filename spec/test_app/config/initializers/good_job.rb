@@ -71,11 +71,6 @@ when 'demo'
         class: "OtherJob",
         set: { queue: :default },
       },
-      cleanup: {
-        description: "Delete old jobs.",
-        cron: "*/15 * * * *",
-        class: "CleanupJob",
-      },
     }
   end
 when 'production'
