@@ -142,7 +142,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 ## Compatibility
 
 - **Ruby on Rails:** 5.2+
-- **Ruby:** MRI 2.5+. JRuby 9.2.13+ (_JRuby's `activerecord-jdbcpostgresql-adapter` gem does not support Postgres LISTEN/NOTIFY)._
+- **Ruby:** MRI 2.5+. JRuby 9.2.13+
 - **Postgres:** 9.6+
 
 ## Configuration
