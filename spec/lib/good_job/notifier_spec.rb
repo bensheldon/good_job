@@ -19,7 +19,7 @@ RSpec.describe GoodJob::Notifier do
     end
   end
 
-  describe '#listen', skip_if_java: true do
+  describe '#listen' do
     it 'loops until it receives a command' do
       stub_const 'RECEIVED_MESSAGE', Concurrent::AtomicBoolean.new(false)
 
@@ -42,10 +42,11 @@ RSpec.describe GoodJob::Notifier do
 
       notifier = described_class.new
       sleep_until(max: 5, increments_of: 0.5) { notifier.listening? }
-      described_class.notify(true)
-      notifier.shutdown
 
-      expect(on_thread_error).to have_received(:call).at_least(:once).with instance_of(ExpectedError)
+      described_class.notify(true)
+      wait_until(max: 5, increments_of: 0.5) { expect(on_thread_error).to have_received(:call).at_least(:once).with instance_of(ExpectedError) }
+
+      notifier.shutdown
     end
   end
 

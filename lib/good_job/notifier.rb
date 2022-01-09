@@ -16,9 +16,6 @@ module GoodJob # :nodoc:
 
     include Notifier::ProcessRegistration
 
-    # Raised if the Database adapter does not implement LISTEN.
-    AdapterCannotListenError = Class.new(StandardError)
-
     # Default Postgres channel for LISTEN/NOTIFY
     CHANNEL = 'good_job'
     # Defaults for instance of Concurrent::ThreadPoolExecutor
@@ -129,8 +126,6 @@ module GoodJob # :nodoc:
     # @!visibility private
     # @return [void]
     def listen_observer(_time, _result, thread_error)
-      return if thread_error.is_a? AdapterCannotListenError
-
       if thread_error
         GoodJob._on_thread_error(thread_error)
         ActiveSupport::Notifications.instrument("notifier_notify_error.good_job", { error: thread_error })
@@ -214,6 +209,15 @@ module GoodJob # :nodoc:
         raw_connection.wait_for_notify(WAIT_INTERVAL) do |channel, _pid, payload|
           yield(channel, payload)
         end
+      elsif raw_connection.respond_to?(:jdbc_connection)
+        raw_connection.execute_query("SELECT 1")
+        notifications = raw_connection.jdbc_connection.getNotifications
+        Array(notifications).each do |notification|
+          channel = notification.getName
+          payload = notification.getParameter
+          yield(channel, payload)
+        end
+        sleep WAIT_INTERVAL
       else
         sleep WAIT_INTERVAL
       end
