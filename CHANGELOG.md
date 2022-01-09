@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.9.0](https://github.com/bensheldon/good_job/tree/v2.9.0) (2022-01-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.8.1...v2.9.0)
+
+**Implemented enhancements:**
+
+- Add JRuby / JDBC support for LISTEN  [\#479](https://github.com/bensheldon/good_job/pull/479) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Remove demo CleanupJob in favor of using built-in cleanup intervals [\#478](https://github.com/bensheldon/good_job/pull/478) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.8.1](https://github.com/bensheldon/good_job/tree/v2.8.1) (2022-01-03)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.8.0...v2.8.1)
