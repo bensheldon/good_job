@@ -27,7 +27,7 @@ module GoodJob
     # @param queues [String, nil] determines which queues to execute jobs from when +execution_mode+ is set to +:async+. See {file:README.md#optimize-queues-threads-and-processes} for more details on the format of this string. You can also set this with the environment variable +GOOD_JOB_QUEUES+. Defaults to +"*"+.
     # @param poll_interval [Integer, nil] sets the number of seconds between polls for jobs when +execution_mode+ is set to +:async+. You can also set this with the environment variable +GOOD_JOB_POLL_INTERVAL+. Defaults to +1+.
     # @param start_async_on_initialize [Boolean] whether to start the async scheduler when the adapter is initialized.
-    def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil, start_async_on_initialize: Rails.application.initialized?)
+    def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil, start_async_on_initialize: GoodJob.async_ready?)
       @configuration = GoodJob::Configuration.new(
         {
           execution_mode: execution_mode,
