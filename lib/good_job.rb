@@ -18,6 +18,8 @@ require "good_job/railtie"
 #
 # +GoodJob+ is the top-level namespace and exposes configuration attributes.
 module GoodJob
+  include GoodJob::Dependencies
+
   DEFAULT_LOGGER = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
 
   # @!attribute [rw] active_record_parent_class
