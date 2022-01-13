@@ -1,5 +1,18 @@
 # Changelog
 
+## [v2.9.1](https://github.com/bensheldon/good_job/tree/v2.9.1) (2022-01-13)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.0...v2.9.1)
+
+**Closed issues:**
+
+- Graceful fallback to polling when LISTEN/NOTIFY isn't available [\#482](https://github.com/bensheldon/good_job/issues/482)
+- Long running locks on latest good job [\#480](https://github.com/bensheldon/good_job/issues/480)
+
+**Merged pull requests:**
+
+- Start async adapters once `ActiveRecord` and `ActiveJob` have loaded, potentially before `Rails.application.initialized?` [\#483](https://github.com/bensheldon/good_job/pull/483) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.9.0](https://github.com/bensheldon/good_job/tree/v2.9.0) (2022-01-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.8.1...v2.9.0)
