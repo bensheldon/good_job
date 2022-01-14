@@ -73,19 +73,19 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 1. Install the gem:
 
     ```bash
-    $ bundle install
+    bundle install
     ```
 
 1. Run the GoodJob install generator. This will generate a database migration to create a table for GoodJob's job records:
 
     ```bash
-    $ bin/rails g good_job:install
+    bin/rails g good_job:install
     ```
 
     Run the migration:
 
     ```bash
-    $ bin/rails db:migrate
+    bin/rails db:migrate
     ```
 
    Optional: If using Rails' multiple databases with the `migrations_paths` configuration option, use the `--database` option:
