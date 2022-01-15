@@ -328,7 +328,7 @@ _🚧 GoodJob's dashboard is a work in progress. Please contribute ideas and cod
 
 GoodJob includes a Dashboard as a mountable `Rails::Engine`.
 
-1. Explicitly require the Engine code at the top of your `config/application.rb` file, immediately after Rails is required. This is necessary because the mountable engine is an optional feature of GoodJob.
+1. Explicitly require the Engine code at the top of your `config/application.rb` file, immediately after Rails is required and before Bundler requires the Rails' groups. This is necessary because the mountable engine is an optional feature of GoodJob.
 
     ```ruby
     # config/application.rb
@@ -338,6 +338,8 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
     require 'good_job/engine' # <= Add this line
     # ...
     ```
+
+   Note: If you find the dashboard fails to reload due to a routing error and uninitialized constant `GoodJob::ExecutionsController`, this is likely because you are not requiring the engine early enough.
 
 1. Mount the engine in your `config/routes.rb` file. The following will mount it at `http://example.com/good_job`.
 
