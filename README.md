@@ -401,6 +401,9 @@ class MyJob < ApplicationJob
     # Can be String or Lambda/Proc that is invoked in the context of the job.
     # Note: Arguments passed to #perform_later must be accessed through `arguments` method.
     key: -> { "Unique-#{arguments.first}" } #  MyJob.perform_later("Alice") => "Unique-Alice"
+
+    # If the method uses named parameters, they can be accessed like so:
+    # key: -> { "Unique-#{arguments.first['name']}" } #  MyJob.perform_later(name: "Alice")
   )
 
   def perform(first_name)
