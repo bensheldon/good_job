@@ -3,7 +3,7 @@ require 'rails_helper'
 
 RSpec.describe GoodJob::Filterable do
   let(:model_class) { GoodJob::Execution }
-  let!(:execution) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default", serialized_params: { example_key: 'example_value' }, error: "ExampleError: a message") }
+  let!(:execution) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default", serialized_params: { example_key: 'example_value' }, error: "ExampleJob::ExampleError: a message") }
 
   describe '.search_test' do
     it 'searches serialized params' do
@@ -16,6 +16,10 @@ RSpec.describe GoodJob::Filterable do
 
     it 'searches errors' do
       expect(model_class.search_text('ExampleError')).to include(execution)
+    end
+
+    it 'searches strings with colons' do
+      expect(model_class.search_text('ExampleJob::ExampleError')).to include(execution)
     end
 
     it 'filters out non-matching records' do

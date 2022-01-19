@@ -85,6 +85,14 @@ RSpec.describe GoodJob::JobsFilter do
       it 'returns a limited set of results' do
         expect(filter.records.size).to eq 1
       end
+
+      describe 'Ruby namespaced query' do
+        before { params[:query] = 'ExampleJob::DeadError' }
+
+        it 'returns a limited set of results' do
+          expect(filter.records.size).to eq 1
+        end
+      end
     end
   end
 
