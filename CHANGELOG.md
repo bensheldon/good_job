@@ -1,17 +1,32 @@
 # Changelog
 
+## [v2.9.2](https://github.com/bensheldon/good_job/tree/v2.9.2) (2022-01-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.1...v2.9.2)
+
+**Fixed bugs:**
+
+- Error on GJ admin UI search form [\#487](https://github.com/bensheldon/good_job/issues/487)
+- Use `websearch_to_tsquery` or \(`plainto_tsquery` for Postgres \< v11\) for Dashboard search filter [\#488](https://github.com/bensheldon/good_job/pull/488) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Update README to illustrate using named arguments for the unique key. [\#486](https://github.com/bensheldon/good_job/pull/486) ([phallstrom](https://github.com/phallstrom))
+- Add details about exactly where to require the engine. [\#485](https://github.com/bensheldon/good_job/pull/485) ([phallstrom](https://github.com/phallstrom))
+- $ symbol gets copied when clicking on the copy button [\#484](https://github.com/bensheldon/good_job/pull/484) ([zeevy](https://github.com/zeevy))
+
 ## [v2.9.1](https://github.com/bensheldon/good_job/tree/v2.9.1) (2022-01-13)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.0...v2.9.1)
+
+**Fixed bugs:**
+
+- Start async adapters once `ActiveRecord` and `ActiveJob` have loaded, potentially before `Rails.application.initialized?` [\#483](https://github.com/bensheldon/good_job/pull/483) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
 - Graceful fallback to polling when LISTEN/NOTIFY isn't available [\#482](https://github.com/bensheldon/good_job/issues/482)
 - Long running locks on latest good job [\#480](https://github.com/bensheldon/good_job/issues/480)
-
-**Merged pull requests:**
-
-- Start async adapters once `ActiveRecord` and `ActiveJob` have loaded, potentially before `Rails.application.initialized?` [\#483](https://github.com/bensheldon/good_job/pull/483) ([bensheldon](https://github.com/bensheldon))
 
 ## [v2.9.0](https://github.com/bensheldon/good_job/tree/v2.9.0) (2022-01-09)
 
