@@ -33,33 +33,33 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 - [Set up](#set-up)
 - [Compatibility](#compatibility)
 - [Configuration](#configuration)
-    - [Command-line options](#command-line-options)
-        - [`good_job start`](#good_job-start)
-        - [`good_job cleanup_preserved_jobs`](#good_job-cleanup_preserved_jobs)
-    - [Configuration options](#configuration-options)
-    - [Global options](#global-options)
-    - [Dashboard](#dashboard)
-    - [ActiveJob concurrency](#activejob-concurrency)
-    - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
-    - [Updating](#updating)
-        - [Upgrading minor versions](#upgrading-minor-versions)
-        - [Upgrading v1 to v2](#upgrading-v1-to-v2)
+  - [Command-line options](#command-line-options)
+    - [`good_job start`](#good_job-start)
+    - [`good_job cleanup_preserved_jobs`](#good_job-cleanup_preserved_jobs)
+  - [Configuration options](#configuration-options)
+  - [Global options](#global-options)
+  - [Dashboard](#dashboard)
+  - [ActiveJob concurrency](#activejob-concurrency)
+  - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
+  - [Updating](#updating)
+    - [Upgrading minor versions](#upgrading-minor-versions)
+    - [Upgrading v1 to v2](#upgrading-v1-to-v2)
 - [Go deeper](#go-deeper)
-    - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
-        - [Exceptions](#exceptions)
-        - [Retries](#retries)
-        - [ActionMailer retries](#actionmailer-retries)
-    - [Timeouts](#timeouts)
-    - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
-    - [Database connections](#database-connections)
-    - [Execute jobs async / in-process](#execute-jobs-async--in-process)
-    - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
-    - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
-    - [PgBouncer compatibility](#pgbouncer-compatibility)
-    - [CLI HTTP health check probes](#cli-http-health-check-probes)
+  - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
+    - [Exceptions](#exceptions)
+    - [Retries](#retries)
+    - [ActionMailer retries](#actionmailer-retries)
+  - [Timeouts](#timeouts)
+  - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
+  - [Database connections](#database-connections)
+  - [Execute jobs async / in-process](#execute-jobs-async--in-process)
+  - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
+  - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
+  - [PgBouncer compatibility](#pgbouncer-compatibility)
+  - [CLI HTTP health check probes](#cli-http-health-check-probes)
 - [Contribute](#contribute)
-    - [Gem development](#gem-development)
-    - [Release](#release)
+  - [Gem development](#gem-development)
+  - [Release](#release)
 - [License](#license)
 
 ## Set up
@@ -260,10 +260,10 @@ end
 Available configuration options are:
 
 - `execution_mode` (symbol) specifies how and where jobs should be executed. You can also set this with the environment variable `GOOD_JOB_EXECUTION_MODE`. It can be any one of:
-    - `:inline` executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
-    - `:external` causes the adapter to enqueue jobs, but not execute them. When using this option (the default for production environments), you’ll need to use the command-line tool to actually execute your jobs.
-    - `:async` (or `:async_server`) executes jobs in separate threads within the Rails web server process (`bundle exec rails server`). It can be more economical for small workloads because you don’t need a separate machine or environment for running your jobs, but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.  When not in the Rails web server, jobs will execute in `:external` mode to ensure jobs are not executed within `rails console`, `rails db:migrate`, `rails assets:prepare`, etc.
-    - `:async_all` executes jobs in separate threads in _any_ Rails process.
+  - `:inline` executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
+  - `:external` causes the adapter to enqueue jobs, but not execute them. When using this option (the default for production environments), you’ll need to use the command-line tool to actually execute your jobs.
+  - `:async` (or `:async_server`) executes jobs in separate threads within the Rails web server process (`bundle exec rails server`). It can be more economical for small workloads because you don’t need a separate machine or environment for running your jobs, but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.  When not in the Rails web server, jobs will execute in `:external` mode to ensure jobs are not executed within `rails console`, `rails db:migrate`, `rails assets:prepare`, etc.
+  - `:async_all` executes jobs in separate threads in _any_ Rails process.
 - `max_threads` (integer) sets the maximum number of threads to use when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
 - `queues` (string) determines which queues to execute jobs from when `execution_mode` is set to `:async`. See the description of `good_job start` for more details on the format of this string. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`. A poll interval of `-1` disables polling completely.
@@ -618,8 +618,8 @@ By default, GoodJob creates a single thread execution pool that will execute job
 
     A pool is configured with the following syntax `<participating_queues>:<thread_count>`:
 
-    - `<participating_queues>`: either `queue1,queue2` (only those queues), `*` (all) or `-queue1,queue2` (all except those queues).
-    - `<thread_count>`: a count overriding for this specific pool the global `max-threads`.
+  - `<participating_queues>`: either `queue1,queue2` (only those queues), `*` (all) or `-queue1,queue2` (all except those queues).
+  - `<thread_count>`: a count overriding for this specific pool the global `max-threads`.
 
     Pool configurations are separated with a semicolon (;) in the `queues` configuration
 
