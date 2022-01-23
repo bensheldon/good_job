@@ -1,7 +1,7 @@
 <div class='card mb-2'>
   <div class='card-body'>
 
-    <%= form_with(method: :get, local: true, class: 'row') do |form| %>
+    <%= form_with(method: :get, local: true, class: 'row', id: 'JobFilterForm') do |form| %>
       <div class="col-md-3">
         <label class="form-label">Filter by job class</label>
         <%= form.select :job_class, filter.job_classes.collect { |t| [ format('%s (%d)', t[0], t[1]), t[0] ]}, { include_blank: true, selected: params[:job_class] }, { class: 'form-select form-select-sm' }  %>
