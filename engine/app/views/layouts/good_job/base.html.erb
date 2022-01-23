@@ -5,14 +5,15 @@
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
-  <%= stylesheet_link_tag bootstrap_path(format: :css, v: GoodJob::VERSION) %>
-  <%= stylesheet_link_tag style_path(format: :css, v: GoodJob::VERSION) %>
+  <%# Assets must use *_url route helpers to avoid being overriden by config.asset_host %>
+  <%= stylesheet_link_tag bootstrap_url(format: :css, v: GoodJob::VERSION), skip_pipeline: true %>
+  <%= stylesheet_link_tag style_url(format: :css, v: GoodJob::VERSION) %>
 
-  <%= javascript_include_tag bootstrap_path(format: :js, v: GoodJob::VERSION), nonce: true %>
-  <%= javascript_include_tag chartjs_path(format: :js, v: GoodJob::VERSION), nonce: true %>
-  <%= javascript_include_tag scripts_path(format: :js, v: GoodJob::VERSION), nonce: true %>
+  <%= javascript_include_tag bootstrap_url(format: :js, v: GoodJob::VERSION), nonce: true %>
+  <%= javascript_include_tag chartjs_url(format: :js, v: GoodJob::VERSION), nonce: true %>
+  <%= javascript_include_tag scripts_url(format: :js, v: GoodJob::VERSION), nonce: true %>
 
-  <%= javascript_include_tag rails_ujs_path(format: :js, v: GoodJob::VERSION), nonce: true %>
+  <%= javascript_include_tag rails_ujs_url(format: :js, v: GoodJob::VERSION), nonce: true %>
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
