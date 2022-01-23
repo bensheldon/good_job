@@ -1,34 +1,66 @@
 <div class='card mb-2'>
-  <div class='card-body'>
+  <div class='card-body d-flex flex-wrap'>
+    <div class='mb-2 me-4'>
+      <small>Filter by job class</small>
+      <br>
+      <% filter.job_classes.each do |name, count| %>
+        <% if params[:job_class] == name %>
+          <%= link_to(filter.to_params(job_class: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
+            <%= name %> (<%= count %>)
+          <% end %>
+        <% else %>
+          <%= link_to(filter.to_params(job_class: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
+            <%= name %> (<%= count %>)
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
 
-    <%= form_with(method: :get, local: true, class: 'row', id: 'JobFilterForm') do |form| %>
-      <div class="col-md-3">
-        <label class="form-label">Filter by job class</label>
-        <%= form.select :job_class, filter.job_classes.collect { |t| [ format('%s (%d)', t[0], t[1]), t[0] ]}, { include_blank: true, selected: params[:job_class] }, { class: 'form-select form-select-sm' }  %>
-      </div>
+    <div class='mb-2 me-4'>
+      <small>Filter by state</small>
+      <br>
+      <% filter.states.each do |name, count| %>
+        <% if params[:state] == name %>
+          <%= link_to(filter.to_params(state: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
+            <%= name %> (<%= count %>)
+          <% end %>
+        <% else %>
+          <%= link_to(filter.to_params(state: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
+            <%= name %> (<%= count %>)
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
 
-      <div class="col-md-2">
-        <label class="form-label">Filter by queue</label>
-        <%= form.select :queue_name, filter.queues.collect { |t| [ format('%s (%d)', t[0].titleize, t[1]), t[0] ]}, { include_blank: true, selected: params[:queue_name] }, { class: 'form-select form-select-sm' }  %>
-      </div>
+    <div class='mb-2 me-4'>
+      <small>Filter by queue</small>
+      <br>
+      <% filter.queues.each do |name, count| %>
+        <% if params[:queue_name] == name %>
+          <%= link_to(filter.to_params(queue_name: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
+            <%= name %> (<%= count %>)
+          <% end %>
+        <% else %>
+          <%= link_to(filter.to_params(queue_name: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
+            <%= name %> (<%= count %>)
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
 
-      <div class="col-md-2">
-        <label class="form-label">Filter by state</label>
-        <%= form.select :state, filter.states.collect { |t| [ format('%s (%d)', t[0].titleize, t[1]), t[0] ]}, { include_blank: true, selected: params[:state] }, { class: 'form-select form-select-sm' }  %>
-      </div>
+    <div class="mb-2">
+      <%= form_with(url: "", method: :get, local: true) do |form| %>
+        <% filter.to_params(query: nil).each do |key, value| %>
+          <%= form.hidden_field(key.to_sym, value: value) %>
+        <% end %>
 
-      <div class="col-md-3">
-        <label class="form-label">Search</label>
-        <%= form.search_field :query, value: params[:query], class: "form-control form-control-sm" %>
-      </div>
-
-      <div class="col-md-2">
-        <label class="form-label">&nbsp;</label>
-        <div class="input-group">
-          <%= form.button "Search", type: "submit", name: nil, class: "btn btn-sm btn-outline-secondary form-control" %>
-          <%= link_to "Clear", nil, class: "btn btn-sm btn-outline-secondary" %>
+        <small><%= form.label :query, "Search" %></small>
+        <div class="input-group input-group-sm">
+          <%= form.search_field :query, value: params[:query], class: "form-control" %>
+          <%= form.button "Search", type: "submit", name: nil, class: "btn btn-sm btn-outline-secondary" %>
+          <%= link_to "Clear", filter.to_params(query: nil), class: "btn btn-sm btn-outline-secondary" %>
         </div>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
   </div>
 </div>
