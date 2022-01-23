@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.9.3](https://github.com/bensheldon/good_job/tree/v2.9.3) (2022-01-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.2...v2.9.3)
+
+**Closed issues:**
+
+- Assets not loaded when Rails is configured with a different hostname for assets [\#491](https://github.com/bensheldon/good_job/issues/491)
+
+**Merged pull requests:**
+
+- Use `*_url` route helpers for Dashboard assets to avoid being overridden by `config.asset_host` [\#493](https://github.com/bensheldon/good_job/pull/493) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.9.2](https://github.com/bensheldon/good_job/tree/v2.9.2) (2022-01-19)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.1...v2.9.2)
