@@ -119,7 +119,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - By default, GoodJob separates job enqueuing from job execution so that jobs can be scaled independently of the web server.  Use the GoodJob command-line tool to execute jobs:
 
         ```bash
-        $ bundle exec good_job start
+        bundle exec good_job start
         ```
 
         Ideally the command-line tool should be run on a separate machine or container from the web process. For example, on Heroku:
@@ -133,8 +133,8 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 
     - GoodJob can also be configured to execute jobs within the web server process to save on resources. This is useful for low-workloads when economy is paramount.
 
-        ```
-        $ GOOD_JOB_EXECUTION_MODE=async rails server
+        ```bash
+        GOOD_JOB_EXECUTION_MODE=async rails server
         ```
 
         Additional configuration is likely necessary, see the reference below for configuration.
@@ -470,7 +470,7 @@ To perform upgrades to the GoodJob database tables:
    Optional: If using Rails' multiple databases with the `migrations_paths` configuration option, use the `--database` option:
 
     ```bash
-    $ bin/rails g good_job:update --database animals
+    bin/rails g good_job:update --database animals
     ```
 
 1. Run the database migration locally
@@ -703,7 +703,7 @@ GoodJob can execute jobs "async" in the same process as the web server (e.g. `bi
 - Or, with environment variables:
 
     ```bash
-    $ GOOD_JOB_EXECUTION_MODE=async GOOD_JOB_MAX_THREADS=4 GOOD_JOB_POLL_INTERVAL=30 bin/rails server
+    GOOD_JOB_EXECUTION_MODE=async GOOD_JOB_MAX_THREADS=4 GOOD_JOB_POLL_INTERVAL=30 bin/rails server
     ```
 
 Depending on your application configuration, you may need to take additional steps:
@@ -821,7 +821,7 @@ It is also necessary to delete these preserved jobs from the database after a ce
 - For example, using the `good_job` command-line utility:
 
     ```bash
-    $ bundle exec good_job cleanup_preserved_jobs --before-seconds-ago=86400
+    bundle exec good_job cleanup_preserved_jobs --before-seconds-ago=86400
     ```
 
 ### PgBouncer compatibility
