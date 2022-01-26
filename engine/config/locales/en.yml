@@ -1,0 +1,14 @@
+en:
+  good_job:
+    shared:
+      navbar:
+        commig_soon: More views coming soon
+        cron_schedules: Cron Schedules
+        current_time: Now is %{time}
+        executions: All Executions
+        jobs: All Jobs
+        name: GoodJob 👍
+        processes: Processes
+        timezone_notice: Times are displayed in %{time} timezone
+      announcement:
+        work_in_progress_html: 🚧 GoodJob's dashboard is a work in progress. Please contribute ideas and code on <a href="https://github.com/bensheldon/good_job/issues" target="_blank" rel="nofollow noopener noreferrer">Github</a>.

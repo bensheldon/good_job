@@ -96,4 +96,24 @@ describe 'Dashboard', type: :system do
       end.to change { unfinished_job.head_execution(reload: true).finished_at }.to within(1.second).of(Time.current)
     end
   end
+
+  describe "renders /good_job in Spanish lang" do
+    it "renders the navbar successfully" do
+      visit "/good_job?locale=es"
+
+      expect(page).to have_content "GoodJob 👍"
+      expect(page).to have_content "Ejecuciones"
+      expect(page).to have_content "Tareas"
+      expect(page).to have_content "Tareas Programadas"
+      expect(page).to have_content "Procesos"
+      expect(page).to have_content "Próximamente más vistas"
+    end
+
+    it "renders work_in_progress successfully" do
+      visit "/good_job?locale=es"
+
+      expect(page).to have_content "🚧 GoodJob se encuentra en desarrollo."
+      expect(page).to have_content "Por favor contribuya en GoodJob con ideas y código."
+    end
+  end
 end

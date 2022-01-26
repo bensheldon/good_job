@@ -1,0 +1,14 @@
+es:
+  good_job:
+    shared:
+      navbar:
+        commig_soon: "Próximamente más vistas"
+        cron_schedules: "Tareas Programadas"
+        current_time: "Ahora son las %{time}"
+        executions: "Ejecuciones"
+        jobs: "Tareas"
+        name: "GoodJob 👍"
+        processes: "Procesos"
+        timezone_notice: "Los tiempos se muestran en la zona horaria %{time}"
+      announcement:
+        work_in_progress_html: 🚧 GoodJob se encuentra en desarrollo. Por favor contribuya en <a href="https://github.com/bensheldon/good_job/issues" target="_blank" rel="nofollow noopener noreferrer">GoodJob</a> con ideas y código.

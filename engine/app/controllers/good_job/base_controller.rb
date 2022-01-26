@@ -27,7 +27,8 @@ module GoodJob
     private
 
     def switch_locale(&action)
-      I18n.with_locale(:en, &action)
+      locale = params[:locale] || I18n.default_locale
+      I18n.with_locale(locale, &action)
     end
   end
 end
