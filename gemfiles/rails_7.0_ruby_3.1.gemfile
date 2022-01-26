@@ -8,6 +8,7 @@ gem "pg", platforms: [:mri, :mingw, :x64_mingw]
 gem "rails", "~> 7.0.1"
 gem "selenium-webdriver", "~> 4.0"
 gem "capybara", "~> 3.36"
+gem "psych", "~> 4.0"
 
 platforms :ruby do
   gem "activerecord-explain-analyze"
