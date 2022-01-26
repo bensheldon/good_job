@@ -22,6 +22,7 @@ AllCops:
     - spec/test_app/**/*
     - vendor/**/*
     - scripts/**/*
+    - gemfiles/**/*
   NewCops: enable
 
 Layout/EmptyLineAfterMagicComment:
