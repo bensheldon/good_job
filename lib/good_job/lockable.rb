@@ -196,8 +196,7 @@ module GoodJob
 
       # Acquires an advisory lock on this record if it is not already locked by
       # another database session. Be careful to ensure you release the lock when
-      # you are done with {#advisory_record_unlock} to release
-      # all remaining locks).
+      # you are done with {#advisory_record_unlock} to release all remaining locks.
       # @param key [String, Symbol] Key to Advisory Lock against
       # @param function [String, Symbol] Postgres Advisory Lock function name to use
       # @return [Boolean] whether the lock was acquired.
@@ -232,12 +231,6 @@ module GoodJob
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
         ]
         connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Unlock', binds).first['unlocked']
-      end
-
-      # Default Advisory Lock key for column-based locking
-      # @return [String]
-      def lockable_column_key(column: _advisory_lockable_column)
-        "#{table_name}-#{self[column]}"
       end
 
       def _advisory_lockable_column
