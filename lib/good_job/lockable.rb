@@ -303,10 +303,10 @@ module GoodJob
     def with_advisory_lock(key: lockable_key, function: advisory_lockable_function)
       raise ArgumentError, "Must provide a block" unless block_given?
 
-      self.class.advisory_record_lock!(key: key, function: function)
+      advisory_lock!(key: key, function: function)
       yield
     ensure
-      self.class.advisory_record_unlock(key: key, function: self.class.advisory_unlockable_function(function)) unless $ERROR_INFO.is_a? RecordAlreadyAdvisoryLockedError
+      advisory_unlock(key: key, function: self.class.advisory_unlockable_function(function)) unless $ERROR_INFO.is_a? RecordAlreadyAdvisoryLockedError
     end
 
     # Tests whether this record has an advisory lock on it.
@@ -361,7 +361,7 @@ module GoodJob
     # @param function [String, Symbol] Postgres Advisory Lock function name to use
     # @return [void]
     def advisory_unlock!(key: lockable_key, function: self.class.advisory_unlockable_function(advisory_lockable_function))
-      self.class.advisory_record_unlock(key: key, function: function) while advisory_locked?
+      advisory_unlock(key: key, function: function) while advisory_locked?
     end
 
     # Default Advisory Lock key
