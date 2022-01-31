@@ -126,6 +126,7 @@ RSpec.describe GoodJob::Lockable do
         model_class.with_advisory_lock(key: execution.lockable_key) do
           expect(execution.advisory_locked?).to be true
           expect(execution.owns_advisory_lock?).to be true
+          expect(PgLock.advisory_lock.count).to eq 1
         end
 
         expect(execution.advisory_locked?).to be false
