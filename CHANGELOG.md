@@ -1,16 +1,37 @@
 # Changelog
 
+## [v2.9.4](https://github.com/bensheldon/good_job/tree/v2.9.4) (2022-01-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.3...v2.9.4)
+
+**Fixed bugs:**
+
+- Fix navbar toggler [\#506](https://github.com/bensheldon/good_job/pull/506) ([JuanVqz](https://github.com/JuanVqz))
+- Guard LogSubscriber against tagged logger without a formatter [\#504](https://github.com/bensheldon/good_job/pull/504) ([bensheldon](https://github.com/bensheldon))
+- Markdown lint fixes + Added missing responsive meta tag  [\#492](https://github.com/bensheldon/good_job/pull/492) ([zeevy](https://github.com/zeevy))
+
+**Closed issues:**
+
+- The navbar icon doesn't show the navbar menu when clicking it [\#503](https://github.com/bensheldon/good_job/issues/503)
+- Not all loggers have a formatter [\#502](https://github.com/bensheldon/good_job/issues/502)
+- Error logs from failed jobs used all storage space [\#495](https://github.com/bensheldon/good_job/issues/495)
+
+**Merged pull requests:**
+
+- Update Code of Conduct to Contributor Covenant 2.1 [\#501](https://github.com/bensheldon/good_job/pull/501) ([bensheldon](https://github.com/bensheldon))
+- Test with Ruby 3.1 [\#498](https://github.com/bensheldon/good_job/pull/498) ([aried3r](https://github.com/aried3r))
+
 ## [v2.9.3](https://github.com/bensheldon/good_job/tree/v2.9.3) (2022-01-23)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.2...v2.9.3)
 
+**Fixed bugs:**
+
+- Use `*_url` route helpers for Dashboard assets to avoid being overridden by `config.asset_host` [\#493](https://github.com/bensheldon/good_job/pull/493) ([bensheldon](https://github.com/bensheldon))
+
 **Closed issues:**
 
 - Assets not loaded when Rails is configured with a different hostname for assets [\#491](https://github.com/bensheldon/good_job/issues/491)
-
-**Merged pull requests:**
-
-- Use `*_url` route helpers for Dashboard assets to avoid being overridden by `config.asset_host` [\#493](https://github.com/bensheldon/good_job/pull/493) ([bensheldon](https://github.com/bensheldon))
 
 ## [v2.9.2](https://github.com/bensheldon/good_job/tree/v2.9.2) (2022-01-19)
 
