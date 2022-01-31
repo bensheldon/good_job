@@ -120,6 +120,18 @@ RSpec.describe GoodJob::Lockable do
 
       expect(sql).to eq 'SELECT "good_jobs".* FROM "good_jobs"'
     end
+
+    context 'when `key` option passed' do
+      it 'locks exactly one record by `key`' do
+        model_class.with_advisory_lock(key: execution.lockable_key) do
+          expect(execution.advisory_locked?).to be true
+          expect(execution.owns_advisory_lock?).to be true
+        end
+
+        expect(execution.advisory_locked?).to be false
+        expect(execution.owns_advisory_lock?).to be false
+      end
+    end
   end
 
   describe '#advisory_lock' do
@@ -201,7 +213,7 @@ RSpec.describe GoodJob::Lockable do
 
   describe '.advisory_record_lock' do
     it 'results in a locked record' do
-      model_class.advisory_record_lock!(key: "good_jobs-#{execution.active_job_id}")
+      model_class.advisory_record_lock!(key: execution.lockable_key)
 
       expect(execution.advisory_locked?).to be true
       expect(execution.owns_advisory_lock?).to be true
@@ -213,7 +225,7 @@ RSpec.describe GoodJob::Lockable do
     end
 
     it 'returns true or false if the lock is acquired' do
-      result = model_class.advisory_record_lock(key: "good_jobs-#{execution.active_job_id}")
+      result = model_class.advisory_record_lock(key: execution.lockable_key)
 
       expect(result).to eq true
       expect(Concurrent::Promises.future(execution, &:advisory_lock).value!).to eq false
@@ -222,7 +234,7 @@ RSpec.describe GoodJob::Lockable do
     end
 
     it 'can lock alternative postgres functions' do
-      model_class.advisory_record_lock!(key: "good_jobs-#{execution.active_job_id}", function: "pg_advisory_lock")
+      model_class.advisory_record_lock!(key: execution.lockable_key, function: "pg_advisory_lock")
 
       expect(execution.advisory_locked?).to be true
       execution.advisory_unlock
@@ -234,7 +246,7 @@ RSpec.describe GoodJob::Lockable do
       execution.advisory_lock!
 
       expect do
-        model_class.advisory_record_unlock(key: "good_jobs-#{execution.active_job_id}")
+        model_class.advisory_record_unlock(key: execution.lockable_key)
       end.to change(execution, :advisory_locked?).from(true).to(false)
     end
 
@@ -243,7 +255,7 @@ RSpec.describe GoodJob::Lockable do
       execution.advisory_lock!
 
       expect do
-        model_class.advisory_record_unlock(key: "good_jobs-#{execution.active_job_id}")
+        model_class.advisory_record_unlock(key: execution.lockable_key)
       end.not_to change(execution, :advisory_locked?).from(true)
 
       execution.advisory_unlock
@@ -254,7 +266,7 @@ RSpec.describe GoodJob::Lockable do
       execution.destroy!
 
       expect do
-        model_class.advisory_record_unlock(key: "good_jobs-#{execution.active_job_id}")
+        model_class.advisory_record_unlock(key: execution.lockable_key)
       end.to change(execution, :advisory_locked?).from(true).to(false)
     end
 
@@ -262,7 +274,7 @@ RSpec.describe GoodJob::Lockable do
       execution.advisory_lock
 
       expect(Concurrent::Promises.future(execution, &:advisory_unlock).value!).to eq false
-      result = model_class.advisory_record_unlock(key: "good_jobs-#{execution.active_job_id}")
+      result = model_class.advisory_record_unlock(key: execution.lockable_key)
 
       expect(result).to eq true
 

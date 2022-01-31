@@ -144,42 +144,28 @@ module GoodJob
       #   MyLockableRecord.order(created_at: :asc).limit(2).with_advisory_lock do |record|
       #     do_something_with record
       #   end
-      def with_advisory_lock(column: _advisory_lockable_column, function: advisory_lockable_function, unlock_session: false)
+      def with_advisory_lock(key: nil, column: _advisory_lockable_column, function: advisory_lockable_function, unlock_session: false)
         raise ArgumentError, "Must provide a block" unless block_given?
 
-        records = advisory_lock(column: column, function: function).to_a
+        records = if key
+                    advisory_record_lock!(key: key, function: function)
+                  else
+                    advisory_lock(column: column, function: function).to_a
+                  end
+
         begin
           unscoped { yield(records) }
         ensure
           if unlock_session
             advisory_unlock_session
+          elsif key
+            advisory_record_unlock(key: key, function: advisory_unlockable_function(function)) unless $ERROR_INFO.is_a? RecordAlreadyAdvisoryLockedError
           else
             records.each do |record|
               record.advisory_unlock(key: record.lockable_column_key(column: column), function: advisory_unlockable_function(function))
             end
           end
         end
-      end
-
-      # Acquires an advisory lock on this record and safely releases it after the
-      # passed block is completed. If the record is locked by another database
-      # session, this raises {RecordAlreadyAdvisoryLockedError}.
-      # @param key [String, Symbol] Key to lock against
-      # @param function [String, Symbol] Postgres Advisory Lock function name to use
-      # @yield Nothing
-      # @return [Object] The result of the block.
-      #
-      # @example
-      #   Execution.with_advisory_record_lock(key: key, function: "pg_advisory_lock") do
-      #     do_something
-      #   end
-      def with_advisory_record_lock(key:, function: advisory_lockable_function)
-        raise ArgumentError, "Must provide a block" unless block_given?
-
-        advisory_record_lock!(key: key, function: function)
-        yield
-      ensure
-        advisory_record_unlock(key: key, function: advisory_unlockable_function(function)) unless $ERROR_INFO.is_a? RecordAlreadyAdvisoryLockedError
       end
 
       # Acquires an advisory lock on this record or raises
@@ -277,48 +263,7 @@ module GoodJob
     # @param function [String, Symbol] Postgres Advisory Lock function name to use
     # @return [Boolean] whether the lock was acquired.
     def advisory_lock(key: lockable_key, function: advisory_lockable_function)
-      query = if function.include? "_try_"
-                <<~SQL.squish
-                  SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint) AS locked
-                SQL
-              else
-                <<~SQL.squish
-                  SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint)::text AS locked
-                SQL
-              end
-
-      binds = [
-        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
-      ]
-      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).first['locked']
-    end
-
-    # Releases an advisory lock on this record if it is locked by this database
-    # session. Note that advisory locks stack, so you must call
-    # {#advisory_unlock} and {#advisory_lock} the same number of times.
-    # @param key [String, Symbol] Key to lock against
-    # @param function [String, Symbol] Postgres Advisory Lock function name to use
-    # @return [Boolean] whether the lock was released.
-    def advisory_unlock(key: lockable_key, function: self.class.advisory_unlockable_function(advisory_lockable_function))
-      query = <<~SQL.squish
-        SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint) AS unlocked
-      SQL
-      binds = [
-        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
-      ]
-      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Unlock', binds).first['unlocked']
-    end
-
-    # Acquires an advisory lock on this record or raises
-    # {RecordAlreadyAdvisoryLockedError} if it is already locked by another
-    # database session.
-    # @param key [String, Symbol] Key to lock against
-    # @param function [String, Symbol] Postgres Advisory Lock function name to use
-    # @raise [RecordAlreadyAdvisoryLockedError]
-    # @return [Boolean] +true+
-    def advisory_lock!(key: lockable_key, function: advisory_lockable_function)
-      result = advisory_lock(key: key, function: function)
-      result || raise(RecordAlreadyAdvisoryLockedError)
+      self.class.advisory_record_lock(key: key, function: function)
     end
 
     # Acquires an advisory lock on this record and safely releases it after the
@@ -337,10 +282,31 @@ module GoodJob
     def with_advisory_lock(key: lockable_key, function: advisory_lockable_function)
       raise ArgumentError, "Must provide a block" unless block_given?
 
-      advisory_lock!(key: key, function: function)
+      self.class.advisory_record_lock!(key: key, function: function)
       yield
     ensure
-      advisory_unlock(key: key, function: self.class.advisory_unlockable_function(function)) unless $ERROR_INFO.is_a? RecordAlreadyAdvisoryLockedError
+      self.class.advisory_record_unlock(key: key, function: self.class.advisory_unlockable_function(function)) unless $ERROR_INFO.is_a? RecordAlreadyAdvisoryLockedError
+    end
+
+    # Releases an advisory lock on this record if it is locked by this database
+    # session. Note that advisory locks stack, so you must call
+    # {#advisory_unlock} and {#advisory_lock} the same number of times.
+    # @param key [String, Symbol] Key to lock against
+    # @param function [String, Symbol] Postgres Advisory Lock function name to use
+    # @return [Boolean] whether the lock was released.
+    def advisory_unlock(key: lockable_key, function: self.class.advisory_unlockable_function(advisory_lockable_function))
+      self.class.advisory_record_unlock(key: key, function: function)
+    end
+
+    # Acquires an advisory lock on this record or raises
+    # {RecordAlreadyAdvisoryLockedError} if it is already locked by another
+    # database session.
+    # @param key [String, Symbol] Key to lock against
+    # @param function [String, Symbol] Postgres Advisory Lock function name to use
+    # @raise [RecordAlreadyAdvisoryLockedError]
+    # @return [Boolean] +true+
+    def advisory_lock!(key: lockable_key, function: advisory_lockable_function)
+      self.class.advisory_record_lock!(key: key, function: function)
     end
 
     # Tests whether this record has an advisory lock on it.
@@ -395,7 +361,7 @@ module GoodJob
     # @param function [String, Symbol] Postgres Advisory Lock function name to use
     # @return [void]
     def advisory_unlock!(key: lockable_key, function: self.class.advisory_unlockable_function(advisory_lockable_function))
-      advisory_unlock(key: key, function: function) while advisory_locked?
+      self.class.advisory_record_unlock(key: key, function: function) while advisory_locked?
     end
 
     # Default Advisory Lock key
