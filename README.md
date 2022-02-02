@@ -403,7 +403,7 @@ class MyJob < ApplicationJob
     key: -> { "Unique-#{arguments.first}" } #  MyJob.perform_later("Alice") => "Unique-Alice"
 
     # If the method uses named parameters, they can be accessed like so:
-    # key: -> { "Unique-#{arguments.first['name']}" } #  MyJob.perform_later(name: "Alice")
+    # key: -> { "Unique-#{arguments.first.fetch(:name)}" } #  MyJob.perform_later(name: "Alice")
   )
 
   def perform(first_name)
