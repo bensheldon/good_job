@@ -399,11 +399,9 @@ class MyJob < ApplicationJob
 
     # A unique key to be globally locked against.
     # Can be String or Lambda/Proc that is invoked in the context of the job.
-    # Note: Arguments passed to #perform_later must be accessed through `arguments` method.
-    key: -> { "Unique-#{arguments.first}" } #  MyJob.perform_later("Alice") => "Unique-Alice"
-
-    # If the method uses named parameters, they can be accessed like so:
-    # key: -> { "Unique-#{arguments.first['name']}" } #  MyJob.perform_later(name: "Alice")
+    # Note: Arguments passed to #perform_later can be accessed through ActiveJob's `arguments` method
+    # which is an array containing positional arguments and, optionally, a kwarg hash.
+    key: -> { "Unique-#{arguments.first}-#{arguments.last[:version]}" } #  MyJob.perform_later("Alice", version: 'v2') => "Unique-Alice-v2"
   )
 
   def perform(first_name)
