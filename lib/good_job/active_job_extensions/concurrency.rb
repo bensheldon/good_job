@@ -30,7 +30,7 @@ module GoodJob
           key = job.good_job_concurrency_key
           next(block.call) if key.blank?
 
-          GoodJob::Execution.new.with_advisory_lock(key: key, function: "pg_advisory_lock") do
+          GoodJob::Execution.with_advisory_lock(key: key, function: "pg_advisory_lock") do
             enqueue_concurrency = if enqueue_limit
                                     GoodJob::Execution.where(concurrency_key: key).unfinished.advisory_unlocked.count
                                   else
@@ -61,7 +61,7 @@ module GoodJob
           key = job.good_job_concurrency_key
           next if key.blank?
 
-          GoodJob::Execution.new.with_advisory_lock(key: key, function: "pg_advisory_lock") do
+          GoodJob::Execution.with_advisory_lock(key: key, function: "pg_advisory_lock") do
             allowed_active_job_ids = GoodJob::Execution.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(perform_limit).pluck(:active_job_id)
             # The current job has already been locked and will appear in the previous query
             raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include? job.job_id
