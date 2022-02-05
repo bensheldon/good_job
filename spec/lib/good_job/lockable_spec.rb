@@ -89,6 +89,37 @@ RSpec.describe GoodJob::Lockable do
     end
   end
 
+  describe '.advisory_lock_key' do
+    it 'locks a key' do
+      model_class.advisory_lock_key(execution.lockable_key)
+      expect(execution).to be_advisory_locked
+      model_class.advisory_unlock_key(execution.lockable_key)
+    end
+
+    context 'when a block is passed' do
+      it 'locks that key for the bloc and then unlocks it' do
+        model_class.advisory_lock_key(execution.lockable_key) do
+          expect(execution.advisory_locked?).to be true
+          expect(execution.owns_advisory_lock?).to be true
+          expect(PgLock.advisory_lock.count).to eq 1
+        end
+
+        expect(execution.advisory_locked?).to be false
+        expect(execution.owns_advisory_lock?).to be false
+      end
+
+      it 'does not invoke the block if the key is already locked' do
+        model_class.advisory_lock_key(execution.lockable_key) do
+          promise = Concurrent::Promises.future do
+            result = model_class.advisory_lock_key(execution.lockable_key) { raise }
+            expect(result).to eq nil
+          end
+          expect { promise.value! }.not_to raise_error
+        end
+      end
+    end
+  end
+
   describe '.with_advisory_lock' do
     it 'opens a block with a lock that locks and unlocks records' do
       records = nil
@@ -119,19 +150,6 @@ RSpec.describe GoodJob::Lockable do
       end
 
       expect(sql).to eq 'SELECT "good_jobs".* FROM "good_jobs"'
-    end
-
-    context 'when `key` option passed' do
-      it 'locks exactly one record by `key`' do
-        model_class.with_advisory_lock(key: execution.lockable_key) do
-          expect(execution.advisory_locked?).to be true
-          expect(execution.owns_advisory_lock?).to be true
-          expect(PgLock.advisory_lock.count).to eq 1
-        end
-
-        expect(execution.advisory_locked?).to be false
-        expect(execution.owns_advisory_lock?).to be false
-      end
     end
   end
 
