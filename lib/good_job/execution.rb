@@ -267,7 +267,9 @@ module GoodJob
     end
 
     def active_job
-      ActiveJob::Base.deserialize(active_job_data)
+      ActiveJob::Base.deserialize(active_job_data).tap do |aj|
+        aj.send(:deserialize_arguments_if_needed)
+      end
     end
 
     private
