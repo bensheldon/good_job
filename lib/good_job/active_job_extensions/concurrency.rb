@@ -62,7 +62,7 @@ module GoodJob
           next if key.blank?
 
           GoodJob::Execution.advisory_lock_key(key, function: "pg_advisory_lock") do
-            allowed_active_job_ids = GoodJob::Execution.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(perform_limit).pluck(:active_job_id)
+            allowed_active_job_ids = GoodJob::Execution.unfinished.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(perform_limit).pluck(:active_job_id)
             # The current job has already been locked and will appear in the previous query
             raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include? job.job_id
           end
