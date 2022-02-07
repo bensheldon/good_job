@@ -1,5 +1,25 @@
 # Changelog
 
+## [v2.9.5](https://github.com/bensheldon/good_job/tree/v2.9.5) (2022-02-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.4...v2.9.5)
+
+**Fixed bugs:**
+
+- Transactions in "aborting" threads do not commit; causes GoodJob::Process record not destroyed on exit [\#489](https://github.com/bensheldon/good_job/issues/489)
+- Deserialize ActiveJob arguments when manually retrying a job [\#513](https://github.com/bensheldon/good_job/pull/513) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Concurrency key proc is missing `arguments` when retrying a discarded job. [\#512](https://github.com/bensheldon/good_job/issues/512)
+- Cron Schedule not visible in dashboard [\#496](https://github.com/bensheldon/good_job/issues/496)
+
+**Merged pull requests:**
+
+- Rename methods to `advisory_lock_key` and allow it to take a block instead of `with_advisory_lock` [\#511](https://github.com/bensheldon/good_job/pull/511) ([bensheldon](https://github.com/bensheldon))
+- README: Limiting concurrency - fetch symbol instead of string [\#510](https://github.com/bensheldon/good_job/pull/510) ([BenSto](https://github.com/BenSto))
+- Add arbitrary lock on class level too [\#499](https://github.com/bensheldon/good_job/pull/499) ([pandwoter](https://github.com/pandwoter))
+
 ## [v2.9.4](https://github.com/bensheldon/good_job/tree/v2.9.4) (2022-01-31)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.3...v2.9.4)
