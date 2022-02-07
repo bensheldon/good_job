@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.9.6](https://github.com/bensheldon/good_job/tree/v2.9.6) (2022-02-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.5...v2.9.6)
+
+**Merged pull requests:**
+
+- Limit query for allowed concurrent jobs to unfinished [\#515](https://github.com/bensheldon/good_job/pull/515) ([til](https://github.com/til))
+
 ## [v2.9.5](https://github.com/bensheldon/good_job/tree/v2.9.5) (2022-02-07)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.4...v2.9.5)
