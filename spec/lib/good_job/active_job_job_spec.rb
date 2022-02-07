@@ -9,7 +9,7 @@ RSpec.describe GoodJob::ActiveJobJob do
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
 
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
-      def perform
+      def perform(feline = nil, canine: nil)
       end
     end)
     stub_const 'TestJob::Error', Class.new(StandardError)
@@ -28,6 +28,7 @@ RSpec.describe GoodJob::ActiveJobJob do
         'executions' => 0,
         'queue_name' => 'mice',
         'priority' => 10,
+        'arguments' => ['cat', { 'canine' => 'dog' }],
       }
     )
   end
@@ -45,6 +46,7 @@ RSpec.describe GoodJob::ActiveJobJob do
         'exception_executions' => { 'TestJob::Error' => 1 },
         'queue_name' => 'mice',
         'priority' => 10,
+        'arguments' => ['cat', { 'canine' => 'dog' }],
       }
     ).tap do |execution|
       tail_execution.update!(
@@ -139,7 +141,8 @@ RSpec.describe GoodJob::ActiveJobJob do
         expect(new_head_execution.serialized_params).to include(
           "executions" => 2,
           "queue_name" => "mice",
-          "priority" => 10
+          "priority" => 10,
+          "arguments" => ['cat', hash_including('canine' => 'dog')]
         )
 
         original_head_execution.reload
