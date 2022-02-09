@@ -8,8 +8,9 @@
 
 <%= render 'good_job/shared/filter', filter: @filter %>
 
+<%= render 'good_job/jobs/table', jobs: @filter.records %>
+
 <% if @filter.records.present? %>
-  <%= render 'good_job/jobs/table', jobs: @filter.records %>
   <nav aria-label="Job pagination" class="mt-3">
     <ul class="pagination">
       <li class="page-item">
@@ -19,6 +20,4 @@
       </li>
     </ul>
   </nav>
-<% else %>
-  <em>No jobs present.</em>
 <% end %>
