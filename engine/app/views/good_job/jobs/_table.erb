@@ -29,9 +29,7 @@
                   <code><%= job.id %></code>
                 <% end %>
               </td>
-              <td>
-                <span class="badge bg-secondary"><%= job.status %></span>
-              </td>
+              <td><%= status_badge(job.status) %></td>
               <td><%= job.job_class %></td>
               <td><%= job.queue_name %></td>
               <td><%= relative_time(job.scheduled_at || job.created_at) %></td>

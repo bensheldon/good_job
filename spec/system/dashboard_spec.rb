@@ -33,13 +33,19 @@ describe 'Dashboard', type: :system do
       ExampleJob.perform_later
 
       visit '/good_job'
-      click_link 'unfinished'
-      expect(page).to have_content 'ExampleJob'
 
-      click_button('Delete execution')
+      select "unfinished", from: "job_state_filter"
+
+      expect(page).to have_content 'ExampleJob'
+      expect(current_url).to match(/state=unfinished/)
+
+      accept_alert do
+        click_button('Delete execution')
+      end
+
       expect(page).to have_content 'Job execution deleted'
       expect(page).not_to have_content 'ExampleJob'
-      expect(current_url).to match %r{/good_job/\?state=unfinished}
+      expect(current_url).to match(/state=unfinished/)
     end
   end
 
@@ -63,11 +69,60 @@ describe 'Dashboard', type: :system do
     end
 
     describe 'filtering' do
+      let!(:foo_queue_job) { ConfigurableQueueJob.set(wait: 10.minutes).perform_later(queue_as: 'foo') }
+
+      it "can filter by job class" do
+        visit root_path
+
+        select "ConfigurableQueueJob", from: "job_class_filter"
+        expect(current_url).to match(/job_class=ConfigurableQueueJob/)
+
+        table = page.find("#executions_index_table")
+        expect(table).to have_selector("tbody tr", count: 1)
+        expect(table).to have_content(foo_queue_job.job_id)
+      end
+
+      it "can filter by state" do
+        visit root_path
+
+        select "unfinished", from: "job_state_filter"
+
+        expect(current_url).to match(/state=unfinished/)
+
+        table = page.find("#executions_index_table")
+        expect(table).to have_selector("tbody tr", count: 2)
+        expect(table).to have_content(foo_queue_job.job_id)
+      end
+
+      it "can filter by queue" do
+        visit root_path
+
+        select "foo", from: "job_queue_filter"
+        expect(current_url).to match(/queue_name=foo/)
+
+        table = page.find("#executions_index_table")
+        expect(table).to have_selector("tbody tr", count: 1)
+        expect(table).to have_content(foo_queue_job.job_id)
+      end
+
+      it "can filter by multiple variables" do
+        visit root_path
+
+        select "ConfigurableQueueJob", from: "job_class_filter"
+        select "default", from: "job_queue_filter"
+
+        expect(page).to have_content("No executions found.")
+
+        select "foo", from: "job_queue_filter"
+
+        expect(page).to have_content(foo_queue_job.job_id)
+      end
+
       it 'can search by argument' do
         visit '/good_job'
         click_on "All Jobs"
 
-        expect(page).to have_selector('.active_job_job', count: 2)
+        expect(page).to have_selector('.active_job_job', count: 3)
         fill_in 'query', with: ExampleJob::DEAD_TYPE
         click_on 'Search'
         expect(page).to have_selector('.active_job_job', count: 1)
