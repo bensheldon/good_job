@@ -8,13 +8,13 @@ if ruby_2
   appraise "rails-5.2" do
     gem "rails", "~> 5.2.0"
   end
-
-  appraise "rails-6.0" do
-    gem "rails", "~> 6.0.0"
-  end
 end
 
 unless ruby_31_or_higher # https://github.com/rails/rails/issues/44090#issuecomment-1007686519
+  appraise "rails-6.0" do
+    gem "rails", "~> 6.0.0"
+  end
+
   appraise "rails-6.1" do
     gem "rails", "~> 6.1.0"
   end

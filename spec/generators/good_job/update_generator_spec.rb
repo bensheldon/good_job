@@ -49,6 +49,6 @@ describe GoodJob::UpdateGenerator, type: :generator, skip_if_java: true do
   end
 
   def normalize_schema(text)
-    text.sub(/ActiveRecord::Schema\.define\(version: ([\d_]*)\)/, 'ActiveRecord::Schema.define(version: SCHEMA_VERSION)')
+    text.sub(/\.define\(version: ([\d_]*)\)/, '.define(version: SCHEMA_VERSION)')
   end
 end
