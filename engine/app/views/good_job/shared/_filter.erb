@@ -33,13 +33,12 @@
       </select>
     </div>
 
-    <div class="me-2 flex-fill">
-      <label for="query"></label>
+    <div class="me-2 flex-fill d-flex flex-col align-items-end">
+      <label class="visually-hidden" for="query" aria-label="Search by class, job id, job params, and error text.">Search by class, job id, job params, and error text.</label>
       <%= search_field_tag "query", params[:query], class: "form-control", placeholder: "Search by class, job id, job params, and error text." %>
     </div>
 
-    <div class="flex-col">
-      <label></label>
+    <div class="d-flex flex-col align-items-end">
       <div>
         <%= form.submit "Search", name: nil, class: "btn btn-primary" %>
         <%= link_to "Clear all", filter.to_params(job_class: nil, state: nil, queue_name: nil, query: nil), class: "btn btn-secondary" %>
