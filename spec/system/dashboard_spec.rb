@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-describe 'Dashboard', type: :system do
+describe 'Dashboard', type: :system, js: true do
   before do
     allow(GoodJob).to receive(:retry_on_unhandled_error).and_return(false)
     allow(GoodJob).to receive(:preserve_job_records).and_return(true)
   end
 
-  it 'renders chart js', js: true do
+  it 'renders chart js' do
     visit '/good_job'
     expect(page).to have_content 'GoodJob 👍'
   end
@@ -135,8 +135,9 @@ describe 'Dashboard', type: :system do
 
       expect do
         within "##{dom_id(discarded_job)}" do
-          click_on 'Retry job'
+          accept_confirm { click_on 'Retry job' }
         end
+        expect(page).to have_content "Job has been retried"
       end.to change { discarded_job.executions.reload.size }.by(1)
     end
 
@@ -146,9 +147,10 @@ describe 'Dashboard', type: :system do
 
       expect do
         within "##{dom_id(unfinished_job)}" do
-          click_on 'Discard job'
+          accept_confirm { click_on 'Discard job' }
         end
-      end.to change { unfinished_job.head_execution(reload: true).finished_at }.to within(1.second).of(Time.current)
+        expect(page).to have_content "Job has been discarded"
+      end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
     end
   end
 end
