@@ -36,13 +36,13 @@ GoodJob::Execution.insert_all(executions_data)
 
 Benchmark.ips do |x|
   x.report("with priority") do
-    GoodJob::Execution.unfinished.priority_ordered.only_scheduled(use_coalesce: true).limit(1).with_advisory_lock do |executions|
+    GoodJob::Execution.unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock do |executions|
       # executions.first&.destroy!
     end
   end
 
   x.report("without priority") do
-    GoodJob::Execution.unfinished.only_scheduled(use_coalesce: true).limit(1).with_advisory_lock do |executions|
+    GoodJob::Execution.unfinished.only_scheduled.limit(1).with_advisory_lock do |executions|
       # executions.first&.destroy!
     end
   end
