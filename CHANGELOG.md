@@ -1,5 +1,23 @@
 # Changelog
 
+## [v2.10.0](https://github.com/bensheldon/good_job/tree/v2.10.0) (2022-02-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.6...v2.10.0)
+
+**Closed issues:**
+
+- Cron jobs not getting run [\#519](https://github.com/bensheldon/good_job/issues/519)
+- Slow queries with many finished entries and concurrency control [\#514](https://github.com/bensheldon/good_job/issues/514)
+- Make default retry behaviour safer [\#505](https://github.com/bensheldon/good_job/issues/505)
+
+**Merged pull requests:**
+
+- Fix Benchmark job throughput script   [\#522](https://github.com/bensheldon/good_job/pull/522) ([douglara](https://github.com/douglara))
+- Update development Gemfile.lock [\#521](https://github.com/bensheldon/good_job/pull/521) ([bensheldon](https://github.com/bensheldon))
+- Ensure Rails 6.0 is tested against Ruby 3.0; use Ruby 3.0 in demo environment [\#520](https://github.com/bensheldon/good_job/pull/520) ([bensheldon](https://github.com/bensheldon))
+- Dashboard: update search filters and some small UI updates [\#518](https://github.com/bensheldon/good_job/pull/518) ([multiplegeorges](https://github.com/multiplegeorges))
+- Document safer setting for retry\_on\_unhandled\_error [\#517](https://github.com/bensheldon/good_job/pull/517) ([tamaloa](https://github.com/tamaloa))
+
 ## [v2.9.6](https://github.com/bensheldon/good_job/tree/v2.9.6) (2022-02-07)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.5...v2.9.6)
