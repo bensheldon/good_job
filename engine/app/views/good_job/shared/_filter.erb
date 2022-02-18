@@ -1,66 +1,58 @@
-<div class='card mb-2'>
-  <div class='card-body d-flex flex-wrap'>
-    <div class='mb-2 me-4'>
-      <small>Filter by job class</small>
-      <br>
-      <% filter.job_classes.each do |name, count| %>
-        <% if params[:job_class] == name %>
-          <%= link_to(filter.to_params(job_class: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
-            <%= name %> (<%= count %>)
-          <% end %>
-        <% else %>
-          <%= link_to(filter.to_params(job_class: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
-            <%= name %> (<%= count %>)
-          <% end %>
+<%= form_with(url: "", method: :get, local: true, id: "filter_form") do |form| %>
+  <div class="d-flex flex-row w-100">
+    <div class="me-2">
+      <label for="job_class_filter">Job class</label>
+      <select name="job_class" id="job_class_filter" class="form-select">
+        <option value="" <%= "selected='selected'" if params[:job_class].blank? %>>All jobs</option>
+
+        <% filter.job_classes.each do |name, count| %>
+          <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:job_class] == name %>><%= name %> (<%= count %>)</option>
         <% end %>
-      <% end %>
+      </select>
     </div>
 
-    <div class='mb-2 me-4'>
-      <small>Filter by state</small>
-      <br>
-      <% filter.states.each do |name, count| %>
-        <% if params[:state] == name %>
-          <%= link_to(filter.to_params(state: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
-            <%= name %> (<%= count %>)
-          <% end %>
-        <% else %>
-          <%= link_to(filter.to_params(state: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
-            <%= name %> (<%= count %>)
-          <% end %>
+    <div class="me-2">
+      <label for="job_state_filter">State</label>
+      <select name="state" id="job_state_filter" class="form-select">
+        <option value="" <%= "selected='selected'" if params[:state].blank? %>>All states</option>
+
+        <% filter.states.each do |name, count| %>
+          <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:state] == name %>><%= name %> (<%= count %>)</option>
         <% end %>
-      <% end %>
+      </select>
     </div>
 
-    <div class='mb-2 me-4'>
-      <small>Filter by queue</small>
-      <br>
-      <% filter.queues.each do |name, count| %>
-        <% if params[:queue_name] == name %>
-          <%= link_to(filter.to_params(queue_name: nil), class: 'btn btn-sm btn-outline-secondary active', role: "button", "aria-pressed": true)  do %>
-            <%= name %> (<%= count %>)
-          <% end %>
-        <% else %>
-          <%= link_to(filter.to_params(queue_name: name), class: 'btn btn-sm btn-outline-secondary', role: "button") do %>
-            <%= name %> (<%= count %>)
-          <% end %>
+    <div class="me-2">
+      <label for="job_queue_filter">Queue</label>
+      <select name="queue_name" id="job_queue_filter" class="form-select">
+        <option value="" <%= "selected='selected'" if params[:queue_name].blank? %>>All queues</option>
+
+        <% filter.queues.each do |name, count| %>
+          <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:queue_name] == name %>><%= name %> (<%= count %>)</option>
         <% end %>
-      <% end %>
+      </select>
     </div>
 
-    <div class="mb-2">
-      <%= form_with(url: "", method: :get, local: true) do |form| %>
-        <% filter.to_params(query: nil).each do |key, value| %>
-          <%= form.hidden_field(key.to_sym, value: value) %>
-        <% end %>
+    <div class="me-2 flex-fill d-flex flex-col align-items-end">
+      <label class="visually-hidden" for="query" aria-label="Search by class, job id, job params, and error text.">Search by class, job id, job params, and error text.</label>
+      <%= search_field_tag "query", params[:query], class: "form-control", placeholder: "Search by class, job id, job params, and error text." %>
+    </div>
 
-        <small><%= form.label :query, "Search" %></small>
-        <div class="input-group input-group-sm">
-          <%= form.search_field :query, value: params[:query], class: "form-control" %>
-          <%= form.button "Search", type: "submit", name: nil, class: "btn btn-sm btn-outline-secondary" %>
-          <%= link_to "Clear", filter.to_params(query: nil), class: "btn btn-sm btn-outline-secondary" %>
-        </div>
-      <% end %>
+    <div class="d-flex flex-col align-items-end">
+      <div>
+        <%= form.submit "Search", name: nil, class: "btn btn-primary" %>
+        <%= link_to "Clear all", filter.to_params(job_class: nil, state: nil, queue_name: nil, query: nil), class: "btn btn-secondary" %>
+      </div>
     </div>
   </div>
-</div>
+<% end %>
+
+<%= javascript_tag nonce: true do %>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("#job_class_filter, #job_state_filter, #job_queue_filter").forEach((filter) => {
+      filter.addEventListener("change", () => {
+        document.querySelector("#filter_form").submit();
+      });
+    })
+  })
+<% end %>

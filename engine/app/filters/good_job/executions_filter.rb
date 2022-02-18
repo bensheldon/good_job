@@ -2,7 +2,7 @@
 module GoodJob
   class ExecutionsFilter < BaseFilter
     def states
-      {
+      @_states ||= {
         'finished' => base_query.finished.count,
         'unfinished' => base_query.unfinished.count,
         'running' => base_query.running.count,

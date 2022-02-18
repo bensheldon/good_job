@@ -1,6 +1,6 @@
 <div class="card my-3">
   <div class="table-responsive">
-    <table class="table card-table table-bordered table-hover table-sm mb-0">
+    <table class="table card-table table-bordered table-hover table-sm mb-0" id="executions_index_table">
       <thead>
         <tr>
           <th>ActiveJob ID</th>
@@ -20,34 +20,40 @@
         </tr>
       </thead>
       <tbody>
-        <% executions.each do |execution| %>
-          <tr id="<%= dom_id(execution) %>">
-            <td>
-              <%= link_to job_path(execution.serialized_params['job_id']) do %>
-                <code><%= execution.active_job_id %></code>
-              <% end %>
-            </td>
-            <td>
-              <%= link_to job_path(execution.active_job_id, anchor: dom_id(execution)) do %>
-                <code><%= execution.id %></code>
-              <% end %>
-            </td>
-            <td><%= execution.serialized_params['job_class'] %></td>
-            <td><%= execution.queue_name %></td>
-            <td><%= relative_time(execution.scheduled_at || execution.created_at) %></td>
-            <td class="text-break"><%= truncate(execution.error, length: 1_000) %></td>
-            <td>
-              <%= tag.button "Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                data: { bs_toggle: "collapse", bs_target: "##{dom_id(execution, 'params')}" },
-                aria: { expanded: false, controls: dom_id(execution, "params") }
-              %>
-              <%= tag.pre JSON.pretty_generate(execution.serialized_params), id: dom_id(execution, "params"), class: "collapse job-params" %>
-            </td>
-            <td>
-              <%= button_to execution_path(execution.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Delete execution", data: { confirm: "Confirm delete" } do %>
-                <%= render "good_job/shared/icons/trash" %>
-              <% end %>
-            </td>
+        <% if executions.present? %>
+          <% executions.each do |execution| %>
+            <tr id="<%= dom_id(execution) %>">
+              <td>
+                <%= link_to job_path(execution.serialized_params['job_id']) do %>
+                  <code><%= execution.active_job_id %></code>
+                <% end %>
+              </td>
+              <td>
+                <%= link_to job_path(execution.active_job_id, anchor: dom_id(execution)) do %>
+                  <code><%= execution.id %></code>
+                <% end %>
+              </td>
+              <td><%= execution.serialized_params['job_class'] %></td>
+              <td><%= execution.queue_name %></td>
+              <td><%= relative_time(execution.scheduled_at || execution.created_at) %></td>
+              <td class="text-break"><%= truncate(execution.error, length: 1_000) %></td>
+              <td>
+                <%= tag.button "Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                  data: { bs_toggle: "collapse", bs_target: "##{dom_id(execution, 'params')}" },
+                  aria: { expanded: false, controls: dom_id(execution, "params") }
+                %>
+                <%= tag.pre JSON.pretty_generate(execution.serialized_params), id: dom_id(execution, "params"), class: "collapse job-params" %>
+              </td>
+              <td>
+                <%= button_to execution_path(execution.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Delete execution", data: { confirm: "Confirm delete" } do %>
+                  <%= render "good_job/shared/icons/trash" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="8" class="py-2 text-center text-muted">No executions found.</td>
           </tr>
         <% end %>
       </tbody>

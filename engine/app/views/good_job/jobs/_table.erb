@@ -21,45 +21,49 @@
         </tr>
       </thead>
       <tbody>
-        <% jobs.each do |job| %>
-          <tr class="<%= dom_class(job) %>" id="<%= dom_id(job) %>">
-            <td>
-              <%= link_to job_path(job.id) do %>
-                <code><%= job.id %></code>
-              <% end %>
-            </td>
-            <td>
-              <span class="badge bg-secondary"><%= job.status %></span>
-            </td>
-            <td><%= job.job_class %></td>
-            <td><%= job.queue_name %></td>
-            <td><%= relative_time(job.scheduled_at || job.created_at) %></td>
-            <td><%= job.executions_count %></td>
-            <td class="text-break"><%= truncate(job.recent_error, length: 1_000) %></td>
-            <td>
-              <%= tag.button "Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                data: { bs_toggle: "collapse", bs_target: "##{dom_id(job, 'params')}" },
-                aria: { expanded: false, controls: dom_id(job, "params") }
-              %>
-              <%= tag.pre JSON.pretty_generate(job.serialized_params), id: dom_id(job, "params"), class: "collapse job-params" %>
-            </td>
-            <td>
-              <div class="text-nowrap">
-                <% job_reschedulable = job.status.in? [:scheduled, :retried, :queued] %>
-                <%= button_to reschedule_job_path(job.id), method: :put, class: "btn btn-sm #{job_reschedulable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_reschedulable, aria: { label: "Reschedule job" }, title: "Reschedule job", data: { confirm: "Confirm reschedule" } do %>
-                  <%= render "good_job/shared/icons/skip_forward" %>
+        <% if jobs.present? %>
+          <% jobs.each do |job| %>
+            <tr class="<%= dom_class(job) %>" id="<%= dom_id(job) %>">
+              <td>
+                <%= link_to job_path(job.id) do %>
+                  <code><%= job.id %></code>
                 <% end %>
+              </td>
+              <td><%= status_badge(job.status) %></td>
+              <td><%= job.job_class %></td>
+              <td><%= job.queue_name %></td>
+              <td><%= relative_time(job.scheduled_at || job.created_at) %></td>
+              <td><%= job.executions_count %></td>
+              <td class="text-break"><%= truncate(job.recent_error, length: 1_000) %></td>
+              <td>
+                <%= tag.button "Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                  data: { bs_toggle: "collapse", bs_target: "##{dom_id(job, 'params')}" },
+                  aria: { expanded: false, controls: dom_id(job, "params") }
+                %>
+                <%= tag.pre JSON.pretty_generate(job.serialized_params), id: dom_id(job, "params"), class: "collapse job-params" %>
+              </td>
+              <td>
+                <div class="text-nowrap">
+                  <% job_reschedulable = job.status.in? [:scheduled, :retried, :queued] %>
+                  <%= button_to reschedule_job_path(job.id), method: :put, class: "btn btn-sm #{job_reschedulable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_reschedulable, aria: { label: "Reschedule job" }, title: "Reschedule job", data: { confirm: "Confirm reschedule" } do %>
+                    <%= render "good_job/shared/icons/skip_forward" %>
+                  <% end %>
 
-                <% job_discardable = job.status.in? [:scheduled, :retried, :queued] %>
-                <%= button_to discard_job_path(job.id), method: :put, class: "btn btn-sm #{job_discardable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_discardable, aria: { label: "Discard job" }, title: "Discard job", data: { confirm: "Confirm discard" } do %>
-                  <%= render "good_job/shared/icons/stop" %>
-                <% end %>
+                  <% job_discardable = job.status.in? [:scheduled, :retried, :queued] %>
+                  <%= button_to discard_job_path(job.id), method: :put, class: "btn btn-sm #{job_discardable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_discardable, aria: { label: "Discard job" }, title: "Discard job", data: { confirm: "Confirm discard" } do %>
+                    <%= render "good_job/shared/icons/stop" %>
+                  <% end %>
 
-                <%= button_to retry_job_path(job.id), method: :put, class: "btn btn-sm #{job.status == :discarded ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: job.status != :discarded, aria: { label: "Retry job" }, title: "Retry job", data: { confirm: "Confirm retry" } do %>
-                  <%= render "good_job/shared/icons/arrow_clockwise" %>
-                <% end %>
-              </div>
-            </td>
+                  <%= button_to retry_job_path(job.id), method: :put, class: "btn btn-sm #{job.status == :discarded ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: job.status != :discarded, aria: { label: "Retry job" }, title: "Retry job", data: { confirm: "Confirm retry" } do %>
+                    <%= render "good_job/shared/icons/arrow_clockwise" %>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="8" class="py-2 text-center text-muted">No jobs found.</td>
           </tr>
         <% end %>
       </tbody>
