@@ -52,6 +52,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Timeouts](#timeouts)
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
     - [Database connections](#database-connections)
+        - [Production setup](#production-setup)
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
     - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
@@ -676,6 +677,41 @@ Each GoodJob execution thread requires its own database connection that is autom
 # config/database.yml
 pool: <%= [ENV.fetch("RAILS_MAX_THREADS", 5).to_i, ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i].max %>
 ```
+#### Production setup
+
+Running GoodJob successfully in production environments requires understanding
+a couple of things:
+ * the [execution mode](execute-jobs-async--in-process)
+ * the [database connection pool size](#database-connections)
+ * the [health check probes](#cli-http-health-check-probes) and potentially the
+   [instrumentation support](#monitor-and-preserve-worked-jobs)
+
+The number of the database connections your setup needs is directly dependent
+on the execution mode. A good way to estimate the size of the connections pool
+per process running as `:external` execution mode is:
+
+ * 1 connection dedicated to the scheduler aka `LISTEN/NOTIFY`
+ * 1 connection per thread * `GOOD_JOB_MAX_THREADS`
+ * 1 connection per every extra thread if your application runs these as part
+   of a job
+ * 1 connection dedicated to the cron scheduler if you're running it
+ * 1 connection dedicated to the cron executor if you're running cron
+
+If you're running the queue along with the Rails process, please adjust
+the pool size taking into account the number of web server threads!
+
+It is important to understand that the queue process won't crash if the
+connections pool is exhausted, instead it will report an exception (eg.
+`ActiveRecord::ConnectionTimeoutError`)!
+
+The best way to monitor the queue in production is:
+ * have an exception notifier callback (see `on_thread_error`)
+ * if possible, run the queue as a dedicated instance and use available HTTP
+   health check probes instead of pid-based monitoring
+ * keep an eye on the number of jobs in the queue (abnormal high number of
+   unscheduled jobs means the queue could be underperforming)
+ * consider performance monitoring services which support the built-in Rails
+   instrumentation (eg. Sentry, Skylight, etc.)
 
 ### Execute jobs async / in-process
 
