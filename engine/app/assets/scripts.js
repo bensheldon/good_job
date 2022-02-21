@@ -33,14 +33,20 @@ GoodJob = {
     if (urlParams.has('poll')) {
       GoodJob.pollEnabled = true
       GoodJob.pollInterval = parseInt(urlParams.get('poll'))
+      GoodJob.setStorage('pollInterval', GoodJob.pollInterval)
     } else {
-      GoodJob.pollEnabled = false
-      GoodJob.pollInterval = 5000 // default 5sec
+      GoodJob.pollEnabled = GoodJob.getStorage('pollEnabled') || false
+      GoodJob.pollInterval = GoodJob.getStorage('pollInterval') || 5000 // default 5sec
+      if (GoodJob.pollEnabled) {
+        // Update the UI element
+        document.getElementById('toggle-poll').checked = true
+      }
     }
   },
 
   togglePoll: (ev) => {
     GoodJob.pollEnabled = ev.currentTarget.checked
+    GoodJob.setStorage('pollEnabled', GoodJob.pollEnabled)
   },
 
   pollUpdates: () => {
@@ -67,9 +73,21 @@ GoodJob = {
       const oldEl = document.getElementById(newEl.id)
 
       if (oldEl) {
-        oldEl.parentNode.replaceChild(newEl, oldEl)
+        oldEl.replaceWith(newEl)
       }
     }
+  },
+
+  getStorage: (key) => {
+    const value = localStorage.getItem('goodjob-' + key)
+
+    if (value === 'true') { return true }
+    else if (value === 'false') { return false }
+    else { return value }
+  },
+
+  setStorage: (key, value) => {
+    localStorage.setItem('goodjob-' + key, value)
   }
 };
 
