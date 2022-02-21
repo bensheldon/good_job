@@ -1,4 +1,5 @@
 <%= form_with(url: "", method: :get, local: true, id: "filter_form") do |form| %>
+  <%= hidden_field_tag :poll, value: params[:poll] %>
   <div class="d-flex flex-row w-100">
     <div class="me-2">
       <label for="job_class_filter">Job class</label>
