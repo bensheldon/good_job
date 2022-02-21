@@ -1,25 +1,3 @@
 <div class="chart-wrapper">
-  <canvas id="chart"></canvas>
+  <canvas class="chart" data-json="<%= chart_data.to_json %>"></canvas>
 </div>
-
-<%= javascript_tag nonce: true do %>
-  const chartData = <%== chart_data.to_json %>;
-
-  const ctx = document.getElementById('chart').getContext('2d');
-  const chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: chartData.labels,
-      datasets: chartData.datasets
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-<% end %>
