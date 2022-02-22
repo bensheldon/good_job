@@ -81,8 +81,8 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-6">
-          <span class="text-muted" title="Now is <%= Time.current %>">
-            Last updated: <%= Time.current %>
+          <span class="text-muted">
+            Last updated: <time id="page-updated-at" datetime="<%= Time.current.utc.iso8601 %>"><%= Time.current %></time>
           </span>
         </div>
 
