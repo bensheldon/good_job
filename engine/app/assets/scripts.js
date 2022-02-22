@@ -15,7 +15,7 @@ GoodJob = {
     GoodJob.renderCharts(true)
   },
 
-  addListeners() {
+  addListeners: () => {
     const gjActionEls = document.querySelectorAll('[data-gj-action]')
 
     for (let i = 0; i < gjActionEls.length; i++) {
@@ -26,18 +26,21 @@ GoodJob = {
     }
   },
 
-  updateSettings() {
+  updateSettings: () => {
     const queryString = window.location.search
     const urlParams = new URLSearchParams(queryString)
 
     // livepoll interval and enablement
     if (urlParams.has('poll')) {
+      const parsedInterval = parseInt(urlParams.get('poll')) || 5000
+
       GoodJob.pollEnabled = true
-      GoodJob.pollInterval = parseInt(urlParams.get('poll'))
+      GoodJob.pollInterval = Math.max(parsedInterval, 1000)
       GoodJob.setStorage('pollInterval', GoodJob.pollInterval)
     } else {
       GoodJob.pollEnabled = GoodJob.getStorage('pollEnabled') || false
       GoodJob.pollInterval = GoodJob.getStorage('pollInterval') || 5000 // default 5sec
+
       if (GoodJob.pollEnabled) {
         // Update the UI element
         document.getElementById('toggle-poll').checked = true
