@@ -9,7 +9,7 @@ describe 'Live Poll', type: :system, js: true do
 
   it 'reloads the dashboard when active' do
     # Load the page with live poll enabled
-    visit 'good_job?poll=1000'
+    visit 'good_job?poll=1'
     expect(page).to have_checked_field('toggle-poll')
 
     # Verify that the page reloads
