@@ -1,5 +1,19 @@
 # Changelog
 
+## [v2.11.0](https://github.com/bensheldon/good_job/tree/v2.11.0) (2022-02-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.10.0...v2.11.0)
+
+**Closed issues:**
+
+- How do I ensure that a the same job can't run twice? \(unique job / avoid duplicates\) [\#531](https://github.com/bensheldon/good_job/issues/531)
+- Bulk reschedule and discard jobs via dashboard [\#527](https://github.com/bensheldon/good_job/issues/527)
+- "Live Poll" dashboard [\#526](https://github.com/bensheldon/good_job/issues/526)
+
+**Merged pull requests:**
+
+- Add support for live polling the dashboard [\#528](https://github.com/bensheldon/good_job/pull/528) ([danielwestendorf](https://github.com/danielwestendorf))
+
 ## [v2.10.0](https://github.com/bensheldon/good_job/tree/v2.10.0) (2022-02-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.6...v2.10.0)
