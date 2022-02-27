@@ -369,6 +369,10 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
     end
     ```
 
+#### Live Polling
+
+The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
+
 ### ActiveJob concurrency
 
 GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.

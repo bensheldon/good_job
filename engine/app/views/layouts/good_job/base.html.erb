@@ -45,7 +45,10 @@
             </div>
           </li>
         </ul>
-        <div class="text-muted" title="Now is <%= Time.current %>">Times are displayed in <%= Time.current.zone %> timezone</div>
+        <div>
+          <input type="checkbox" id="toggle-poll" name="toggle-poll" data-gj-action='change#togglePoll' <%= 'checked' if params[:poll].present? %>>
+          <label for="toggle-poll">Live Poll</label>
+        </div>
       </div>
     </div>
   </nav>
@@ -70,7 +73,24 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     <% end %>
+
     <%= yield %>
   </div>
+
+  <footer class="footer mt-auto py-3 bg-light fixed-bottom" id="footer" data-gj-poll-replace>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-6">
+          <span class="text-muted">
+            Last updated: <time id="page-updated-at" datetime="<%= Time.current.utc.iso8601 %>"><%= Time.current %></time>
+          </span>
+        </div>
+
+        <div class="col-6 text-end">
+          Remember, you're doing a Good Job too!
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
