@@ -37,13 +37,13 @@ const GoodJob = {
     // live poll interval and enablement
     if (urlParams.has('poll')) {
       const parsedInterval = (parseInt(urlParams.get('poll')) || GOOD_JOB_DEFAULT_POLL_INTERVAL_SECONDS) * 1000;
-
-      GoodJob.pollEnabled = true;
       GoodJob.pollInterval = Math.max(parsedInterval, GOOD_JOB_MINIMUM_POLL_INTERVAL);
       GoodJob.setStorage('pollInterval', GoodJob.pollInterval);
+
+      GoodJob.pollEnabled = true;
     } else {
+      GoodJob.pollInterval = GoodJob.getStorage('pollInterval') || (GOOD_JOB_DEFAULT_POLL_INTERVAL_SECONDS * 1000);
       GoodJob.pollEnabled = GoodJob.getStorage('pollEnabled') || false;
-      GoodJob.pollInterval = GoodJob.getStorage('pollInterval') || GOOD_JOB_DEFAULT_POLL_INTERVAL_SECONDS;
     }
 
     document.getElementById('toggle-poll').checked = GoodJob.pollEnabled;
