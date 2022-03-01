@@ -1,8 +1,24 @@
 # Changelog
 
+## [v2.11.1](https://github.com/bensheldon/good_job/tree/v2.11.1) (2022-03-01)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.11.0...v2.11.1)
+
+**Fixed bugs:**
+
+- Ensure sticky footer doesn't overlap paginater; fix polling interval to 30 seconds, not ms [\#534](https://github.com/bensheldon/good_job/pull/534) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Pagination buttons hidden behind footer [\#533](https://github.com/bensheldon/good_job/issues/533)
+
 ## [v2.11.0](https://github.com/bensheldon/good_job/tree/v2.11.0) (2022-02-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.10.0...v2.11.0)
+
+**Implemented enhancements:**
+
+- Add support for live polling the dashboard [\#528](https://github.com/bensheldon/good_job/pull/528) ([danielwestendorf](https://github.com/danielwestendorf))
 
 **Closed issues:**
 
@@ -10,13 +26,13 @@
 - Bulk reschedule and discard jobs via dashboard [\#527](https://github.com/bensheldon/good_job/issues/527)
 - "Live Poll" dashboard [\#526](https://github.com/bensheldon/good_job/issues/526)
 
-**Merged pull requests:**
-
-- Add support for live polling the dashboard [\#528](https://github.com/bensheldon/good_job/pull/528) ([danielwestendorf](https://github.com/danielwestendorf))
-
 ## [v2.10.0](https://github.com/bensheldon/good_job/tree/v2.10.0) (2022-02-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.6...v2.10.0)
+
+**Implemented enhancements:**
+
+- Dashboard: update search filters and some small UI updates [\#518](https://github.com/bensheldon/good_job/pull/518) ([multiplegeorges](https://github.com/multiplegeorges))
 
 **Closed issues:**
 
@@ -29,7 +45,6 @@
 - Fix Benchmark job throughput script   [\#522](https://github.com/bensheldon/good_job/pull/522) ([douglara](https://github.com/douglara))
 - Update development Gemfile.lock [\#521](https://github.com/bensheldon/good_job/pull/521) ([bensheldon](https://github.com/bensheldon))
 - Ensure Rails 6.0 is tested against Ruby 3.0; use Ruby 3.0 in demo environment [\#520](https://github.com/bensheldon/good_job/pull/520) ([bensheldon](https://github.com/bensheldon))
-- Dashboard: update search filters and some small UI updates [\#518](https://github.com/bensheldon/good_job/pull/518) ([multiplegeorges](https://github.com/multiplegeorges))
 - Document safer setting for retry\_on\_unhandled\_error [\#517](https://github.com/bensheldon/good_job/pull/517) ([tamaloa](https://github.com/tamaloa))
 
 ## [v2.9.6](https://github.com/bensheldon/good_job/tree/v2.9.6) (2022-02-07)
