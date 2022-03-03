@@ -52,6 +52,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Timeouts](#timeouts)
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
     - [Database connections](#database-connections)
+        - [Production setup](#production-setup)
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
     - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
@@ -674,12 +675,37 @@ Keep in mind, queue operations and management is an advanced discipline. This st
 
 ### Database connections
 
-Each GoodJob execution thread requires its own database connection that is automatically checked out from Rails’ connection pool. _Allowing GoodJob to create more threads than available database connections can lead to timeouts and is not recommended._ For example:
+Each GoodJob execution thread requires its own database connection that is automatically checked out from Rails’ connection pool. For example:
 
 ```yaml
 # config/database.yml
-pool: <%= [ENV.fetch("RAILS_MAX_THREADS", 5).to_i, ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i].max %>
+pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + (ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i %>
 ```
+
+To calculate the total number of the database connections you'll need:
+
+- 1 connection dedicated to the scheduler aka `LISTEN/NOTIFY`
+- 1 connection per query pool thread e.g. `--queues=mice:2;elephants:1` is 3 threads. Pool thread size defaults to `--max-threads`
+- (optional) 2 connections for Cron scheduler if you're running it
+- (optional) 1 connection per subthread, if your application makes multithreaded database queries within a job
+- When running `:async`, you must also add the number of threads by the webserver
+
+The queue process will not crash if the connections pool is exhausted, instead it will report an exception (eg. `ActiveRecord::ConnectionTimeoutError`).
+
+#### Production setup
+
+When running GoodJob in a production environment, you should be mindful of:
+
+- [Execution mode](execute-jobs-async--in-process)
+- [Database connection pool size](#database-connections)
+- [Health check probes](#cli-http-health-check-probes) and potentially the [instrumentation support](#monitor-and-preserve-worked-jobs)
+
+The recommended way to monitor the queue in production is:
+
+- have an exception notifier callback (see `on_thread_error`)
+- if possible, run the queue as a dedicated instance and use available HTTP health check probes instead of pid-based monitoring
+- keep an eye on the number of jobs in the queue (abnormal high number of unscheduled jobs means the queue could be underperforming)
+- consider performance monitoring services which support the built-in Rails instrumentation (eg. Sentry, Skylight, etc.)
 
 ### Execute jobs async / in-process
 
