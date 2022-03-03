@@ -9,6 +9,7 @@ module GoodJob
     def data
       end_time = Time.current
       start_time = end_time - 1.day
+      table_name = GoodJob::ActiveJobJob.table_name
 
       count_query = Arel.sql(GoodJob::Execution.pg_or_jdbc_query(<<~SQL.squish))
         SELECT *
@@ -23,7 +24,7 @@ module GoodJob
               queue_name,
               count(*) AS count
             FROM (
-              #{@filter.filtered_query.except(:select, :order).select('queue_name', 'COALESCE(good_jobs.scheduled_at, good_jobs.created_at)::timestamp AS scheduled_at').to_sql}
+              #{@filter.filtered_query.except(:select, :order).select('queue_name', "COALESCE(#{table_name}.scheduled_at, #{table_name}.created_at)::timestamp AS scheduled_at").to_sql}
             ) sources
             GROUP BY date_trunc('hour', scheduled_at), queue_name
         ) sources ON sources.scheduled_at = timestamp
