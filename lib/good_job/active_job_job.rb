@@ -15,7 +15,14 @@ module GoodJob
     # Attached to a Job's Execution when the Job is discarded.
     DiscardJobError = Class.new(StandardError)
 
-    self.table_name = 'good_jobs'
+    class << self
+      delegate :table_name, to: Execution
+
+      def table_name=(_value)
+        raise NotImplementedError, 'Assign GoodJob::Execution.table_name directly'
+      end
+    end
+
     self.primary_key = 'active_job_id'
     self.advisory_lockable_column = 'active_job_id'
 
