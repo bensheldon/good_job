@@ -671,47 +671,37 @@ Keep in mind, queue operations and management is an advanced discipline. This st
 
 ### Database connections
 
-Each GoodJob execution thread requires its own database connection that is automatically checked out from Rails’ connection pool. _Allowing GoodJob to create more threads than available database connections can lead to timeouts and is not recommended._ For example:
+Each GoodJob execution thread requires its own database connection that is automatically checked out from Rails’ connection pool. For example:
 
 ```yaml
 # config/database.yml
-pool: <%= [ENV.fetch("RAILS_MAX_THREADS", 5).to_i, ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i].max %>
+pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + (ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i %>
 ```
+
+To calculate the total number of the database connections you'll need:
+
+- 1 connection dedicated to the scheduler aka `LISTEN/NOTIFY`
+- 1 connection per query pool thread e.g. `--queues=mice:2;elephants:1` is 3 threads. Pool thread size defaults to `--max-threads`
+- (optional) 2 connections for Cron scheduler if you're running it
+- (optional) 1 connection per subthread, if your application makes multithreaded database queries within a job
+- When running `:async`, you must also add the number of threads by the webserver
+
+The queue process will not crash if the connections pool is exhausted, instead it will report an exception (eg. `ActiveRecord::ConnectionTimeoutError`).
+
 #### Production setup
 
-Running GoodJob successfully in production environments requires understanding
-a couple of things:
- * the [execution mode](execute-jobs-async--in-process)
- * the [database connection pool size](#database-connections)
- * the [health check probes](#cli-http-health-check-probes) and potentially the
-   [instrumentation support](#monitor-and-preserve-worked-jobs)
+When running GoodJob in a production environment, you should be mindful of:
 
-The number of the database connections your setup needs is directly dependent
-on the execution mode. A good way to estimate the size of the connections pool
-per process running as `:external` execution mode is:
+- [Execution mode](execute-jobs-async--in-process)
+- [Database connection pool size](#database-connections)
+- [Health check probes](#cli-http-health-check-probes) and potentially the [instrumentation support](#monitor-and-preserve-worked-jobs)
 
- * 1 connection dedicated to the scheduler aka `LISTEN/NOTIFY`
- * 1 connection per thread * `GOOD_JOB_MAX_THREADS`
- * 1 connection per every extra thread if your application runs these as part
-   of a job
- * 1 connection dedicated to the cron scheduler if you're running it
- * 1 connection dedicated to the cron executor if you're running cron
+The recommended way to monitor the queue in production is:
 
-If you're running the queue along with the Rails process, please adjust
-the pool size taking into account the number of web server threads!
-
-It is important to understand that the queue process won't crash if the
-connections pool is exhausted, instead it will report an exception (eg.
-`ActiveRecord::ConnectionTimeoutError`)!
-
-The best way to monitor the queue in production is:
- * have an exception notifier callback (see `on_thread_error`)
- * if possible, run the queue as a dedicated instance and use available HTTP
-   health check probes instead of pid-based monitoring
- * keep an eye on the number of jobs in the queue (abnormal high number of
-   unscheduled jobs means the queue could be underperforming)
- * consider performance monitoring services which support the built-in Rails
-   instrumentation (eg. Sentry, Skylight, etc.)
+- have an exception notifier callback (see `on_thread_error`)
+- if possible, run the queue as a dedicated instance and use available HTTP health check probes instead of pid-based monitoring
+- keep an eye on the number of jobs in the queue (abnormal high number of unscheduled jobs means the queue could be underperforming)
+- consider performance monitoring services which support the built-in Rails instrumentation (eg. Sentry, Skylight, etc.)
 
 ### Execute jobs async / in-process
 
