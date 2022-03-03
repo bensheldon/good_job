@@ -20,16 +20,6 @@ require 'database_cleaner'
 require 'pry'
 # Add additional requires below this line. Rails is not loaded until this point!
 
-# https://stackoverflow.com/a/63442278
-RSPEC_LOCK = Mutex.new
-RSpec.configure do |config|
-  config.around do |example|
-    RSPEC_LOCK.synchronize do
-      example.run
-    end
-  end
-end
-
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
