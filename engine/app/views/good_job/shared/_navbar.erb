@@ -19,7 +19,7 @@
       </ul>
       <div class="nav-item pe-2">
         <div class="form-check">
-          <input type="checkbox" id="toggle-poll" name="toggle-poll" data-gj-action='change#togglePoll' <%= 'checked' if params[:poll].present? %>>
+          <input type="checkbox" id="toggle-poll" name="toggle-poll" <%= 'checked' if params[:poll].present? %>>
           <label for="toggle-poll"><%= t(".live_poll") %></label>
         </div>
       </div>

@@ -14,14 +14,14 @@ describe 'Live Poll', type: :system, js: true do
 
     # Verify that the page reloads
     last_updated = page.find('#page-updated-at')['datetime']
-    wait_until do
+    wait_until(max: 10) do
       expect(last_updated).not_to eq(page.find('#page-updated-at')['datetime'])
     end
 
     # Disable live polling and verify that the page does not reload
     uncheck('toggle-poll')
     last_updated = page.find('#page-updated-at')['datetime']
-    sleep 2
+    sleep 5
     expect(last_updated).to eq(page.find('#page-updated-at')['datetime'])
 
     # Re-enable live polling and verify it is reloading again
