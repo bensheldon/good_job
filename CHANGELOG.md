@@ -1,5 +1,20 @@
 # Changelog
 
+## [v2.11.2](https://github.com/bensheldon/good_job/tree/v2.11.2) (2022-03-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.11.1...v2.11.2)
+
+**Closed issues:**
+
+- Best practices in deploying and monitoring a queue [\#523](https://github.com/bensheldon/good_job/issues/523)
+
+**Merged pull requests:**
+
+- Wrap Rspec before and example blocks with a mutex for JRuby [\#537](https://github.com/bensheldon/good_job/pull/537) ([bensheldon](https://github.com/bensheldon))
+- Delegate `ActiveJobJob.table_name` to `Execution` and prevent it from being directly assignable [\#536](https://github.com/bensheldon/good_job/pull/536) ([bensheldon](https://github.com/bensheldon))
+- Enable DB table names customization [\#535](https://github.com/bensheldon/good_job/pull/535) ([dimvic](https://github.com/dimvic))
+- Added a chapter on how to prepare for production. [\#525](https://github.com/bensheldon/good_job/pull/525) ([stas](https://github.com/stas))
+
 ## [v2.11.1](https://github.com/bensheldon/good_job/tree/v2.11.1) (2022-03-01)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.11.0...v2.11.1)
