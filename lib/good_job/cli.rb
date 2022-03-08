@@ -50,14 +50,14 @@ module GoodJob
       separate isolated execution pools with semicolons and threads with colons.
 
     DESCRIPTION
-    method_option :max_threads,
-                  type: :numeric,
-                  banner: 'COUNT',
-                  desc: "Maximum number of threads to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)"
     method_option :queues,
                   type: :string,
                   banner: "QUEUE_LIST",
-                  desc: "Queues to work from. (env var: GOOD_JOB_QUEUES, default: *)"
+                  desc: "Queues or queue pools to work from. (env var: GOOD_JOB_QUEUES, default: *)"
+    method_option :max_threads,
+                  type: :numeric,
+                  banner: 'COUNT',
+                  desc: "Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)"
     method_option :poll_interval,
                   type: :numeric,
                   banner: 'SECONDS',

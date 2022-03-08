@@ -165,8 +165,8 @@ Usage:
   good_job start
 
 Options:
-  [--max-threads=COUNT]        # Maximum number of threads to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
-  [--queues=QUEUE_LIST]        # Queues to work from. (env var: GOOD_JOB_QUEUES, default: *)
+  [--queues=QUEUE_LIST]        # Queues or pools to work from. (env var: GOOD_JOB_QUEUES, default: *)
+  [--max-threads=COUNT]        # Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
   [--poll-interval=SECONDS]    # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 1)
   [--max-cache=COUNT]          # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
   [--shutdown-timeout=SECONDS] # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
@@ -230,12 +230,12 @@ Rails.application.configure do
   config.good_job.retry_on_unhandled_error = false
   config.good_job.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
   config.good_job.execution_mode = :async
+  config.good_job.queues = '*'
   config.good_job.max_threads = 5
   config.good_job.poll_interval = 30 # seconds
   config.good_job.shutdown_timeout = 25 # seconds
   config.good_job.enable_cron = true
   config.good_job.cron = { example: { cron: '0 * * * *', class: 'ExampleJob'  } }
-  config.good_job.queues = '*'
 
   # ...or all at once.
   config.good_job = {
@@ -243,6 +243,7 @@ Rails.application.configure do
     retry_on_unhandled_error: false,
     on_thread_error: -> (exception) { Raven.capture_exception(exception) },
     execution_mode: :async,
+    queues: '*',
     max_threads: 5,
     poll_interval: 30,
     shutdown_timeout: 25,
@@ -253,7 +254,6 @@ Rails.application.configure do
         class: 'ExampleJob'
       },
     },
-    queues: '*',
   }
 end
 ```
@@ -265,8 +265,8 @@ Available configuration options are:
     - `:external` causes the adapter to enqueue jobs, but not execute them. When using this option (the default for production environments), you’ll need to use the command-line tool to actually execute your jobs.
     - `:async` (or `:async_server`) executes jobs in separate threads within the Rails web server process (`bundle exec rails server`). It can be more economical for small workloads because you don’t need a separate machine or environment for running your jobs, but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.  When not in the Rails web server, jobs will execute in `:external` mode to ensure jobs are not executed within `rails console`, `rails db:migrate`, `rails assets:prepare`, etc.
     - `:async_all` executes jobs in separate threads in _any_ Rails process.
-- `max_threads` (integer) sets the maximum number of threads to use when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
-- `queues` (string) determines which queues to execute jobs from when `execution_mode` is set to `:async`. See the description of `good_job start` for more details on the format of this string. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
+- `queues` (string) sets queues or pools to execute jobs. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
+- `max_threads` (integer) sets the default number of threads per pool to use for working jobs. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`. A poll interval of `-1` disables polling completely.
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
 - `shutdown_timeout` (float) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
@@ -679,7 +679,7 @@ Each GoodJob execution thread requires its own database connection that is autom
 
 ```yaml
 # config/database.yml
-pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + (ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i %>
+pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + 3 + (ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
 ```
 
 To calculate the total number of the database connections you'll need:
