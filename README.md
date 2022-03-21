@@ -65,19 +65,13 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 
 ## Set up
 
-1. Add `good_job` to your application's Gemfile:
+1. Install the gem
 
-    ```ruby
-    gem 'good_job'
+    ```sh
+    bundle add good_job
     ```
 
-1. Install the gem:
-
-    ```bash
-    bundle install
-    ```
-
-1. Run the GoodJob install generator. This will generate a database migration to create a table for GoodJob's job records:
+2. Run the GoodJob install generator. This will generate a database migration to create a table for GoodJob's job records:
 
     ```bash
     bin/rails g good_job:install
@@ -96,14 +90,14 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     bin/rails db:migrate:animals
     ```
 
-1. Configure the ActiveJob adapter:
+3. Configure the ActiveJob adapter:
 
     ```ruby
     # config/application.rb or config/environments/{RAILS_ENV}.rb
     config.active_job.queue_adapter = :good_job
     ```
 
-1. Inside of your application, queue your job 🎉:
+4. Inside of your application, queue your job 🎉:
 
     ```ruby
     YourJob.perform_later
@@ -115,7 +109,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     YourJob.set(queue: :some_queue, wait: 5.minutes, priority: 10).perform_later
     ```
 
-1. In development, GoodJob executes jobs immediately. In production, GoodJob provides different options:
+5. In development, GoodJob executes jobs immediately. In production, GoodJob provides different options:
 
     - By default, GoodJob separates job enqueuing from job execution so that jobs can be scaled independently of the web server.  Use the GoodJob command-line tool to execute jobs:
 
