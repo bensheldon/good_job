@@ -65,16 +65,10 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 
 ## Set up
 
-1. Add `good_job` to your application's Gemfile:
+1. Add `good_job` to your application's Gemfile and install the gem:
 
-    ```ruby
-    gem 'good_job'
-    ```
-
-1. Install the gem:
-
-    ```bash
-    bundle install
+    ```sh
+    bundle add good_job
     ```
 
 1. Run the GoodJob install generator. This will generate a database migration to create a table for GoodJob's job records:
