@@ -50,8 +50,8 @@ RSpec.describe GoodJob::CLI do
           max_threads: 4,
           max_cache: GoodJob::Configuration::DEFAULT_MAX_CACHE,
           warm_cache_on_initialize: true,
-          cleanup_interval_seconds: nil,
-          cleanup_interval_jobs: nil
+          cleanup_interval_seconds: GoodJob::Configuration::DEFAULT_CLEANUP_INTERVAL_SECONDS,
+          cleanup_interval_jobs: GoodJob::Configuration::DEFAULT_CLEANUP_INTERVAL_JOBS
         )
       end
     end
