@@ -206,7 +206,7 @@ module GoodJob
       good_job_tag = ["ActiveJob"].freeze
 
       self.class.loggers.inject(block) do |inner, each_logger|
-        if each_logger.respond_to?(:tagged)
+        if each_logger.respond_to?(:tagged) && each_logger.formatter
           tags_for_logger = if each_logger.formatter.current_tags.include?("ActiveJob")
                               good_job_tag + tags
                             else

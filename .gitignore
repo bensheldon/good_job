@@ -10,3 +10,4 @@ doc
 .yardoc
 gemfiles/*.gemfile.lock
 tmp/rspec_examples.txt
+.DS_Store

@@ -1,16 +1,127 @@
 # Changelog
 
+## [v2.11.2](https://github.com/bensheldon/good_job/tree/v2.11.2) (2022-03-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.11.1...v2.11.2)
+
+**Closed issues:**
+
+- Best practices in deploying and monitoring a queue [\#523](https://github.com/bensheldon/good_job/issues/523)
+
+**Merged pull requests:**
+
+- Wrap Rspec before and example blocks with a mutex for JRuby [\#537](https://github.com/bensheldon/good_job/pull/537) ([bensheldon](https://github.com/bensheldon))
+- Delegate `ActiveJobJob.table_name` to `Execution` and prevent it from being directly assignable [\#536](https://github.com/bensheldon/good_job/pull/536) ([bensheldon](https://github.com/bensheldon))
+- Enable DB table names customization [\#535](https://github.com/bensheldon/good_job/pull/535) ([dimvic](https://github.com/dimvic))
+- Added a chapter on how to prepare for production. [\#525](https://github.com/bensheldon/good_job/pull/525) ([stas](https://github.com/stas))
+
+## [v2.11.1](https://github.com/bensheldon/good_job/tree/v2.11.1) (2022-03-01)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.11.0...v2.11.1)
+
+**Fixed bugs:**
+
+- Ensure sticky footer doesn't overlap paginater; fix polling interval to 30 seconds, not ms [\#534](https://github.com/bensheldon/good_job/pull/534) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Pagination buttons hidden behind footer [\#533](https://github.com/bensheldon/good_job/issues/533)
+
+## [v2.11.0](https://github.com/bensheldon/good_job/tree/v2.11.0) (2022-02-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.10.0...v2.11.0)
+
+**Implemented enhancements:**
+
+- Add support for live polling the dashboard [\#528](https://github.com/bensheldon/good_job/pull/528) ([danielwestendorf](https://github.com/danielwestendorf))
+
+**Closed issues:**
+
+- How do I ensure that a the same job can't run twice? \(unique job / avoid duplicates\) [\#531](https://github.com/bensheldon/good_job/issues/531)
+- Bulk reschedule and discard jobs via dashboard [\#527](https://github.com/bensheldon/good_job/issues/527)
+- "Live Poll" dashboard [\#526](https://github.com/bensheldon/good_job/issues/526)
+
+## [v2.10.0](https://github.com/bensheldon/good_job/tree/v2.10.0) (2022-02-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.6...v2.10.0)
+
+**Implemented enhancements:**
+
+- Dashboard: update search filters and some small UI updates [\#518](https://github.com/bensheldon/good_job/pull/518) ([multiplegeorges](https://github.com/multiplegeorges))
+
+**Closed issues:**
+
+- Cron jobs not getting run [\#519](https://github.com/bensheldon/good_job/issues/519)
+- Slow queries with many finished entries and concurrency control [\#514](https://github.com/bensheldon/good_job/issues/514)
+- Make default retry behaviour safer [\#505](https://github.com/bensheldon/good_job/issues/505)
+
+**Merged pull requests:**
+
+- Fix Benchmark job throughput script   [\#522](https://github.com/bensheldon/good_job/pull/522) ([douglara](https://github.com/douglara))
+- Update development Gemfile.lock [\#521](https://github.com/bensheldon/good_job/pull/521) ([bensheldon](https://github.com/bensheldon))
+- Ensure Rails 6.0 is tested against Ruby 3.0; use Ruby 3.0 in demo environment [\#520](https://github.com/bensheldon/good_job/pull/520) ([bensheldon](https://github.com/bensheldon))
+- Document safer setting for retry\_on\_unhandled\_error [\#517](https://github.com/bensheldon/good_job/pull/517) ([tamaloa](https://github.com/tamaloa))
+
+## [v2.9.6](https://github.com/bensheldon/good_job/tree/v2.9.6) (2022-02-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.5...v2.9.6)
+
+**Merged pull requests:**
+
+- Limit query for allowed concurrent jobs to unfinished [\#515](https://github.com/bensheldon/good_job/pull/515) ([til](https://github.com/til))
+
+## [v2.9.5](https://github.com/bensheldon/good_job/tree/v2.9.5) (2022-02-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.4...v2.9.5)
+
+**Fixed bugs:**
+
+- Transactions in "aborting" threads do not commit; causes GoodJob::Process record not destroyed on exit [\#489](https://github.com/bensheldon/good_job/issues/489)
+- Deserialize ActiveJob arguments when manually retrying a job [\#513](https://github.com/bensheldon/good_job/pull/513) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Concurrency key proc is missing `arguments` when retrying a discarded job. [\#512](https://github.com/bensheldon/good_job/issues/512)
+- Cron Schedule not visible in dashboard [\#496](https://github.com/bensheldon/good_job/issues/496)
+
+**Merged pull requests:**
+
+- Rename methods to `advisory_lock_key` and allow it to take a block instead of `with_advisory_lock` [\#511](https://github.com/bensheldon/good_job/pull/511) ([bensheldon](https://github.com/bensheldon))
+- README: Limiting concurrency - fetch symbol instead of string [\#510](https://github.com/bensheldon/good_job/pull/510) ([BenSto](https://github.com/BenSto))
+- Add arbitrary lock on class level too [\#499](https://github.com/bensheldon/good_job/pull/499) ([pandwoter](https://github.com/pandwoter))
+
+## [v2.9.4](https://github.com/bensheldon/good_job/tree/v2.9.4) (2022-01-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.3...v2.9.4)
+
+**Fixed bugs:**
+
+- Fix navbar toggler [\#506](https://github.com/bensheldon/good_job/pull/506) ([JuanVqz](https://github.com/JuanVqz))
+- Guard LogSubscriber against tagged logger without a formatter [\#504](https://github.com/bensheldon/good_job/pull/504) ([bensheldon](https://github.com/bensheldon))
+- Markdown lint fixes + Added missing responsive meta tag  [\#492](https://github.com/bensheldon/good_job/pull/492) ([zeevy](https://github.com/zeevy))
+
+**Closed issues:**
+
+- The navbar icon doesn't show the navbar menu when clicking it [\#503](https://github.com/bensheldon/good_job/issues/503)
+- Not all loggers have a formatter [\#502](https://github.com/bensheldon/good_job/issues/502)
+- Error logs from failed jobs used all storage space [\#495](https://github.com/bensheldon/good_job/issues/495)
+
+**Merged pull requests:**
+
+- Update Code of Conduct to Contributor Covenant 2.1 [\#501](https://github.com/bensheldon/good_job/pull/501) ([bensheldon](https://github.com/bensheldon))
+- Test with Ruby 3.1 [\#498](https://github.com/bensheldon/good_job/pull/498) ([aried3r](https://github.com/aried3r))
+
 ## [v2.9.3](https://github.com/bensheldon/good_job/tree/v2.9.3) (2022-01-23)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.9.2...v2.9.3)
 
+**Fixed bugs:**
+
+- Use `*_url` route helpers for Dashboard assets to avoid being overridden by `config.asset_host` [\#493](https://github.com/bensheldon/good_job/pull/493) ([bensheldon](https://github.com/bensheldon))
+
 **Closed issues:**
 
 - Assets not loaded when Rails is configured with a different hostname for assets [\#491](https://github.com/bensheldon/good_job/issues/491)
-
-**Merged pull requests:**
-
-- Use `*_url` route helpers for Dashboard assets to avoid being overridden by `config.asset_host` [\#493](https://github.com/bensheldon/good_job/pull/493) ([bensheldon](https://github.com/bensheldon))
 
 ## [v2.9.2](https://github.com/bensheldon/good_job/tree/v2.9.2) (2022-01-19)
 

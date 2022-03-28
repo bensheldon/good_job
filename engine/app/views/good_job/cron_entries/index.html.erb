@@ -1,3 +1,7 @@
+<div class="my-3 flex">
+  <h2>Cron Schedules</h2>
+</div>
+
 <% if @cron_entries.present? %>
   <div class="card my-3">
     <div class="table-responsive">
@@ -47,5 +51,11 @@
     </div>
   </div>
 <% else %>
-  <em>No cron schedules present.</em>
+  <div class="card my-3">
+    <div class="card-body">
+      <p class="card-text">
+        <em>No cron schedules found.</em>
+      </p>
+    </div>
+  </div>
 <% end %>

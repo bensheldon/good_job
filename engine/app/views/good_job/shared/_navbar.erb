@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <%= link_to t(".name"), root_path, class: "navbar-brand mb-0 h1" %>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -25,8 +25,9 @@
           </div>
         </li>
       </ul>
-      <div class="text-muted" title="<%= t(".current_time", time: Time.current) %>">
-        <%= t(".timezone_notice", time: Time.current.zone) %>
+      <div>
+        <input type="checkbox" id="toggle-poll" name="toggle-poll" data-gj-action='change#togglePoll' <%= 'checked' if params[:poll].present? %>>
+        <label for="toggle-poll">Live Poll</label>
       </div>
     </div>
   </div>

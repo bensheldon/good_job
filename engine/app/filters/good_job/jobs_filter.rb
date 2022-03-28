@@ -14,7 +14,7 @@ module GoodJob
 
     def filtered_query
       query = base_query.includes(:executions)
-                        .joins_advisory_locks.select('good_jobs.*', 'pg_locks.locktype AS locktype')
+                        .joins_advisory_locks.select("#{GoodJob::ActiveJobJob.table_name}.*", 'pg_locks.locktype AS locktype')
 
       query = query.job_class(params[:job_class]) if params[:job_class].present?
       query = query.where(queue_name: params[:queue_name]) if params[:queue_name].present?
@@ -31,7 +31,7 @@ module GoodJob
         when 'scheduled'
           query = query.scheduled
         when 'running'
-          query = query.running.select('good_jobs.*', 'pg_locks.locktype')
+          query = query.running.select("#{GoodJob::ActiveJobJob.table_name}.*", 'pg_locks.locktype')
         when 'queued'
           query = query.queued
         end
