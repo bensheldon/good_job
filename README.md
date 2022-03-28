@@ -436,7 +436,7 @@ config.good_job.cron = {
   frequent_task: { # each recurring job must have a unique key
     cron: "*/15 * * * *", # cron-style scheduling format by fugit gem
     class: "ExampleJob", # reference the Job class with a string
-    args: [42, { name: "Alice" }], # arguments to pass; can also be a proc e.g. `-> { { when: Time.now } }`
+    args: [42, { name: "Alice" }], # arguments to pass; can also be a proc e.g. `-> { [{ when: Time.now }] }`
     set: { priority: -10 }, # additional ActiveJob properties; can also be a lambda/proc e.g. `-> { { priority: [1,2].sample } }`
     description: "Something helpful", # optional description that appears in Dashboard (coming soon!)
   },
