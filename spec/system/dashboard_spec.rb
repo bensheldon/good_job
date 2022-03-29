@@ -154,23 +154,16 @@ describe 'Dashboard', type: :system, js: true do
     end
   end
 
-  describe "renders /good_job in Spanish lang" do
-    it "renders the navbar successfully" do
-      visit "/good_job?locale=es"
+  describe "when changing language" do
+    it "changes wording from English to Spanish" do
+      visit good_job_path(locale: :en)
 
-      expect(page).to have_content "GoodJob 👍"
-      expect(page).to have_content "Ejecuciones"
-      expect(page).to have_content "Tareas"
-      expect(page).to have_content "Tareas Programadas"
+      expect(page).to have_content "Processes"
+      find("#localeOptions").click
+      within "div[aria-labelledby='localeOptions']" do
+        click_on "es"
+      end
       expect(page).to have_content "Procesos"
-      expect(page).to have_content "Próximamente más vistas"
-    end
-
-    it "renders work_in_progress successfully" do
-      visit "/good_job?locale=es"
-
-      expect(page).to have_content "🚧 GoodJob se encuentra en desarrollo."
-      expect(page).to have_content "Por favor contribuya en GoodJob con ideas y código."
     end
   end
 end

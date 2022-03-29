@@ -20,5 +20,17 @@ module GoodJob
 
       content_tag :span, status.to_s, class: classes
     end
+
+    def language_options
+      available_languages.map { |locale| language_option(locale) }.join
+    end
+
+    def language_option(locale)
+      link_to locale, url_for(locale: locale), class: "dropdown-item"
+    end
+
+    def available_languages
+      I18n.available_locales.reject { |locale| locale == I18n.locale }
+    end
   end
 end
