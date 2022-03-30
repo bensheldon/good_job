@@ -9,7 +9,8 @@ describe GoodJob::CronEntry do
       key: 'test',
       cron: "* * * * *",
       class: "TestJob",
-      args: [42, { name: "Alice" }],
+      args: [42],
+      kwargs: { name: "Alice" },
       set: { queue: 'test_queue' },
       description: "Something helpful",
     }
@@ -90,7 +91,17 @@ describe GoodJob::CronEntry do
     it 'enqueues a job with the correct parameters' do
       expect do
         entry.enqueue
-      end.to have_enqueued_job(TestJob).with(42, { name: 'Alice' }).on_queue('test_queue')
+      end.to have_enqueued_job(TestJob).with(42, name: 'Alice').on_queue('test_queue')
+    end
+
+    describe 'job execution' do
+      include ActiveJob::TestHelper
+
+      it 'executes the job properly' do
+        perform_enqueued_jobs do
+          entry.enqueue
+        end
+      end
     end
 
     it 'assigns cron_key and cron_at to the execution' do
@@ -120,11 +131,11 @@ describe GoodJob::CronEntry do
     it 'returns a hash of properties' do
       expect(entry.display_properties).to eq({
                                                key: 'test',
-        cron: "* * * * *",
-        class: "TestJob",
-        args: [42, { name: "Alice" }],
-        set: "Lambda/Callable",
-        description: "Something helpful",
+                                               cron: "* * * * *",
+                                               class: "TestJob",
+                                               args: [42, { name: "Alice" }],
+                                               set: "Lambda/Callable",
+                                               description: "Something helpful",
                                              })
     end
   end

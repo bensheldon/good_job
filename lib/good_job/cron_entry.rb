@@ -52,6 +52,10 @@ module GoodJob # :nodoc:
       params[:args]
     end
 
+    def kwargs
+      params[:kwargs]
+    end
+
     def description
       params[:description]
     end
@@ -87,7 +91,8 @@ module GoodJob # :nodoc:
         current_thread.cron_key = key
         current_thread.cron_at = cron_at
 
-        job_class.constantize.set(set_value).perform_later(*args_value)
+        configured_job = job_class.constantize.set(set_value)
+        kwargs_value.present? ? configured_job.perform_later(*args_value, **kwargs_value) : configured_job.perform_later(*args_value)
       end
     rescue ActiveRecord::RecordNotUnique
       false
@@ -121,6 +126,11 @@ module GoodJob # :nodoc:
 
     def args_value
       value = args || []
+      value.respond_to?(:call) ? value.call : value
+    end
+
+    def kwargs_value
+      value = kwargs || nil
       value.respond_to?(:call) ? value.call : value
     end
 
