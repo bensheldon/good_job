@@ -1,5 +1,25 @@
 # Changelog
 
+## [v2.11.3](https://github.com/bensheldon/good_job/tree/v2.11.3) (2022-03-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.11.2...v2.11.3)
+
+**Fixed bugs:**
+
+- Add explicit `kwargs:` key to cron configuration [\#548](https://github.com/bensheldon/good_job/pull/548) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- ArgumentError: wrong number of arguments \(given 1, expected 0; required keyword: schedule\) - cron [\#546](https://github.com/bensheldon/good_job/issues/546)
+- How to run clean up preserved jobs in cron? [\#541](https://github.com/bensheldon/good_job/issues/541)
+- Erroring with "Too many open files" when good\_job tries reconnecting to database [\#530](https://github.com/bensheldon/good_job/issues/530)
+- Can't cast Array [\#529](https://github.com/bensheldon/good_job/issues/529)
+
+**Merged pull requests:**
+
+- Use bundle add instead [\#542](https://github.com/bensheldon/good_job/pull/542) ([glaucocustodio](https://github.com/glaucocustodio))
+- Update Readme to better explain queues, pools, threads, and database connections; update CLI to frontload queue option [\#539](https://github.com/bensheldon/good_job/pull/539) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.11.2](https://github.com/bensheldon/good_job/tree/v2.11.2) (2022-03-03)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.11.1...v2.11.2)
