@@ -9,6 +9,9 @@ en:
         jobs: All Jobs
         name: GoodJob 👍
         processes: Processes
-        timezone_notice: Times are displayed in %{time} timezone
+        live_poll: Live Poll
       announcement:
         work_in_progress_html: 🚧 GoodJob's dashboard is a work in progress. Please contribute ideas and code on <a href="https://github.com/bensheldon/good_job/issues" target="_blank" rel="nofollow noopener noreferrer">Github</a>.
+      footer:
+        last_update_html: Last updated <time id="page-updated-at" datetime="%{time}">%{time}</time>
+        wording: Remember, you're doing a Good Job too!

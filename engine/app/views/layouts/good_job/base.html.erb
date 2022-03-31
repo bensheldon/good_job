@@ -27,20 +27,6 @@
     <%= yield %>
   </div>
 
-  <footer class="footer mt-auto py-3 bg-light fixed-bottom" id="footer" data-gj-poll-replace>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-6">
-          <span class="text-muted">
-            Last updated: <time id="page-updated-at" datetime="<%= Time.current.utc.iso8601 %>"><%= Time.current %></time>
-          </span>
-        </div>
-
-        <div class="col-6 text-end">
-          Remember, you're doing a Good Job too!
-        </div>
-      </div>
-    </div>
-  </footer>
+    <%= render "good_job/shared/footer" %>
 </body>
 </html>
