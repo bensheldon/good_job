@@ -3,7 +3,7 @@ module GoodJob
   class BaseController < ActionController::Base # rubocop:disable Rails/ApplicationController
     protect_from_forgery with: :exception
 
-    before_action :set_locale
+    around_action :switch_locale
 
     content_security_policy do |policy|
       policy.default_src(:none) if policy.default_src(*policy.default_src).blank?
@@ -30,8 +30,8 @@ module GoodJob
 
     private
 
-    def set_locale
-      I18n.locale = current_locale
+    def switch_locale(&action)
+      I18n.with_locale(current_locale, &action)
     end
 
     def current_locale

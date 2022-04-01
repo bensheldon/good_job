@@ -20,6 +20,7 @@ gem 'rails'
 
 platforms :ruby do
   gem "activerecord-explain-analyze"
+  gem 'i18n-tasks'
   gem "memory_profiler"
   gem "pry-byebug"
   gem "rbtrace"
