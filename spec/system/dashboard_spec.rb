@@ -160,7 +160,7 @@ describe 'Dashboard', type: :system, js: true do
 
       expect(page).to have_content "Processes"
       find("#localeOptions").click
-      within "div[aria-labelledby='localeOptions']" do
+      within ".navbar" do
         click_on "es"
       end
       expect(page).to have_content "Procesos"
