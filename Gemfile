@@ -20,13 +20,13 @@ gem 'rails'
 
 platforms :ruby do
   gem "activerecord-explain-analyze"
-  gem 'i18n-tasks'
   gem "memory_profiler"
   gem "pry-byebug"
   gem "rbtrace"
 
   group :lint do
     gem "erb_lint", ">= 0.0.35"
+    gem 'i18n-tasks'
     gem "mdl"
     gem "rubocop"
     gem "rubocop-performance"
