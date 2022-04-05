@@ -6,13 +6,10 @@ module GoodJob # :nodoc:
   # Pollers regularly wake up execution threads to check for new work.
   #
   class Poller
-    TIMEOUT_INTERVAL = 5
-
     # Defaults for instance of Concurrent::TimerTask.
     # The timer controls how and when sleeping threads check for new work.
     DEFAULT_TIMER_OPTIONS = {
       execution_interval: Configuration::DEFAULT_POLL_INTERVAL,
-      timeout_interval: TIMEOUT_INTERVAL,
       run_now: true,
     }.freeze
 
