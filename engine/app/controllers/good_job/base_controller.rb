@@ -35,7 +35,17 @@ module GoodJob
     end
 
     def current_locale
-      params[:locale] || I18n.default_locale
+      if params[:locale]
+        params[:locale]
+      elsif good_job_available_locales.exclude?(I18n.default_locale) && I18n.available_locales.include?(:en)
+        :en
+      else
+        I18n.default_locale
+      end
+    end
+
+    def good_job_available_locales
+      @_good_job_available_locales ||= GoodJob::Engine.root.join("config/locales").glob("*.yml").map { |path| File.basename(path, ".yml").to_sym }.uniq
     end
   end
 end
