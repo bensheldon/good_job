@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module GoodJob
-  class ExecutionsController < GoodJob::BaseController
+  class ExecutionsController < GoodJob::ApplicationController
     def index
       @filter = ExecutionsFilter.new(params)
     end

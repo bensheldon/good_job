@@ -19,6 +19,7 @@ module TestApp
 
     # config.middleware.insert_before Rack::Sendfile, ActionDispatch::DebugLocks
     config.log_level = :debug
+
+    config.action_controller.include_all_helpers = false
   end
 end
-
