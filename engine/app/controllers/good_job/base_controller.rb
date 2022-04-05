@@ -24,10 +24,28 @@ module GoodJob
       request.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
     end
 
+    def default_url_options(options = {})
+      { locale: I18n.locale }.merge(options)
+    end
+
     private
 
     def switch_locale(&action)
-      I18n.with_locale(:en, &action)
+      I18n.with_locale(current_locale, &action)
+    end
+
+    def current_locale
+      if params[:locale]
+        params[:locale]
+      elsif good_job_available_locales.exclude?(I18n.default_locale) && I18n.available_locales.include?(:en)
+        :en
+      else
+        I18n.default_locale
+      end
+    end
+
+    def good_job_available_locales
+      @_good_job_available_locales ||= GoodJob::Engine.root.join("config/locales").glob("*.yml").map { |path| File.basename(path, ".yml").to_sym }.uniq
     end
   end
 end

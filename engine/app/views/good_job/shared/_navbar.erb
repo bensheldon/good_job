@@ -1,0 +1,49 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <%= link_to t(".name"), root_path, class: "navbar-brand mb-0 h1" %>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <%= link_to t(".executions"), root_path, class: ["nav-link", ("active" if current_page?(root_path))] %>
+        </li>
+        <li class="nav-item">
+          <%= link_to t(".jobs"), jobs_path, class: ["nav-link", ("active" if current_page?(jobs_path))] %>
+        </li>
+        <li class="nav-item">
+          <%= link_to t(".cron_schedules"), cron_entries_path, class: ["nav-link", ("active" if current_page?(cron_entries_path))] %>
+        </li>
+        <li class="nav-item">
+          <%= link_to t(".processes"), processes_path, class: ["nav-link", ("active" if current_page?(processes_path))] %>
+        </li>
+        <li class="nav-item">
+          <div class="nav-link">
+            <span class="badge bg-secondary"><%= t(".coming_soon") %></span>
+          </div>
+        </li>
+      </ul>
+      <div class="nav-item pe-2">
+        <div class="form-check">
+          <input type="checkbox" id="toggle-poll" name="toggle-poll" data-gj-action='change#togglePoll' <%= 'checked' if params[:poll].present? %>>
+          <label for="toggle-poll"><%= t(".live_poll") %></label>
+        </div>
+      </div>
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a href="#" class="nav-link dropdown-toggle" type="button" id="localeOptions" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <%= I18n.locale %>
+          </a>
+
+          <ul class="dropdown-menu" aria-labelledby="localeOptions">
+            <% I18n.available_locales.reject { |locale| locale == I18n.locale }.each do |locale| %>
+              <li><%= link_to locale, url_for(locale: locale), class: "dropdown-item" %></li>
+            <% end %>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

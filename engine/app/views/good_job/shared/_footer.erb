@@ -1,0 +1,15 @@
+<footer class="footer mt-auto py-3 bg-light fixed-bottom" id="footer" data-gj-poll-replace>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-6">
+        <span class="text-muted">
+          <%= t(".last_update_html", time: Time.current.utc.iso8601) %>
+        </span>
+      </div>
+
+      <div class="col-6 text-end">
+        <%= t(".wording") %>
+      </div>
+    </div>
+  </div>
+</footer>

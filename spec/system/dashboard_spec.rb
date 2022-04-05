@@ -153,4 +153,17 @@ describe 'Dashboard', type: :system, js: true do
       end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
     end
   end
+
+  describe "when changing language" do
+    it "changes wording from English to Spanish" do
+      visit good_job_path(locale: :en)
+
+      expect(page).to have_content "Processes"
+      find("#localeOptions").click
+      within ".navbar" do
+        click_on "es"
+      end
+      expect(page).to have_content "Procesos"
+    end
+  end
 end

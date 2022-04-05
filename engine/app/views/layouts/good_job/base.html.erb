@@ -18,79 +18,15 @@
   <%= javascript_include_tag rails_ujs_url(format: :js, v: GoodJob::VERSION), nonce: true %>
 </head>
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <div class="container-fluid">
-      <%= link_to "GoodJob 👍", root_path, class: 'navbar-brand mb-0 h1' %>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <%= link_to "All Executions", root_path, class: ["nav-link", ("active" if current_page?(root_path))] %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "All Jobs", jobs_path, class: ["nav-link", ("active" if current_page?(jobs_path))] %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Cron Schedules", cron_entries_path, class: ["nav-link", ("active" if current_page?(cron_entries_path))] %>
-          </li>
-          <li class="nav-item">
-            <%= link_to "Processes", processes_path, class: ["nav-link", ("active" if current_page?(processes_path))] %>
-          </li>
-          <li class="nav-item">
-            <div class="nav-link">
-              <span class="badge bg-secondary">More views coming soon</span>
-            </div>
-          </li>
-        </ul>
-        <div>
-          <input type="checkbox" id="toggle-poll" name="toggle-poll" data-gj-action='change#togglePoll' <%= 'checked' if params[:poll].present? %>>
-          <label for="toggle-poll">Live Poll</label>
-        </div>
-      </div>
-    </div>
-  </nav>
+  <%= render "good_job/shared/navbar" %>
 
   <div class="container-fluid">
-    <div class="card border-warning text-dark my-3">
-      <div class="card-body">
-        <p class="card-text">🚧 GoodJob's dashboard is a work in progress. Please contribute ideas and code on <a href="https://github.com/bensheldon/good_job/issues" target="_blank" rel="nofollow noopener noreferrer">Github</a>.</p>
-      </div>
-    </div>
-
-    <% if notice %>
-      <div class="alert alert-success alert-dismissible fade show d-flex align-items-center offset-md-3 col-6" role="alert">
-        <%= render "good_job/shared/icons/check", class: "flex-shrink-0 me-2" %>
-        <div><%= notice %></div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    <% elsif alert %>
-      <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center offset-md-3 col-6" role="alert">
-        <%= render "good_job/shared/icons/exclamation", class: "flex-shrink-0 me-2" %>
-        <div><%= alert %></div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    <% end %>
+    <%= render "good_job/shared/announcement" %>
+    <%= render "good_job/shared/alert" %>
 
     <%= yield %>
   </div>
 
-  <footer class="footer mt-auto py-3 bg-light fixed-bottom" id="footer" data-gj-poll-replace>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-6">
-          <span class="text-muted">
-            Last updated: <time id="page-updated-at" datetime="<%= Time.current.utc.iso8601 %>"><%= Time.current %></time>
-          </span>
-        </div>
-
-        <div class="col-6 text-end">
-          Remember, you're doing a Good Job too!
-        </div>
-      </div>
-    </div>
-  </footer>
+    <%= render "good_job/shared/footer" %>
 </body>
 </html>

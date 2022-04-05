@@ -26,6 +26,7 @@ platforms :ruby do
 
   group :lint do
     gem "erb_lint", ">= 0.0.35"
+    gem 'i18n-tasks'
     gem "mdl"
     gem "rubocop"
     gem "rubocop-performance"
