@@ -1,5 +1,23 @@
 # Changelog
 
+## [v2.12.0](https://github.com/bensheldon/good_job/tree/v2.12.0) (2022-04-05)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.11.3...v2.12.0)
+
+**Closed issues:**
+
+- TimeTask timeouts are now ignored as these were not able to be implemented correctly [\#555](https://github.com/bensheldon/good_job/issues/555)
+- undefined method `relative\_time' when include\_all\_helpers is false [\#550](https://github.com/bensheldon/good_job/issues/550)
+- ArgumentError: wrong number of arguments \(given 1, expected 0; required keyword: schedule\) - cron [\#546](https://github.com/bensheldon/good_job/issues/546)
+
+**Merged pull requests:**
+
+- Deprecate Adapter configuration of job execution/cron [\#558](https://github.com/bensheldon/good_job/pull/558) ([bensheldon](https://github.com/bensheldon))
+- Remove usage of Concurrent::TimerTask's timeout\_interval [\#557](https://github.com/bensheldon/good_job/pull/557) ([bensheldon](https://github.com/bensheldon))
+- Include locale in html lang attribute [\#556](https://github.com/bensheldon/good_job/pull/556) ([bensheldon](https://github.com/bensheldon))
+- Rename `GoodJob::BaseController` to `GoodJob::ApplicationController` [\#553](https://github.com/bensheldon/good_job/pull/553) ([shouichi](https://github.com/shouichi))
+- Internationalize/I18n the Dashboard Engine [\#497](https://github.com/bensheldon/good_job/pull/497) ([JuanVqz](https://github.com/JuanVqz))
+
 ## [v2.11.3](https://github.com/bensheldon/good_job/tree/v2.11.3) (2022-03-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.11.2...v2.11.3)
@@ -10,7 +28,6 @@
 
 **Closed issues:**
 
-- ArgumentError: wrong number of arguments \(given 1, expected 0; required keyword: schedule\) - cron [\#546](https://github.com/bensheldon/good_job/issues/546)
 - How to run clean up preserved jobs in cron? [\#541](https://github.com/bensheldon/good_job/issues/541)
 - Erroring with "Too many open files" when good\_job tries reconnecting to database [\#530](https://github.com/bensheldon/good_job/issues/530)
 - Can't cast Array [\#529](https://github.com/bensheldon/good_job/issues/529)
