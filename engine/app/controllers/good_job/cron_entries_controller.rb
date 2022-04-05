@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module GoodJob
-  class CronEntriesController < GoodJob::BaseController
+  class CronEntriesController < GoodJob::ApplicationController
     def index
       @cron_entries = CronEntry.all
     end

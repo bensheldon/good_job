@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module GoodJob
-  class JobsController < GoodJob::BaseController
+  class JobsController < GoodJob::ApplicationController
     rescue_from GoodJob::ActiveJobJob::AdapterNotGoodJobError,
                 GoodJob::ActiveJobJob::ActionForStateMismatchError,
                 with: :redirect_on_error
