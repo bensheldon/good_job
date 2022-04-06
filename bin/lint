@@ -44,4 +44,7 @@ FileUtils.chdir GEM_ROOT do
 
   puts "\n== Markdown Lint =="
   system! "bundle exec mdl --style .mdstyle.rb README.md"
+
+  puts "\n== i18n-tasks health =="
+  system! "bin/i18n-tasks health  "
 end
