@@ -3,7 +3,7 @@ module GoodJob
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
 
-    around_action :switch_locale
+    around_action :switch_locale, :default_url_options
 
     content_security_policy do |policy|
       policy.default_src(:none) if policy.default_src(*policy.default_src).blank?
@@ -24,11 +24,11 @@ module GoodJob
       request.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
     end
 
+    private
+
     def default_url_options(options = {})
       { locale: I18n.locale }.merge(options)
     end
-
-    private
 
     def switch_locale(&action)
       I18n.with_locale(current_locale, &action)
