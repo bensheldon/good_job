@@ -1,0 +1,56 @@
+---
+ru:
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: около 1 часа
+        other: около %{count} часов
+      about_x_months:
+        one: около 1 месяца
+        other: около %{count} месяцев
+      about_x_years:
+        one: около 1 года
+        other: около %{count} лет
+      almost_x_years:
+        one: почти 1 год
+        other: почти %{count} года
+      half_a_minute: пол минуты
+      less_than_x_minutes:
+        one: меньше 1 минуты
+        other: меньше %{count} минут
+      less_than_x_seconds:
+        one: меньше 1 секунды
+        other: меньше %{count} секунд
+      over_x_years:
+        one: больше 1 года
+        other: больше %{count} лет
+      x_days:
+        one: 1 день
+        other: "%{count} дней"
+      x_minutes:
+        one: 1 минута
+        other: "%{count} минут"
+      x_months:
+        one: 1 месяц
+        other: "%{count} месяца"
+      x_seconds:
+        one: 1 секунда
+        other: "%{count} секунд"
+      x_years:
+        one: 1 год
+        other: "%{count} года"
+  good_job:
+    shared:
+      announcement:
+        work_in_progress_html: "🚧 GoodJob панель все еще в разработке. Пожалуйста расскажите нам о ваших идеях и наработках в <a href=\"https://github.com/bensheldon/good_job/issues\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">Github</a>."
+      footer:
+        last_update_html: Последнее обновление <time id="page-updated-at" datetime="%{time}">%{time}</time>
+        wording: Запомни, ты делаешь Good Job тоже!
+      navbar:
+        coming_soon: Скоро будет больше секций
+        cron_schedules: Cron Расписания
+        executions: Все Исполнения
+        jobs: Все Задачи
+        live_poll: Живой Опрос
+        name: "GoodJob 👍"
+        processes: Процессы
