@@ -1,5 +1,14 @@
 # Changelog
 
+## [v2.12.2](https://github.com/bensheldon/good_job/tree/v2.12.2) (2022-04-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.12.1...v2.12.2)
+
+**Merged pull requests:**
+
+- Dashboard: added NL translations [\#568](https://github.com/bensheldon/good_job/pull/568) ([eelcoj](https://github.com/eelcoj))
+- Un-deprecate Adapter's `execution_mode` argument [\#567](https://github.com/bensheldon/good_job/pull/567) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.12.1](https://github.com/bensheldon/good_job/tree/v2.12.1) (2022-04-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.12.0...v2.12.1)
