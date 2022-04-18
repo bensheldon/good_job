@@ -41,13 +41,10 @@ es:
         other: "%{count} años"
   good_job:
     shared:
-      announcement:
-        work_in_progress_html: "🚧 GoodJob se encuentra en desarrollo. Por favor contribuya en <a href=\"https://github.com/bensheldon/good_job/issues\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">GoodJob</a> con ideas y código."
       footer:
         last_update_html: Última actualización <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: "¡Recuerda, también tú estás haciendo un buen trabajo!"
       navbar:
-        coming_soon: Próximamente más vistas
         cron_schedules: Tareas Programadas
         executions: Ejecuciones
         jobs: Tareas
