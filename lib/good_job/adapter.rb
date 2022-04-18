@@ -28,9 +28,9 @@ module GoodJob
     # @param poll_interval [Integer, nil] sets the number of seconds between polls for jobs when +execution_mode+ is set to +:async+. You can also set this with the environment variable +GOOD_JOB_POLL_INTERVAL+. Defaults to +1+.
     # @param start_async_on_initialize [Boolean] whether to start the async scheduler when the adapter is initialized.
     def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil, start_async_on_initialize: nil)
-      if execution_mode || queues || max_threads || poll_interval || start_async_on_initialize
+      if queues || max_threads || poll_interval || start_async_on_initialize
         ActiveSupport::Deprecation.warn(
-          "The GoodJob::Adapter's initialization parameters have been deprecated and will be removed in GoodJob v3. These options should be configured through GoodJob global configuration instead."
+          "GoodJob::Adapter's execution-related arguments (queues, max_threads, poll_interval, start_async_on_initialize) have been deprecated and will be removed in GoodJob v3. These options should be configured through GoodJob global configuration instead."
         )
       end
 
