@@ -41,13 +41,10 @@ en:
         other: "%{count} years"
   good_job:
     shared:
-      announcement:
-        work_in_progress_html: "🚧 GoodJob's dashboard is a work in progress. Please contribute ideas and code on <a href=\"https://github.com/bensheldon/good_job/issues\" target=\"_blank\" rel=\"nofollow noopener noreferrer\">Github</a>."
       footer:
         last_update_html: Last updated <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: Remember, you're doing a Good Job too!
       navbar:
-        coming_soon: More views coming soon
         cron_schedules: Cron Schedules
         executions: All Executions
         jobs: All Jobs
