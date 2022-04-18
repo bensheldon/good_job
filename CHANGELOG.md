@@ -1,5 +1,29 @@
 # Changelog
 
+## [v2.12.1](https://github.com/bensheldon/good_job/tree/v2.12.1) (2022-04-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.12.0...v2.12.1)
+
+**Implemented enhancements:**
+
+- Dashboard: adding Russian translation [\#565](https://github.com/bensheldon/good_job/pull/565) ([skatkov](https://github.com/skatkov))
+
+**Fixed bugs:**
+
+- I18n::InvalidLocale \(:en is not a valid locale\): [\#549](https://github.com/bensheldon/good_job/issues/549)
+- FIX: make 'default\_url\_options' method private [\#562](https://github.com/bensheldon/good_job/pull/562) ([friendlyantz](https://github.com/friendlyantz))
+
+**Closed issues:**
+
+- Exponential backoff by default? [\#563](https://github.com/bensheldon/good_job/issues/563)
+- Finished without Error [\#552](https://github.com/bensheldon/good_job/issues/552)
+- Track processes in the database [\#421](https://github.com/bensheldon/good_job/issues/421)
+
+**Merged pull requests:**
+
+- Remove WIP comments from dashboard [\#566](https://github.com/bensheldon/good_job/pull/566) ([bkeepers](https://github.com/bkeepers))
+- Add i18n-tasks to linter, add binstub and move config to project root [\#559](https://github.com/bensheldon/good_job/pull/559) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.12.0](https://github.com/bensheldon/good_job/tree/v2.12.0) (2022-04-05)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.11.3...v2.12.0)
