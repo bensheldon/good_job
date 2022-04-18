@@ -1,9 +1,5 @@
-<div class="card my-3 p-6" data-gj-poll-replace id="executions-chart">
-  <%= render 'good_job/shared/chart', chart_data: GoodJob::ScheduledByQueueChart.new(@filter).data %>
-</div>
-
-<%= render 'good_job/shared/filter', filter: @filter %>
-
+<%= render 'good_job/shared/filter', title: "Executions", filter: @filter %>
+<%= render 'good_job/shared/chart', chart_data: GoodJob::ScheduledByQueueChart.new(@filter).data %>
 <%= render 'good_job/executions/table', executions: @filter.records %>
 
 <% if @filter.records.present? %>
