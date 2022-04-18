@@ -24,11 +24,11 @@ module GoodJob
       request.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
     end
 
+    private
+
     def default_url_options(options = {})
       { locale: I18n.locale }.merge(options)
     end
-
-    private
 
     def switch_locale(&action)
       I18n.with_locale(current_locale, &action)
