@@ -3,7 +3,7 @@ module GoodJob
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
 
-    around_action :switch_locale, :default_url_options
+    around_action :switch_locale
 
     content_security_policy do |policy|
       policy.default_src(:none) if policy.default_src(*policy.default_src).blank?
