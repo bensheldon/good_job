@@ -25,6 +25,7 @@ platforms :ruby do
   gem "rbtrace"
 
   group :lint do
+    gem 'easy_translate'
     gem "erb_lint", ">= 0.0.35"
     gem 'i18n-tasks'
     gem "mdl"
