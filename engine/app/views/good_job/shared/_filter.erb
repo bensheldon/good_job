@@ -57,7 +57,7 @@
 
   <%= javascript_tag nonce: true do %>
     document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll("#job_class_filter, #job_state_filter, #job_queue_filter").forEach((filter) => {
+      document.querySelectorAll("#job_class_filter, #job_queue_filter").forEach((filter) => {
         filter.addEventListener("change", () => {
           document.querySelector("#filter_form").submit();
         });
