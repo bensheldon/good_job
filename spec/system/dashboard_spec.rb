@@ -34,7 +34,7 @@ describe 'Dashboard', type: :system, js: true do
 
       visit '/good_job'
 
-      select "unfinished", from: "job_state_filter"
+      click_on "Unfinished"
 
       expect(page).to have_content 'ExampleJob'
       expect(current_url).to match(/state=unfinished/)
@@ -85,7 +85,7 @@ describe 'Dashboard', type: :system, js: true do
       it "can filter by state" do
         visit root_path
 
-        select "unfinished", from: "job_state_filter"
+        click_on "Unfinished"
 
         expect(current_url).to match(/state=unfinished/)
 
