@@ -1,5 +1,21 @@
 # Changelog
 
+## [v2.13.0](https://github.com/bensheldon/good_job/tree/v2.13.0) (2022-04-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.12.2...v2.13.0)
+
+**Implemented enhancements:**
+
+- Dashboard UI updates: sticky navbar, statuses as tabs [\#572](https://github.com/bensheldon/good_job/pull/572) ([bkeepers](https://github.com/bkeepers))
+
+**Closed issues:**
+
+- Internationalize/I18n the Dashboard Engine [\#408](https://github.com/bensheldon/good_job/issues/408)
+
+**Merged pull requests:**
+
+- Fix Russian translation linting [\#573](https://github.com/bensheldon/good_job/pull/573) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.12.2](https://github.com/bensheldon/good_job/tree/v2.12.2) (2022-04-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.12.1...v2.12.2)
