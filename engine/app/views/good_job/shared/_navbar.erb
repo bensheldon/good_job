@@ -8,16 +8,16 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <%= link_to t(".executions"), root_path, class: ["nav-link", ("active" if current_page?(root_path))] %>
+          <%= link_to t(".executions"), root_path, class: ["nav-link", ("active" if controller_name == 'executions')] %>
         </li>
         <li class="nav-item">
-          <%= link_to t(".jobs"), jobs_path, class: ["nav-link", ("active" if current_page?(jobs_path))] %>
+          <%= link_to t(".jobs"), jobs_path, class: ["nav-link", ("active" if controller_name == 'jobs')] %>
         </li>
         <li class="nav-item">
-          <%= link_to t(".cron_schedules"), cron_entries_path, class: ["nav-link", ("active" if current_page?(cron_entries_path))] %>
+          <%= link_to t(".cron_schedules"), cron_entries_path, class: ["nav-link", ("active" if controller_name == 'cron_entries')] %>
         </li>
         <li class="nav-item">
-          <%= link_to t(".processes"), processes_path, class: ["nav-link", ("active" if current_page?(processes_path))] %>
+          <%= link_to t(".processes"), processes_path, class: ["nav-link", ("active" if  controller_name == 'processes')] %>
         </li>
       </ul>
       <div class="nav-item pe-2">
