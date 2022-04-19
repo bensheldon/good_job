@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-light border-bottom bg-white sticky-top shadow-sm">
   <div class="container-fluid">
     <%= link_to t(".name"), root_path, class: "navbar-brand mb-0 h1" %>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -8,16 +8,16 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <%= link_to t(".executions"), root_path, class: ["nav-link", ("active" if current_page?(root_path))] %>
+          <%= link_to t(".executions"), root_path, class: ["nav-link", ("active" if controller_name == 'executions')] %>
         </li>
         <li class="nav-item">
-          <%= link_to t(".jobs"), jobs_path, class: ["nav-link", ("active" if current_page?(jobs_path))] %>
+          <%= link_to t(".jobs"), jobs_path, class: ["nav-link", ("active" if controller_name == 'jobs')] %>
         </li>
         <li class="nav-item">
-          <%= link_to t(".cron_schedules"), cron_entries_path, class: ["nav-link", ("active" if current_page?(cron_entries_path))] %>
+          <%= link_to t(".cron_schedules"), cron_entries_path, class: ["nav-link", ("active" if controller_name == 'cron_entries')] %>
         </li>
         <li class="nav-item">
-          <%= link_to t(".processes"), processes_path, class: ["nav-link", ("active" if current_page?(processes_path))] %>
+          <%= link_to t(".processes"), processes_path, class: ["nav-link", ("active" if  controller_name == 'processes')] %>
         </li>
       </ul>
       <div class="nav-item pe-2">

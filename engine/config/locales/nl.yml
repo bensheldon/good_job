@@ -45,9 +45,9 @@ nl:
         last_update_html: Laatst bijgewerkt <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: 'Onthoud: jij levert ook goed werk!'
       navbar:
-        cron_schedules: Cron Schema
-        executions: Alle Uitvoeringen
-        jobs: Alle Taken
+        cron_schedules: Cron
+        executions: Uitvoeringen
+        jobs: Taken
         live_poll: Live Poll
         name: "GoodJob 👍"
         processes: Processen

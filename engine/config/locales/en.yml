@@ -45,9 +45,9 @@ en:
         last_update_html: Last updated <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: Remember, you're doing a Good Job too!
       navbar:
-        cron_schedules: Cron Schedules
-        executions: All Executions
-        jobs: All Jobs
+        cron_schedules: Cron
+        executions: Executions
+        jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
         processes: Processes

@@ -1,59 +1,67 @@
-<%= form_with(url: "", method: :get, local: true, id: "filter_form") do |form| %>
-  <%= hidden_field_tag :poll, value: params[:poll] %>
-  <div class="d-flex flex-row w-100">
-    <div class="me-2">
-      <label for="job_class_filter">Job class</label>
-      <select name="job_class" id="job_class_filter" class="form-select">
-        <option value="" <%= "selected='selected'" if params[:job_class].blank? %>>All jobs</option>
+<div data-gj-poll-replace id="filter">
+  <div class="bg-light break-out">
+    <h2 class="container-fluid pt-3 pb-2"><%= title %></h2>
 
-        <% filter.job_classes.each do |name, count| %>
-          <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:job_class] == name %>><%= name %> (<%= count %>)</option>
-        <% end %>
-      </select>
-    </div>
+    <ul class="nav nav-tabs bg-light px-3 mb-3">
+      <li class="nav-item">
+        <%= link_to "All", url_for(state: nil), class: "nav-link #{"active" unless params[:state]}" %>
+      </li>
 
-    <div class="me-2">
-      <label for="job_state_filter">State</label>
-      <select name="state" id="job_state_filter" class="form-select">
-        <option value="" <%= "selected='selected'" if params[:state].blank? %>>All states</option>
+      <% filter.states.each do |name, count| %>
+        <li class="nav-item">
+          <%= link_to url_for({state: name}), class: "nav-link #{"active" if params[:state] == name}" do %>
+            <%= name.titleize %>
+            <span class="badge bg-primary rounded-pill <%= "bg-secondary" if count == 0 %>"><%= count %></span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
 
-        <% filter.states.each do |name, count| %>
-          <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:state] == name %>><%= name %> (<%= count %>)</option>
-        <% end %>
-      </select>
-    </div>
+  <%= form_with(url: "", method: :get, local: true, id: "filter_form", class: "container-fluid") do |form| %>
+    <%= hidden_field_tag :poll, params[:poll] %>
+    <%= hidden_field_tag :state, params[:state] %>
+    <div class="d-flex flex-row w-100">
+      <div class="me-2">
+        <select name="job_class" id="job_class_filter" class="form-select form-select-sm">
+          <option value="" <%= "selected='selected'" if params[:job_class].blank? %>>All jobs</option>
 
-    <div class="me-2">
-      <label for="job_queue_filter">Queue</label>
-      <select name="queue_name" id="job_queue_filter" class="form-select">
-        <option value="" <%= "selected='selected'" if params[:queue_name].blank? %>>All queues</option>
+          <% filter.job_classes.each do |name, count| %>
+            <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:job_class] == name %>><%= name %> (<%= count %>)</option>
+          <% end %>
+        </select>
+      </div>
 
-        <% filter.queues.each do |name, count| %>
-          <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:queue_name] == name %>><%= name %> (<%= count %>)</option>
-        <% end %>
-      </select>
-    </div>
+      <div class="me-2">
+        <select name="queue_name" id="job_queue_filter" class="form-select form-select-sm">
+          <option value="" <%= "selected='selected'" if params[:queue_name].blank? %>>All queues</option>
 
-    <div class="me-2 flex-fill d-flex flex-col align-items-end">
-      <label class="visually-hidden" for="query" aria-label="Search by class, job id, job params, and error text.">Search by class, job id, job params, and error text.</label>
-      <%= search_field_tag "query", params[:query], class: "form-control", placeholder: "Search by class, job id, job params, and error text." %>
-    </div>
+          <% filter.queues.each do |name, count| %>
+            <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:queue_name] == name %>><%= name %> (<%= count %>)</option>
+          <% end %>
+        </select>
+      </div>
 
-    <div class="d-flex flex-col align-items-end">
-      <div>
-        <%= form.submit "Search", name: nil, class: "btn btn-primary" %>
-        <%= link_to "Clear all", filter.to_params(job_class: nil, state: nil, queue_name: nil, query: nil), class: "btn btn-secondary" %>
+      <div class="me-2 flex-fill">
+        <%= search_field_tag "query", params[:query], class: "form-control form-control-sm", placeholder: "Search by class, job id, job params, and error text." %>
+      </div>
+
+      <div class="d-flex flex-col align-items-end">
+        <div>
+          <%= form.submit "Search", name: nil, class: "btn btn-primary btn-sm" %>
+          <%= link_to "Clear all", filter.to_params(job_class: nil, state: nil, queue_name: nil, query: nil), class: "btn btn-secondary btn-sm" %>
+        </div>
       </div>
     </div>
-  </div>
-<% end %>
+  <% end %>
 
-<%= javascript_tag nonce: true do %>
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll("#job_class_filter, #job_state_filter, #job_queue_filter").forEach((filter) => {
-      filter.addEventListener("change", () => {
-        document.querySelector("#filter_form").submit();
-      });
+  <%= javascript_tag nonce: true do %>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll("#job_class_filter, #job_queue_filter").forEach((filter) => {
+        filter.addEventListener("change", () => {
+          document.querySelector("#filter_form").submit();
+        });
+      })
     })
-  })
-<% end %>
+  <% end %>
+</div>

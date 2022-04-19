@@ -45,7 +45,7 @@ es:
         last_update_html: Última actualización <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: "¡Recuerda, también tú estás haciendo un buen trabajo!"
       navbar:
-        cron_schedules: Tareas Programadas
+        cron_schedules: Cron
         executions: Ejecuciones
         jobs: Tareas
         live_poll: En vivo

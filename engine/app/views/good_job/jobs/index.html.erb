@@ -1,13 +1,5 @@
-<div class="my-3 flex">
-  <h2>All Jobs</h2>
-</div>
-
-<div class="card my-3 p-6" data-gj-poll-replace id="jobs-chart">
-  <%= render 'good_job/shared/chart', chart_data: GoodJob::ScheduledByQueueChart.new(@filter).data %>
-</div>
-
-<%= render 'good_job/shared/filter', filter: @filter %>
-
+<%= render 'good_job/shared/filter', title: "Jobs", filter: @filter %>
+<%= render 'good_job/shared/chart', chart_data: GoodJob::ScheduledByQueueChart.new(@filter).data %>
 <%= render 'good_job/jobs/table', jobs: @filter.records %>
 
 <% if @filter.records.present? %>

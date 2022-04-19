@@ -16,13 +16,13 @@ describe 'Dashboard', type: :system, js: true do
     visit '/good_job'
     expect(page).to have_content 'GoodJob 👍'
 
-    click_on "All Executions"
+    click_on "Executions"
     expect(page).to have_content 'GoodJob 👍'
 
-    click_on "All Jobs"
+    click_on "Jobs"
     expect(page).to have_content 'GoodJob 👍'
 
-    click_on "Cron Schedule"
+    click_on "Cron"
     expect(page).to have_content 'GoodJob 👍'
   end
 
@@ -34,7 +34,7 @@ describe 'Dashboard', type: :system, js: true do
 
       visit '/good_job'
 
-      select "unfinished", from: "job_state_filter"
+      click_on "Unfinished"
 
       expect(page).to have_content 'ExampleJob'
       expect(current_url).to match(/state=unfinished/)
@@ -85,7 +85,7 @@ describe 'Dashboard', type: :system, js: true do
       it "can filter by state" do
         visit root_path
 
-        select "unfinished", from: "job_state_filter"
+        click_on "Unfinished"
 
         expect(current_url).to match(/state=unfinished/)
 
@@ -120,7 +120,7 @@ describe 'Dashboard', type: :system, js: true do
 
       it 'can search by argument' do
         visit '/good_job'
-        click_on "All Jobs"
+        click_on "Jobs"
 
         expect(page).to have_selector('.active_job_job', count: 3)
         fill_in 'query', with: ExampleJob::DEAD_TYPE
@@ -131,7 +131,7 @@ describe 'Dashboard', type: :system, js: true do
 
     it 'can retry discarded jobs' do
       visit '/good_job'
-      click_on "All Jobs"
+      click_on "Jobs"
 
       expect do
         within "##{dom_id(discarded_job)}" do
@@ -143,7 +143,7 @@ describe 'Dashboard', type: :system, js: true do
 
     it 'can discard jobs' do
       visit '/good_job'
-      click_on "All Jobs"
+      click_on "Jobs"
 
       expect do
         within "##{dom_id(unfinished_job)}" do

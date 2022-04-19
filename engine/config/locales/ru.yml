@@ -69,9 +69,9 @@ ru:
         last_update_html: Последнее обновление <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: Запомни, ты делаешь Good Job тоже!
       navbar:
-        cron_schedules: Cron Расписания
-        executions: Все Исполнения
-        jobs: Все Задачи
+        cron_schedules: Cron
+        executions: Исполнения
+        jobs: Задачи
         live_poll: Живой Опрос
         name: "GoodJob 👍"
         processes: Процессы
