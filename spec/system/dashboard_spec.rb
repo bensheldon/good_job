@@ -22,7 +22,7 @@ describe 'Dashboard', type: :system, js: true do
     click_on "Jobs"
     expect(page).to have_content 'GoodJob 👍'
 
-    click_on "Cron Schedule"
+    click_on "Schedules"
     expect(page).to have_content 'GoodJob 👍'
   end
 
