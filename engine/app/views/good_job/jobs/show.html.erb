@@ -1,3 +1,72 @@
-<h1 class="mb-3">ActiveJob ID: <code><%= @executions.first.id %></code></h1>
+<div class="break-out bg-light border-bottom py-2 mb-3">
+  <div class="container-fluid pt-2">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><%= link_to "Jobs", jobs_path %></li>
+        <li class="breadcrumb-item active" aria-current="page">ActiveJob ID: <code><%= @job.id %></code></li>
+      </ol>
+    </nav>
+    <h2 class="mb-1"><code><%= @job.job_class %></code></h2>
+    <div>
+      <%= status_badge @job.status %>
+      <span class="small text-muted">
+        <% if @job.finished_at %>
+          <%= relative_time @job.finished_at, include_seconds: true %>
+          <% if @job.runtime %>
+            • <%= @job.runtime.round(2) %>s runtime
+          <% end %>
+        <% elsif @job.performed_at %>
+          <%= relative_time @job.performed_at, include_seconds: true if @job.performed_at %>
+          <% if @job.runtime %>
+            <span class="small text-muted">(<%= @job.runtime.round(2) %>s runtime)</span>
+          <% end %>
+        <% elsif @job.scheduled_at %>
+          <%= relative_time @job.scheduled_at, include_seconds: true %>
+        <% else %>
+          <%= relative_time @job.created_at, include_seconds: true %>
+        <% end %>
+
+        <% if @job.executions_count > 1 %>
+          • <%= pluralize @job.executions_count, 'attempt' %>
+        <% end %>
+      </span>
+    </div>
+  </div>
+</div>
+
+<table class="table">
+  <tr>
+    <th class="col-1">Queue</th>
+    <td>
+      <%= @job.queue_name %>
+        <% if @job.latency %>
+          <span class="text-muted small">(<%= @job.latency.round(2) %>s latency)</span>
+        <% end %>
+    </td>
+  </tr>
+  <tr>
+    <th>Priority</th>
+    <td><%= @job.priority %></td>
+  </tr>
+
+  <tr>
+    <th>Arguments</th>
+    <td><code><%= @job.serialized_params["arguments"].map(&:inspect).join(', ') %></code></td>
+  </tr>
+
+  <% if @job.recent_error %>
+    <tr>
+      <th>Error</th>
+      <td><pre class="text-danger my-0"><%= @job.recent_error %></pre></td>
+    </tr>
+  <% end %>
+
+  <tr>
+    <th>Params</th>
+    <td><%= tag.pre JSON.pretty_generate(@job.serialized_params) %></td>
+  </tr>
+</table>
+
+
 
 <%= render 'good_job/executions/table', executions: @executions %>

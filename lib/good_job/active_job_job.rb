@@ -104,6 +104,17 @@ module GoodJob
       end
     end
 
+    # Time between when this job was queued and when it started running
+    def latency
+      now = DateTime.current
+      (performed_at || now) - (scheduled_at || created_at) unless (scheduled_at || created_at) > now
+    end
+
+    # Time between when this job whas scheduled and when it started running
+    def runtime
+      finished_at - performed_at if finished_at
+    end
+
     # This job's most recent {Execution}
     # @param reload [Booelan] whether to reload executions
     # @return [Execution]
