@@ -46,7 +46,7 @@
               </td>
               <td>
                 <%= button_to execution_path(execution.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Delete execution", data: { confirm: "Confirm delete" } do %>
-                  <%= render "good_job/shared/icons/trash" %>
+                  <%= render_icon "trash" %>
                 <% end %>
               </td>
             </tr>

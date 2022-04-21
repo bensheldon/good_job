@@ -129,6 +129,45 @@ describe 'Dashboard', type: :system, js: true do
         expect(page).to have_content "Job has been discarded"
       end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
     end
+
+    it 'performs batch job actions' do
+      visit "/good_job"
+      click_on "Jobs"
+
+      expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+
+      check "toggle_job_ids"
+      expect(page).to have_selector('input[type=checkbox]:checked', count: 3)
+
+      uncheck "toggle_job_ids"
+      expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+
+      expect do
+        check "toggle_job_ids"
+        within("table thead") { accept_confirm { click_on "Reschedule all" } }
+        expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+      end.to change { unfinished_job.reload.scheduled_at }.to within(1.second).of(Time.current)
+
+      expect do
+        check "toggle_job_ids"
+        within("table thead") { accept_confirm { click_on "Discard all" } }
+        expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+      end.to change { GoodJob::ActiveJobJob.discarded.count }.from(1).to(2)
+
+      expect do
+        check "toggle_job_ids"
+        within("table thead") { accept_confirm { click_on "Retry all" } }
+        expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+      end.to change { GoodJob::ActiveJobJob.discarded.count }.from(2).to(0)
+
+      visit good_job.jobs_path(limit: 1)
+      expect do
+        check "toggle_job_ids"
+        check "Apply to all 2 jobs"
+        within("table thead") { accept_confirm { click_on "Discard all" } }
+        expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+      end.to change { GoodJob::ActiveJobJob.discarded.count }.from(0).to(2)
+    end
   end
 
   describe "when changing language" do
