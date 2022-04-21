@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 GoodJob::Engine.routes.draw do
-  root to: 'executions#index'
+  root to: redirect(path: 'jobs')
 
   resources :executions, only: %i[destroy]
 
