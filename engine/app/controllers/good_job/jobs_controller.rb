@@ -12,7 +12,7 @@ module GoodJob
     def show
       @executions = GoodJob::Execution.active_job_id(params[:id])
                                       .order(Arel.sql("COALESCE(scheduled_at, created_at) DESC"))
-      redirect_to root_path, alert: "Executions for Active Job #{params[:id]} not found" if @executions.empty?
+      redirect_to jobs_path, alert: "Executions for Active Job #{params[:id]} not found" if @executions.empty?
     end
 
     def discard

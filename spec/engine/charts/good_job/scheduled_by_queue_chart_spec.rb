@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::ScheduledByQueueChart do
-  subject(:chart) { described_class.new(GoodJob::ExecutionsFilter.new({})) }
+  subject(:chart) { described_class.new(GoodJob::JobsFilter.new({})) }
 
   describe "#data" do
     it "returns a hash of chart configuration and data" do

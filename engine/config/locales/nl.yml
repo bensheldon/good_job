@@ -46,7 +46,6 @@ nl:
         wording: 'Onthoud: jij levert ook goed werk!'
       navbar:
         cron_schedules: Cron
-        executions: Uitvoeringen
         jobs: Taken
         live_poll: Live Poll
         name: "GoodJob 👍"

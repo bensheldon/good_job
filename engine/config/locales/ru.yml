@@ -70,7 +70,6 @@ ru:
         wording: Запомни, ты делаешь Good Job тоже!
       navbar:
         cron_schedules: Cron
-        executions: Исполнения
         jobs: Задачи
         live_poll: Живой Опрос
         name: "GoodJob 👍"

@@ -16,37 +16,14 @@ describe 'Dashboard', type: :system, js: true do
     visit '/good_job'
     expect(page).to have_content 'GoodJob 👍'
 
-    click_on "Executions"
-    expect(page).to have_content 'GoodJob 👍'
-
     click_on "Jobs"
     expect(page).to have_content 'GoodJob 👍'
 
     click_on "Cron"
     expect(page).to have_content 'GoodJob 👍'
-  end
 
-  describe 'Executions' do
-    it 'deletes executions and redirects back to applied filter' do
-      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
-
-      ExampleJob.perform_later
-
-      visit '/good_job'
-
-      click_on "Unfinished"
-
-      expect(page).to have_content 'ExampleJob'
-      expect(current_url).to match(/state=unfinished/)
-
-      accept_alert do
-        click_button('Delete execution')
-      end
-
-      expect(page).to have_content 'Job execution deleted'
-      expect(page).not_to have_content 'ExampleJob'
-      expect(current_url).to match(/state=unfinished/)
-    end
+    click_on "Processes"
+    expect(page).to have_content 'GoodJob 👍'
   end
 
   describe 'Jobs' do
@@ -72,46 +49,46 @@ describe 'Dashboard', type: :system, js: true do
       let!(:foo_queue_job) { ConfigurableQueueJob.set(wait: 10.minutes).perform_later(queue_as: 'foo') }
 
       it "can filter by job class" do
-        visit root_path
+        visit good_job.jobs_path
 
         select "ConfigurableQueueJob", from: "job_class_filter"
         expect(current_url).to match(/job_class=ConfigurableQueueJob/)
 
-        table = page.find("#executions_index_table")
+        table = page.find("#jobs-table")
         expect(table).to have_selector("tbody tr", count: 1)
         expect(table).to have_content(foo_queue_job.job_id)
       end
 
       it "can filter by state" do
-        visit root_path
+        visit good_job.jobs_path
 
-        click_on "Unfinished"
+        click_on "Scheduled"
 
-        expect(current_url).to match(/state=unfinished/)
+        expect(current_url).to match(/state=scheduled/)
 
-        table = page.find("#executions_index_table")
+        table = page.find("#jobs-table")
         expect(table).to have_selector("tbody tr", count: 2)
         expect(table).to have_content(foo_queue_job.job_id)
       end
 
       it "can filter by queue" do
-        visit root_path
+        visit good_job.jobs_path
 
         select "foo", from: "job_queue_filter"
         expect(current_url).to match(/queue_name=foo/)
 
-        table = page.find("#executions_index_table")
+        table = page.find("#jobs-table")
         expect(table).to have_selector("tbody tr", count: 1)
         expect(table).to have_content(foo_queue_job.job_id)
       end
 
       it "can filter by multiple variables" do
-        visit root_path
+        visit good_job.jobs_path
 
         select "ConfigurableQueueJob", from: "job_class_filter"
         select "default", from: "job_queue_filter"
 
-        expect(page).to have_content("No executions found.")
+        expect(page).to have_content("No jobs found.")
 
         select "foo", from: "job_queue_filter"
 

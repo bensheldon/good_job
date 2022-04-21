@@ -46,7 +46,6 @@ es:
         wording: "¡Recuerda, también tú estás haciendo un buen trabajo!"
       navbar:
         cron_schedules: Cron
-        executions: Ejecuciones
         jobs: Tareas
         live_poll: En vivo
         name: "GoodJob 👍"
