@@ -46,7 +46,6 @@ en:
         wording: Remember, you're doing a Good Job too!
       navbar:
         cron_schedules: Cron
-        executions: Executions
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
