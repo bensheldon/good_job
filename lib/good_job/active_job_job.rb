@@ -104,15 +104,18 @@ module GoodJob
       end
     end
 
-    # Time between when this job was queued and when it started running
+    # Time between when this job was expected to run and when it started running
     def latency
-      now = DateTime.current
-      (performed_at || now) - (scheduled_at || created_at) unless (scheduled_at || created_at) > now
+      now = Time.zone.now
+      expected_start = scheduled_at || created_at
+      actual_start = performed_at || now
+
+      actual_start - expected_start unless expected_start >= now
     end
 
-    # Time between when this job whas scheduled and when it started running
+    # Time between when this job started and finished
     def runtime
-      finished_at - performed_at if finished_at
+      (finished_at || Time.zone.now) - performed_at if performed_at
     end
 
     # This job's most recent {Execution}

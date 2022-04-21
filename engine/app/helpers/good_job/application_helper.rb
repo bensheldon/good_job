@@ -18,7 +18,7 @@ module GoodJob
                   "badge rounded-pill bg-danger"
                 end
 
-      content_tag :span, status.to_s, class: classes
+      content_tag :span, status.to_s.titleize, class: classes
     end
   end
 end
