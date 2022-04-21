@@ -1,13 +1,20 @@
-<% if notice %>
-  <div class="alert alert-success alert-dismissible fade show d-flex align-items-center offset-md-3 col-6" role="alert">
-    <%= render "good_job/shared/icons/check", class: "flex-shrink-0 me-2" %>
-    <div><%= notice %></div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-<% elsif alert %>
-  <div class="alert alert-warning alert-dismissible fade show d-flex align-items-center offset-md-3 col-6" role="alert">
-    <%= render "good_job/shared/icons/exclamation", class: "flex-shrink-0 me-2" %>
-    <div><%= alert %></div>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-<% end %>
+<div class="toast-container position-fixed p-3 start-50 translate-middle-x">
+  <% if notice %>
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body d-flex align-items-center gap-2">
+        <%= render "good_job/shared/icons/check", class: "flex-shrink-0 text-success" %>
+        <div class="flex-fill"><%= notice %></div>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  <% end %>
+  <% if alert %>
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-body d-flex align-items-center gap-2">
+        <%= render "good_job/shared/icons/exclamation", class: "flex-shrink-0 text-danger" %>
+        <div class="flex-fill"><%= alert %></div>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  <% end %>
+</div>
