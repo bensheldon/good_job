@@ -16,7 +16,11 @@ describe 'Cron Schedules', type: :system do
     expect(cron_entry.last_at).to be_nil
 
     within "##{dom_id(cron_entry)}" do
-      click_on "Run cron entry now"
+      accept_confirm { click_on "Run cron entry now" }
+    end
+
+    wait_until do
+      expect(cron_entry.last_job).to be_present
     end
 
     click_on "Job #{cron_entry.last_job.id}"

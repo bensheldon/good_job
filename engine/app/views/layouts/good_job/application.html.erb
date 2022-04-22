@@ -7,15 +7,18 @@
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
-  <%# Assets must use *_url route helpers to avoid being overriden by config.asset_host %>
-  <%= stylesheet_link_tag bootstrap_url(format: :css, v: GoodJob::VERSION), skip_pipeline: true %>
-  <%= stylesheet_link_tag style_url(format: :css, v: GoodJob::VERSION) %>
+  <%# Do not use asset tag helpers to avoid paths being overriden by config.asset_host %>
+  <%= tag.link rel: "stylesheet", media: "screen", href: bootstrap_path(format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+  <%= tag.link rel: "stylesheet", media: "screen", href: style_path(format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
 
-  <%= javascript_include_tag bootstrap_url(format: :js, v: GoodJob::VERSION), nonce: true %>
-  <%= javascript_include_tag chartjs_url(format: :js, v: GoodJob::VERSION), nonce: true %>
-  <%= javascript_include_tag scripts_url(format: :js, v: GoodJob::VERSION), nonce: true %>
+  <%= tag.script "", src: bootstrap_path(format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+  <%= tag.script "", src: chartjs_path(format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+  <%= tag.script "", src: rails_ujs_path(format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
 
-  <%= javascript_include_tag rails_ujs_url(format: :js, v: GoodJob::VERSION), nonce: true %>
+  <%= tag.script "", src: es_module_shims_path(format: :js, v: GoodJob::VERSION, locale: nil), async: true, nonce: content_security_policy_nonce %>
+  <% importmaps = { imports: GoodJob::AssetsController.js_modules.keys.each_with_object({}) { |module_name, imports| imports[module_name] = modules_path(module_name, format: :js, locale: nil, v: GoodJob::VERSION) } } %>
+  <%= tag.script importmaps.to_json.html_safe, type: "importmap", nonce: content_security_policy_nonce %>
+  <%= tag.script "", src: scripts_path(format: :js, v: GoodJob::VERSION, locale: nil), type: "module", nonce: content_security_policy_nonce %>
 </head>
 <body>
   <div class="d-flex flex-column min-vh-100">

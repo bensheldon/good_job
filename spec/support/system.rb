@@ -44,4 +44,14 @@ RSpec.configure do |config|
       driver_options.add_argument("--no-sandbox")
     end
   end
+
+  config.after(:each, type: :system, js: true) do |example|
+    @previous_browser_logs ||= []
+
+    if example.exception
+      browser_logs = page.driver.browser.manage.logs.get(:browser) - @previous_browser_logs
+      raise "Browser logs:\n\n#{browser_logs.join("\n")}" unless browser_logs.empty?
+    end
+    @previous_browser_logs = page.driver.browser.manage.logs.get(:browser)
+  end
 end

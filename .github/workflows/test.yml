@@ -75,6 +75,8 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+      - uses: browser-actions/setup-chrome@latest
+      - run: chrome --version
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Update .ruby-version with matrix value
@@ -121,7 +123,9 @@ jobs:
         if: failure()
         with:
           name: screenshots
-          path: spec/test_app/tmp/screenshots
+          path: |
+            spec/test_app/tmp/screenshots
+            spec/test_app/tmp/capybara
       - name: Archive Rails logs
         uses: actions/upload-artifact@v2
         if: failure()
