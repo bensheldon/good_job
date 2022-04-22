@@ -1,5 +1,27 @@
 # Changelog
 
+## [v2.13.1](https://github.com/bensheldon/good_job/tree/v2.13.1) (2022-04-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.13.0...v2.13.1)
+
+**Fixed bugs:**
+
+- `ActionMailer::MailDeliveryJob` executing twice [\#329](https://github.com/bensheldon/good_job/issues/329)
+- Email job breaks dashboard [\#313](https://github.com/bensheldon/good_job/issues/313)
+
+**Closed issues:**
+
+- Possible encryption feature? [\#561](https://github.com/bensheldon/good_job/issues/561)
+- Inconsistencies in configuration settings [\#380](https://github.com/bensheldon/good_job/issues/380)
+- Lockable should accept an explicit keys on class methods too [\#341](https://github.com/bensheldon/good_job/issues/341)
+- Run Scheduler\#cache\_warm on global thread pool instead of Scheduler's thread pool [\#286](https://github.com/bensheldon/good_job/issues/286)
+
+**Merged pull requests:**
+
+- Dashboard: Use toasts to show notices and alerts [\#577](https://github.com/bensheldon/good_job/pull/577) ([bkeepers](https://github.com/bkeepers))
+- Remove executions from the dashboard [\#576](https://github.com/bensheldon/good_job/pull/576) ([bkeepers](https://github.com/bkeepers))
+- Use javascript importmaps for Dashboard [\#574](https://github.com/bensheldon/good_job/pull/574) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.13.0](https://github.com/bensheldon/good_job/tree/v2.13.0) (2022-04-19)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.12.2...v2.13.0)
