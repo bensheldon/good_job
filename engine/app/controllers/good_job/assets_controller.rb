@@ -4,7 +4,7 @@ module GoodJob
     skip_before_action :verify_authenticity_token, raise: false
 
     def self.js_modules
-      @_js_modules ||= GoodJob::Engine.root.join("app", "assets", "modules").children.select(&:file?).each_with_object({}) do |file, modules|
+      @_js_modules ||= GoodJob::Engine.root.join("app", "assets", "modules", "good_job").children.select(&:file?).each_with_object({}) do |file, modules|
         key = File.basename(file.basename.to_s, ".js").to_sym
         modules[key] = file
       end
@@ -35,11 +35,11 @@ module GoodJob
     end
 
     def scripts_js
-      render file: GoodJob::Engine.root.join("app", "assets", "scripts.js")
+      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "scripts.js")
     end
 
     def style_css
-      render file: GoodJob::Engine.root.join("app", "assets", "style.css")
+      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "style.css")
     end
 
     def modules_js
