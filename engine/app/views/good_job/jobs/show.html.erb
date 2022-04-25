@@ -5,23 +5,14 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb small mb-0">
             <li class="breadcrumb-item"><%= link_to "Jobs", jobs_path %></li>
-            <li class="breadcrumb-item active" aria-current="page">ActiveJob ID: <code><%= @job.id %></code></li>
+            <li class="breadcrumb-item active" aria-current="page">ActiveJob ID: <%= tag.code @job.id %></li>
           </ol>
         </nav>
-        <h2 class="mb-1"><code><%= @job.job_class %></code></h2>
-        <div>
-          <%= status_badge @job.status %>
-          <span class="small text-muted">
-            <%= relative_time @job.finished_at || @job.performed_at || @job.scheduled_at || @job.created_at, include_seconds: true %>
-
-            <% if @job.runtime %>
-              • <%= @job.runtime.round(2) %>s runtime
-            <% end %>
-
-            <% if @job.executions_count > 1 %>
-              • <%= pluralize @job.executions_count, 'attempt' %>
-            <% end %>
-          </span>
+        <h2 class="mb-1"><%= tag.code @job.job_class %></h2>
+        <div class="text-muted small d-flex gap-2">
+            <div>Queue: <%= tag.strong @job.queue_name %></div>
+            •
+            <div>Priority: <%= tag.strong @job.priority %></div>
         </div>
       </div>
       <div>
@@ -52,37 +43,9 @@
   </div>
 </div>
 
-<table class="table">
-  <tr>
-    <th class="col-1">Queue</th>
-    <td>
-      <%= @job.queue_name %>
-        <% if @job.latency %>
-          <span class="text-muted small">(<%= @job.latency.round(2) %>s latency)</span>
-        <% end %>
-    </td>
-  </tr>
-  <tr>
-    <th>Priority</th>
-    <td><%= @job.priority %></td>
-  </tr>
-
-  <tr>
-    <th>Arguments</th>
-    <td><code><%= @job.serialized_params["arguments"].map(&:inspect).join(', ') %></code></td>
-  </tr>
-
-  <% if @job.recent_error %>
-    <tr>
-      <th>Error</th>
-      <td><pre class="text-danger my-0"><%= @job.recent_error %></pre></td>
-    </tr>
-  <% end %>
-
-  <tr>
-    <th>Params</th>
-    <td><%= tag.pre JSON.pretty_generate(@job.serialized_params) %></td>
-  </tr>
-</table>
+<div class="my-4">
+  <h5>Arguments</h5>
+  <%= tag.pre @job.serialized_params["arguments"].map(&:inspect).join(', ') %>
+</div>
 
 <%= render 'good_job/executions/table', executions: @executions %>

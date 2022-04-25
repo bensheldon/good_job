@@ -16,5 +16,19 @@ module GoodJob
       DEPRECATION
       nil
     end
+
+    # Time between when this job was expected to run and when it started running
+    def latency
+      now = Time.zone.now
+      expected_start = scheduled_at || created_at
+      actual_start = performed_at || now
+
+      actual_start - expected_start unless expected_start >= now
+    end
+
+    # Time between when this job started and finished
+    def runtime
+      (finished_at || Time.zone.now) - performed_at if performed_at
+    end
   end
 end
