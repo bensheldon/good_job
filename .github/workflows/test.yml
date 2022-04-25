@@ -91,7 +91,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: gemfiles/vendor/bundle
-          key: v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-${{ hashFiles('**/Gemfile.lock') }}
+          key: v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-${{ hashFiles('Gemfile.lock', 'gemfiles/*.gemfile.lock') }}
           restore-keys: |
             v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-
       - name: Install Appraisal gems
@@ -106,6 +106,7 @@ jobs:
                                       --require ./spec/support/pre_documentation_formatter.rb \
                                       --format PreDocumentationFormatter
       - name: Run System tests
+        if: ${{ !contains(matrix.ruby, 'jruby') }}
         run: |
           bundle exec appraisal rspec --require ./spec/support/pre_documentation_formatter.rb \
                                       --format PreDocumentationFormatter \
