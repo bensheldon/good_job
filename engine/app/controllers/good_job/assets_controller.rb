@@ -4,7 +4,7 @@ module GoodJob
     skip_before_action :verify_authenticity_token, raise: false
 
     def self.js_modules
-      @_js_modules ||= GoodJob::Engine.root.join("app", "assets", "modules").children.select(&:file?).each_with_object({}) do |file, modules|
+      @_js_modules ||= GoodJob::Engine.root.join("app", "assets", "good_job", "modules").children.select(&:file?).each_with_object({}) do |file, modules|
         key = File.basename(file.basename.to_s, ".js").to_sym
         modules[key] = file
       end
@@ -15,31 +15,31 @@ module GoodJob
     end
 
     def es_module_shims_js
-      render file: GoodJob::Engine.root.join("app", "assets", "vendor", "es_module_shims.js")
+      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "es_module_shims.js")
     end
 
     def bootstrap_css
-      render file: GoodJob::Engine.root.join("app", "assets", "vendor", "bootstrap", "bootstrap.min.css")
+      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "bootstrap", "bootstrap.min.css")
     end
 
     def bootstrap_js
-      render file: GoodJob::Engine.root.join("app", "assets", "vendor", "bootstrap", "bootstrap.bundle.min.js")
+      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "bootstrap", "bootstrap.bundle.min.js")
     end
 
     def chartjs_js
-      render file: GoodJob::Engine.root.join("app", "assets", "vendor", "chartjs", "chart.min.js")
+      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "chartjs", "chart.min.js")
     end
 
     def rails_ujs_js
-      render file: GoodJob::Engine.root.join("app", "assets", "vendor", "rails_ujs.js")
+      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "rails_ujs.js")
     end
 
     def scripts_js
-      render file: GoodJob::Engine.root.join("app", "assets", "scripts.js")
+      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "scripts.js")
     end
 
     def style_css
-      render file: GoodJob::Engine.root.join("app", "assets", "style.css")
+      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "style.css")
     end
 
     def modules_js
