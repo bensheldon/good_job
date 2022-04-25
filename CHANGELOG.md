@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.13.2](https://github.com/bensheldon/good_job/tree/v2.13.2) (2022-04-25)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.13.1...v2.13.2)
+
+**Merged pull requests:**
+
+- Namespaces assets per Rails docs [\#580](https://github.com/bensheldon/good_job/pull/580) ([kylekthompson](https://github.com/kylekthompson))
+
 ## [v2.13.1](https://github.com/bensheldon/good_job/tree/v2.13.1) (2022-04-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.13.0...v2.13.1)
