@@ -64,6 +64,9 @@ describe GoodJob do
       described_class.cleanup_preserved_jobs
 
       expect(ActiveSupport::Notifications).to have_received(:instrument).at_least(:once)
+
+      # Manually remove the stub to prevent the instrumentation from affecting multi-threaded teardown
+      ::RSpec::Mocks.space.proxy_for(ActiveSupport::Notifications).remove_stub(:instrument)
     end
   end
 end
