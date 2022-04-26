@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.14.1](https://github.com/bensheldon/good_job/tree/v2.14.1) (2022-04-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.14.0...v2.14.1)
+
+**Fixed bugs:**
+
+- Temporarily disable Mass Action "Apply to all" because the action is badly scoped [\#583](https://github.com/bensheldon/good_job/pull/583) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.14.0](https://github.com/bensheldon/good_job/tree/v2.14.0) (2022-04-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.13.2...v2.14.0)
