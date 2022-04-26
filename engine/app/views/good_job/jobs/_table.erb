@@ -36,16 +36,6 @@
                 <% end %>
               </div>
           </tr>
-          <tr class="d-none" data-checkbox-toggle-show="job_ids">
-            <td class="text-center table-warning" colspan="10">
-              <% all_jobs_count = local_assigns[:all_jobs_count] %>
-              <label>
-                <%= check_box_tag "all_job_ids", 1, false, disabled: true, data: { "checkbox-toggle-show": "job_ids"} %>
-                Apply to all <%= all_jobs_count.present? ? number_with_delimiter(all_jobs_count) : "" %> <%= "job".pluralize(all_jobs_count || 99) %>.
-                <em>This could be a lot.</em>
-              </label>
-            </td>
-          </tr>
         </thead>
         <tbody>
           <% if jobs.present? %>
