@@ -1,16 +1,37 @@
 # Changelog
 
+## [v2.14.0](https://github.com/bensheldon/good_job/tree/v2.14.0) (2022-04-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.13.2...v2.14.0)
+
+**Implemented enhancements:**
+
+- Add mass update operations for jobs to Dashboard [\#578](https://github.com/bensheldon/good_job/pull/578) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Allow "mass"-actions through Dashboard \(e.g. retry all\) [\#446](https://github.com/bensheldon/good_job/issues/446)
+
+**Merged pull requests:**
+
+- Track down incompatibility/race condition between JRuby and RSpec mocks in tests [\#581](https://github.com/bensheldon/good_job/pull/581) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.13.2](https://github.com/bensheldon/good_job/tree/v2.13.2) (2022-04-25)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.13.1...v2.13.2)
 
-**Merged pull requests:**
+**Fixed bugs:**
 
 - Namespaces assets per Rails docs [\#580](https://github.com/bensheldon/good_job/pull/580) ([kylekthompson](https://github.com/kylekthompson))
 
 ## [v2.13.1](https://github.com/bensheldon/good_job/tree/v2.13.1) (2022-04-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.13.0...v2.13.1)
+
+**Implemented enhancements:**
+
+- Dashboard: Use toasts to show notices and alerts [\#577](https://github.com/bensheldon/good_job/pull/577) ([bkeepers](https://github.com/bkeepers))
+- Remove executions from the dashboard [\#576](https://github.com/bensheldon/good_job/pull/576) ([bkeepers](https://github.com/bkeepers))
 
 **Fixed bugs:**
 
@@ -26,8 +47,6 @@
 
 **Merged pull requests:**
 
-- Dashboard: Use toasts to show notices and alerts [\#577](https://github.com/bensheldon/good_job/pull/577) ([bkeepers](https://github.com/bkeepers))
-- Remove executions from the dashboard [\#576](https://github.com/bensheldon/good_job/pull/576) ([bkeepers](https://github.com/bkeepers))
 - Use javascript importmaps for Dashboard [\#574](https://github.com/bensheldon/good_job/pull/574) ([bensheldon](https://github.com/bensheldon))
 
 ## [v2.13.0](https://github.com/bensheldon/good_job/tree/v2.13.0) (2022-04-19)
@@ -50,10 +69,13 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.12.1...v2.12.2)
 
+**Fixed bugs:**
+
+- Un-deprecate Adapter's `execution_mode` argument [\#567](https://github.com/bensheldon/good_job/pull/567) ([bensheldon](https://github.com/bensheldon))
+
 **Merged pull requests:**
 
 - Dashboard: added NL translations [\#568](https://github.com/bensheldon/good_job/pull/568) ([eelcoj](https://github.com/eelcoj))
-- Un-deprecate Adapter's `execution_mode` argument [\#567](https://github.com/bensheldon/good_job/pull/567) ([bensheldon](https://github.com/bensheldon))
 
 ## [v2.12.1](https://github.com/bensheldon/good_job/tree/v2.12.1) (2022-04-18)
 
