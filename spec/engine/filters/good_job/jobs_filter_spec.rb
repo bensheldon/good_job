@@ -96,6 +96,12 @@ RSpec.describe GoodJob::JobsFilter do
     end
   end
 
+  describe '#filtered_query_count' do
+    it 'returns a count of unlimited items' do
+      expect(filter.filtered_query_count).to eq 4
+    end
+  end
+
   %w[
     scheduled
     retried

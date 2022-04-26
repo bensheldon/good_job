@@ -3,7 +3,7 @@ require "selenium-webdriver"
 
 Capybara.default_max_wait_time = 2
 Capybara.server = :puma, { Silent: true }
-Capybara.disable_animation = true
+Capybara.disable_animation = true # injects CSP-incompatible CSS and JS
 
 module SystemTestHelpers
   [

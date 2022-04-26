@@ -13,8 +13,7 @@ module GoodJob
     end
 
     def filtered_query
-      query = base_query.includes(:executions)
-                        .joins_advisory_locks.select("#{GoodJob::ActiveJobJob.table_name}.*", 'pg_locks.locktype AS locktype')
+      query = base_query.includes(:executions).includes_advisory_locks
 
       query = query.job_class(params[:job_class]) if params[:job_class].present?
       query = query.where(queue_name: params[:queue_name]) if params[:queue_name].present?
@@ -38,6 +37,10 @@ module GoodJob
       end
 
       query
+    end
+
+    def filtered_query_count
+      filtered_query.unscope(:select).count
     end
 
     private

@@ -5,6 +5,11 @@ GoodJob::Engine.routes.draw do
   resources :executions, only: %i[destroy]
 
   resources :jobs, only: %i[index show] do
+    collection do
+      get :mass_update, to: redirect(path: 'jobs')
+      put :mass_update
+    end
+
     member do
       put :discard
       put :reschedule

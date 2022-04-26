@@ -153,6 +153,18 @@ RSpec.describe GoodJob::Lockable do
     end
   end
 
+  describe '.includes_advisory_locks' do
+    it 'includes the locktable data' do
+      execution.advisory_lock!
+
+      record = model_class.where(id: execution.id).includes_advisory_locks.first
+      expect(record['locktype']).to eq "advisory"
+      expect(record['owns_advisory_lock']).to be true
+
+      execution.advisory_unlock
+    end
+  end
+
   describe '#advisory_lock' do
     it 'results in a locked record' do
       execution.advisory_lock!
