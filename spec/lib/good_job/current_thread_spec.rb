@@ -33,7 +33,7 @@ RSpec.describe GoodJob::CurrentThread do
       it 'is resettable' do
         described_class.send "#{accessor}=", 'apple'
         described_class.reset
-        expect(described_class.send(accessor)).to eq nil
+        expect(described_class.send(accessor)).to be_nil
       end
     end
   end

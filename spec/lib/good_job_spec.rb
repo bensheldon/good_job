@@ -10,8 +10,8 @@ describe GoodJob do
     it 'shuts down all scheduler and notifier instances' do
       described_class.shutdown
 
-      expect(scheduler.shutdown?).to eq true
-      expect(notifier.shutdown?).to eq true
+      expect(scheduler.shutdown?).to be true
+      expect(notifier.shutdown?).to be true
     end
   end
 

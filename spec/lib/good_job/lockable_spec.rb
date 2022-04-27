@@ -112,7 +112,7 @@ RSpec.describe GoodJob::Lockable do
         model_class.advisory_lock_key(execution.lockable_key) do
           promise = Concurrent::Promises.future do
             result = model_class.advisory_lock_key(execution.lockable_key) { raise }
-            expect(result).to eq nil
+            expect(result).to be_nil
           end
           expect { promise.value! }.not_to raise_error
         end
@@ -178,9 +178,9 @@ RSpec.describe GoodJob::Lockable do
     end
 
     it 'returns true or false if the lock is acquired' do
-      expect(execution.advisory_lock).to eq true
+      expect(execution.advisory_lock).to be true
 
-      expect(Concurrent::Promises.future(execution, &:advisory_lock).value!).to eq false
+      expect(Concurrent::Promises.future(execution, &:advisory_lock).value!).to be false
 
       execution.advisory_unlock
     end
@@ -232,8 +232,8 @@ RSpec.describe GoodJob::Lockable do
     it 'returns true or false if the unlock operation is successful' do
       execution.advisory_lock
 
-      expect(Concurrent::Promises.future(execution, &:advisory_unlock).value!).to eq false
-      expect(execution.advisory_unlock).to eq true
+      expect(Concurrent::Promises.future(execution, &:advisory_unlock).value!).to be false
+      expect(execution.advisory_unlock).to be true
 
       unless RUBY_PLATFORM.include?('java')
         expect(POSTGRES_NOTICES.first).to include "you don't own a lock of type ExclusiveLock"
@@ -244,20 +244,20 @@ RSpec.describe GoodJob::Lockable do
 
   describe '#advisory_locked?' do
     it 'reflects whether the record is locked' do
-      expect(execution.advisory_locked?).to eq false
+      expect(execution.advisory_locked?).to be false
       execution.advisory_lock
-      expect(execution.advisory_locked?).to eq true
+      expect(execution.advisory_locked?).to be true
       execution.advisory_unlock
-      expect(execution.advisory_locked?).to eq false
+      expect(execution.advisory_locked?).to be false
     end
 
     it 'is accurate even if the execution has been destroyed' do
       execution.advisory_lock
-      expect(execution.advisory_locked?).to eq true
+      expect(execution.advisory_locked?).to be true
       execution.destroy!
-      expect(execution.advisory_locked?).to eq true
+      expect(execution.advisory_locked?).to be true
       execution.advisory_unlock
-      expect(execution.advisory_locked?).to eq false
+      expect(execution.advisory_locked?).to be false
     end
   end
 
@@ -278,7 +278,7 @@ RSpec.describe GoodJob::Lockable do
 
       model_class.advisory_unlock_session
 
-      expect(execution.advisory_locked?).to eq false
+      expect(execution.advisory_locked?).to be false
     end
   end
 

@@ -4,6 +4,7 @@ source "https://rubygems.org"
 
 gem "activerecord-jdbcpostgresql-adapter", platforms: [:jruby]
 gem "appraisal", branch: "fix-bundle-env", git: "https://github.com/bensheldon/appraisal.git"
+gem "nokogiri", "~> 1.12.0"
 gem "pg", platforms: [:mri, :mingw, :x64_mingw]
 gem "rails", "~> 7.0.0"
 gem "selenium-webdriver", "~> 4.0"
@@ -15,7 +16,9 @@ platforms :ruby do
   gem "rbtrace"
 
   group :lint do
+    gem "easy_translate"
     gem "erb_lint", ">= 0.0.35"
+    gem "i18n-tasks"
     gem "mdl"
     gem "rubocop"
     gem "rubocop-performance"

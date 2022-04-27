@@ -22,7 +22,7 @@ describe ActiveJob::QueueAdapters::GoodJobAdapter do
 
       it 'runs async' do
         adapter = described_class.new
-        expect(adapter.execute_async?).to eq true
+        expect(adapter.execute_async?).to be true
       end
     end
 
@@ -31,7 +31,7 @@ describe ActiveJob::QueueAdapters::GoodJobAdapter do
 
       it 'runs inline' do
         adapter = described_class.new
-        expect(adapter.execute_inline?).to eq true
+        expect(adapter.execute_inline?).to be true
       end
     end
 
@@ -40,7 +40,7 @@ describe ActiveJob::QueueAdapters::GoodJobAdapter do
 
       it 'runs in normal mode' do
         adapter = described_class.new
-        expect(adapter.execute_inline?).to eq false
+        expect(adapter.execute_inline?).to be false
       end
     end
   end
