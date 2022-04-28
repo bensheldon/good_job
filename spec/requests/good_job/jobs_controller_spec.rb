@@ -11,7 +11,7 @@ describe GoodJob::JobsController, type: :request do
 
   before do
     allow(GoodJob).to receive(:preserve_job_records).and_return(true)
-    ExampleJob.enable_test_adapter(GoodJob::Adapter.new(execution_mode: :inline))
+    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
   end
 
   describe 'GET #index' do
@@ -125,6 +125,20 @@ describe GoodJob::JobsController, type: :request do
         job.reload
         expect(job.finished_at).to be_present
         expect(job.error).to include "Discarded through dashboard"
+      end
+
+      it 'scopes changes to the current filter' do
+        put good_job.mass_update_jobs_path, params: {
+          mass_action: 'discard',
+          all_job_ids: 1,
+          state: 'finished',
+        }
+
+        expect(response).to have_http_status(:found)
+        expect(flash[:notice]).to eq('No jobs were discarded')
+
+        job.reload
+        expect(job.finished_at).to be_blank
       end
     end
   end

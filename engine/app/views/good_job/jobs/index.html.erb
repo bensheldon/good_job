@@ -2,7 +2,7 @@
 <%= render 'good_job/shared/chart', chart_data: GoodJob::ScheduledByQueueChart.new(@filter).data %>
 
 <div data-live-poll-region="jobs-table">
-  <%= render 'good_job/jobs/table', jobs: @filter.records, all_jobs_count: @filter.filtered_query_count %>
+  <%= render 'good_job/jobs/table', jobs: @filter.records, filter: @filter %>
   <% if @filter.records.present? %>
     <nav aria-label="Job pagination" class="mt-3">
       <ul class="pagination">

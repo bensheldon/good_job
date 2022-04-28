@@ -18,6 +18,7 @@ module GoodJob
       query = query.job_class(params[:job_class]) if params[:job_class].present?
       query = query.where(queue_name: params[:queue_name]) if params[:queue_name].present?
       query = query.search_text(params[:query]) if params[:query].present?
+      query = query.where(cron_key: params[:cron_key]) if params[:cron_key].present?
 
       if params[:state]
         case params[:state]
@@ -39,7 +40,7 @@ module GoodJob
       query
     end
 
-    def filtered_query_count
+    def filtered_count
       filtered_query.unscope(:select).count
     end
 

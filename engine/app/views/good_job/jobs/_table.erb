@@ -1,6 +1,6 @@
 <div class="my-3">
   <div class="table-responsive">
-    <%= form_with(url: mass_update_jobs_path, method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
+    <%= form_with(url: mass_update_jobs_path(filter.to_params), method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
       <table class="table table-hover table-sm mb-0 table-jobs">
         <thead>
           <tr>
@@ -35,6 +35,15 @@
                   <%= render_icon "arrow_clockwise" %> All
                 <% end %>
               </div>
+            </th>
+          </tr>
+          <tr class="d-none" data-checkbox-toggle-show="job_ids">
+            <td class="text-center table-warning" colspan="10">
+              <label>
+                <%= check_box_tag "all_job_ids", 1, false, disabled: true, data: { "checkbox-toggle-show": "job_ids"} %>
+                Apply to all <%= filter.filtered_count %> <%= "job".pluralize(filter.filtered_count) %>.
+              </label>
+            </td>
           </tr>
         </thead>
         <tbody>
