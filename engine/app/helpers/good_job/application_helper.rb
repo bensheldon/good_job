@@ -47,7 +47,7 @@ module GoodJob
 
     def status_icon(status, **options)
       options[:class] ||= "text-#{STATUS_COLOR.fetch(status)}"
-      icon = render("good_job/shared/icons/#{STATUS_ICONS.fetch(status)}")
+      icon = render_icon STATUS_ICONS.fetch(status)
       content_tag :span, icon, **options
     end
 
