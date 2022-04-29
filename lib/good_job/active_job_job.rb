@@ -72,7 +72,7 @@ module GoodJob
 
     # The status of the Job, based on the state of its most recent execution.
     # @return [Symbol]
-    delegate :status, to: :head_execution
+    delegate :status, :last_status_at, to: :head_execution
 
     # This job's most recent {Execution}
     # @param reload [Booelan] whether to reload executions

@@ -312,6 +312,11 @@ module GoodJob
       serialized_params.fetch('executions', 0) + 1
     end
 
+    # The last relevant timestamp for this execution
+    def last_status_at
+      finished_at || performed_at || scheduled_at || created_at
+    end
+
     private
 
     def active_job_data
