@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module GoodJob
   module ApplicationHelper
-    def duration(sec)
+    def format_duration(sec)
       return unless sec
 
       if sec < 1

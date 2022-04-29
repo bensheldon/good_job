@@ -14,10 +14,10 @@
               <%= relative_time execution.finished_at || execution.performed_at || execution.scheduled_at || execution.created_at, include_seconds: true %>
 
               <% if execution.runtime %>
-                • <div><%= duration execution.runtime %> runtime</div>
+                • <div><%= format_duration execution.runtime %> runtime</div>
               <% end %>
               <% if execution.latency %>
-                • <div><%= duration execution.latency %> latency</div>
+                • <div><%= format_duration execution.latency %> latency</div>
               <% end %>
             </div>
           </div>
