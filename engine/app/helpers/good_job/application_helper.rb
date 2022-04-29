@@ -50,5 +50,11 @@ module GoodJob
       icon = render("good_job/shared/icons/#{STATUS_ICONS.fetch(status)}")
       content_tag :span, icon, **options
     end
+
+    def render_icon(name)
+      # workaround to render svg icons without all of the log messages
+      partial = lookup_context.find_template("good_job/shared/icons/#{name}", [], true)
+      partial.render(self, {})
+    end
   end
 end

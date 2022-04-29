@@ -82,6 +82,16 @@ module GoodJob
         joins(sanitize_sql_for_conditions([join_sql, { table_name: table_name }]))
       end)
 
+      # Joins the current query with Postgres's +pg_locks+ table AND SELECTs the resulting columns
+      # @!method joins_advisory_locks(column: _advisory_lockable_column)
+      # @!scope class
+      # @param column [String, Symbol] column values to Advisory Lock against
+      # @return [ActiveRecord::Relation]
+      scope :includes_advisory_locks, (lambda do |column: _advisory_lockable_column|
+        owns_advisory_lock_sql = "#{connection.quote_table_name('pg_locks')}.#{connection.quote_column_name('pid')} = pg_backend_pid() AS owns_advisory_lock"
+        joins_advisory_locks(column: column).select("#{quoted_table_name}.*, #{connection.quote_table_name('pg_locks')}.locktype, #{owns_advisory_lock_sql}")
+      end)
+
       # Find records that do not have an advisory lock on them.
       # @!method advisory_unlocked(column: _advisory_lockable_column)
       # @!scope class

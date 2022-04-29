@@ -107,7 +107,7 @@ RSpec.describe GoodJob::ActiveJobJob do
     context 'when advisory_locks are eagerloaded' do
       it 'is true if the job is Advisory Locked' do
         job.with_advisory_lock do
-          eagerloaded_job = described_class.where(active_job_id: job.id).joins_advisory_locks.select('good_jobs.*', 'pg_locks.locktype AS locktype').first
+          eagerloaded_job = described_class.where(active_job_id: job.id).includes_advisory_locks.first
           expect(eagerloaded_job).to be_running
         end
       end
@@ -115,7 +115,7 @@ RSpec.describe GoodJob::ActiveJobJob do
 
     it 'is true if the job is Advisory Locked' do
       job.with_advisory_lock do
-        job_with_locktype = described_class.where(active_job_id: job.id).joins_advisory_locks.select('good_jobs.*', 'pg_locks.locktype AS locktype').first
+        job_with_locktype = described_class.where(active_job_id: job.id).includes_advisory_locks.first
         expect(job_with_locktype).to be_running
       end
     end

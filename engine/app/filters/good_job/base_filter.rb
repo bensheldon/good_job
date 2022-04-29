@@ -54,6 +54,9 @@ module GoodJob
       raise NotImplementedError
     end
 
+    # def filtered_query_count
+    delegate :count, to: :filtered_query, prefix: true
+
     private
 
     def default_base_query

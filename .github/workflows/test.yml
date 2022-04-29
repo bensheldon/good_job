@@ -75,6 +75,8 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
+      - uses: browser-actions/setup-chrome@latest
+      - run: chrome --version
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Update .ruby-version with matrix value
@@ -89,7 +91,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: gemfiles/vendor/bundle
-          key: v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-${{ hashFiles('**/Gemfile.lock') }}
+          key: v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-${{ hashFiles('Gemfile.lock', 'gemfiles/*.gemfile.lock') }}
           restore-keys: |
             v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-
       - name: Install Appraisal gems
@@ -104,6 +106,7 @@ jobs:
                                       --require ./spec/support/pre_documentation_formatter.rb \
                                       --format PreDocumentationFormatter
       - name: Run System tests
+        if: ${{ !contains(matrix.ruby, 'jruby') }}
         run: |
           bundle exec appraisal rspec --require ./spec/support/pre_documentation_formatter.rb \
                                       --format PreDocumentationFormatter \
@@ -121,7 +124,9 @@ jobs:
         if: failure()
         with:
           name: screenshots
-          path: spec/test_app/tmp/screenshots
+          path: |
+            spec/test_app/tmp/screenshots
+            spec/test_app/tmp/capybara
       - name: Archive Rails logs
         uses: actions/upload-artifact@v2
         if: failure()

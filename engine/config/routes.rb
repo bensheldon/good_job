@@ -5,6 +5,11 @@ GoodJob::Engine.routes.draw do
   resources :executions, only: %i[destroy]
 
   resources :jobs, only: %i[index show] do
+    collection do
+      get :mass_update, to: redirect(path: 'jobs')
+      put :mass_update
+    end
+
     member do
       put :discard
       put :reschedule
@@ -20,7 +25,7 @@ GoodJob::Engine.routes.draw do
 
   resources :processes, only: %i[index]
 
-  scope controller: :assets do
+  scope :assets, controller: :assets do
     constraints(format: :css) do
       get :bootstrap, action: :bootstrap_css
       get :style, action: :style_css
@@ -28,8 +33,10 @@ GoodJob::Engine.routes.draw do
 
     constraints(format: :js) do
       get :bootstrap, action: :bootstrap_js
-      get :rails_ujs, action: :rails_ujs_js
       get :chartjs, action: :chartjs_js
+      get :rails_ujs, action: :rails_ujs_js
+      get :es_module_shims, action: :es_module_shims_js
+      get "modules/:module", action: :modules_js, as: :modules
       get :scripts, action: :scripts_js
     end
   end

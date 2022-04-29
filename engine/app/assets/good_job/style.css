@@ -30,3 +30,7 @@
   position:relative;
   left:calc(-1 * (100vw - 100%)/2);
 }
+
+.toast-container {
+  z-index: 1;
+}

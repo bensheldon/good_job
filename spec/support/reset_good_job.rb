@@ -13,7 +13,7 @@ RSpec.configure do |config|
     THREAD_ERRORS.clear
     Thread.current.name = "RSpec: #{example.description}"
     GoodJob.on_thread_error = lambda do |exception|
-      THREAD_ERRORS << [Thread.current.name, exception]
+      THREAD_ERRORS << [Thread.current.name, exception, exception.backtrace]
     end
 
     example.run

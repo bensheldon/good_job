@@ -118,7 +118,7 @@ module GoodJob
     # Tests whether the job is being executed right now.
     # @return [Boolean]
     def running?
-      # Avoid N+1 Query: `.joins_advisory_locks.select('good_jobs.*', 'pg_locks.locktype AS locktype')`
+      # Avoid N+1 Query: `.includes_advisory_locks`
       if has_attribute?(:locktype)
         self['locktype'].present?
       else
@@ -127,7 +127,7 @@ module GoodJob
     end
 
     # Retry a job that has errored and been discarded.
-    # This action will create a new job {Execution} record.
+    # This action will create a new {Execution} record for the job.
     # @return [ActiveJob::Base]
     def retry_job
       with_advisory_lock do
@@ -135,7 +135,7 @@ module GoodJob
         active_job = execution.active_job
 
         raise AdapterNotGoodJobError unless active_job.class.queue_adapter.is_a? GoodJob::Adapter
-        raise ActionForStateMismatchError unless status == :discarded
+        raise ActionForStateMismatchError if execution.finished_at.blank? || execution.error.blank?
 
         # Update the executions count because the previous execution will not have been preserved
         # Do not update `exception_executions` because that comes from rescue_from's arguments
@@ -146,7 +146,7 @@ module GoodJob
           current_thread.execution = execution
 
           execution.class.transaction(joinable: false, requires_new: true) do
-            new_active_job = active_job.retry_job(wait: 0, error: error)
+            new_active_job = active_job.retry_job(wait: 0, error: execution.error)
             execution.save
           end
         end
@@ -159,10 +159,10 @@ module GoodJob
     # @return [void]
     def discard_job(message)
       with_advisory_lock do
-        raise ActionForStateMismatchError unless status.in? [:scheduled, :queued, :retried]
-
         execution = head_execution(reload: true)
         active_job = execution.active_job
+
+        raise ActionForStateMismatchError if execution.finished_at.present?
 
         job_error = GoodJob::ActiveJobJob::DiscardJobError.new(message)
 
@@ -186,7 +186,9 @@ module GoodJob
     # @return [void]
     def reschedule_job(scheduled_at = Time.current)
       with_advisory_lock do
-        raise ActionForStateMismatchError unless status.in? [:scheduled, :queued, :retried]
+        execution = head_execution(reload: true)
+
+        raise ActionForStateMismatchError if execution.finished_at.present?
 
         execution = head_execution(reload: true)
         execution.update(scheduled_at: scheduled_at)
