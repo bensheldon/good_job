@@ -98,7 +98,7 @@ RSpec.describe GoodJob::Adapter do
       let(:adapter) { described_class.new(execution_mode: :async_all) }
 
       it 'returns true' do
-        expect(adapter.execute_async?).to eq true
+        expect(adapter.execute_async?).to be true
       end
     end
 
@@ -111,8 +111,8 @@ RSpec.describe GoodJob::Adapter do
         end
 
         it 'returns true' do
-          expect(adapter.execute_async?).to eq true
-          expect(adapter.execute_externally?).to eq false
+          expect(adapter.execute_async?).to be true
+          expect(adapter.execute_externally?).to be false
         end
       end
 
@@ -122,8 +122,8 @@ RSpec.describe GoodJob::Adapter do
         end
 
         it 'returns false' do
-          expect(adapter.execute_async?).to eq false
-          expect(adapter.execute_externally?).to eq true
+          expect(adapter.execute_async?).to be false
+          expect(adapter.execute_externally?).to be true
         end
       end
     end
@@ -137,8 +137,8 @@ RSpec.describe GoodJob::Adapter do
         end
 
         it 'returns true' do
-          expect(adapter.execute_async?).to eq true
-          expect(adapter.execute_externally?).to eq false
+          expect(adapter.execute_async?).to be true
+          expect(adapter.execute_externally?).to be false
         end
       end
 
@@ -148,8 +148,8 @@ RSpec.describe GoodJob::Adapter do
         end
 
         it 'returns false' do
-          expect(adapter.execute_async?).to eq false
-          expect(adapter.execute_externally?).to eq true
+          expect(adapter.execute_async?).to be false
+          expect(adapter.execute_externally?).to be true
         end
       end
     end

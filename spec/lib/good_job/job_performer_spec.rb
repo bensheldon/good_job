@@ -26,16 +26,16 @@ RSpec.describe GoodJob::JobPerformer do
       state = { queue_name: 'elephants' }
 
       result = described_class.new('*').next?(state)
-      expect(result).to eq true
+      expect(result).to be true
 
       result = described_class.new('elephants').next?(state)
-      expect(result).to eq true
+      expect(result).to be true
 
       result = described_class.new('-elephants').next?(state)
-      expect(result).to eq false
+      expect(result).to be false
 
       result = described_class.new('mice').next?(state)
-      expect(result).to eq false
+      expect(result).to be false
     end
   end
 

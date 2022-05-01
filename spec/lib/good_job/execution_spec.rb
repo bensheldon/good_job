@@ -46,10 +46,10 @@ RSpec.describe GoodJob::Execution do
 
     it 'can be created with an advisory lock' do
       unlocked_execution = described_class.enqueue(active_job)
-      expect(unlocked_execution.advisory_locked?).to eq false
+      expect(unlocked_execution.advisory_locked?).to be false
 
       locked_execution = described_class.enqueue(active_job, create_with_advisory_lock: true)
-      expect(locked_execution.advisory_locked?).to eq true
+      expect(locked_execution.advisory_locked?).to be true
 
       locked_execution.advisory_unlock
     end
@@ -73,13 +73,13 @@ RSpec.describe GoodJob::Execution do
 
       expect(result).to be_a GoodJob::ExecutionResult
       expect(result.value).to eq 'a string'
-      expect(result.unhandled_error).to eq nil
+      expect(result.unhandled_error).to be_nil
 
       described_class.enqueue(TestJob.new(true, raise_error: true))
       errored_result = described_class.all.perform_with_advisory_lock
 
       expect(result).to be_a GoodJob::ExecutionResult
-      expect(errored_result.value).to eq nil
+      expect(errored_result.value).to be_nil
       expect(errored_result.unhandled_error).to be_an TestJob::ExpectedError
     end
   end
@@ -184,21 +184,21 @@ RSpec.describe GoodJob::Execution do
 
     it 'is true when locked' do
       good_job.with_advisory_lock do
-        expect(good_job.executable?).to eq true
+        expect(good_job.executable?).to be true
       end
     end
 
     it 'is false when job no longer exists' do
       good_job.with_advisory_lock do
         good_job.destroy!
-        expect(good_job.executable?).to eq false
+        expect(good_job.executable?).to be false
       end
     end
 
     it 'is false when the job has finished' do
       good_job.with_advisory_lock do
         good_job.update! finished_at: Time.current
-        expect(good_job.executable?).to eq false
+        expect(good_job.executable?).to be false
       end
     end
   end
@@ -227,7 +227,7 @@ RSpec.describe GoodJob::Execution do
         it 'returns the error' do
           result = good_job.perform
 
-          expect(result.value).to eq nil
+          expect(result.value).to be_nil
           expect(result.unhandled_error).to be_an_instance_of TestJob::ExpectedError
         end
 
@@ -283,7 +283,7 @@ RSpec.describe GoodJob::Execution do
           it 'returns the error' do
             result = good_job.perform
 
-            expect(result.value).to eq nil
+            expect(result.value).to be_nil
             expect(result.unhandled_error).to be_an_instance_of TestJob::ExpectedError
           end
 
@@ -297,7 +297,7 @@ RSpec.describe GoodJob::Execution do
               it 'returns the error' do
                 result = good_job.perform
 
-                expect(result.value).to eq nil
+                expect(result.value).to be_nil
                 expect(result.handled_error).to be_an_instance_of TestJob::ExpectedError
               end
             end
@@ -310,7 +310,7 @@ RSpec.describe GoodJob::Execution do
               it 'returns the error' do
                 result = good_job.perform
 
-                expect(result.value).to eq nil
+                expect(result.value).to be_nil
                 expect(result.handled_error).to be_an_instance_of TestJob::ExpectedError
               end
             end
@@ -384,7 +384,7 @@ RSpec.describe GoodJob::Execution do
       it 'returns the results of the job' do
         result = good_job.perform
 
-        expect(result.value).to eq nil
+        expect(result.value).to be_nil
         expect(result.unhandled_error).to be_a(TestJob::ExpectedError)
       end
 

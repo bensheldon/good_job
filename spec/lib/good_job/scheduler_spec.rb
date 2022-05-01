@@ -103,21 +103,21 @@ RSpec.describe GoodJob::Scheduler do
       scheduler = described_class.from_configuration(configuration)
 
       scheduler.create_thread(queue_name: 'mice')
-      expect(scheduler.create_thread(queue_name: 'mice')).to eq nil
+      expect(scheduler.create_thread(queue_name: 'mice')).to be_nil
     end
 
     it 'returns true if the state matches the performer' do
       configuration = GoodJob::Configuration.new({ queues: 'mice:2' })
       scheduler = described_class.from_configuration(configuration)
 
-      expect(scheduler.create_thread(queue_name: 'mice')).to eq true
+      expect(scheduler.create_thread(queue_name: 'mice')).to be true
     end
 
     it 'returns false if the state does not match the performer' do
       configuration = GoodJob::Configuration.new({ queues: 'mice:2' })
       scheduler = described_class.from_configuration(configuration)
 
-      expect(scheduler.create_thread(queue_name: 'elephant')).to eq false
+      expect(scheduler.create_thread(queue_name: 'elephant')).to be false
     end
   end
 
