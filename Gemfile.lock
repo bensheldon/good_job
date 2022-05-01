@@ -231,6 +231,7 @@ GEM
     mail (2.7.1)
       mini_mime (>= 0.1.1)
     marcel (1.0.2)
+    matrix (0.4.2)
     mdl (0.11.0)
       kramdown (~> 2.3)
       kramdown-parser-gfm (~> 1.1)
@@ -436,6 +437,7 @@ DEPENDENCIES
   i18n-tasks
   kramdown
   kramdown-parser-gfm
+  matrix
   mdl
   memory_profiler
   nokogiri (~> 1.12.0)
@@ -456,4 +458,4 @@ DEPENDENCIES
   yard-activesupport-concern
 
 BUNDLED WITH
-   2.3.7
+   2.3.5

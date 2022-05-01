@@ -14,6 +14,7 @@ gemspec
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'appraisal', github: "bensheldon/appraisal", branch: "fix-bundle-env" # https://github.com/thoughtbot/appraisal/pull/174
+gem 'matrix'
 gem 'nokogiri', '~> 1.12.0' # Compatible with Ruby 2.5 / JRuby 9.2
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 gem 'rails'
