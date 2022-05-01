@@ -59,14 +59,14 @@ describe GoodJob do
     end
 
     it 'is instrumented' do
-      allow(ActiveSupport::Notifications).to receive(:instrument).and_call_original
+      payloads = []
+      callback = proc { |*args| payloads << args }
 
-      described_class.cleanup_preserved_jobs
+      ActiveSupport::Notifications.subscribed(callback, "cleanup_preserved_jobs.good_job") do
+        described_class.cleanup_preserved_jobs
+      end
 
-      expect(ActiveSupport::Notifications).to have_received(:instrument).at_least(:once)
-
-      # Manually remove the stub to prevent the instrumentation from affecting multi-threaded teardown
-      ::RSpec::Mocks.space.proxy_for(ActiveSupport::Notifications).remove_stub(:instrument)
+      expect(payloads.size).to eq 1
     end
   end
 end
