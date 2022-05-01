@@ -9,10 +9,15 @@ RSpec.describe GoodJob::JobsFilter do
   before do
     allow(GoodJob).to receive(:retry_on_unhandled_error).and_return(false)
     allow(GoodJob).to receive(:preserve_job_records).and_return(true)
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
 
+    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+    ExampleJob.set(queue: 'cron').perform_later
+    GoodJob::ActiveJobJob.order(created_at: :asc).last.update!(cron_key: "frequent_cron")
+
+    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
     ExampleJob.set(queue: 'default').perform_later('success')
     ExampleJob.set(queue: 'mice').perform_later('error_once')
+
     begin
       ExampleJob.set(queue: 'elephants').perform_later('dead')
     rescue ExampleJob::DeadError
@@ -34,7 +39,7 @@ RSpec.describe GoodJob::JobsFilter do
   describe '#job_classes' do
     it 'is a valid result' do
       expect(filter.job_classes).to eq({
-                                         'ExampleJob' => 4,
+                                         'ExampleJob' => 5,
                                        })
     end
   end
@@ -42,6 +47,7 @@ RSpec.describe GoodJob::JobsFilter do
   describe '#queues' do
     it 'is a valid result' do
       expect(filter.queues).to eq({
+                                    "cron" => 1,
                                     "default" => 2,
                                     "elephants" => 1,
                                     "mice" => 1,
@@ -54,7 +60,7 @@ RSpec.describe GoodJob::JobsFilter do
       expect(filter.states).to eq({
                                     "scheduled" => 0,
                                     "retried" => 0,
-                                    "queued" => 0,
+                                    "queued" => 1,
                                     "running" => 1,
                                     "finished" => 2,
                                     "discarded" => 1,
@@ -64,7 +70,7 @@ RSpec.describe GoodJob::JobsFilter do
 
   describe '#records' do
     it 'is a valid result' do
-      expect(filter.records.size).to eq 4
+      expect(filter.records.size).to eq 5
     end
 
     context 'when filtered by state' do
@@ -94,11 +100,21 @@ RSpec.describe GoodJob::JobsFilter do
         end
       end
     end
+
+    context 'when filtered by cron_key' do
+      before do
+        params[:cron_key] = 'frequent_cron'
+      end
+
+      it 'filters results' do
+        expect(filter.records.size).to eq 1
+      end
+    end
   end
 
-  describe '#filtered_query_count' do
+  describe '#filtered_count' do
     it 'returns a count of unlimited items' do
-      expect(filter.filtered_query_count).to eq 4
+      expect(filter.filtered_count).to eq 5
     end
   end
 

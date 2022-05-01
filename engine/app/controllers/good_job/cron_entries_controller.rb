@@ -6,12 +6,12 @@ module GoodJob
     end
 
     def show
-      @cron_entry = CronEntry.find(params[:id])
+      @cron_entry = CronEntry.find(params[:cron_key])
       @jobs_filter = JobsFilter.new(params, @cron_entry.jobs)
     end
 
     def enqueue
-      @cron_entry = CronEntry.find(params[:id])
+      @cron_entry = CronEntry.find(params[:cron_key])
       @cron_entry.enqueue(Time.current)
       redirect_back(fallback_location: cron_entries_path, notice: "Cron entry has been enqueued.")
     end

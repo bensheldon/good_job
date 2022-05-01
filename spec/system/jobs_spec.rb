@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-describe 'Dashboard', type: :system, js: true do
+describe 'Jobs', type: :system, js: true do
   before do
     allow(GoodJob).to receive(:retry_on_unhandled_error).and_return(false)
     allow(GoodJob).to receive(:preserve_job_records).and_return(true)
   end
 
   it 'renders chart js' do
-    visit '/good_job'
+    visit good_job.jobs_path
     expect(page).to have_content 'GoodJob 👍'
   end
 
   it 'renders each top-level page successfully' do
-    visit '/good_job'
+    visit good_job.jobs_path
     expect(page).to have_content 'GoodJob 👍'
 
     click_on "Jobs"
@@ -28,12 +28,12 @@ describe 'Dashboard', type: :system, js: true do
 
   describe 'Jobs' do
     let(:unfinished_job) do
-      ExampleJob.set(wait: 10.minutes).perform_later
+      ExampleJob.set(wait: 10.minutes, queue: :mice).perform_later
       GoodJob::ActiveJobJob.order(created_at: :asc).last
     end
 
     let(:discarded_job) do
-      ExampleJob.perform_later(ExampleJob::DEAD_TYPE)
+      ExampleJob.set(queue: :elephants).perform_later(ExampleJob::DEAD_TYPE)
     rescue StandardError
       GoodJob::ActiveJobJob.order(created_at: :asc).last
     end
@@ -86,7 +86,7 @@ describe 'Dashboard', type: :system, js: true do
         visit good_job.jobs_path
 
         select "ConfigurableQueueJob", from: "job_class_filter"
-        select "default", from: "job_queue_filter"
+        select "mice", from: "job_queue_filter"
 
         expect(page).to have_content("No jobs found.")
 
@@ -160,26 +160,13 @@ describe 'Dashboard', type: :system, js: true do
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
       end.to change { GoodJob::ActiveJobJob.discarded.count }.from(2).to(0)
 
-      # visit good_job.jobs_path(limit: 1)
-      # expect do
-      #   check "toggle_job_ids"
-      #   check "Apply to all 2 jobs"
-      #   within("table thead") { accept_confirm { click_on "Discard all" } }
-      #   expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
-      # end.to change { GoodJob::ActiveJobJob.discarded.count }.from(0).to(2)
-    end
-  end
-
-  describe "when changing language" do
-    it "changes wording from English to Spanish" do
-      visit good_job_path(locale: :en)
-
-      expect(page).to have_content "Processes"
-      find("#localeOptions").click
-      within ".navbar" do
-        click_on "es"
-      end
-      expect(page).to have_content "Procesos"
+      visit good_job.jobs_path(limit: 1)
+      expect do
+        check "toggle_job_ids"
+        check "Apply to all 2 jobs"
+        within("table thead") { accept_confirm { click_on "Discard all" } }
+        expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+      end.to change { GoodJob::ActiveJobJob.discarded.count }.from(0).to(2)
     end
   end
 end

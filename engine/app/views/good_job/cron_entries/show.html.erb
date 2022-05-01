@@ -3,4 +3,4 @@
 <% end %>
 
 <%= render 'good_job/shared/filter', title: title, filter: @jobs_filter %>
-<%= render 'good_job/jobs/table', jobs: @jobs_filter.records %>
+<%= render 'good_job/jobs/table', jobs: @jobs_filter.records, filter: @jobs_filter %>

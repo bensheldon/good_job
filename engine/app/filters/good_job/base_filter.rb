@@ -47,6 +47,7 @@ module GoodJob
         queue_name: params[:queue_name],
         query: params[:query],
         state: params[:state],
+        cron_key: params[:cron_key],
       }.merge(override).delete_if { |_, v| v.blank? }
     end
 
@@ -54,8 +55,9 @@ module GoodJob
       raise NotImplementedError
     end
 
-    # def filtered_query_count
-    delegate :count, to: :filtered_query, prefix: true
+    def filtered_count
+      filtered_query.count
+    end
 
     private
 
