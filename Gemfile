@@ -2,6 +2,14 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
+# To change the ruby version, modify the .ruby-version file in the project root
+ruby_version_path = File.join(File.dirname(__FILE__), '.ruby-version')
+if File.exist?(ruby_version_path)
+  ruby_version = Gem::Version.new(File.read(ruby_version_path).strip)
+  tripled_ruby_version = ruby_version.segments.size < 3 ? "#{ruby_version}.0" : ruby_version.to_s
+  ruby "~> #{tripled_ruby_version}"
+end
+
 # Declare your gem's dependencies in good_job.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
