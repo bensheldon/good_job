@@ -54,7 +54,7 @@ describe 'Dashboard', type: :system, js: true do
         select "ConfigurableQueueJob", from: "job_class_filter"
         expect(current_url).to match(/job_class=ConfigurableQueueJob/)
 
-        table = page.find("#jobs-table")
+        table = page.find(".table-jobs")
         expect(table).to have_selector("tbody tr", count: 1)
         expect(table).to have_content(foo_queue_job.job_id)
       end
@@ -66,7 +66,7 @@ describe 'Dashboard', type: :system, js: true do
 
         expect(current_url).to match(/state=scheduled/)
 
-        table = page.find("#jobs-table")
+        table = page.find(".table-jobs")
         expect(table).to have_selector("tbody tr", count: 2)
         expect(table).to have_content(foo_queue_job.job_id)
       end
@@ -77,7 +77,7 @@ describe 'Dashboard', type: :system, js: true do
         select "foo", from: "job_queue_filter"
         expect(current_url).to match(/queue_name=foo/)
 
-        table = page.find("#jobs-table")
+        table = page.find(".table-jobs")
         expect(table).to have_selector("tbody tr", count: 1)
         expect(table).to have_content(foo_queue_job.job_id)
       end

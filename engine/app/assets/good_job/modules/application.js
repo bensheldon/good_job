@@ -4,11 +4,13 @@ import renderCharts from "charts";
 import checkboxToggle from "checkbox_toggle";
 import documentReady from "document_ready";
 import showToasts from "toasts";
-import Poller from "poller";
+import LivePoll from "live_poll";
 
 documentReady(function() {
   renderCharts();
   showToasts();
   checkboxToggle();
-  Poller.start();
+
+  const livePoll = new LivePoll
+  livePoll.start();
 });

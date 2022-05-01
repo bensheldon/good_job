@@ -1,7 +1,7 @@
-<div class="my-3" data-gj-poll-replace id="jobs-table">
+<div class="my-3">
   <div class="table-responsive">
     <%= form_with(url: mass_update_jobs_path, method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
-      <table class="table table-hover table-sm mb-0">
+      <table class="table table-hover table-sm mb-0 table-jobs">
         <thead>
           <tr>
             <th><%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %></th>
