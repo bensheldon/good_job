@@ -60,6 +60,9 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [CLI HTTP health check probes](#cli-http-health-check-probes)
 - [Contribute](#contribute)
     - [Gem development](#gem-development)
+        - [Development setup](#development-setup)
+        - [Rails development harness](#rails-development-harness)
+        - [Running tests](#running-tests)
     - [Release](#release)
 - [License](#license)
 
@@ -941,47 +944,80 @@ spec:
 
 ## Contribute
 
-Contributions are welcomed and appreciated 🙏
+<!-- Please keep this section in sync with CONTRIBUTING.md -->
+
+All contributions, from feedback to code and beyond, are welcomed and appreciated 🙏
 
 - Review the [Prioritized Project Backlog](https://github.com/bensheldon/good_job/projects/1).
 - Open a new Issue or contribute to an [existing Issue](https://github.com/bensheldon/good_job/issues). Questions or suggestions are fantastic.
-- Participate according to our [Code of Conduct](https://github.com/bensheldon/good_job/projects/1).
+- Participate according to our [Code of Conduct](/CODE_OF_CONDUCT.md).
+- Financially support the project via [Sponsorship](https://github.com/sponsors/bensheldon).
+
+For gem development and debugging information, please review the [README's Gem Development section](/README.md#gem-development).
 
 ### Gem development
 
-To run tests:
+#### Development setup
 
 ```bash
 # Clone the repository locally
-$ git clone git@github.com:bensheldon/good_job.git
+git clone git@github.com:bensheldon/good_job.git
 
 # Set up the local environment
-$ bin/setup
-
-# Run the tests
-$ bin/rspec
+bin/setup
 ```
 
-This gem uses Appraisal to run tests against multiple versions of Rails:
+#### Rails development harness
+
+A Rails application exists within `spec/test_app` that is used for development, test, and GoodJob Demo environments.
 
 ```bash
-# Install Appraisal(s) gemfiles
-$ bundle exec appraisal
+# Run a local development webserver
+bin/rails s
 
-# Run tests
-$ bundle exec appraisal bin/rspec
+# Disable job execution and cron for cleaner console output
+GOOD_JOB_ENABLE_CRON=0 GOOD_JOB_EXECUTION_MODE=external bin/rails s
+
+# Open the Rails console
+bin/rails c
 ```
 
 For developing locally within another Ruby on Rails project:
 
 ```bash
-# Within Ruby on Rails directory...
-$ bundle config local.good_job /path/to/local/git/repository
+# Within Ruby on Rails project directory
+# Ensure that the Gemfile is set to git with a branch e.g.
+# gem "good_job", git: "https://github.com/bensheldon/good_job.git", branch: "main"
+# Then, override the Bundle config to point to the local filesystem's good_job repository
+bundle config local.good_job /path/to/local/good_job/repository
 
 # Confirm that the local copy is used
-$ bundle install
+bundle install
 
 # => Using good_job 0.1.0 from https://github.com/bensheldon/good_job.git (at /Users/You/Projects/good_job@dc57fb0)
+```
+
+#### Running tests
+
+Tests can be run against the primary development environment:
+
+```bash
+bin/rspec
+```
+
+Environment variables that may help with debugging:
+
+- `LOUD=1`: display all stdout/stderr output from all sources. This is helpful because GoodJob wraps some tests with `quiet { }` for cleaner test output, but it can hinder debugging.
+- `SHOW_BROWSER=1`: Run system tests headfully with Chrome/Chromedriver. Use `binding.irb` in the system tests to pause.
+
+Appraisal can be used to run a test matrix of multiple versions of Rails:
+
+```bash
+# Install Appraisal matrix of gemfiles
+bin/appraisal
+
+# Run tests against matrix
+bin/appraisal bin/rspec
 ```
 
 ### Release

@@ -23,6 +23,7 @@ AllCops:
     - vendor/**/*
     - scripts/**/*
     - gemfiles/**/*
+    - Brewfile
   NewCops: enable
 
 Layout/EmptyLineAfterMagicComment:
