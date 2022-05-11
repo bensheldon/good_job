@@ -14,6 +14,7 @@ GoodJob::Engine.routes.draw do
       put :discard
       put :reschedule
       put :retry
+      delete :delete
     end
   end
 
