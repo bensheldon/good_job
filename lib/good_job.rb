@@ -136,11 +136,14 @@ module GoodJob
   # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be deleted (default: +86400+).
   # @return [Integer] Number of jobs that were deleted.
   def self.cleanup_preserved_jobs(older_than: nil)
-    older_than ||= GoodJob::Configuration.new({}).cleanup_preserved_jobs_before_seconds_ago
+    configuration = GoodJob::Configuration.new({})
+    older_than ||= configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
+    include_discarded = configuration.cleanup_discarded_jobs?
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
       old_jobs = GoodJob::ActiveJobJob.where('finished_at <= ?', timestamp)
+      old_jobs = old_jobs.not_discarded unless include_discarded
       old_jobs_count = old_jobs.count
 
       GoodJob::Execution.where(job: old_jobs).delete_all
