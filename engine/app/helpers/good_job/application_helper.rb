@@ -5,15 +5,15 @@ module GoodJob
       return unless sec
 
       if sec < 1
-        format "%{ms}dms", ms: sec * 1000
+        t('duration.milliseconds', ms: sec * 1000)
       elsif sec < 10
-        format "%{sec}.2fs", sec: sec
+        t('duration.less_than_10_seconds', sec: sec)
       elsif sec < 60
-        format "%{sec}ds", sec: sec
+        t('duration.seconds', sec: sec)
       elsif sec < 3600
-        format "%{min}dm%{sec}ds", min: sec / 60, sec: sec % 60
+        t('duration.minutes', min: sec / 60, sec: sec % 60)
       else
-        format "%{hour}dh%{min}dm", hour: sec / 3600, min: (sec % 3600) / 60
+        t('duration.hours', hour: sec / 3600, min: (sec % 3600) / 60)
       end
     end
 

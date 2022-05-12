@@ -1,5 +1,11 @@
 ---
 en:
+  duration:
+    milliseconds: "%<ms>dms"
+    less_than_10_seconds: "%<sec>.2fs"
+    seconds: "%<sec>ds"
+    minutes: "%<min>dm%<sec>ds"
+    hours: "%<hour>dh%<min>dm"
   datetime:
     distance_in_words:
       about_x_hours:
