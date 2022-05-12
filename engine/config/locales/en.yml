@@ -1,11 +1,5 @@
 ---
 en:
-  duration:
-    milliseconds: "%<ms>dms"
-    less_than_10_seconds: "%<sec>.2fs"
-    seconds: "%<sec>ds"
-    minutes: "%<min>dm%<sec>ds"
-    hours: "%<hour>dh%<min>dm"
   datetime:
     distance_in_words:
       about_x_hours:
@@ -45,6 +39,12 @@ en:
       x_years:
         one: 1 year
         other: "%{count} years"
+  duration:
+    hours: "%<hour>dh%<min>dm"
+    less_than_10_seconds: "%<sec>.2fs"
+    milliseconds: "%<ms>dms"
+    minutes: "%<min>dm%<sec>ds"
+    seconds: "%<sec>ds"
   good_job:
     shared:
       footer:
