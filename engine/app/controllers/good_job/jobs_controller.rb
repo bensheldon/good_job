@@ -22,7 +22,7 @@ module GoodJob
       raise ActionController::BadRequest, "#{mass_action} is not a valid mass action" unless mass_action.in?(ACTIONS.keys)
 
       jobs = if params[:all_job_ids]
-               ActiveJobJob.all
+               JobsFilter.new(params).filtered_query
              else
                job_ids = params.fetch(:job_ids, [])
                ActiveJobJob.where(active_job_id: job_ids)
@@ -49,7 +49,7 @@ module GoodJob
                  "No jobs were #{ACTIONS[mass_action]}"
                end
 
-      redirect_to jobs_path, notice: notice
+      redirect_back(fallback_location: jobs_path, notice: notice)
     end
 
     def show

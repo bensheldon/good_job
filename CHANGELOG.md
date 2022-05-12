@@ -1,5 +1,23 @@
 # Changelog
 
+## [v2.14.2](https://github.com/bensheldon/good_job/tree/v2.14.2) (2022-05-01)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.14.1...v2.14.2)
+
+**Fixed bugs:**
+
+- Reintroduce fixed "Apply to all" mass action [\#586](https://github.com/bensheldon/good_job/pull/586) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- how to get the number of tasks in the queue and the size of the queue? [\#564](https://github.com/bensheldon/good_job/issues/564)
+- GoodJob tells me to upgrade but migrations fail [\#544](https://github.com/bensheldon/good_job/issues/544)
+
+**Merged pull requests:**
+
+- Update development dependencies [\#584](https://github.com/bensheldon/good_job/pull/584) ([bensheldon](https://github.com/bensheldon))
+- Refactor Dashboard Live Poll javascript [\#582](https://github.com/bensheldon/good_job/pull/582) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.14.1](https://github.com/bensheldon/good_job/tree/v2.14.1) (2022-04-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.14.0...v2.14.1)

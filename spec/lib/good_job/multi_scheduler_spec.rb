@@ -15,7 +15,7 @@ RSpec.describe GoodJob::MultiScheduler do
         allow(scheduler_2).to receive(:create_thread).and_return(false)
 
         result = multi_scheduler.create_thread(state)
-        expect(result).to eq true
+        expect(result).to be true
 
         expect(scheduler_1).to have_received(:create_thread)
         expect(scheduler_2).to have_received(:create_thread)
@@ -27,7 +27,7 @@ RSpec.describe GoodJob::MultiScheduler do
 
       it 'delegates to all schedulers if they return nil' do
         result = multi_scheduler.create_thread(state)
-        expect(result).to eq nil
+        expect(result).to be_nil
 
         expect(scheduler_1).to have_received(:create_thread).with(state)
         expect(scheduler_2).to have_received(:create_thread).with(state)
@@ -38,7 +38,7 @@ RSpec.describe GoodJob::MultiScheduler do
         allow(scheduler_2).to receive(:create_thread).and_return(false)
 
         result = multi_scheduler.create_thread(state)
-        expect(result).to eq false
+        expect(result).to be false
 
         expect(scheduler_1).to have_received(:create_thread)
         expect(scheduler_2).to have_received(:create_thread)
@@ -49,7 +49,7 @@ RSpec.describe GoodJob::MultiScheduler do
         allow(scheduler_2).to receive(:create_thread).and_return(false)
 
         result = multi_scheduler.create_thread(state)
-        expect(result).to eq true
+        expect(result).to be true
 
         expect(scheduler_1).to have_received(:create_thread)
         expect(scheduler_2).not_to have_received(:create_thread)

@@ -10,10 +10,16 @@ def system!(*args)
 end
 
 FileUtils.chdir GEM_ROOT do
+  puts "\n== Installing gem dependencies =="
   system!('bundle install')
 end
 
 FileUtils.chdir APP_ROOT do
-  system!('bundle exec bin/rails db:setup')
-  system!('bundle exec bin/rails db:migrate')
+  puts "\n== Setting up database =="
+  system!('bin/rails db:setup')
+  system!('bin/rails db:test:prepare')
+  system!('bin/rails db:migrate')
 end
+
+puts "\n== Verifying system dependencies =="
+system("chromedriver -v") || abort("\n!!! Chrome/Chromedriver must be installed to run Rails System tests\n\n")

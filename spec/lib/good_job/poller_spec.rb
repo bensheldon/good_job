@@ -24,14 +24,18 @@ RSpec.describe GoodJob::Poller do
   describe 'polling' do
     it 'is instrumented' do
       stub_const 'POLL_COUNT', Concurrent::AtomicFixnum.new(0)
-      allow(ActiveSupport::Notifications).to receive(:instrument)
 
-      recipient = proc { |_payload| POLL_COUNT.increment }
-      poller = described_class.new(recipient, poll_interval: 1)
-      sleep_until(max: 5, increments_of: 0.5) { POLL_COUNT.value > 1 }
-      poller.shutdown
+      payloads = []
+      callback = proc { |*args| payloads << args }
 
-      expect(ActiveSupport::Notifications).to have_received(:instrument).at_least(:once)
+      ActiveSupport::Notifications.subscribed(callback, "finished_timer_task") do
+        recipient = proc { |_payload| POLL_COUNT.increment }
+        poller = described_class.new(recipient, poll_interval: 1)
+        sleep_until(max: 5, increments_of: 0.5) { POLL_COUNT.value > 1 }
+        poller.shutdown
+      end
+
+      expect(payloads.size).to be >= 1
     end
   end
 

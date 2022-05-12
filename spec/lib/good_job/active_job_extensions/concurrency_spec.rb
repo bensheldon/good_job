@@ -25,14 +25,14 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
 
       it "does not enqueue if limit is exceeded for a particular key" do
         expect(TestJob.perform_later(name: "Alice")).to be_present
-        expect(TestJob.perform_later(name: "Alice")).to eq false
+        expect(TestJob.perform_later(name: "Alice")).to be false
       end
 
       it "is inclusive of both performing and enqueued jobs" do
         expect(TestJob.perform_later(name: "Alice")).to be_present
 
         GoodJob::Execution.all.with_advisory_lock do
-          expect(TestJob.perform_later(name: "Alice")).to eq false
+          expect(TestJob.perform_later(name: "Alice")).to be false
         end
       end
     end
@@ -50,7 +50,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(TestJob.perform_later(name: "Alice")).to be_present
 
         # Third usage of key does not enqueue
-        expect(TestJob.perform_later(name: "Alice")).to eq false
+        expect(TestJob.perform_later(name: "Alice")).to be false
 
         # Usage of different key does enqueue
         expect(TestJob.perform_later(name: "Bob")).to be_present

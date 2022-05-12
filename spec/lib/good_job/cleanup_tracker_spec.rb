@@ -9,7 +9,7 @@ describe GoodJob::CleanupTracker do
 
         1000.times { tracker.increment }
         travel_to 1.year.from_now do
-          expect(tracker.cleanup?).to eq false
+          expect(tracker.cleanup?).to be false
         end
       end
     end
@@ -18,10 +18,10 @@ describe GoodJob::CleanupTracker do
       tracker = described_class.new(cleanup_interval_seconds: nil, cleanup_interval_jobs: 10)
 
       10.times { tracker.increment }
-      expect(tracker.cleanup?).to eq false
+      expect(tracker.cleanup?).to be false
 
       tracker.increment
-      expect(tracker.cleanup?).to eq true
+      expect(tracker.cleanup?).to be true
     end
   end
 

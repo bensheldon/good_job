@@ -31,7 +31,7 @@ RSpec.describe GoodJob::Notifier do
       sleep_until(max: 5, increments_of: 0.5) { RECEIVED_MESSAGE.true? }
       notifier.shutdown
 
-      expect(RECEIVED_MESSAGE.true?).to eq true
+      expect(RECEIVED_MESSAGE.true?).to be true
     end
 
     it 'raises exception to GoodJob.on_thread_error' do
