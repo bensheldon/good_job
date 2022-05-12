@@ -35,7 +35,7 @@
         <% end %>
 
         <%= button_to retry_job_path(@job.id), method: :put, class: "btn btn-sm #{@job.status == :discarded ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: @job.status != :discarded, aria: { label: "Retry job" }, title: "Retry job", data: { confirm: "Confirm retry" } do %>
-          <%= render "arrow_clockwise" %>
+          <%= render_icon "arrow_clockwise" %>
           Retry
         <% end %>
       </div>
