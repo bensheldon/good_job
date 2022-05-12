@@ -223,7 +223,7 @@ RSpec.describe GoodJob::ActiveJobJob do
   describe '#latency' do
     it 'is nil for future scheduled job' do
       job.scheduled_at = 1.minute.from_now
-      expect(job.latency).to be(nil)
+      expect(job.latency).to be_nil
     end
 
     it 'is distance between scheduled_at and now for past scheduled job' do
@@ -245,7 +245,7 @@ RSpec.describe GoodJob::ActiveJobJob do
 
   describe "#runtime" do
     it 'is nil for queued job' do
-      expect(job.runtime).to be(nil)
+      expect(job.runtime).to be_nil
     end
 
     it 'is distance between performed_at and now for started job' do
