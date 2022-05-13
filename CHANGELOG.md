@@ -1,5 +1,25 @@
 # Changelog
 
+## [v2.14.3](https://github.com/bensheldon/good_job/tree/v2.14.3) (2022-05-13)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.14.2...v2.14.3)
+
+**Fixed bugs:**
+
+- Bind probe server to all interfaces [\#598](https://github.com/bensheldon/good_job/pull/598) ([Timmitry](https://github.com/Timmitry))
+
+**Closed issues:**
+
+- NoMethodError: undefined method `current\_tags' for nil:NilClass  [\#596](https://github.com/bensheldon/good_job/issues/596)
+- When running rspec, I get: current transaction is aborted, commands ignored until end of transaction block [\#595](https://github.com/bensheldon/good_job/issues/595)
+- CLI healtheck only listening on localhost, not reachable for Kubernetes [\#592](https://github.com/bensheldon/good_job/issues/592)
+
+**Merged pull requests:**
+
+- Improve development instructions and tooling \(rename bin/rails, add bin/appraisal\) [\#590](https://github.com/bensheldon/good_job/pull/590) ([bensheldon](https://github.com/bensheldon))
+- Replace test Instrumentation mocking with temporary subscriptions [\#589](https://github.com/bensheldon/good_job/pull/589) ([bensheldon](https://github.com/bensheldon))
+- Update to development to Ruby 3.0.4, include `matrix` gem in development Gemfile [\#588](https://github.com/bensheldon/good_job/pull/588) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.14.2](https://github.com/bensheldon/good_job/tree/v2.14.2) (2022-05-01)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.14.1...v2.14.2)
