@@ -11,12 +11,20 @@ RSpec.describe GoodJob::ProbeServer do
   end
 
   describe '#start' do
-    it 'starts a webrick server' do
+    it 'starts a webrick server that binds to all interfaces' do
       probe_server.start
       wait_until(max: 1) { expect(probe_server).to be_running }
 
-      response = Net::HTTP.get("127.0.0.1", "/", port)
-      expect(response).to eq("OK")
+      ip_addresses = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address)
+      expect(ip_addresses.size).to be >= 2
+      expect(ip_addresses).to include("127.0.0.1")
+
+      aggregate_failures do
+        ip_addresses.each do |ip_address|
+          response = Net::HTTP.get(ip_address, "/", port)
+          expect(response).to eq("OK")
+        end
+      end
     end
   end
 
