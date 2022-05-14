@@ -5,15 +5,15 @@ module GoodJob
       return unless sec
 
       if sec < 1
-        t('duration.milliseconds', ms: sec * 1000)
+        t 'duration.milliseconds', ms: (sec * 1000).floor
       elsif sec < 10
-        t('duration.less_than_10_seconds', sec: sec)
+        t 'duration.less_than_10_seconds', sec: sec.floor
       elsif sec < 60
-        t('duration.seconds', sec: sec)
+        t 'duration.seconds', sec: sec.floor
       elsif sec < 3600
-        t('duration.minutes', min: sec / 60, sec: sec % 60)
+        t 'duration.minutes', min: (sec / 60).floor, sec: (sec % 60).floor
       else
-        t('duration.hours', hour: sec / 3600, min: (sec % 3600) / 60)
+        t 'duration.hours', hour: (sec / 3600).floor, min: ((sec % 3600) / 60).floor
       end
     end
 
