@@ -99,13 +99,9 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(GoodJob::Execution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
       end
 
-      context 'when run with perform_now' do
-        it 'error and enqueue the job when concurrency is exceeded' do
-          TestJob.perform_now(name: "Alice")
-
-          expect(GoodJob::Job.count).to eq 1
-          expect(JOB_PERFORMED).to be_false
-        end
+      it 'is ignored with the job is executed via perform_now' do
+        TestJob.perform_now(name: "Alice")
+        expect(JOB_PERFORMED).to be_true
       end
     end
   end
