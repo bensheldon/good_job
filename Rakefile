@@ -8,6 +8,7 @@ end
 require 'dotenv/load'
 require_relative "lib/good_job/version"
 Rake.load_rakefile 'spec/test_app/Rakefile'
+Bundler::GemHelper.install_tasks
 
 require 'rdoc/task'
 
@@ -24,7 +25,7 @@ def system!(*args)
 end
 
 desc 'Commit version and changelog'
-task :release, [:version_bump] do |_t, args|
+task :release_good_job, [:version_bump] do |_t, args|
   version_bump = args[:version_bump]
   if version_bump.nil?
     puts "Pass a version [major|minor|patch|pre|release] or a given version number [x.x.x]:"
@@ -52,8 +53,11 @@ task :release, [:version_bump] do |_t, args|
     exit(1)
   end
 
+  puts "\n== Creating gem package and checksum =="
+  system! "bundle exec rake build:checksum"
+
   puts "\n== Creating git commit  =="
-  system! "git add lib/good_job/version.rb CHANGELOG.md Gemfile.lock"
+  system! "git add lib/good_job/version.rb CHANGELOG.md Gemfile.lock checksums"
   system! "git commit -m \"Release good_job v#{GoodJob::VERSION}\""
   system! "git tag v#{GoodJob::VERSION}"
 
@@ -61,6 +65,7 @@ task :release, [:version_bump] do |_t, args|
   changelog_anchor = "v#{GoodJob::VERSION.delete('.')}-#{Time.now.utc.strftime('%Y-%m-%d')}"
   changelog_url = "https://github.com/bensheldon/good_job/blob/main/CHANGELOG.md##{changelog_anchor}"
 
+  puts "\n"
   puts <<~INSTRUCTIONS
     == Next steps ==
 

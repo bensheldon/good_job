@@ -1032,7 +1032,7 @@ $ gem signin
 # CHANGELOG_GITHUB_TOKEN= # Github Personal Access Token
 
 # Update version number, changelog, and create git commit:
-$ bundle exec rake release[minor] # major,minor,patch
+$ bundle exec rake release_good_job[minor] # major,minor,patch
 
 # ..and follow subsequent directions.
 ```
