@@ -61,6 +61,11 @@ module GoodJob
           key = job.good_job_concurrency_key
           next if key.blank?
 
+          if CurrentThread.execution.blank?
+            logger.debug("Ignoring concurrency limits because the job is executed with `perform_now`.")
+            next
+          end
+
           GoodJob::Execution.advisory_lock_key(key, function: "pg_advisory_lock") do
             allowed_active_job_ids = GoodJob::Execution.unfinished.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(perform_limit).pluck(:active_job_id)
             # The current job has already been locked and will appear in the previous query
