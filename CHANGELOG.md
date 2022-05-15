@@ -1,5 +1,13 @@
 # Changelog
 
+## [v2.14.4](https://github.com/bensheldon/good_job/tree/v2.14.4) (2022-05-15)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.14.3...v2.14.4)
+
+**Fixed bugs:**
+
+- Fix Concurrency extension to not break `perform_now` [\#593](https://github.com/bensheldon/good_job/pull/593) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.14.3](https://github.com/bensheldon/good_job/tree/v2.14.3) (2022-05-13)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.14.2...v2.14.3)
