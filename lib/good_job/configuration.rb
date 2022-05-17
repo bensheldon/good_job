@@ -171,7 +171,7 @@ module GoodJob
       cron.map { |cron_key, params| GoodJob::CronEntry.new(params.merge(key: cron_key)) }
     end
 
-    # Whether to delete discarded jobs when cleaning up preserved jobs.
+    # Whether to destroy discarded jobs when cleaning up preserved jobs.
     # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
     # @return [Boolean]
     def cleanup_discarded_jobs?

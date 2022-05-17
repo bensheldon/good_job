@@ -2,8 +2,8 @@
 module GoodJob
   class ExecutionsController < GoodJob::ApplicationController
     def destroy
-      deleted_count = GoodJob::Execution.where(id: params[:id]).delete_all
-      message = deleted_count.positive? ? { notice: "Job execution deleted" } : { alert: "Job execution not deleted" }
+      destroyed_count = GoodJob::Execution.where(id: params[:id]).destroy_all
+      message = destroyed_count.positive? ? { notice: "Job execution destroyed" } : { alert: "Job execution not destroyed" }
       redirect_back fallback_location: jobs_path, **message
     end
   end

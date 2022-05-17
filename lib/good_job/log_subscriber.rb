@@ -140,10 +140,10 @@ module GoodJob
     # @!macro notification_responder
     def cleanup_preserved_jobs(event)
       timestamp = event.payload[:timestamp]
-      deleted_records_count = event.payload[:deleted_records_count]
+      destroyed_records_count = event.payload[:destroyed_records_count]
 
       info do
-        "GoodJob deleted #{deleted_records_count} preserved #{'job'.pluralize(deleted_records_count)} finished before #{timestamp}."
+        "GoodJob destroyed #{destroyed_records_count} preserved #{'job'.pluralize(destroyed_records_count)} finished before #{timestamp}."
       end
     end
 

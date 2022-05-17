@@ -130,14 +130,14 @@ describe 'Jobs', type: :system, js: true do
       end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
     end
 
-    it 'can delete jobs' do
+    it 'can destroy jobs' do
       visit '/good_job'
       click_on "Jobs"
 
       within "##{dom_id(discarded_job)}" do
-        accept_confirm { click_on 'Delete job' }
+        accept_confirm { click_on 'Destroy job' }
       end
-      expect(page).to have_content "Job has been deleted"
+      expect(page).to have_content "Job has been destroyed"
       expect { discarded_job.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
@@ -183,7 +183,7 @@ describe 'Jobs', type: :system, js: true do
       click_on "Jobs"
       expect do
         check "toggle_job_ids"
-        within("table thead") { accept_confirm { click_on "Delete all" } }
+        within("table thead") { accept_confirm { click_on "Destroy all" } }
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
       end.to change { GoodJob::ActiveJobJob.count }.from(2).to(0)
     end
