@@ -13,11 +13,11 @@
               <%= status_badge execution.status %>
               <%= relative_time execution.last_status_at, include_seconds: true %>
 
-              <% if execution.runtime %>
-                • <div><%= format_duration execution.runtime %> runtime</div>
+              <% if execution.runtime_latency %>
+                • <div><%= format_duration execution.runtime_latency %> runtime</div>
               <% end %>
-              <% if execution.latency %>
-                • <div><%= format_duration execution.latency %> latency</div>
+              <% if execution.queue_latency %>
+                • <div><%= format_duration execution.queue_latency %> in queue</div>
               <% end %>
             </div>
           </div>
