@@ -88,7 +88,7 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :priority_ordered, -> { order('priority DESC NULLS LAST') }
 
-    # Order jobs by scheduled (unscheduled or soonest first).
+    # Order jobs by scheduled or created (oldest first).
     # @!method schedule_ordered
     # @!scope class
     # @return [ActiveRecord::Relation]

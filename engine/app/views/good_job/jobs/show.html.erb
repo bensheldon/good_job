@@ -48,4 +48,4 @@
   <%= tag.pre @job.serialized_params["arguments"].map(&:inspect).join(', ') %>
 </div>
 
-<%= render 'good_job/executions/table', executions: @executions %>
+<%= render 'good_job/executions/table', executions: @job.executions.reverse %>
