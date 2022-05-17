@@ -3,7 +3,7 @@
   <div class="list-group list-group-flush">
     <% executions.each do |execution| %>
       <%= tag.div id: dom_id(execution), class: "list-group-item py-3" do %>
-        <div class="d-flex">
+        <div class="d-md-flex">
           <div class="flex-fill">
             <div class="small text-muted">
               #<%= execution.number %>:
@@ -22,7 +22,7 @@
             </div>
           </div>
           <div>
-            <div class="mt-4 d-flex gap-2 flex-nowrap text-nowrap">
+            <div class="mt-4 d-flex gap-2">
               <%= tag.button type: "button", class: "btn btn-link btn-sm text-decoration-none text-muted", role: "button",
                 data: { bs_toggle: "collapse", bs_target: "##{dom_id(execution, 'params')}" },
                 aria: { expanded: false, controls: dom_id(execution, "params") } do %>
