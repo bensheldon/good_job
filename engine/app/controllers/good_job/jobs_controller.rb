@@ -38,7 +38,7 @@ module GoodJob
         when :retry
           job.retry_job
         when :delete
-          job.destroy
+          job.destroy_job
         end
 
         job
@@ -81,7 +81,7 @@ module GoodJob
 
     def delete
       @job = ActiveJobJob.find(params[:id])
-      @job.destroy
+      @job.destroy_job
       redirect_back(fallback_location: jobs_path, notice: "Job has been deleted")
     end
 
