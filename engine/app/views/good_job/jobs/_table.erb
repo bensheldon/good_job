@@ -100,9 +100,9 @@
                     <% end %>
 
                     <% if job.status.in? [:discarded, :finished] %>
-                    <%= link_to job_path(job.id), method: :delete, class: "btn btn-sm btn-outline-primary", title: "Destroy job", data: { confirm: "Confirm destroy", disable: true } do %>
-                      <%= render_icon "trash" %>
-                    <% end %>
+                      <%= link_to job_path(job.id), method: :delete, class: "btn btn-sm btn-outline-primary", title: "Destroy job", data: { confirm: "Confirm destroy", disable: true } do %>
+                        <%= render_icon "trash" %>
+                      <% end %>
                     <% else %>
                       <button class="btn btn-sm btn-outline-secondary" disabled><%= render_icon "trash" %></button>
                     <% end %>

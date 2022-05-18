@@ -38,6 +38,12 @@
           <%= render_icon "arrow_clockwise" %>
           Retry
         <% end %>
+
+        <% job_destroyable = @job.status.in? [:discarded, :finished] %>
+        <%= button_to job_path(@job.id), method: :delete, class: "btn btn-sm #{job_destroyable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_destroyable, aria: { label: "Destroy job" }, title: "Destroy job", data: { confirm: "Confirm destroy" } do %>
+          <%= render_icon "trash" %>
+          Destroy
+        <% end %>
       </div>
     </div>
   </div>
