@@ -74,7 +74,7 @@ task :release_good_job, [:version_bump] do |_t, args|
     1. Push commit and tag to Github:
         git push origin && git push origin --tags
     2. Push to Rubygems.org:
-        gem push pkg/good_job-#{GOODJOB::VERSION}.gem
+        gem push pkg/good_job-#{GoodJob::VERSION}.gem
     3. Author a Github Release:
         https://github.com/bensheldon/good_job/releases/new?tag=v#{GoodJob::VERSION}&body=#{CGI.escape "_Review the [Changelog](#{changelog_url}) for more details._"}
   INSTRUCTIONS
