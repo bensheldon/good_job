@@ -67,7 +67,7 @@
                 <td><%= job.executions_count %></td>
                 <td class="text-break"><%= truncate(job.recent_error, length: 1_000) %></td>
                 <td>
-                  <%= tag.button "Preview", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+                  <%= tag.button "Inspect", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
                                  data: { bs_toggle: "collapse", bs_target: "##{dom_id(job, 'params')}" },
                                  aria: { expanded: false, controls: dom_id(job, "params") }
                   %>

@@ -23,15 +23,10 @@
           </div>
           <div>
             <div class="mt-4 d-flex gap-2">
-              <%= tag.button type: "button", class: "btn btn-link btn-sm text-decoration-none text-muted", role: "button",
+              <%= tag.button type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
                 data: { bs_toggle: "collapse", bs_target: "##{dom_id(execution, 'params')}" },
                 aria: { expanded: false, controls: dom_id(execution, "params") } do %>
                 Inspect
-              <% end %>
-
-              <%= button_to execution_path(execution.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Destroy execution", data: { confirm: "Confirm destroy" } do %>
-                <%= render_icon "trash" %>
-                Destroy
               <% end %>
             </div>
           </div>

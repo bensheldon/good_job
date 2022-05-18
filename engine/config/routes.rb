@@ -2,8 +2,6 @@
 GoodJob::Engine.routes.draw do
   root to: redirect(path: 'jobs')
 
-  resources :executions, only: %i[destroy]
-
   resources :jobs, only: %i[index show destroy] do
     collection do
       get :mass_update, to: redirect(path: 'jobs')
