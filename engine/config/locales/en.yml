@@ -39,6 +39,12 @@ en:
       x_years:
         one: 1 year
         other: "%{count} years"
+  duration:
+    hours: "%{hour}h %{min}m"
+    less_than_10_seconds: "%{sec}s"
+    milliseconds: "%{ms}ms"
+    minutes: "%{min}m %{sec}s"
+    seconds: "%{sec}s"
   good_job:
     shared:
       footer:
@@ -50,3 +56,10 @@ en:
         live_poll: Live Poll
         name: "GoodJob 👍"
         processes: Processes
+    status:
+      discarded: Discarded
+      finished: Finished
+      queued: Queued
+      retried: Retried
+      running: Running
+      scheduled: Scheduled

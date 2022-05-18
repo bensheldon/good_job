@@ -17,7 +17,7 @@ module GoodJob
     def start
       @handler = Rack::Handler.get(RACK_SERVER)
       @future = Concurrent::Future.new(args: [@handler, @port, GoodJob.logger]) do |thr_handler, thr_port, thr_logger|
-        thr_handler.run(self, Port: thr_port, Logger: thr_logger, AccessLog: [])
+        thr_handler.run(self, Port: thr_port, Host: '0.0.0.0', Logger: thr_logger, AccessLog: [])
       end
       @future.add_observer(self.class, :task_observer)
       @future.execute

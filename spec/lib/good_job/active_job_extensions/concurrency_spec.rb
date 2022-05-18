@@ -5,11 +5,13 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
   before do
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
 
+    stub_const 'JOB_PERFORMED', Concurrent::AtomicBoolean.new(false)
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       include GoodJob::ActiveJobExtensions::Concurrency
 
       def perform(name:)
         name && sleep(1)
+        JOB_PERFORMED.make_true
       end
     end)
   end
@@ -95,6 +97,11 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
 
         expect(GoodJob::Execution.count).to be >= 1
         expect(GoodJob::Execution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
+      end
+
+      it 'is ignored with the job is executed via perform_now' do
+        TestJob.perform_now(name: "Alice")
+        expect(JOB_PERFORMED).to be_true
       end
     end
   end

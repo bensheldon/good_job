@@ -10,7 +10,7 @@
       <% filter.states.each do |name, count| %>
         <li class="nav-item">
           <%= link_to url_for({state: name}), class: "nav-link #{"active" if params[:state] == name}" do %>
-            <%= name.titleize %>
+            <%= t(name, scope: '.status') %>
             <span class="badge bg-primary rounded-pill <%= "bg-secondary" if count == 0 %>"><%= count %></span>
           <% end %>
         </li>
