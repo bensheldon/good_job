@@ -1,5 +1,24 @@
 # Changelog
 
+## [v2.15.0](https://github.com/bensheldon/good_job/tree/v2.15.0) (2022-05-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.14.4...v2.15.0)
+
+**Implemented enhancements:**
+
+- Adds the ability to delete jobs on the dashboard; add `cleanup_discarded_jobs` option to retain discarded jobs during cleanup [\#597](https://github.com/bensheldon/good_job/pull/597) ([TAGraves](https://github.com/TAGraves))
+- Dashboard: show more details about jobs [\#575](https://github.com/bensheldon/good_job/pull/575) ([bkeepers](https://github.com/bkeepers))
+
+**Closed issues:**
+
+- Show status on jobs\#show page [\#547](https://github.com/bensheldon/good_job/issues/547)
+
+**Merged pull requests:**
+
+- Remove ability to destroy individual Executions from Dashboard; rename "Toggle" to "Inspect" everywhere [\#601](https://github.com/bensheldon/good_job/pull/601) ([bensheldon](https://github.com/bensheldon))
+- Disable ActiveRecord Connection Reaper in test [\#600](https://github.com/bensheldon/good_job/pull/600) ([bensheldon](https://github.com/bensheldon))
+- Update README dashboard screenshot [\#599](https://github.com/bensheldon/good_job/pull/599) ([aried3r](https://github.com/aried3r))
+
 ## [v2.14.4](https://github.com/bensheldon/good_job/tree/v2.14.4) (2022-05-15)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.14.3...v2.14.4)
