@@ -71,38 +71,8 @@ module GoodJob
     end
 
     # The status of the Job, based on the state of its most recent execution.
-    # There are 3 buckets of non-overlapping statuses:
-    #   1. The job will be executed
-    #     - queued: The job will execute immediately when an execution thread becomes available.
-    #     - scheduled: The job is scheduled to execute in the future.
-    #     - retried: The job previously errored on execution and will be re-executed in the future.
-    #   2. The job is being executed
-    #     - running: the job is actively being executed by an execution thread
-    #   3. The job will not execute
-    #     - finished: The job executed successfully
-    #     - discarded: The job previously errored on execution and will not be re-executed in the future.
-    #
     # @return [Symbol]
-    def status
-      execution = head_execution
-      if execution.finished_at.present?
-        if execution.error.present?
-          :discarded
-        else
-          :finished
-        end
-      elsif (execution.scheduled_at || execution.created_at) > DateTime.current
-        if execution.serialized_params.fetch('executions', 0) > 1
-          :retried
-        else
-          :scheduled
-        end
-      elsif running?
-        :running
-      else
-        :queued
-      end
-    end
+    delegate :status, :last_status_at, to: :head_execution
 
     # This job's most recent {Execution}
     # @param reload [Booelan] whether to reload executions

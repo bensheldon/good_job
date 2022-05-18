@@ -39,6 +39,12 @@ nl:
       x_years:
         one: 1 jaar
         other: "%{count} jaren"
+  duration:
+    hours: "%{hour}h %{min}m"
+    less_than_10_seconds: "%{sec}s"
+    milliseconds: "%{ms}ms"
+    minutes: "%{min}m %{sec}s"
+    seconds: "%{sec}s"
   good_job:
     shared:
       footer:
@@ -50,3 +56,10 @@ nl:
         live_poll: Live Poll
         name: "GoodJob 👍"
         processes: Processen
+    status:
+      discarded: weggegooid
+      finished: Afgewerkt
+      queued: In de wachtrij
+      retried: Opnieuw geprobeerd
+      running: Rennen
+      scheduled: Gepland

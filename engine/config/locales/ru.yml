@@ -63,6 +63,12 @@ ru:
         many: "%{count} лет"
         one: 1 год
         other: "%{count} года"
+  duration:
+    hours: "%{hour}h %{min}m"
+    less_than_10_seconds: "%{sec}s"
+    milliseconds: "%{ms}мс"
+    minutes: "%{min}м %{sec}с"
+    seconds: "%{sec}s"
   good_job:
     shared:
       footer:
@@ -74,3 +80,10 @@ ru:
         live_poll: Живой Опрос
         name: "GoodJob 👍"
         processes: Процессы
+    status:
+      discarded: Отброшено
+      finished: Законченный
+      queued: В очереди
+      retried: Повторная попытка
+      running: Бег
+      scheduled: по расписанию

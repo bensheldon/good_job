@@ -88,7 +88,7 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :priority_ordered, -> { order('priority DESC NULLS LAST') }
 
-    # Order jobs by scheduled (unscheduled or soonest first).
+    # Order jobs by scheduled or created (oldest first).
     # @!method schedule_ordered
     # @!scope class
     # @return [ActiveRecord::Relation]
@@ -270,6 +270,65 @@ module GoodJob
       ActiveJob::Base.deserialize(active_job_data).tap do |aj|
         aj.send(:deserialize_arguments_if_needed)
       end
+    end
+
+    # There are 3 buckets of non-overlapping statuses:
+    #   1. The job will be executed
+    #     - queued: The job will execute immediately when an execution thread becomes available.
+    #     - scheduled: The job is scheduled to execute in the future.
+    #     - retried: The job previously errored on execution and will be re-executed in the future.
+    #   2. The job is being executed
+    #     - running: the job is actively being executed by an execution thread
+    #   3. The job will not execute
+    #     - finished: The job executed successfully
+    #     - discarded: The job previously errored on execution and will not be re-executed in the future.
+    #
+    # @return [Symbol]
+    def status
+      if finished_at.present?
+        if error.present?
+          :discarded
+        else
+          :finished
+        end
+      elsif (scheduled_at || created_at) > DateTime.current
+        if serialized_params.fetch('executions', 0) > 1
+          :retried
+        else
+          :scheduled
+        end
+      elsif running?
+        :running
+      else
+        :queued
+      end
+    end
+
+    def running?
+      performed_at? && !finished_at?
+    end
+
+    def number
+      serialized_params.fetch('executions', 0) + 1
+    end
+
+    # The last relevant timestamp for this execution
+    def last_status_at
+      finished_at || performed_at || scheduled_at || created_at
+    end
+
+    # Time between when this job was expected to run and when it started running
+    def queue_latency
+      now = Time.zone.now
+      expected_start = scheduled_at || created_at
+      actual_start = performed_at || now
+
+      actual_start - expected_start unless expected_start >= now
+    end
+
+    # Time between when this job started and finished
+    def runtime_latency
+      (finished_at || Time.zone.now) - performed_at if performed_at
     end
 
     private

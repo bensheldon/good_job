@@ -452,4 +452,49 @@ RSpec.describe GoodJob::Execution do
       end
     end
   end
+
+  describe '#queue_latency' do
+    let(:execution) { described_class.create! }
+
+    it 'is nil for future scheduled execution' do
+      execution.scheduled_at = 1.minute.from_now
+      expect(execution.queue_latency).to be_nil
+    end
+
+    it 'is distance between scheduled_at and now for past scheduled job' do
+      execution.scheduled_at = 1.minute.ago
+      expect(execution.queue_latency).to be_within(0.1).of(Time.zone.now - execution.scheduled_at)
+    end
+
+    it 'is distance between created_at and now for queued job' do
+      execution.scheduled_at = nil
+      expect(execution.queue_latency).to be_within(0.1).of(Time.zone.now - execution.created_at)
+    end
+
+    it 'is distance between created_at and performed_at for started job' do
+      execution.scheduled_at = nil
+      execution.performed_at = 10.seconds.ago
+      expect(execution.queue_latency).to eq(execution.performed_at - execution.created_at)
+    end
+  end
+
+  describe "#runtime_latency" do
+    let(:execution) { described_class.create! }
+
+    it 'is nil for queued job' do
+      expect(execution.runtime_latency).to be_nil
+    end
+
+    it 'is distance between performed_at and now for started job' do
+      execution.performed_at = 10.seconds.ago
+      execution.finished_at = nil
+      expect(execution.runtime_latency).to be_within(0.1).of(Time.zone.now - execution.performed_at)
+    end
+
+    it 'is distance between performed_at and finished_at' do
+      execution.performed_at = 5.seconds.ago
+      execution.finished_at = 1.second.ago
+      expect(execution.runtime_latency).to eq(execution.finished_at - execution.performed_at)
+    end
+  end
 end
