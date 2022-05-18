@@ -171,6 +171,16 @@ module GoodJob
       cron.map { |cron_key, params| GoodJob::CronEntry.new(params.merge(key: cron_key)) }
     end
 
+    # Whether to destroy discarded jobs when cleaning up preserved jobs.
+    # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
+    # @return [Boolean]
+    def cleanup_discarded_jobs?
+      return rails_config[:cleanup_discarded_jobs] unless rails_config[:cleanup_discarded_jobs].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_CLEANUP_DISCARDED_JOBS']) unless env['GOOD_JOB_CLEANUP_DISCARDED_JOBS'].nil?
+
+      true
+    end
+
     # Number of seconds to preserve jobs when using the +good_job cleanup_preserved_jobs+ CLI command.
     # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
     # @return [Integer]

@@ -96,7 +96,7 @@ module GoodJob
 
     # Get Jobs were completed before the given timestamp. If no timestamp is
     # provided, get all jobs that have been completed. By default, GoodJob
-    # deletes jobs after they are completed and this will find no jobs.
+    # destroys jobs after they are completed and this will find no jobs.
     # However, if you have changed {GoodJob.preserve_job_records}, this may
     # find completed Jobs.
     # @!method finished(timestamp = nil)

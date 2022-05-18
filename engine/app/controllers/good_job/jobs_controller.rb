@@ -7,6 +7,7 @@ module GoodJob
       discard: "discarded",
       reschedule: "rescheduled",
       retry: "retried",
+      destroy: "destroyed",
     }.freeze
 
     rescue_from GoodJob::ActiveJobJob::AdapterNotGoodJobError,
@@ -36,6 +37,8 @@ module GoodJob
           job.reschedule_job
         when :retry
           job.retry_job
+        when :destroy
+          job.destroy_job
         end
 
         job
@@ -72,6 +75,12 @@ module GoodJob
       @job = ActiveJobJob.find(params[:id])
       @job.retry_job
       redirect_back(fallback_location: jobs_path, notice: "Job has been retried")
+    end
+
+    def destroy
+      @job = ActiveJobJob.find(params[:id])
+      @job.destroy_job
+      redirect_back(fallback_location: jobs_path, notice: "Job has been destroyed")
     end
 
     private

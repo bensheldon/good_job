@@ -219,4 +219,26 @@ RSpec.describe GoodJob::ActiveJobJob do
       end
     end
   end
+
+  describe '#destroy_job' do
+    context 'when a job is finished' do
+      before do
+        job.head_execution.update! finished_at: Time.current
+      end
+
+      it 'destroys all the job executions' do
+        job.destroy_job
+
+        expect { head_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+        expect { tail_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+        expect { job.reload }.to raise_error ActiveRecord::RecordNotFound
+      end
+    end
+
+    context 'when a job is not finished' do
+      it 'raises an ActionForStateMismatchError' do
+        expect { job.destroy_job }.to raise_error GoodJob::ActiveJobJob::ActionForStateMismatchError
+      end
+    end
+  end
 end

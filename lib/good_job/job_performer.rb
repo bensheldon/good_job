@@ -57,7 +57,7 @@ module GoodJob
       job_query.next_scheduled_at(after: after, limit: limit, now_limit: now_limit)
     end
 
-    # Delete expired preserved jobs
+    # Destroy expired preserved jobs
     # @return [void]
     def cleanup
       GoodJob.cleanup_preserved_jobs

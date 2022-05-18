@@ -43,7 +43,7 @@ module GoodJob
   # @!attribute [rw] preserve_job_records
   #   @!scope class
   #   Whether to preserve job records in the database after they have finished (default: +false+).
-  #   By default, GoodJob deletes job records after the job is completed successfully.
+  #   By default, GoodJob destroys job records after the job is completed successfully.
   #   If you want to preserve jobs for latter inspection, set this to +true+.
   #   If you want to preserve only jobs that finished with error for latter inspection, set this to +:on_unhandled_error+.
   #   If +true+, you will need to clean out jobs using the +good_job cleanup_preserved_jobs+ CLI command or
@@ -126,25 +126,28 @@ module GoodJob
     end
   end
 
-  # Deletes preserved job records.
-  # By default, GoodJob deletes job records when the job is performed and this
+  # Destroys preserved job records.
+  # By default, GoodJob destroys job records when the job is performed and this
   # method is not necessary. However, when `GoodJob.preserve_job_records = true`,
   # the jobs will be preserved in the database. This is useful when wanting to
   # analyze or inspect job performance.
   # If you are preserving job records this way, use this method regularly to
-  # delete old records and preserve space in your database.
-  # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be deleted (default: +86400+).
-  # @return [Integer] Number of jobs that were deleted.
+  # destroy old records and preserve space in your database.
+  # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
+  # @return [Integer] Number of jobs that were destroyed.
   def self.cleanup_preserved_jobs(older_than: nil)
-    older_than ||= GoodJob::Configuration.new({}).cleanup_preserved_jobs_before_seconds_ago
+    configuration = GoodJob::Configuration.new({})
+    older_than ||= configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
+    include_discarded = configuration.cleanup_discarded_jobs?
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
       old_jobs = GoodJob::ActiveJobJob.where('finished_at <= ?', timestamp)
+      old_jobs = old_jobs.not_discarded unless include_discarded
       old_jobs_count = old_jobs.count
 
-      GoodJob::Execution.where(job: old_jobs).delete_all
-      payload[:deleted_records_count] = old_jobs_count
+      GoodJob::Execution.where(job: old_jobs).destroy_all
+      payload[:destroyed_records_count] = old_jobs_count
     end
   end
 

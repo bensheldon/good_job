@@ -108,6 +108,20 @@ describe GoodJob::JobsController, type: :request do
       end
     end
 
+    describe 'mass_action=destroy' do
+      it 'destroys jobs' do
+        put good_job.mass_update_jobs_path, params: {
+          mass_action: 'destroy',
+          job_ids: [job.id],
+        }
+
+        expect(response).to have_http_status(:found)
+        expect(flash[:notice]).to eq('Successfully destroyed 1 job')
+
+        expect { job.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
     describe 'all_job_ids option' do
       before do
         job.update(finished_at: nil)

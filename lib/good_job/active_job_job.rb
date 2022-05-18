@@ -54,9 +54,11 @@ module GoodJob
     # Advisory locked and executing
     scope :running, -> { where(finished_at: nil).joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
     # Completed executing successfully
-    scope :finished, -> { where.not(finished_at: nil).where(error: nil) }
+    scope :finished, -> { not_discarded.where.not(finished_at: nil) }
     # Errored but will not be retried
     scope :discarded, -> { where.not(finished_at: nil).where.not(error: nil) }
+    # Not errored
+    scope :not_discarded, -> { where(error: nil) }
 
     # The job's ActiveJob UUID
     # @return [String]
@@ -192,6 +194,18 @@ module GoodJob
 
         execution = head_execution(reload: true)
         execution.update(scheduled_at: scheduled_at)
+      end
+    end
+
+    # Destroy all of a discarded or finished job's executions from the database so that it will no longer appear on the dashboard.
+    # @return [void]
+    def destroy_job
+      with_advisory_lock do
+        execution = head_execution(reload: true)
+
+        raise ActionForStateMismatchError if execution.finished_at.blank?
+
+        destroy
       end
     end
 

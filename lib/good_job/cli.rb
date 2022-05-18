@@ -120,11 +120,11 @@ module GoodJob
     default_task :start
 
     # @!macro thor.desc
-    desc :cleanup_preserved_jobs, "Deletes preserved job records."
+    desc :cleanup_preserved_jobs, "Destroys preserved job records."
     long_desc <<~DESCRIPTION
-      Deletes preserved job records.
+      Destroys preserved job records.
 
-      By default, GoodJob deletes job records when the job is performed and this
+      By default, GoodJob destroys job records when the job is performed and this
       command is not necessary.
 
       However, when `GoodJob.preserve_job_records = true`, the jobs will be
@@ -132,13 +132,13 @@ module GoodJob
       inspect job performance.
 
       If you are preserving job records this way, use this command regularly
-      to delete old records and preserve space in your database.
+      to destroy old records and preserve space in your database.
 
     DESCRIPTION
     method_option :before_seconds_ago,
                   type: :numeric,
                   banner: 'SECONDS',
-                  desc: "Delete records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 86400)"
+                  desc: "Destroy records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 86400)"
 
     def cleanup_preserved_jobs
       set_up_application!

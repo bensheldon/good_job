@@ -29,9 +29,9 @@
                 Inspect
               <% end %>
 
-              <%= button_to execution_path(execution.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Delete execution", data: { confirm: "Confirm delete" } do %>
+              <%= button_to execution_path(execution.id), method: :delete, class: "btn btn-sm btn-outline-danger", title: "Destroy execution", data: { confirm: "Confirm destroy" } do %>
                 <%= render_icon "trash" %>
-                Delete
+                Destroy
               <% end %>
             </div>
           </div>

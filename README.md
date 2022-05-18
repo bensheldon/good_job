@@ -185,7 +185,7 @@ separate isolated execution pools with semicolons and threads with colons.
 
 #### `good_job cleanup_preserved_jobs`
 
-`good_job cleanup_preserved_jobs` deletes preserved job records. See `GoodJob.preserve_job_records` for when this command is useful.
+`good_job cleanup_preserved_jobs` destroys preserved job records. See `GoodJob.preserve_job_records` for when this command is useful.
 
 ```bash
 $ bundle exec good_job help cleanup_preserved_jobs
@@ -194,11 +194,11 @@ Usage:
   good_job cleanup_preserved_jobs
 
 Options:
-  [--before-seconds-ago=SECONDS] # Delete records finished more than this many seconds ago (env var:  GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 86400)
+  [--before-seconds-ago=SECONDS] # Destroy records finished more than this many seconds ago (env var:  GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 86400)
 
-Deletes preserved job records.
+Destroys preserved job records.
 
-By default, GoodJob deletes job records when the job is performed and this
+By default, GoodJob destroys job records when the job is performed and this
 command is not necessary.
 
 However, when `GoodJob.preserve_job_records = true`, the jobs will be
@@ -206,7 +206,7 @@ preserved in the database. This is useful when wanting to analyze or
 inspect job performance.
 
 If you are preserving job records this way, use this command regularly
-to delete old records and preserve space in your database.
+to destroy old records and preserve space in your database.
 ```
 
 ### Configuration options
@@ -269,6 +269,7 @@ Available configuration options are:
 - `shutdown_timeout` (float) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 - `enable_cron` (boolean) whether to run cron process. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_CRON`.
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
+- `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`. _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
 - `cleanup_preserved_jobs_before_seconds_ago` (integer) number of seconds to preserve jobs when using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `86400` (1 day). Can also be set with  the environment variable `GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO`.  _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
 - `cleanup_interval_jobs` (integer) Number of jobs a Scheduler will execute before cleaning up preserved jobs. Defaults to `nil`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_JOBS`.
 - `cleanup_interval_seconds` (integer) Number of seconds a Scheduler will wait before cleaning up preserved jobs. Defaults to `nil`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_SECONDS`.
@@ -826,7 +827,7 @@ If your application is already using an ActiveJob backend, you will need to inst
 
 GoodJob is fully instrumented with [`ActiveSupport::Notifications`](https://edgeguides.rubyonrails.org/active_support_instrumentation.html#introduction-to-instrumentation).
 
-By default, GoodJob will delete job records after they are run, regardless of whether they succeed or not (raising a kind of `StandardError`), unless they are interrupted (raising a kind of `Exception`).
+By default, GoodJob will destroy job records after they are run, regardless of whether they succeed or not (raising a kind of `StandardError`), unless they are interrupted (raising a kind of `Exception`).
 
 To preserve job records for later inspection, set an initializer:
 
@@ -835,7 +836,7 @@ To preserve job records for later inspection, set an initializer:
 GoodJob.preserve_job_records = true
 ```
 
-It is also necessary to delete these preserved jobs from the database after a certain time period:
+It is also necessary to destroy these preserved jobs from the database after a certain time period:
 
 - For example, in a Rake task:
 

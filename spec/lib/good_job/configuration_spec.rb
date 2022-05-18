@@ -37,6 +37,35 @@ RSpec.describe GoodJob::Configuration do
     end
   end
 
+  describe '#cleanup_discarded_jobs?' do
+    it 'defaults to true' do
+      configuration = described_class.new({})
+      expect(configuration.cleanup_discarded_jobs?).to be true
+    end
+
+    context 'when rails config is set' do
+      before do
+        allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_discarded_jobs: false })
+      end
+
+      it 'uses rails config value' do
+        configuration = described_class.new({})
+        expect(configuration.cleanup_discarded_jobs?).to be false
+      end
+    end
+
+    context 'when environment variable is set' do
+      before do
+        stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_DISCARDED_JOBS' => 'false' })
+      end
+
+      it 'uses environment variable' do
+        configuration = described_class.new({})
+        expect(configuration.cleanup_discarded_jobs?).to be false
+      end
+    end
+  end
+
   describe '#cleanup_preserved_jobs_before_seconds_ago' do
     it 'defaults to 86400' do
       configuration = described_class.new({})
