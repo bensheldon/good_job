@@ -29,6 +29,6 @@
     }
   ],
   "scripts": {
-    "postdeploy": "bin/test_app_rake heroku:postdeploy"
+    "postdeploy": "bin/rails heroku:postdeploy"
   }
 }
