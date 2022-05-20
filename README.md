@@ -39,7 +39,10 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Configuration options](#configuration-options)
     - [Global options](#global-options)
     - [Dashboard](#dashboard)
+        - [API-only Rails applications](#api-only-rails-applications)
+        - [Live Polling][#live-polling]
     - [ActiveJob concurrency](#activejob-concurrency)
+        - [How concurrency controls work](#how-concurrency-controls-work)
     - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
     - [Updating](#updating)
         - [Upgrading minor versions](#upgrading-minor-versions)
@@ -368,6 +371,23 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
     end
     ```
 
+#### API-only Rails applications
+
+API-only Rails applications may not have all of the required Rack middleware for the GoodJob Dashboard to function. To re-add the middlware:
+
+```ruby
+# config/application.rb
+module MyApp
+  class Application < Rails::Application
+    #...
+    config.middleware.use Rack::MethodOverride
+    config.middleware.use ActionDispatch::Flash
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore
+  end
+end
+```
+
 #### Live Polling
 
 The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
@@ -419,6 +439,13 @@ When testing, the resulting concurrency key value can be inspected:
 job = MyJob.perform_later("Alice")
 job.good_job_concurrency_key #=> "Unique-Alice"
 ```
+
+#### How concurrency controls work
+
+GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry with an incremental backoff". The [code is readable](https://github.com/bensheldon/good_job/blob/main/lib/good_job/active_job_extensions/concurrency.rb).
+
+- "Optimistic" meaning that the implementation's performance trade-off assumes that collisions are atypical (e.g. two users enqueue the same job at the same time) rather than regular (e.g. the system enqueues thousands of colliding jobs at the same time).
+- "Retry with an incremental backoff" means that when `perform_limit` is exceeded, the job will raise a `GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError` which is caught by a `retry_on` handler which re-schedules the job to execute in the near future with an incremental backoff.
 
 ### Cron-style repeating/recurring jobs
 
