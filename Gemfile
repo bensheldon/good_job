@@ -25,6 +25,9 @@ gem 'rails'
 platforms :ruby do
   gem "activerecord-explain-analyze"
   gem "pry-byebug"
+  gem 'rack-mini-profiler'
+  gem "rbtrace"
+  gem 'stackprof'
 
   gem 'net-imap', require: false
   gem 'net-pop', require: false
