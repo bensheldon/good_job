@@ -41,7 +41,7 @@ module GoodJob
     }.freeze
 
     def status_badge(status)
-      content_tag :span, status_icon(status, class: "text-white") + t(status, scope: '.status'),
+      content_tag :span, status_icon(status, class: "text-white") + t(status, scope: 'good_job.status'),
                   class: "badge rounded-pill bg-#{STATUS_COLOR.fetch(status)} d-inline-flex gap-2 ps-1 pe-3 align-items-center"
     end
 
