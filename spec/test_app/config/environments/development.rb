@@ -54,11 +54,7 @@ Rails.application.configure do
   # config.assets.quiet = true
 
   # Raises error for missing translations.
-  if Gem::Version.new(Rails.version) < Gem::Version.new('6.1')
-    config.action_view.raise_on_missing_translations = true
-  else
-    config.i18n.raise_on_missing_translations = true
-  end
+  # config.action_view.raise_on_missing_translations = true
 
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
