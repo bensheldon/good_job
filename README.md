@@ -40,7 +40,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Global options](#global-options)
     - [Dashboard](#dashboard)
         - [API-only Rails applications](#api-only-rails-applications)
-        - [Live Polling][#live-polling]
+        - [Live Polling](#live-polling)
     - [ActiveJob concurrency](#activejob-concurrency)
         - [How concurrency controls work](#how-concurrency-controls-work)
     - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
