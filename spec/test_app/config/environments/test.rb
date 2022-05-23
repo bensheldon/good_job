@@ -8,7 +8,11 @@ Rails.application.configure do
   config.eager_load = false
 
   # Raises error for missing translations.
-  config.action_view.raise_on_missing_translations = true
+  if Gem::Version.new(Rails.version) < Gem::Version.new('6.1')
+    config.action_view.raise_on_missing_translations = true
+  else
+    config.i18n.raise_on_missing_translations = true
+  end
 
   if ActiveModel::Type::Boolean.new.cast(ENV['RAILS_LOG_TO_STDOUT'])
     logger = ActiveSupport::Logger.new(STDOUT)
