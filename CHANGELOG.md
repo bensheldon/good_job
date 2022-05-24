@@ -1,5 +1,21 @@
 # Changelog
 
+## [v2.15.1](https://github.com/bensheldon/good_job/tree/v2.15.1) (2022-05-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.15.0...v2.15.1)
+
+**Closed issues:**
+
+- dashboard/engine – i18n: Wrong translation scope [\#605](https://github.com/bensheldon/good_job/issues/605)
+- Concurrency not properly putting jobs in the queue [\#603](https://github.com/bensheldon/good_job/issues/603)
+- Some dashboard actions have a routing error [\#602](https://github.com/bensheldon/good_job/issues/602)
+
+**Merged pull requests:**
+
+- Fix/i18n status scopes [\#607](https://github.com/bensheldon/good_job/pull/607) ([Jay-Schneider](https://github.com/Jay-Schneider))
+- Make "Live Polling" ToC entry clickable [\#606](https://github.com/bensheldon/good_job/pull/606) ([aried3r](https://github.com/aried3r))
+- Update readme explaining Concurrency implementation and how to integrate Dashboard with API-only Rails apps [\#604](https://github.com/bensheldon/good_job/pull/604) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.15.0](https://github.com/bensheldon/good_job/tree/v2.15.0) (2022-05-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.14.4...v2.15.0)
