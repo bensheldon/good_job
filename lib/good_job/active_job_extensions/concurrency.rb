@@ -51,6 +51,8 @@ module GoodJob
         before_perform do |job|
           # Don't attempt to enforce concurrency limits with other queue adapters.
           next unless job.class.queue_adapter.is_a?(GoodJob::Adapter)
+          # ...or GoodJob's inline adapter.
+          next if job.class.queue_adapter.execute_inline?
 
           perform_limit = job.class.good_job_concurrency_config[:perform_limit] ||
                           job.class.good_job_concurrency_config[:total_limit]

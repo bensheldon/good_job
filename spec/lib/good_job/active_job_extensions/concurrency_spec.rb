@@ -103,6 +103,15 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         TestJob.perform_now(name: "Alice")
         expect(JOB_PERFORMED).to be_true
       end
+
+      it 'is ignored if the adapter is inline' do
+        TestJob.perform_later(name: "Alice")
+        GoodJob::Execution.first.with_advisory_lock do
+          allow(TestJob.queue_adapter).to receive(:execute_inline?).and_return(true)
+          TestJob.perform_later(name: "Alice")
+          expect(JOB_PERFORMED).to be_true
+        end
+      end
     end
   end
 end
