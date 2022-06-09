@@ -22,7 +22,7 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        create_with_advisory_lock: false,
+        create_with_advisory_lock: nil,
         scheduled_at: nil
       )
     end
@@ -51,6 +51,28 @@ RSpec.describe GoodJob::Adapter do
         expect do
           adapter.enqueue(TestJob.new(succeed: false))
         end.to raise_error(JobError)
+
+        expect(PERFORMED.size).to eq 1
+      end
+
+      it 'executes future scheduled jobs' do
+        adapter.enqueue_at(TestJob.new, 1.minute.from_now.to_f)
+        expect(PERFORMED.size).to eq 1
+        expect(GoodJob::ActiveJobJob.count).to eq 0
+      end
+
+      context 'when inline_execution_respects_schedule is true' do
+        before do
+          config = Rails.application.config.good_job.dup.merge({ inline_execution_respects_schedule: true })
+          allow(Rails.application.config).to receive(:good_job).and_return(config)
+          puts Rails.application.config.good_job[:inline_execution_respects_schedule]
+        end
+
+        it 'does not execute future scheduled jobs' do
+          adapter.enqueue_at(TestJob.new, 1.minute.from_now.to_f)
+          expect(PERFORMED.size).to eq 0
+          expect(GoodJob::ActiveJobJob.count).to eq 1
+        end
       end
     end
 
@@ -81,7 +103,7 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        create_with_advisory_lock: false,
+        create_with_advisory_lock: nil,
         scheduled_at: scheduled_at.change(usec: 0)
       )
     end

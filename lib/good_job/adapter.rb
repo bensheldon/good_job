@@ -62,19 +62,48 @@ module GoodJob
     # @param timestamp [Integer, nil] the epoch time to perform the job
     # @return [GoodJob::Execution]
     def enqueue_at(active_job, timestamp)
-      execution = GoodJob::Execution.enqueue(
-        active_job,
-        scheduled_at: timestamp ? Time.zone.at(timestamp) : nil,
-        create_with_advisory_lock: execute_inline?
-      )
+      scheduled_at = timestamp ? Time.zone.at(timestamp) : nil
 
       if execute_inline?
+        future_scheduled = (scheduled_at.nil? || scheduled_at > Time.current)
+        will_execute_inline = !future_scheduled || (future_scheduled && !@configuration.inline_execution_respects_schedule?)
+      end
+
+      execution = GoodJob::Execution.enqueue(
+        active_job,
+        scheduled_at: scheduled_at,
+        create_with_advisory_lock: will_execute_inline
+      )
+
+      if will_execute_inline
+        if future_scheduled && !@configuration.inline_execution_respects_schedule?
+          ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+            In the next major release, GoodJob will not *inline* execute
+            future-scheduled jobs.
+
+            To opt into this behavior immediately set:
+            `config.good_job.inline_execution_respects_schedule = true`
+
+            To perform jobs inline at any time, use `GoodJob.perform_inline`.
+
+            For example, using time helpers within an integration test:
+
+            ```
+            MyJob.set(wait: 10.minutes).perform_later
+            travel_to(15.minutes.from_now) { GoodJob.perform_inline }
+            ```
+
+            Note: Rails `travel`/`travel_to` time helpers do not have millisecond
+            precision, so you must leave at least 1 second between the schedule
+            and time traveling for the job to be executed.
+          DEPRECATION
+        end
+
         begin
           result = execution.perform
         ensure
           execution.advisory_unlock
         end
-
         raise result.unhandled_error if result.unhandled_error
       else
         job_state = { queue_name: execution.queue_name }

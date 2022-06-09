@@ -119,6 +119,10 @@ module GoodJob
       end
     end
 
+    def inline_execution_respects_schedule?
+      !!rails_config[:inline_execution_respects_schedule]
+    end
+
     # The maximum number of future-scheduled jobs to store in memory.
     # Storing future-scheduled jobs in memory reduces execution latency
     # at the cost of increased memory usage. 10,000 stored jobs = ~20MB.
