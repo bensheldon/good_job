@@ -8,7 +8,8 @@ Zeitwerk::Loader.for_gem.tap do |loader|
   loader.inflector.inflect({
                              "cli" => "CLI",
                            })
-  loader.ignore(File.join(File.dirname(__FILE__), "generators"))
+  loader.ignore(File.join(File.dirname(__FILE__), "generators")) # required by Rails
+  loader.ignore(File.join(File.dirname(__FILE__), "active_job")) # required in Railtie after ActiveJob initializes
   loader.setup
 end
 
