@@ -42,19 +42,17 @@ module GoodJob
       # happens _before_ ActiveRecord finishes loading. GoodJob will deadlock if an async executor is started in the middle of
       # ActiveRecord loading.
 
-      ActiveSupport.on_load(:active_record) do
-        GoodJob._active_record_loaded = true
-        GoodJob.start_async_adapters
-      end
-
-      ActiveSupport.on_load(:active_job) do
-        require 'active_job/queue_adapters/good_job_adapter'
-
-        GoodJob._active_job_loaded = true
-        GoodJob.start_async_adapters
-      end
-
       config.after_initialize do
+        ActiveSupport.on_load(:active_record) do
+          GoodJob._active_record_loaded = true
+          GoodJob.start_async_adapters
+        end
+
+        ActiveSupport.on_load(:active_job) do
+          GoodJob._active_job_loaded = true
+          GoodJob.start_async_adapters
+        end
+
         GoodJob._rails_after_initialize_hook_called = true
         GoodJob.start_async_adapters
       end
