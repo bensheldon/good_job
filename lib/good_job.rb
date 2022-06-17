@@ -8,7 +8,9 @@ Zeitwerk::Loader.for_gem.tap do |loader|
   loader.inflector.inflect({
                              "cli" => "CLI",
                            })
-  loader.ignore(File.join(File.dirname(__FILE__), "generators"))
+  loader.ignore("#{__dir__}/generators")
+  loader.ignore("#{__dir__}/active_job")
+  loader.push_dir("#{__dir__}/active_job/queue_adapters", namespace: ActiveJob::QueueAdapters)
   loader.setup
 end
 
