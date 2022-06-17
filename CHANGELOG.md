@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.15.2](https://github.com/bensheldon/good_job/tree/v2.15.2) (2022-06-17)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.15.1...v2.15.2)
+
+**Closed issues:**
+
+- ActiveRecord::StatementInvalid PG::ProgramLimitExceeded:  ERROR: index row size 3296 exceeds btree version 4 maximum 2704 for index [\#612](https://github.com/bensheldon/good_job/issues/612)
+
+**Merged pull requests:**
+
+- Zeitwerk ignore `lib/active_job` [\#617](https://github.com/bensheldon/good_job/pull/617) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.15.1](https://github.com/bensheldon/good_job/tree/v2.15.1) (2022-05-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.15.0...v2.15.1)
@@ -22,6 +34,7 @@
 
 **Implemented enhancements:**
 
+- Remove ability to destroy individual Executions from Dashboard; rename "Toggle" to "Inspect" everywhere [\#601](https://github.com/bensheldon/good_job/pull/601) ([bensheldon](https://github.com/bensheldon))
 - Adds the ability to delete jobs on the dashboard; add `cleanup_discarded_jobs` option to retain discarded jobs during cleanup [\#597](https://github.com/bensheldon/good_job/pull/597) ([TAGraves](https://github.com/TAGraves))
 - Dashboard: show more details about jobs [\#575](https://github.com/bensheldon/good_job/pull/575) ([bkeepers](https://github.com/bkeepers))
 
@@ -31,7 +44,6 @@
 
 **Merged pull requests:**
 
-- Remove ability to destroy individual Executions from Dashboard; rename "Toggle" to "Inspect" everywhere [\#601](https://github.com/bensheldon/good_job/pull/601) ([bensheldon](https://github.com/bensheldon))
 - Disable ActiveRecord Connection Reaper in test [\#600](https://github.com/bensheldon/good_job/pull/600) ([bensheldon](https://github.com/bensheldon))
 - Update README dashboard screenshot [\#599](https://github.com/bensheldon/good_job/pull/599) ([aried3r](https://github.com/aried3r))
 
