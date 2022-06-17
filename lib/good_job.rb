@@ -153,6 +153,20 @@ module GoodJob
     end
   end
 
+  # Perform all queued jobs in the current thread.
+  # This is primarily intended for usage in a test environment.
+  # Unhandled job errors will be raised.
+  # @param queue_string [String] Queues to execute jobs from
+  # @return [void]
+  def self.perform_inline(queue_string = "*")
+    job_performer = JobPerformer.new(queue_string)
+    loop do
+      result = job_performer.next
+      break unless result
+      raise result.unhandled_error if result.unhandled_error
+    end
+  end
+
   def self._executables
     [].concat(
       CronManager.instances,

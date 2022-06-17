@@ -85,4 +85,46 @@ describe GoodJob do
       expect { old_discarded_job.reload }.not_to raise_error
     end
   end
+
+  describe '.perform_inline' do
+    before do
+      stub_const 'PERFORMED', []
+      stub_const 'JobError', Class.new(StandardError)
+      stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+        self.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+
+        def perform(succeed: true)
+          PERFORMED << Time.current
+          raise JobError unless succeed
+        end
+      end)
+    end
+
+    it 'executes performable jobs' do
+      TestJob.perform_later
+      TestJob.perform_later
+      TestJob.set(wait: 1.minute).perform_later
+
+      described_class.perform_inline
+      expect(PERFORMED.size).to eq 2
+    end
+
+    it 'raises unhandled exceptions' do
+      TestJob.perform_later(succeed: false)
+
+      expect do
+        described_class.perform_inline
+      end.to raise_error JobError
+    end
+
+    it 'executes future scheduled jobs' do
+      TestJob.set(wait: 5.minutes).perform_later
+
+      expect(PERFORMED.size).to eq 0
+      travel_to(6.minutes.from_now) do
+        described_class.perform_inline
+      end
+      expect(PERFORMED.size).to eq 1
+    end
+  end
 end
