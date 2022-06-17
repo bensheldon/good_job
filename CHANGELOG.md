@@ -1,5 +1,17 @@
 # Changelog
 
+## [v2.16.0](https://github.com/bensheldon/good_job/tree/v2.16.0) (2022-06-17)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.15.2...v2.16.0)
+
+**Closed issues:**
+
+- Upgrading zeitwerk to 2.6.0 causes a warning related to good\_job [\#616](https://github.com/bensheldon/good_job/issues/616)
+
+**Merged pull requests:**
+
+- Allow inline executor to respect scheduled jobs; deprecate old behavior. Add `GoodJob.perform_inline` [\#615](https://github.com/bensheldon/good_job/pull/615) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.15.2](https://github.com/bensheldon/good_job/tree/v2.15.2) (2022-06-17)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.15.1...v2.15.2)
