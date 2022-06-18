@@ -111,9 +111,19 @@ RSpec.describe 'Adapter Integration' do
       end)
     end
 
+    it 'executes unscheduled jobs immediately' do
+      TestJob.perform_later
+      expect(PERFORMED.size).to eq 1
+    end
+
     it 'raises unhandled exceptions' do
       expect do
         TestJob.perform_later
+        5.times do
+          travel(5.minutes)
+          GoodJob.perform_inline
+        end
+        travel_back
       end.to raise_error JobError
       expect(PERFORMED.size).to eq 3
     end

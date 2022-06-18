@@ -9,8 +9,8 @@ class ExampleJob < ApplicationJob
     DEAD_TYPE = 'dead',
     SLOW_TYPE = 'slow',
   ]
-  
-  retry_on DeadError, attempts: 3
+
+  retry_on(DeadError, attempts: 3) { nil }
 
   def perform(type = SUCCESS_TYPE)
     if type == SUCCESS_TYPE

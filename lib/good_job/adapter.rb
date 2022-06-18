@@ -65,7 +65,7 @@ module GoodJob
       scheduled_at = timestamp ? Time.zone.at(timestamp) : nil
 
       if execute_inline?
-        future_scheduled = (scheduled_at.nil? || scheduled_at > Time.current)
+        future_scheduled = scheduled_at && scheduled_at > Time.current
         will_execute_inline = !future_scheduled || (future_scheduled && !@configuration.inline_execution_respects_schedule?)
       end
 
