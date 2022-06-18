@@ -4,13 +4,12 @@ require "active_job"
 require "active_job/queue_adapters"
 
 require "zeitwerk"
-Zeitwerk::Loader.for_gem.tap do |loader|
+zeitwerk_options = Gem::Version.new(Zeitwerk::VERSION) >= Gem::Version.new("2.6.0") ? { warn_on_extra_files: false } : {}
+Zeitwerk::Loader.for_gem(**zeitwerk_options).tap do |loader|
   loader.inflector.inflect({
                              "cli" => "CLI",
                            })
   loader.ignore("#{__dir__}/generators")
-  loader.ignore("#{__dir__}/active_job")
-  loader.push_dir("#{__dir__}/active_job/queue_adapters", namespace: ActiveJob::QueueAdapters)
   loader.setup
 end
 
