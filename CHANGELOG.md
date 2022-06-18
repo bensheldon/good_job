@@ -1,5 +1,14 @@
 # Changelog
 
+## [v2.16.1](https://github.com/bensheldon/good_job/tree/v2.16.1) (2022-06-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.16.0...v2.16.1)
+
+**Merged pull requests:**
+
+- Fix `:inline` mode with future behavior to run unscheduled jobs immediately [\#620](https://github.com/bensheldon/good_job/pull/620) ([bensheldon](https://github.com/bensheldon))
+- Version check `Zeitwerk::Loader.new(warn_on_extra_files: false)` flag [\#619](https://github.com/bensheldon/good_job/pull/619) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.16.0](https://github.com/bensheldon/good_job/tree/v2.16.0) (2022-06-17)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.15.2...v2.16.0)
