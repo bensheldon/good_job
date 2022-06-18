@@ -19,6 +19,12 @@ describe ExampleJob do
     describe "ERROR_ONCE_TYPE" do
       it 'errors once then succeeds' do
         active_job = described_class.perform_later(described_class::ERROR_ONCE_TYPE)
+        10.times do
+          GoodJob.perform_inline
+          travel(5.minutes)
+        end
+        travel_back
+
         executions = GoodJob::Execution.where(active_job_id: active_job.job_id).order(created_at: :asc)
         expect(executions.size).to eq 2
         expect(executions.last.error).to be_nil
@@ -28,6 +34,12 @@ describe ExampleJob do
     describe "ERROR_FIVE_TIMES_TYPE" do
       it 'errors five times then succeeds' do
         active_job = described_class.perform_later(described_class::ERROR_FIVE_TIMES_TYPE)
+        10.times do
+          GoodJob.perform_inline
+          travel(5.minutes)
+        end
+        travel_back
+
         executions = GoodJob::Execution.where(active_job_id: active_job.job_id).order(created_at: :asc)
         expect(executions.size).to eq 6
         expect(executions.last.error).to be_nil
@@ -36,11 +48,13 @@ describe ExampleJob do
 
     describe "DEAD_TYPE" do
       it 'errors but does not retry' do
-        begin
-          described_class.perform_later(described_class::DEAD_TYPE)
-        rescue ExampleJob::DeadError
-          nil
+        described_class.perform_later(described_class::DEAD_TYPE)
+        10.times do
+          GoodJob.perform_inline
+          travel(5.minutes)
         end
+        travel_back
+
         active_job_id = GoodJob::Execution.last.active_job_id
 
         executions = GoodJob::Execution.where(active_job_id: active_job_id).order(created_at: :asc)

@@ -55,23 +55,31 @@ RSpec.describe GoodJob::Adapter do
         expect(PERFORMED.size).to eq 1
       end
 
-      it 'executes future scheduled jobs' do
-        adapter.enqueue_at(TestJob.new, 1.minute.from_now.to_f)
-        expect(PERFORMED.size).to eq 1
-        expect(GoodJob::ActiveJobJob.count).to eq 0
-      end
-
-      context 'when inline_execution_respects_schedule is true' do
+      context 'when inline_execution_respects_schedule is TRUE' do
         before do
           config = Rails.application.config.good_job.dup.merge({ inline_execution_respects_schedule: true })
           allow(Rails.application.config).to receive(:good_job).and_return(config)
-          puts Rails.application.config.good_job[:inline_execution_respects_schedule]
         end
 
         it 'does not execute future scheduled jobs' do
           adapter.enqueue_at(TestJob.new, 1.minute.from_now.to_f)
           expect(PERFORMED.size).to eq 0
           expect(GoodJob::ActiveJobJob.count).to eq 1
+        end
+      end
+
+      context 'when inline_execution_respects_schedule is FALSE' do
+        before do
+          config = Rails.application.config.good_job.dup.merge({ inline_execution_respects_schedule: false })
+          allow(Rails.application.config).to receive(:good_job).and_return(config)
+        end
+
+        it 'executes future scheduled jobs' do
+          expect do
+            adapter.enqueue_at(TestJob.new, 1.minute.from_now.to_f)
+            expect(PERFORMED.size).to eq 1
+            expect(GoodJob::ActiveJobJob.count).to eq 0
+          end.to output(/DEPRECATION WARNING/).to_stderr_from_any_process
         end
       end
     end

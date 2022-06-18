@@ -1,4 +1,7 @@
 Rails.application.configure do
+  # TODO: Remove on GoodJob 3.0 release
+  config.good_job.inline_execution_respects_schedule = true
+
   config.good_job.cron = {
     example: {
       cron: '*/5 * * * * *', # every 5 seconds

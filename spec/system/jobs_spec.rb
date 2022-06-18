@@ -33,8 +33,13 @@ describe 'Jobs', type: :system, js: true do
     end
 
     let(:discarded_job) do
+      travel_to 1.hour.ago
       ExampleJob.set(queue: :elephants).perform_later(ExampleJob::DEAD_TYPE)
-    rescue StandardError
+      5.times do
+        travel 5.minutes
+        GoodJob.perform_inline
+      end
+      travel_back
       GoodJob::ActiveJobJob.order(created_at: :asc).last
     end
 

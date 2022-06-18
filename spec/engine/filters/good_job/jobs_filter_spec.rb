@@ -15,14 +15,16 @@ RSpec.describe GoodJob::JobsFilter do
     GoodJob::ActiveJobJob.order(created_at: :asc).last.update!(cron_key: "frequent_cron")
 
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-    ExampleJob.set(queue: 'default').perform_later('success')
-    ExampleJob.set(queue: 'mice').perform_later('error_once')
+    ExampleJob.set(queue: 'default').perform_later(ExampleJob::SUCCESS_TYPE)
+    ExampleJob.set(queue: 'mice').perform_later(ExampleJob::ERROR_ONCE_TYPE)
 
-    begin
-      ExampleJob.set(queue: 'elephants').perform_later('dead')
-    rescue ExampleJob::DeadError
-      nil
+    travel_to 1.hour.ago
+    ExampleJob.set(queue: 'elephants').perform_later(ExampleJob::DEAD_TYPE)
+    5.times do
+      travel 5.minutes
+      GoodJob.perform_inline
     end
+    travel_back
 
     running_job = ExampleJob.perform_later('success')
     running_execution = GoodJob::Execution.find(running_job.provider_job_id)
@@ -58,9 +60,9 @@ RSpec.describe GoodJob::JobsFilter do
   describe '#states' do
     it 'is a valid result' do
       expect(filter.states).to eq({
-                                    "scheduled" => 0,
+                                    "scheduled" => 1,
                                     "retried" => 0,
-                                    "queued" => 1,
+                                    "queued" => 0,
                                     "running" => 1,
                                     "finished" => 2,
                                     "discarded" => 1,
