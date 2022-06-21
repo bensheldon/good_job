@@ -27,7 +27,8 @@ platforms :ruby do
   gem "sorbet"
   gem "sorbet-rails"
   gem "sorbet-runtime"
-  gem "sord", github: "AaronC81/sord" # https://github.com/AaronC81/sord/pull/127b
+  gem "sord", github: "AaronC81/sord" # https://github.com/AaronC81/sord/pull/127
+  gem "tapioca"
 
   group :lint do
     gem 'easy_translate'

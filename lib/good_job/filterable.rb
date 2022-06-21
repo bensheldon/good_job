@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 module GoodJob
   # Shared methods for filtering Execution/Job records from the +good_jobs+ table.

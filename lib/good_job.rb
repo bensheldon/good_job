@@ -89,7 +89,6 @@ module GoodJob
   #   * +-1+, the scheduler will wait until the shutdown is complete.
   #   * +0+, the scheduler will immediately shutdown and stop any active tasks.
   #   * +1..+, the scheduler will wait that many seconds before stopping any remaining active tasks.
-  # @param wait [Boolean] whether to wait for shutdown
   # @return [void]
   def self.shutdown(timeout: -1)
     _shutdown_all(_executables, timeout: timeout)

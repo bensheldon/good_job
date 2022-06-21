@@ -175,7 +175,7 @@ module GoodJob
 
       # Acquires an advisory lock on this record if it is not already locked by
       # another database session. Be careful to ensure you release the lock when
-      # you are done with {#advisory_unlock_key} to release all remaining locks.
+      # you are done with {.advisory_unlock_key} to release all remaining locks.
       # @param key [String, Symbol] Key to Advisory Lock against
       # @param function [String, Symbol] Postgres Advisory Lock function name to use
       # @return [Boolean] whether the lock was acquired.

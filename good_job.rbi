@@ -70,8 +70,6 @@ module GoodJob
   # See the {file:README.md#executing-jobs-async--in-process} for more explanation and examples.
   # 
   # _@param_ `timeout` — Seconds to wait for actively executing jobs to finish * +nil+, the scheduler will trigger a shutdown but not wait for it to complete. * +-1+, the scheduler will wait until the shutdown is complete. * +0+, the scheduler will immediately shutdown and stop any active tasks. * +1..+, the scheduler will wait that many seconds before stopping any remaining active tasks.
-  # 
-  # _@param_ `wait` — whether to wait for shutdown
   sig { params(timeout: T.nilable(Numeric)).void }
   def self.shutdown(timeout: -1); end
 
@@ -561,7 +559,7 @@ module GoodJob
 
     # Acquires an advisory lock on this record if it is not already locked by
     # another database session. Be careful to ensure you release the lock when
-    # you are done with {#advisory_unlock_key} to release all remaining locks.
+    # you are done with {.advisory_unlock_key} to release all remaining locks.
     # 
     # _@param_ `key` — Key to Advisory Lock against
     # 
@@ -1763,9 +1761,9 @@ module GoodJob
     # sord warn - ActiveRecord::Relation wasn't able to be resolved to a constant in this project
     # Get Jobs with given class name
     # 
-    # _@param_ `string` — Execution class name
-    sig { returns(ActiveRecord::Relation) }
-    def self.job_class; end
+    # _@param_ `job_class` — Job class name
+    sig { params(job_class: String).returns(ActiveRecord::Relation) }
+    def self.job_class(job_class); end
 
     # sord warn - ActiveRecord::Relation wasn't able to be resolved to a constant in this project
     # Get Jobs finished before the given timestamp.

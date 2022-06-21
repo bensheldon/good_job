@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
@@ -32,9 +33,9 @@ module GoodJob
     default_scope { where(retried_good_job_id: nil) }
 
     # Get Jobs with given class name
-    # @!method job_class
+    # @!method job_class(job_class)
     # @!scope class
-    # @param string [String] Execution class name
+    # @param job_class [String] Job class name
     # @return [ActiveRecord::Relation]
     scope :job_class, ->(job_class) { where("serialized_params->>'job_class' = ?", job_class) }
 

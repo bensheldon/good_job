@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 module GoodJob
   # Base ActiveRecord class that all GoodJob models inherit from.
