@@ -373,6 +373,15 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
     end
     ```
 
+1. If you want to see finished (successful) and discarded (failed) jobs on the dashboard, you will have to configure job records to be preserved:
+
+    ```ruby
+    # eg in config/initializers/good_job.rb
+    GoodJob.preserve_job_records = true
+    ```
+
+    See more at [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
+
 #### API-only Rails applications
 
 API-only Rails applications may not have all of the required Rack middleware for the GoodJob Dashboard to function. To re-add the middlware:
