@@ -28,7 +28,8 @@ Gem::Specification.new do |spec|
   }
 
   spec.files = Dir[
-    "engine/**/*",
+    "app/**/*",
+    "config/**/*",
     "lib/**/*",
     "README.md",
     "CHANGELOG.md",

@@ -10,8 +10,8 @@ base_locale: en
 # Read and write translations.
 data:
   read:
-    - engine/config/locales/%{locale}.yml
-    - engine/config/locales/**/*.%{locale}.yml
+    - config/locales/%{locale}.yml
+    - config/locales/**/*.%{locale}.yml
 
   # Locale files to write new keys to, based on a list of key pattern => file rules. Matched from top to bottom:
   # `i18n-tasks normalize -p` will force move the keys according to these rules
@@ -46,11 +46,11 @@ data:
 # Find translate calls
 search:
   paths:
-    - engine/app
+    - app
   relative_roots:
-    - engine/app/controllers
-    - engine/app/helpers
-    - engine/app/views
+    - app/controllers
+    - app/helpers
+    - app/views
 
   ## Directories where method names which should not be part of a relative key resolution.
   # By default, if a relative translation is used inside a method, the name of the method will be considered part of the resolved key.
