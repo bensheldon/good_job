@@ -116,7 +116,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     YourJob.set(queue: :some_queue, wait: 5.minutes, priority: 10).perform_later
     ```
 
-1. In development, GoodJob executes jobs immediately. In production, GoodJob provides different options:
+1. In development, GoodJob executes jobs immediately in a separate thread (async mode). In production, GoodJob provides different options:
 
     - By default, GoodJob separates job enqueuing from job execution so that jobs can be scaled independently of the web server.  Use the GoodJob command-line tool to execute jobs:
 
