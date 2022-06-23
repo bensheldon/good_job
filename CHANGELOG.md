@@ -1,25 +1,39 @@
 # Changelog
 
+## [v2.17.0](https://github.com/bensheldon/good_job/tree/v2.17.0) (2022-06-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.16.1...v2.17.0)
+
+**Merged pull requests:**
+
+- Remove nonexistant `engine/lib` from $LOAD\_PATH [\#629](https://github.com/bensheldon/good_job/pull/629) ([bensheldon](https://github.com/bensheldon))
+- Mention in README that dashboard can't see completed jobs unless they are preserved [\#627](https://github.com/bensheldon/good_job/pull/627) ([jrochkind](https://github.com/jrochkind))
+- Clarify README on default in development [\#623](https://github.com/bensheldon/good_job/pull/623) ([jrochkind](https://github.com/jrochkind))
+- Convert GoodJob into a single mountable engine \(instead of a plugin plus optional engine\) [\#554](https://github.com/bensheldon/good_job/pull/554) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.16.1](https://github.com/bensheldon/good_job/tree/v2.16.1) (2022-06-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.16.0...v2.16.1)
 
-**Merged pull requests:**
+**Fixed bugs:**
 
 - Fix `:inline` mode with future behavior to run unscheduled jobs immediately [\#620](https://github.com/bensheldon/good_job/pull/620) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
 - Version check `Zeitwerk::Loader.new(warn_on_extra_files: false)` flag [\#619](https://github.com/bensheldon/good_job/pull/619) ([bensheldon](https://github.com/bensheldon))
 
 ## [v2.16.0](https://github.com/bensheldon/good_job/tree/v2.16.0) (2022-06-17)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.15.2...v2.16.0)
 
+**Implemented enhancements:**
+
+- Allow inline executor to respect scheduled jobs; deprecate old behavior. Add `GoodJob.perform_inline` [\#615](https://github.com/bensheldon/good_job/pull/615) ([bensheldon](https://github.com/bensheldon))
+
 **Closed issues:**
 
 - Upgrading zeitwerk to 2.6.0 causes a warning related to good\_job [\#616](https://github.com/bensheldon/good_job/issues/616)
-
-**Merged pull requests:**
-
-- Allow inline executor to respect scheduled jobs; deprecate old behavior. Add `GoodJob.perform_inline` [\#615](https://github.com/bensheldon/good_job/pull/615) ([bensheldon](https://github.com/bensheldon))
 
 ## [v2.15.2](https://github.com/bensheldon/good_job/tree/v2.15.2) (2022-06-17)
 
