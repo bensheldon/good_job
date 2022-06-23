@@ -51,7 +51,7 @@ module GoodJob
       end
     end
 
-    belongs_to :job, class_name: 'GoodJob::ActiveJobJob', foreign_key: 'active_job_id', primary_key: 'active_job_id', optional: true, inverse_of: :executions
+    belongs_to :job, class_name: 'GoodJob::Job', foreign_key: 'active_job_id', primary_key: 'active_job_id', optional: true, inverse_of: :executions
 
     # Get Jobs with given ActiveJob ID
     # @!method active_job_id
@@ -346,8 +346,7 @@ module GoodJob
         current_thread.reset
         current_thread.execution = self
 
-        # DEPRECATION: Remove deprecated `good_job:` parameter in GoodJob v3
-        ActiveSupport::Notifications.instrument("perform_job.good_job", { good_job: self, execution: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do
+        ActiveSupport::Notifications.instrument("perform_job.good_job", { execution: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do
           value = ActiveJob::Base.execute(active_job_data)
 
           if value.is_a?(Exception)

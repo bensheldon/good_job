@@ -12,7 +12,7 @@ RSpec.describe GoodJob::JobsFilter do
 
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
     ExampleJob.set(queue: 'cron').perform_later
-    GoodJob::ActiveJobJob.order(created_at: :asc).last.update!(cron_key: "frequent_cron")
+    GoodJob::Job.order(created_at: :asc).last.update!(cron_key: "frequent_cron")
 
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
     ExampleJob.set(queue: 'default').perform_later(ExampleJob::SUCCESS_TYPE)
