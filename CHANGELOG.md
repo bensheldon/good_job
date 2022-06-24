@@ -1,5 +1,22 @@
 # Changelog
 
+## [v2.17.1](https://github.com/bensheldon/good_job/tree/v2.17.1) (2022-06-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.17.0...v2.17.1)
+
+**Fixed bugs:**
+
+- Move models out of `app` into `lib/models` [\#635](https://github.com/bensheldon/good_job/pull/635) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- dashboard "delete all" does not work [\#630](https://github.com/bensheldon/good_job/issues/630)
+- Concurrency controlled jobs cause infinite loops when perform\_limit is exceeded in test environments [\#609](https://github.com/bensheldon/good_job/issues/609)
+
+**Merged pull requests:**
+
+- Better isolate test environment: run server integration tests on port 3009 with custom pidfile; scope advisory lock counts to test database [\#632](https://github.com/bensheldon/good_job/pull/632) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.17.0](https://github.com/bensheldon/good_job/tree/v2.17.0) (2022-06-23)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.16.1...v2.17.0)
