@@ -8,6 +8,7 @@ Zeitwerk::Loader.for_gem(**zeitwerk_options).tap do |loader|
   loader.inflector.inflect({
                              "cli" => "CLI",
                            })
+  loader.push_dir("#{__dir__}/models")
   loader.ignore("#{__dir__}/generators")
   loader.setup
 end
