@@ -40,19 +40,18 @@ RSpec.configure do |config|
   config.before(:each, type: :system, js: true) do
     # Chrome's no-sandbox option is required for running in Docker
     driven_by :selenium, using: (ENV['SHOW_BROWSER'] ? :chrome : :headless_chrome), screen_size: [1024, 800] do |driver_options|
-      driver_options.add_option('w3c', false)
       driver_options.add_argument("--disable-dev-shm-usage")
       driver_options.add_argument("--no-sandbox")
     end
   end
 
-  config.after(:each, type: :system, js: true) do |example|
-    @previous_browser_logs ||= []
-
-    if example.exception
-      browser_logs = page.driver.browser.manage.logs.get(:browser) - @previous_browser_logs
-      raise "Browser logs:\n\n#{browser_logs.join("\n")}" unless browser_logs.empty?
-    end
-    @previous_browser_logs = page.driver.browser.manage.logs.get(:browser)
-  end
+  # config.after(:each, type: :system, js: true) do |example|
+  #   @previous_browser_logs ||= []
+  #
+  #   if example.exception
+  #     browser_logs = page.driver.browser.manage.logs.get(:browser) - @previous_browser_logs
+  #     raise "Browser logs:\n\n#{browser_logs.join("\n")}" unless browser_logs.empty?
+  #   end
+  #   @previous_browser_logs = page.driver.browser.manage.logs.get(:browser)
+  # end
 end
