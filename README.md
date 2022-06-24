@@ -144,9 +144,9 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 
 ## Compatibility
 
-- **Ruby on Rails:** 5.2+
-- **Ruby:** MRI 2.5+. JRuby 9.2.13+
-- **Postgres:** 9.6+
+- **Ruby on Rails:** 6.0+
+- **Ruby:** Ruby 2.5+. JRuby 9.2.13+
+- **Postgres:** 10.0+
 
 ## Configuration
 
@@ -395,8 +395,6 @@ The Dashboard can be set to automatically refresh by checking "Live Poll" in the
 
 GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.
 
-**Note:** Limiting concurrency at _enqueue_ requires Rails 6.0+ because Rails 5.2 cannot halt ActiveJob callbacks.
-
 ```ruby
 class MyJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
@@ -610,7 +608,7 @@ By default, jobs will not be retried unless `retry_on` is configured. This can b
 
 #### ActionMailer retries
 
-Any configuration in `ApplicationJob` will have to be duplicated on `ActionMailer::MailDeliveryJob` (`ActionMailer::DeliveryJob` in Rails 5.2 or earlier) because ActionMailer uses a custom class, `ActionMailer::MailDeliveryJob`, which inherits from `ActiveJob::Base`,  rather than your applications `ApplicationJob`.
+Any configuration in `ApplicationJob` will have to be duplicated on `ActionMailer::MailDeliveryJob` because ActionMailer uses that custom class which inherits from `ActiveJob::Base`,  rather than your application's `ApplicationJob`.
 
 You can use an initializer to configure `ActionMailer::MailDeliveryJob`, for example:
 
