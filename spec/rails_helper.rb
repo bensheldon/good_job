@@ -35,6 +35,8 @@ require 'pry'
 #
 Dir[File.join(File.dirname(__FILE__), 'support', '**', '*.rb')].sort.each { |f| require f }
 
+RSpec::Support::ObjectFormatter.default_instance.max_formatted_output_length = 10_000
+
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
 begin

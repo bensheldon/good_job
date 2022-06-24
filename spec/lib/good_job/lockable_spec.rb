@@ -101,7 +101,7 @@ RSpec.describe GoodJob::Lockable do
         model_class.advisory_lock_key(execution.lockable_key) do
           expect(execution.advisory_locked?).to be true
           expect(execution.owns_advisory_lock?).to be true
-          expect(PgLock.advisory_lock.count).to eq 1
+          expect(PgLock.current_database.advisory_lock.count).to eq 1
         end
 
         expect(execution.advisory_locked?).to be false
@@ -131,7 +131,7 @@ RSpec.describe GoodJob::Lockable do
       end
 
       expect(records).to all be_advisory_unlocked
-      expect(PgLock.advisory_lock.count).to eq 0
+      expect(PgLock.current_database.advisory_lock.count).to eq 0
     end
 
     it 'can unlock all advisory locks on the session with `unlock_session: true`' do
@@ -141,7 +141,7 @@ RSpec.describe GoodJob::Lockable do
                  .with_advisory_lock(unlock_session: true) { |_records| nil }
 
       expect(another_record).not_to be_advisory_locked
-      expect(PgLock.advisory_lock.count).to eq 0
+      expect(PgLock.current_database.advisory_lock.count).to eq 0
     end
 
     it 'does not leak relation scope into inner queries' do
