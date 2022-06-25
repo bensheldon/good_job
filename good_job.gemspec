@@ -60,7 +60,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "zeitwerk", ">= 2.0"
 
   spec.add_development_dependency "benchmark-ips"
-  spec.add_development_dependency "capybara", "~> 3.35.0" # Capybara 3.36 requires Ruby 2.6+, which is not compatible with JRuby 9.2 (MRI 2.5 compatible)
+  spec.add_development_dependency "capybara"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "dotenv"
   spec.add_development_dependency "foreman"
@@ -71,7 +71,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry-rails"
   spec.add_development_dependency "puma"
   spec.add_development_dependency "rspec-rails"
-  spec.add_development_dependency "selenium-webdriver", "~> 3.142" # Selenium Webdriver 4.x requires Ruby 2.6+, which is not compatible with JRuby 9.2 (MRI 2.5 compatible)
+  spec.add_development_dependency "selenium-webdriver"
   spec.add_development_dependency "sigdump"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "yard-activesupport-concern"

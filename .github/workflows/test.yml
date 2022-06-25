@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        ruby: [2.5, 2.6, 2.7, "3.0", 3.1, jruby-9.2, jruby-9.3]
+        ruby: ["2.7", "3.0", "3.1", jruby-9.2, jruby-9.3]
         pg: [14]
         include:
           - ruby: "3.0"
@@ -81,6 +81,9 @@ jobs:
         uses: actions/checkout@v2
       - name: Update .ruby-version with matrix value
         run: echo "${{ matrix.ruby }}" >| .ruby-version
+      - name: Set specific Gemfile
+        if: ${{ !contains(matrix.ruby, 'jruby') }}
+        run: echo "BUNDLE_GEMFILE=Gemfile.jruby"  >> $GITHUB_ENV
 
       # Dependencies
       - name: Set up Ruby

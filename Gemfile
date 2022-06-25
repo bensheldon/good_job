@@ -2,6 +2,8 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
+ruby ">= 2.7.0"
+
 # Declare your gem's dependencies in good_job.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
@@ -15,7 +17,7 @@ gemspec
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'appraisal', github: "bensheldon/appraisal", branch: "fix-bundle-env" # https://github.com/thoughtbot/appraisal/pull/174
 gem 'matrix'
-gem 'nokogiri', '~> 1.12.0' # Compatible with Ruby 2.5 / JRuby 9.2
+gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 gem 'rails'
 
@@ -27,7 +29,7 @@ platforms :ruby do
 
   group :lint do
     gem 'easy_translate'
-    gem "erb_lint", ">= 0.0.35"
+    gem "erb_lint"
     gem 'i18n-tasks'
     gem "mdl"
     gem "rubocop"
