@@ -82,7 +82,7 @@ jobs:
       - name: Update .ruby-version with matrix value
         run: echo "${{ matrix.ruby }}" >| .ruby-version
       - name: Set specific Gemfile
-        if: ${{ !contains(matrix.ruby, 'jruby') }}
+        if: ${{ contains(matrix.ruby, 'jruby') }}
         run: echo "BUNDLE_GEMFILE=Gemfile.jruby"  >> $GITHUB_ENV
 
       # Dependencies

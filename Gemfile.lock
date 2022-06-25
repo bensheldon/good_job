@@ -404,6 +404,7 @@ PLATFORMS
   ruby
   universal-java-11
   universal-java-17
+  x86_64-linux
 
 DEPENDENCIES
   activerecord-explain-analyze
