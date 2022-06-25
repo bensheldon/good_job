@@ -190,7 +190,7 @@ describe 'Jobs', type: :system, js: true do
         check "toggle_job_ids"
         within("table thead") { accept_confirm { click_on "Destroy all" } }
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
-      end.to change { GoodJob::ActiveJobJob.count }.from(2).to(0)
+      end.to change(GoodJob::ActiveJobJob, :count).from(2).to(0)
     end
   end
 end
