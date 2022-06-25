@@ -237,6 +237,8 @@ GEM
     nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
       racc (~> 1.4)
+    nokogiri (1.12.5-arm64-darwin)
+      racc (~> 1.4)
     nokogiri (1.12.5-java)
       racc (~> 1.4)
     octokit (4.25.0)
@@ -397,6 +399,7 @@ GEM
     zeitwerk (2.6.0)
 
 PLATFORMS
+  arm64-darwin
   java
   ruby
   universal-java-11
@@ -438,6 +441,9 @@ DEPENDENCIES
   sigdump
   yard
   yard-activesupport-concern
+
+RUBY VERSION
+   ruby 3.0.4p208
 
 BUNDLED WITH
    2.3.16
