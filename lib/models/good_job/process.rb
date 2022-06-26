@@ -25,15 +25,6 @@ module GoodJob # :nodoc:
     # @return [ActiveRecord::Relation]
     scope :inactive, -> { advisory_unlocked }
 
-    # Whether the +good_job_processes+ table exsists.
-    # @return [Boolean]
-    def self.migrated?
-      return true if connection.table_exists?(table_name)
-
-      migration_pending_warning!
-      false
-    end
-
     # UUID that is unique to the current process and changes when forked.
     # @return [String]
     def self.current_id

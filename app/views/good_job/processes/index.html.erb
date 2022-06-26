@@ -3,15 +3,7 @@
 </div>
 
 <div data-live-poll-region="processes">
-  <% if !GoodJob::Process.migrated? %>
-    <div class="card my-3">
-      <div class="card-body">
-        <p class="card-text">
-          <em>Feature unavailable because of pending database migration.</em>
-        </p>
-      </div>
-    </div>
-  <% elsif @processes.present? %>
+  <% if @processes.present? %>
     <div class="card my-3">
       <div class="table-responsive">
         <table class="table card-table table-bordered table-hover table-sm mb-0">

@@ -14,8 +14,6 @@ module GoodJob # :nodoc:
       # Registers the current process.
       def register_process
         GoodJob::Process.with_connection(connection) do
-          next unless Process.migrated?
-
           GoodJob::Process.cleanup
           @process = GoodJob::Process.register
         end
@@ -24,8 +22,6 @@ module GoodJob # :nodoc:
       # Deregisters the current process.
       def deregister_process
         GoodJob::Process.with_connection(connection) do
-          next unless Process.migrated?
-
           @process&.deregister
         end
       end
