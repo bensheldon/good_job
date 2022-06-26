@@ -43,23 +43,21 @@ module GoodJob
 
   # @!attribute [rw] preserve_job_records
   #   @!scope class
-  #   Whether to preserve job records in the database after they have finished (default: +false+).
-  #   By default, GoodJob destroys job records after the job is completed successfully.
+  #   Whether to preserve job records in the database after they have finished (default: +true+).
+  #   By default, GoodJob deletes job records after the job is completed successfully.
   #   If you want to preserve jobs for latter inspection, set this to +true+.
   #   If you want to preserve only jobs that finished with error for latter inspection, set this to +:on_unhandled_error+.
-  #   If +true+, you will need to clean out jobs using the +good_job cleanup_preserved_jobs+ CLI command or
-  #   by using +Goodjob.cleanup_preserved_jobs+.
   #   @return [Boolean, nil]
-  mattr_accessor :preserve_job_records, default: false
+  mattr_accessor :preserve_job_records, default: true
 
   # @!attribute [rw] retry_on_unhandled_error
   #   @!scope class
-  #   Whether to re-perform a job when a type of +StandardError+ is raised to GoodJob (default: +true+).
+  #   Whether to re-perform a job when a type of +StandardError+ is raised to GoodJob (default: +false+).
   #   If +true+, causes jobs to be re-queued and retried if they raise an instance of +StandardError+.
   #   If +false+, jobs will be discarded or marked as finished if they raise an instance of +StandardError+.
   #   Instances of +Exception+, like +SIGINT+, will *always* be retried, regardless of this attribute's value.
   #   @return [Boolean, nil]
-  mattr_accessor :retry_on_unhandled_error, default: true
+  mattr_accessor :retry_on_unhandled_error, default: false
 
   # @!attribute [rw] on_thread_error
   #   @!scope class

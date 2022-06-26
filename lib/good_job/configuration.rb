@@ -15,13 +15,13 @@ module GoodJob
     # Default poll interval for async in development environment
     DEFAULT_DEVELOPMENT_ASYNC_POLL_INTERVAL = -1
     # Default number of threads to use per {Scheduler}
-    DEFAULT_MAX_CACHE = 10000
+    DEFAULT_MAX_CACHE = 10_000
     # Default number of seconds to preserve jobs for {CLI#cleanup_preserved_jobs} and {GoodJob.cleanup_preserved_jobs}
-    DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 24 * 60 * 60
+    DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO = 14.days.to_i
     # Default number of jobs to execute between preserved job cleanup runs
-    DEFAULT_CLEANUP_INTERVAL_JOBS = nil
+    DEFAULT_CLEANUP_INTERVAL_JOBS = 1_000
     # Default number of seconds to wait between preserved job cleanup runs
-    DEFAULT_CLEANUP_INTERVAL_SECONDS = nil
+    DEFAULT_CLEANUP_INTERVAL_SECONDS = 10.minutes.to_i
     # Default to always wait for jobs to finish for {Adapter#shutdown}
     DEFAULT_SHUTDOWN_TIMEOUT = -1
     # Default to not running cron

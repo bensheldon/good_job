@@ -67,9 +67,9 @@ RSpec.describe GoodJob::Configuration do
   end
 
   describe '#cleanup_preserved_jobs_before_seconds_ago' do
-    it 'defaults to 86400' do
+    it 'defaults to 14 days' do
       configuration = described_class.new({})
-      expect(configuration.cleanup_preserved_jobs_before_seconds_ago).to eq 86400
+      expect(configuration.cleanup_preserved_jobs_before_seconds_ago).to eq 14.days.to_i
     end
 
     context 'when environment variable is set' do

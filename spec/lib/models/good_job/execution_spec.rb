@@ -259,6 +259,8 @@ RSpec.describe GoodJob::Execution do
           end
 
           it 'does not modify the original good_job serialized params' do
+            allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+
             expect do
               good_job.perform
             end.not_to change { good_job.reload.serialized_params["exception_executions"]["[TestJob::ExpectedError]"] }
