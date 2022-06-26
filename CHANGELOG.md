@@ -1,5 +1,21 @@
 # Changelog
 
+## [v2.99.0](https://github.com/bensheldon/good_job/tree/v2.99.0) (2022-06-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.17.1...v2.99.0)
+
+**Closed issues:**
+
+- How to accomplish user controlled recurring jobs? [\#640](https://github.com/bensheldon/good_job/issues/640)
+- "uninitialized constant GoodJob::Execution" in development env [\#634](https://github.com/bensheldon/good_job/issues/634)
+
+**Merged pull requests:**
+
+- Create upgrade instructions for v2.99 -\> v3.0.0 [\#641](https://github.com/bensheldon/good_job/pull/641) ([bensheldon](https://github.com/bensheldon))
+- Update development dependencies; delete Gemfile.lock in CI to avoid Ruby version dependency mismatches [\#639](https://github.com/bensheldon/good_job/pull/639) ([bensheldon](https://github.com/bensheldon))
+- Put more model files in `lib/models` and align specs too [\#638](https://github.com/bensheldon/good_job/pull/638) ([bensheldon](https://github.com/bensheldon))
+- Generate sha256 checksums on gem release too [\#636](https://github.com/bensheldon/good_job/pull/636) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.17.1](https://github.com/bensheldon/good_job/tree/v2.17.1) (2022-06-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.17.0...v2.17.1)

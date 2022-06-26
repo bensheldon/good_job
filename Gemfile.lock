@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    good_job (2.17.1)
+    good_job (2.99.0)
       activejob (>= 5.2.0)
       activerecord (>= 5.2.0)
       concurrent-ruby (>= 1.0.2)
@@ -241,6 +241,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.12.5-java)
       racc (~> 1.4)
+    nokogiri (1.12.5-x86_64-linux)
+      racc (~> 1.4)
     octokit (4.25.0)
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
@@ -442,9 +444,6 @@ DEPENDENCIES
   sigdump
   yard
   yard-activesupport-concern
-
-RUBY VERSION
-   ruby 3.0.4p208
 
 BUNDLED WITH
    2.3.6
