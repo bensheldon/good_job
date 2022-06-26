@@ -64,8 +64,8 @@ RSpec.describe GoodJob::Execution do
 
       described_class.all.perform_with_advisory_lock
 
-      expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
-      expect { good_job_2.reload }.not_to raise_error
+      expect(good_job.reload.finished_at).to be_present
+      expect(good_job_2.reload.finished_at).to be_blank
     end
 
     it 'returns the result or nil if not' do
@@ -321,7 +321,16 @@ RSpec.describe GoodJob::Execution do
       end
     end
 
-    it 'destroys the job' do
+    it 'preserves the job by default' do
+      good_job.perform
+      expect(good_job.reload).to have_attributes(
+        performed_at: within(1.second).of(Time.current),
+        finished_at: within(1.second).of(Time.current)
+      )
+    end
+
+    it 'can destroy the job when preserve_job_records is false' do
+      allow(GoodJob).to receive(:preserve_job_records).and_return(false)
       good_job.perform
       expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
     end
@@ -330,16 +339,6 @@ RSpec.describe GoodJob::Execution do
       allow(GoodJob).to receive(:preserve_job_records).and_return(:on_unhandled_error)
       good_job.perform
       expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
-    end
-
-    it 'can preserve the job' do
-      allow(GoodJob).to receive(:preserve_job_records).and_return(true)
-
-      good_job.perform
-      expect(good_job.reload).to have_attributes(
-        performed_at: within(1.second).of(Time.current),
-        finished_at: within(1.second).of(Time.current)
-      )
     end
 
     it 'raises an error if the job is attempted to be re-run' do
@@ -361,13 +360,7 @@ RSpec.describe GoodJob::Execution do
         expect(result.handled_error).to be_a(TestJob::ExpectedError)
       end
 
-      it 'destroys the job' do
-        good_job.perform
-
-        expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
-      end
-
-      it 'can preserve the job' do
+      it 'can preserves the job' do
         allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
         good_job.perform

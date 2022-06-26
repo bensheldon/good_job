@@ -14,9 +14,6 @@ end
 case Rails.env
 when 'development'
   ActiveJob::Base.queue_adapter = :good_job
-
-  GoodJob.retry_on_unhandled_error = false
-  GoodJob.preserve_job_records = true
   GoodJob.on_thread_error = -> (error) { Rails.logger.warn("#{error}\n#{error.backtrace}") }
 
   Rails.application.configure do
@@ -43,9 +40,6 @@ when 'test'
   # test
 when 'demo'
   ActiveJob::Base.queue_adapter = :good_job
-
-  GoodJob.preserve_job_records = true
-  GoodJob.retry_on_unhandled_error = false
 
   Rails.application.configure do
     config.good_job.execution_mode = :async
