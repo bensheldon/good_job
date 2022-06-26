@@ -56,8 +56,8 @@ module GoodJob
     # Exports values to hash
     # @return [Hash]
     def self.to_h
-      ACCESSORS.each_with_object({}) do |accessor, hash|
-        hash[accessor] = send(accessor)
+      ACCESSORS.index_with do |accessor|
+        send(accessor)
       end
     end
 

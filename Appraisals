@@ -1,14 +1,7 @@
 # frozen_string_literal: true
-ruby_2 = Gem::Version.new(RUBY_VERSION) < Gem::Version.new('3')
 ruby_27_or_higher = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.7')
 ruby_31_or_higher = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1')
 jruby = RUBY_PLATFORM.include?('java')
-
-if ruby_2
-  appraise "rails-5.2" do
-    gem "rails", "~> 5.2.0"
-  end
-end
 
 unless ruby_31_or_higher # https://github.com/rails/rails/issues/44090#issuecomment-1007686519
   appraise "rails-6.0" do

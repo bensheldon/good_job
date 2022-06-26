@@ -16,7 +16,7 @@
   <%= tag.script "", src: rails_ujs_path(format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
 
   <%= tag.script "", src: es_module_shims_path(format: :js, v: GoodJob::VERSION, locale: nil), async: true, nonce: content_security_policy_nonce %>
-  <% importmaps = { imports: GoodJob::AssetsController.js_modules.keys.each_with_object({}) { |module_name, imports| imports[module_name] = modules_path(module_name, format: :js, locale: nil, v: GoodJob::VERSION) } } %>
+  <% importmaps = { imports: GoodJob::AssetsController.js_modules.keys.index_with { |module_name| modules_path(module_name, format: :js, locale: nil, v: GoodJob::VERSION) } } %>
   <%= tag.script importmaps.to_json.html_safe, type: "importmap", nonce: content_security_policy_nonce %>
   <%= tag.script "", src: scripts_path(format: :js, v: GoodJob::VERSION, locale: nil), type: "module", nonce: content_security_policy_nonce %>
 </head>

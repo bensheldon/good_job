@@ -289,32 +289,29 @@ RSpec.describe GoodJob::Execution do
             expect(result.unhandled_error).to be_an_instance_of TestJob::ExpectedError
           end
 
-          if Gem::Version.new(Rails.version) > Gem::Version.new("6")
-            # Necessary instrumentation was added in Rails 6.0
-            context 'when retry_on is used' do
-              before do
-                TestJob.retry_on(StandardError, wait: 0, attempts: Float::INFINITY) { nil }
-              end
-
-              it 'returns the error' do
-                result = good_job.perform
-
-                expect(result.value).to be_nil
-                expect(result.handled_error).to be_an_instance_of TestJob::ExpectedError
-              end
+          context 'when retry_on is used' do
+            before do
+              TestJob.retry_on(StandardError, wait: 0, attempts: Float::INFINITY) { nil }
             end
 
-            context 'when discard_on is used' do
-              before do
-                TestJob.discard_on(StandardError) { nil }
-              end
+            it 'returns the error' do
+              result = good_job.perform
 
-              it 'returns the error' do
-                result = good_job.perform
+              expect(result.value).to be_nil
+              expect(result.handled_error).to be_an_instance_of TestJob::ExpectedError
+            end
+          end
 
-                expect(result.value).to be_nil
-                expect(result.handled_error).to be_an_instance_of TestJob::ExpectedError
-              end
+          context 'when discard_on is used' do
+            before do
+              TestJob.discard_on(StandardError) { nil }
+            end
+
+            it 'returns the error' do
+              result = good_job.perform
+
+              expect(result.value).to be_nil
+              expect(result.handled_error).to be_an_instance_of TestJob::ExpectedError
             end
           end
         end
