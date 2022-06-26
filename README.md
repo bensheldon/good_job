@@ -519,8 +519,9 @@ GoodJob v3 is operationally identical to v2; upgrading to GoodJob v3 should be s
 
 Notable changes:
 
-- Defaults to preserve job records, and automatically delete after 14 days.
+- Defaults to preserve job records, and automatically delete them after 14 days.
 - Defaults to discarding failed jobs, instead of immediately retrying them.
+- `:inline` execution mode respects job schedules. Tests can invoke  `GoodJob.perform_inline` to execute jobs.
 - `GoodJob::Adapter` can no longer can be initialized with custom execution options (`queues:`, `max_threads:`, `poll_interval:`).
 - Renames `GoodJob::ActiveJobJob` to `GoodJob::Job`.
 - Removes support for Rails 5.2.
