@@ -5,7 +5,7 @@ source "https://rubygems.org"
 gem "activerecord-jdbcpostgresql-adapter", platforms: [:jruby]
 gem "appraisal", branch: "fix-bundle-env", git: "https://github.com/bensheldon/appraisal.git"
 gem "matrix"
-gem "nokogiri", "~> 1.12.0"
+gem "nokogiri"
 gem "pg", platforms: [:mri, :mingw, :x64_mingw]
 gem "rails", "~> 6.1.0"
 
@@ -17,7 +17,7 @@ platforms :ruby do
 
   group :lint do
     gem "easy_translate"
-    gem "erb_lint", ">= 0.0.35"
+    gem "erb_lint"
     gem "i18n-tasks"
     gem "mdl"
     gem "rubocop"
