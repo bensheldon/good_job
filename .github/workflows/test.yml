@@ -13,7 +13,6 @@ jobs:
       BUNDLE_JOBS: 4
       BUNDLE_RETRY: 3
       BUNDLE_PATH: vendor/bundle
-      DISABLE_SPRING: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -27,6 +26,47 @@ jobs:
       # Lint
       - name: Run linter
         run: bin/lint --nofix
+
+  development_environment:
+    name: Development Environment
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PGHOST: localhost
+      PGUSER: good_job
+      BUNDLE_JOBS: 4
+      BUNDLE_RETRY: 3
+      BUNDLE_PATH: vendor/bundle
+      DISABLE_SPRING: 1
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: good_job
+          POSTGRES_DB: good_job_test
+          POSTGRES_PASSWORD: ""
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: [ "5432:5432" ]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Dependencies
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      # Validate Development Environment
+      - name: bin/setup
+        run: bin/rails db:test:prepare
+      - name: bin/setup
+        run: bin/rspec
 
   test:
     name: Test
@@ -61,7 +101,6 @@ jobs:
       BUNDLE_RETRY: 3
       BUNDLE_PATH: vendor/bundle
       BUNDLE_WITHOUT: lint
-      DISABLE_SPRING: 1
       RAILS_LOG_TO_STDOUT: false
     services:
       postgres:
@@ -81,9 +120,15 @@ jobs:
         uses: actions/checkout@v2
       - name: Update .ruby-version with matrix value
         run: echo "${{ matrix.ruby }}" >| .ruby-version
-
       # Dependencies
-      - name: Set up Ruby
+      - name: Set up generic Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: false
+      - name: Delete and recreate Gemfile.lock
+        run: |
+          rm Gemfile.lock && bundle lock
+      - name: Set up Ruby and bundle install
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
