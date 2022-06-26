@@ -1,5 +1,20 @@
 # Changelog
 
+## [v3.0.0](https://github.com/bensheldon/good_job/tree/v3.0.0) (2022-06-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v2.99.0...v3.0.0)
+
+**Implemented enhancements:**
+
+- By default, preserve job records and automatically them clean up [\#545](https://github.com/bensheldon/good_job/pull/545) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Update tests to reflect default of `GoodJob.preserve_job_records = true`; update appraisal Gemfiles too [\#643](https://github.com/bensheldon/good_job/pull/643) ([bensheldon](https://github.com/bensheldon))
+- Remove database migration shims and old migrations [\#642](https://github.com/bensheldon/good_job/pull/642) ([bensheldon](https://github.com/bensheldon))
+- Remove support for EOL Rails 5.2 [\#637](https://github.com/bensheldon/good_job/pull/637) ([bensheldon](https://github.com/bensheldon))
+- Remove/rename deprecated behavior and constants for GoodJob v3  [\#633](https://github.com/bensheldon/good_job/pull/633) ([bensheldon](https://github.com/bensheldon))
+
 ## [v2.99.0](https://github.com/bensheldon/good_job/tree/v2.99.0) (2022-06-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.17.1...v2.99.0)
