@@ -20,32 +20,16 @@ module GoodJob
     #
     #  The default value depends on the Rails environment:
     #
-    #  - +development+ and +test+: +:inline+
+    #  - +development+: +:async:+
+    #   -+test+: +:inline+
     #  - +production+ and all other environments: +:external+
     #
-    # @param max_threads [Integer, nil] sets the number of threads per scheduler to use when +execution_mode+ is set to +:async+. The +queues+ parameter can specify a number of threads for each group of queues which will override this value. You can also set this with the environment variable +GOOD_JOB_MAX_THREADS+. Defaults to +5+.
-    # @param queues [String, nil] determines which queues to execute jobs from when +execution_mode+ is set to +:async+. See {file:README.md#optimize-queues-threads-and-processes} for more details on the format of this string. You can also set this with the environment variable +GOOD_JOB_QUEUES+. Defaults to +"*"+.
-    # @param poll_interval [Integer, nil] sets the number of seconds between polls for jobs when +execution_mode+ is set to +:async+. You can also set this with the environment variable +GOOD_JOB_POLL_INTERVAL+. Defaults to +1+.
-    # @param start_async_on_initialize [Boolean] whether to start the async scheduler when the adapter is initialized.
-    def initialize(execution_mode: nil, queues: nil, max_threads: nil, poll_interval: nil, start_async_on_initialize: nil)
-      if queues || max_threads || poll_interval || start_async_on_initialize
-        ActiveSupport::Deprecation.warn(
-          "GoodJob::Adapter's execution-related arguments (queues, max_threads, poll_interval, start_async_on_initialize) have been deprecated and will be removed in GoodJob v3. These options should be configured through GoodJob global configuration instead."
-        )
-      end
-
-      @configuration = GoodJob::Configuration.new(
-        {
-          execution_mode: execution_mode,
-          queues: queues,
-          max_threads: max_threads,
-          poll_interval: poll_interval,
-        }
-      )
+    def initialize(execution_mode: nil)
+      @configuration = GoodJob::Configuration.new({ execution_mode: execution_mode })
       @configuration.validate!
       self.class.instances << self
 
-      start_async if start_async_on_initialize || GoodJob.async_ready?
+      start_async if GoodJob.async_ready?
     end
 
     # Enqueues the ActiveJob job to be performed.
@@ -63,11 +47,7 @@ module GoodJob
     # @return [GoodJob::Execution]
     def enqueue_at(active_job, timestamp)
       scheduled_at = timestamp ? Time.zone.at(timestamp) : nil
-
-      if execute_inline?
-        future_scheduled = scheduled_at && scheduled_at > Time.current
-        will_execute_inline = !future_scheduled || (future_scheduled && !@configuration.inline_execution_respects_schedule?)
-      end
+      will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
 
       execution = GoodJob::Execution.enqueue(
         active_job,
@@ -76,29 +56,6 @@ module GoodJob
       )
 
       if will_execute_inline
-        if future_scheduled && !@configuration.inline_execution_respects_schedule?
-          ActiveSupport::Deprecation.warn(<<~DEPRECATION)
-            In the next major release, GoodJob will not *inline* execute
-            future-scheduled jobs.
-
-            To opt into this behavior immediately set:
-            `config.good_job.inline_execution_respects_schedule = true`
-
-            To perform jobs inline at any time, use `GoodJob.perform_inline`.
-
-            For example, using time helpers within an integration test:
-
-            ```
-            MyJob.set(wait: 10.minutes).perform_later
-            travel_to(15.minutes.from_now) { GoodJob.perform_inline }
-            ```
-
-            Note: Rails `travel`/`travel_to` time helpers do not have millisecond
-            precision, so you must leave at least 1 second between the schedule
-            and time traveling for the job to be executed.
-          DEPRECATION
-        end
-
         begin
           result = execution.perform
         ensure

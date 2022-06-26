@@ -29,7 +29,7 @@ describe 'Jobs', type: :system, js: true do
   describe 'Jobs' do
     let(:unfinished_job) do
       ExampleJob.set(wait: 10.minutes, queue: :mice).perform_later
-      GoodJob::ActiveJobJob.order(created_at: :asc).last
+      GoodJob::Job.order(created_at: :asc).last
     end
 
     let(:discarded_job) do
@@ -40,7 +40,7 @@ describe 'Jobs', type: :system, js: true do
         GoodJob.perform_inline
       end
       travel_back
-      GoodJob::ActiveJobJob.order(created_at: :asc).last
+      GoodJob::Job.order(created_at: :asc).last
     end
 
     before do
@@ -104,10 +104,10 @@ describe 'Jobs', type: :system, js: true do
         visit '/good_job'
         click_on "Jobs"
 
-        expect(page).to have_selector('.active_job_job', count: 3)
+        expect(page).to have_selector('.job', count: 3)
         fill_in 'query', with: ExampleJob::DEAD_TYPE
         click_on 'Search'
-        expect(page).to have_selector('.active_job_job', count: 1)
+        expect(page).to have_selector('.job', count: 1)
       end
     end
 
@@ -168,13 +168,13 @@ describe 'Jobs', type: :system, js: true do
         check "toggle_job_ids"
         within("table thead") { accept_confirm { click_on "Discard all" } }
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
-      end.to change { GoodJob::ActiveJobJob.discarded.count }.from(1).to(2)
+      end.to change { GoodJob::Job.discarded.count }.from(1).to(2)
 
       expect do
         check "toggle_job_ids"
         within("table thead") { accept_confirm { click_on "Retry all" } }
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
-      end.to change { GoodJob::ActiveJobJob.discarded.count }.from(2).to(0)
+      end.to change { GoodJob::Job.discarded.count }.from(2).to(0)
 
       visit good_job.jobs_path(limit: 1)
       expect do
@@ -182,7 +182,7 @@ describe 'Jobs', type: :system, js: true do
         check "Apply to all 2 jobs"
         within("table thead") { accept_confirm { click_on "Discard all" } }
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
-      end.to change { GoodJob::ActiveJobJob.discarded.count }.from(0).to(2)
+      end.to change { GoodJob::Job.discarded.count }.from(0).to(2)
 
       visit "/good_job"
       click_on "Jobs"
@@ -190,7 +190,7 @@ describe 'Jobs', type: :system, js: true do
         check "toggle_job_ids"
         within("table thead") { accept_confirm { click_on "Destroy all" } }
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
-      end.to change(GoodJob::ActiveJobJob, :count).from(2).to(0)
+      end.to change(GoodJob::Job, :count).from(2).to(0)
     end
   end
 end

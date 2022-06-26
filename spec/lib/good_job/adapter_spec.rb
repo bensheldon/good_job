@@ -22,7 +22,7 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        create_with_advisory_lock: nil,
+        create_with_advisory_lock: false,
         scheduled_at: nil
       )
     end
@@ -55,32 +55,10 @@ RSpec.describe GoodJob::Adapter do
         expect(PERFORMED.size).to eq 1
       end
 
-      context 'when inline_execution_respects_schedule is TRUE' do
-        before do
-          config = Rails.application.config.good_job.dup.merge({ inline_execution_respects_schedule: true })
-          allow(Rails.application.config).to receive(:good_job).and_return(config)
-        end
-
-        it 'does not execute future scheduled jobs' do
-          adapter.enqueue_at(TestJob.new, 1.minute.from_now.to_f)
-          expect(PERFORMED.size).to eq 0
-          expect(GoodJob::ActiveJobJob.count).to eq 1
-        end
-      end
-
-      context 'when inline_execution_respects_schedule is FALSE' do
-        before do
-          config = Rails.application.config.good_job.dup.merge({ inline_execution_respects_schedule: false })
-          allow(Rails.application.config).to receive(:good_job).and_return(config)
-        end
-
-        it 'executes future scheduled jobs' do
-          expect do
-            adapter.enqueue_at(TestJob.new, 1.minute.from_now.to_f)
-            expect(PERFORMED.size).to eq 1
-            expect(GoodJob::ActiveJobJob.count).to eq 0
-          end.to output(/DEPRECATION WARNING/).to_stderr_from_any_process
-        end
+      it 'does not execute future scheduled jobs' do
+        adapter.enqueue_at(TestJob.new, 1.minute.from_now.to_f)
+        expect(PERFORMED.size).to eq 0
+        expect(GoodJob::Job.count).to eq 1
       end
     end
 
@@ -92,7 +70,10 @@ RSpec.describe GoodJob::Adapter do
         scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
         allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
 
-        adapter = described_class.new(execution_mode: :async_all, poll_interval: -1)
+        poller = instance_double(GoodJob::Poller, recipients: [], shutdown: nil)
+        allow(GoodJob::Poller).to receive(:new).and_return(poller)
+
+        adapter = described_class.new(execution_mode: :async_all)
         adapter.enqueue(active_job)
 
         expect(scheduler).to have_received(:create_thread)
@@ -111,7 +92,7 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        create_with_advisory_lock: nil,
+        create_with_advisory_lock: false,
         scheduled_at: scheduled_at.change(usec: 0)
       )
     end

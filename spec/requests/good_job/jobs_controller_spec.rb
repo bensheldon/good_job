@@ -28,7 +28,7 @@ describe GoodJob::JobsController, type: :request do
   describe 'PUT #mass_update' do
     let!(:job) do
       ExampleJob.perform_later
-      GoodJob::ActiveJobJob.first
+      GoodJob::Job.first
     end
 
     describe 'invalid input' do

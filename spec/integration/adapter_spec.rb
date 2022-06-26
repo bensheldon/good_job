@@ -66,32 +66,17 @@ RSpec.describe 'Adapter Integration' do
   end
 
   describe 'Async execution mode' do
-    context 'when Scheduler polling is disabled' do
-      let(:adapter) { GoodJob::Adapter.new execution_mode: :async_all, queues: 'mice:2', poll_interval: -1 }
+    let(:adapter) { GoodJob::Adapter.new execution_mode: :async_all }
 
-      it 'Jobs are directly handed to the performer, if they match the queues' do
-        elephant_ajob = TestJob.set(queue: 'elephants').perform_later
-        mice_ajob = TestJob.set(queue: 'mice').perform_later
+    it 'executes the job', skip_if_java: true do
+      elephant_adapter = GoodJob::Adapter.new execution_mode: :async_all
+      elephant_ajob = TestJob.set(queue: 'elephants').perform_later
 
-        sleep_until { RUN_JOBS.include? mice_ajob.provider_job_id }
+      sleep_until { RUN_JOBS.include? elephant_ajob.provider_job_id }
 
-        expect(RUN_JOBS).to include(mice_ajob.provider_job_id)
-        expect(RUN_JOBS).not_to include(elephant_ajob.provider_job_id)
-      end
+      expect(RUN_JOBS).to include(elephant_ajob.provider_job_id)
 
-      it 'invokes the notifier if the job is not locally runnable', skip_if_java: true do
-        # Create another adapter but do not attach it
-        elephant_adapter = GoodJob::Adapter.new execution_mode: :async_all, queues: 'elephants:1', poll_interval: -1
-        sleep_until { GoodJob::Notifier.instances.all?(&:listening?) }
-
-        elephant_ajob = TestJob.set(queue: 'elephants').perform_later
-
-        sleep_until { RUN_JOBS.include? elephant_ajob.provider_job_id }
-
-        expect(RUN_JOBS).to include(elephant_ajob.provider_job_id)
-
-        elephant_adapter.shutdown
-      end
+      elephant_adapter.shutdown
     end
   end
 

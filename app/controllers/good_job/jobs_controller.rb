@@ -10,8 +10,8 @@ module GoodJob
       destroy: "destroyed",
     }.freeze
 
-    rescue_from GoodJob::ActiveJobJob::AdapterNotGoodJobError,
-                GoodJob::ActiveJobJob::ActionForStateMismatchError,
+    rescue_from GoodJob::Job::AdapterNotGoodJobError,
+                GoodJob::Job::ActionForStateMismatchError,
                 with: :redirect_on_error
 
     def index
@@ -26,7 +26,7 @@ module GoodJob
                JobsFilter.new(params).filtered_query
              else
                job_ids = params.fetch(:job_ids, [])
-               ActiveJobJob.where(active_job_id: job_ids)
+               Job.where(active_job_id: job_ids)
              end
 
       processed_jobs = jobs.map do |job|
@@ -42,7 +42,7 @@ module GoodJob
         end
 
         job
-      rescue GoodJob::ActiveJobJob::ActionForStateMismatchError
+      rescue GoodJob::Job::ActionForStateMismatchError
         nil
       end.compact
 
@@ -56,29 +56,29 @@ module GoodJob
     end
 
     def show
-      @job = ActiveJobJob.find(params[:id])
+      @job = Job.find(params[:id])
     end
 
     def discard
-      @job = ActiveJobJob.find(params[:id])
+      @job = Job.find(params[:id])
       @job.discard_job(DISCARD_MESSAGE)
       redirect_back(fallback_location: jobs_path, notice: "Job has been discarded")
     end
 
     def reschedule
-      @job = ActiveJobJob.find(params[:id])
+      @job = Job.find(params[:id])
       @job.reschedule_job
       redirect_back(fallback_location: jobs_path, notice: "Job has been rescheduled")
     end
 
     def retry
-      @job = ActiveJobJob.find(params[:id])
+      @job = Job.find(params[:id])
       @job.retry_job
       redirect_back(fallback_location: jobs_path, notice: "Job has been retried")
     end
 
     def destroy
-      @job = ActiveJobJob.find(params[:id])
+      @job = Job.find(params[:id])
       @job.destroy_job
       redirect_back(fallback_location: jobs_path, notice: "Job has been destroyed")
     end
@@ -87,9 +87,9 @@ module GoodJob
 
     def redirect_on_error(exception)
       alert = case exception
-              when GoodJob::ActiveJobJob::AdapterNotGoodJobError
+              when GoodJob::Job::AdapterNotGoodJobError
                 "ActiveJob Queue Adapter must be GoodJob."
-              when GoodJob::ActiveJobJob::ActionForStateMismatchError
+              when GoodJob::Job::ActionForStateMismatchError
                 "Job is not in an appropriate state for this action."
               else
                 exception.to_s

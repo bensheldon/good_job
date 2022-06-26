@@ -73,13 +73,13 @@ module GoodJob # :nodoc:
     end
 
     def jobs
-      GoodJob::ActiveJobJob.where(cron_key: key)
+      GoodJob::Job.where(cron_key: key)
     end
 
     def last_at
       return if last_job.blank?
 
-      if GoodJob::ActiveJobJob.column_names.include?('cron_at')
+      if GoodJob::Job.column_names.include?('cron_at')
         (last_job.cron_at || last_job.created_at).localtime
       else
         last_job.created_at
@@ -99,7 +99,7 @@ module GoodJob # :nodoc:
     end
 
     def last_job
-      if GoodJob::ActiveJobJob.column_names.include?('cron_at')
+      if GoodJob::Job.column_names.include?('cron_at')
         jobs.order("cron_at DESC NULLS LAST").first
       else
         jobs.order(created_at: :asc).last

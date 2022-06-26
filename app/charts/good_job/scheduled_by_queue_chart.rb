@@ -9,7 +9,7 @@ module GoodJob
     def data
       end_time = Time.current
       start_time = end_time - 1.day
-      table_name = GoodJob::ActiveJobJob.table_name
+      table_name = GoodJob::Job.table_name
 
       count_query = Arel.sql(GoodJob::Execution.pg_or_jdbc_query(<<~SQL.squish))
         SELECT *
