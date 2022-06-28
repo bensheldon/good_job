@@ -1,0 +1,26 @@
+<tr id="<%= dom_id(cron_entry) %>">
+    <% cron_entry_status = GoodJob::CronEntryStatus.where(key: cron_entry.key).first %>
+
+    <td class="font-monospace"><%= cron_entry.key %></td>
+    <td class="font-monospace"><%= cron_entry.schedule %></td>
+    <td><%= cron_entry_status.active? ? 'Yes' : 'No' %></td>
+    <td>
+    <%= tag.button("Inspect", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
+            data: { bs_toggle: "collapse", bs_target: "##{dom_id(cron_entry, 'properties')}" },
+            aria: { expanded: false, controls: dom_id(cron_entry, 'properties') }) %>
+    <%= tag.pre(JSON.pretty_generate(cron_entry.display_properties), id: dom_id(cron_entry, 'properties'), class: "collapse cron-entry-properties") %>
+    </td>
+    <td><%= cron_entry.description %></td>
+    <td><%= cron_entry.next_at %></td>
+    <td><%= cron_entry_status.last_execution_time&.to_s(:long) %>
+
+    </td>
+    <td>
+    <%= button_to enqueue_cron_entry_path(cron_entry.id), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Run cron entry now" }, title: "Run cron entry now", data: { confirm: "Confirm run cron entry now" } do %>
+        <%= render "good_job/shared/icons/plus" %>
+    <% end %>
+    <%= button_to toggle_cron_entry_path(cron_entry.id), remote: true, method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Toggle cron entry now" }, title: "Run cron entry now", data: { confirm: "Confirm toggle cron entry now" } do %>
+        <%= render cron_entry_status.active? ? "good_job/shared/icons/pause" :  "good_job/shared/icons/play" %>
+    <% end %>
+    </td>
+</tr>

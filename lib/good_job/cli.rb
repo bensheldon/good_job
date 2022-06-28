@@ -95,6 +95,7 @@ module GoodJob
       notifier.recipients << [scheduler, :create_thread]
       poller.recipients << [scheduler, :create_thread]
 
+      GoodJob::CronEntryStatus.init! if configuration.enable_cron?
       cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true) if configuration.enable_cron?
 
       if configuration.probe_port

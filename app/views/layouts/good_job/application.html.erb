@@ -19,6 +19,7 @@
   <% importmaps = { imports: GoodJob::AssetsController.js_modules.keys.index_with { |module_name| modules_path(module_name, format: :js, locale: nil, v: GoodJob::VERSION) } } %>
   <%= tag.script importmaps.to_json.html_safe, type: "importmap", nonce: content_security_policy_nonce %>
   <%= tag.script "", src: scripts_path(format: :js, v: GoodJob::VERSION, locale: nil), type: "module", nonce: content_security_policy_nonce %>
+
 </head>
 <body>
   <div class="d-flex flex-column min-vh-100">

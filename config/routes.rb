@@ -18,6 +18,7 @@ GoodJob::Engine.routes.draw do
   resources :cron_entries, only: %i[index show], param: :cron_key do
     member do
       post :enqueue
+      post :toggle
     end
   end
 

@@ -1,0 +1,1 @@
+document.querySelector('tr#cron_entry_<%= params["cron_key"] %>').outerHTML = '<%= escape_javascript(render('row', cron_entry: @cron_entry)) %>'
