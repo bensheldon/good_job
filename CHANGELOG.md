@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.0.1](https://github.com/bensheldon/good_job/tree/v3.0.1) (2022-07-02)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.0.0...v3.0.1)
+
+**Closed issues:**
+
+- ERROR:  relation "good\_jobs" does not exist at character 454 [\#308](https://github.com/bensheldon/good_job/issues/308)
+
+**Merged pull requests:**
+
+- Fix `GoodJob.cleanup_preserved_jobs` to use `delete_all` instead of `destroy_all` [\#652](https://github.com/bensheldon/good_job/pull/652) ([bensheldon](https://github.com/bensheldon))
+- Create codeql-analysis.yml [\#648](https://github.com/bensheldon/good_job/pull/648) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.0.0](https://github.com/bensheldon/good_job/tree/v3.0.0) (2022-06-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.99.0...v3.0.0)
@@ -1011,7 +1024,6 @@
 
 **Closed issues:**
 
-- ERROR:  relation "good\_jobs" does not exist at character 454 [\#308](https://github.com/bensheldon/good_job/issues/308)
 - Add Frozen String Literal to all files [\#298](https://github.com/bensheldon/good_job/issues/298)
 - Support for good\_job without Rails? [\#295](https://github.com/bensheldon/good_job/issues/295)
 
