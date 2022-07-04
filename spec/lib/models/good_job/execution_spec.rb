@@ -56,7 +56,7 @@ RSpec.describe GoodJob::Execution do
   end
 
   describe '.perform_with_advisory_lock' do
-    context 'one job' do
+    context 'with one job' do
       let(:active_job) { TestJob.new('a string') }
       let!(:good_job) { described_class.enqueue(active_job) }
 
@@ -85,7 +85,7 @@ RSpec.describe GoodJob::Execution do
       end
     end
 
-    context 'dequeue ordering' do
+    context 'with multiple jobs' do
       def job_params
         { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" } }
       end
