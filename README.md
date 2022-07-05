@@ -713,7 +713,7 @@ Each GoodJob execution thread requires its own database connection that is autom
 
 ```yaml
 # config/database.yml
-pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + 3 + (ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
+pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + 3 + ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
 ```
 
 To calculate the total number of the database connections you'll need:
