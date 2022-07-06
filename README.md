@@ -370,6 +370,16 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
 
     See more at [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
 
+**Troubleshooting the Dashboard:** Some applications are unable to autoload the Goodjob Engine. To work around this, explicitly require the Engine at the top of your `config/application.rb` file, immediately after Rails is required and before Bundler requires the Rails' groups.
+
+```ruby
+# config/application.rb
+require_relative 'boot'
+require 'rails/all'
+require 'good_job/engine' # <= Add this line
+# ...
+```
+
 #### API-only Rails applications
 
 API-only Rails applications may not have all of the required Rack middleware for the GoodJob Dashboard to function. To re-add the middlware:
