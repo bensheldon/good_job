@@ -330,6 +330,7 @@ module GoodJob
       serialized_params.deep_dup
                        .tap do |job_data|
         job_data["provider_job_id"] = id
+        job_data["good_job_concurrency_key"] = concurrency_key if concurrency_key
       end
     end
 

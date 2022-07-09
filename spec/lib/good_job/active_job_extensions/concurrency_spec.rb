@@ -105,4 +105,37 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
     end
   end
+
+  describe '#good_job_concurrency_key' do
+    context 'when retrying a job' do
+      before do
+        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+          include GoodJob::ActiveJobExtensions::Concurrency
+
+          good_job_control_concurrency_with(
+            total_limit: 1,
+            key: -> { Time.current.to_f }
+          )
+          retry_on StandardError
+
+          def perform
+            raise "ERROR"
+          end
+        end)
+      end
+
+      it 'preserves the key value across retries' do
+        TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
+        begin
+          GoodJob.perform_inline
+        rescue StandardError
+          nil
+        end
+
+        expect(GoodJob::Execution.count).to eq 2
+        first_execution, retried_execution = GoodJob::Execution.order(created_at: :asc).to_a
+        expect(retried_execution.concurrency_key).to eq first_execution.concurrency_key
+      end
+    end
+  end
 end
