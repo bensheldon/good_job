@@ -1,5 +1,30 @@
 # Changelog
 
+## [v3.0.2](https://github.com/bensheldon/good_job/tree/v3.0.2) (2022-07-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.0.1...v3.0.2)
+
+**Fixed bugs:**
+
+- Copy forward concurrency key value when retrying a job, rather than regenerating it [\#622](https://github.com/bensheldon/good_job/issues/622)
+- All concurrency controlled jobs throw exceptions and are rescheduled if they are called using perform\_now [\#591](https://github.com/bensheldon/good_job/issues/591)
+
+**Closed issues:**
+
+- Queue config not respecting limits [\#659](https://github.com/bensheldon/good_job/issues/659)
+- UI engine does not work without explicit require [\#646](https://github.com/bensheldon/good_job/issues/646)
+- Should `:inline` adapter mode retry jobs? [\#611](https://github.com/bensheldon/good_job/issues/611)
+- Error Job Not Preserved  [\#594](https://github.com/bensheldon/good_job/issues/594)
+- Jobs never get run... [\#516](https://github.com/bensheldon/good_job/issues/516)
+- Release GoodJob 3.0 [\#507](https://github.com/bensheldon/good_job/issues/507)
+- Improve security of Gem releases [\#422](https://github.com/bensheldon/good_job/issues/422)
+
+**Merged pull requests:**
+
+- Preserve initial concurrency key when retrying jobs [\#657](https://github.com/bensheldon/good_job/pull/657) ([bensheldon](https://github.com/bensheldon))
+- Add Dashboard troubleshooting note to explicitly require the engine [\#654](https://github.com/bensheldon/good_job/pull/654) ([bensheldon](https://github.com/bensheldon))
+- Removes wrong parentheses [\#653](https://github.com/bensheldon/good_job/pull/653) ([esasse](https://github.com/esasse))
+
 ## [v3.0.1](https://github.com/bensheldon/good_job/tree/v3.0.1) (2022-07-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.0.0...v3.0.1)
