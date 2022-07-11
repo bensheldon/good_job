@@ -122,7 +122,7 @@ RSpec.describe GoodJob::Job do
   end
 
   describe '#retry_job' do
-    context 'when job is discarded' do
+    context 'when job is retried' do
       before do
         head_execution.update!(
           finished_at: Time.current,

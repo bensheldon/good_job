@@ -3,7 +3,8 @@ module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
   # There is not a table in the database whose discrete rows represents "Jobs".
   # The +good_jobs+ table is a table of individual {GoodJob::Execution}s that share the same +active_job_id+.
-  # A single row from the +good_jobs+ table of executions is fetched to represent an Job
+  # A single row from the +good_jobs+ table of executions is fetched to represent a Job.
+  #
   class Job < BaseRecord
     include Filterable
     include Lockable
@@ -72,9 +73,51 @@ module GoodJob
       serialized_params['job_class']
     end
 
-    # The status of the Job, based on the state of its most recent execution.
-    # @return [Symbol]
-    delegate :status, :last_status_at, to: :head_execution
+    def last_status_at
+      finished_at || performed_at || scheduled_at || created_at
+    end
+
+    def status
+      if finished_at.present?
+        if error.present? && retried_good_job_id.present?
+          :retried
+        elsif error.present? && retried_good_job_id.nil?
+          :discarded
+        else
+          :finished
+        end
+      elsif (scheduled_at || created_at) > DateTime.current
+        if serialized_params.fetch('executions', 0) > 1
+          :retried
+        else
+          :scheduled
+        end
+      elsif running?
+        :running
+      else
+        :queued
+      end
+    end
+
+    # Override #reload to add a custom scope to ensure the reloaded record is the head execution
+    # @return [Job]
+    def reload(options = nil)
+      self.class.connection.clear_query_cache
+
+      # override with the `where(retried_good_job_id: nil)` scope
+      override_query = self.class.where(retried_good_job_id: nil)
+      fresh_object =
+        if options && options[:lock]
+          self.class.unscoped { override_query.lock(options[:lock]).find(id) }
+        else
+          self.class.unscoped { override_query.find(id) }
+        end
+
+      @attributes = fresh_object.instance_variable_get(:@attributes)
+      @new_record = false
+      @previously_new_record = false
+      self
+    end
 
     # This job's most recent {Execution}
     # @param reload [Booelan] whether to reload executions
@@ -94,7 +137,7 @@ module GoodJob
     # The number of times this job has been executed, according to ActiveJob's serialized state.
     # @return [Numeric]
     def executions_count
-      aj_count = head_execution.serialized_params.fetch('executions', 0)
+      aj_count = serialized_params.fetch('executions', 0)
       # The execution count within serialized_params is not updated
       # once the underlying execution has been executed.
       if status.in? [:discarded, :finished, :running]
@@ -114,7 +157,7 @@ module GoodJob
     # If the job has been retried, the error will be fetched from the previous {Execution} record.
     # @return [String]
     def recent_error
-      head_execution.error || executions[-2]&.error
+      error || executions[-2]&.error
     end
 
     # Tests whether the job is being executed right now.
@@ -192,7 +235,6 @@ module GoodJob
 
         raise ActionForStateMismatchError if execution.finished_at.present?
 
-        execution = head_execution(reload: true)
         execution.update(scheduled_at: scheduled_at)
       end
     end
