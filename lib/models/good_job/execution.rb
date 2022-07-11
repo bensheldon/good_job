@@ -279,7 +279,9 @@ module GoodJob
     # @return [Symbol]
     def status
       if finished_at.present?
-        if error.present?
+        if error.present? && retried_good_job_id.present?
+          :retried
+        elsif error.present? && retried_good_job_id.nil?
           :discarded
         else
           :finished
@@ -298,7 +300,11 @@ module GoodJob
     end
 
     def running?
-      performed_at? && !finished_at?
+      if has_attribute?(:locktype)
+        self['locktype'].present?
+      else
+        advisory_locked?
+      end
     end
 
     def number
@@ -314,7 +320,7 @@ module GoodJob
     def queue_latency
       now = Time.zone.now
       expected_start = scheduled_at || created_at
-      actual_start = performed_at || now
+      actual_start = performed_at || finished_at || now
 
       actual_start - expected_start unless expected_start >= now
     end
