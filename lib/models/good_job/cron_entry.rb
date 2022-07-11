@@ -112,9 +112,11 @@ module GoodJob # :nodoc:
         class: job_class,
         cron: schedule,
         set: display_property(set),
-        args: display_property(args),
         description: display_property(description),
-      }
+      }.tap do |properties|
+        properties[:args] = display_property(args) if args.present?
+        properties[:kwargs] = display_property(kwargs) if kwargs.present?
+      end
     end
 
     private
