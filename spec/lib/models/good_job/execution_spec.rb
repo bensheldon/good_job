@@ -56,31 +56,57 @@ RSpec.describe GoodJob::Execution do
   end
 
   describe '.perform_with_advisory_lock' do
-    let(:active_job) { TestJob.new('a string') }
-    let!(:good_job) { described_class.enqueue(active_job) }
+    context 'with one job' do
+      let(:active_job) { TestJob.new('a string') }
+      let!(:good_job) { described_class.enqueue(active_job) }
 
-    it 'performs one job' do
-      good_job_2 = described_class.create!(serialized_params: {})
+      it 'performs one job' do
+        good_job_2 = described_class.create!(serialized_params: {})
 
-      described_class.all.perform_with_advisory_lock
+        described_class.perform_with_advisory_lock
 
-      expect(good_job.reload.finished_at).to be_present
-      expect(good_job_2.reload.finished_at).to be_blank
+        expect(good_job.reload.finished_at).to be_present
+        expect(good_job_2.reload.finished_at).to be_blank
+      end
+
+      it 'returns the result or nil if not' do
+        result = described_class.perform_with_advisory_lock
+
+        expect(result).to be_a GoodJob::ExecutionResult
+        expect(result.value).to eq 'a string'
+        expect(result.unhandled_error).to be_nil
+
+        described_class.enqueue(TestJob.new(true, raise_error: true))
+        errored_result = described_class.all.perform_with_advisory_lock
+
+        expect(result).to be_a GoodJob::ExecutionResult
+        expect(errored_result.value).to be_nil
+        expect(errored_result.unhandled_error).to be_an TestJob::ExpectedError
+      end
     end
 
-    it 'returns the result or nil if not' do
-      result = described_class.all.perform_with_advisory_lock
+    context 'with multiple jobs' do
+      def job_params
+        { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" } }
+      end
 
-      expect(result).to be_a GoodJob::ExecutionResult
-      expect(result.value).to eq 'a string'
-      expect(result.unhandled_error).to be_nil
+      let!(:older_job) { described_class.create!(job_params.merge(created_at: 10.minutes.ago)) }
+      let!(:newer_job) { described_class.create!(job_params.merge(created_at: 5.minutes.ago)) }
+      let!(:low_priority_job) { described_class.create!(job_params.merge(priority: 5)) }
+      let!(:high_priority_job) { described_class.create!(job_params.merge(priority: 100)) }
 
-      described_class.enqueue(TestJob.new(true, raise_error: true))
-      errored_result = described_class.all.perform_with_advisory_lock
+      it "orders by priority ascending and creation descending" do
+        4.times do
+          described_class.perform_with_advisory_lock
+        end
 
-      expect(result).to be_a GoodJob::ExecutionResult
-      expect(errored_result.value).to be_nil
-      expect(errored_result.unhandled_error).to be_an TestJob::ExpectedError
+        expect(described_class.all.order(finished_at: :asc).to_a).to eq([
+                                                                          high_priority_job,
+                                                                          low_priority_job,
+                                                                          older_job,
+                                                                          newer_job,
+                                                                        ])
+      end
     end
   end
 

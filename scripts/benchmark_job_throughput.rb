@@ -31,11 +31,11 @@ puts "Inserting seed records into the database...\n"
 GoodJob::Execution.insert_all(executions_data)
 
 # ActiveRecord::Base.connection.execute('SET enable_seqscan = OFF')
-# puts GoodJob::Execution.unfinished.priority_ordered.only_scheduled(use_coalesce: true).limit(1).advisory_lock.explain(analyze: true)
+# puts GoodJob::Execution.unfinished.dequeue_ordered.only_scheduled(use_coalesce: true).limit(1).advisory_lock.explain(analyze: true)
 # exit!
 
 Benchmark.ips do |x|
-  x.report("with priority") do
+  x.report("with priority only") do
     GoodJob::Execution.unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock do |executions|
       # executions.first&.destroy!
     end
@@ -43,6 +43,12 @@ Benchmark.ips do |x|
 
   x.report("without priority") do
     GoodJob::Execution.unfinished.only_scheduled.limit(1).with_advisory_lock do |executions|
+      # executions.first&.destroy!
+    end
+  end
+
+  x.report("with priority and FIFO") do
+    GoodJob::Execution.unfinished.dequeue_ordered.only_scheduled.limit(1).with_advisory_lock do |executions|
       # executions.first&.destroy!
     end
   end

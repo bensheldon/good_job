@@ -88,6 +88,18 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :priority_ordered, -> { order('priority DESC NULLS LAST') }
 
+    # Order jobs by created_at, for first-in first-out
+    # @!method creation_ordered
+    # @!scope class
+    # @return [ActiveRecord:Relation]
+    scope :creation_ordered, -> { order('created_at ASC') }
+
+    # Order jobs for de-queueing
+    # @!method dequeue_ordered
+    # @!scope class
+    # @return [ActiveRecord:Relation]
+    scope :dequeue_ordered, -> { priority_ordered.creation_ordered }
+
     # Order jobs by scheduled or created (oldest first).
     # @!method schedule_ordered
     # @!scope class
@@ -154,7 +166,7 @@ module GoodJob
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
     def self.perform_with_advisory_lock
-      unfinished.priority_ordered.only_scheduled.limit(1).with_advisory_lock(unlock_session: true) do |executions|
+      unfinished.dequeue_ordered.only_scheduled.limit(1).with_advisory_lock(unlock_session: true) do |executions|
         execution = executions.first
         break if execution.blank?
         break :unlocked unless execution&.executable?
