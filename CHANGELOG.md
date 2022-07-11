@@ -1,5 +1,29 @@
 # Changelog
 
+## [v3.1.0](https://github.com/bensheldon/good_job/tree/v3.1.0) (2022-07-11)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.0.2...v3.1.0)
+
+**Implemented enhancements:**
+
+- Improve Dashboard display of parameters \(CronEntry kwargs; Process configuration; Job and Execution database values\) [\#662](https://github.com/bensheldon/good_job/pull/662) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Don't delegate `GoodJob::Job#status` to executions to avoid race condition [\#661](https://github.com/bensheldon/good_job/pull/661) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- How to suppress repetitive logs in development? [\#658](https://github.com/bensheldon/good_job/issues/658)
+- 500 Internal Server Error Exception in web interface trying to view running jobs [\#656](https://github.com/bensheldon/good_job/issues/656)
+- Cron schedule page in dashboard not showing kwargs [\#608](https://github.com/bensheldon/good_job/issues/608)
+- Paralelism x database connections [\#569](https://github.com/bensheldon/good_job/issues/569)
+
+**Merged pull requests:**
+
+- Show job/cron/process counts in the Navbar [\#663](https://github.com/bensheldon/good_job/pull/663) ([bensheldon](https://github.com/bensheldon))
+- Dequeing should be first-in first-out [\#651](https://github.com/bensheldon/good_job/pull/651) ([jrochkind](https://github.com/jrochkind))
+
 ## [v3.0.2](https://github.com/bensheldon/good_job/tree/v3.0.2) (2022-07-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.0.1...v3.0.2)
