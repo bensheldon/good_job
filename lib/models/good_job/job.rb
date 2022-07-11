@@ -160,6 +160,14 @@ module GoodJob
       error || executions[-2]&.error
     end
 
+    # Return formatted serialized_params for display in the dashboard
+    # @return [Hash]
+    def display_serialized_params
+      serialized_params.merge({
+                                _good_job: attributes.except('serialized_params', 'locktype', 'owns_advisory_lock'),
+                              })
+    end
+
     # Tests whether the job is being executed right now.
     # @return [Boolean]
     def running?

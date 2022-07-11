@@ -299,6 +299,14 @@ module GoodJob
       end
     end
 
+    # Return formatted serialized_params for display in the dashboard
+    # @return [Hash]
+    def display_serialized_params
+      serialized_params.merge({
+                                _good_job: attributes.except('serialized_params', 'locktype', 'owns_advisory_lock'),
+                              })
+    end
+
     def running?
       if has_attribute?(:locktype)
         self['locktype'].present?

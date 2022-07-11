@@ -38,7 +38,7 @@
           </div>
         <% end %>
         <div>
-          <%= tag.pre JSON.pretty_generate(execution.serialized_params), id: dom_id(execution, "params"), class: "collapse bg-light card card-body p-3 my-3" %>
+          <%= tag.pre JSON.pretty_generate(execution.display_serialized_params), id: dom_id(execution, "params"), class: "collapse bg-light card card-body p-3 my-3" %>
         </div>
       <% end %>
     <% end %>
