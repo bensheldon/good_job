@@ -108,8 +108,34 @@ module GoodJob
     # Order jobs for de-queueing
     # @!method dequeue_ordered
     # @!scope class
-    # @return [ActiveRecord:Relation]
-    scope :dequeue_ordered, -> { priority_ordered.creation_ordered }
+    # @param parsed_queues [Hash]
+    #   optional output of .queue_parser, parsed queues, will be used for
+    #   ordered queues.
+    # @return [ActiveRecord::Relation]
+    scope :dequeue_ordered, (lambda do |parsed_queues|
+      relation = self
+      if parsed_queues && parsed_queues[:ordered_queues] && parsed_queues[:include]
+        relation = relation.queue_ordered(parsed_queues[:include])
+      end
+      relation = relation.priority_ordered.creation_ordered
+
+      relation
+    end)
+
+    # Order jobs in order of queues in array param
+    # @!method queue_ordered
+    # @!scope class
+    # @param queues [Array<string] ordered names of queues
+    # @return [ActiveRecord::Relation]
+    scope :queue_ordered, (lambda do |queues|
+      clauses = queues.map.with_index do |queue_name, index|
+        "WHEN queue_name = '#{queue_name}' THEN #{index}"
+      end
+
+      order(
+        Arel.sql("(CASE #{clauses.join(' ')} ELSE #{queues.length} END)")
+      )
+    end)
 
     # Order jobs by scheduled or created (oldest first).
     # @!method schedule_ordered
@@ -176,8 +202,8 @@ module GoodJob
     #   return value for the job's +#perform+ method, and the exception the job
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
-    def self.perform_with_advisory_lock
-      unfinished.dequeue_ordered.only_scheduled.limit(1).with_advisory_lock(unlock_session: true) do |executions|
+    def self.perform_with_advisory_lock(parsed_queues: nil)
+      unfinished.dequeue_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true) do |executions|
         execution = executions.first
         break if execution.blank?
         break :unlocked unless execution&.executable?
