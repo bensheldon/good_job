@@ -106,13 +106,13 @@ module GoodJob
     scope :creation_ordered, -> { order('created_at ASC') }
 
     # Order jobs for de-queueing
-    # @!method dequeue_ordered
+    # @!method dequeueing_ordered
     # @!scope class
     # @param parsed_queues [Hash]
     #   optional output of .queue_parser, parsed queues, will be used for
     #   ordered queues.
     # @return [ActiveRecord::Relation]
-    scope :dequeue_ordered, (lambda do |parsed_queues|
+    scope :dequeueing_ordered, (lambda do |parsed_queues|
       relation = self
       relation = relation.queue_ordered(parsed_queues[:include]) if parsed_queues && parsed_queues[:ordered_queues] && parsed_queues[:include]
       relation = relation.priority_ordered.creation_ordered
@@ -201,7 +201,7 @@ module GoodJob
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
     def self.perform_with_advisory_lock(parsed_queues: nil)
-      unfinished.dequeue_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true) do |executions|
+      unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true) do |executions|
         execution = executions.first
         break if execution.blank?
         break :unlocked unless execution&.executable?
