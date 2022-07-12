@@ -665,7 +665,7 @@ By default, GoodJob creates a single thread execution pool that will execute job
 
     A pool is configured with the following syntax `<participating_queues>:<thread_count>`:
 
-    - `<participating_queues>`: either `queue1,queue2` (only those queues), `*` (all) or `-queue1,queue2` (all except those queues).
+    - `<participating_queues>`: either `queue1,queue2` (only those queues), `+queue1,queue2` (only those queues, and processed in order), `*` (all) or `-queue1,queue2` (all except those queues).
     - `<thread_count>`: a count overriding for this specific pool the global `max-threads`.
 
     Pool configurations are separated with a semicolon (;) in the `queues` configuration
@@ -682,6 +682,12 @@ By default, GoodJob creates a single thread execution pool that will execute job
     - `batch_processing:1` execute jobs enqueued on `batch_processing`, with a single thread.
     - `-transactional_messages,batch_processing`: execute jobs enqueued on _any_ queue _excluding_ `transactional_messages` or `batch_processing`, with up to 2 threads.
     - `*`: execute jobs on any queue, with up to 5 threads (as configured by `--max-threads=5`).
+
+    When a pool is performing jobs from multiple queues, jobs will be performed from specified queues, ordered by priority and creation time. To perform jobs from queues in the queues' given order, use the `+` modifier. In this example, jobs in `batch_processing` will be performed only when there are no jobs in `transactional_messages`:
+
+    ```bash
+    bundle exec good_job --queues="+transactional_messages,batch_processing"
+    ```
 
     Configuration can be injected by environment variables too:
 

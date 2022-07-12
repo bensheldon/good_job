@@ -24,7 +24,7 @@ module GoodJob
     # Perform the next eligible job
     # @return [Object, nil] Returns job result or +nil+ if no job was found
     def next
-      job_query.perform_with_advisory_lock
+      job_query.perform_with_advisory_lock(parsed_queues: parsed_queues)
     end
 
     # Tests whether this performer should be used in GoodJob's current state.

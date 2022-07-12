@@ -99,12 +99,31 @@ RSpec.describe GoodJob::Execution do
         4.times do
           described_class.perform_with_advisory_lock
         end
-
         expect(described_class.all.order(finished_at: :asc).to_a).to eq([
                                                                           high_priority_job,
                                                                           low_priority_job,
                                                                           older_job,
                                                                           newer_job,
+                                                                        ])
+      end
+    end
+
+    context "with multiple jobs and ordered queues" do
+      def job_params
+        { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" } }
+      end
+
+      let(:parsed_queues) { { include: %w{one two}, ordered_queues: true } }
+      let!(:queue_two_job) { described_class.create!(job_params.merge(queue_name: "two", created_at: 10.minutes.ago, priority: 100)) }
+      let!(:queue_one_job) { described_class.create!(job_params.merge(queue_name: "one", created_at: 1.minute.ago, priority: 1)) }
+
+      it "orders by queue order" do
+        2.times do
+          described_class.perform_with_advisory_lock(parsed_queues: parsed_queues)
+        end
+        expect(described_class.all.order(finished_at: :asc).to_a).to eq([
+                                                                          queue_one_job,
+                                                                          queue_two_job,
                                                                         ])
       end
     end
@@ -126,6 +145,11 @@ RSpec.describe GoodJob::Execution do
       expect(result).to eq({
                              all: true,
                            })
+      result = described_class.queue_parser('+first,second')
+      expect(result).to eq({
+                             include: %w[first second],
+                             ordered_queues: true,
+                           })
     end
   end
 
@@ -143,6 +167,15 @@ RSpec.describe GoodJob::Execution do
     it 'accepts empty strings' do
       query = described_class.queue_string('')
       expect(query.to_sql).to eq described_class.all.to_sql
+    end
+  end
+
+  describe '.queue_ordered' do
+    it "produces SQL to order by queue order" do
+      query_sql = described_class.queue_ordered(%w{one two three}).to_sql
+      expect(query_sql).to include(
+        "ORDER BY (CASE WHEN queue_name = 'one' THEN 0 WHEN queue_name = 'two' THEN 1 WHEN queue_name = 'three' THEN 2 ELSE 3 END)"
+      )
     end
   end
 
