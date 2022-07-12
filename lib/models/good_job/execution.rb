@@ -29,14 +29,20 @@ module GoodJob
     #     not match.
     #   - +{ include: Array<String> }+ indicates the listed queue names should
     #     match.
+    #   - +{ include: Array<String>, ordered_queues: true }+ indicates the listed
+    #     queue names should match, and dequeue should respect queue order.
     # @example
     #   GoodJob::Execution.queue_parser('-queue1,queue2')
     #   => { exclude: [ 'queue1', 'queue2' ] }
     def self.queue_parser(string)
       string = string.presence || '*'
 
-      if string.first == '-'
+      case string.first
+      when '-'
         exclude_queues = true
+        string = string[1..-1]
+      when '+'
+        ordered_queues = true
         string = string[1..-1]
       end
 
@@ -46,6 +52,11 @@ module GoodJob
         { all: true }
       elsif exclude_queues
         { exclude: queues }
+      elsif ordered_queues
+        {
+          include: queues,
+          ordered_queues: true,
+        }
       else
         { include: queues }
       end

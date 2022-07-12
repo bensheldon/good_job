@@ -126,6 +126,11 @@ RSpec.describe GoodJob::Execution do
       expect(result).to eq({
                              all: true,
                            })
+      result = described_class.queue_parser('+first,second')
+      expect(result).to eq({
+                             include: %w[first second],
+                             ordered_queues: true,
+                           })
     end
   end
 
