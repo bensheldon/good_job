@@ -24,16 +24,17 @@ module GoodJob
       @_last ||= records.last
     end
 
-    def job_classes
-      base_query.group("serialized_params->>'job_class'").count
-                .sort_by { |name, _count| name.to_s }
-                .to_h
-    end
-
     def queues
       base_query.group(:queue_name).count
                 .sort_by { |name, _count| name.to_s || EMPTY }
                 .to_h
+    end
+
+    def job_classes
+      filtered_query(params.slice(:queue_name)).unscope(:select)
+                                               .group("serialized_params->>'job_class'").count
+                                               .sort_by { |name, _count| name.to_s }
+                                               .to_h
     end
 
     def states
@@ -51,7 +52,7 @@ module GoodJob
       }.merge(override).delete_if { |_, v| v.blank? }
     end
 
-    def filtered_query
+    def filtered_query(filtered_params = params)
       raise NotImplementedError
     end
 
