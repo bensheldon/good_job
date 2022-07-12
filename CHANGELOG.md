@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.2.0](https://github.com/bensheldon/good_job/tree/v3.2.0) (2022-07-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.1.0...v3.2.0)
+
+**Merged pull requests:**
+
+- Ordered queue handling by workers [\#665](https://github.com/bensheldon/good_job/pull/665) ([jrochkind](https://github.com/jrochkind))
+
 ## [v3.1.0](https://github.com/bensheldon/good_job/tree/v3.1.0) (2022-07-11)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.0.2...v3.1.0)
