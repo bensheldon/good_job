@@ -10,8 +10,18 @@ module GoodJob
         end
       end
 
+      module Prepends
+        def deserialize(job_data)
+          super
+          self.good_job_concurrency_key = job_data['good_job_concurrency_key']
+        end
+      end
+
       included do
+        prepend Prepends
+
         class_attribute :good_job_concurrency_config, instance_accessor: false, default: {}
+        attr_writer :good_job_concurrency_key
 
         around_enqueue do |job, block|
           # Don't attempt to enforce concurrency limits with other queue adapters.
@@ -27,6 +37,8 @@ module GoodJob
                       (total_limit.present? && (0...Float::INFINITY).cover?(total_limit))
           next(block.call) unless has_limit
 
+          # Only generate the concurrency key on the initial enqueue in case it is dynamic
+          job.good_job_concurrency_key ||= job._good_job_concurrency_key
           key = job.good_job_concurrency_key
           next(block.call) if key.blank?
 
@@ -80,7 +92,15 @@ module GoodJob
         end
       end
 
+      # Existing or dynamically generated concurrency key
+      # @return [Object] concurrency key
       def good_job_concurrency_key
+        @good_job_concurrency_key || _good_job_concurrency_key
+      end
+
+      # Generates the concurrency key from the configuration
+      # @return [Object] concurrency key
+      def _good_job_concurrency_key
         key = self.class.good_job_concurrency_config[:key]
         return if key.blank?
 

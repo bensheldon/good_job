@@ -87,3 +87,22 @@ ru:
       retried: Повторная попытка
       running: Бег
       scheduled: по расписанию
+  number:
+    format:
+      delimiter: " "
+      separator: ","
+    human:
+      decimal_units:
+        format: "%n%u"
+        units:
+          billion: Б
+          hundred: ''
+          million: М
+          quadrillion: Q
+          thousand: К
+          trillion: Т
+          unit: ''
+      format:
+        delimiter: " "
+        precision: 3
+        separator: ","

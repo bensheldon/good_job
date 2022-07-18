@@ -11,7 +11,7 @@
         <li class="nav-item">
           <%= link_to url_for({state: name}), class: "nav-link #{"active" if params[:state] == name}" do %>
             <%= t(name, scope: 'good_job.status') %>
-            <span class="badge bg-primary rounded-pill <%= "bg-secondary" if count == 0 %>"><%= count %></span>
+            <span class="badge bg-primary rounded-pill <%= "bg-secondary" if count == 0 %>"><%= number_with_delimiter(count) %></span>
           <% end %>
         </li>
       <% end %>

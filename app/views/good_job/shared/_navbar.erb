@@ -8,13 +8,25 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <%= link_to t(".jobs"), jobs_path, class: ["nav-link", ("active" if controller_name == 'jobs')] %>
+          <%= link_to jobs_path, class: ["nav-link", ("active" if controller_name == 'jobs')] do %>
+            <%= t(".jobs") %>
+            <% jobs_count = GoodJob::Job.count %>
+            <span class="badge bg-secondary rounded-pill"><%= number_to_human(jobs_count) %></span>
+        <% end %>
         </li>
         <li class="nav-item">
-          <%= link_to t(".cron_schedules"), cron_entries_path, class: ["nav-link", ("active" if controller_name == 'cron_entries')] %>
+          <%= link_to cron_entries_path, class: ["nav-link", ("active" if controller_name == 'cron_entries')] do %>
+            <%= t(".cron_schedules") %>
+            <% cron_entries_count = GoodJob::CronEntry.all.size %>
+            <span class="badge bg-secondary rounded-pill"><%= cron_entries_count %></span>
+        <% end %>
         </li>
         <li class="nav-item">
-          <%= link_to t(".processes"), processes_path, class: ["nav-link", ("active" if controller_name == 'processes')] %>
+          <%= link_to processes_path, class: ["nav-link", ("active" if controller_name == 'processes')] do %>
+            <%= t(".processes") %>
+            <% processes_count = GoodJob::Process.count %>
+            <span class="badge bg-secondary rounded-pill <%= "bg-danger" if processes_count == 0 %>"><%= processes_count %></span>
+          <% end %>
         </li>
       </ul>
       <div class="nav-item pe-2">

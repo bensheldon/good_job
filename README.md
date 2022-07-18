@@ -370,6 +370,16 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
 
     See more at [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
 
+**Troubleshooting the Dashboard:** Some applications are unable to autoload the Goodjob Engine. To work around this, explicitly require the Engine at the top of your `config/application.rb` file, immediately after Rails is required and before Bundler requires the Rails' groups.
+
+```ruby
+# config/application.rb
+require_relative 'boot'
+require 'rails/all'
+require 'good_job/engine' # <= Add this line
+# ...
+```
+
 #### API-only Rails applications
 
 API-only Rails applications may not have all of the required Rack middleware for the GoodJob Dashboard to function. To re-add the middlware:
@@ -655,7 +665,7 @@ By default, GoodJob creates a single thread execution pool that will execute job
 
     A pool is configured with the following syntax `<participating_queues>:<thread_count>`:
 
-    - `<participating_queues>`: either `queue1,queue2` (only those queues), `*` (all) or `-queue1,queue2` (all except those queues).
+    - `<participating_queues>`: either `queue1,queue2` (only those queues), `+queue1,queue2` (only those queues, and processed in order), `*` (all) or `-queue1,queue2` (all except those queues).
     - `<thread_count>`: a count overriding for this specific pool the global `max-threads`.
 
     Pool configurations are separated with a semicolon (;) in the `queues` configuration
@@ -672,6 +682,12 @@ By default, GoodJob creates a single thread execution pool that will execute job
     - `batch_processing:1` execute jobs enqueued on `batch_processing`, with a single thread.
     - `-transactional_messages,batch_processing`: execute jobs enqueued on _any_ queue _excluding_ `transactional_messages` or `batch_processing`, with up to 2 threads.
     - `*`: execute jobs on any queue, with up to 5 threads (as configured by `--max-threads=5`).
+
+    When a pool is performing jobs from multiple queues, jobs will be performed from specified queues, ordered by priority and creation time. To perform jobs from queues in the queues' given order, use the `+` modifier. In this example, jobs in `batch_processing` will be performed only when there are no jobs in `transactional_messages`:
+
+    ```bash
+    bundle exec good_job --queues="+transactional_messages,batch_processing"
+    ```
 
     Configuration can be injected by environment variables too:
 
@@ -713,7 +729,7 @@ Each GoodJob execution thread requires its own database connection that is autom
 
 ```yaml
 # config/database.yml
-pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + 3 + (ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
+pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + 3 + ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
 ```
 
 To calculate the total number of the database connections you'll need:
