@@ -10,6 +10,12 @@ def system!(*args)
 end
 
 FileUtils.chdir GEM_ROOT do
+  puts "\n== Ruby Version =="
+  puts "Development .ruby-version: #{File.read('.ruby-version').strip}"
+  puts "Current Ruby: #{RUBY_VERSION}"
+end
+
+FileUtils.chdir GEM_ROOT do
   puts "\n== Installing gem dependencies =="
   system!('bundle install')
 end
