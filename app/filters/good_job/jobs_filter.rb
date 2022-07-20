@@ -7,7 +7,7 @@ module GoodJob
         'retried' => base_query.retried.count,
         'queued' => base_query.queued.count,
         'running' => base_query.running.count,
-        'finished' => GoodJob::Execution.total_count, #base_query.finished.count,
+        'finished' => base_query.finished.count,
         'discarded' => base_query.discarded.count,
       }
     end

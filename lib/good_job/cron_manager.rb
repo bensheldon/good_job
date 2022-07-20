@@ -89,11 +89,7 @@ module GoodJob # :nodoc:
         thr_scheduler.create_task(thr_cron_entry)
 
         Rails.application.executor.wrap do
-          cron_entry_status = GoodJob::CronEntryStatus.where(key: cron_entry.key).first
-          if cron_entry_status.active?
-            cron_entry.enqueue(thr_cron_at) 
-            cron_entry_status.update_column(:last_execution_time, Time.current)
-          end
+          cron_entry.enqueue(thr_cron_at) if cron_entry.enabled?
         end
       end
 

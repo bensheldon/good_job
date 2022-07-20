@@ -86,6 +86,31 @@ module GoodJob # :nodoc:
       end
     end
 
+    def enabled?
+      cron_disabled = GoodJob::Setting.find_by(key: Setting::CRON_KEYS_DISABLED)&.value || []
+      cron_disabled.exclude?(key.to_s)
+    end
+
+    def toggle
+      enabled? ? disable : enable
+    end
+
+    def disable
+      setting = Setting.find_or_initialize_by(key: Setting::CRON_KEYS_DISABLED) do |record|
+        record.value = []
+      end
+      setting.value << key
+      setting.save!
+    end
+
+    def enable
+      setting = GoodJob::Setting.find_by(key: Setting::CRON_KEYS_DISABLED)
+      return unless setting&.value&.include?(key.to_s)
+
+      setting.value.delete(key.to_s)
+      setting.save!
+    end
+
     def enqueue(cron_at = nil)
       GoodJob::CurrentThread.within do |current_thread|
         current_thread.cron_key = key

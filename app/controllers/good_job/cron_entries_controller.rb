@@ -17,10 +17,9 @@ module GoodJob
     end
 
     def toggle
-      cs = GoodJob::CronEntryStatus.where(key: params[:cron_key]).first
-      cs.active = !cs.active
-      cs.save!
-      @cron_entry = GoodJob::CronEntry.find(params[:cron_key])
+      @cron_entry = CronEntry.find(params[:cron_key])
+      @cron_entry.toggle
+      redirect_back(fallback_location: cron_entries_path, notice: "Cron has been updated.")
     end
   end
 end

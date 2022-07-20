@@ -272,10 +272,6 @@ module GoodJob
       end
     end
 
-    def self.total_count
-      ActiveRecord::Base.connection.execute("SELECT last_value FROM good_jobs_total_seq")[0]["last_value"]
-    end
-
     # Execute the ActiveJob job this {Execution} represents.
     # @return [ExecutionResult]
     #   An array of the return value of the job's +#perform+ method and the
@@ -300,8 +296,6 @@ module GoodJob
       else
         destroy!
       end
-
-      ActiveRecord::Base.connection.execute("select nextval('good_jobs_total_seq')")
 
       result
     end
