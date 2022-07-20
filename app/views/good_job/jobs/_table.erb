@@ -7,21 +7,30 @@
           <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %>
         </div>
         <div class="col-4">
-          <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'btn btn-sm btn-outline-secondary', title: "Reschedule all", data: { confirm: "Confirm reschedule all", disable: true } do %>
+          <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'btn btn-sm btn-outline-secondary', title: "Reschedule all", data: { confirm: "Are you sure you want to reschedule the selected jobs?", disable: true } do %>
             <span class="me-1"><%= render_icon "skip_forward" %></span> Reschedule
           <% end %>
 
-          <%= form.button type: 'submit', name: 'mass_action', value: 'discard', class: 'btn btn-sm btn-outline-secondary', title: "Discard all", data: { confirm: "Confirm discard all", disable: true } do %>
-            <span class="me-1"><%= render_icon "stop" %></span> Discard
-          <% end %>
-
-          <%= form.button type: 'submit', name: 'mass_action', value: 'retry', class: 'btn btn-sm btn-outline-secondary', title: "Retry all", data: { confirm: "Confirm retry all", disable: true } do %>
+          <%= form.button type: 'submit', name: 'mass_action', value: 'retry', class: 'btn btn-sm btn-outline-secondary', title: "Retry all", data: { confirm: "Are you sure you want to retry the selected jobs?", disable: true } do %>
             <span class="me-1"><%= render_icon "arrow_clockwise" %></span> Retry
           <% end %>
 
-          <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn btn-sm btn-outline-secondary', title: "Destroy all", data: { confirm: "Confirm destroy all", disable: true } do %>
-            <span class="me-1"><%= render_icon "trash" %></span> Destroy
-          <% end %>
+          <div class="btn-group" role="group">
+            <%= form.button type: 'submit', name: 'mass_action', value: 'discard', class: 'btn btn-sm btn-outline-secondary', title: "Discard all", data: { confirm: "Are you usure you want to discard the selected jobs?", disable: true } do %>
+              <span class="me-1"><%= render_icon "stop" %></span> Discard
+            <% end %>
+            <button id="destroy-dropdown-toggle" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="destroy-dropdown-toggle">
+              <li>
+                <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn', title: "Destroy all", data: { confirm: "Are you sure you want to destroy the selected jobs?", disable: true } do %>
+                  <span class="me-1"><%= render_icon "trash" %></span> Destroy
+                <% end %>
+              </li>
+            </div>
+          </div>
+
         </div>
         <div class="col-1">Queue</div>
         <div class="col-1">Priority</div>
