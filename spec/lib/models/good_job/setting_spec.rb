@@ -21,11 +21,11 @@ RSpec.describe GoodJob::Setting do
 
         described_class.cron_key_disable(:test)
         expect(described_class.where(key: described_class::CRON_KEYS_DISABLED).count).to eq 1
-        expect(described_class.find_by(key: described_class::CRON_KEYS_DISABLED).value).to eq ['test']
+        expect(described_class.find_by(key: described_class::CRON_KEYS_DISABLED).value).to contain_exactly 'test'
 
         described_class.cron_key_disable(:test_2)
         expect(described_class.where(key: described_class::CRON_KEYS_DISABLED).count).to eq 1
-        expect(described_class.find_by(key: described_class::CRON_KEYS_DISABLED).value).to eq %w[test test2]
+        expect(described_class.find_by(key: described_class::CRON_KEYS_DISABLED).value).to contain_exactly "test", "test_2"
 
         described_class.cron_key_enable(:test)
         described_class.cron_key_enable(:test_2)
