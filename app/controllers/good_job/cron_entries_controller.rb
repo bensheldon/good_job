@@ -16,10 +16,16 @@ module GoodJob
       redirect_back(fallback_location: cron_entries_path, notice: "Cron entry has been enqueued.")
     end
 
-    def toggle
+    def enable
       @cron_entry = CronEntry.find(params[:cron_key])
-      @cron_entry.toggle
-      redirect_back(fallback_location: cron_entries_path, notice: "Cron has been updated.")
+      @cron_entry.enable
+      redirect_back(fallback_location: cron_entries_path, notice: "Cron has been enabled.")
+    end
+
+    def disable
+      @cron_entry = CronEntry.find(params[:cron_key])
+      @cron_entry.disable
+      redirect_back(fallback_location: cron_entries_path, notice: "Cron has been disabled.")
     end
   end
 end

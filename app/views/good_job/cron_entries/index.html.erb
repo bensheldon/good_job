@@ -9,7 +9,7 @@
         <thead>
           <th>Key</th>
           <th>Schedule</th>
-          <th>Active</th>
+          <th>Enabled</th>
           <th>
             Properties
             <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
@@ -41,15 +41,19 @@
                   <%= link_to cron_entry.last_at, cron_entry_path(cron_entry), title: "Job #{cron_entry.last_job.id}" %>
                 <% end %>
               </td>
-
-              </td>
               <td>
-                <%= button_to enqueue_cron_entry_path(cron_entry.id), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Run cron entry now" }, title: "Run cron entry now", data: { confirm: "Confirm run cron entry now" } do %>
+                <%= button_to enqueue_cron_entry_path(cron_entry), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Run cron entry now" }, title: "Run cron entry now", data: { confirm: "Confirm run cron entry now" } do %>
                   <%= render_icon "skip_forward" %>
                 <% end %>
 
-                <%= button_to toggle_cron_entry_path(cron_entry.id), remote: true, method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Toggle cron entry now" }, title: "Toggle cron entry now", data: { confirm: "Confirm toggle cron entry now" } do %>
-                  <%= render cron_entry.enabled? ? "good_job/shared/icons/pause" : "good_job/shared/icons/play" %>
+                <% if cron_entry.enabled? %>
+                  <%= button_to disable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Disable cron entry" }, title: "Disable cron entry", data: { confirm: "Confirm disable cron entry" } do %>
+                    <%= render_icon "pause" %>
+                  <% end %>
+                <% else %>
+                  <%= button_to enable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Enable cron entry" }, title: "Enable cron entry", data: { confirm: "Confirm enable cron entry" } do %>
+                    <%= render_icon "play" %>
+                  <% end %>
                 <% end %>
               </td>
             </tr>
