@@ -7,9 +7,9 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       t.text :queue_name
       t.integer :priority
       t.jsonb :serialized_params
-      t.timestamp :scheduled_at
-      t.timestamp :performed_at
-      t.timestamp :finished_at
+      t.datetime :scheduled_at
+      t.datetime :performed_at
+      t.datetime :finished_at
       t.text :error
 
       t.timestamps
@@ -18,7 +18,7 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       t.text :concurrency_key
       t.text :cron_key
       t.uuid :retried_good_job_id
-      t.timestamp :cron_at
+      t.datetime :cron_at
     end
 
     create_table :good_job_processes, id: :uuid do |t|
