@@ -25,7 +25,8 @@
             <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
               data: { bs_toggle: "collapse", bs_target: "##{dom_id(execution, 'params')}" },
               aria: { expanded: false, controls: dom_id(execution, "params") } do %>
-              <%= render "good_job/shared/icons/info" %>
+              <%= render_icon "info" %>
+              <span class="visually-hidden">Inspect</span>
             <% end %>
           </div>
         </div>
@@ -35,9 +36,9 @@
             <code class="text-wrap text-break m-0 text-black"><%= execution.error %></code>
           </div>
         <% end %>
-        <div>
-          <%= tag.pre JSON.pretty_generate(execution.display_serialized_params), id: dom_id(execution, "params"), class: "collapse bg-light card card-body p-3 my-3" %>
-        </div>
+      <% end %>
+      <%= tag.div id: dom_id(execution, "params"), class: "list-group-item collapse small bg-dark text-light" do %>
+        <%= tag.pre JSON.pretty_generate(execution.display_serialized_params) %>
       <% end %>
     <% end %>
   </div>

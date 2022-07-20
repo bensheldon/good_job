@@ -36,8 +36,14 @@
         <div class="col-1">Priority</div>
         <div class="col-1">Latency</div>
         <div class="col-1 text-end">Attempts</div>
-        <div class="col-3"><!-- Status --></div>
-        <div class="col"></div>
+        <div class="col text-end">
+          <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
+                  data: { bs_toggle: "collapse", bs_target: ".job-params" },
+                  aria: { expanded: false, controls: jobs.map { |job| "##{dom_id(job, "params")}" }.join(" ") } do %>
+              <%= render_icon "info" %>
+              <span class="visually-hidden">Inspect</span>
+          <% end %>
+        </div>
       </div>
     </div>
     <label class="d-none list-group-item list-group-item-warning list-group-item-action py-3" data-checkbox-toggle-show="job_ids">
@@ -126,10 +132,23 @@
                       Destroy
                     <% end %>
                   </li>
+
+                  <li>
+                    <%= link_to "##{dom_id(job, 'params')}",
+                      class: "dropdown-item",
+                      data: { bs_toggle: "collapse" },
+                      aria: { expanded: false, controls: dom_id(job, "params") } do %>
+                      <%= render_icon "info" %>
+                      Inspect
+                    <% end %>
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
+        <% end %>
+        <%= tag.div id: dom_id(job, "params"), class: "job-params list-group-item collapse small bg-dark text-light" do %>
+          <%= tag.pre JSON.pretty_generate(job.display_serialized_params) %>
         <% end %>
       <% end %>
     <% else %>
