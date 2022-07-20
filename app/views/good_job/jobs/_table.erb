@@ -1,7 +1,7 @@
 <%= form_with(url: mass_update_jobs_path(filter.to_params), method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
 <div class="my-3 card" data-gj-poll-replace id="jobs-table">
-  <div class="list-group list-group-flush text-nowrap table-jobs">
-    <div class="list-group-item bg-light">
+  <div class="list-group list-group-flush text-nowrap table-jobs" role="table">
+    <header class="list-group-item bg-light">
       <div class="row small text-muted text-uppercase align-items-center">
         <div class="col-auto">
           <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %>
@@ -20,7 +20,7 @@
               <span class="me-1"><%= render_icon "stop" %></span> Discard
             <% end %>
             <button id="destroy-dropdown-toggle" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-              <span class="visually-hidden">Toggle Dropdown</span>
+              <span class="visually-hidden">Toggle Actions</span>
             </button>
             <div class="dropdown-menu" aria-labelledby="destroy-dropdown-toggle">
               <li>
@@ -45,21 +45,21 @@
           <% end %>
         </div>
       </div>
-    </div>
-    <label class="d-none list-group-item list-group-item-warning list-group-item-action py-3" data-checkbox-toggle-show="job_ids">
-        <div class="row">
-          <div class="col-auto">
-            <%= check_box_tag "all_job_ids", 1, false, disabled: true, data: { "checkbox-toggle-show": "job_ids"} %>
-          </div>
-          <div class="col-auto">
-            Apply to all <%= filter.filtered_count %> <%= "job".pluralize(filter.filtered_count) %>.
-          </div>
+    </header>
+    <label role="row" class="list-group-item list-group-item-warning list-group-item-action py-3 d-none" data-checkbox-toggle-show="job_ids">
+      <div class="row">
+        <div class="col-auto">
+          <%= check_box_tag "all_job_ids", 1, false, disabled: true, data: { "checkbox-toggle-show": "job_ids"} %>
         </div>
+        <div class="col-auto">
+          Apply to all <%= filter.filtered_count %> <%= "job".pluralize(filter.filtered_count) %>.
+        </div>
+      </div>
     </label>
 
     <% if jobs.present? %>
       <% jobs.each do |job| %>
-        <%= tag.div id: dom_id(job), class: "list-group-item list-group-item-action py-3" do %>
+        <%= tag.div id: dom_id(job), role: "row", class: "list-group-item list-group-item-action py-3" do %>
           <div class="row align-items-center">
             <div class="col-auto">
               <%= check_box_tag 'job_ids[]', job.id, false, data: { "checkbox-toggle-each": "job_ids" } %>
@@ -104,6 +104,7 @@
               <div class="dropdown float-end">
                 <button class="d-flex align-items-center btn btn-sm" type="button" id="<%= dom_id(job, :actions) %>" data-bs-toggle="dropdown" aria-expanded="false">
                   <%= render "good_job/shared/icons/dots" %>
+                  <span class="visually-hidden">Actions</span>
                 </button>
                 <ul class="dropdown-menu shadow" aria-labelledby="<%= dom_id(job, :actions) %>">
                   <li>
