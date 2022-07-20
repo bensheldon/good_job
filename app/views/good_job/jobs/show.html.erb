@@ -10,13 +10,13 @@
         </nav>
         <h2 class="mb-0"><%= tag.code @job.job_class %></h2>
       </div>
-      <div class="col">
+      <div class="col-2">
         <div class="small text-muted text-uppercase">Queue</div>
         <div class="badge bg-primary bg-opacity-25 text-dark font-monospace my-2">
           <%= tag.strong @job.queue_name %>
         </div>
       </div>
-      <div class="col">
+      <div class="col-2">
         <div class="small text-muted text-uppercase">Priority</div>
         <div class="font-monospace fw-bold small my-2"><%= tag.strong @job.priority %></div>
       </div>
