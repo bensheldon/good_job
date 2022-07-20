@@ -1,0 +1,3 @@
+name: "GoodJob CodeQL config"
+paths-ignore:
+  - app/assets/good_job/vendor

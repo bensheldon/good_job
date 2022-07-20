@@ -145,7 +145,7 @@ module GoodJob
       old_jobs = old_jobs.not_discarded unless include_discarded
       old_jobs_count = old_jobs.count
 
-      GoodJob::Execution.where(job: old_jobs).destroy_all
+      GoodJob::Execution.where(job: old_jobs).delete_all
       payload[:destroyed_records_count] = old_jobs_count
     end
   end

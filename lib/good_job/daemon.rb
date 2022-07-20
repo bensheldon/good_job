@@ -26,7 +26,7 @@ module GoodJob
     # @return [void]
     def write_pid
       File.open(pidfile, ::File::CREAT | ::File::EXCL | ::File::WRONLY) { |f| f.write(::Process.pid.to_s) }
-      at_exit { File.delete(pidfile) if File.exist?(pidfile) }
+      at_exit { File.delete(pidfile) if File.exist?(pidfile) } # rubocop:disable Lint/NonAtomicFileOperation
     rescue Errno::EEXIST
       check_pid
       retry
@@ -34,7 +34,7 @@ module GoodJob
 
     # @return [void]
     def delete_pid
-      File.delete(pidfile) if File.exist?(pidfile)
+      File.delete(pidfile) if File.exist?(pidfile) # rubocop:disable Lint/NonAtomicFileOperation
     end
 
     # @return [void]

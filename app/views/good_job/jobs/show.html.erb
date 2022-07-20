@@ -54,4 +54,4 @@
   <%= tag.pre @job.serialized_params["arguments"].map(&:inspect).join(', ') %>
 </div>
 
-<%= render 'executions', executions: @job.executions.reverse %>
+<%= render 'executions', executions: @job.executions.includes_advisory_locks.reverse %>

@@ -56,7 +56,7 @@ module GoodJob
     end
 
     def show
-      @job = Job.find(params[:id])
+      @job = Job.includes_advisory_locks.find(params[:id])
     end
 
     def discard

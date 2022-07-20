@@ -22,7 +22,7 @@ FileUtils.chdir GEM_ROOT do
   if options[:todo]
     flags << '--auto-gen-config'
   elsif !options[:nofix]
-    flags << '--auto-correct'
+    flags << '--autocorrect'
   else
     flags << '--parallel'
   end

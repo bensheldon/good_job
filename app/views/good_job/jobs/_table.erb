@@ -13,7 +13,7 @@
             <th>Executions</th>
             <th>Error</th>
             <th>
-              ActiveJob Params&nbsp;
+              Parameters&nbsp;
               <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
                              data: { bs_toggle: "collapse", bs_target: ".job-params" },
                              aria: { expanded: false, controls: jobs.map { |job| "##{dom_id(job, "params")}" }.join(" ") }
@@ -71,7 +71,7 @@
                                  data: { bs_toggle: "collapse", bs_target: "##{dom_id(job, 'params')}" },
                                  aria: { expanded: false, controls: dom_id(job, "params") }
                   %>
-                  <%= tag.pre JSON.pretty_generate(job.serialized_params), id: dom_id(job, "params"), class: "collapse job-params" %>
+                  <%= tag.pre JSON.pretty_generate(job.display_serialized_params), id: dom_id(job, "params"), class: "collapse job-params" %>
                 </td>
                 <td>
                   <div class="text-nowrap">

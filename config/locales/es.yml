@@ -63,3 +63,22 @@ es:
       retried: reintentado
       running: Corriendo
       scheduled: Programado
+  number:
+    format:
+      delimiter: " "
+      separator: ","
+    human:
+      decimal_units:
+        format: "%n%u"
+        units:
+          billion: B
+          hundred: ''
+          million: M
+          quadrillion: q
+          thousand: k
+          trillion: T
+          unit: ''
+      format:
+        delimiter: " "
+        precision: 3
+        separator: ","

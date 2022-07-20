@@ -1,5 +1,75 @@
 # Changelog
 
+## [v3.2.0](https://github.com/bensheldon/good_job/tree/v3.2.0) (2022-07-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.1.0...v3.2.0)
+
+**Merged pull requests:**
+
+- Ordered queue handling by workers [\#665](https://github.com/bensheldon/good_job/pull/665) ([jrochkind](https://github.com/jrochkind))
+
+## [v3.1.0](https://github.com/bensheldon/good_job/tree/v3.1.0) (2022-07-11)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.0.2...v3.1.0)
+
+**Implemented enhancements:**
+
+- Improve Dashboard display of parameters \(CronEntry kwargs; Process configuration; Job and Execution database values\) [\#662](https://github.com/bensheldon/good_job/pull/662) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Don't delegate `GoodJob::Job#status` to executions to avoid race condition [\#661](https://github.com/bensheldon/good_job/pull/661) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- How to suppress repetitive logs in development? [\#658](https://github.com/bensheldon/good_job/issues/658)
+- 500 Internal Server Error Exception in web interface trying to view running jobs [\#656](https://github.com/bensheldon/good_job/issues/656)
+- Cron schedule page in dashboard not showing kwargs [\#608](https://github.com/bensheldon/good_job/issues/608)
+- Paralelism x database connections [\#569](https://github.com/bensheldon/good_job/issues/569)
+
+**Merged pull requests:**
+
+- Show job/cron/process counts in the Navbar [\#663](https://github.com/bensheldon/good_job/pull/663) ([bensheldon](https://github.com/bensheldon))
+- Dequeing should be first-in first-out [\#651](https://github.com/bensheldon/good_job/pull/651) ([jrochkind](https://github.com/jrochkind))
+
+## [v3.0.2](https://github.com/bensheldon/good_job/tree/v3.0.2) (2022-07-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.0.1...v3.0.2)
+
+**Fixed bugs:**
+
+- Copy forward concurrency key value when retrying a job, rather than regenerating it [\#622](https://github.com/bensheldon/good_job/issues/622)
+- All concurrency controlled jobs throw exceptions and are rescheduled if they are called using perform\_now [\#591](https://github.com/bensheldon/good_job/issues/591)
+
+**Closed issues:**
+
+- Queue config not respecting limits [\#659](https://github.com/bensheldon/good_job/issues/659)
+- UI engine does not work without explicit require [\#646](https://github.com/bensheldon/good_job/issues/646)
+- Should `:inline` adapter mode retry jobs? [\#611](https://github.com/bensheldon/good_job/issues/611)
+- Error Job Not Preserved  [\#594](https://github.com/bensheldon/good_job/issues/594)
+- Jobs never get run... [\#516](https://github.com/bensheldon/good_job/issues/516)
+- Release GoodJob 3.0 [\#507](https://github.com/bensheldon/good_job/issues/507)
+- Improve security of Gem releases [\#422](https://github.com/bensheldon/good_job/issues/422)
+
+**Merged pull requests:**
+
+- Preserve initial concurrency key when retrying jobs [\#657](https://github.com/bensheldon/good_job/pull/657) ([bensheldon](https://github.com/bensheldon))
+- Add Dashboard troubleshooting note to explicitly require the engine [\#654](https://github.com/bensheldon/good_job/pull/654) ([bensheldon](https://github.com/bensheldon))
+- Removes wrong parentheses [\#653](https://github.com/bensheldon/good_job/pull/653) ([esasse](https://github.com/esasse))
+
+## [v3.0.1](https://github.com/bensheldon/good_job/tree/v3.0.1) (2022-07-02)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.0.0...v3.0.1)
+
+**Closed issues:**
+
+- ERROR:  relation "good\_jobs" does not exist at character 454 [\#308](https://github.com/bensheldon/good_job/issues/308)
+
+**Merged pull requests:**
+
+- Fix `GoodJob.cleanup_preserved_jobs` to use `delete_all` instead of `destroy_all` [\#652](https://github.com/bensheldon/good_job/pull/652) ([bensheldon](https://github.com/bensheldon))
+- Create codeql-analysis.yml [\#648](https://github.com/bensheldon/good_job/pull/648) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.0.0](https://github.com/bensheldon/good_job/tree/v3.0.0) (2022-06-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v2.99.0...v3.0.0)
@@ -1011,7 +1081,6 @@
 
 **Closed issues:**
 
-- ERROR:  relation "good\_jobs" does not exist at character 454 [\#308](https://github.com/bensheldon/good_job/issues/308)
 - Add Frozen String Literal to all files [\#298](https://github.com/bensheldon/good_job/issues/298)
 - Support for good\_job without Rails? [\#295](https://github.com/bensheldon/good_job/issues/295)
 
