@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module GoodJob
   module Reportable
     # The last relevant timestamp for this execution
