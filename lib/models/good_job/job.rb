@@ -8,6 +8,7 @@ module GoodJob
   class Job < BaseRecord
     include Filterable
     include Lockable
+    include Reportable
 
     # Raised when an inappropriate action is applied to a Job based on its state.
     ActionForStateMismatchError = Class.new(StandardError)
@@ -71,10 +72,6 @@ module GoodJob
     # @return [String]
     def job_class
       serialized_params['job_class']
-    end
-
-    def last_status_at
-      finished_at || performed_at || scheduled_at || created_at
     end
 
     def status

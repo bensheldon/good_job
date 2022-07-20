@@ -9,10 +9,18 @@
           </ol>
         </nav>
         <h2 class="mb-1"><%= tag.code @job.job_class %></h2>
-        <div class="text-muted small d-flex gap-2">
-            <div>Queue: <%= tag.strong @job.queue_name %></div>
+        <div class="text-muted d-flex gap-2">
+            <div>
+              <span class="small">Queue:</span>
+              <span class="badge bg-primary bg-opacity-25 text-dark font-monospace">
+                <%= tag.strong @job.queue_name %>
+              </span>
+            </div>
             •
-            <div>Priority: <%= tag.strong @job.priority %></div>
+            <div>
+              <span class="small">Priority:</span>
+              <span class="font-monospace fw-bold small"><%= tag.strong @job.priority %></span>
+            </div>
         </div>
       </div>
       <div>

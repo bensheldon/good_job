@@ -12,6 +12,10 @@ module GoodJob
       }
     end
 
+    def future?
+      params[:state].in?(['scheduled', 'retried'])
+    end
+
     def filtered_query
       query = base_query.includes(:executions).includes_advisory_locks
 
