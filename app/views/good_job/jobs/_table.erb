@@ -34,7 +34,7 @@
         </div>
         <div class="col-1">Queue</div>
         <div class="col-1">Priority</div>
-        <div class="col-1"><% unless filter.future? %>Latency<% end %></div>
+        <div class="col-1">Latency</div>
         <div class="col-1 text-end">Attempts</div>
         <div class="col-3"><!-- Status --></div>
         <div class="col"></div>
@@ -71,26 +71,23 @@
             <div class="col-1 small">
               <% if job.queue_latency %>
                 <div><%= format_duration job.queue_latency %> <span class="text-muted">in queue</span></div>
+              <% else %>
+                <div class="text-center text-muted">⋯</div>
               <% end %>
               <% if job.runtime_latency %>
                 <div><%= format_duration job.runtime_latency %> <span class="text-muted">runtime</span></div>
               <% end %>
             </div>
-            <div class="col-1 text-end">
-              <% if job.executions_count > 0 %>
-                <%= job.executions_count %>
-              <% end %>
-              <% if job.error %>
-                <%= tag.button type: "button",
-                    class: "btn btn-sm py-0 btn-link text-reset text-decoration-none",
-                    data: {
+            <div class="col-1 text-center">
+              <% if job.executions_count > 0 && job.status != :finished %>
+                <%= tag.span job.executions_count, class: "badge rounded-pill bg-danger", data: {
                       bs_toggle: "popover",
                       bs_trigger: "hover focus click",
                       bs_placement: "bottom",
-                      bs_content: tag.pre(job.error, class: "text-wrap text-break m-0")
-                    } do %>
-                  <span class="text-danger me-1"><%= render "good_job/shared/icons/exclamation" %></span>
-                <% end %>
+                      bs_content: tag.pre(job.recent_error, class: "text-wrap text-break m-0")
+                } %>
+              <% else %>
+                <span class="badge bg-secondary bg-opacity-50 rounded-pill"><%= job.executions_count %></span>
               <% end %>
             </div>
             <div class="col d-flex gap-3 align-items-center justify-content-end">
