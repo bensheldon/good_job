@@ -27,7 +27,17 @@
             <tr id="<%= dom_id(cron_entry) %>">
               <td class="font-monospace"><%= cron_entry.key %></td>
               <td class="font-monospace"><%= cron_entry.schedule %></td>
-              <td><%= cron_entry.enabled? ? 'Yes' : 'No' %></td>
+              <td>
+                <% if cron_entry.enabled? %>
+                  <span class="badge bg-success">
+                    Enabled
+                  </span>
+                <% else %>
+                  <span class="badge bg-warning">
+                    Disabled
+                  </span>
+                <% end %>
+                </td>
               <td>
                 <%= tag.button("Inspect", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
                                data: { bs_toggle: "collapse", bs_target: "##{dom_id(cron_entry, 'properties')}" },
@@ -42,7 +52,7 @@
                 <% end %>
               </td>
               <td>
-                <%= button_to enqueue_cron_entry_path(cron_entry), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Run cron entry now" }, title: "Run cron entry now", data: { confirm: "Confirm run cron entry now" } do %>
+                <%= button_to enqueue_cron_entry_path(cron_entry), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Enqueue cron entry now" }, title: "Enqueue cron entry now", data: { confirm: "Confirm enqueue cron entry now" } do %>
                   <%= render_icon "skip_forward" %>
                 <% end %>
 

@@ -19,13 +19,13 @@ module GoodJob
     def enable
       @cron_entry = CronEntry.find(params[:cron_key])
       @cron_entry.enable
-      redirect_back(fallback_location: cron_entries_path, notice: "Cron has been enabled.")
+      redirect_back(fallback_location: cron_entries_path, notice: "Cron entry has been enabled.")
     end
 
     def disable
       @cron_entry = CronEntry.find(params[:cron_key])
       @cron_entry.disable
-      redirect_back(fallback_location: cron_entries_path, notice: "Cron has been disabled.")
+      redirect_back(fallback_location: cron_entries_path, notice: "Cron entry has been disabled.")
     end
   end
 end
