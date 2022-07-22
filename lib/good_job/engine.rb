@@ -32,6 +32,7 @@ module GoodJob
         GoodJob.on_thread_error = rails_config[:on_thread_error] if rails_config.key?(:on_thread_error)
         GoodJob.preserve_job_records = rails_config[:preserve_job_records] if rails_config.key?(:preserve_job_records)
         GoodJob.retry_on_unhandled_error = rails_config[:retry_on_unhandled_error] if rails_config.key?(:retry_on_unhandled_error)
+        GoodJob.cron_enabled = rails_config[:enable_cron] if rails_config.key?(:enable_cron)
       end
     end
 
