@@ -20,7 +20,7 @@
           </div>
           <div class="col">
             <div class="d-flex gap-3 align-items-center justify-content-end">
-              <%= tag.span relative_time(execution.last_status_at, include_seconds: true), class: "small text-muted" %>
+              <%= tag.span relative_time(execution.last_status_at, include_seconds: true), class: "small" %>
               <%= status_badge execution.status %>
             </div>
           </div>

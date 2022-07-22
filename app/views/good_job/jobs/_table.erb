@@ -97,7 +97,7 @@
               <% end %>
             </div>
             <div class="col d-flex gap-3 align-items-center justify-content-end">
-              <%= tag.span relative_time(job.last_status_at), class: "small text-muted" %>
+              <%= tag.span relative_time(job.last_status_at), class: "small" %>
               <%= status_badge job.status %>
             </div>
             <div class="col-auto">
