@@ -57,7 +57,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "railties", ">= 6.0.0"
   spec.add_dependency "thor", ">= 0.14.1"
   spec.add_dependency "webrick", ">= 1.3"
-  spec.add_dependency "zeitwerk", ">= 2.0"
 
   spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "capybara"
