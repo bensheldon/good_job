@@ -67,7 +67,9 @@ describe 'Jobs', type: :system, js: true do
       it "can filter by state" do
         visit good_job.jobs_path
 
-        click_on "Scheduled"
+        within "#filter" do
+          click_on "Scheduled"
+        end
 
         expect(current_url).to match(/state=scheduled/)
 
