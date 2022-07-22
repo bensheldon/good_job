@@ -34,7 +34,6 @@
         </div>
         <div class="col-1">Queue</div>
         <div class="col-1">Priority</div>
-        <div class="col-1">Latency</div>
         <div class="col-1 text-end">Attempts</div>
         <div class="col text-end">
           <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
@@ -73,16 +72,6 @@
             </div>
             <div class="col-1 small text-center">
               <span class="font-monospace fw-bold"><%= job.priority %></span>
-            </div>
-            <div class="col-1 small">
-              <% if job.queue_latency %>
-                <div><%= format_duration job.queue_latency %> <span class="text-muted">in queue</span></div>
-              <% else %>
-                <div class="text-center text-muted">⋯</div>
-              <% end %>
-              <% if job.runtime_latency %>
-                <div><%= format_duration job.runtime_latency %> <span class="text-muted">runtime</span></div>
-              <% end %>
             </div>
             <div class="col-1 text-center">
               <% if job.executions_count > 0 && job.status != :finished %>
