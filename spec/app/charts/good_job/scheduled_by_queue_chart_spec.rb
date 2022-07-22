@@ -6,7 +6,10 @@ RSpec.describe GoodJob::ScheduledByQueueChart do
 
   describe "#data" do
     it "returns a hash of chart configuration and data" do
-      expect(chart.data).to be_a(Hash)
+      result = chart.data
+      puts "-------------------"
+      pp result
+      # expect(chart.data).to be_a(Hash)
     end
   end
 end

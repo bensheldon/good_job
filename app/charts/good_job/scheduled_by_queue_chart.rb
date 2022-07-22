@@ -9,10 +9,14 @@ module GoodJob
     def data
       end_time = Time.current
       start_time = end_time - 1.day
-      table_name = GoodJob::Job.table_name
 
       count_query = Arel.sql(GoodJob::Execution.pg_or_jdbc_query(<<~SQL.squish))
-        SELECT *
+        SELECT
+          timestamp,
+          scheduled_executions,
+          completed_executions,
+          retried_executions,
+          discarded_executions
         FROM generate_series(
           date_trunc('hour', $1::timestamp),
           date_trunc('hour', $2::timestamp),
@@ -21,13 +25,32 @@ module GoodJob
         LEFT JOIN (
           SELECT
               date_trunc('hour', scheduled_at) AS scheduled_at,
-              queue_name,
-              count(*) AS count
+              COUNT(*) AS scheduled_executions
             FROM (
-              #{@filter.filtered_query.except(:select, :order).select('queue_name', "COALESCE(#{table_name}.scheduled_at, #{table_name}.created_at)::timestamp AS scheduled_at").to_sql}
+              #{@filter.filtered_query
+                       .except(:select, :order)
+                       .unscope(where: :retried_good_job_id)
+                       .select("MIN(COALESCE(scheduled_at, created_at))::timestamp AS scheduled_at")
+                       .group(:active_job_id)
+                       .to_sql}
             ) sources
-            GROUP BY date_trunc('hour', scheduled_at), queue_name
-        ) sources ON sources.scheduled_at = timestamp
+            GROUP BY date_trunc('hour', scheduled_at)
+        ) scheduled_executions ON scheduled_executions.scheduled_at = timestamp
+        LEFT JOIN (
+          SELECT
+              date_trunc('hour', finished_at) AS finished_at,
+              COUNT(*) FILTER (WHERE error IS NULL) AS completed_executions,
+              COUNT(*) FILTER (WHERE error IS NOT NULL AND retried_good_job_id IS NOT NULL) AS retried_executions,
+              COUNT(*) FILTER (WHERE error IS NOT NULL AND retried_good_job_id IS NULL) AS discarded_executions
+            FROM (
+              #{@filter.filtered_query
+                       .except(:select, :order)
+                       .where.not(finished_at: nil)
+                       .select('finished_at', 'error', 'retried_good_job_id')
+                       .to_sql}
+            ) sources
+            GROUP BY date_trunc('hour', finished_at)
+        ) finished_executions ON finished_executions.finished_at = timestamp
         ORDER BY timestamp ASC
       SQL
 
@@ -37,26 +60,48 @@ module GoodJob
       ]
       executions_data = GoodJob::Execution.connection.exec_query(GoodJob::Execution.pg_or_jdbc_query(count_query), "GoodJob Dashboard Chart", binds)
 
-      queue_names = executions_data.reject { |d| d['count'].nil? }.map { |d| d['queue_name'] || BaseFilter::EMPTY }.uniq
-      labels = []
-      queues_data = executions_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
-        labels << timestamp.in_time_zone.strftime('%H:%M')
-        queue_names.each do |queue_name|
-          (hash[queue_name] ||= []) << values.find { |d| d['queue_name'] == queue_name }&.[]('count')
-        end
-      end
+      puts executions_data
+
+      labels = executions_data.map { |row| row['timestamp'].in_time_zone.strftime('%H:%M') }
+
+      colors = {
+        scheduled: "blue",
+        succeeded: "#198754",
+        retried: "orange",
+        discarded: "#FF0000",
+      }
 
       {
         labels: labels,
-        datasets: queues_data.map do |queue, data|
-          label = queue || '(none)'
+        datasets: [
           {
-            label: label,
-            data: data,
-            backgroundColor: string_to_hsl(label),
-            borderColor: string_to_hsl(label),
-          }
-        end,
+            label: 'Scheduled/Enqueued',
+            data: executions_data.map { |row| row['scheduled_executions'] || 0 },
+            type: 'line',
+            borderColor: colors[:scheduled],
+          },
+          # {
+          #   label: 'Retried',
+          #   data: executions_data.map { |row| row['retried_executions'] || 0 },
+          #   stack: 1,
+          #   type: 'bar',
+          #   backgroundColor: colors[:retried],
+          # },
+          {
+            label: 'Finished',
+            data: executions_data.map { |row| row['completed_executions'] || 0 },
+            stack: 1,
+            type: 'bar',
+            backgroundColor: colors[:succeeded],
+          },
+          {
+            label: 'Discarded',
+            data: executions_data.map { |row| row['discarded_executions'] || 0 },
+            stack: 1,
+            type: 'bar',
+            backgroundColor: colors[:discarded],
+          },
+        ],
       }
     end
 
