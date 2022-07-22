@@ -74,28 +74,6 @@ module GoodJob
       serialized_params['job_class']
     end
 
-    def status
-      if finished_at.present?
-        if error.present? && retried_good_job_id.present?
-          :retried
-        elsif error.present? && retried_good_job_id.nil?
-          :discarded
-        else
-          :finished
-        end
-      elsif (scheduled_at || created_at) > DateTime.current
-        if serialized_params.fetch('executions', 0) > 1
-          :retried
-        else
-          :scheduled
-        end
-      elsif running?
-        :running
-      else
-        :queued
-      end
-    end
-
     # Override #reload to add a custom scope to ensure the reloaded record is the head execution
     # @return [Job]
     def reload(options = nil)
