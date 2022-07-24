@@ -59,20 +59,22 @@ describe 'Jobs', type: :system, js: true do
         select "ConfigurableQueueJob", from: "job_class_filter"
         expect(current_url).to match(/job_class=ConfigurableQueueJob/)
 
-        table = page.find(".table-jobs")
-        expect(table).to have_selector("tbody tr", count: 1)
+        table = page.find("[role=table]")
+        expect(table).to have_selector("[role=row]", count: 1)
         expect(table).to have_content(foo_queue_job.job_id)
       end
 
       it "can filter by state" do
         visit good_job.jobs_path
 
-        click_on "Scheduled"
+        within "#filter" do
+          click_on "Scheduled"
+        end
 
         expect(current_url).to match(/state=scheduled/)
 
-        table = page.find(".table-jobs")
-        expect(table).to have_selector("tbody tr", count: 2)
+        table = page.find("[role=table]")
+        expect(table).to have_selector("[role=row]", count: 2)
         expect(table).to have_content(foo_queue_job.job_id)
       end
 
@@ -82,8 +84,8 @@ describe 'Jobs', type: :system, js: true do
         select "foo", from: "job_queue_filter"
         expect(current_url).to match(/queue_name=foo/)
 
-        table = page.find(".table-jobs")
-        expect(table).to have_selector("tbody tr", count: 1)
+        table = page.find("[role=table]")
+        expect(table).to have_selector("[role=row]", count: 1)
         expect(table).to have_content(foo_queue_job.job_id)
       end
 
@@ -104,10 +106,10 @@ describe 'Jobs', type: :system, js: true do
         visit '/good_job'
         click_on "Jobs"
 
-        expect(page).to have_selector('.job', count: 3)
+        expect(page).to have_selector('[role=row]', count: 3)
         fill_in 'query', with: ExampleJob::DEAD_TYPE
         click_on 'Search'
-        expect(page).to have_selector('.job', count: 1)
+        expect(page).to have_selector('[role=row]', count: 1)
       end
     end
 
@@ -117,6 +119,7 @@ describe 'Jobs', type: :system, js: true do
 
       expect do
         within "##{dom_id(discarded_job)}" do
+          click_on 'Actions'
           accept_confirm { click_on 'Retry job' }
         end
         expect(page).to have_content "Job has been retried"
@@ -129,6 +132,7 @@ describe 'Jobs', type: :system, js: true do
 
       expect do
         within "##{dom_id(unfinished_job)}" do
+          click_on 'Actions'
           accept_confirm { click_on 'Discard job' }
         end
         expect(page).to have_content "Job has been discarded"
@@ -140,6 +144,7 @@ describe 'Jobs', type: :system, js: true do
       click_on "Jobs"
 
       within "##{dom_id(discarded_job)}" do
+        click_on 'Actions'
         accept_confirm { click_on 'Destroy job' }
       end
       expect(page).to have_content "Job has been destroyed"
@@ -160,19 +165,19 @@ describe 'Jobs', type: :system, js: true do
 
       expect do
         check "toggle_job_ids"
-        within("table thead") { accept_confirm { click_on "Reschedule all" } }
+        within("[role=table] header") { accept_confirm { click_on "Reschedule all" } }
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
       end.to change { unfinished_job.reload.scheduled_at }.to within(1.second).of(Time.current)
 
       expect do
         check "toggle_job_ids"
-        within("table thead") { accept_confirm { click_on "Discard all" } }
+        within("[role=table] header") { accept_confirm { click_on "Discard all" } }
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(1).to(2)
 
       expect do
         check "toggle_job_ids"
-        within("table thead") { accept_confirm { click_on "Retry all" } }
+        within("[role=table] header") { accept_confirm { click_on "Retry all" } }
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(2).to(0)
 
@@ -180,7 +185,7 @@ describe 'Jobs', type: :system, js: true do
       expect do
         check "toggle_job_ids"
         check "Apply to all 2 jobs"
-        within("table thead") { accept_confirm { click_on "Discard all" } }
+        within("[role=table] header") { accept_confirm { click_on "Discard all" } }
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(0).to(2)
 
@@ -188,7 +193,10 @@ describe 'Jobs', type: :system, js: true do
       click_on "Jobs"
       expect do
         check "toggle_job_ids"
-        within("table thead") { accept_confirm { click_on "Destroy all" } }
+        within("[role=table] header") do
+          click_on "Toggle Actions"
+          accept_confirm { click_on "Destroy all" }
+        end
         expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
       end.to change(GoodJob::Job, :count).from(2).to(0)
     end

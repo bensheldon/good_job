@@ -1,48 +1,57 @@
 <div class="break-out bg-light border-bottom py-2 mb-3">
   <div class="container-fluid pt-2">
-    <div class="d-flex align-items-center">
-      <div class="flex-fill">
+    <div class="row align-items-center">
+      <div class="col-5">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb small mb-0">
             <li class="breadcrumb-item"><%= link_to "Jobs", jobs_path %></li>
-            <li class="breadcrumb-item active" aria-current="page">ActiveJob ID: <%= tag.code @job.id %></li>
+            <li class="breadcrumb-item active" aria-current="page"><%= tag.code @job.id, class: "text-muted" %></li>
           </ol>
         </nav>
-        <h2 class="mb-1"><%= tag.code @job.job_class %></h2>
-        <div class="text-muted small d-flex gap-2">
-            <div>Queue: <%= tag.strong @job.queue_name %></div>
-            •
-            <div>Priority: <%= tag.strong @job.priority %></div>
+        <h2 class="mb-0"><%= tag.code @job.job_class %></h2>
+      </div>
+      <div class="col-2">
+        <div class="small text-muted text-uppercase">Queue</div>
+        <div class="badge bg-primary bg-opacity-25 text-dark font-monospace my-2">
+          <%= tag.strong @job.queue_name %>
         </div>
       </div>
-      <div>
-        <% job_reschedulable = @job.status.in? [:scheduled, :retried, :queued] %>
-        <%= button_to reschedule_job_path(@job.id), method: :put,
-            class: "btn btn-sm #{job_reschedulable ? 'btn-outline-primary' : 'btn-outline-secondary'}",
-            form_class: "d-inline-block",
-            disabled: !job_reschedulable,
-            aria: { label: "Reschedule job" },
-            title: "Reschedule job",
-            data: { confirm: "Confirm reschedule" } do %>
-          <%= render_icon "skip_forward" %>
-          Reschedule
+      <div class="col-2">
+        <div class="small text-muted text-uppercase">Priority</div>
+        <div class="font-monospace fw-bold small my-2"><%= tag.strong @job.priority %></div>
+      </div>
+      <div class="col text-end">
+        <% if @job.status.in? [:scheduled, :retried, :queued] %>
+          <%= button_to reschedule_job_path(@job.id), method: :put,
+              class: "btn btn-sm btn-outline-primary",
+              form_class: "d-inline-block",
+              aria: { label: "Reschedule job" },
+              title: "Reschedule job",
+              data: { confirm: "Confirm reschedule" } do %>
+            <%= render_icon "skip_forward" %>
+            Reschedule
+          <% end %>
         <% end %>
 
-        <% job_discardable = @job.status.in? [:scheduled, :retried, :queued] %>
-        <%= button_to discard_job_path(@job.id), method: :put, class: "btn btn-sm #{job_discardable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_discardable, aria: { label: "Discard job" }, title: "Discard job", data: { confirm: "Confirm discard" } do %>
-          <%= render_icon "stop" %>
-          Discard
+        <% if @job.status.in? [:scheduled, :retried, :queued] %>
+          <%= button_to discard_job_path(@job.id), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Discard job" }, title: "Discard job", data: { confirm: "Confirm discard" } do %>
+            <%= render_icon "stop" %>
+            Discard
+          <% end %>
         <% end %>
 
-        <%= button_to retry_job_path(@job.id), method: :put, class: "btn btn-sm #{@job.status == :discarded ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: @job.status != :discarded, aria: { label: "Retry job" }, title: "Retry job", data: { confirm: "Confirm retry" } do %>
-          <%= render_icon "arrow_clockwise" %>
-          Retry
+        <% if @job.status == :discarded %>
+          <%= button_to retry_job_path(@job.id), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Retry job" }, title: "Retry job", data: { confirm: "Confirm retry" } do %>
+            <%= render_icon "arrow_clockwise" %>
+            Retry
+          <% end %>
         <% end %>
 
-        <% job_destroyable = @job.status.in? [:discarded, :finished] %>
-        <%= button_to job_path(@job.id), method: :delete, class: "btn btn-sm #{job_destroyable ? 'btn-outline-primary' : 'btn-outline-secondary'}", form_class: "d-inline-block", disabled: !job_destroyable, aria: { label: "Destroy job" }, title: "Destroy job", data: { confirm: "Confirm destroy" } do %>
-          <%= render_icon "trash" %>
-          Destroy
+        <% if @job.status.in? [:discarded, :finished] %>
+          <%= button_to job_path(@job.id), method: :delete, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Destroy job" }, title: "Destroy job", data: { confirm: "Confirm destroy" } do %>
+            <%= render_icon "trash" %>
+            Destroy
+          <% end %>
         <% end %>
       </div>
     </div>
@@ -51,7 +60,7 @@
 
 <div class="my-4">
   <h5>Arguments</h5>
-  <%= tag.pre @job.serialized_params["arguments"].map(&:inspect).join(', ') %>
+  <%= tag.pre @job.serialized_params["arguments"].map(&:inspect).join(', '), class: 'text-wrap text-break' %>
 </div>
 
 <%= render 'executions', executions: @job.executions.includes_advisory_locks.reverse %>
