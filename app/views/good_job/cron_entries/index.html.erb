@@ -1,61 +1,64 @@
-<div class="my-3 flex">
-  <h2>Cron Schedules</h2>
+<div class="bg-light break-out border-bottom">
+  <h2 class="container-fluid pt-3 pb-2">Cron Schedules</h2>
 </div>
 
-<% if @cron_entries.present? %>
-  <div class="card my-3">
-    <div class="table-responsive">
-      <table class="table card-table table-bordered table-hover table-sm mb-0">
-        <thead>
-          <th>Key</th>
-          <th>Schedule</th>
-          <th>
-            Properties
-            <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                           data: { bs_toggle: "collapse", bs_target: ".cron-entry-properties" },
-                           aria: { expanded: false, controls: @cron_entries.map { |cron_entry| "##{dom_id(cron_entry, 'properties')}" }.join(" ") }
-            %>
-          </th>
-          <th>Description</th>
-          <th>Next scheduled</th>
-          <th>Last run</th>
-          <th>Actions</th>
-        </thead>
-        <tbody>
-          <% @cron_entries.each do |cron_entry| %>
-            <tr id="<%= dom_id(cron_entry) %>">
-              <td class="font-monospace"><%= cron_entry.key %></td>
-              <td class="font-monospace"><%= cron_entry.schedule %></td>
-              <td>
-                <%= tag.button("Inspect", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                        data: { bs_toggle: "collapse", bs_target: "##{dom_id(cron_entry, 'properties')}" },
-                        aria: { expanded: false, controls: dom_id(cron_entry, 'properties') }) %>
-                <%= tag.pre(JSON.pretty_generate(cron_entry.display_properties), id: dom_id(cron_entry, 'properties'), class: "collapse cron-entry-properties") %>
-              </td>
-              <td><%= cron_entry.description %></td>
-              <td><%= cron_entry.next_at %></td>
-              <td>
-                <% if cron_entry.last_job.present? %>
-                  <%= link_to cron_entry.last_at, cron_entry_path(cron_entry), title: "Job #{cron_entry.last_job.id}" %>
-                <% end %>
-              </td>
-              <td>
-                <%= button_to enqueue_cron_entry_path(cron_entry.id), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Run cron entry now" }, title: "Run cron entry now", data: { confirm: "Confirm run cron entry now" } do %>
-                  <%= render "good_job/shared/icons/play" %>
-                <% end %>
-              </td>
-            </tr>
+<div class="card my-3">
+  <div class="list-group list-group-flush text-nowrap" role="table">
+    <header class="list-group-item bg-light">
+      <div class="row small text-muted text-uppercase align-items-center">
+        <div class="col"></div>
+        <div class="col">Class</div>
+        <div class="col">Schedule</div>
+        <div class="col">Next scheduled</div>
+        <div class="col">Last run</div>
+        <div class="col text-end">
+          <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
+                         data: { bs_toggle: "collapse", bs_target: ".cron-entry-properties" },
+                         aria: { expanded: false, controls: @cron_entries.map { |cron_entry| "##{dom_id(cron_entry, 'properties')}" }.join(" ") } do %>
+            <%= render_icon "info" %>
+            <span class="visually-hidden">Inspect</span>
           <% end %>
-        </tbody>
-      </table>
-    </div>
+        </div>
+      </div>
+    </header>
+    <% @cron_entries.each do |cron_entry| %>
+      <div id="<%= dom_id(cron_entry) %>" class="list-group-item py-3" role="row">
+        <div class="row align-items-center">
+          <div class="col">
+            <div class="small font-monospace"><%= cron_entry.key %></div>
+            <div class="small text-muted"><%= cron_entry.description %></div>
+          </div>
+          <div class="col"><%= tag.span tag.code(cron_entry.job_class), class: "fs-5 mb-0" %></div>
+          <div class="col font-monospace fw-bold"><%= cron_entry.schedule %></div>
+          <div class="col small"><%= relative_time cron_entry.next_at %></div>
+          <div class="col small">
+            <% if cron_entry.last_job.present? %>
+              <%= link_to relative_time(cron_entry.last_at), cron_entry_path(cron_entry), title: "Job #{cron_entry.last_job.id}" %>
+            <% end %>
+          </div>
+          <div class="col d-flex gap-3 justify-content-end">
+            <%= button_to enqueue_cron_entry_path(cron_entry.id), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Run cron entry now" }, title: "Run cron entry now", data: { confirm: "Confirm run cron entry now" } do %>
+              <%= render "good_job/shared/icons/play" %>
+              Run Now
+            <% end %>
+            <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
+                           title: "Inspect",
+                           data: { bs_toggle: "collapse", bs_target: "##{dom_id(cron_entry, 'properties')}" },
+                           aria: { expanded: false, controls: dom_id(cron_entry, "properties") } do %>
+              <%= render_icon "info" %>
+              <span class="visually-hidden">Inspect</span>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <%= tag.div id: dom_id(cron_entry, 'properties'), class: "collapse cron-entry-properties list-group-item collapse small bg-dark text-light" do %>
+        <%= tag.pre JSON.pretty_generate(cron_entry.display_properties) %>
+      <% end %>
+    <% end %>
+    <% if @cron_entries.empty? %>
+      <div class="list-group-item py-4 text-center text-muted">
+        No cron schedules found.
+      </div>
+    <% end %>
   </div>
-<% else %>
-  <div class="card my-3">
-    <div class="card-body">
-      <p class="card-text">
-        <em>No cron schedules found.</em>
-      </p>
-    </div>
-  </div>
-<% end %>
+</div>

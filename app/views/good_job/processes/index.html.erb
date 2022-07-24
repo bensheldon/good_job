@@ -1,38 +1,66 @@
-<div class="my-3 flex">
-  <h2>Processes</h2>
+<div class="bg-light break-out border-bottom">
+  <h2 class="container-fluid pt-3 pb-2">Processes</h2>
 </div>
 
-<div data-live-poll-region="processes">
-  <% if @processes.present? %>
-    <div class="card my-3">
-      <div class="table-responsive">
-        <table class="table card-table table-bordered table-hover table-sm mb-0">
-          <thead>
-          <tr>
-            <th>Process UUID</th>
-            <th>Created At</th></th>
-            <th>State</th>
-          </tr>
-          </thead>
-          <tbody>
-          <% @processes.each do |process| %>
-            <tr class="<%= dom_class(process) %>" id="<%= dom_id(process) %>">
-              <td><%= process.id %></td>
-              <td><%= relative_time(process.created_at) %></td>
-              <td><%= tag.pre JSON.pretty_generate(process.state) %></td>
-            </tr>
+<div class="card my-3" data-live-poll-region="processes">
+  <div class="list-group list-group-flush text-nowrap" role="table">
+    <header class="list-group-item bg-light">
+      <div class="row small text-muted text-uppercase align-items-center">
+        <div class="col">Process</div>
+        <div class="col">Schedulers</div>
+        <div class="col-2 d-flex gap-2">
+          <span>Started</span>
+        </div>
+        <div class="col-auto">
+          <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
+                         data: { bs_toggle: "collapse", bs_target: ".process-state" },
+                         aria: { expanded: false, controls: @processes.map { |process| "##{dom_id(process, 'state')}" }.join(" ") } do %>
+              <%= render_icon "info" %>
+              <span class="visually-hidden">Inspect</span>
           <% end %>
-          </tbody>
-        </table>
+        </div>
       </div>
-    </div>
-  <% else %>
-    <div class="card my-3">
-      <div class="card-body">
-        <p class="card-text">
-          <em>No GoodJob processes found.</em>
-        </p>
+    </header>
+    <% @processes.each do |process| %>
+      <div id="<%= dom_id(process) %>" class="<%= dom_class(process) %> list-group-item py-3" role="row">
+        <div class="row align-items-center">
+          <div class="col">
+            <code class="font-monospace">
+              <span class="text-muted opacity-50">$</span>
+              <%= process.state["proctitle"] %>
+            </code>
+            <div>
+              <span class="text-muted small">PID</span>
+              <span class="badge rounded-pill bg-light text-dark"><%= process.state["pid"] %></span>
+              <span class="text-muted small">@</span>
+              <span class="badge rounded-pill bg-light text-dark"><%= process.state["hostname"] %></span>
+            </div>
+          </div>
+          <div class="col">
+            <% process.state["schedulers"].each do |scheduler| %>
+              <pre class="mb-0"><%= scheduler %></pre>
+            <% end %>
+          </div>
+          <div class="col-2 small"><%= relative_time(process.created_at) %></div>
+          <div class="col-auto">
+            <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
+                           title: "Inspect",
+                           data: { bs_toggle: "collapse", bs_target: "##{dom_id(process, 'state')}" },
+                           aria: { expanded: false, controls: dom_id(process, "state") } do %>
+              <%= render_icon "info" %>
+              <span class="visually-hidden">Inspect</span>
+            <% end %>
+          </div>
+        </div>
       </div>
-    </div>
-  <% end %>
+      <%= tag.div id: dom_id(process, "state"), class: "process-state list-group-item collapse small bg-dark text-light" do %>
+        <%= tag.pre JSON.pretty_generate(process.state) %>
+      <% end %>
+    <% end %>
+    <% if @processes.empty? %>
+      <div class="list-group-item py-4 text-center text-muted">
+        No GoodJob processes found.
+      </div>
+    <% end %>
+  </div>
 </div>
