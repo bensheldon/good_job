@@ -8,6 +8,7 @@ module GoodJob
   class Job < BaseRecord
     include Filterable
     include Lockable
+    include Reportable
 
     # Raised when an inappropriate action is applied to a Job based on its state.
     ActionForStateMismatchError = Class.new(StandardError)
@@ -71,32 +72,6 @@ module GoodJob
     # @return [String]
     def job_class
       serialized_params['job_class']
-    end
-
-    def last_status_at
-      finished_at || performed_at || scheduled_at || created_at
-    end
-
-    def status
-      if finished_at.present?
-        if error.present? && retried_good_job_id.present?
-          :retried
-        elsif error.present? && retried_good_job_id.nil?
-          :discarded
-        else
-          :finished
-        end
-      elsif (scheduled_at || created_at) > DateTime.current
-        if serialized_params.fetch('executions', 0) > 1
-          :retried
-        else
-          :scheduled
-        end
-      elsif running?
-        :running
-      else
-        :queued
-      end
     end
 
     # Override #reload to add a custom scope to ensure the reloaded record is the head execution

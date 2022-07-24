@@ -1,122 +1,151 @@
-<div class="my-3">
-  <div class="table-responsive">
-    <%= form_with(url: mass_update_jobs_path(filter.to_params), method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
-      <table class="table table-hover table-sm mb-0 table-jobs">
-        <thead>
-          <tr>
-            <th><%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %></th>
-            <th>ActiveJob ID</th>
-            <th>State</th>
-            <th>Job Class</th>
-            <th>Queue</th>
-            <th>Scheduled At</th>
-            <th>Executions</th>
-            <th>Error</th>
-            <th>
-              Parameters&nbsp;
-              <%= tag.button "Toggle", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                             data: { bs_toggle: "collapse", bs_target: ".job-params" },
-                             aria: { expanded: false, controls: jobs.map { |job| "##{dom_id(job, "params")}" }.join(" ") }
-              %>
-            </th>
-            <th>
-              Actions<br>
-
-              <div class="d-inline text-nowrap">
-                <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'btn btn-sm btn-outline-primary', title: "Reschedule all", data: { confirm: "Confirm reschedule all", disable: true } do %>
-                  <%= render_icon "skip_forward" %> All
-                <% end %>
-
-                <%= form.button type: 'submit', name: 'mass_action', value: 'discard', class: 'btn btn-sm btn-outline-primary', title: "Discard all", data: { confirm: "Confirm discard all", disable: true } do %>
-                  <%= render_icon "stop" %> All
-                <% end %>
-
-                <%= form.button type: 'submit', name: 'mass_action', value: 'retry', class: 'btn btn-sm btn-outline-primary', title: "Retry all", data: { confirm: "Confirm retry all", disable: true } do %>
-                  <%= render_icon "arrow_clockwise" %> All
-                <% end %>
-
-                <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn btn-sm btn-outline-primary', title: "Destroy all", data: { confirm: "Confirm destroy all", disable: true } do %>
-                  <%= render_icon "trash" %> All
-                <% end %>
-              </div>
-            </th>
-          </tr>
-          <tr class="d-none" data-checkbox-toggle-show="job_ids">
-            <td class="text-center table-warning" colspan="10">
-              <label>
-                <%= check_box_tag "all_job_ids", 1, false, disabled: true, data: { "checkbox-toggle-show": "job_ids"} %>
-                Apply to all <%= filter.filtered_count %> <%= "job".pluralize(filter.filtered_count) %>.
-              </label>
-            </td>
-          </tr>
-        </thead>
-        <tbody>
-          <% if jobs.present? %>
-            <% jobs.each do |job| %>
-              <tr class="<%= dom_class(job) %>" id="<%= dom_id(job) %>">
-                <td><%= check_box_tag 'job_ids[]', job.id, false, data: { "checkbox-toggle-each": "job_ids" } %></td>
-                <td>
-                  <%= link_to job_path(job.id) do %>
-                    <code><%= job.id %></code>
-                  <% end %>
-                </td>
-                <td><%= status_badge(job.status) %></td>
-                <td><%= job.job_class %></td>
-                <td><%= job.queue_name %></td>
-                <td><%= relative_time(job.scheduled_at || job.created_at) %></td>
-                <td><%= job.executions_count %></td>
-                <td class="text-break"><%= truncate(job.recent_error, length: 1_000) %></td>
-                <td>
-                  <%= tag.button "Inspect", type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                                 data: { bs_toggle: "collapse", bs_target: "##{dom_id(job, 'params')}" },
-                                 aria: { expanded: false, controls: dom_id(job, "params") }
-                  %>
-                  <%= tag.pre JSON.pretty_generate(job.display_serialized_params), id: dom_id(job, "params"), class: "collapse job-params" %>
-                </td>
-                <td>
-                  <div class="text-nowrap">
-                    <% if job.status.in? [:scheduled, :retried, :queued] %>
-                      <%= link_to reschedule_job_path(job.id), method: :put, class: "btn btn-sm btn-outline-primary", title: "Reschedule job", data: { confirm: "Confirm reschedule", disable: true } do %>
-                        <%= render_icon "skip_forward" %>
-                      <% end %>
-                    <% else %>
-                      <button class="btn btn-sm btn-outline-secondary" disabled><%= render_icon "skip_forward" %></button>
-                    <% end %>
-
-                    <% if job.status.in? [:scheduled, :retried, :queued] %>
-                      <%= link_to discard_job_path(job.id), method: :put, class: "btn btn-sm btn-outline-primary", title: "Discard job", data: { confirm: "Confirm discard", disable: true } do %>
-                        <%= render_icon "stop" %>
-                      <% end %>
-                    <% else %>
-                      <button class="btn btn-sm btn-outline-secondary" disabled><%= render_icon "stop" %></button>
-                    <% end %>
-
-                    <% if job.status == :discarded %>
-                      <%= link_to retry_job_path(job.id), method: :put, class: "btn btn-sm btn-outline-primary", title: "Retry job", data: { confirm: "Confirm retry", disable: true } do %>
-                        <%= render_icon "arrow_clockwise" %>
-                      <% end %>
-                    <% else %>
-                      <button class="btn btn-sm btn-outline-secondary" disabled><%= render_icon "arrow_clockwise" %></button>
-                    <% end %>
-
-                    <% if job.status.in? [:discarded, :finished] %>
-                      <%= link_to job_path(job.id), method: :delete, class: "btn btn-sm btn-outline-primary", title: "Destroy job", data: { confirm: "Confirm destroy", disable: true } do %>
-                        <%= render_icon "trash" %>
-                      <% end %>
-                    <% else %>
-                      <button class="btn btn-sm btn-outline-secondary" disabled><%= render_icon "trash" %></button>
-                    <% end %>
-                  </div>
-                </td>
-              </tr>
-            <% end %>
-          <% else %>
-            <tr>
-              <td colspan="10" class="py-2 text-center text-muted">No jobs found.</td>
-            </tr>
+<%= form_with(url: mass_update_jobs_path(filter.to_params), method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
+<div class="my-3 card" data-gj-poll-replace id="jobs-table">
+  <div class="list-group list-group-flush text-nowrap table-jobs" role="table">
+    <header class="list-group-item bg-light">
+      <div class="row small text-muted text-uppercase align-items-center">
+        <div class="col-auto">
+          <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %>
+        </div>
+        <div class="col-4">
+          <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'btn btn-sm btn-outline-secondary', title: "Reschedule all", data: { confirm: "Are you sure you want to reschedule the selected jobs?", disable: true } do %>
+            <span class="me-1"><%= render_icon "skip_forward" %></span> Reschedule
           <% end %>
-        </tbody>
-      </table>
+
+          <%= form.button type: 'submit', name: 'mass_action', value: 'retry', class: 'btn btn-sm btn-outline-secondary', title: "Retry all", data: { confirm: "Are you sure you want to retry the selected jobs?", disable: true } do %>
+            <span class="me-1"><%= render_icon "arrow_clockwise" %></span> Retry
+          <% end %>
+
+          <div class="btn-group" role="group">
+            <%= form.button type: 'submit', name: 'mass_action', value: 'discard', class: 'btn btn-sm btn-outline-secondary', title: "Discard all", data: { confirm: "Are you usure you want to discard the selected jobs?", disable: true } do %>
+              <span class="me-1"><%= render_icon "stop" %></span> Discard
+            <% end %>
+            <button id="destroy-dropdown-toggle" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="visually-hidden">Toggle Actions</span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="destroy-dropdown-toggle">
+              <li>
+                <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn', title: "Destroy all", data: { confirm: "Are you sure you want to destroy the selected jobs?", disable: true } do %>
+                  <span class="me-1"><%= render_icon "trash" %></span> Destroy
+                <% end %>
+              </li>
+            </div>
+          </div>
+
+        </div>
+        <div class="col-1">Queue</div>
+        <div class="col-1">Priority</div>
+        <div class="col-1 text-end">Attempts</div>
+        <div class="col text-end">
+          <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
+                  data: { bs_toggle: "collapse", bs_target: ".job-params" },
+                  aria: { expanded: false, controls: jobs.map { |job| "##{dom_id(job, "params")}" }.join(" ") } do %>
+              <%= render_icon "info" %>
+              <span class="visually-hidden">Inspect</span>
+          <% end %>
+        </div>
+      </div>
+    </header>
+    <label role="row" class="list-group-item list-group-item-warning list-group-item-action py-3 d-none" data-checkbox-toggle-show="job_ids">
+      <div class="row">
+        <div class="col-auto">
+          <%= check_box_tag "all_job_ids", 1, false, disabled: true, data: { "checkbox-toggle-show": "job_ids"} %>
+        </div>
+        <div class="col-auto">
+          Apply to all <%= filter.filtered_count %> <%= "job".pluralize(filter.filtered_count) %>.
+        </div>
+      </div>
+    </label>
+
+    <% if jobs.present? %>
+      <% jobs.each do |job| %>
+        <%= label_tag dom_id(job, :checkbox), id: dom_id(job), role: "row", class: "list-group-item list-group-item-action py-3" do %>
+          <div class="row align-items-center">
+            <div class="col-auto">
+              <%= check_box_tag 'job_ids[]', job.id, false, id: dom_id(job, :checkbox), data: { "checkbox-toggle-each": "job_ids" } %>
+            </div>
+            <div class="col-4">
+              <%= tag.code link_to(job.id, job_path(job), class: "small text-muted text-decoration-none") %>
+              <%= tag.h5 tag.code(link_to(job.job_class, job_path(job), class: "text-reset text-decoration-none")), class: "text-reset mb-0" %>
+            </div>
+            <div class="col-1">
+              <span class="badge bg-primary bg-opacity-25 text-dark font-monospace"><%= job.queue_name %></span>
+            </div>
+            <div class="col-1 small text-center">
+              <span class="font-monospace fw-bold"><%= job.priority %></span>
+            </div>
+            <div class="col-1 text-center">
+              <% if job.executions_count > 0 && job.status != :finished %>
+                <%= tag.span job.executions_count, class: "badge rounded-pill bg-danger", data: {
+                      bs_toggle: "popover",
+                      bs_trigger: "hover focus click",
+                      bs_placement: "bottom",
+                      bs_content: job.recent_error
+                } %>
+              <% else %>
+                <span class="badge bg-secondary bg-opacity-50 rounded-pill"><%= job.executions_count %></span>
+              <% end %>
+            </div>
+            <div class="col d-flex gap-3 align-items-center justify-content-end">
+              <%= tag.span relative_time(job.last_status_at), class: "small" %>
+              <%= status_badge job.status %>
+            </div>
+            <div class="col-auto">
+              <div class="dropdown float-end">
+                <button class="d-flex align-items-center btn btn-sm" type="button" id="<%= dom_id(job, :actions) %>" data-bs-toggle="dropdown" aria-expanded="false">
+                  <%= render "good_job/shared/icons/dots" %>
+                  <span class="visually-hidden">Actions</span>
+                </button>
+                <ul class="dropdown-menu shadow" aria-labelledby="<%= dom_id(job, :actions) %>">
+                  <li>
+                    <% job_reschedulable = job.status.in? [:scheduled, :retried, :queued] %>
+                    <%= link_to reschedule_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_reschedulable}", title: "Reschedule job", data: { confirm: "Confirm reschedule", disable: true } do %>
+                      <%= render "good_job/shared/icons/skip_forward" %>
+                      Reschedule
+                    <% end %>
+                  </li>
+                  <li>
+                    <% job_discardable = job.status.in? [:scheduled, :retried, :queued] %>
+                    <%= link_to discard_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_discardable}", title: "Discard job", data: { confirm: "Confirm discard", disable: true } do %>
+                      <%= render "good_job/shared/icons/stop" %>
+                      Discard
+                    <% end %>
+                  </li>
+                  <li>
+                    <%= link_to retry_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job.status == :discarded}", title: "Retry job", data: { confirm: "Confirm retry", disable: true } do %>
+                      <%= render "good_job/shared/icons/arrow_clockwise" %>
+                      Retry
+                    <% end %>
+                  </li>
+                  <li>
+                    <%= link_to job_path(job.id), method: :delete, class: "dropdown-item #{'disabled' unless job.status.in? [:discarded, :finished]}", title: "Destroy job", data: { confirm: "Confirm destroy", disable: true } do %>
+                      <%= render_icon "trash" %>
+                      Destroy
+                    <% end %>
+                  </li>
+
+                  <li>
+                    <%= link_to "##{dom_id(job, 'params')}",
+                      class: "dropdown-item",
+                      data: { bs_toggle: "collapse" },
+                      aria: { expanded: false, controls: dom_id(job, "params") } do %>
+                      <%= render_icon "info" %>
+                      Inspect
+                    <% end %>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <%= tag.div id: dom_id(job, "params"), class: "job-params list-group-item collapse small bg-dark text-light" do %>
+          <%= tag.pre JSON.pretty_generate(job.display_serialized_params) %>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="list-group-item py-4 text-center text-muted">
+        No jobs found.
+      </div>
     <% end %>
   </div>
 </div>
+<% end %>

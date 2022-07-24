@@ -9,6 +9,6 @@ class AddCronAtToGoodJobs < ActiveRecord::Migration[5.2]
       end
     end
 
-    add_column :good_jobs, :cron_at, :timestamp
+    add_column :good_jobs, :cron_at, :datetime
   end
 end

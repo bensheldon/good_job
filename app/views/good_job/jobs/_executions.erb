@@ -3,43 +3,46 @@
   <div class="list-group list-group-flush">
     <% executions.each do |execution| %>
       <%= tag.div id: dom_id(execution), class: "list-group-item py-3" do %>
-        <div class="d-md-flex">
-          <div class="flex-fill">
-            <div class="small text-muted">
-              #<%= execution.number %>:
-              <%= tag.code link_to(execution.id, "##{dom_id(execution)}", class: "text-muted text-decoration-none") %>
-            </div>
-            <div class="d-flex gap-2 align-items-center text-muted mt-1">
+        <div class="row align-items-center text-nowrap">
+          <div class="col-5 d-flex gap-2">
+            <%= tag.span execution.number, class: "badge bg-secondary bg-opacity-50 rounded-pill" %>
+            <%= tag.code link_to(execution.id, "##{dom_id(execution)}", class: "text-muted text-decoration-none small") %>
+          </div>
+          <div class="col-2 small">
+            <% if execution.queue_latency %>
+              <%= format_duration execution.queue_latency %> <span class="text-muted">in queue</span>
+            <% end %>
+          </div>
+          <div class="col-2 small">
+            <% if execution.runtime_latency %>
+              <%= format_duration execution.runtime_latency %> <span class="text-muted">runtime</span>
+            <% end %>
+          </div>
+          <div class="col">
+            <div class="d-flex gap-3 align-items-center justify-content-end">
+              <%= tag.span relative_time(execution.last_status_at, include_seconds: true), class: "small" %>
               <%= status_badge execution.status %>
-              <%= relative_time execution.last_status_at, include_seconds: true %>
-
-              <% if execution.runtime_latency %>
-                • <div><%= format_duration execution.runtime_latency %> runtime</div>
-              <% end %>
-              <% if execution.queue_latency %>
-                • <div><%= format_duration execution.queue_latency %> in queue</div>
-              <% end %>
             </div>
           </div>
-          <div>
-            <div class="mt-4 d-flex gap-2">
-              <%= tag.button type: "button", class: "btn btn-sm btn-outline-primary", role: "button",
-                data: { bs_toggle: "collapse", bs_target: "##{dom_id(execution, 'params')}" },
-                aria: { expanded: false, controls: dom_id(execution, "params") } do %>
-                Inspect
-              <% end %>
-            </div>
+          <div class="col-auto">
+            <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
+              title: "Inspect",
+              data: { bs_toggle: "collapse", bs_target: "##{dom_id(execution, 'params')}" },
+              aria: { expanded: false, controls: dom_id(execution, "params") } do %>
+              <%= render_icon "info" %>
+              <span class="visually-hidden">Inspect</span>
+            <% end %>
           </div>
         </div>
         <% if execution.error %>
-          <div class="mt-3">
+          <div class="mt-3 small">
             <strong class="small">Error:</strong>
-            <pre class="text-wrap text-break m-0"><%= execution.error %></pre>
+            <code class="text-wrap text-break m-0 text-black"><%= execution.error %></code>
           </div>
         <% end %>
-        <div>
-          <%= tag.pre JSON.pretty_generate(execution.display_serialized_params), id: dom_id(execution, "params"), class: "collapse bg-light card card-body p-3 my-3" %>
-        </div>
+      <% end %>
+      <%= tag.div id: dom_id(execution, "params"), class: "list-group-item collapse small bg-dark text-light" do %>
+        <%= tag.pre JSON.pretty_generate(execution.display_serialized_params) %>
       <% end %>
     <% end %>
   </div>

@@ -34,8 +34,8 @@ module GoodJob
     STATUS_COLOR = {
       discarded: "danger",
       finished: "success",
-      queued: "warning",
-      retried: "secondary",
+      queued: "secondary",
+      retried: "warning",
       running: "primary",
       scheduled: "secondary",
     }.freeze

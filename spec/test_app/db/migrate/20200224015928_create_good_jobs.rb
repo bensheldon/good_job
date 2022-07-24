@@ -7,9 +7,9 @@ class CreateGoodJobs < ActiveRecord::Migration[5.2]
       t.text :queue_name
       t.integer :priority
       t.jsonb :serialized_params
-      t.timestamp :scheduled_at
-      t.timestamp :performed_at
-      t.timestamp :finished_at
+      t.datetime :scheduled_at
+      t.datetime :performed_at
+      t.datetime :finished_at
       t.text :error
 
       t.timestamps
