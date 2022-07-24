@@ -46,4 +46,18 @@ RSpec.describe GoodJob::Process do
       expect { process.deregister }.to change(described_class, :count).by(-1)
     end
   end
+
+  describe '#basename' do
+    subject { described_class.new state: {} }
+
+    it 'splits proctitle on dir and program name' do
+      subject.state['proctitle'] = '/app/bin/good_job'
+      expect(subject.basename).to eq('good_job')
+    end
+
+    it 'preserves program arguments' do
+      subject.state['proctitle'] = '/Users/me/projects/good_job/bin/bundle exec rails start'
+      expect(subject.basename).to eq('bundle exec rails start')
+    end
+  end
 end

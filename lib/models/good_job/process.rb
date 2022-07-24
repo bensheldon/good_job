@@ -71,5 +71,9 @@ module GoodJob # :nodoc:
       destroy!
       advisory_unlock
     end
+
+    def basename
+      File.basename(state["proctitle"])
+    end
   end
 end
