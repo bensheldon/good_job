@@ -24,7 +24,7 @@
         <li class="nav-item">
           <%= link_to processes_path, class: ["nav-link", ("active" if controller_name == 'processes')] do %>
             <%= t(".processes") %>
-            <% processes_count = GoodJob::Process.count %>
+            <% processes_count = GoodJob::Process.active.count %>
             <span class="badge bg-secondary rounded-pill <%= "bg-danger" if processes_count == 0 %>"><%= processes_count %></span>
           <% end %>
         </li>
