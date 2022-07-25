@@ -10,6 +10,8 @@ module GoodJob
     #   @return [Array<GoodJob::Adapter>, nil]
     cattr_reader :instances, default: [], instance_reader: false
 
+    attr_reader :execution_mode
+
     # @param execution_mode [Symbol, nil] specifies how and where jobs should be executed. You can also set this with the environment variable +GOOD_JOB_EXECUTION_MODE+.
     #
     #  - +:inline+ executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
@@ -25,8 +27,8 @@ module GoodJob
     #  - +production+ and all other environments: +:external+
     #
     def initialize(execution_mode: nil)
-      @configuration = GoodJob::Configuration.new({ execution_mode: execution_mode })
-      @configuration.validate!
+      @execution_mode = (execution_mode || GoodJob.configuration.execution_mode).to_sym
+      GoodJob::Configuration.validate_execution_mode(@execution_mode)
       self.class.instances << self
 
       start_async if GoodJob.async_ready?
@@ -82,7 +84,7 @@ module GoodJob
     # @return [void]
     def shutdown(timeout: :default)
       timeout = if timeout == :default
-                  @configuration.shutdown_timeout
+                  GoodJob.configuration.shutdown_timeout
                 else
                   timeout
                 end
@@ -95,21 +97,21 @@ module GoodJob
     # Whether in +:async+ execution mode.
     # @return [Boolean]
     def execute_async?
-      @configuration.execution_mode == :async_all ||
-        (@configuration.execution_mode.in?([:async, :async_server]) && in_server_process?)
+      execution_mode == :async_all ||
+        (execution_mode.in?([:async, :async_server]) && in_server_process?)
     end
 
     # Whether in +:external+ execution mode.
     # @return [Boolean]
     def execute_externally?
-      @configuration.execution_mode == :external ||
-        (@configuration.execution_mode.in?([:async, :async_server]) && !in_server_process?)
+      execution_mode == :external ||
+        (execution_mode.in?([:async, :async_server]) && !in_server_process?)
     end
 
     # Whether in +:inline+ execution mode.
     # @return [Boolean]
     def execute_inline?
-      @configuration.execution_mode == :inline
+      execution_mode == :inline
     end
 
     # Start async executors
@@ -118,12 +120,12 @@ module GoodJob
       return unless execute_async?
 
       @notifier = GoodJob::Notifier.new
-      @poller = GoodJob::Poller.new(poll_interval: @configuration.poll_interval)
-      @scheduler = GoodJob::Scheduler.from_configuration(@configuration, warm_cache_on_initialize: true)
+      @poller = GoodJob::Poller.new(poll_interval: GoodJob.configuration.poll_interval)
+      @scheduler = GoodJob::Scheduler.from_configuration(GoodJob.configuration, warm_cache_on_initialize: true)
       @notifier.recipients << [@scheduler, :create_thread]
       @poller.recipients << [@scheduler, :create_thread]
 
-      @cron_manager = GoodJob::CronManager.new(@configuration.cron_entries, start_on_initialize: true) if @configuration.enable_cron?
+      @cron_manager = GoodJob::CronManager.new(GoodJob.configuration.cron_entries, start_on_initialize: true) if GoodJob.configuration.enable_cron?
 
       @_async_started = true
     end

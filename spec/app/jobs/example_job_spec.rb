@@ -65,7 +65,7 @@ describe ExampleJob do
 
     describe "SLOW_TYPE" do
       it 'sleeps for period' do
-        expect_any_instance_of(Object).to receive(:sleep)
+        expect_any_instance_of(described_class).to receive(:sleep)
 
         active_job = described_class.perform_later(described_class::SLOW_TYPE)
 

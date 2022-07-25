@@ -27,7 +27,12 @@ module GoodJob
     # Default to not running cron
     DEFAULT_ENABLE_CRON = false
 
+    def self.validate_execution_mode(execution_mode)
+      raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
+    end
+
     # The options that were explicitly set when initializing +Configuration+.
+    # It is safe to modify this hash in place; be sure to symbolize keys.
     # @return [Hash]
     attr_reader :options
 
@@ -47,7 +52,7 @@ module GoodJob
     end
 
     def validate!
-      raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
+      self.class.validate_execution_mode(execution_mode)
     end
 
     # Specifies how and where jobs should be executed. See {Adapter#initialize}

@@ -85,7 +85,8 @@ module GoodJob
 
     def start
       set_up_application!
-      configuration = GoodJob::Configuration.new(options)
+      GoodJob.configuration.options.merge!(options.symbolize_keys)
+      configuration = GoodJob.configuration
 
       Daemon.new(pidfile: configuration.pidfile).daemonize if configuration.daemonize?
 
@@ -142,10 +143,9 @@ module GoodJob
 
     def cleanup_preserved_jobs
       set_up_application!
+      GoodJob.configuration.options.merge!(options.symbolize_keys)
 
-      configuration = GoodJob::Configuration.new(options)
-
-      GoodJob.cleanup_preserved_jobs(older_than: configuration.cleanup_preserved_jobs_before_seconds_ago)
+      GoodJob.cleanup_preserved_jobs(older_than: GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago)
     end
 
     no_commands do

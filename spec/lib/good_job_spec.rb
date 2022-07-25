@@ -73,8 +73,7 @@ describe GoodJob do
     end
 
     it "respects the cleanup_discarded_jobs? configuration" do
-      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_DISCARDED_JOBS' => 'false' })
-
+      allow(described_class.configuration).to receive(:env).and_return ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_DISCARDED_JOBS' => 'false' })
       destroyed_jobs_count = described_class.cleanup_preserved_jobs
 
       expect(destroyed_jobs_count).to eq 1

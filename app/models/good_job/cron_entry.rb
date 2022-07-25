@@ -13,7 +13,7 @@ module GoodJob # :nodoc:
     attr_reader :params
 
     def self.all(configuration: nil)
-      configuration ||= GoodJob::Configuration.new({})
+      configuration ||= GoodJob.configuration
       configuration.cron_entries
     end
 
