@@ -2,18 +2,28 @@
 require "active_job"
 require "active_job/queue_adapters"
 
-require "zeitwerk"
-zeitwerk_options = Gem::Version.new(Zeitwerk::VERSION) >= Gem::Version.new("2.6.0") ? { warn_on_extra_files: false } : {}
-Zeitwerk::Loader.for_gem(**zeitwerk_options).tap do |loader|
-  loader.inflector.inflect({
-                             "cli" => "CLI",
-                           })
-  loader.push_dir("#{__dir__}/models")
-  loader.ignore("#{__dir__}/generators")
-  loader.setup
-end
-
+require "good_job/version"
 require "good_job/engine"
+
+require "good_job/adapter"
+require "active_job/queue_adapters/good_job_adapter"
+require "good_job/active_job_extensions/concurrency"
+
+require "good_job/assignable_connection"
+require "good_job/cleanup_tracker"
+require "good_job/cli"
+require "good_job/configuration"
+require "good_job/cron_manager"
+require 'good_job/current_thread'
+require "good_job/daemon"
+require "good_job/dependencies"
+require "good_job/job_performer"
+require "good_job/log_subscriber"
+require "good_job/multi_scheduler"
+require "good_job/notifier"
+require "good_job/poller"
+require "good_job/probe_server"
+require "good_job/scheduler"
 
 # GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 #

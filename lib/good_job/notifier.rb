@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 require 'active_support/core_ext/module/attribute_accessors_per_thread'
 require 'concurrent/atomic/atomic_boolean'
+require "good_job/notifier/process_registration"
 
 module GoodJob # :nodoc:
   #
