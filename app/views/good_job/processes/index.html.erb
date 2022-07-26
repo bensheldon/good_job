@@ -25,10 +25,10 @@
       <div id="<%= dom_id(process) %>" class="<%= dom_class(process) %> list-group-item py-3" role="row">
         <div class="row align-items-center">
           <div class="col">
-            <code class="font-monospace">
+            <%= tag.code title: process.state['proctitle'], class: "font-monospace" do %>
               <span class="text-muted opacity-50">$</span>
-              <%= process.state["proctitle"] %>
-            </code>
+              <%= process.basename %>
+            <% end %>
             <div>
               <span class="text-muted small">PID</span>
               <span class="badge rounded-pill bg-light text-dark"><%= process.state["pid"] %></span>

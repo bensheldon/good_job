@@ -1,5 +1,25 @@
 # Changelog
 
+## [v3.3.0](https://github.com/bensheldon/good_job/tree/v3.3.0) (2022-07-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.2.0...v3.3.0)
+
+**Closed issues:**
+
+- Calculating database connections [\#669](https://github.com/bensheldon/good_job/issues/669)
+- Unable to Replace GoodJob's Logger [\#667](https://github.com/bensheldon/good_job/issues/667)
+- Readme should consistently encourage usage of `config.good_job....` instead of `GoodJob.` configuration [\#628](https://github.com/bensheldon/good_job/issues/628)
+- Improve the "Gem development" section of README? [\#551](https://github.com/bensheldon/good_job/issues/551)
+- Simplify Rails initialization to only be a mountable Engine [\#543](https://github.com/bensheldon/good_job/issues/543)
+
+**Merged pull requests:**
+
+- Dashboard: Update cron and processes to match jobs listing [\#676](https://github.com/bensheldon/good_job/pull/676) ([bkeepers](https://github.com/bkeepers))
+- Dashboard: improvements to jobs index and show pages [\#672](https://github.com/bensheldon/good_job/pull/672) ([bkeepers](https://github.com/bkeepers))
+- Replace "timestamp" column-type in migrations with "datetime" [\#671](https://github.com/bensheldon/good_job/pull/671) ([bensheldon](https://github.com/bensheldon))
+- Improve Readme description of v3 job preservation defaults [\#670](https://github.com/bensheldon/good_job/pull/670) ([bensheldon](https://github.com/bensheldon))
+- update Gemfile.lock to latest dependencies [\#647](https://github.com/bensheldon/good_job/pull/647) ([jrochkind](https://github.com/jrochkind))
+
 ## [v3.2.0](https://github.com/bensheldon/good_job/tree/v3.2.0) (2022-07-12)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.1.0...v3.2.0)
@@ -1055,7 +1075,6 @@
 - PgBouncer and prepared statements [\#269](https://github.com/bensheldon/good_job/issues/269)
 - Question about locking internals [\#212](https://github.com/bensheldon/good_job/issues/212)
 - Encoding::UndefinedConversionError \("\xE2" from ASCII-8BIT to UTF-8\) [\#198](https://github.com/bensheldon/good_job/issues/198)
-- tools for managing a 'fleet' of processes [\#150](https://github.com/bensheldon/good_job/issues/150)
 
 **Merged pull requests:**
 
