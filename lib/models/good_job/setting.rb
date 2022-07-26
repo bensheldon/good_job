@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module GoodJob
-  class Setting < ActiveRecord::Base
+  class Setting < BaseRecord
     CRON_KEYS_DISABLED = "cron_keys_disabled"
 
     self.table_name = 'good_job_settings'

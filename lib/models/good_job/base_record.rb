@@ -16,5 +16,15 @@ module GoodJob
       DEPRECATION
       nil
     end
+
+    # Checks for whether the schema is up to date.
+    # Can be overriden by child class.
+    # @return [Boolean]
+    def self.migrated?
+      return true if connection.table_exists?(table_name)
+
+      migration_pending_warning!
+      false
+    end
   end
 end
