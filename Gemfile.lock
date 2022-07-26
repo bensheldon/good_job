@@ -420,7 +420,7 @@ DEPENDENCIES
   benchmark-ips
   capybara
   database_cleaner
-  dotenv
+  dotenv (~> 2.7.6)
   easy_translate
   erb_lint
   foreman
