@@ -79,6 +79,12 @@ module GoodJob
   #   @return [Proc, nil]
   mattr_accessor :on_thread_error, default: nil
 
+  # @!attribute [rw] configuration
+  #   @!scope class
+  #   Global configuration object for GoodJob.
+  #   @return [GoodJob::Configuration, nil]
+  mattr_accessor :configuration, default: GoodJob::Configuration.new({})
+
   # Called with exception when a GoodJob thread raises an exception
   # @param exception [Exception] Exception that was raised
   # @return [void]
@@ -145,10 +151,9 @@ module GoodJob
   # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
   # @return [Integer] Number of jobs that were destroyed.
   def self.cleanup_preserved_jobs(older_than: nil)
-    configuration = GoodJob::Configuration.new({})
-    older_than ||= configuration.cleanup_preserved_jobs_before_seconds_ago
+    older_than ||= GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
-    include_discarded = configuration.cleanup_discarded_jobs?
+    include_discarded = GoodJob.configuration.cleanup_discarded_jobs?
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
       old_jobs = GoodJob::Job.where('finished_at <= ?', timestamp)

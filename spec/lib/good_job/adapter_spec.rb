@@ -7,6 +7,12 @@ RSpec.describe GoodJob::Adapter do
   let(:good_job) { instance_double(GoodJob::Execution, queue_name: 'default', scheduled_at: nil) }
 
   describe '#initialize' do
+    it 'uses the global configuration value' do
+      allow(GoodJob.configuration).to receive(:execution_mode).and_return(:external)
+      adapter = described_class.new
+      expect(adapter.execution_mode).to eq(:external)
+    end
+
     it 'guards against improper execution modes' do
       expect do
         described_class.new(execution_mode: :blarg)

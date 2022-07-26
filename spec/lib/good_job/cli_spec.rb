@@ -3,11 +3,10 @@ require 'rails_helper'
 
 RSpec.describe GoodJob::CLI do
   let(:scheduler_mock) { instance_double GoodJob::Scheduler, shutdown?: false, shutdown: nil }
-  let(:env) { {} }
-  let(:args) { [] }
 
   before do
     stub_const 'GoodJob::CLI::RAILS_ENVIRONMENT_RB', File.expand_path("spec/test_app/config/environment.rb")
+    allow(GoodJob).to receive(:configuration).and_return(GoodJob::Configuration.new({}))
     allow(GoodJob::Scheduler).to receive(:new).and_return scheduler_mock
   end
 
@@ -38,11 +37,10 @@ RSpec.describe GoodJob::CLI do
     describe 'max threads' do
       it 'defaults to --max_threads, GOOD_JOB_MAX_THREADS, RAILS_MAX_THREADS, database connection pool size' do
         allow(Kernel).to receive(:loop)
-
-        cli = described_class.new([], { max_threads: 4 }, {})
-        stub_const 'ENV', ENV.to_hash.merge({ 'RAILS_MAX_THREADS' => 3, 'GOOD_JOB_MAX_THREADS' => 2 })
+        allow(GoodJob.configuration).to receive(:env).and_return(ENV.to_h.merge({ 'RAILS_MAX_THREADS' => 3, 'GOOD_JOB_MAX_THREADS' => 2 }))
         allow(ActiveRecord::Base.connection_pool).to receive(:size).and_return(1)
 
+        cli = described_class.new([], { max_threads: 4 }, {})
         cli.start
 
         expect(GoodJob::Scheduler).to have_received(:new).with(
