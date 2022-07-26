@@ -1,8 +1,39 @@
 # Changelog
 
+## [v3.3.1](https://github.com/bensheldon/good_job/tree/v3.3.1) (2022-07-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.3.0...v3.3.1)
+
+**Implemented enhancements:**
+
+- Show basename of proctitle [\#679](https://github.com/bensheldon/good_job/pull/679) ([bkeepers](https://github.com/bkeepers))
+
+**Fixed bugs:**
+
+- Only count \_active\_ processes in the Navbar [\#680](https://github.com/bensheldon/good_job/pull/680) ([bensheldon](https://github.com/bensheldon))
+- Remove Zeitwerk and use explicit requires to be more like an engine [\#677](https://github.com/bensheldon/good_job/pull/677) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Dashboard UI Invalid count of running process  [\#678](https://github.com/bensheldon/good_job/issues/678)
+
+**Merged pull requests:**
+
+- Lock to dotenv 2.7.x for Ruby 2.5 compatibility [\#682](https://github.com/bensheldon/good_job/pull/682) ([bensheldon](https://github.com/bensheldon))
+- Create global GoodJob.configuration object [\#681](https://github.com/bensheldon/good_job/pull/681) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.3.0](https://github.com/bensheldon/good_job/tree/v3.3.0) (2022-07-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.2.0...v3.3.0)
+
+**Implemented enhancements:**
+
+- Dashboard: Update cron and processes to match jobs listing [\#676](https://github.com/bensheldon/good_job/pull/676) ([bkeepers](https://github.com/bkeepers))
+- Dashboard: improvements to jobs index and show pages [\#672](https://github.com/bensheldon/good_job/pull/672) ([bkeepers](https://github.com/bkeepers))
+
+**Fixed bugs:**
+
+- Replace "timestamp" column-type in migrations with "datetime" [\#671](https://github.com/bensheldon/good_job/pull/671) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
@@ -14,9 +45,6 @@
 
 **Merged pull requests:**
 
-- Dashboard: Update cron and processes to match jobs listing [\#676](https://github.com/bensheldon/good_job/pull/676) ([bkeepers](https://github.com/bkeepers))
-- Dashboard: improvements to jobs index and show pages [\#672](https://github.com/bensheldon/good_job/pull/672) ([bkeepers](https://github.com/bkeepers))
-- Replace "timestamp" column-type in migrations with "datetime" [\#671](https://github.com/bensheldon/good_job/pull/671) ([bensheldon](https://github.com/bensheldon))
 - Improve Readme description of v3 job preservation defaults [\#670](https://github.com/bensheldon/good_job/pull/670) ([bensheldon](https://github.com/bensheldon))
 - update Gemfile.lock to latest dependencies [\#647](https://github.com/bensheldon/good_job/pull/647) ([jrochkind](https://github.com/jrochkind))
 
@@ -24,7 +52,7 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.1.0...v3.2.0)
 
-**Merged pull requests:**
+**Implemented enhancements:**
 
 - Ordered queue handling by workers [\#665](https://github.com/bensheldon/good_job/pull/665) ([jrochkind](https://github.com/jrochkind))
 
@@ -34,7 +62,9 @@
 
 **Implemented enhancements:**
 
+- Show job/cron/process counts in the Navbar [\#663](https://github.com/bensheldon/good_job/pull/663) ([bensheldon](https://github.com/bensheldon))
 - Improve Dashboard display of parameters \(CronEntry kwargs; Process configuration; Job and Execution database values\) [\#662](https://github.com/bensheldon/good_job/pull/662) ([bensheldon](https://github.com/bensheldon))
+- Dequeing should be first-in first-out [\#651](https://github.com/bensheldon/good_job/pull/651) ([jrochkind](https://github.com/jrochkind))
 
 **Fixed bugs:**
 
@@ -46,11 +76,6 @@
 - 500 Internal Server Error Exception in web interface trying to view running jobs [\#656](https://github.com/bensheldon/good_job/issues/656)
 - Cron schedule page in dashboard not showing kwargs [\#608](https://github.com/bensheldon/good_job/issues/608)
 - Paralelism x database connections [\#569](https://github.com/bensheldon/good_job/issues/569)
-
-**Merged pull requests:**
-
-- Show job/cron/process counts in the Navbar [\#663](https://github.com/bensheldon/good_job/pull/663) ([bensheldon](https://github.com/bensheldon))
-- Dequeing should be first-in first-out [\#651](https://github.com/bensheldon/good_job/pull/651) ([jrochkind](https://github.com/jrochkind))
 
 ## [v3.0.2](https://github.com/bensheldon/good_job/tree/v3.0.2) (2022-07-10)
 
@@ -81,13 +106,16 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.0.0...v3.0.1)
 
+**Fixed bugs:**
+
+- Fix `GoodJob.cleanup_preserved_jobs` to use `delete_all` instead of `destroy_all` [\#652](https://github.com/bensheldon/good_job/pull/652) ([bensheldon](https://github.com/bensheldon))
+
 **Closed issues:**
 
 - ERROR:  relation "good\_jobs" does not exist at character 454 [\#308](https://github.com/bensheldon/good_job/issues/308)
 
 **Merged pull requests:**
 
-- Fix `GoodJob.cleanup_preserved_jobs` to use `delete_all` instead of `destroy_all` [\#652](https://github.com/bensheldon/good_job/pull/652) ([bensheldon](https://github.com/bensheldon))
 - Create codeql-analysis.yml [\#648](https://github.com/bensheldon/good_job/pull/648) ([bensheldon](https://github.com/bensheldon))
 
 ## [v3.0.0](https://github.com/bensheldon/good_job/tree/v3.0.0) (2022-06-26)
