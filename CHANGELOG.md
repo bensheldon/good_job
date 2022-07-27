@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.3.2](https://github.com/bensheldon/good_job/tree/v3.3.2) (2022-07-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.3.1...v3.3.2)
+
+**Fixed bugs:**
+
+- Defer setting Adapter's execution mode until Rails initializes [\#683](https://github.com/bensheldon/good_job/pull/683) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.3.1](https://github.com/bensheldon/good_job/tree/v3.3.1) (2022-07-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.3.0...v3.3.1)
