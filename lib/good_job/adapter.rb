@@ -10,8 +10,6 @@ module GoodJob
     #   @return [Array<GoodJob::Adapter>, nil]
     cattr_reader :instances, default: [], instance_reader: false
 
-    attr_reader :execution_mode
-
     # @param execution_mode [Symbol, nil] specifies how and where jobs should be executed. You can also set this with the environment variable +GOOD_JOB_EXECUTION_MODE+.
     #
     #  - +:inline+ executes jobs immediately in whatever process queued them (usually the web server process). This should only be used in test and development environments.
@@ -27,10 +25,10 @@ module GoodJob
     #  - +production+ and all other environments: +:external+
     #
     def initialize(execution_mode: nil)
-      @execution_mode = (execution_mode || GoodJob.configuration.execution_mode).to_sym
-      GoodJob::Configuration.validate_execution_mode(@execution_mode)
-      self.class.instances << self
+      @_execution_mode_override = execution_mode
+      GoodJob::Configuration.validate_execution_mode(@_execution_mode_override) if @_execution_mode_override
 
+      self.class.instances << self
       start_async if GoodJob.async_ready?
     end
 
@@ -94,6 +92,12 @@ module GoodJob
       @_async_started = false
     end
 
+    # This adapter's execution mode
+    # @return [Symbol, nil]
+    def execution_mode
+      @_execution_mode_override || GoodJob.configuration.execution_mode
+    end
+
     # Whether in +:async+ execution mode.
     # @return [Boolean]
     def execute_async?
@@ -104,7 +108,8 @@ module GoodJob
     # Whether in +:external+ execution mode.
     # @return [Boolean]
     def execute_externally?
-      execution_mode == :external ||
+      execution_mode.nil? ||
+        execution_mode == :external ||
         (execution_mode.in?([:async, :async_server]) && !in_server_process?)
     end
 
