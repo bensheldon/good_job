@@ -69,14 +69,6 @@ module GoodJob
   #   @return [Boolean, nil]
   mattr_accessor :retry_on_unhandled_error, default: false
 
-  # @!attribute [rw] cron_enabled
-  #   @!scope class
-  #   Use this to know if cron is enabled for the process (default: +false+).
-  #   If +true+, it means cron is enabled.
-  #   If +false+, it means cron disabled.
-  #   @return [Boolean, nil]
-  mattr_accessor :cron_enabled, default: false
-
   # @!attribute [rw] on_thread_error
   #   @!scope class
   #   This callable will be called when an exception reaches GoodJob (default: +nil+).
