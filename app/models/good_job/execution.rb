@@ -152,23 +152,16 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :schedule_ordered, -> { order(Arel.sql('COALESCE(scheduled_at, created_at) ASC')) }
 
-    # Get Jobs were completed before the given timestamp. If no timestamp is
-    # provided, get all jobs that have been completed. By default, GoodJob
-    # destroys jobs after they are completed and this will find no jobs.
-    # However, if you have changed {GoodJob.preserve_job_records}, this may
-    # find completed Jobs.
-    # @!method finished(timestamp = nil)
-    # @!scope class
-    # @param timestamp (Float)
-    #   Get jobs that finished before this time (in epoch time).
-    # @return [ActiveRecord::Relation]
-    scope :finished, ->(timestamp = nil) { timestamp ? where(arel_table['finished_at'].lteq(timestamp)) : where.not(finished_at: nil) }
-
-    # Get Jobs that started but not finished yet.
-    # @!method running
-    # @!scope class
-    # @return [ActiveRecord::Relation]
-    scope :running, -> { where.not(performed_at: nil).where(finished_at: nil) }
+    # First execution will run in the future
+    scope :scheduled, -> { where(finished_at: nil).where('COALESCE(scheduled_at, created_at) > ?', DateTime.current).where("(serialized_params->>'executions')::integer < 2") }
+     # Immediate/Scheduled time to run has passed, waiting for an available thread run
+    scope :queued, -> { where(finished_at: nil).where('COALESCE(scheduled_at, created_at) <= ?', DateTime.current).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
+    # Advisory locked and executing
+    scope :running, -> { where(finished_at: nil).joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
+    # Completed executing successfully
+    scope :finished, -> { where.not(finished_at: nil).where(error: nil) }
+    # Errored but will not be retried
+    scope :errored, -> { where.not(finished_at: nil).where.not(error: nil) }
 
     # Get Jobs that do not have subsequent retries
     # @!method running

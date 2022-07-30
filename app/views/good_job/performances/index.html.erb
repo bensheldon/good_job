@@ -1,0 +1,29 @@
+<div class="bg-light break-out">
+  <h2 class="container-fluid pt-3 pb-2">Performance</h2>
+
+  <%= form_with(url: "", method: :get, local: true, id: "filter_form", class: "container-fluid") do |form| %>
+    <div class="d-flex flex-row w-100">
+      <div class="me-2">
+        <select name="duration" id="duration_filter" class="form-select form-select-sm">
+          <% GoodJob::PerformanceFilter::DURATIONS.each do |(duration, interval)| %>
+            <option value="<%= duration.to_param %>" <%= "selected='selected'" if params[:duration] == duration %>>Previous <%= duration %> (<%= interval %> breakdown)</option>
+          <% end %>
+        </select>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+
+<%= javascript_tag nonce: true do %>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("#duration_filter, #job_queue_filter").forEach((filter) => {
+      filter.addEventListener("change", () => {
+        document.querySelector("#filter_form").submit();
+      });
+    })
+  })
+<% end %>
+
+
+
