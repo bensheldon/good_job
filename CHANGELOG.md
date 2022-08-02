@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.3.3](https://github.com/bensheldon/good_job/tree/v3.3.3) (2022-08-02)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.3.2...v3.3.3)
+
+**Closed issues:**
+
+- Async not working Rails 7 with puma CLI [\#685](https://github.com/bensheldon/good_job/issues/685)
+
+**Merged pull requests:**
+
+- Detect usage of `puma` CLI for async mode [\#686](https://github.com/bensheldon/good_job/pull/686) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.3.2](https://github.com/bensheldon/good_job/tree/v3.3.2) (2022-07-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.3.1...v3.3.2)
