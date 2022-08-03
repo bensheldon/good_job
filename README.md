@@ -472,7 +472,7 @@ config.good_job.cron = {
     args: [42, "life"], # positional arguments to pass; can also be a proc e.g. `-> { [Time.now] }`
     kwargs: { name: "Alice" }, # keyword arguments to pass; can also be a proc e.g. `-> { { name: NAMES.sample } }`
     set: { priority: -10 }, # additional ActiveJob properties; can also be a lambda/proc e.g. `-> { { priority: [1,2].sample } }`
-    description: "Something helpful", # optional description that appears in Dashboard (coming soon!)
+    description: "Something helpful", # optional description that appears in Dashboard
   },
   another_task: {
     cron: "0 0,12 * * *",
