@@ -2,26 +2,27 @@
 module GoodJob
   class JobsFilter < BaseFilter
     def states
+      query = filtered_query(params.except(:state)).unscope(:select)
       {
-        'scheduled' =>  base_query.scheduled.count,
-        'retried' => base_query.retried.count,
-        'queued' => base_query.queued.count,
-        'running' => base_query.running.count,
-        'finished' => base_query.finished.count,
-        'discarded' => base_query.discarded.count,
+        'scheduled' =>  query.scheduled.count,
+        'retried' => query.retried.count,
+        'queued' => query.queued.count,
+        'running' => query.running.count,
+        'finished' => query.finished.count,
+        'discarded' => query.discarded.count,
       }
     end
 
-    def filtered_query
+    def filtered_query(filter_params = params)
       query = base_query.includes(:executions).includes_advisory_locks
 
-      query = query.job_class(params[:job_class]) if params[:job_class].present?
-      query = query.where(queue_name: params[:queue_name]) if params[:queue_name].present?
-      query = query.search_text(params[:query]) if params[:query].present?
-      query = query.where(cron_key: params[:cron_key]) if params[:cron_key].present?
+      query = query.job_class(filter_params[:job_class]) if filter_params[:job_class].present?
+      query = query.where(queue_name: filter_params[:queue_name]) if filter_params[:queue_name].present?
+      query = query.search_text(filter_params[:query]) if filter_params[:query].present?
+      query = query.where(cron_key: filter_params[:cron_key]) if filter_params[:cron_key].present?
 
-      if params[:state]
-        case params[:state]
+      if filter_params[:state]
+        case filter_params[:state]
         when 'discarded'
           query = query.discarded
         when 'finished'
