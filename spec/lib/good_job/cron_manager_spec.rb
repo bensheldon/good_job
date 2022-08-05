@@ -70,5 +70,15 @@ RSpec.describe GoodJob::CronManager do
       executions = GoodJob::Execution.all.to_a
       expect(executions.size).to eq executions.map(&:cron_at).uniq.size
     end
+
+    it 'respects the disabled setting' do
+      GoodJob::Setting.cron_key_disable('example')
+
+      cron_manager = described_class.new(cron_entries, start_on_initialize: true)
+      sleep 2
+      cron_manager.shutdown
+
+      expect(GoodJob::Execution.count).to eq 0
+    end
   end
 end

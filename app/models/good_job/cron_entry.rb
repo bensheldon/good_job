@@ -86,6 +86,20 @@ module GoodJob # :nodoc:
       end
     end
 
+    def enabled?
+      return true unless GoodJob::Setting.migrated?
+
+      GoodJob::Setting.cron_key_enabled?(key)
+    end
+
+    def enable
+      GoodJob::Setting.cron_key_enable(key)
+    end
+
+    def disable
+      GoodJob::Setting.cron_key_disable(key)
+    end
+
     def enqueue(cron_at = nil)
       GoodJob::CurrentThread.within do |current_thread|
         current_thread.cron_key = key

@@ -45,7 +45,7 @@ module ExampleAppHelper
     #
     # Ideally this would happen in a different database, but that seemed like
     # a lot of work to do in Github Actions.
-    tables = [:good_jobs, :good_job_processes]
+    tables = [:good_jobs, :good_job_processes, :good_job_settings]
     quiet do
       tables.each do |table_name|
         ActiveRecord::Migration.drop_table(table_name) if ActiveRecord::Base.connection.table_exists?(table_name)

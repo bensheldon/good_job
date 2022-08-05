@@ -37,10 +37,20 @@
             <% end %>
           </div>
           <div class="col d-flex gap-3 justify-content-end">
-            <%= button_to enqueue_cron_entry_path(cron_entry.id), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Run cron entry now" }, title: "Run cron entry now", data: { confirm: "Confirm run cron entry now" } do %>
-              <%= render "good_job/shared/icons/play" %>
-              Run Now
+            <%= button_to enqueue_cron_entry_path(cron_entry), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Enqueue cron entry now" }, title: "Enqueue cron entry now", data: { confirm: "Confirm enqueue cron entry now" } do %>
+              <%= render_icon "skip_forward" %>
             <% end %>
+
+            <% if cron_entry.enabled? %>
+              <%= button_to disable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Disable cron entry" }, title: "Disable cron entry", data: { confirm: "Confirm disable cron entry" } do %>
+                <%= render_icon "pause" %>
+              <% end %>
+            <% else %>
+              <%= button_to enable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Enable cron entry" }, title: "Enable cron entry", data: { confirm: "Confirm enable cron entry" } do %>
+                <%= render_icon "play" %>
+              <% end %>
+            <% end %>
+
             <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                            title: "Inspect",
                            data: { bs_toggle: "collapse", bs_target: "##{dom_id(cron_entry, 'properties')}" },

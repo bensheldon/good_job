@@ -89,7 +89,7 @@ module GoodJob # :nodoc:
         thr_scheduler.create_task(thr_cron_entry)
 
         Rails.application.executor.wrap do
-          cron_entry.enqueue(thr_cron_at)
+          cron_entry.enqueue(thr_cron_at) if thr_cron_entry.enabled?
         end
       end
 
