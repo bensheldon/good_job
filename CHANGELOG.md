@@ -1,16 +1,35 @@
 # Changelog
 
+## [v3.4.0](https://github.com/bensheldon/good_job/tree/v3.4.0) (2022-08-05)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.3.3...v3.4.0)
+
+**Implemented enhancements:**
+
+- Add cron\_enabled attribute to good\_job and pass it to process current state [\#675](https://github.com/bensheldon/good_job/pull/675) ([saksham-jain](https://github.com/saksham-jain))
+- Reverse Dashboard Filter Hierarchy to be: queues+jobs then state [\#666](https://github.com/bensheldon/good_job/pull/666) ([bensheldon](https://github.com/bensheldon))
+- Allow cron entries to be temporarily disabled and re-enabled through the Dashboard [\#649](https://github.com/bensheldon/good_job/pull/649) ([alex-klepa](https://github.com/alex-klepa))
+- Add Configuration.total\_estimated\_threads to report number of threads consumed by GoodJob [\#645](https://github.com/bensheldon/good_job/pull/645) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Cron Schedule jobs add disable action [\#540](https://github.com/bensheldon/good_job/issues/540)
+
+**Merged pull requests:**
+
+- Removed text that implied an existing feature had not been finished [\#688](https://github.com/bensheldon/good_job/pull/688) ([pgvsalamander](https://github.com/pgvsalamander))
+
 ## [v3.3.3](https://github.com/bensheldon/good_job/tree/v3.3.3) (2022-08-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.3.2...v3.3.3)
 
+**Fixed bugs:**
+
+- Detect usage of `puma` CLI for async mode [\#686](https://github.com/bensheldon/good_job/pull/686) ([bensheldon](https://github.com/bensheldon))
+
 **Closed issues:**
 
 - Async not working Rails 7 with puma CLI [\#685](https://github.com/bensheldon/good_job/issues/685)
-
-**Merged pull requests:**
-
-- Detect usage of `puma` CLI for async mode [\#686](https://github.com/bensheldon/good_job/pull/686) ([bensheldon](https://github.com/bensheldon))
 
 ## [v3.3.2](https://github.com/bensheldon/good_job/tree/v3.3.2) (2022-07-27)
 
