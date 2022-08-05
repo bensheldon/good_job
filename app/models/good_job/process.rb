@@ -48,6 +48,7 @@ module GoodJob # :nodoc:
         preserve_job_records: GoodJob.preserve_job_records,
         retry_on_unhandled_error: GoodJob.retry_on_unhandled_error,
         schedulers: GoodJob::Scheduler.instances.map(&:name),
+        cron_enabled: GoodJob.configuration.enable_cron?,
       }
     end
 
