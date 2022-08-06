@@ -1,5 +1,19 @@
 # Changelog
 
+## [v3.4.1](https://github.com/bensheldon/good_job/tree/v3.4.1) (2022-08-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.0...v3.4.1)
+
+**Closed issues:**
+
+- Add `cron_enabled` to Process state [\#673](https://github.com/bensheldon/good_job/issues/673)
+- Good job is using a lot of memory / ram [\#613](https://github.com/bensheldon/good_job/issues/613)
+- ActiveRecord::StatementInvalid: PG::ConnectionBad: PQsocket\(\) can't get socket descriptor every 30 minutes aprox. [\#579](https://github.com/bensheldon/good_job/issues/579)
+
+**Merged pull requests:**
+
+- Only report Notifier connection errors once after they happen 3 consecutive times [\#689](https://github.com/bensheldon/good_job/pull/689) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.4.0](https://github.com/bensheldon/good_job/tree/v3.4.0) (2022-08-05)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.3.3...v3.4.0)
