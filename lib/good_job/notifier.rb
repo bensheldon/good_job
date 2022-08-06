@@ -40,6 +40,7 @@ module GoodJob # :nodoc:
       PG::UnableToSend
       PG::Error
     ].freeze
+    CONNECTION_ERRORS_REPORTING_THRESHOLD = 3
 
     # @!attribute [r] instances
     #   @!scope class
@@ -70,6 +71,8 @@ module GoodJob # :nodoc:
     def initialize(*recipients)
       @recipients = Concurrent::Array.new(recipients)
       @listening = Concurrent::AtomicBoolean.new(false)
+      @connection_errors_count = Concurrent::AtomicFixnum.new(0)
+      @connection_errors_reported = Concurrent::AtomicBoolean.new(false)
 
       self.class.instances << self
 
@@ -128,7 +131,6 @@ module GoodJob # :nodoc:
     # @return [void]
     def listen_observer(_time, _result, thread_error)
       if thread_error
-        GoodJob._on_thread_error(thread_error)
         ActiveSupport::Notifications.instrument("notifier_notify_error.good_job", { error: thread_error })
 
         connection_error = CONNECTION_ERRORS.any? do |error_string|
@@ -136,6 +138,16 @@ module GoodJob # :nodoc:
           next unless error_class
 
           thread_error.is_a? error_class
+        end
+
+        if connection_error
+          @connection_errors_count.increment
+          if @connection_errors_reported.false? && @connection_errors_count.value >= CONNECTION_ERRORS_REPORTING_THRESHOLD
+            GoodJob._on_thread_error(thread_error)
+            @connection_errors_reported.make_true
+          end
+        else
+          GoodJob._on_thread_error(thread_error)
         end
       end
 
@@ -175,6 +187,8 @@ module GoodJob # :nodoc:
                     target.send(method_name, parsed_payload)
                   end
                 end
+
+                reset_connection_errors
               end
             end
           end
@@ -222,6 +236,11 @@ module GoodJob # :nodoc:
       else
         sleep WAIT_INTERVAL
       end
+    end
+
+    def reset_connection_errors
+      @connection_errors_count.value = 0
+      @connection_errors_reported.make_false
     end
   end
 end

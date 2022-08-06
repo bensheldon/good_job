@@ -48,6 +48,22 @@ RSpec.describe GoodJob::Notifier do
 
       notifier.shutdown
     end
+
+    it 'raises exception to GoodJob.on_thread_error when there is a connection error' do
+      stub_const('ExpectedError', Class.new(ActiveRecord::ConnectionNotEstablished))
+      stub_const('GoodJob::Notifier::CONNECTION_ERRORS_REPORTING_THRESHOLD', 1)
+      on_thread_error = instance_double(Proc, call: nil)
+      allow(GoodJob).to receive(:on_thread_error).and_return(on_thread_error)
+      allow(JSON).to receive(:parse).and_raise ExpectedError
+
+      notifier = described_class.new
+      sleep_until(max: 5, increments_of: 0.5) { notifier.listening? }
+
+      described_class.notify(true)
+      wait_until(max: 5, increments_of: 0.5) { expect(on_thread_error).to have_received(:call).at_least(:once).with instance_of(ExpectedError) }
+
+      notifier.shutdown
+    end
   end
 
   describe 'Process tracking' do
