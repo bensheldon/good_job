@@ -7,22 +7,39 @@ on:
 
 jobs:
   add_to_backlog:
-    name: "Add to Backlog Project Board"
+    name: "Add to Project Board"
     runs-on: ubuntu-latest
     env:
       gh_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
     steps:
-      - name: 'Add Issue'
+      - name: 'Project v1: Add Issue'
         if: ${{ github.event_name == 'issues' && env.gh_token }}
         uses: alex-page/github-project-automation-plus@9a05133789dbc96bd560ec84223a0ad49253d342
         with:
           project: Backlog
           column: Inbox
           repo-token: ${{ env.gh_token }}
-      - name: "Add Pull Request"
+      
+      - name: "Project v1: Add Pull Request"
         if: ${{ github.event_name == 'pull_request' && env.gh_token }}
         uses: alex-page/github-project-automation-plus@9a05133789dbc96bd560ec84223a0ad49253d342
         with:
           project: Backlog
           column: In progress
           repo-token: ${{ env.gh_token }}
+      
+      - name: 'Project v2: Add Issue'
+        if: ${{ github.event_name == 'issues' && env.gh_token }}
+        uses: actions/add-to-project@a9f041ddd462ed185893ea1024cec954f50dbe42
+        with:
+          project-url: https://github.com/users/bensheldon/projects/3
+          column: Inbox
+          github-token: ${{ env.gh_token }}
+      
+      - name: "Project v2: Add Pull Request"
+        if: ${{ github.event_name == 'pull_request' && env.gh_token }}
+        uses: actions/add-to-project@a9f041ddd462ed185893ea1024cec954f50dbe42
+        with:
+          project: Backlog
+          column: In progress
+          github-token: ${{ env.gh_token }}
