@@ -32,7 +32,7 @@ module GoodJob
       return unless exception
 
       error do
-        "GoodJob error: #{exception}\n #{exception.backtrace}"
+        "GoodJob error: #{exception.class}: #{exception}\n #{exception.backtrace}"
       end
     end
 
@@ -42,7 +42,7 @@ module GoodJob
       return unless exception
 
       error do
-        "GoodJob error: #{exception}\n #{exception.backtrace}"
+        "GoodJob error: #{exception.class}: #{exception}\n #{exception.backtrace}"
       end
     end
 
@@ -123,10 +123,10 @@ module GoodJob
 
     # @!macro notification_responder
     def notifier_notify_error(event)
-      error = event.payload[:error]
+      exception = event.payload[:error]
 
       error do
-        "Notifier errored: #{error}"
+        "Notifier errored: #{exception.class}: #{exception}\n #{exception.backtrace}"
       end
     end
 
