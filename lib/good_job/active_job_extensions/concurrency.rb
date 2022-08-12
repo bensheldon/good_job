@@ -33,6 +33,10 @@ module GoodJob
           enqueue_limit = job.class.good_job_concurrency_config[:enqueue_limit]
           total_limit = job.class.good_job_concurrency_config[:total_limit]
 
+          # For limits that are procs
+          enqueue_limit = instance_exec(&enqueue_limit) if enqueue_limit.respond_to?(:call)
+          total_limit = instance_exec(&total_limit) if total_limit.respond_to?(:call)
+
           has_limit = (enqueue_limit.present? && (0...Float::INFINITY).cover?(enqueue_limit)) ||
                       (total_limit.present? && (0...Float::INFINITY).cover?(total_limit))
           next(block.call) unless has_limit
@@ -64,8 +68,14 @@ module GoodJob
           # Don't attempt to enforce concurrency limits with other queue adapters.
           next unless job.class.queue_adapter.is_a?(GoodJob::Adapter)
 
-          perform_limit = job.class.good_job_concurrency_config[:perform_limit] ||
-                          job.class.good_job_concurrency_config[:total_limit]
+          perform_limit = job.class.good_job_concurrency_config[:perform_limit]
+          total_limit = job.class.good_job_concurrency_config[:total_limit]
+
+          # For limits that are procs
+          perform_limit = instance_exec(&perform_limit) if perform_limit.respond_to?(:call)
+          total_limit = instance_exec(&total_limit) if total_limit.respond_to?(:call)
+
+          perform_limit = perform_limit || total_limit
 
           has_limit = perform_limit.present? && (0...Float::INFINITY).cover?(perform_limit)
           next unless has_limit
