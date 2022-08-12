@@ -84,6 +84,8 @@ describe GoodJob::CronEntry do
   end
 
   describe '#enqueue' do
+    include ActiveJob::TestHelper
+
     before do
       ActiveJob::Base.queue_adapter = :test
     end
@@ -94,9 +96,17 @@ describe GoodJob::CronEntry do
       end.to have_enqueued_job(TestJob).with(42, name: 'Alice').on_queue('test_queue')
     end
 
-    describe 'job execution' do
-      include ActiveJob::TestHelper
+    it 'enqueues a job with I18n default locale' do
+      I18n.default_locale = :nl
 
+      I18n.with_locale(:en) { entry.enqueue }
+
+      expect(enqueued_jobs.last["locale"]).to eq("nl")
+    ensure
+      I18n.default_locale = :en
+    end
+
+    describe 'job execution' do
       it 'executes the job properly' do
         perform_enqueued_jobs do
           entry.enqueue

@@ -106,7 +106,9 @@ module GoodJob # :nodoc:
         current_thread.cron_at = cron_at
 
         configured_job = job_class.constantize.set(set_value)
-        kwargs_value.present? ? configured_job.perform_later(*args_value, **kwargs_value) : configured_job.perform_later(*args_value)
+        I18n.with_locale(I18n.default_locale) do
+          kwargs_value.present? ? configured_job.perform_later(*args_value, **kwargs_value) : configured_job.perform_later(*args_value)
+        end
       end
     rescue ActiveRecord::RecordNotUnique
       false
