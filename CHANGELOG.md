@@ -1,5 +1,25 @@
 # Changelog
 
+## [v3.4.2](https://github.com/bensheldon/good_job/tree/v3.4.2) (2022-08-13)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.1...v3.4.2)
+
+**Fixed bugs:**
+
+- Jobs enqueued via dashboard ignores app default\_locale [\#697](https://github.com/bensheldon/good_job/issues/697)
+- Include better exception log messages, including class and backtrace [\#693](https://github.com/bensheldon/good_job/pull/693) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Do we need to implement concurrency with scheduled cron jobs? [\#690](https://github.com/bensheldon/good_job/issues/690)
+- Uninitialized constant GoodJob::JobsController [\#674](https://github.com/bensheldon/good_job/issues/674)
+- ActiveRecord::StatementInvalid: PG::ConnectionBad: PQsocket\(\) can't get socket descriptor every 30 minutes aprox. [\#579](https://github.com/bensheldon/good_job/issues/579)
+- Handle assets in dashboard when rails app is behind proxy path [\#424](https://github.com/bensheldon/good_job/issues/424)
+
+**Merged pull requests:**
+
+- Enqueues jobs with I18n default locale [\#698](https://github.com/bensheldon/good_job/pull/698) ([esasse](https://github.com/esasse))
+
 ## [v3.4.1](https://github.com/bensheldon/good_job/tree/v3.4.1) (2022-08-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.0...v3.4.1)
@@ -8,7 +28,6 @@
 
 - Add `cron_enabled` to Process state [\#673](https://github.com/bensheldon/good_job/issues/673)
 - Good job is using a lot of memory / ram [\#613](https://github.com/bensheldon/good_job/issues/613)
-- ActiveRecord::StatementInvalid: PG::ConnectionBad: PQsocket\(\) can't get socket descriptor every 30 minutes aprox. [\#579](https://github.com/bensheldon/good_job/issues/579)
 
 **Merged pull requests:**
 
