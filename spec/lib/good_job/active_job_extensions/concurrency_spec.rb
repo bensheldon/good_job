@@ -20,7 +20,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     describe 'total_limit:', skip_rails_5: true do
       before do
         TestJob.good_job_control_concurrency_with(
-          total_limit: 1,
+          total_limit: -> { 1 },
           key: -> { arguments.first[:name] }
         )
       end
@@ -42,7 +42,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     describe 'enqueue_limit:', skip_rails_5: true do
       before do
         TestJob.good_job_control_concurrency_with(
-          enqueue_limit: 2,
+          enqueue_limit: -> { 2 },
           key: -> { arguments.first[:name] }
         )
       end
@@ -78,7 +78,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
         TestJob.good_job_control_concurrency_with(
-          perform_limit: 0,
+          perform_limit: -> { 0 },
           key: -> { arguments.first[:name] }
         )
       end
