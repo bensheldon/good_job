@@ -444,10 +444,11 @@ job.good_job_concurrency_key #=> "Unique-Alice"
 
 #### How concurrency controls work
 
-GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry with an incremental backoff". The [code is readable](https://github.com/bensheldon/good_job/blob/main/lib/good_job/active_job_extensions/concurrency.rb).
+GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry with an incremental backoff".  The [code is readable](https://github.com/bensheldon/good_job/blob/main/lib/good_job/active_job_extensions/concurrency.rb).
 
-- "Optimistic" meaning that the implementation's performance trade-off assumes that collisions are atypical (e.g. two users enqueue the same job at the same time) rather than regular (e.g. the system enqueues thousands of colliding jobs at the same time).
+- "Optimistic" meaning that the implementation's performance trade-off assumes that collisions are atypical (e.g. two users enqueue the same job at the same time) rather than regular (e.g. the system enqueues thousands of colliding jobs at the same time). Depending on your concurrency requirements, you may also want to manage concurrency through the number of GoodJob threads and processes that are performing a given queue.
 - "Retry with an incremental backoff" means that when `perform_limit` is exceeded, the job will raise a `GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError` which is caught by a `retry_on` handler which re-schedules the job to execute in the near future with an incremental backoff.
+- First-in-first-out job execution order is not preserved when a job is retried with incremental back-off.
 
 ### Cron-style repeating/recurring jobs
 
