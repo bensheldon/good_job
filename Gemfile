@@ -21,9 +21,7 @@ gem 'rails'
 
 platforms :ruby do
   gem "activerecord-explain-analyze"
-  gem "memory_profiler"
   gem "pry-byebug"
-  gem "rbtrace"
 
   group :lint do
     gem 'easy_translate'
