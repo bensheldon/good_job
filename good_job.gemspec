@@ -71,7 +71,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "puma"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "selenium-webdriver"
-  spec.add_development_dependency "sigdump"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "yard-activesupport-concern"
 end

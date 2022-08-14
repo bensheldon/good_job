@@ -168,7 +168,6 @@ GEM
     faraday-http-cache (2.4.0)
       faraday (>= 0.8)
     faraday-net_http (2.0.3)
-    ffi (1.15.5)
     ffi (1.15.5-java)
     fiber-local (1.0.0)
     foreman (0.87.2)
@@ -221,7 +220,6 @@ GEM
       mixlib-cli (~> 2.1, >= 2.1.1)
       mixlib-config (>= 2.2.1, < 4)
       mixlib-shellout
-    memory_profiler (1.0.0)
     method_source (1.0.0)
     mini_mime (1.1.2)
     mini_portile2 (2.8.0)
@@ -231,7 +229,6 @@ GEM
       tomlrb
     mixlib-shellout (3.2.7)
       chef-utils
-    msgpack (1.5.3)
     multi_json (1.15.0)
     nio4r (2.5.8)
     nio4r (2.5.8-java)
@@ -247,7 +244,6 @@ GEM
     octokit (4.25.1)
       faraday (>= 1, < 3)
       sawyer (~> 0.9)
-    optimist (3.0.1)
     parallel (1.22.1)
     parser (3.1.2.0)
       ast (~> 2.4.1)
@@ -313,10 +309,6 @@ GEM
       thor (~> 1.0)
     rainbow (3.1.1)
     rake (13.0.6)
-    rbtrace (0.4.14)
-      ffi (>= 1.0.6)
-      msgpack (>= 0.4.3)
-      optimist (>= 3.0.0)
     regexp_parser (2.5.0)
     rexml (3.2.5)
     rspec-core (3.11.0)
@@ -368,7 +360,6 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
-    sigdump (0.2.4)
     smart_properties (1.17.0)
     spoon (0.0.6)
       ffi
@@ -432,21 +423,18 @@ DEPENDENCIES
   kramdown-parser-gfm
   matrix
   mdl
-  memory_profiler
   nokogiri
   pg
   pry-byebug
   pry-rails
   puma
   rails
-  rbtrace
   rspec-rails
   rubocop
   rubocop-performance
   rubocop-rails
   rubocop-rspec
   selenium-webdriver
-  sigdump
   yard
   yard-activesupport-concern
 
