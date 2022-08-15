@@ -1,5 +1,21 @@
 # Changelog
 
+## [v3.4.3](https://github.com/bensheldon/good_job/tree/v3.4.3) (2022-08-15)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.2...v3.4.3)
+
+**Closed issues:**
+
+- How to run multiple workers? [\#699](https://github.com/bensheldon/good_job/issues/699)
+- Getting Postgres Errors on killing development server after setting up Goodjob [\#692](https://github.com/bensheldon/good_job/issues/692)
+
+**Merged pull requests:**
+
+- Fix Project v2 GitHub Actions [\#701](https://github.com/bensheldon/good_job/pull/701) ([bensheldon](https://github.com/bensheldon))
+- Remove development dependencies: memory\_profiler, rbtrace, sigdump [\#700](https://github.com/bensheldon/good_job/pull/700) ([bensheldon](https://github.com/bensheldon))
+- Allow concurrency limits to be configured dynamically with lambda/proc [\#696](https://github.com/bensheldon/good_job/pull/696) ([baka-san](https://github.com/baka-san))
+- Add additional details to Concurrency Control explanation [\#695](https://github.com/bensheldon/good_job/pull/695) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.4.2](https://github.com/bensheldon/good_job/tree/v3.4.2) (2022-08-13)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.1...v3.4.2)
@@ -18,7 +34,7 @@
 
 **Merged pull requests:**
 
-- Enqueues jobs with I18n default locale [\#698](https://github.com/bensheldon/good_job/pull/698) ([esasse](https://github.com/esasse))
+- Enqueues Cron jobs with I18n default locale [\#698](https://github.com/bensheldon/good_job/pull/698) ([esasse](https://github.com/esasse))
 
 ## [v3.4.1](https://github.com/bensheldon/good_job/tree/v3.4.1) (2022-08-06)
 
