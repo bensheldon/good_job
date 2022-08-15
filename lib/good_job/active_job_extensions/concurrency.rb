@@ -31,11 +31,17 @@ module GoodJob
           next(block.call) if CurrentThread.active_job_id == job.job_id
 
           enqueue_limit = job.class.good_job_concurrency_config[:enqueue_limit]
-          total_limit = job.class.good_job_concurrency_config[:total_limit]
+          enqueue_limit = instance_exec(&enqueue_limit) if enqueue_limit.respond_to?(:call)
+          enqueue_limit = nil unless enqueue_limit.present? && (0...Float::INFINITY).cover?(enqueue_limit)
 
-          has_limit = (enqueue_limit.present? && (0...Float::INFINITY).cover?(enqueue_limit)) ||
-                      (total_limit.present? && (0...Float::INFINITY).cover?(total_limit))
-          next(block.call) unless has_limit
+          unless enqueue_limit
+            total_limit = job.class.good_job_concurrency_config[:total_limit]
+            total_limit = instance_exec(&total_limit) if total_limit.respond_to?(:call)
+            total_limit = nil unless total_limit.present? && (0...Float::INFINITY).cover?(total_limit)
+          end
+
+          limit = enqueue_limit || total_limit
+          next(block.call) unless limit
 
           # Only generate the concurrency key on the initial enqueue in case it is dynamic
           job.good_job_concurrency_key ||= job._good_job_concurrency_key
@@ -50,7 +56,7 @@ module GoodJob
                                   end
 
             # The job has not yet been enqueued, so check if adding it will go over the limit
-            block.call unless enqueue_concurrency + 1 > (enqueue_limit || total_limit)
+            block.call unless (enqueue_concurrency + 1) > limit
           end
         end
 
@@ -64,11 +70,18 @@ module GoodJob
           # Don't attempt to enforce concurrency limits with other queue adapters.
           next unless job.class.queue_adapter.is_a?(GoodJob::Adapter)
 
-          perform_limit = job.class.good_job_concurrency_config[:perform_limit] ||
-                          job.class.good_job_concurrency_config[:total_limit]
+          perform_limit = job.class.good_job_concurrency_config[:perform_limit]
+          perform_limit = instance_exec(&perform_limit) if perform_limit.respond_to?(:call)
+          perform_limit = nil unless perform_limit.present? && (0...Float::INFINITY).cover?(perform_limit)
 
-          has_limit = perform_limit.present? && (0...Float::INFINITY).cover?(perform_limit)
-          next unless has_limit
+          unless perform_limit
+            total_limit = job.class.good_job_concurrency_config[:total_limit]
+            total_limit = instance_exec(&total_limit) if total_limit.respond_to?(:call)
+            total_limit = nil unless total_limit.present? && (0...Float::INFINITY).cover?(total_limit)
+          end
+
+          limit = perform_limit || total_limit
+          next unless limit
 
           key = job.good_job_concurrency_key
           next if key.blank?
@@ -79,7 +92,7 @@ module GoodJob
           end
 
           GoodJob::Execution.advisory_lock_key(key, function: "pg_advisory_lock") do
-            allowed_active_job_ids = GoodJob::Execution.unfinished.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(perform_limit).pluck(:active_job_id)
+            allowed_active_job_ids = GoodJob::Execution.unfinished.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(limit).pluck(:active_job_id)
             # The current job has already been locked and will appear in the previous query
             raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include? job.job_id
           end
