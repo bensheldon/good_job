@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.4.4](https://github.com/bensheldon/good_job/tree/v3.4.4) (2022-08-20)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.3...v3.4.4)
+
+**Fixed bugs:**
+
+- Keep locale param when submitting dashboard filter [\#707](https://github.com/bensheldon/good_job/pull/707) ([aki77](https://github.com/aki77))
+
+**Merged pull requests:**
+
+- Fix document [\#704](https://github.com/bensheldon/good_job/pull/704) ([aki77](https://github.com/aki77))
+- Describe pessimistic usecases [\#702](https://github.com/bensheldon/good_job/pull/702) ([shouichi](https://github.com/shouichi))
+
 ## [v3.4.3](https://github.com/bensheldon/good_job/tree/v3.4.3) (2022-08-15)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.2...v3.4.3)
@@ -125,7 +138,6 @@
 
 **Closed issues:**
 
-- Calculating database connections [\#669](https://github.com/bensheldon/good_job/issues/669)
 - Unable to Replace GoodJob's Logger [\#667](https://github.com/bensheldon/good_job/issues/667)
 - Readme should consistently encourage usage of `config.good_job....` instead of `GoodJob.` configuration [\#628](https://github.com/bensheldon/good_job/issues/628)
 - Improve the "Gem development" section of README? [\#551](https://github.com/bensheldon/good_job/issues/551)
