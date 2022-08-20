@@ -5,6 +5,7 @@
     <%= form_with(url: "", method: :get, local: true, id: "filter_form", class: "container-fluid") do |form| %>
       <%= hidden_field_tag :poll, params[:poll] %>
       <%= hidden_field_tag :state, params[:state] %>
+      <%= hidden_field_tag :locale, params[:locale] if params[:locale] %>
       <div class="d-flex flex-row w-100">
         <div class="me-2">
           <select name="queue_name" id="job_queue_filter" class="form-select form-select-sm">
