@@ -8,6 +8,7 @@
       <%= hidden_field_tag :locale, params[:locale] if params[:locale] %>
       <div class="d-flex flex-row w-100">
         <div class="me-2">
+          <%= label_tag "job_queue_filter", "Queue name", class: "visually-hidden" %>
           <select name="queue_name" id="job_queue_filter" class="form-select form-select-sm">
             <option value="" <%= "selected='selected'" if params[:queue_name].blank? %>>All queues</option>
 
@@ -18,6 +19,7 @@
         </div>
 
         <div class="me-2">
+          <%= label_tag "job_class_filter", "Job name", class: "visually-hidden" %>
           <select name="job_class" id="job_class_filter" class="form-select form-select-sm">
             <option value="" <%= "selected='selected'" if params[:job_class].blank? %>>All jobs</option>
 
@@ -28,6 +30,7 @@
         </div>
 
         <div class="me-2 flex-fill">
+          <%= label_tag "query", "Search", class: "visually-hidden" %>
           <%= search_field_tag "query", params[:query], class: "form-control form-control-sm", placeholder: "Search by class, job id, job params, and error text." %>
         </div>
 

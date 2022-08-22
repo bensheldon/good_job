@@ -72,7 +72,6 @@ en:
         format: "%n%u"
         units:
           billion: B
-          hundred: ''
           million: M
           quadrillion: Q
           thousand: K

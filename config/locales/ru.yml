@@ -96,7 +96,6 @@ ru:
         format: "%n%u"
         units:
           billion: Б
-          hundred: ''
           million: М
           quadrillion: Q
           thousand: К
