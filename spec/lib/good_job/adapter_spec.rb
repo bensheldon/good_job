@@ -28,8 +28,8 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        create_with_advisory_lock: false,
-        scheduled_at: nil
+        scheduled_at: nil,
+        create_with_advisory_lock: false
       )
     end
 
@@ -98,8 +98,8 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        create_with_advisory_lock: false,
-        scheduled_at: scheduled_at.change(usec: 0)
+        scheduled_at: scheduled_at.change(usec: 0),
+        create_with_advisory_lock: false
       )
     end
   end

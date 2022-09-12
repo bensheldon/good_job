@@ -276,10 +276,17 @@ RSpec.describe GoodJob::Execution do
 
       context 'when there is an error' do
         let(:active_job) { TestJob.new("whoops", raise_error: true) }
+        let(:batch_id) { SecureRandom.uuid }
+
         let!(:good_job) do
-          GoodJob::CurrentThread.cron_key = "test_key"
-          execution = described_class.enqueue(active_job)
-          GoodJob::CurrentThread.cron_key = nil
+          execution = nil
+          GoodJob::CurrentThread.within do
+            GoodJob::Batch.within_thread(batch_id: batch_id) do
+              GoodJob::CurrentThread.cron_key = 'test_key'
+              execution = described_class.enqueue(active_job)
+            end
+          end
+
           execution
         end
 
@@ -301,6 +308,7 @@ RSpec.describe GoodJob::Execution do
             new_record = described_class.order(created_at: :asc).last
             expect(new_record.active_job_id).to eq good_job.active_job_id
             expect(new_record.cron_key).to eq "test_key"
+            expect(new_record.batch_id).to eq batch_id
           end
 
           it 'records the new job UUID on the executing record' do

@@ -19,6 +19,11 @@ when 'development'
   Rails.application.configure do
     config.good_job.enable_cron = ActiveModel::Type::Boolean.new.cast(ENV.fetch('GOOD_JOB_ENABLE_CRON', true))
     config.good_job.cron = {
+      batch_example: {
+        description: "Enqueue a Batch",
+        cron: "*/15 * * * * *",
+        class: "ExampleJob::BatchJob",
+      },
       frequent_example: {
         description: "Enqueue an ExampleJob",
         cron: "*/5 * * * * *",
