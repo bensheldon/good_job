@@ -1,5 +1,23 @@
 # Changelog
 
+## [v3.4.5](https://github.com/bensheldon/good_job/tree/v3.4.5) (2022-09-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.4...v3.4.5)
+
+**Fixed bugs:**
+
+- Dashboard: Remove translation\_missing red highlighting; remove number\_to\_human.hundreds; add form labels [\#708](https://github.com/bensheldon/good_job/pull/708) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- pg\_xact No Such File error in logs [\#709](https://github.com/bensheldon/good_job/issues/709)
+- Broken upgrade to v3. [\#703](https://github.com/bensheldon/good_job/issues/703)
+
+**Merged pull requests:**
+
+- Sentry integration Docs [\#711](https://github.com/bensheldon/good_job/pull/711) ([remy727](https://github.com/remy727))
+- Add an `Execution` `after_perform_unlocked` callback [\#706](https://github.com/bensheldon/good_job/pull/706) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.4.4](https://github.com/bensheldon/good_job/tree/v3.4.4) (2022-08-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.3...v3.4.4)
@@ -138,7 +156,6 @@
 
 **Closed issues:**
 
-- Unable to Replace GoodJob's Logger [\#667](https://github.com/bensheldon/good_job/issues/667)
 - Readme should consistently encourage usage of `config.good_job....` instead of `GoodJob.` configuration [\#628](https://github.com/bensheldon/good_job/issues/628)
 - Improve the "Gem development" section of README? [\#551](https://github.com/bensheldon/good_job/issues/551)
 - Simplify Rails initialization to only be a mountable Engine [\#543](https://github.com/bensheldon/good_job/issues/543)
