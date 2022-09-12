@@ -60,6 +60,7 @@ module GoodJob
           result = execution.perform
         ensure
           execution.advisory_unlock
+          execution.run_callbacks(:perform_unlocked)
         end
         raise result.unhandled_error if result.unhandled_error
       else

@@ -20,6 +20,8 @@ module GoodJob
     self.table_name = 'good_jobs'
     self.advisory_lockable_column = 'active_job_id'
 
+    define_model_callbacks :perform_unlocked, only: :after
+
     # Parse a string representing a group of queues into a more readable data
     # structure.
     # @param string [String] Queue string
@@ -202,13 +204,18 @@ module GoodJob
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
     def self.perform_with_advisory_lock(parsed_queues: nil)
+      execution = nil
+      result = nil
       unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true) do |executions|
         execution = executions.first
         break if execution.blank?
         break :unlocked unless execution&.executable?
 
-        execution.perform
+        result = execution.perform
       end
+      execution&.run_callbacks(:perform_unlocked)
+
+      result
     end
 
     # Fetches the scheduled execution time of the next eligible Execution(s).
