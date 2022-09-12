@@ -4,6 +4,7 @@
     <header class="list-group-item bg-light">
       <div class="row small text-muted text-uppercase align-items-center">
         <div class="col-auto">
+          <%= label_tag('toggle_job_ids', "Toggle all jobs", class: "visually-hidden") %>
           <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %>
         </div>
         <div class="col-4">

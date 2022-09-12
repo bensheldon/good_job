@@ -35,11 +35,6 @@
   z-index: 1;
 }
 
-.translation_missing {
-  background-color: red;
-  color: white;
-}
-
 .btn-outline-secondary {
   border-color: #ced4da; /* $gray-400 */
 }
