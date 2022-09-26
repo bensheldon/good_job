@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    good_job (3.4.5)
+    good_job (3.4.6)
       activejob (>= 6.0.0)
       activerecord (>= 6.0.0)
       concurrent-ruby (>= 1.0.2)
@@ -171,7 +171,7 @@ GEM
     ffi (1.15.5-java)
     fiber-local (1.0.0)
     foreman (0.87.2)
-    fugit (1.5.3)
+    fugit (1.7.1)
       et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
     gem-release (2.2.2)

@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.4.6](https://github.com/bensheldon/good_job/tree/v3.4.6) (2022-09-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.5...v3.4.6)
+
+**Fixed bugs:**
+
+- Support SemanticLogger logging with improve stdout logic and tagged logs [\#715](https://github.com/bensheldon/good_job/pull/715) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Unable to Replace GoodJob's Logger [\#667](https://github.com/bensheldon/good_job/issues/667)
+- Jobs never get run... [\#516](https://github.com/bensheldon/good_job/issues/516)
+
 ## [v3.4.5](https://github.com/bensheldon/good_job/tree/v3.4.5) (2022-09-12)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.4...v3.4.5)
@@ -209,7 +222,6 @@
 - UI engine does not work without explicit require [\#646](https://github.com/bensheldon/good_job/issues/646)
 - Should `:inline` adapter mode retry jobs? [\#611](https://github.com/bensheldon/good_job/issues/611)
 - Error Job Not Preserved  [\#594](https://github.com/bensheldon/good_job/issues/594)
-- Jobs never get run... [\#516](https://github.com/bensheldon/good_job/issues/516)
 - Release GoodJob 3.0 [\#507](https://github.com/bensheldon/good_job/issues/507)
 - Improve security of Gem releases [\#422](https://github.com/bensheldon/good_job/issues/422)
 
