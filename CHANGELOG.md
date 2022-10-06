@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.4.7](https://github.com/bensheldon/good_job/tree/v3.4.7) (2022-10-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.6...v3.4.7)
+
+**Closed issues:**
+
+- Changing assets path? [\#717](https://github.com/bensheldon/good_job/issues/717)
+- Support Sequel [\#713](https://github.com/bensheldon/good_job/issues/713)
+
+**Merged pull requests:**
+
+- Update bootstrap to latest 5.2.2 [\#718](https://github.com/bensheldon/good_job/pull/718) ([morgoth](https://github.com/morgoth))
+
 ## [v3.4.6](https://github.com/bensheldon/good_job/tree/v3.4.6) (2022-09-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.5...v3.4.6)
