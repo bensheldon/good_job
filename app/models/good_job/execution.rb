@@ -66,6 +66,7 @@ module GoodJob
     end
 
     belongs_to :job, class_name: 'GoodJob::Job', foreign_key: 'active_job_id', primary_key: 'active_job_id', optional: true, inverse_of: :executions
+    after_destroy -> { self.class.active_job_id(active_job_id).delete_all }
 
     # Get Jobs with given ActiveJob ID
     # @!method active_job_id

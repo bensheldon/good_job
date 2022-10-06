@@ -397,6 +397,25 @@ RSpec.describe GoodJob::Execution do
       expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
+    context 'when there are prior executions' do
+      let!(:prior_execution) do
+        described_class.enqueue(active_job).tap do |job|
+          job.update!(
+            error: "TestJob::ExpectedError: Raised expected error",
+            performed_at: Time.current,
+            finished_at: Time.current
+          )
+        end
+      end
+
+      it 'destroys the job and prior executions when preserving record only on error' do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(:on_unhandled_error)
+        good_job.perform
+        expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
+        expect { prior_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      end
+    end
+
     it 'raises an error if the job is attempted to be re-run' do
       good_job.update!(finished_at: Time.current)
       expect { good_job.perform }.to raise_error described_class::PreviouslyPerformedError
