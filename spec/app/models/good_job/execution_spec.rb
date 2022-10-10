@@ -523,6 +523,19 @@ RSpec.describe GoodJob::Execution do
     end
   end
 
+  describe '#destroy_job' do
+    let!(:execution) { described_class.create! active_job_id: SecureRandom.uuid }
+    let!(:prior_execution) { described_class.create! active_job_id: execution.active_job_id }
+    let!(:other_job) { described_class.create! active_job_id: SecureRandom.uuid }
+
+    it 'destroys all of the job executions' do
+      execution.destroy_job
+      expect { execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { prior_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { other_job.reload }.not_to raise_error
+    end
+  end
+
   describe '#queue_latency' do
     let(:execution) { described_class.create! }
 
