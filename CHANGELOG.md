@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.4.8](https://github.com/bensheldon/good_job/tree/v3.4.8) (2022-10-11)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.7...v3.4.8)
+
+**Merged pull requests:**
+
+- When not preserving job records, ensure all prior executions are deleted after successful retry [\#719](https://github.com/bensheldon/good_job/pull/719) ([ylansegal](https://github.com/ylansegal))
+
 ## [v3.4.7](https://github.com/bensheldon/good_job/tree/v3.4.7) (2022-10-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.6...v3.4.7)
