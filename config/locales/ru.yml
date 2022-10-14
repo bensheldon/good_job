@@ -82,11 +82,11 @@ ru:
         processes: Процессы
     status:
       discarded: Отброшено
-      finished: Законченный
       queued: В очереди
       retried: Повторная попытка
       running: Бег
       scheduled: по расписанию
+      succeeded: удалось
   number:
     format:
       delimiter: " "

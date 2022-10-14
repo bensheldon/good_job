@@ -58,11 +58,11 @@ es:
         processes: Procesos
     status:
       discarded: Descartado
-      finished: Acabado
       queued: Puesto en cola
       retried: reintentado
       running: Corriendo
       scheduled: Programado
+      succeeded: Acierto
   number:
     format:
       delimiter: " "

@@ -55,12 +55,12 @@ module GoodJob
     scope :queued, -> { where(finished_at: nil).where('COALESCE(scheduled_at, created_at) <= ?', DateTime.current).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
     # Advisory locked and executing
     scope :running, -> { where(finished_at: nil).joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
+    # Finished executing (succeeded or discarded)
+    scope :finished, -> { where.not(finished_at: nil).where(retried_good_job_id: nil) }
     # Completed executing successfully
-    scope :finished, -> { not_discarded.where.not(finished_at: nil) }
+    scope :succeeded, -> { finished.where(error: nil) }
     # Errored but will not be retried
-    scope :discarded, -> { where.not(finished_at: nil).where.not(error: nil) }
-    # Not errored
-    scope :not_discarded, -> { where(error: nil) }
+    scope :discarded, -> { finished.where.not(error: nil) }
 
     # The job's ActiveJob UUID
     # @return [String]
@@ -115,7 +115,7 @@ module GoodJob
       aj_count = serialized_params.fetch('executions', 0)
       # The execution count within serialized_params is not updated
       # once the underlying execution has been executed.
-      if status.in? [:discarded, :finished, :running]
+      if status.in? [:discarded, :succeeded, :running]
         aj_count + 1
       else
         aj_count
@@ -152,6 +152,24 @@ module GoodJob
       else
         advisory_locked?
       end
+    end
+
+    # Tests whether the job has finished (succeeded or discarded).
+    # @return [Boolean]
+    def finished?
+      finished_at.present? && retried_good_job_id.nil?
+    end
+
+    # Tests whether the job has finished but with an error.
+    # @return [Boolean]
+    def discarded?
+      finished? && error.present?
+    end
+
+    # Tests whether the job has finished without error
+    # @return [Boolean]
+    def succeeded?
+      finished? && !discarded?
     end
 
     # Retry a job that has errored and been discarded.

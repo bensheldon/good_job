@@ -145,7 +145,7 @@ describe GoodJob::JobsController, type: :request do
         put good_job.mass_update_jobs_path, params: {
           mass_action: 'discard',
           all_job_ids: 1,
-          state: 'finished',
+          state: 'succeeded',
         }
 
         expect(response).to have_http_status(:found)

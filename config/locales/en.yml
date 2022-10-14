@@ -58,11 +58,11 @@ en:
         processes: Processes
     status:
       discarded: Discarded
-      finished: Finished
       queued: Queued
       retried: Retried
       running: Running
       scheduled: Scheduled
+      succeeded: Succeeded
   number:
     format:
       delimiter: ","

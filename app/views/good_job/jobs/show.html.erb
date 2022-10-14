@@ -47,7 +47,7 @@
           <% end %>
         <% end %>
 
-        <% if @job.status.in? [:discarded, :finished] %>
+        <% if @job.status.in? [:discarded, :succeeded] %>
           <%= button_to job_path(@job.id), method: :delete, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Destroy job" }, title: "Destroy job", data: { confirm: "Confirm destroy" } do %>
             <%= render_icon "trash" %>
             Destroy

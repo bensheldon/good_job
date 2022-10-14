@@ -121,6 +121,42 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  describe '#finished?' do
+    it 'is true if the job has finished' do
+      expect do
+        job.update(finished_at: Time.current, retried_good_job_id: nil)
+      end.to change(job, :finished?).from(false).to(true)
+
+      expect do
+        job.update(finished_at: Time.current, retried_good_job_id: SecureRandom.uuid)
+      end.to change(job, :finished?).from(true).to(false)
+    end
+  end
+
+  describe '#succeeded?' do
+    it 'is true if the job has finished without error' do
+      expect do
+        job.update(finished_at: Time.current, error: nil)
+      end.to change(job, :succeeded?).from(false).to(true)
+
+      expect do
+        job.update(finished_at: Time.current, error: 'TestJob::Error: TestJob::Error')
+      end.to change(job, :succeeded?).from(true).to(false)
+    end
+  end
+
+  describe '#discarded?' do
+    it 'is true if the job has finished with an error' do
+      expect do
+        job.update(finished_at: Time.current, error: 'TestJob::Error: TestJob::Error')
+      end.to change(job, :discarded?).from(false).to(true)
+
+      expect do
+        job.update(finished_at: Time.current, error: nil)
+      end.to change(job, :discarded?).from(true).to(false)
+    end
+  end
+
   describe '#retry_job' do
     context 'when job is retried' do
       before do
@@ -189,7 +225,7 @@ RSpec.describe GoodJob::Job do
       end
 
       it 'raises an ActionForStateMismatchError' do
-        expect(job.reload.status).to eq :finished
+        expect(job.reload.status).to eq :succeeded
         expect { job.discard_job("Discard in test") }.to raise_error GoodJob::Job::ActionForStateMismatchError
       end
     end
@@ -214,7 +250,7 @@ RSpec.describe GoodJob::Job do
       end
 
       it 'raises an ActionForStateMismatchError' do
-        expect(job.reload.status).to eq :finished
+        expect(job.reload.status).to eq :succeeded
         expect { job.reschedule_job }.to raise_error GoodJob::Job::ActionForStateMismatchError
       end
     end

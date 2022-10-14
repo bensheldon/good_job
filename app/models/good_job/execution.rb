@@ -68,7 +68,7 @@ module GoodJob
     belongs_to :job, class_name: 'GoodJob::Job', foreign_key: 'active_job_id', primary_key: 'active_job_id', optional: true, inverse_of: :executions
     after_destroy -> { self.class.active_job_id(active_job_id).delete_all }, if: -> { @_destroy_job }
 
-    # Get Jobs with given ActiveJob ID
+    # Get executions with given ActiveJob ID
     # @!method active_job_id
     # @!scope class
     # @param active_job_id [String]
@@ -76,7 +76,7 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :active_job_id, ->(active_job_id) { where(active_job_id: active_job_id) }
 
-    # Get Jobs with given class name
+    # Get executions with given class name
     # @!method job_class
     # @!scope class
     # @param string [String]
@@ -84,32 +84,32 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :job_class, ->(job_class) { where("serialized_params->>'job_class' = ?", job_class) }
 
-    # Get Jobs that have not yet been completed.
+    # Get executions that have not yet finished (succeeded or discarded).
     # @!method unfinished
     # @!scope class
     # @return [ActiveRecord::Relation]
     scope :unfinished, -> { where(finished_at: nil) }
 
-    # Get Jobs that are not scheduled for a later time than now (i.e. jobs that
+    # Get executions that are not scheduled for a later time than now (i.e. jobs that
     # are not scheduled or scheduled for earlier than the current time).
     # @!method only_scheduled
     # @!scope class
     # @return [ActiveRecord::Relation]
     scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(Time.current)).or(where(scheduled_at: nil)) }
 
-    # Order jobs by priority (highest priority first).
+    # Order executions by priority (highest priority first).
     # @!method priority_ordered
     # @!scope class
     # @return [ActiveRecord::Relation]
     scope :priority_ordered, -> { order('priority DESC NULLS LAST') }
 
-    # Order jobs by created_at, for first-in first-out
+    # Order executions by created_at, for first-in first-out
     # @!method creation_ordered
     # @!scope class
     # @return [ActiveRecord:Relation]
     scope :creation_ordered, -> { order('created_at ASC') }
 
-    # Order jobs for de-queueing
+    # Order executions for de-queueing
     # @!method dequeueing_ordered
     # @!scope class
     # @param parsed_queues [Hash]
@@ -124,7 +124,7 @@ module GoodJob
       relation
     end)
 
-    # Order jobs in order of queues in array param
+    # Order executions in order of queues in array param
     # @!method queue_ordered
     # @!scope class
     # @param queues [Array<string] ordered names of queues

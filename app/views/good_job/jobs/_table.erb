@@ -75,7 +75,7 @@
               <span class="font-monospace fw-bold"><%= job.priority %></span>
             </div>
             <div class="col-1 text-center">
-              <% if job.executions_count > 0 && job.status != :finished %>
+              <% if job.executions_count > 0 && job.status != :succeeded %>
                 <%= tag.span job.executions_count, class: "badge rounded-pill bg-danger", data: {
                       bs_toggle: "popover",
                       bs_trigger: "hover focus click",
@@ -118,7 +118,7 @@
                     <% end %>
                   </li>
                   <li>
-                    <%= link_to job_path(job.id), method: :delete, class: "dropdown-item #{'disabled' unless job.status.in? [:discarded, :finished]}", title: "Destroy job", data: { confirm: "Confirm destroy", disable: true } do %>
+                    <%= link_to job_path(job.id), method: :delete, class: "dropdown-item #{'disabled' unless job.status.in? [:discarded, :succeeded]}", title: "Destroy job", data: { confirm: "Confirm destroy", disable: true } do %>
                       <%= render_icon "trash" %>
                       Destroy
                     <% end %>
