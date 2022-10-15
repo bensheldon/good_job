@@ -143,17 +143,30 @@ RSpec.describe GoodJob::Scheduler do
     context 'when there are more than cleanup_interval_jobs' do
       it 'runs cleanup' do
         allow(GoodJob).to receive(:cleanup_preserved_jobs)
+
         performed_jobs = 0
+        total_jobs = 2
         allow(performer).to receive(:next) do
           performed_jobs += 1
-          performed_jobs < 4
+          performed_jobs < total_jobs
         end
 
         scheduler = described_class.new(performer, cleanup_interval_jobs: 2)
-        2.times { scheduler.create_thread }
-        expect(performer).not_to have_received(:cleanup)
-        scheduler.create_thread
+        4.times { scheduler.create_thread }
+        wait_until(max: 1) { expect(performer).not_to have_received(:cleanup) }
+        scheduler.shutdown
+
+        performed_jobs = 0
+        total_jobs = 4
+        allow(performer).to receive(:next) do
+          performed_jobs += 1
+          performed_jobs < total_jobs
+        end
+
+        scheduler = described_class.new(performer, cleanup_interval_jobs: 2)
+        4.times { scheduler.create_thread }
         wait_until(max: 1) { expect(performer).to have_received(:cleanup) }
+        scheduler.shutdown
       end
     end
   end
