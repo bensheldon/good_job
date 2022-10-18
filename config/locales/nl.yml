@@ -58,11 +58,11 @@ nl:
         processes: Processen
     status:
       discarded: weggegooid
-      finished: Afgewerkt
       queued: In de wachtrij
       retried: Opnieuw geprobeerd
       running: Rennen
       scheduled: Gepland
+      succeeded: Geslaagd
   number:
     format:
       delimiter: "."

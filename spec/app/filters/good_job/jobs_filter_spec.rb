@@ -64,7 +64,7 @@ RSpec.describe GoodJob::JobsFilter do
                                     "retried" => 0,
                                     "queued" => 0,
                                     "running" => 1,
-                                    "finished" => 2,
+                                    "succeeded" => 2,
                                     "discarded" => 1,
                                   })
     end

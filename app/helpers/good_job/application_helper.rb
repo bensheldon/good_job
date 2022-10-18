@@ -24,7 +24,7 @@ module GoodJob
 
     STATUS_ICONS = {
       discarded: "exclamation",
-      finished: "check",
+      succeeded: "check",
       queued: "dash_circle",
       retried: "arrow_clockwise",
       running: "play",
@@ -33,7 +33,7 @@ module GoodJob
 
     STATUS_COLOR = {
       discarded: "danger",
-      finished: "success",
+      succeeded: "success",
       queued: "secondary",
       retried: "warning",
       running: "primary",

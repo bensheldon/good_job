@@ -8,7 +8,7 @@ module GoodJob
         'retried' => query.retried.count,
         'queued' => query.queued.count,
         'running' => query.running.count,
-        'finished' => query.finished.count,
+        'succeeded' => query.succeeded.count,
         'discarded' => query.discarded.count,
       }
     end
@@ -25,8 +25,8 @@ module GoodJob
         case filter_params[:state]
         when 'discarded'
           query = query.discarded
-        when 'finished'
-          query = query.finished
+        when 'succeeded'
+          query = query.succeeded
         when 'retried'
           query = query.retried
         when 'scheduled'

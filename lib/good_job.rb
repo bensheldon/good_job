@@ -157,7 +157,7 @@ module GoodJob
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
       old_jobs = GoodJob::Job.where('finished_at <= ?', timestamp)
-      old_jobs = old_jobs.not_discarded unless include_discarded
+      old_jobs = old_jobs.succeeded unless include_discarded
       old_jobs_count = old_jobs.count
 
       GoodJob::Execution.where(job: old_jobs).delete_all

@@ -8,8 +8,8 @@ module GoodJob
     #     - retried: The job previously errored on execution and will be re-executed in the future.
     #   2. The job is being executed
     #     - running: the job is actively being executed by an execution thread
-    #   3. The job will not execute
-    #     - finished: The job executed successfully
+    #   3. The job has finished
+    #     - succeeded: The job executed successfully
     #     - discarded: The job previously errored on execution and will not be re-executed in the future.
     #
     # @return [Symbol]
@@ -20,7 +20,7 @@ module GoodJob
         elsif error.present? && retried_good_job_id.nil?
           :discarded
         else
-          :finished
+          :succeeded
         end
       elsif (scheduled_at || created_at) > DateTime.current
         if serialized_params.fetch('executions', 0) > 1
