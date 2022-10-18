@@ -1,5 +1,15 @@
 # Changelog
 
+## [v3.5.0](https://github.com/bensheldon/good_job/tree/v3.5.0) (2022-10-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.8...v3.5.0)
+
+**Merged pull requests:**
+
+- Fix flaky test for `Scheduler#cleanup_interval_jobs` [\#723](https://github.com/bensheldon/good_job/pull/723) ([bensheldon](https://github.com/bensheldon))
+- Pin development Puma version until Capybara is compatible [\#722](https://github.com/bensheldon/good_job/pull/722) ([bensheldon](https://github.com/bensheldon))
+- Rename Job status of `finished` to `succeeded`; `finished` now means either `succeeded` or `discarded` [\#721](https://github.com/bensheldon/good_job/pull/721) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.4.8](https://github.com/bensheldon/good_job/tree/v3.4.8) (2022-10-11)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.7...v3.4.8)
