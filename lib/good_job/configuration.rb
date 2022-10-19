@@ -26,6 +26,8 @@ module GoodJob
     DEFAULT_SHUTDOWN_TIMEOUT = -1
     # Default to not running cron
     DEFAULT_ENABLE_CRON = false
+    # Default to selecting a limit of 1,000 jobs
+    DEFAULT_QUEUE_SELECT_LIMIT = 1_000
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
@@ -206,6 +208,20 @@ module GoodJob
 
     def cron_entries
       cron.map { |cron_key, params| GoodJob::CronEntry.new(params.merge(key: cron_key)) }
+    end
+
+    # The number of queued jobs to select when polling for a job to run.
+    # This limit is intended to avoid locking a large number of rows when selecting eligible jobs
+    # from the queue. This value should be higher than the total number of threads across all good_job
+    # processes to ensure a thread can retrieve an eligible and unlocked job.
+    # @return [Integer, nil]
+    def queue_select_limit
+      (
+        options[:queue_select_limit ] ||
+          rails_config[:queue_select_limit ] ||
+          env['QUEUE_SELECT_LIMIT'] ||
+          DEFAULT_QUEUE_SELECT_LIMIT
+      ).to_i
     end
 
     # Whether to destroy discarded jobs when cleaning up preserved jobs.
