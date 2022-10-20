@@ -297,9 +297,10 @@ module GoodJob
       job_error = result.handled_error || result.unhandled_error
       self.error = [job_error.class, ERROR_MESSAGE_SEPARATOR, job_error.message].join if job_error
 
+      reenqueued = result.retried? || retried_good_job_id.present?
       if result.unhandled_error && GoodJob.retry_on_unhandled_error
         save!
-      elsif GoodJob.preserve_job_records == true || result.retried? || (result.unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error)
+      elsif GoodJob.preserve_job_records == true || reenqueued || (result.unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error)
         self.finished_at = Time.current
         save!
       else

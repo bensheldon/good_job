@@ -416,6 +416,22 @@ RSpec.describe GoodJob::Execution do
       end
     end
 
+    context 'when the job is directly re-enqueued' do
+      before do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(false)
+        TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+        TestJob.after_perform do
+          enqueue(wait: 1.minute)
+        end
+      end
+
+      it 'does not destroy the execution records' do
+        good_job.perform
+        expect { good_job.reload }.not_to raise_error
+        expect(described_class.where(active_job_id: good_job.active_job_id).count).to eq 2
+      end
+    end
+
     it 'raises an error if the job is attempted to be re-run' do
       good_job.update!(finished_at: Time.current)
       expect { good_job.perform }.to raise_error described_class::PreviouslyPerformedError
