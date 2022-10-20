@@ -4,8 +4,8 @@
 # and recreated between test runs. Don't rely on the data there!
 
 Rails.application.configure do
-  config.cache_classes = true
-  config.eager_load = true
+  config.cache_classes = false
+  config.eager_load = false
 
   # Raises error for missing translations.
   if Gem::Version.new(Rails.version) < Gem::Version.new('6.1')

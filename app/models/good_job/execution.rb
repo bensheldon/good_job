@@ -66,7 +66,6 @@ module GoodJob
     end
 
     belongs_to :job, class_name: 'GoodJob::Job', foreign_key: 'active_job_id', primary_key: 'active_job_id', optional: true, inverse_of: :executions
-    after_destroy -> { self.class.active_job_id(active_job_id).delete_all }, if: -> { @_destroy_job }
 
     # Get executions with given ActiveJob ID
     # @!method active_job_id
@@ -299,11 +298,11 @@ module GoodJob
 
       if result.unhandled_error && GoodJob.retry_on_unhandled_error
         save!
-      elsif GoodJob.preserve_job_records == true || result.retried? || (result.unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error)
+      elsif GoodJob.preserve_job_records == true || (result.unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error)
         self.finished_at = Time.current
         save!
       else
-        destroy_job
+        destroy!
       end
 
       result
@@ -355,14 +354,6 @@ module GoodJob
       (finished_at || Time.zone.now) - performed_at if performed_at
     end
 
-    # Destroys this execution and all executions within the same job
-    def destroy_job
-      @_destroy_job = true
-      destroy!
-    ensure
-      @_destroy_job = false
-    end
-
     private
 
     def active_job_data
@@ -388,7 +379,7 @@ module GoodJob
           end
           handled_error ||= current_thread.error_on_retry || current_thread.error_on_discard
 
-          ExecutionResult.new(value: value, handled_error: handled_error, retried: current_thread.error_on_retry.present?)
+          ExecutionResult.new(value: value, handled_error: handled_error)
         rescue StandardError => e
           ExecutionResult.new(value: nil, unhandled_error: e)
         end
