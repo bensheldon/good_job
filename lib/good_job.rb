@@ -57,7 +57,7 @@ module GoodJob
   #   By default, GoodJob deletes job records after the job is completed successfully.
   #   If you want to preserve jobs for latter inspection, set this to +true+.
   #   If you want to preserve only jobs that finished with error for latter inspection, set this to +:on_unhandled_error+.
-  #   @return [Boolean, Symbol, nil]
+  #   @return [Boolean, nil]
   mattr_accessor :preserve_job_records, default: true
 
   # @!attribute [rw] retry_on_unhandled_error
