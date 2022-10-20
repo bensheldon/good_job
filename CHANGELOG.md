@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.5.1](https://github.com/bensheldon/good_job/tree/v3.5.1) (2022-10-20)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.5.0...v3.5.1)
+
+**Closed issues:**
+
+- Assert cancelled jobs [\#724](https://github.com/bensheldon/good_job/issues/724)
+
+**Merged pull requests:**
+
+- Revert "When not preserving job records, ensure all prior executions are deleted after successful retry" because some retry patterns stopped working [\#729](https://github.com/bensheldon/good_job/pull/729) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.5.0](https://github.com/bensheldon/good_job/tree/v3.5.0) (2022-10-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.8...v3.5.0)
