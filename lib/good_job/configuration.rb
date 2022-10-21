@@ -217,9 +217,9 @@ module GoodJob
     # @return [Integer, nil]
     def queue_select_limit
       (
-        options[:queue_select_limit ] ||
-          rails_config[:queue_select_limit ] ||
-          env['QUEUE_SELECT_LIMIT'] ||
+        options[:queue_select_limit] ||
+          rails_config[:queue_select_limit] ||
+          env['GOOD_JOB_QUEUE_SELECT_LIMIT'] ||
           DEFAULT_QUEUE_SELECT_LIMIT
       ).to_i
     end
