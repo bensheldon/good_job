@@ -176,6 +176,7 @@ Options:
   [--daemonize]                # Run as a background daemon (default: false)
   [--pidfile=PIDFILE]          # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
   [--probe-port=PORT]          # Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)
+  [--queue-select-limit=COUNT] # The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
 
 Executes queued jobs.
 

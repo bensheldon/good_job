@@ -214,12 +214,11 @@ module GoodJob
     # processes to ensure a thread can retrieve an eligible and unlocked job.
     # @return [Integer, nil]
     def queue_select_limit
-      limit =
+      (
         options[:queue_select_limit] ||
         rails_config[:queue_select_limit] ||
         env['GOOD_JOB_QUEUE_SELECT_LIMIT']
-
-      limit.to_i if limit
+      )&.to_i
     end
 
     # Whether to destroy discarded jobs when cleaning up preserved jobs.
