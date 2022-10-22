@@ -81,7 +81,12 @@ module GoodJob
                   desc: "Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)"
     method_option :probe_port,
                   type: :numeric,
+                  banner: 'PORT',
                   desc: "Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)"
+    method_option :queue_select_limit,
+                  type: :numeric,
+                  banner: 'COUNT',
+                  desc: "The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
 
     def start
       set_up_application!

@@ -19,14 +19,11 @@ RSpec.describe GoodJob::Lockable do
       end
     end
 
-    context 'when using default lockable column' do
-      before do
+    describe 'lockable column do' do
+      it 'default column generates appropriate SQL' do
         allow(model_class).to receive(:advisory_lockable_column).and_return(:id)
-      end
 
-      it 'generates appropriate SQL' do
         query = model_class.where(priority: 99).order(priority: :desc).limit(2).advisory_lock
-
         expect(normalize_sql(query.to_sql)).to eq normalize_sql(<<~SQL.squish)
           SELECT "good_jobs".*
           FROM "good_jobs"
@@ -45,28 +42,48 @@ RSpec.describe GoodJob::Lockable do
           ORDER BY "good_jobs"."priority" DESC
         SQL
       end
+
+      it 'can be customized with `lockable_column`' do
+        allow(model_class).to receive(:advisory_lockable_column).and_return("queue_name")
+        query = model_class.order(priority: :desc).limit(2).advisory_lock
+
+        expect(normalize_sql(query.to_sql)).to eq normalize_sql(<<~SQL.squish)
+          SELECT "good_jobs".*
+          FROM "good_jobs"
+          WHERE "good_jobs"."id" IN (
+            WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
+              SELECT "good_jobs"."id", "good_jobs"."queue_name"
+              FROM "good_jobs"
+              ORDER BY "good_jobs"."priority" DESC
+            )
+            SELECT "rows"."id"
+            FROM "rows"
+            WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || '-' || "rows"."queue_name"::text), 1, 16))::bit(64)::bigint)
+            LIMIT 2
+          )
+          ORDER BY "good_jobs"."priority" DESC
+        SQL
+      end
     end
 
-    it 'can be customized with `lockable_column`' do
-      allow(model_class).to receive(:advisory_lockable_column).and_return("queue_name")
-      query = model_class.order(priority: :desc).limit(2).advisory_lock
-
-      expect(normalize_sql(query.to_sql)).to eq normalize_sql(<<~SQL.squish)
-        SELECT "good_jobs".*
-        FROM "good_jobs"
-        WHERE "good_jobs"."id" IN (
-          WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
-            SELECT "good_jobs"."id", "good_jobs"."queue_name"
-            FROM "good_jobs"
-            ORDER BY "good_jobs"."priority" DESC
+    describe 'select limit' do
+      it 'introduces a limit into the materialized CTE' do
+        query = model_class.advisory_lock(select_limit: 1000)
+        expect(normalize_sql(query.to_sql)).to eq normalize_sql(<<~SQL.squish)
+          SELECT "good_jobs".*
+          FROM "good_jobs"
+          WHERE "good_jobs"."id" IN (
+            WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
+              SELECT "good_jobs"."id", "good_jobs"."active_job_id"
+              FROM "good_jobs"
+              LIMIT 1000
+            )
+            SELECT "rows"."id"
+            FROM "rows"
+            WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || '-' || "rows"."active_job_id"::text), 1, 16))::bit(64)::bigint)
           )
-          SELECT "rows"."id"
-          FROM "rows"
-          WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || '-' || "rows"."queue_name"::text), 1, 16))::bit(64)::bigint)
-          LIMIT 2
-        )
-        ORDER BY "good_jobs"."priority" DESC
-      SQL
+        SQL
+      end
     end
 
     it 'returns first row of the query with a lock' do

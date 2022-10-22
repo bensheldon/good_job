@@ -57,6 +57,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
     - [Database connections](#database-connections)
         - [Production setup](#production-setup)
+        - [Queue performance with Queue Select Limit](#queue-performance-with-queue-select-limit)
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
     - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
@@ -176,6 +177,7 @@ Options:
   [--daemonize]                # Run as a background daemon (default: false)
   [--pidfile=PIDFILE]          # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
   [--probe-port=PORT]          # Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)
+  [--queue-select-limit=COUNT] # The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
 
 Executes queued jobs.
 
@@ -756,6 +758,45 @@ The recommended way to monitor the queue in production is:
 - if possible, run the queue as a dedicated instance and use available HTTP health check probes instead of pid-based monitoring
 - keep an eye on the number of jobs in the queue (abnormal high number of unscheduled jobs means the queue could be underperforming)
 - consider performance monitoring services which support the built-in Rails instrumentation (eg. Sentry, Skylight, etc.)
+
+#### Queue performance with Queue Select Limit
+
+GoodJob’s advisory locking strategy uses a materialized CTE (Common Table Expression). This strategy can be non-performant when querying a very large queue of executable jobs (100,000+) because the database query must materialize all executable jobs before acquiring an advisory lock.
+
+GoodJob offers an optional optimization to limit the number of jobs that are queried: Queue Select Limit.
+
+```none
+# CLI option
+--queue-select-limit=1000
+
+# Rails configuration
+config.good_job.queue_select_limit = 1000
+
+# Environment Variable
+GOOD_JOB_QUEUE_SELECT_LIMIT=1000
+```
+
+The Queue Select Limit value should be set to a rough upper-bound that exceeds all GoodJob execution threads / database connections. `1000` is a number that likely exceeds the available database connections on most PaaS offerings, but still offers a performance boost for GoodJob when executing very large queues.
+
+To explain where this value is used, here is the pseudo-query that GoodJob uses to find executable jobs:
+
+```sql
+  SELECT *
+  FROM good_jobs
+  WHERE id IN (
+    WITH rows AS MATERIALIZED (
+      SELECT id, active_job_id
+      FROM good_jobs
+      WHERE (scheduled_at <= NOW() OR scheduled_at IS NULL) AND finished_at IS NULL
+      ORDER BY priority DESC NULLS LAST, created_at ASC
+      [LIMIT 1000] -- <= introduced when queue_select_limit is set
+    )
+    SELECT id
+    FROM rows
+    WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || '-' || active_job_id::text), 1, 16))::bit(64)::bigint)
+    LIMIT 1
+  )
+```
 
 ### Execute jobs async / in-process
 

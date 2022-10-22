@@ -37,11 +37,12 @@ module GoodJob
       # @param function [String, Symbol]  Postgres Advisory Lock function name to use
       # @return [ActiveRecord::Relation]
       #   A relation selecting only the records that were locked.
-      scope :advisory_lock, (lambda do |column: _advisory_lockable_column, function: advisory_lockable_function|
+      scope :advisory_lock, (lambda do |column: _advisory_lockable_column, function: advisory_lockable_function, select_limit: nil|
         original_query = self
 
         cte_table = Arel::Table.new(:rows)
         cte_query = original_query.select(primary_key, column).except(:limit)
+        cte_query = cte_query.limit(select_limit) if select_limit
         cte_type = if supports_cte_materialization_specifiers?
                      'MATERIALIZED'
                    else
@@ -154,10 +155,10 @@ module GoodJob
       #   MyLockableRecord.order(created_at: :asc).limit(2).with_advisory_lock do |record|
       #     do_something_with record
       #   end
-      def with_advisory_lock(column: _advisory_lockable_column, function: advisory_lockable_function, unlock_session: false)
+      def with_advisory_lock(column: _advisory_lockable_column, function: advisory_lockable_function, unlock_session: false, select_limit: nil)
         raise ArgumentError, "Must provide a block" unless block_given?
 
-        records = advisory_lock(column: column, function: function).to_a
+        records = advisory_lock(column: column, function: function, select_limit: select_limit).to_a
 
         begin
           unscoped { yield(records) }

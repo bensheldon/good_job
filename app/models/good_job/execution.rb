@@ -203,10 +203,10 @@ module GoodJob
     #   return value for the job's +#perform+ method, and the exception the job
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
-    def self.perform_with_advisory_lock(parsed_queues: nil)
+    def self.perform_with_advisory_lock(parsed_queues: nil, queue_select_limit: nil)
       execution = nil
       result = nil
-      unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true) do |executions|
+      unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true, select_limit: queue_select_limit) do |executions|
         execution = executions.first
         break if execution.blank?
         break :unlocked unless execution&.executable?

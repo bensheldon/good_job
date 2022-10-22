@@ -208,6 +208,19 @@ module GoodJob
       cron.map { |cron_key, params| GoodJob::CronEntry.new(params.merge(key: cron_key)) }
     end
 
+    # The number of queued jobs to select when polling for a job to run.
+    # This limit is intended to avoid locking a large number of rows when selecting eligible jobs
+    # from the queue. This value should be higher than the total number of threads across all good_job
+    # processes to ensure a thread can retrieve an eligible and unlocked job.
+    # @return [Integer, nil]
+    def queue_select_limit
+      (
+        options[:queue_select_limit] ||
+        rails_config[:queue_select_limit] ||
+        env['GOOD_JOB_QUEUE_SELECT_LIMIT']
+      )&.to_i
+    end
+
     # Whether to destroy discarded jobs when cleaning up preserved jobs.
     # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
     # @return [Boolean]
