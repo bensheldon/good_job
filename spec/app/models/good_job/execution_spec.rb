@@ -397,6 +397,41 @@ RSpec.describe GoodJob::Execution do
       expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
+    context 'when there are prior executions' do
+      let!(:prior_execution) do
+        described_class.enqueue(active_job).tap do |job|
+          job.update!(
+            error: "TestJob::ExpectedError: Raised expected error",
+            performed_at: Time.current,
+            finished_at: Time.current
+          )
+        end
+      end
+
+      it 'destroys the job and prior executions when preserving record only on error' do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(:on_unhandled_error)
+        good_job.perform
+        expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
+        expect { prior_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      end
+    end
+
+    context 'when the job is directly re-enqueued' do
+      before do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(false)
+        TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+        TestJob.after_perform do
+          enqueue(wait: 1.minute)
+        end
+      end
+
+      it 'does not destroy the execution records' do
+        good_job.perform
+        expect { good_job.reload }.not_to raise_error
+        expect(described_class.where(active_job_id: good_job.active_job_id).count).to eq 2
+      end
+    end
+
     it 'raises an error if the job is attempted to be re-run' do
       good_job.update!(finished_at: Time.current)
       expect { good_job.perform }.to raise_error described_class::PreviouslyPerformedError
@@ -501,6 +536,19 @@ RSpec.describe GoodJob::Execution do
           end
         end
       end
+    end
+  end
+
+  describe '#destroy_job' do
+    let!(:execution) { described_class.create! active_job_id: SecureRandom.uuid }
+    let!(:prior_execution) { described_class.create! active_job_id: execution.active_job_id }
+    let!(:other_job) { described_class.create! active_job_id: SecureRandom.uuid }
+
+    it 'destroys all of the job executions' do
+      execution.destroy_job
+      expect { execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { prior_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { other_job.reload }.not_to raise_error
     end
   end
 
