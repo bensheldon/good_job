@@ -206,7 +206,7 @@ module GoodJob
     def self.perform_with_advisory_lock(parsed_queues: nil, queue_select_limit: nil)
       execution = nil
       result = nil
-      unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true, queue_select_limit: queue_select_limit) do |executions|
+      unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true, select_limit: queue_select_limit) do |executions|
         execution = executions.first
         break if execution.blank?
         break :unlocked unless execution&.executable?
