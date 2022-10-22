@@ -1,5 +1,19 @@
 # Changelog
 
+## [v3.6.0](https://github.com/bensheldon/good_job/tree/v3.6.0) (2022-10-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.5.1...v3.6.0)
+
+**Fixed bugs:**
+
+- 3.4.8 release breaks job retrying [\#728](https://github.com/bensheldon/good_job/issues/728)
+
+**Merged pull requests:**
+
+- Redo: When not preserving job records, ensure all prior executions are deleted after successful retry [\#730](https://github.com/bensheldon/good_job/pull/730) ([bensheldon](https://github.com/bensheldon))
+- Add configurable limit \(`queue_select_limit`\) when querying candidate jobs [\#727](https://github.com/bensheldon/good_job/pull/727) ([mitchellhenke](https://github.com/mitchellhenke))
+- Add index to `good_jobs` to improve querying candidate jobs [\#726](https://github.com/bensheldon/good_job/pull/726) ([mitchellhenke](https://github.com/mitchellhenke))
+
 ## [v3.5.1](https://github.com/bensheldon/good_job/tree/v3.5.1) (2022-10-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.5.0...v3.5.1)
