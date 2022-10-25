@@ -953,7 +953,7 @@ It is also possible to manually trigger a cleanup of preserved job records:
 
 ### Write tests
 
-By default, GoodJob uses its inline adapter in the test environment; the inline adapter is designed for the test environment. When enquing a job with GoodJob's inline adapter, the job will be executed immediately on the current thread; unhandled exceptions will be raised.
+By default, GoodJob uses its inline adapter in the test environment; the inline adapter is designed for the test environment. When enqueuing a job with GoodJob's inline adapter, the job will be executed immediately on the current thread; unhandled exceptions will be raised.
 
 In GoodJob 2.0, the inline adapter will execute future scheduled jobs immediately. In the next major release, GoodJob 3.0, the inline adapter will not execute future scheduled jobs and instead enqueue them in the database.
 
@@ -1067,7 +1067,7 @@ spec:
 All contributions, from feedback to code and beyond, are welcomed and appreciated 🙏
 
 - Review the [Prioritized Project Backlog](https://github.com/bensheldon/good_job/projects/1).
-- Open a new Issue or contribute to an [existing Issue](https://github.com/bensheldon/good_job/issues). Questions or suggestions are fantastic.
+- Open a new issue or contribute to an [existing Issue](https://github.com/bensheldon/good_job/issues). Questions or suggestions are fantastic.
 - Participate according to our [Code of Conduct](/CODE_OF_CONDUCT.md).
 - Financially support the project via [Sponsorship](https://github.com/sponsors/bensheldon).
 
