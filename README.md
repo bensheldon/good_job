@@ -153,7 +153,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 
 ### Command-line options
 
-There several top-level commands available through the `good_job` command-line tool.
+There are several top-level commands available through the `good_job` command-line tool.
 
 Configuration options are available with `help`.
 
@@ -275,7 +275,7 @@ Available configuration options are:
 - `max_threads` (integer) sets the default number of threads per pool to use for working jobs. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`. A poll interval of `-1` disables polling completely.
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
-- `shutdown_timeout` (float) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
+- `shutdown_timeout` (integer) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 - `enable_cron` (boolean) whether to run cron process. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_CRON`.
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
 - `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`. _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
@@ -286,7 +286,7 @@ Available configuration options are:
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
 - `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
 - `retry_on_unhandled_error` (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Be advised this may lead to jobs being repeated infinitely ([see below for more on retries](#retries)). Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `false`)
-- `on_thread_error` (proc, lambda, or callable) will be called when an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake. Example:
+- `on_thread_error` (proc, lambda, or callable) will be called when there is an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake. Example:
 
     ```ruby
     config.good_job.on_thread_error = -> (exception) { Sentry.capture_exception(exception) }
@@ -327,7 +327,7 @@ The following options are also configurable via accessors, but you are encourage
 - **`GoodJob.logger`** ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger`.
 - **`GoodJob.preserve_job_records`** (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
 - **`GoodJob.retry_on_unhandled_error`** (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Be advised this may lead to jobs being repeated infinitely ([see below for more on retries](#retries)). Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `false`)
-- **`GoodJob.on_thread_error`** (proc, lambda, or callable) will be called when an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake.
+- **`GoodJob.on_thread_error`** (proc, lambda, or callable) will be called when there is an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake.
 
 ### Dashboard
 
@@ -379,7 +379,7 @@ require 'good_job/engine' # <= Add this line
 
 #### API-only Rails applications
 
-API-only Rails applications may not have all of the required Rack middleware for the GoodJob Dashboard to function. To re-add the middlware:
+API-only Rails applications may not have all of the required Rack middleware for the GoodJob Dashboard to function. To re-add the middleware:
 
 ```ruby
 # config/application.rb
@@ -400,7 +400,7 @@ The Dashboard can be set to automatically refresh by checking "Live Poll" in the
 
 ### ActiveJob concurrency
 
-GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.
+GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unnecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.
 
 ```ruby
 class MyJob < ApplicationJob
@@ -460,7 +460,7 @@ GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry 
 
 GoodJob can enqueue jobs on a recurring basis that can be used as a replacement for cron.
 
-Cron-style jobs are run on every GoodJob process (e.g. CLI or `async` execution mode) when `config.good_job.enable_cron = true`, but GoodJob's cron uses unique indexes to ensure that only a single job is enqeued at the given time interval.
+Cron-style jobs are run on every GoodJob process (e.g. CLI or `async` execution mode) when `config.good_job.enable_cron = true`, but GoodJob's cron uses unique indexes to ensure that only a single job is enqueued at the given time interval.
 
 Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`) and natural language parsing (e.g. `every second`).
 
@@ -542,7 +542,7 @@ GoodJob v2 introduces a new Advisory Lock key format that is operationally diffe
 
 1. Upgrade your production environment to `v1.99.x` following the minor version upgrade process, including database migrations. `v1.99` is a transitional release that is safely compatible with both `v1.x` and `v2.0.0` because it uses both `v1`- and `v2`-formatted advisory locks.
 1. Address any deprecation warnings generated by `v1.99`.
-1. Upgrade your production environment to `v1.99.x` to `v2.0.x` again following the _minor_ upgrade process.
+1. Upgrade your production environment from `v1.99.x` to `v2.0.x` again following the _minor_ upgrade process.
 
 Notable changes:
 
@@ -748,14 +748,14 @@ The queue process will not crash if the connections pool is exhausted, instead i
 
 When running GoodJob in a production environment, you should be mindful of:
 
-- [Execution mode](execute-jobs-async--in-process)
+- [Execution mode](#execute-jobs-async--in-process)
 - [Database connection pool size](#database-connections)
 - [Health check probes](#cli-http-health-check-probes) and potentially the [instrumentation support](#monitor-and-preserve-worked-jobs)
 
 The recommended way to monitor the queue in production is:
 
-- have an exception notifier callback (see `on_thread_error`)
-- if possible, run the queue as a dedicated instance and use available HTTP health check probes instead of pid-based monitoring
+- have an exception notifier callback (see [`on_thread_error`](#configuration-options))
+- if possible, run the queue as a dedicated instance and use available HTTP health check probes instead of PID-based monitoring
 - keep an eye on the number of jobs in the queue (abnormal high number of unscheduled jobs means the queue could be underperforming)
 - consider performance monitoring services which support the built-in Rails instrumentation (eg. Sentry, Skylight, etc.)
 
@@ -953,7 +953,7 @@ It is also possible to manually trigger a cleanup of preserved job records:
 
 ### Write tests
 
-By default, GoodJob uses its inline adapter in the test environment; the inline adapter is designed for the test environment. When enquing a job with GoodJob's inline adapter, the job will be executed immediately on the current thread; unhandled exceptions will be raised.
+By default, GoodJob uses its inline adapter in the test environment; the inline adapter is designed for the test environment. When enqueuing a job with GoodJob's inline adapter, the job will be executed immediately on the current thread; unhandled exceptions will be raised.
 
 In GoodJob 2.0, the inline adapter will execute future scheduled jobs immediately. In the next major release, GoodJob 3.0, the inline adapter will not execute future scheduled jobs and instead enqueue them in the database.
 
@@ -1067,7 +1067,7 @@ spec:
 All contributions, from feedback to code and beyond, are welcomed and appreciated 🙏
 
 - Review the [Prioritized Project Backlog](https://github.com/bensheldon/good_job/projects/1).
-- Open a new Issue or contribute to an [existing Issue](https://github.com/bensheldon/good_job/issues). Questions or suggestions are fantastic.
+- Open a new issue or contribute to an [existing Issue](https://github.com/bensheldon/good_job/issues). Questions or suggestions are fantastic.
 - Participate according to our [Code of Conduct](/CODE_OF_CONDUCT.md).
 - Financially support the project via [Sponsorship](https://github.com/sponsors/bensheldon).
 
