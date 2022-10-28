@@ -8,6 +8,7 @@ require "good_job/engine"
 require "good_job/adapter"
 require "active_job/queue_adapters/good_job_adapter"
 require "good_job/active_job_extensions/concurrency"
+require "good_job/active_job_extensions/logging"
 
 require "good_job/assignable_connection"
 require "good_job/cleanup_tracker"

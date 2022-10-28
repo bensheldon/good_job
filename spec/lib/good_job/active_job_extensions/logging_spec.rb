@@ -14,6 +14,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Logging do
       def perform
         logger.info "Hello, world!"
         logger.debug "Debug level!"
+        logger.tagged("TAG") { logger.info "Tagged!" }
       end
     end)
   end
@@ -24,9 +25,13 @@ RSpec.describe GoodJob::ActiveJobExtensions::Logging do
       active_job = TestJob.perform_later
       GoodJob.perform_inline
 
-      job_log = described_class.logs
+      job_log = described_class::LogDevice.logs
       # I expect this tuple would be replaced with a better object eventually, but that can be deferred to later checkpoints.
-      expect(job_log).to eq [[active_job.provider_job_id, 'Hello, world!', 'Debug level!']]
+      expect(job_log).to eq([
+                              [active_job.provider_job_id, 'Hello, world!'],
+                              [active_job.provider_job_id, 'Debug level!'],
+                              [active_job.provider_job_id, '[TAG] Tagged!'],
+                            ])
     end
   end
 end
