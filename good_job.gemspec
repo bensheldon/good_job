@@ -61,7 +61,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "capybara"
   spec.add_development_dependency "database_cleaner"
-  spec.add_development_dependency "dotenv", "~> 2.7.6" # required for Ruby 2.5 support
+  spec.add_development_dependency "dotenv", "~> 2.8.1" # required for Ruby 2.5 support
   spec.add_development_dependency "foreman"
   spec.add_development_dependency "gem-release"
   spec.add_development_dependency "github_changelog_generator"
