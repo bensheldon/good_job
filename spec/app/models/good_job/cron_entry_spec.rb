@@ -109,7 +109,7 @@ describe GoodJob::CronEntry do
     describe 'job execution' do
       it 'executes the job properly' do
         perform_enqueued_jobs do
-          entry.enqueue
+          expect { entry.enqueue }.not_to raise_error
         end
       end
     end

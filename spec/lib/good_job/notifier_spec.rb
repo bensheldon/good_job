@@ -15,7 +15,7 @@ RSpec.describe GoodJob::Notifier do
 
   describe '.notify' do
     it 'sends a message to Postgres' do
-      described_class.notify("hello")
+      expect { described_class.notify("hello") }.not_to raise_error
     end
   end
 

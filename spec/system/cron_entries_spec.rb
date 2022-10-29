@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-describe 'Cron Schedules', type: :system do
+describe 'Cron Schedules' do
   let(:cron_entry) { GoodJob::CronEntry.find(:example) }
 
   before do

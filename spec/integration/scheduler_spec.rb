@@ -76,7 +76,7 @@ RSpec.describe 'Schedule Integration' do
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       max_threads.times { scheduler.create_thread }
 
-      sleep_until(max: 30, increments_of: 0.5) { GoodJob::Execution.unfinished.count == 0 }
+      sleep_until(max: 30, increments_of: 0.5) { GoodJob::Execution.unfinished.count.zero? }
       scheduler.shutdown
 
       expect(GoodJob::Execution.unfinished.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Execution.unfinished.map(&:id)}" }
@@ -111,7 +111,7 @@ RSpec.describe 'Schedule Integration' do
       scheduler.create_thread
 
       sleep_until(max: 10, increments_of: 0.5) do
-        GoodJob::Execution.unfinished.count == 0
+        GoodJob::Execution.unfinished.count.zero?
       end
       scheduler.shutdown
       expect(scheduler).to be_shutdown
@@ -126,7 +126,9 @@ RSpec.describe 'Schedule Integration' do
       scheduler = GoodJob::Scheduler.new(performer)
       scheduler.create_thread
 
-      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Execution.unfinished.count == 0 }
+      wait_until(max: 5, increments_of: 0.5) do
+        expect(GoodJob::Execution.unfinished.count).to eq 0
+      end
 
       scheduler.shutdown
     end
@@ -142,7 +144,7 @@ RSpec.describe 'Schedule Integration' do
       performer = GoodJob::JobPerformer.new('*')
       scheduler = GoodJob::Scheduler.new(performer, max_threads: 5, max_cache: 5)
       scheduler.warm_cache
-      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Execution.unfinished.count == 0 }
+      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Execution.unfinished.count.zero? }
       scheduler.shutdown
       expect(scheduler).to be_shutdown
     end
