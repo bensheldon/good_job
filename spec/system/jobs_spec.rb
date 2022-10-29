@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-describe 'Jobs', type: :system, js: true do
+describe 'Jobs', js: true do
   before do
     allow(GoodJob).to receive(:retry_on_unhandled_error).and_return(false)
     allow(GoodJob).to receive(:preserve_job_records).and_return(true)
@@ -155,30 +155,30 @@ describe 'Jobs', type: :system, js: true do
       visit "/good_job"
       click_on "Jobs"
 
-      expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+      expect(page).to have_field(checked: true, count: 0)
 
       check "toggle_job_ids"
-      expect(page).to have_selector('input[type=checkbox]:checked', count: 3)
+      expect(page).to have_field(checked: true, count: 3)
 
       uncheck "toggle_job_ids"
-      expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+      expect(page).to have_field(checked: true, count: 0)
 
       expect do
         check "toggle_job_ids"
         within("[role=table] header") { accept_confirm { click_on "Reschedule all" } }
-        expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+        expect(page).to have_field(checked: true, count: 0)
       end.to change { unfinished_job.reload.scheduled_at }.to within(1.second).of(Time.current)
 
       expect do
         check "toggle_job_ids"
         within("[role=table] header") { accept_confirm { click_on "Discard all" } }
-        expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+        expect(page).to have_field(checked: true, count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(1).to(2)
 
       expect do
         check "toggle_job_ids"
         within("[role=table] header") { accept_confirm { click_on "Retry all" } }
-        expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+        expect(page).to have_field(checked: true, count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(2).to(0)
 
       visit good_job.jobs_path(limit: 1)
@@ -186,7 +186,7 @@ describe 'Jobs', type: :system, js: true do
         check "toggle_job_ids"
         check "Apply to all 2 jobs"
         within("[role=table] header") { accept_confirm { click_on "Discard all" } }
-        expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+        expect(page).to have_field(checked: true, count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(0).to(2)
 
       visit "/good_job"
@@ -197,7 +197,7 @@ describe 'Jobs', type: :system, js: true do
           click_on "Toggle Actions"
           accept_confirm { click_on "Destroy all" }
         end
-        expect(page).to have_selector('input[type=checkbox]:checked', count: 0)
+        expect(page).to have_field(checked: true, count: 0)
       end.to change(GoodJob::Job, :count).from(2).to(0)
     end
   end

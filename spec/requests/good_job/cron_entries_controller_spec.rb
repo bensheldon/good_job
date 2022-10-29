@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-describe GoodJob::CronEntriesController, type: :request do
+describe GoodJob::CronEntriesController do
   around do |example|
     orig_value = ActionController::Base.allow_forgery_protection
     ActionController::Base.allow_forgery_protection = false

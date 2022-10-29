@@ -106,7 +106,7 @@ RSpec.describe GoodJob::Adapter do
 
   describe '#shutdown' do
     it 'is callable' do
-      adapter.shutdown
+      expect { adapter.shutdown }.not_to raise_error
     end
   end
 

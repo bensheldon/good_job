@@ -6,7 +6,7 @@ module ExampleAppHelper
     FileUtils.rm_rf(example_app_path)
 
     # Rails will not install within a directory containing `bin/rails`
-    File.rename(Rails.root.join("../../bin/rails"), Rails.root.join("../../bin/_rails")) if File.exist?(Rails.root.join("../../bin/rails"))
+    Rails.root.join("../../bin/rails").rename(Rails.root.join("../../bin/_rails")) if Rails.root.join("../../bin/rails").exist?
 
     root_path = example_app_path.join('..')
     FileUtils.cd(root_path) do
@@ -22,7 +22,7 @@ module ExampleAppHelper
   end
 
   def teardown_example_app
-    File.rename(Rails.root.join("../../bin/_rails"), Rails.root.join("../../bin/rails"))
+    Rails.root.join("../../bin/_rails").rename(Rails.root.join("../../bin/rails"))
     FileUtils.rm_rf(example_app_path)
   end
 
