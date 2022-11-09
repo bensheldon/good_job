@@ -59,4 +59,14 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   # config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  if ENV['CODESPACE_NAME'].present?
+    pf_domain = ENV['GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN']
+    pf_port = (Rails::Server.new.options[:Port] if defined?(Rails::Server)).presence || 3000
+    pf_host = "#{ENV['CODESPACE_NAME']}-#{pf_port}.#{pf_domain}"
+
+    config.hosts << pf_host
+    config.action_cable.allowed_request_origins = ["https://#{pf_host}"]
+    config.action_dispatch.default_headers['X-Frame-Options'] = "ALLOW-FROM #{pf_domain}"
+  end
 end
