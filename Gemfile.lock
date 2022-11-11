@@ -169,7 +169,7 @@ GEM
     ffi (1.15.5-java)
     fiber-local (1.0.0)
     foreman (0.87.2)
-    fugit (1.7.1)
+    fugit (1.7.2)
       et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
     gem-release (2.2.2)
