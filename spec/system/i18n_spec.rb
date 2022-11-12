@@ -14,7 +14,7 @@ describe 'I18n Internationalization', js: true do
       expect(page).to have_content "Procesos"
     end
 
-    it "changes wording from English to Spanish" do
+    it "changes wording from English to Ukrainian" do
       visit good_job_path(locale: :en)
 
       expect(page).to have_content "Processes"
