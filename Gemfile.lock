@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    good_job (3.6.0)
+    good_job (3.6.1)
       activejob (>= 6.0.0)
       activerecord (>= 6.0.0)
       concurrent-ruby (>= 1.0.2)
@@ -200,6 +200,7 @@ GEM
       terminal-table (>= 1.5.1)
     jdbc-postgres (42.2.25)
     json (2.6.2)
+    json (2.6.2-java)
     kramdown (2.4.0)
       rexml
     kramdown-parser-gfm (1.1.0)
@@ -372,6 +373,7 @@ GEM
     thor (1.2.1)
     thread (0.2.2)
     thread_safe (0.3.6)
+    thread_safe (0.3.6-java)
     timers (4.3.5)
     tomlrb (2.0.3)
     traces (0.8.0)

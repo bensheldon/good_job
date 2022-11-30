@@ -1,30 +1,54 @@
 # Changelog
 
+## [v3.6.1](https://github.com/bensheldon/good_job/tree/v3.6.1) (2022-11-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.6.0...v3.6.1)
+
+**Implemented enhancements:**
+
+- add UA to i18n [\#747](https://github.com/bensheldon/good_job/pull/747) ([yshmarov](https://github.com/yshmarov))
+
+**Closed issues:**
+
+- Minor Cron Concurrency Clarification [\#743](https://github.com/bensheldon/good_job/issues/743)
+- Materialized CTE performance bottleneck [\#720](https://github.com/bensheldon/good_job/issues/720)
+- Calculating database connections [\#669](https://github.com/bensheldon/good_job/issues/669)
+
+**Merged pull requests:**
+
+- Update gems, rubocop, and development ruby \(v2.7.7\) [\#752](https://github.com/bensheldon/good_job/pull/752) ([bensheldon](https://github.com/bensheldon))
+- Add chrome/chromdriver to Codespace configuration [\#746](https://github.com/bensheldon/good_job/pull/746) ([bensheldon](https://github.com/bensheldon))
+- Add GitHub Codespaces / devcontainer configuration [\#745](https://github.com/bensheldon/good_job/pull/745) ([bensheldon](https://github.com/bensheldon))
+- Bump fugit from 1.7.1 to 1.7.2 [\#742](https://github.com/bensheldon/good_job/pull/742) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bundle update and Rubocop lints [\#740](https://github.com/bensheldon/good_job/pull/740) ([bensheldon](https://github.com/bensheldon))
+- Add dependabot to update development dependencies [\#734](https://github.com/bensheldon/good_job/pull/734) ([bensheldon](https://github.com/bensheldon))
+- Fix misspellings and grammar in README [\#732](https://github.com/bensheldon/good_job/pull/732) ([aisayo](https://github.com/aisayo))
+
 ## [v3.6.0](https://github.com/bensheldon/good_job/tree/v3.6.0) (2022-10-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.5.1...v3.6.0)
 
+**Implemented enhancements:**
+
+- Add configurable limit \(`queue_select_limit`\) when querying candidate jobs [\#727](https://github.com/bensheldon/good_job/pull/727) ([mitchellhenke](https://github.com/mitchellhenke))
+- Add index to `good_jobs` to improve querying candidate jobs [\#726](https://github.com/bensheldon/good_job/pull/726) ([mitchellhenke](https://github.com/mitchellhenke))
+
 **Fixed bugs:**
 
 - 3.4.8 release breaks job retrying [\#728](https://github.com/bensheldon/good_job/issues/728)
-
-**Merged pull requests:**
-
 - Redo: When not preserving job records, ensure all prior executions are deleted after successful retry [\#730](https://github.com/bensheldon/good_job/pull/730) ([bensheldon](https://github.com/bensheldon))
-- Add configurable limit \(`queue_select_limit`\) when querying candidate jobs [\#727](https://github.com/bensheldon/good_job/pull/727) ([mitchellhenke](https://github.com/mitchellhenke))
-- Add index to `good_jobs` to improve querying candidate jobs [\#726](https://github.com/bensheldon/good_job/pull/726) ([mitchellhenke](https://github.com/mitchellhenke))
 
 ## [v3.5.1](https://github.com/bensheldon/good_job/tree/v3.5.1) (2022-10-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.5.0...v3.5.1)
 
+**Fixed bugs:**
+
+- Revert "When not preserving job records, ensure all prior executions are deleted after successful retry" because some retry patterns stopped working [\#729](https://github.com/bensheldon/good_job/pull/729) ([bensheldon](https://github.com/bensheldon))
+
 **Closed issues:**
 
 - Assert cancelled jobs [\#724](https://github.com/bensheldon/good_job/issues/724)
-
-**Merged pull requests:**
-
-- Revert "When not preserving job records, ensure all prior executions are deleted after successful retry" because some retry patterns stopped working [\#729](https://github.com/bensheldon/good_job/pull/729) ([bensheldon](https://github.com/bensheldon))
 
 ## [v3.5.0](https://github.com/bensheldon/good_job/tree/v3.5.0) (2022-10-18)
 
@@ -40,7 +64,7 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.4.7...v3.4.8)
 
-**Merged pull requests:**
+**Fixed bugs:**
 
 - When not preserving job records, ensure all prior executions are deleted after successful retry [\#719](https://github.com/bensheldon/good_job/pull/719) ([ylansegal](https://github.com/ylansegal))
 
@@ -124,6 +148,7 @@
 **Fixed bugs:**
 
 - Jobs enqueued via dashboard ignores app default\_locale [\#697](https://github.com/bensheldon/good_job/issues/697)
+- Enqueues Cron jobs with I18n default locale [\#698](https://github.com/bensheldon/good_job/pull/698) ([esasse](https://github.com/esasse))
 - Include better exception log messages, including class and backtrace [\#693](https://github.com/bensheldon/good_job/pull/693) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
@@ -132,10 +157,6 @@
 - Uninitialized constant GoodJob::JobsController [\#674](https://github.com/bensheldon/good_job/issues/674)
 - ActiveRecord::StatementInvalid: PG::ConnectionBad: PQsocket\(\) can't get socket descriptor every 30 minutes aprox. [\#579](https://github.com/bensheldon/good_job/issues/579)
 - Handle assets in dashboard when rails app is behind proxy path [\#424](https://github.com/bensheldon/good_job/issues/424)
-
-**Merged pull requests:**
-
-- Enqueues Cron jobs with I18n default locale [\#698](https://github.com/bensheldon/good_job/pull/698) ([esasse](https://github.com/esasse))
 
 ## [v3.4.1](https://github.com/bensheldon/good_job/tree/v3.4.1) (2022-08-06)
 
@@ -1022,7 +1043,7 @@
 - Warn in Readme that configuration should not go into `config/initializers/*.rb` [\#418](https://github.com/bensheldon/good_job/pull/418) ([bensheldon](https://github.com/bensheldon))
 - Replace worker wording [\#409](https://github.com/bensheldon/good_job/pull/409) ([Hugo-Hache](https://github.com/Hugo-Hache))
 - Improve Readme's "Optimize queues, threads, processes" section [\#405](https://github.com/bensheldon/good_job/pull/405) ([Hugo-Hache](https://github.com/Hugo-Hache))
-- Update GH Test Matrix with more PG versions [\#401](https://github.com/bensheldon/good_job/pull/401) ([tedhexaflow](https://github.com/tedhexaflow))
+- Update GH Test Matrix with more PG versions [\#401](https://github.com/bensheldon/good_job/pull/401) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
 - Extract cron configuration hash into CronEntry ActiveModel objects [\#400](https://github.com/bensheldon/good_job/pull/400) ([bensheldon](https://github.com/bensheldon))
 - Remove errant copy-paste from app.json [\#397](https://github.com/bensheldon/good_job/pull/397) ([morgoth](https://github.com/morgoth))
 
@@ -1062,7 +1083,7 @@
 
 **Merged pull requests:**
 
-- Update GH Test Matrix with latest JRuby 9.3.0.0 [\#387](https://github.com/bensheldon/good_job/pull/387) ([tedhexaflow](https://github.com/tedhexaflow))
+- Update GH Test Matrix with latest JRuby 9.3.0.0 [\#387](https://github.com/bensheldon/good_job/pull/387) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
 - Improve test support's ShellOut command's process termination and add test logs [\#385](https://github.com/bensheldon/good_job/pull/385) ([bensheldon](https://github.com/bensheldon))
 - @bensheldon Add Rails 7 alpha to Appraisal; update development dependencies [\#384](https://github.com/bensheldon/good_job/pull/384) ([bensheldon](https://github.com/bensheldon))
 
@@ -1321,7 +1342,7 @@
 
 - Have prettier Dashboard asset urls e.g. `bootstrap.css` instead of `bootstrap_css.css` [\#306](https://github.com/bensheldon/good_job/pull/306) ([bensheldon](https://github.com/bensheldon))
 - Create dashboard demo app on Heroku [\#305](https://github.com/bensheldon/good_job/pull/305) ([bensheldon](https://github.com/bensheldon))
-- Add Frozen String Literal to all files [\#302](https://github.com/bensheldon/good_job/pull/302) ([tedhexaflow](https://github.com/tedhexaflow))
+- Add Frozen String Literal to all files [\#302](https://github.com/bensheldon/good_job/pull/302) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
 
 ## [v1.11.2](https://github.com/bensheldon/good_job/tree/v1.11.2) (2021-07-20)
 
@@ -1379,7 +1400,7 @@
 
 **Merged pull requests:**
 
-- Update GH Test Matrix with latest JRuby 9.2.19.0 [\#283](https://github.com/bensheldon/good_job/pull/283) ([tedhexaflow](https://github.com/tedhexaflow))
+- Update GH Test Matrix with latest JRuby 9.2.19.0 [\#283](https://github.com/bensheldon/good_job/pull/283) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
 
 ## [v1.10.0](https://github.com/bensheldon/good_job/tree/v1.10.0) (2021-06-29)
 
@@ -1529,11 +1550,11 @@
 - Move executable flags from constants to accessors on GoodJob::CLI [\#234](https://github.com/bensheldon/good_job/pull/234) ([bensheldon](https://github.com/bensheldon))
 - Add custom Scheduler::TimerSet [\#232](https://github.com/bensheldon/good_job/pull/232) ([bensheldon](https://github.com/bensheldon))
 - Fix assorted constant references in YARD documentation [\#231](https://github.com/bensheldon/good_job/pull/231) ([bensheldon](https://github.com/bensheldon))
-- Update GH Test Matrix with latest JRuby 9.2.17.0 [\#228](https://github.com/bensheldon/good_job/pull/228) ([tedhexaflow](https://github.com/tedhexaflow))
+- Update GH Test Matrix with latest JRuby 9.2.17.0 [\#228](https://github.com/bensheldon/good_job/pull/228) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
 - Update gem dependencies [\#227](https://github.com/bensheldon/good_job/pull/227) ([bensheldon](https://github.com/bensheldon))
 - Remove leftover text from Readme [\#226](https://github.com/bensheldon/good_job/pull/226) ([weh](https://github.com/weh))
 - Fix appraisal and bundler version CI conflicts [\#224](https://github.com/bensheldon/good_job/pull/224) ([bensheldon](https://github.com/bensheldon))
-- Update GH Test Matrix with latest JRuby [\#223](https://github.com/bensheldon/good_job/pull/223) ([tedhexaflow](https://github.com/tedhexaflow))
+- Update GH Test Matrix with latest JRuby [\#223](https://github.com/bensheldon/good_job/pull/223) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
 
 ## [v1.8.0](https://github.com/bensheldon/good_job/tree/v1.8.0) (2021-03-04)
 
@@ -1616,8 +1637,8 @@
 **Merged pull requests:**
 
 - Update bundler version to 2.2.5 [\#200](https://github.com/bensheldon/good_job/pull/200) ([bensheldon](https://github.com/bensheldon))
-- Update GH Test Matrix with minimum & latest JRuby version [\#197](https://github.com/bensheldon/good_job/pull/197) ([tedhexaflow](https://github.com/tedhexaflow))
-- Fix JRuby version number [\#193](https://github.com/bensheldon/good_job/pull/193) ([tedhexaflow](https://github.com/tedhexaflow))
+- Update GH Test Matrix with minimum & latest JRuby version [\#197](https://github.com/bensheldon/good_job/pull/197) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
+- Fix JRuby version number [\#193](https://github.com/bensheldon/good_job/pull/193) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
 
 ## [v1.4.1](https://github.com/bensheldon/good_job/tree/v1.4.1) (2021-01-09)
 
