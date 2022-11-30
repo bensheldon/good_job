@@ -200,6 +200,7 @@ GEM
       terminal-table (>= 1.5.1)
     jdbc-postgres (42.2.25)
     json (2.6.2)
+    json (2.6.2-java)
     kramdown (2.4.0)
       rexml
     kramdown-parser-gfm (1.1.0)
@@ -244,7 +245,7 @@ GEM
     parallel (1.22.1)
     parser (3.1.2.1)
       ast (~> 2.4.1)
-    pg (1.4.4)
+    pg (1.4.5)
     protocol-hpack (1.4.2)
     protocol-http (0.23.12)
     protocol-http1 (0.14.6)
@@ -372,6 +373,7 @@ GEM
     thor (1.2.1)
     thread (0.2.2)
     thread_safe (0.3.6)
+    thread_safe (0.3.6-java)
     timers (4.3.5)
     tomlrb (2.0.3)
     traces (0.7.0)
@@ -436,4 +438,4 @@ DEPENDENCIES
   yard-activesupport-concern
 
 BUNDLED WITH
-  2.3.25
+   2.3.26
