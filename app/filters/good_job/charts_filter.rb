@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 module GoodJob
-  class PerformanceFilter < BaseFilter
+  class ChartsFilter < BaseFilter
     DURATIONS = {
       "2m" => '1 second',
       "2h" => '1 minute',

@@ -2,7 +2,7 @@
 GoodJob::Engine.routes.draw do
   root to: redirect(path: 'jobs')
 
-  resources :performances, only: %i[index]
+  resources :charts, only: %i[index]
 
   resources :jobs, only: %i[index show destroy] do
     collection do
