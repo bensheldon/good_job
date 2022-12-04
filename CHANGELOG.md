@@ -1,5 +1,14 @@
 # Changelog
 
+## [v3.6.2](https://github.com/bensheldon/good_job/tree/v3.6.2) (2022-12-04)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.6.1...v3.6.2)
+
+**Merged pull requests:**
+
+- Redirect to Jobs path after destroy [\#754](https://github.com/bensheldon/good_job/pull/754) ([BilalBudhani](https://github.com/BilalBudhani))
+- Bump pg from 1.4.4 to 1.4.5 [\#751](https://github.com/bensheldon/good_job/pull/751) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.6.1](https://github.com/bensheldon/good_job/tree/v3.6.1) (2022-11-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.6.0...v3.6.1)
