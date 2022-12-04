@@ -2,6 +2,9 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
+ruby_version = ENV.fetch('GEMFILE_RUBY_VERSION', nil)
+ruby ruby_version if ruby_version
+
 # Declare your gem's dependencies in good_job.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
