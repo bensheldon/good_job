@@ -80,7 +80,7 @@ module GoodJob
     def destroy
       @job = Job.find(params[:id])
       @job.destroy_job
-      redirect_back(fallback_location: jobs_path, notice: "Job has been destroyed")
+      redirect_to jobs_path, notice: "Job has been destroyed" # rubocop:disable Rails/I18nLocaleTexts
     end
 
     private
