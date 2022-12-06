@@ -135,7 +135,7 @@ jobs:
         with:
           bundler-cache: true
       - name: Cache Appraisal gems
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: gemfiles/vendor/bundle
           key: v1-bundler-${{ runner.os }}-${{ matrix.ruby }}-${{ hashFiles('Gemfile.lock', 'gemfiles/*.gemfile.lock') }}
