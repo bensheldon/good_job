@@ -167,7 +167,7 @@ jobs:
 
       # Archive
       - name: Archive system spec screenshots
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: screenshots
@@ -175,7 +175,7 @@ jobs:
             spec/test_app/tmp/screenshots
             spec/test_app/tmp/capybara
       - name: Archive Rails logs
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: rails_logs
