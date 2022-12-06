@@ -30,14 +30,14 @@ jobs:
 
       - name: 'Project v2: Add Issue'
         if: ${{ github.event_name == 'issues' && env.gh_token }}
-        uses: actions/add-to-project@a9f041ddd462ed185893ea1024cec954f50dbe42
+        uses: actions/add-to-project@960fbad431afda394cfcf8743445e741acd19e85
         with:
           project-url: https://github.com/users/bensheldon/projects/3
           github-token: ${{ env.gh_token }}
 
       - name: "Project v2: Add Pull Request"
         if: ${{ github.event_name == 'pull_request' && env.gh_token }}
-        uses: actions/add-to-project@a9f041ddd462ed185893ea1024cec954f50dbe42
+        uses: actions/add-to-project@960fbad431afda394cfcf8743445e741acd19e85
         with:
           project-url: https://github.com/users/bensheldon/projects/3
           github-token: ${{ env.gh_token }}
