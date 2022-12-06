@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: 'Project v1: Add Issue'
         if: ${{ github.event_name == 'issues' && env.gh_token }}
-        uses: alex-page/github-project-automation-plus@9a05133789dbc96bd560ec84223a0ad49253d342
+        uses: alex-page/github-project-automation-plus@1f8873e97e3c8f58161a323b7c568c1f623a1c4d
         with:
           project: Backlog
           column: Inbox
@@ -22,7 +22,7 @@ jobs:
 
       - name: "Project v1: Add Pull Request"
         if: ${{ github.event_name == 'pull_request' && env.gh_token }}
-        uses: alex-page/github-project-automation-plus@9a05133789dbc96bd560ec84223a0ad49253d342
+        uses: alex-page/github-project-automation-plus@1f8873e97e3c8f58161a323b7c568c1f623a1c4d
         with:
           project: Backlog
           column: In progress
