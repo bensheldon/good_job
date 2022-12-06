@@ -22,6 +22,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+          rubygems: latest
 
       # Lint
       - name: Run linter
@@ -61,6 +62,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+          rubygems: latest
 
       # Validate Development Environment
       - name: bin/setup
@@ -74,7 +76,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        ruby: [2.5, 2.6, 2.7, "3.0", 3.1, jruby-9.2, jruby-9.3]
+        ruby: [2.5, 2.6, 2.7, "3.0", 3.1, jruby-9.3]
         pg: [14]
         include:
           - ruby: "3.0"
@@ -127,7 +129,7 @@ jobs:
           bundler-cache: false
       - name: Delete and recreate Gemfile.lock
         run: |
-          rm Gemfile.lock && bundle lock
+          rm Gemfile.lock && bundle lock && cat Gemfile.lock
       - name: Set up Ruby and bundle install
         uses: ruby/setup-ruby@v1
         with:
