@@ -221,8 +221,7 @@ module GoodJob
       )&.to_i
     end
 
-    # Whether to destroy discarded jobs when cleaning up preserved jobs.
-    # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
+    # Whether to automatically destroy discarded jobs that have been preserved.
     # @return [Boolean]
     def cleanup_discarded_jobs?
       return rails_config[:cleanup_discarded_jobs] unless rails_config[:cleanup_discarded_jobs].nil?
@@ -231,8 +230,7 @@ module GoodJob
       true
     end
 
-    # Number of seconds to preserve jobs when using the +good_job cleanup_preserved_jobs+ CLI command.
-    # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
+    # Number of seconds to preserve jobs before automatic destruction.
     # @return [Integer]
     def cleanup_preserved_jobs_before_seconds_ago
       (
@@ -243,7 +241,7 @@ module GoodJob
       ).to_i
     end
 
-    # Number of jobs a {Scheduler} will execute before cleaning up preserved jobs.
+    # Number of jobs a {Scheduler} will execute before automatically cleaning up preserved jobs.
     # @return [Integer, nil]
     def cleanup_interval_jobs
       value = (
@@ -254,7 +252,7 @@ module GoodJob
       value.present? ? value.to_i : nil
     end
 
-    # Number of seconds a {Scheduler} will wait before cleaning up preserved jobs.
+    # Number of seconds a {Scheduler} will wait before automatically cleaning up preserved jobs.
     # @return [Integer, nil]
     def cleanup_interval_seconds
       value = (

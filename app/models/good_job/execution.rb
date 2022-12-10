@@ -300,7 +300,7 @@ module GoodJob
       reenqueued = result.retried? || retried_good_job_id.present?
       if result.unhandled_error && GoodJob.retry_on_unhandled_error
         save!
-      elsif GoodJob.preserve_job_records == true || reenqueued || (result.unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error)
+      elsif GoodJob.preserve_job_records == true || reenqueued || (result.unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error) || cron_key.present?
         self.finished_at = Time.current
         save!
       else

@@ -128,17 +128,10 @@ module GoodJob
     # @!macro thor.desc
     desc :cleanup_preserved_jobs, "Destroys preserved job records."
     long_desc <<~DESCRIPTION
-      Destroys preserved job records.
+      Manually destroys preserved job records.
 
-      By default, GoodJob destroys job records when the job is performed and this
-      command is not necessary.
-
-      However, when `GoodJob.preserve_job_records = true`, the jobs will be
-      preserved in the database. This is useful when wanting to analyze or
-      inspect job performance.
-
-      If you are preserving job records this way, use this command regularly
-      to destroy old records and preserve space in your database.
+      By default, GoodJob automatically destroys job records when the job is performed
+      and this command is not required to be used.
 
     DESCRIPTION
     method_option :before_seconds_ago,
