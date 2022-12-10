@@ -1,12 +1,38 @@
 # Changelog
 
+## [v3.7.0](https://github.com/bensheldon/good_job/tree/v3.7.0) (2022-12-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.6.2...v3.7.0)
+
+**Implemented enhancements:**
+
+- Add GoodJob version to start banner [\#766](https://github.com/bensheldon/good_job/pull/766) ([zarqman](https://github.com/zarqman))
+
+**Fixed bugs:**
+
+- Always preserve job records created by cron [\#767](https://github.com/bensheldon/good_job/pull/767) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Bump nokogiri from 1.13.9 to 1.13.10 [\#765](https://github.com/bensheldon/good_job/pull/765) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Remove JRuby 9.2 from testing matrix [\#763](https://github.com/bensheldon/good_job/pull/763) ([bensheldon](https://github.com/bensheldon))
+- Bump actions/cache from 1 to 3 [\#762](https://github.com/bensheldon/good_job/pull/762) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/upload-artifact from 2 to 3 [\#761](https://github.com/bensheldon/good_job/pull/761) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/add-to-project from 0.3.0 to 0.4.0 [\#759](https://github.com/bensheldon/good_job/pull/759) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump alex-page/github-project-automation-plus from 9a05133789dbc96bd560ec84223a0ad49253d342 to 1f8873e97e3c8f58161a323b7c568c1f623a1c4d [\#758](https://github.com/bensheldon/good_job/pull/758) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump selenium-webdriver from 4.6.1 to 4.7.1 [\#757](https://github.com/bensheldon/good_job/pull/757) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add explicit ruby version in Gemfile for Heroku demo [\#755](https://github.com/bensheldon/good_job/pull/755) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.6.2](https://github.com/bensheldon/good_job/tree/v3.6.2) (2022-12-04)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.6.1...v3.6.2)
 
-**Merged pull requests:**
+**Fixed bugs:**
 
 - Redirect to Jobs path after destroy [\#754](https://github.com/bensheldon/good_job/pull/754) ([BilalBudhani](https://github.com/BilalBudhani))
+
+**Merged pull requests:**
+
 - Bump pg from 1.4.4 to 1.4.5 [\#751](https://github.com/bensheldon/good_job/pull/751) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v3.6.1](https://github.com/bensheldon/good_job/tree/v3.6.1) (2022-11-30)
