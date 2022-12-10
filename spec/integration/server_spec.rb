@@ -33,7 +33,7 @@ RSpec.describe 'Server modes', skip_if_java: true do
       ShellOut.command("bundle exec rails s -p #{port} -P #{pidfile}", env: env) do |shell|
         wait_until(max: 30) do
           expect(shell.output).to include(/Listening on/)
-          expect(shell.output).to include(/GoodJob started scheduler/)
+          expect(shell.output).to include(/GoodJob [0-9.]+ started scheduler/)
           expect(shell.output).to include(/GoodJob started cron/)
         end
       end
@@ -48,7 +48,7 @@ RSpec.describe 'Server modes', skip_if_java: true do
         wait_until(max: 30) do
           expect(shell.output).to include(/Current version/)
         end
-        expect(shell.output).not_to include(/GoodJob started scheduler/)
+        expect(shell.output).not_to include(/GoodJob [0-9.]+ started scheduler/)
       end
     end
   end
