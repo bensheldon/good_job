@@ -432,6 +432,22 @@ RSpec.describe GoodJob::Execution do
       end
     end
 
+    context 'when the job is a cron job and records are not preserved' do
+      before do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(false)
+        TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+        good_job.update(cron_key: "test_key", cron_at: Time.current)
+      end
+
+      it 'preserves the job record anyway' do
+        good_job.perform
+        expect(good_job.reload).to have_attributes(
+          performed_at: within(1.second).of(Time.current),
+          finished_at: within(1.second).of(Time.current)
+        )
+      end
+    end
+
     it 'raises an error if the job is attempted to be re-run' do
       good_job.update!(finished_at: Time.current)
       expect { good_job.perform }.to raise_error described_class::PreviouslyPerformedError

@@ -203,17 +203,10 @@ Usage:
 Options:
   [--before-seconds-ago=SECONDS] # Destroy records finished more than this many seconds ago (env var:  GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 1209600 (14 days))
 
-Destroys preserved job records.
+Manually destroys preserved job records.
 
-By default, GoodJob destroys job records when the job is performed and this
-command is not necessary.
-
-However, when `GoodJob.preserve_job_records = true`, the jobs will be
-preserved in the database. This is useful when wanting to analyze or
-inspect job performance.
-
-If you are preserving job records this way, use this command regularly
-to destroy old records and preserve space in your database.
+By default, GoodJob automatically destroys job records when the job is performed
+and this command is not required to be used.
 ```
 
 ### Configuration options
@@ -460,7 +453,9 @@ GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry 
 
 GoodJob can enqueue jobs on a recurring basis that can be used as a replacement for cron.
 
-Cron-style jobs are run on every GoodJob process (e.g. CLI or `async` execution mode) when `config.good_job.enable_cron = true`, but GoodJob's cron uses unique indexes to ensure that only a single job is enqueued at the given time interval.
+Cron-style jobs are run on every GoodJob process (e.g. CLI or `async` execution mode) when `config.good_job.enable_cron = true`.
+
+GoodJob's cron uses unique indexes to ensure that only a single job is enqueued at the given time interval. In order for this to work, GoodJob must preserve cron-created job records; these records will be automatically deleted like any other preserved record.
 
 Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`) and natural language parsing (e.g. `every second`).
 
