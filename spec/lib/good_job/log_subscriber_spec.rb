@@ -23,7 +23,7 @@ RSpec.describe GoodJob::LogSubscriber do
       event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", {})
 
       subscriber.scheduler_create_pool(event)
-      expect(logs.string).to include("GoodJob started scheduler with queues= max_threads=")
+      expect(logs.string).to include("GoodJob #{GoodJob::VERSION} started scheduler with queues= max_threads=")
     end
 
     it 'logs output with a tagged logger with missing formatter' do
@@ -34,7 +34,7 @@ RSpec.describe GoodJob::LogSubscriber do
       event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", {})
 
       subscriber.scheduler_create_pool(event)
-      expect(logs.string).to include("GoodJob started scheduler with queues= max_threads=")
+      expect(logs.string).to include("GoodJob #{GoodJob::VERSION} started scheduler with queues= max_threads=")
     end
   end
 end

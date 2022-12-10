@@ -53,7 +53,7 @@ module GoodJob
       process_id = event.payload[:process_id]
 
       info(tags: [process_id]) do
-        "GoodJob started scheduler with queues=#{performer_name} max_threads=#{max_threads}."
+        "GoodJob #{GoodJob::VERSION} started scheduler with queues=#{performer_name} max_threads=#{max_threads}."
       end
     end
 
