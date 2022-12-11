@@ -244,22 +244,26 @@ module GoodJob
     # Number of jobs a {Scheduler} will execute before automatically cleaning up preserved jobs.
     # @return [Integer, nil]
     def cleanup_interval_jobs
-      value = (
-        rails_config[:cleanup_interval_jobs] ||
-          env['GOOD_JOB_CLEANUP_INTERVAL_JOBS'] ||
-          DEFAULT_CLEANUP_INTERVAL_JOBS
-      )
+      value = if rails_config.key?(:cleanup_interval_jobs)
+                rails_config[:cleanup_interval_jobs]
+              elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_JOBS')
+                env['GOOD_JOB_CLEANUP_INTERVAL_JOBS']
+              else
+                DEFAULT_CLEANUP_INTERVAL_JOBS
+              end
       value.present? ? value.to_i : nil
     end
 
     # Number of seconds a {Scheduler} will wait before automatically cleaning up preserved jobs.
     # @return [Integer, nil]
     def cleanup_interval_seconds
-      value = (
-        rails_config[:cleanup_interval_seconds] ||
-          env['GOOD_JOB_CLEANUP_INTERVAL_SECONDS'] ||
-          DEFAULT_CLEANUP_INTERVAL_SECONDS
-      )
+      value = if rails_config.key?(:cleanup_interval_seconds)
+                rails_config[:cleanup_interval_seconds]
+              elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_SECONDS')
+                env['GOOD_JOB_CLEANUP_INTERVAL_SECONDS']
+              else
+                DEFAULT_CLEANUP_INTERVAL_SECONDS
+              end
       value.present? ? value.to_i : nil
     end
 

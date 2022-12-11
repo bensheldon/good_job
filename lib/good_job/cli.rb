@@ -137,7 +137,7 @@ module GoodJob
     method_option :before_seconds_ago,
                   type: :numeric,
                   banner: 'SECONDS',
-                  desc: "Destroy records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 86400)"
+                  desc: "Destroy records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 1209600 (14 days))"
 
     def cleanup_preserved_jobs
       set_up_application!
