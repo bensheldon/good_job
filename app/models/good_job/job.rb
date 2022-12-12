@@ -206,7 +206,7 @@ module GoodJob
     def discard_job(message)
       with_advisory_lock do
         execution = head_execution(reload: true)
-        active_job = execution.active_job
+        active_job = execution.active_job(ignore_deserialization_errors: true)
 
         raise ActionForStateMismatchError if execution.finished_at.present?
 
