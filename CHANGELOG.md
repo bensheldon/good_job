@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.7.1](https://github.com/bensheldon/good_job/tree/v3.7.1) (2022-12-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.0...v3.7.1)
+
+**Fixed bugs:**
+
+- Fix disabling of interval cleanups [\#768](https://github.com/bensheldon/good_job/pull/768) ([zarqman](https://github.com/zarqman))
+
 ## [v3.7.0](https://github.com/bensheldon/good_job/tree/v3.7.0) (2022-12-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.6.2...v3.7.0)
