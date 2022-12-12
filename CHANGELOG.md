@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.7.2](https://github.com/bensheldon/good_job/tree/v3.7.2) (2022-12-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.1...v3.7.2)
+
+**Closed issues:**
+
+- Unable to discard failed jobs which crashed with `ActiveJob::DeserializationError` [\#770](https://github.com/bensheldon/good_job/issues/770)
+
+**Merged pull requests:**
+
+- Ignore ActiveJob::DeserializationError when discarding jobs [\#771](https://github.com/bensheldon/good_job/pull/771) ([nickcampbell18](https://github.com/nickcampbell18))
+- Bump rubocop from 1.39.0 to 1.40.0 [\#769](https://github.com/bensheldon/good_job/pull/769) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.7.1](https://github.com/bensheldon/good_job/tree/v3.7.1) (2022-12-12)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.0...v3.7.1)
