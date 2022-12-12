@@ -59,7 +59,7 @@ task :release_good_job, [:version_bump] do |_t, args|
   puts "\n== Creating sha256 checksum too =="
   require "digest/sha2"
   gem_filename = "good_job-#{GoodJob::VERSION}.gem"
-  sha256_checksum = ::Digest::SHA256.hexdigest File.read "#{__dir__}/pkg/#{gem_filename}"
+  sha256_checksum = Digest::SHA256.hexdigest File.read "#{__dir__}/pkg/#{gem_filename}"
   File.write "#{__dir__}/checksums/#{gem_filename}.sha256", "#{sha256_checksum}\n"
 
   puts "\n== Creating git commit  =="
