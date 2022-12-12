@@ -273,8 +273,8 @@ Available configuration options are:
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
 - `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`. _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
 - `cleanup_preserved_jobs_before_seconds_ago` (integer) number of seconds to preserve jobs when using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `1209600` (14 days). Can also be set with  the environment variable `GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO`.  _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
-- `cleanup_interval_jobs` (integer) Number of jobs a Scheduler will execute before cleaning up preserved jobs. Defaults to `1000`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_JOBS`.
-- `cleanup_interval_seconds` (integer) Number of seconds a Scheduler will wait before cleaning up preserved jobs. Defaults to `600` (10 minutes). Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_SECONDS`.
+- `cleanup_interval_jobs` (integer) Number of jobs a Scheduler will execute before cleaning up preserved jobs. Defaults to `1000`. Disable with `nil`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_JOBS`.
+- `cleanup_interval_seconds` (integer) Number of seconds a Scheduler will wait before cleaning up preserved jobs. Defaults to `600` (10 minutes). Disable with `nil`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_SECONDS`.
 - `inline_execution_respects_schedule` (boolean) Opt-in to future behavior of inline execution respecting scheduled jobs. Defaults to `false`.
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
 - `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
@@ -926,9 +926,9 @@ config.good_job.preserve_job_records = false # defaults to true; can also be `fa
 GoodJob will automatically delete preserved job records after 14 days. The retention period, as well as the frequency GoodJob checks for deletable records can be configured:
 
 ```ruby
-config.good_job.cleanup_preserved_jobs_before_seconds_ago = 14.days.to_i
+config.good_job.cleanup_preserved_jobs_before_seconds_ago = 14.days
 config.good_job.cleanup_interval_jobs = 1_000 # Number of executed jobs between deletion sweeps.
-config.good_job.cleanup_interval_seconds = 10.minutes.to_i # Number of seconds between deletion sweeps.
+config.good_job.cleanup_interval_seconds = 10.minutes # Number of seconds between deletion sweeps.
 ```
 
 It is also possible to manually trigger a cleanup of preserved job records:
