@@ -229,6 +229,28 @@ RSpec.describe GoodJob::Job do
         expect { job.discard_job("Discard in test") }.to raise_error GoodJob::Job::ActionForStateMismatchError
       end
     end
+
+    context 'when job arguments cannot be deserialized' do
+      let(:deserialization_exception) do
+        # `ActiveJob::DeserializationError` looks at `$!` (last exception), so to create
+        # an instance of this exception we need to trigger a canary exception first.
+        original_exception = StandardError.new("Unsupported argument")
+        begin
+          raise original_exception
+        rescue StandardError
+          ActiveJob::DeserializationError.new
+        end
+      end
+
+      it 'ignores the error and discards the job' do
+        allow_any_instance_of(ActiveJob::Base).to receive(:deserialize_arguments_if_needed).and_raise(deserialization_exception)
+        expect_any_instance_of(ActiveJob::Base).to receive(:deserialize_arguments_if_needed)
+
+        expect do
+          job.discard_job("Discarded in test")
+        end.to change { job.reload.status }.from(:scheduled).to(:discarded)
+      end
+    end
   end
 
   describe '#reschedule_job' do
