@@ -26,6 +26,10 @@ platforms :ruby do
   gem "activerecord-explain-analyze"
   gem "pry-byebug"
 
+  gem 'net-imap', require: false
+  gem 'net-pop', require: false
+  gem 'net-smtp', require: false
+
   group :lint do
     gem 'easy_translate'
     gem "erb_lint"
