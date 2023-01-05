@@ -144,6 +144,8 @@ GEM
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
+    date (3.3.3)
+    date (3.3.3-java)
     diff-lcs (1.5.0)
     dotenv (2.7.6)
     easy_translate (0.5.1)
@@ -227,6 +229,15 @@ GEM
     mixlib-shellout (3.2.7)
       chef-utils
     multi_json (1.15.0)
+    net-imap (0.3.4)
+      date
+      net-protocol
+    net-pop (0.1.2)
+      net-protocol
+    net-protocol (0.2.1)
+      timeout
+    net-smtp (0.3.3)
+      net-protocol
     nio4r (2.5.8)
     nio4r (2.5.8-java)
     nokogiri (1.13.10)
@@ -374,6 +385,7 @@ GEM
     thread (0.2.2)
     thread_safe (0.3.6)
     thread_safe (0.3.6-java)
+    timeout (0.3.1)
     timers (4.3.5)
     tomlrb (2.0.3)
     traces (0.8.0)
@@ -423,6 +435,9 @@ DEPENDENCIES
   kramdown-parser-gfm
   matrix
   mdl
+  net-imap
+  net-pop
+  net-smtp
   nokogiri
   pg
   pry-byebug
