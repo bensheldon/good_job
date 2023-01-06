@@ -248,7 +248,7 @@ module GoodJob
     #   Whether to establish a lock on the {Execution} record after it is created.
     # @return [Execution]
     #   The new {Execution} instance representing the queued ActiveJob job.
-    def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
+    def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false, bulk_buffer: nil)
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         execution_args = {
           active_job_id: active_job.job_id,
@@ -272,7 +272,12 @@ module GoodJob
 
         instrument_payload[:execution] = execution
 
-        execution.save_or_add_to_bulk_buffer!
+        if bulk_buffer
+          bulk_buffer << execution
+        else
+          execution.save!
+        end
+
         active_job.provider_job_id = execution.id
 
         CurrentThread.execution.retried_good_job_id = execution.id if CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
@@ -369,18 +374,6 @@ module GoodJob
       destroy!
     ensure
       @_destroy_job = false
-    end
-
-    # Either saves the freshly created execution or adds it
-    # to the current bulk buffer for bulk-insert
-    # @return [void]
-    def save_or_add_to_bulk_buffer!
-      if GoodJob::CurrentThread.bulk_buffer
-        raise_validation_error unless perform_validations({})
-        GoodJob::CurrentThread.bulk_buffer << attributes
-      else
-        save!
-      end
     end
 
     private

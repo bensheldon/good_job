@@ -40,15 +40,29 @@ module GoodJob
       enqueue_at(active_job, nil)
     end
 
+    def enqueue_all(active_jobs)
+      bulk_buffer = []
+      active_jobs.each do |job|
+        scheduled_at = extract_scheduled_at_from(job, nil)
+        enqueue_at(job, scheduled_at: scheduled_at, create_with_advisory_lock: false, bulk_buffer: bulk_buffer)
+      end
+      t = Time.current
+      bulk_buffer.each_slice(5000).flat_map do |executions|
+        insert_all_attributes = executions.map do |ex|
+          ex.attributes.merge("created_at" => t, "updated_at" => t, "id" => ex.id)
+        end
+        insert_all(insert_all_attributes)
+      end
+      []
+    end
+
     # Enqueues an ActiveJob job to be run at a specific time.
     # For use by Rails; you should generally not call this directly.
     # @param active_job [ActiveJob::Base] the job to be enqueued from +#perform_later+
     # @param timestamp [Integer, nil] the epoch time to perform the job
     # @return [GoodJob::Execution]
     def enqueue_at(active_job, timestamp)
-      scheduled_at_from_job = active_job.respond_to?(:scheduled_at) && active_job.scheduled_at
-      scheduled_at_from_timestamp = timestamp && Time.zone.at(timestamp)
-      scheduled_at = scheduled_at_from_timestamp || scheduled_at_from_job || nil
+      scheduled_at = extract_scheduled_at_from(active_job, timestamp)
       will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
 
       execution = GoodJob::Execution.enqueue(
@@ -145,6 +159,12 @@ module GoodJob
     end
 
     private
+
+    def extract_scheduled_at_from(active_job, timestamp)
+      scheduled_at_from_job = active_job.respond_to?(:scheduled_at) && active_job.scheduled_at
+      scheduled_at_from_timestamp = timestamp && Time.zone.at(timestamp)
+      scheduled_at_from_timestamp || scheduled_at_from_job || nil
+    end
 
     # Whether running in a web server process.
     # @return [Boolean, nil]
