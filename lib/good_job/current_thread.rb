@@ -12,6 +12,7 @@ module GoodJob
       error_on_discard
       error_on_retry
       execution
+      bulk_buffer
     ].freeze
 
     # @!attribute [rw] cron_at
@@ -43,6 +44,12 @@ module GoodJob
     #   Execution
     #   @return [GoodJob::Execution, nil]
     thread_mattr_accessor :execution
+
+    # @!attribute [rw] bulk_buffer
+    #   @!scope class
+    #   Current bulk buffer
+    #   @return [Array<Hash>, nil]
+    thread_mattr_accessor :bulk_buffer
 
     # Resets attributes
     # @param [Hash] values to assign

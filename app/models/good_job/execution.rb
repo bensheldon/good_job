@@ -272,7 +272,7 @@ module GoodJob
 
         instrument_payload[:execution] = execution
 
-        execution.save!
+        execution.save_or_add_to_bulk_buffer!
         active_job.provider_job_id = execution.id
 
         CurrentThread.execution.retried_good_job_id = execution.id if CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
@@ -369,6 +369,18 @@ module GoodJob
       destroy!
     ensure
       @_destroy_job = false
+    end
+
+    # Either saves the freshly created execution or adds it
+    # to the current bulk buffer for bulk-insert
+    # @return [void]
+    def save_or_add_to_bulk_buffer!
+      if GoodJob::CurrentThread.bulk_buffer
+        raise_validation_error unless perform_validations({})
+        GoodJob::CurrentThread.bulk_buffer << attributes
+      else
+        save!
+      end
     end
 
     private

@@ -180,6 +180,30 @@ module GoodJob
     end
   end
 
+  # Instead of INSERTing the job immediately, buffers all the jobs generated
+  # within the block, and uses a bulk insert (`insert_all`) to insert them in
+  # bursts. This can be very useful when you have a task which enqueues large
+  # numbers of jobs - like a big e-mail push. The INSERTs per job do add up,
+  # making the performance of the enqueueing task worse. After a certain number
+  # it is more efficient to insert the jobs in bulk.
+  # @param bulk_size [Integer] How many jobs to insert at once
+  # @return [Object] The return value of the passed block
+  def self.in_bulk(bulk_size: 5000)
+    buf = []
+    GoodJob::CurrentThread.bulk_buffer = buf
+    yield.tap do
+      t_now = Time.now.utc
+      buf.each_slice(bulk_size) do |buf_slice|
+        buf_slice.each do |attrs|
+          attrs.merge!("created_at" => t_now, "updated_at" => t_now, "id" => SecureRandom.uuid)
+        end
+        GoodJob::Execution.insert_all(buf_slice)
+      end
+    end
+  ensure
+    GoodJob::CurrentThread.bulk_buffer = nil
+  end
+
   def self._executables
     [].concat(
       CronManager.instances,
