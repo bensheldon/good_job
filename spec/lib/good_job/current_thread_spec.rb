@@ -10,7 +10,6 @@ RSpec.describe GoodJob::CurrentThread do
     :execution,
     :error_on_discard,
     :error_on_retry,
-    :bulk_buffer,
   ].each do |accessor|
     describe ".#{accessor}" do
       it 'maintains value across threads' do
@@ -58,7 +57,6 @@ RSpec.describe GoodJob::CurrentThread do
         error_on_discard: false,
         error_on_retry: false,
         execution: instance_double(GoodJob::Execution),
-        bulk_buffer: nil,
       }
 
       described_class.reset(value)
