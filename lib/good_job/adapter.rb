@@ -49,18 +49,19 @@ module GoodJob
     # @param active_job [Array<ActiveJob::Base>] all the jobs to be enqueued
     # @return [Object] The return value of the passed block
     def enqueue_all(active_jobs)
-      bulk_buffer = []
-      active_jobs.each do |job|
-        scheduled_at = extract_scheduled_at_from(job, nil)
-        enqueue_at(job, scheduled_at: scheduled_at, create_with_advisory_lock: false, bulk_buffer: bulk_buffer)
+      executions = active_jobs.map do |active_job|
+        GoodJob::Execution.enqueue(
+          active_job,
+          scheduled_at: extract_scheduled_at_from(active_job, nil),
+          create_with_advisory_lock: will_execute_inline,
+          persist_immediately: false
+        )
       end
       t = Time.current
-      bulk_buffer.each_slice(5000).flat_map do |executions|
-        insert_all_attributes = executions.map do |ex|
-          ex.attributes.merge("created_at" => t, "updated_at" => t, "id" => ex.id)
-        end
-        insert_all(insert_all_attributes)
+      values_for_insert_all = executions.map do |ex|
+        ex.attributes.merge("created_at" => t, "updated_at" => t, "id" => ex.id)
       end
+      insert_all(values_for_insert_all)
       []
     end
 
@@ -76,7 +77,8 @@ module GoodJob
       execution = GoodJob::Execution.enqueue(
         active_job,
         scheduled_at: scheduled_at,
-        create_with_advisory_lock: will_execute_inline
+        create_with_advisory_lock: will_execute_inline,
+        persist_immediately: true
       )
 
       if will_execute_inline
