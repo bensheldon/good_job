@@ -55,6 +55,39 @@ RSpec.describe GoodJob::Execution do
     end
   end
 
+  describe '.enqueue with bulk enqueue enabled' do
+    let(:active_job) { TestJob.new }
+
+    it 'creates a new GoodJob record' do
+      execution = nil
+
+      expect do
+        GoodJob.in_bulk do
+          execution = described_class.enqueue(active_job)
+        end
+      end.to change(described_class, :count).by(1)
+
+      expect(execution).to have_attributes(
+        active_job_id: a_kind_of(String),
+        serialized_params: a_kind_of(Hash),
+        queue_name: 'test',
+        priority: 50,
+        scheduled_at: nil
+      )
+    end
+
+    it 'enqueues all jobs at once' do
+      initial_count = described_class.count
+      GoodJob.in_bulk(bulk_size: 20) do
+        22.times do
+          described_class.enqueue(active_job)
+          expect(described_class.count).to eq(initial_count)
+        end
+      end
+      expect(described_class.count).to eq(initial_count + 22)
+    end
+  end
+
   describe '.perform_with_advisory_lock' do
     context 'with one job' do
       let(:active_job) { TestJob.new('a string') }
