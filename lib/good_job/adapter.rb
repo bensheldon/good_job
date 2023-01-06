@@ -46,7 +46,9 @@ module GoodJob
     # @param timestamp [Integer, nil] the epoch time to perform the job
     # @return [GoodJob::Execution]
     def enqueue_at(active_job, timestamp)
-      scheduled_at = timestamp ? Time.zone.at(timestamp) : nil
+      scheduled_at_from_job = active_job.respond_to?(:scheduled_at) && active_job.scheduled_at
+      scheduled_at_from_timestamp = timestamp && Time.zone.at(timestamp)
+      scheduled_at = scheduled_at_from_timestamp || scheduled_at_from_job || nil
       will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
 
       execution = GoodJob::Execution.enqueue(
