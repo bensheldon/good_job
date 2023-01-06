@@ -40,6 +40,14 @@ module GoodJob
       enqueue_at(active_job, nil)
     end
 
+    # Instead of INSERTing the job immediately, buffers all the jobs generated
+    # within the block, and uses a bulk insert (`insert_all`) to insert them in
+    # bursts. This can be very useful when you have a task which enqueues large
+    # numbers of jobs - like a big e-mail push. The INSERTs per job do add up,
+    # making the performance of the enqueueing task worse. After a certain number
+    # it is more efficient to insert the jobs in bulk.
+    # @param active_job [Array<ActiveJob::Base>] all the jobs to be enqueued
+    # @return [Object] The return value of the passed block
     def enqueue_all(active_jobs)
       bulk_buffer = []
       active_jobs.each do |job|
