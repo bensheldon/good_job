@@ -53,15 +53,15 @@ module GoodJob
         GoodJob::Execution.enqueue(
           active_job,
           scheduled_at: extract_scheduled_at_from(active_job, nil),
-          create_with_advisory_lock: will_execute_inline,
+          create_with_advisory_lock: false,
           persist_immediately: false
         )
       end
       t = Time.current
       values_for_insert_all = executions.map do |ex|
-        ex.attributes.merge("created_at" => t, "updated_at" => t, "id" => ex.id)
+        ex.attributes.merge("created_at" => t, "updated_at" => t)
       end
-      insert_all(values_for_insert_all)
+      GoodJob::Execution.insert_all(values_for_insert_all)
       []
     end
 
@@ -72,8 +72,15 @@ module GoodJob
     # @return [GoodJob::Execution]
     def enqueue_at(active_job, timestamp)
       scheduled_at = extract_scheduled_at_from(active_job, timestamp)
-      will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
 
+      # If there is a currently open Bulk in the current thred, direct the
+      # job there to be enqueued using enqueue_all
+      unless GoodJob::Bulk.jobs.nil?
+        GoodJob::Bulk.jobs << [self, active_job]
+        return
+      end
+
+      will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
       execution = GoodJob::Execution.enqueue(
         active_job,
         scheduled_at: scheduled_at,

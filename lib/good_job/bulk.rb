@@ -11,21 +11,17 @@ module GoodJob
 
       yield
 
-      new_jobs = jobs
+      # The `jobs` are tuples of [Adapter, ActiveJob::Base]
+      new_jobs = self.jobs
       self.jobs = nil
 
       enqueuer = lambda do
-        new_jobs_per_adapter = new_jobs.group_by(&:adapter)
-        new_jobs_per_adapter.each_pair do |adapter, jobs_for_adapter|
-          if adapter.respond_to?(:enqueue_all)
-            # `enqueue_all` does not support "scheduled_at"
-            just_jobs = jobs_for_adapter.map {|j| j[1] }
-            adapter.enqueue_all(just_jobs)
-          else
-            jobs_for_adapter.each do |(_adapter, active_job, scheduled_at)|
-              adapter.enqueue_all(active_job, scheduled_at)
-            end
-          end
+        jobs_per_adapter = new_jobs.each_with_object({}) do |(adapter, job), h|
+          h[adapter] ||= []
+          h[adapter] << job
+        end
+        jobs_per_adapter.each_pair do |adapter, active_jobs|
+          adapter.enqueue_all(active_jobs)
         end
       end
 
@@ -33,5 +29,6 @@ module GoodJob
     ensure
       self.jobs = original_jobs
     end
+
   end
 end

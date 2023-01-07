@@ -11,7 +11,10 @@ describe GoodJob::Bulk do
     it 'enqueues multiple jobs at once' do
       described_class.enqueue do
         TestJob.perform_later
+        expect(GoodJob::Job.count).to eq 0
+
         TestJob.perform_later
+        expect(GoodJob::Job.count).to eq 0
       end
 
       expect(GoodJob::Job.count).to eq 2

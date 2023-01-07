@@ -272,7 +272,11 @@ module GoodJob
 
         instrument_payload[:execution] = execution
 
-        execution.save! if persist_immediately
+        if persist_immediately
+          execution.save! # Also generates an ID
+        else
+          execution.id = SecureRandom.uuid
+        end
 
         active_job.provider_job_id = execution.id
 
