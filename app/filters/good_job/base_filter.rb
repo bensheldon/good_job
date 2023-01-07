@@ -14,7 +14,7 @@ module GoodJob
     def records
       after_scheduled_at = params[:after_scheduled_at].present? ? Time.zone.parse(params[:after_scheduled_at]) : nil
 
-      filtered_query.display_all(
+      query_for_records.display_all(
         after_scheduled_at: after_scheduled_at,
         after_id: params[:after_id]
       ).limit(params.fetch(:limit, DEFAULT_LIMIT))
@@ -61,6 +61,10 @@ module GoodJob
     end
 
     private
+
+    def query_for_records
+      raise NotImplementedError
+    end
 
     def default_base_query
       raise NotImplementedError
