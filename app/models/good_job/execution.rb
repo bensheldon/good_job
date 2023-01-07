@@ -275,6 +275,9 @@ module GoodJob
         if persist_immediately
           execution.save! # Also generates an ID
         else
+          # The ID is necessary for the provider_job_id value,
+          # so with deferred persistence we need to generate it
+          # explicitly here
           execution.id = SecureRandom.uuid
         end
 
