@@ -63,19 +63,25 @@ module GoodJob
         )
       end
       t = Time.current
-      # There doesn't seem to be a hard limit on the size of an INSERT
-      # statement in Postgres, see https://dba.stackexchange.com/questions/129972
-      # and https://stackoverflow.com/questions/36879127
-      # If this turns out to be a problem this can always be remedied with
-      # each_slice.
       values_for_insert_all = unpersisted_executions.map do |ex|
         ex.attributes.merge("created_at" => t, "updated_at" => t)
       end
-      GoodJob::Execution.insert_all(values_for_insert_all)
+
+      instrumentation_event_name = persist_immediately ?  : "build_job.good_job"
+      job_count = values_for_insert_all.length
+
+      ActiveSupport::Notifications.instrument("enqueue_multiple_jobs.good_job", {job_count: job_count}) do
+        # There doesn't seem to be a hard limit on the size of an INSERT
+        # statement in Postgres, see https://dba.stackexchange.com/questions/129972
+        # and https://stackoverflow.com/questions/36879127
+        # If this turns out to be a problem this can always be remedied with
+        # each_slice.
+        GoodJob::Execution.insert_all(values_for_insert_all)
+      end
 
       # The implementation in the Rails PR specifies that the adapter
       # should return the number of jobs that were enqueued 
-      values_for_insert_all.length
+      job_count
     end
 
     # Enqueues an ActiveJob job to be run at a specific time.

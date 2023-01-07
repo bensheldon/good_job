@@ -257,7 +257,8 @@ module GoodJob
         raise ArgumentError, "It is not possible to take the advisory lock immediately without saving the record"
       end
 
-      ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
+      instrumentation_event_name = persist_immediately ? "enqueue_job.good_job" : "build_job.good_job"
+      ActiveSupport::Notifications.instrument(instrumentation_event_name, { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         execution_args = {
           active_job_id: active_job.job_id,
           queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
