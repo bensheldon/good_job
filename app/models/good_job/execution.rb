@@ -246,9 +246,17 @@ module GoodJob
     #   Epoch timestamp when the job should be executed.
     # @param create_with_advisory_lock [Boolean]
     #   Whether to establish a lock on the {Execution} record after it is created.
+    # @param persist_immediately [Boolean]
+    #   Whether to save the record immediately or just initialize it with values. When bulk-inserting
+    #   jobs the caller takes care of the persistence and sets this parameter to `false`
     # @return [Execution]
     #   The new {Execution} instance representing the queued ActiveJob job.
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false, persist_immediately: true)
+      # We currently do not allow immediate locking with bulk-insert
+      if create_with_advisory_lock && !persist_immediately
+        raise ArgumentError, "It is not possible to take the advisory lock immediately without saving the record"
+      end
+
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         execution_args = {
           active_job_id: active_job.job_id,
@@ -273,11 +281,16 @@ module GoodJob
         instrument_payload[:execution] = execution
 
         if persist_immediately
-          execution.save! # Also generates an ID
+          # We are supposed to persist the record before returning it.
+          # save! also performs validations and generates an ID
+          execution.save!
         else
-          # The ID is necessary for the provider_job_id value,
+          # We return the record to the caller unpersisted.
+          # Validate the record manually to provide the same side-effect as save!..
+          raise ActiveRecord::RecordInvalid.new(execution) unless execution.valid?
+          # ...and generate the ID. It is necessary for the provider_job_id value,
           # so with deferred persistence we need to generate it
-          # explicitly here
+          # explicitly here - we can't wait for the caller to set it.
           execution.id = SecureRandom.uuid
         end
 
