@@ -97,8 +97,7 @@ module GoodJob
       execution = GoodJob::Execution.enqueue(
         active_job,
         scheduled_at: scheduled_at,
-        create_with_advisory_lock: will_execute_inline,
-        persist_immediately: true
+        create_with_advisory_lock: will_execute_inline
       )
 
       if will_execute_inline
