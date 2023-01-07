@@ -70,7 +70,7 @@ module GoodJob
       instrumentation_event_name = persist_immediately ?  : "build_job.good_job"
       job_count = values_for_insert_all.length
 
-      ActiveSupport::Notifications.instrument("enqueue_multiple_jobs.good_job", {job_count: job_count}) do
+      ActiveSupport::Notifications.instrument("insert_all.good_job", {job_count: job_count}) do
         # There doesn't seem to be a hard limit on the size of an INSERT
         # statement in Postgres, see https://dba.stackexchange.com/questions/129972
         # and https://stackoverflow.com/questions/36879127
