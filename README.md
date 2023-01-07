@@ -58,6 +58,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Database connections](#database-connections)
         - [Production setup](#production-setup)
         - [Queue performance with Queue Select Limit](#queue-performance-with-queue-select-limit)
+    - [Bulk enqueue](#bulk-enqueue)
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
     - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
@@ -792,6 +793,21 @@ To explain where this value is used, here is the pseudo-query that GoodJob uses 
     LIMIT 1
   )
 ```
+
+### Bulk enqueue
+
+When you have a job which enqueues a large number of other jobs - like a mass email push - you can save a lot of wall clock time by packaging all the jobs into one `INSERT` SQL statement. By itself, ActiveJob does not provide a bulk enqueue feature. An effort [is currently underway](https://github.com/rails/rails/pull/46603) to add that functionality, and GoodJob is committed to support it when it gets released. Meanwhile, you can bulk-enqueue jobs manually using a GoodJob module. For example, when generating a mass email push:
+
+```ruby
+GoodJob::Bulk.enqueue do
+  User.eligible_for_notification.find_each do |user|
+    NotificationMailer.expiry_notification(user).deliver_later
+  end
+end
+```
+
+At the end of the block passed to `GoodJob::Bulk.enqueue` all the generated jobs are going to be inserted together. If the
+block raises, no jobs get inserted. Note that it is not possible to immediately lock the jobs for execution when bulk-inserting. Generally tasks that generate large numbers of jobs will benefit greatly from bulk enqueue.
 
 ### Execute jobs async / in-process
 
