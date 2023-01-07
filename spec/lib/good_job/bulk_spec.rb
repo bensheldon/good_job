@@ -3,8 +3,40 @@ require 'rails_helper'
 
 describe GoodJob::Bulk do
   before do
-    stub_const 'TestJob', Class.new(ActiveJob::Base)
+    stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+      def perform
+        true
+      end
+    end)
     TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+  end
+
+  describe '.capture' do
+    describe 'when a block is used' do
+      it 'restores the previous buffer when the block completes' do
+        described_class.capture do
+          expect { described_class.capture { true } }.not_to change(described_class, :current_buffer)
+        end
+      end
+
+      it 'returns the block return value' do
+        result = described_class.capture { 1 }
+        expect(result).to eq 1
+      end
+    end
+
+    describe 'when no block is used' do
+      it 'returns a truthy value when there is a buffer' do
+        described_class.capture do
+          expect(described_class.capture(TestJob.new)).to be_truthy
+        end
+      end
+
+      it 'returns a falsey value when there is no buffer' do
+        result = described_class.capture(TestJob.new)
+        expect(result).to be_falsey
+      end
+    end
   end
 
   describe '.enqueue' do
@@ -32,22 +64,39 @@ describe GoodJob::Bulk do
       expect(GoodJob::Job.count).to eq 0
     end
 
-    describe 'wrap:' do
-      it 'wraps the bulk enqueuing' do
-        wrapped_jobs = nil
-        wrapper = lambda do |jobs, &block|
-          wrapped_jobs = jobs
-          block.call
-        end
-
-        described_class.enqueue(wrap: wrapper) do
-          TestJob.perform_later
-          TestJob.perform_later
-        end
-
-        expect(GoodJob::Job.count).to eq 2
-        expect(wrapped_jobs.count).to eq 2
+    it 'returns the Active Jobs that were enqueued' do
+      active_jobs = described_class.enqueue do
+        TestJob.perform_later
+        TestJob.perform_later
       end
+
+      expect(active_jobs.count).to eq 2
+      expect(active_jobs.first).to be_a TestJob
+      expect(active_jobs.first.provider_job_id).to be_present
+    end
+
+    it 'can enqueue Active Jobs directly' do
+      active_job = TestJob.new
+      result = described_class.enqueue(active_job)
+
+      expect(result).to eq [active_job]
+      expect(active_job.provider_job_id).to be_present
+    end
+
+    it 'does not re-enqueue Active Jobs that have already been enqueued' do
+      active_job = TestJob.new
+      active_job.provider_job_id = 1
+
+      expect do
+        described_class.enqueue(active_job)
+      end.not_to change(active_job, :provider_job_id)
+    end
+
+    it 'can handle non-GoodJob jobs that are directly inserted into the buffer' do
+      TestJob.queue_adapter = :inline
+
+      described_class.enqueue(TestJob.new)
+      expect(GoodJob::Job.count).to eq 0
     end
   end
 end

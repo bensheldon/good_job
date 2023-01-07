@@ -104,6 +104,34 @@ RSpec.describe GoodJob::Adapter do
     end
   end
 
+  describe '#enqueue_all' do
+    it 'enqueues multiple active jobs, returns the number of jobs enqueued, and sets provider_job_id' do
+      active_jobs = [ExampleJob.new, ExampleJob.new]
+      result = adapter.enqueue_all(active_jobs)
+      expect(result).to eq 2
+
+      provider_job_ids = active_jobs.map(&:provider_job_id)
+      expect(provider_job_ids).to all(be_present)
+    end
+
+    context 'when a job fails to enqueue' do
+      it 'does not set a provider_job_id' do
+        allow(GoodJob::Execution).to receive(:insert_all).and_wrap_original do |m, *args|
+          m.call(*args).tap do |resultset|
+            resultset.rows.delete_at(-1) # remove the last item as if it failed to be inserted
+          end
+        end
+
+        active_jobs = [ExampleJob.new, ExampleJob.new]
+        result = adapter.enqueue_all(active_jobs)
+        expect(result).to eq 1
+
+        provider_job_ids = active_jobs.map(&:provider_job_id)
+        expect(provider_job_ids).to include(nil)
+      end
+    end
+  end
+
   describe '#shutdown' do
     it 'is callable' do
       expect { adapter.shutdown }.not_to raise_error

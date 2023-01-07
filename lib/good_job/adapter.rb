@@ -46,42 +46,26 @@ module GoodJob
     # numbers of jobs - like a big e-mail push. The INSERTs per job do add up,
     # making the performance of the enqueueing task worse. After a certain number
     # it is more efficient to insert the jobs in bulk.
-    # Note that the interface is conformant with this Rails PR
-    # https://github.com/rails/rails/pull/46603 and is subject to possible change.
-    # Note that `enqueue_all` does not support immediate execution and immediate locking.
-    # For use by Rails; you should generally not call this directly.
-    #
-    # @param active_job [Array<ActiveJob::Base>] all the jobs to be enqueued
-    # @return [Integer] The number of jobs that have been enqueued
+    # @param active_jobs [Array<ActiveJob::Base>] jobs to be enqueued
+    # @return [Integer] number of jobs that were successfully enqueued
     def enqueue_all(active_jobs)
-      unpersisted_executions = active_jobs.map do |active_job|
-        GoodJob::Execution.enqueue(
-          active_job,
-          scheduled_at: extract_scheduled_at_from(active_job, nil),
-          create_with_advisory_lock: false,
-          persist_immediately: false
-        )
+      active_jobs = Array(active_jobs)
+      current_time = Time.current
+      executions = active_jobs.map do |active_job|
+        GoodJob::Execution.build_for_enqueue(active_job, {
+                                               id: SecureRandom.uuid,
+                                               created_at: current_time,
+                                               updated_at: current_time,
+                                             })
       end
-      t = Time.current
-      values_for_insert_all = unpersisted_executions.map do |ex|
-        ex.attributes.merge("created_at" => t, "updated_at" => t)
+      return 0 if executions.empty?
+
+      results = GoodJob::Execution.insert_all(executions.map(&:attributes), returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
+      job_id_to_provider_job_id = results.each_with_object({}) { |result, hash| hash[result['active_job_id']] = result['id'] }
+      active_jobs.each do |active_job|
+        active_job.provider_job_id = job_id_to_provider_job_id[active_job.job_id]
       end
-
-      instrumentation_event_name = persist_immediately ?  : "build_job.good_job"
-      job_count = values_for_insert_all.length
-
-      ActiveSupport::Notifications.instrument("insert_all.good_job", {job_count: job_count}) do
-        # There doesn't seem to be a hard limit on the size of an INSERT
-        # statement in Postgres, see https://dba.stackexchange.com/questions/129972
-        # and https://stackoverflow.com/questions/36879127
-        # If this turns out to be a problem this can always be remedied with
-        # each_slice.
-        GoodJob::Execution.insert_all(values_for_insert_all)
-      end
-
-      # The implementation in the Rails PR specifies that the adapter
-      # should return the number of jobs that were enqueued 
-      job_count
+      results.rows.size
     end
 
     # Enqueues an ActiveJob job to be run at a specific time.
@@ -90,21 +74,17 @@ module GoodJob
     # @param timestamp [Integer, nil] the epoch time to perform the job
     # @return [GoodJob::Execution]
     def enqueue_at(active_job, timestamp)
-      scheduled_at = extract_scheduled_at_from(active_job, timestamp)
+      scheduled_at = timestamp ? Time.zone.at(timestamp) : nil
 
-      # If there is a currently open Bulk in the current thred, direct the
+      # If there is a currently open Bulk in the current thread, direct the
       # job there to be enqueued using enqueue_all
-      unless GoodJob::Bulk.jobs.nil?
-        GoodJob::Bulk.jobs << [self, active_job]
-        return
-      end
+      return if GoodJob::Bulk.capture(active_job, self)
 
       will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
       execution = GoodJob::Execution.enqueue(
         active_job,
         scheduled_at: scheduled_at,
-        create_with_advisory_lock: will_execute_inline,
-        persist_immediately: true
+        create_with_advisory_lock: will_execute_inline
       )
 
       if will_execute_inline
