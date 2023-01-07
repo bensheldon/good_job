@@ -46,10 +46,15 @@ module GoodJob
     # numbers of jobs - like a big e-mail push. The INSERTs per job do add up,
     # making the performance of the enqueueing task worse. After a certain number
     # it is more efficient to insert the jobs in bulk.
+    # Note that the interface is conformant with this Rails PR
+    # https://github.com/rails/rails/pull/46603 and is subject to possible change.
+    # For use by Rails; you should generally not call this directly.
+    # Note that `enqueue_all` does not support immediate execution and immediate locking.
+    #
     # @param active_job [Array<ActiveJob::Base>] all the jobs to be enqueued
-    # @return [Object] The return value of the passed block
+    # @return [Integer] The number of jobs that have been enqueued
     def enqueue_all(active_jobs)
-      executions = active_jobs.map do |active_job|
+      unpersisted_executions = active_jobs.map do |active_job|
         GoodJob::Execution.enqueue(
           active_job,
           scheduled_at: extract_scheduled_at_from(active_job, nil),
@@ -58,11 +63,19 @@ module GoodJob
         )
       end
       t = Time.current
-      values_for_insert_all = executions.map do |ex|
+      # There doesn't seem to be a hard limit on the size of an INSERT
+      # statement in Postgres, see https://dba.stackexchange.com/questions/129972
+      # and https://stackoverflow.com/questions/36879127
+      # If this turns out to be a problem this can always be remedied with
+      # each_slice.
+      values_for_insert_all = unpersisted_executions.map do |ex|
         ex.attributes.merge("created_at" => t, "updated_at" => t)
       end
       GoodJob::Execution.insert_all(values_for_insert_all)
-      []
+
+      # The implementation in the Rails PR specifies that the adapter
+      # should return the number of jobs that were enqueued 
+      values_for_insert_all.length
     end
 
     # Enqueues an ActiveJob job to be run at a specific time.
