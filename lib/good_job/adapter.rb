@@ -48,8 +48,8 @@ module GoodJob
     # it is more efficient to insert the jobs in bulk.
     # Note that the interface is conformant with this Rails PR
     # https://github.com/rails/rails/pull/46603 and is subject to possible change.
-    # For use by Rails; you should generally not call this directly.
     # Note that `enqueue_all` does not support immediate execution and immediate locking.
+    # For use by Rails; you should generally not call this directly.
     #
     # @param active_job [Array<ActiveJob::Base>] all the jobs to be enqueued
     # @return [Integer] The number of jobs that have been enqueued
