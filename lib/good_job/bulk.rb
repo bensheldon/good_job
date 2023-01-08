@@ -60,7 +60,7 @@ module GoodJob
       end
 
       def add(active_job, queue_adapter = nil)
-        queue_adapter ||= active_job.queue_adapter
+        queue_adapter ||= active_job.class.queue_adapter
         raise Error, "Jobs must have a Queue Adapter" if queue_adapter.nil?
 
         @values[queue_adapter] ||= []
