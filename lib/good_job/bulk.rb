@@ -61,7 +61,7 @@ module GoodJob
 
       def add(active_jobs, queue_adapter: nil)
         new_pairs = Array(active_jobs).map do |active_job|
-          adapter = queue_adapter || active_job.queue_adapter
+          adapter = queue_adapter || active_job.class.queue_adapter
           raise Error, "Jobs must have a Queue Adapter" unless adapter
 
           [active_job, adapter]
