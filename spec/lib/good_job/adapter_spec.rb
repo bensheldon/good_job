@@ -116,10 +116,9 @@ RSpec.describe GoodJob::Adapter do
 
     context 'when a job fails to enqueue' do
       it 'does not set a provider_job_id' do
-        allow(GoodJob::Execution).to receive(:insert_all).and_wrap_original do |m, *args|
-          m.call(*args).tap do |resultset|
-            resultset.rows.delete_at(-1) # remove the last item as if it failed to be inserted
-          end
+        allow(GoodJob::Execution).to receive(:insert_all).and_wrap_original do |original_method, *args|
+          attributes, kwargs = *args
+          original_method.call(attributes[0, 1], **kwargs) #  pretend only the first item is successfully inserted
         end
 
         active_jobs = [ExampleJob.new, ExampleJob.new]
