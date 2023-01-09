@@ -65,6 +65,9 @@ module GoodJob
       active_jobs.each do |active_job|
         active_job.provider_job_id = job_id_to_provider_job_id[active_job.job_id]
       end
+
+      # TODO: execute inline
+
       results.rows.size
     end
 
@@ -78,7 +81,7 @@ module GoodJob
 
       # If there is a currently open Bulk in the current thread, direct the
       # job there to be enqueued using enqueue_all
-      return if GoodJob::Bulk.capture(active_job, self)
+      return if GoodJob::Bulk.capture(active_job, queue_adapter: self)
 
       will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
       execution = GoodJob::Execution.enqueue(
@@ -175,12 +178,6 @@ module GoodJob
     end
 
     private
-
-    def extract_scheduled_at_from(active_job, timestamp)
-      scheduled_at_from_job = active_job.respond_to?(:scheduled_at) && active_job.scheduled_at
-      scheduled_at_from_timestamp = timestamp && Time.zone.at(timestamp)
-      scheduled_at_from_timestamp || scheduled_at_from_job || nil
-    end
 
     # Whether running in a web server process.
     # @return [Boolean, nil]

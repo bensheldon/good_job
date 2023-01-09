@@ -7,73 +7,95 @@ module GoodJob
 
     thread_mattr_accessor :current_buffer
 
-    # @return [Boolean] Whether the current thread is currently bulk buffering jobs
-    def self.capture(active_jobs = nil, queue_adapter = nil)
+    # @return [nil, Array<ActiveJob::Base>] The ActiveJob instances that have been buffered; nil if no active buffer
+    def self.capture(active_jobs = nil, queue_adapter: nil)
+      raise(ArgumentError, "Use either the block form or the argument form, not both") if block_given? && active_jobs
+
       if block_given?
         begin
           original_buffer = current_buffer
-          self.current_buffer = Buffer.new(active_jobs, queue_adapter)
+          self.current_buffer = Buffer.new
           yield
+          current_buffer.active_jobs
         ensure
           self.current_buffer = original_buffer
         end
       else
-        current_buffer&.add(active_jobs, queue_adapter)
+        current_buffer&.add(active_jobs, queue_adapter: queue_adapter)
       end
     end
 
-    def self.capture!(active_jobs = nil, queue_adapter = nil, &block)
-      capture(active_jobs, queue_adapter, &block) || raise(Error, 'No bulk capture in progress')
+    # Temporarily unset the current buffer; used to enqueue buffered jobs
+    def self.unbuffer
+      original_buffer = current_buffer
+      self.current_buffer = nil
+      yield
+    ensure
+      self.current_buffer = original_buffer
     end
 
     # @return [Array<ActiveJob::Base>] The ActiveJob instances that have been captured; check provider_job_id to confirm enqueued.
-    def self.enqueue(active_jobs = [], queue_adapter = nil)
+    def self.enqueue(active_jobs = nil)
+      raise(ArgumentError, "Use either the block form or the argument form, not both") if block_given? && active_jobs
+
       if block_given?
-        capture(active_jobs, queue_adapter) do
+        capture do
           yield
-          enqueue
+          current_buffer&.enqueue
         end
-      else
-        buffer = current_buffer || Buffer.new
-        Array(active_jobs).each { |active_job| buffer.add(active_job, queue_adapter) }
-
-        buffer.active_jobs_by_queue_adapter.each_pair do |adapter, jobs|
-          jobs = jobs.reject(&:provider_job_id)
-
-          if adapter.respond_to?(:enqueue_all)
-            adapter.enqueue_all(jobs)
-          else
-            jobs.each do |active_job|
-              active_job.scheduled_at ? adapter.enqueue_at(active_job, active_job.scheduled_at) : adapter.enqueue(active_job)
-            end
-          end
-        end
-
+      elsif active_jobs.present?
+        buffer = Buffer.new
+        buffer.add(active_jobs)
+        buffer.enqueue
         buffer.active_jobs
+      elsif current_buffer.present?
+        current_buffer.enqueue
+        current_buffer.active_jobs
       end
     end
 
     class Buffer
-      def initialize(active_jobs = nil, queue_adapter = nil)
-        @values = {}
-        Array(active_jobs).each { |active_job| add(active_job, queue_adapter) }
+      def initialize
+        @values = []
       end
 
-      def add(active_job, queue_adapter = nil)
-        queue_adapter ||= active_job.class.queue_adapter
-        raise Error, "Jobs must have a Queue Adapter" if queue_adapter.nil?
+      def add(active_jobs, queue_adapter: nil)
+        new_pairs = Array(active_jobs).map do |active_job|
+          adapter = queue_adapter || active_job.queue_adapter
+          raise Error, "Jobs must have a Queue Adapter" unless adapter
 
-        @values[queue_adapter] ||= []
-        @values[queue_adapter] << active_job
+          [active_job, adapter]
+        end
+        @values.append(*new_pairs)
+
         true
       end
 
+      def enqueue
+        Bulk.unbuffer do
+          active_jobs_by_queue_adapter.each do |adapter, jobs|
+            jobs = jobs.reject(&:provider_job_id) # Do not re-enqueue already enqueued jobs
+
+            if adapter.respond_to?(:enqueue_all)
+              adapter.enqueue_all(jobs)
+            else
+              jobs.each do |active_job|
+                active_job.scheduled_at ? adapter.enqueue_at(active_job, active_job.scheduled_at) : adapter.enqueue(active_job)
+              end
+            end
+          end
+        end
+      end
+
       def active_jobs_by_queue_adapter
-        @values
+        @values.each_with_object({}) do |(job, adapter), memo|
+          memo[adapter] ||= []
+          memo[adapter] << job
+        end
       end
 
       def active_jobs
-        @values.values.flatten
+        @values.map(&:first)
       end
     end
   end

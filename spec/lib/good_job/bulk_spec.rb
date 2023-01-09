@@ -19,9 +19,9 @@ describe GoodJob::Bulk do
         end
       end
 
-      it 'returns the block return value' do
-        result = described_class.capture { 1 }
-        expect(result).to eq 1
+      it 'returns the active jobs that were captured' do
+        result = described_class.capture { TestJob.perform_later }
+        expect(result).to contain_exactly instance_of(TestJob)
       end
     end
 
