@@ -1,5 +1,30 @@
 # Changelog
 
+## [v3.7.3](https://github.com/bensheldon/good_job/tree/v3.7.3) (2023-01-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.2...v3.7.3)
+
+**Implemented enhancements:**
+
+- Provide clearer values/deprecation notices for `cleanup_interval_jobs` and `cleanup_interval_seconds`; setting `0` disables, `-1` always [\#776](https://github.com/bensheldon/good_job/pull/776) ([zarqman](https://github.com/zarqman))
+
+**Closed issues:**
+
+- Demo page shows Application Error [\#787](https://github.com/bensheldon/good_job/issues/787)
+- Configuration for PG Schema Other Than Public [\#774](https://github.com/bensheldon/good_job/issues/774)
+
+**Merged pull requests:**
+
+- Avoid including unnecessary pg\_locks references when counting jobs [\#789](https://github.com/bensheldon/good_job/pull/789) ([mkrfowler](https://github.com/mkrfowler))
+- Add net-\* gems to Gemfile for Heroku [\#788](https://github.com/bensheldon/good_job/pull/788) ([bensheldon](https://github.com/bensheldon))
+- Add Ruby 3.2 to test matrix [\#786](https://github.com/bensheldon/good_job/pull/786) ([bensheldon](https://github.com/bensheldon))
+- Bump rubocop from 1.41.1 to 1.42.0 [\#781](https://github.com/bensheldon/good_job/pull/781) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rubocop from 1.40.0 to 1.41.1 [\#779](https://github.com/bensheldon/good_job/pull/779) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rubocop-performance from 1.15.1 to 1.15.2 [\#777](https://github.com/bensheldon/good_job/pull/777) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rubocop-rspec from 2.15.0 to 2.16.0 [\#775](https://github.com/bensheldon/good_job/pull/775) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rails-html-sanitizer from 1.4.3 to 1.4.4 [\#773](https://github.com/bensheldon/good_job/pull/773) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump loofah from 2.19.0 to 2.19.1 [\#772](https://github.com/bensheldon/good_job/pull/772) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.7.2](https://github.com/bensheldon/good_job/tree/v3.7.2) (2022-12-12)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.1...v3.7.2)
