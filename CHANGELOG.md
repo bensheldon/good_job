@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.7.4](https://github.com/bensheldon/good_job/tree/v3.7.4) (2023-01-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.3...v3.7.4)
+
+**Merged pull requests:**
+
+- Update to es-module-shims v1.6.3 and use an inline script entry-point; remove script.js entrypoint; remove sourcemap references [\#793](https://github.com/bensheldon/good_job/pull/793) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.7.3](https://github.com/bensheldon/good_job/tree/v3.7.3) (2023-01-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.2...v3.7.3)
