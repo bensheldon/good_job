@@ -37,7 +37,6 @@ GoodJob::Engine.routes.draw do
       get :rails_ujs, action: :rails_ujs_js
       get :es_module_shims, action: :es_module_shims_js
       get "modules/:module", action: :modules_js, as: :modules
-      get :scripts, action: :scripts_js
     end
   end
 end
