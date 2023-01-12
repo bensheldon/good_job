@@ -1,0 +1,83 @@
+---
+fr:
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: environ 1 heure
+        other: environ %{count} heures
+      about_x_months:
+        one: environ 1 heure
+        other: environ %{count} heures
+      about_x_years:
+        one: environ 1 an
+        other: environ %{count} ans
+      almost_x_years:
+        one: presque 1 an
+        other: presque %{count} ans
+      half_a_minute: une demi-minute
+      less_than_x_minutes:
+        one: moins d'une minute
+        other: moins de %{count} minutes
+      less_than_x_seconds:
+        one: moins d'une seconde
+        other: moins de %{count} secondes
+      over_x_years:
+        one: plus d'un an
+        other: plus de %{count} ans
+      x_days:
+        one: 1 jour
+        other: "%{count} jours"
+      x_minutes:
+        one: 1 minute
+        other: "%{count} minutes"
+      x_months:
+        one: 1 mois
+        other: "%{count} mois"
+      x_seconds:
+        one: 1 seconde
+        other: "%{count} secondes"
+      x_years:
+        one: 1 an
+        other: "%{count} ans"
+  duration:
+    hours: "%{hour}h %{min}m"
+    less_than_10_seconds: "%{sec}s"
+    milliseconds: "%{ms}ms"
+    minutes: "%{min}m %{sec}s"
+    seconds: "%{sec}s"
+  good_job:
+    shared:
+      footer:
+        last_update_html: Dernière mise à jour <time id="page-updated-at" datetime="%{time}">%{time}</time>
+        wording: N'oublie pas, toi aussi tu fais du bon boulot !
+      navbar:
+        cron_schedules: Cron
+        jobs: Jobs
+        live_poll: En direct
+        name: "GoodJob 👍"
+        processes: Processus
+    status:
+      discarded: Abandonnés
+      queued: À la file
+      retried: Réessayés
+      running: En cours
+      scheduled: Programmés
+      succeeded: Réussis
+  number:
+    format:
+      delimiter: " "
+      separator: ","
+    human:
+      decimal_units:
+        format: "%n%u"
+        units:
+          billion: B
+          million: M
+          quadrillion: q
+          thousand: k
+          trillion: T
+          unit: ''
+      format:
+        delimiter: " "
+        precision: 3
+        separator: ","
