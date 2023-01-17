@@ -129,6 +129,25 @@ RSpec.describe GoodJob::Adapter do
         expect(provider_job_ids).to include(nil)
       end
     end
+
+    context 'when the adapter is inline' do
+      let(:adapter) { described_class.new(execution_mode: :inline) }
+
+      it 'executes the jobs immediately' do
+        stub_const 'PERFORMED', []
+        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+          def perform
+            raise "Not advisory locked" unless GoodJob::Execution.find(provider_job_id).advisory_locked?
+            PERFORMED << Time.current
+          end
+        end)
+
+        active_jobs = [TestJob.new, TestJob.new]
+        result = adapter.enqueue_all(active_jobs)
+        expect(result).to eq 2
+        expect(PERFORMED.size).to eq 2
+      end
+    end
   end
 
   describe '#shutdown' do

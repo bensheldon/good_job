@@ -50,6 +50,8 @@ module GoodJob
     # @return [Integer] number of jobs that were successfully enqueued
     def enqueue_all(active_jobs)
       active_jobs = Array(active_jobs)
+      return 0 if active_jobs.empty?
+
       current_time = Time.current
       executions = active_jobs.map do |active_job|
         GoodJob::Execution.build_for_enqueue(active_job, {
@@ -58,17 +60,53 @@ module GoodJob
                                                updated_at: current_time,
                                              })
       end
-      return 0 if executions.empty?
 
-      results = GoodJob::Execution.insert_all(executions.map(&:attributes), returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
-      job_id_to_provider_job_id = results.each_with_object({}) { |result, hash| hash[result['active_job_id']] = result['id'] }
-      active_jobs.each do |active_job|
-        active_job.provider_job_id = job_id_to_provider_job_id[active_job.job_id]
+      inline_executions = []
+      GoodJob::Execution.transaction(requires_new: true, joinable: false) do
+        results = GoodJob::Execution.insert_all(executions.map(&:attributes), returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
+
+        job_id_to_provider_job_id = results.each_with_object({}) { |result, hash| hash[result['active_job_id']] = result['id'] }
+        active_jobs.each do |active_job|
+          active_job.provider_job_id = job_id_to_provider_job_id[active_job.job_id]
+        end
+        executions.each do |execution|
+          execution.instance_variable_set(:@new_record, false) if job_id_to_provider_job_id[execution.active_job_id]
+        end
+        executions = executions.select(&:persisted?) # prune unpersisted executions
+
+        if execute_inline?
+          inline_executions = executions.select { |execution| (execution.scheduled_at.nil? || execution.scheduled_at <= Time.current) }
+          inline_executions.each(&:advisory_lock!)
+        end
       end
 
-      # TODO: execute inline
+      begin
+        until inline_executions.empty?
+          begin
+            inline_execution = inline_executions.shift
+            inline_result = inline_execution.perform
+          ensure
+            inline_execution.advisory_unlock
+            inline_execution.run_callbacks(:perform_unlocked)
+          end
+          raise inline_result.unhandled_error if inline_result.unhandled_error
+        end
+      ensure
+        inline_executions.each(&:advisory_unlock)
+      end
 
-      results.rows.size
+      executions.reject(&:finished_at).group_by(&:queue_name).each do |queue_name, executions_by_queue|
+        executions_by_queue.group_by(&:scheduled_at).each do |scheduled_at, executions_by_queue_and_scheduled_at|
+          # TODO: have Adapter#create_thread handle state[:count] values
+          state = { queue_name: queue_name, count: executions_by_queue_and_scheduled_at.size }
+          state[:scheduled_at] = scheduled_at if scheduled_at
+
+          executed_locally = execute_async? && @scheduler&.create_thread(state)
+          Notifier.notify(state) unless executed_locally
+        end
+      end
+
+      active_jobs.count(&:provider_job_id)
     end
 
     # Enqueues an ActiveJob job to be run at a specific time.
