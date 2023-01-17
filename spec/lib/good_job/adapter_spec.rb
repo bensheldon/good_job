@@ -138,6 +138,7 @@ RSpec.describe GoodJob::Adapter do
         stub_const 'TestJob', (Class.new(ActiveJob::Base) do
           def perform
             raise "Not advisory locked" unless GoodJob::Execution.find(provider_job_id).advisory_locked?
+
             PERFORMED << Time.current
           end
         end)
