@@ -194,12 +194,7 @@ module GoodJob
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
         ]
 
-        begin
-          locked = connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).first['locked']
-        rescue TypeError
-          raise ArgumentError, "Can't cast concurrency key class #{key.class} to String"
-        end
-
+        locked = connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).first['locked']
         return locked unless block_given?
         return nil unless locked
 
