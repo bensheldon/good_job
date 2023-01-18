@@ -154,7 +154,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
 
       it 'raises an error for non-serializable types' do
-        expect { TestJob.perform_later({ key: "value" }) }.to raise_error(TypeError)
+        expect { TestJob.perform_later({ key: "value" }) }.to raise_error(TypeError, "Concurrency key must be a String; was a Hash")
         expect { TestJob.perform_later({ key: "value" }.with_indifferent_access) }.to raise_error(TypeError)
         expect { TestJob.perform_later(["key"]) }.to raise_error(TypeError)
         expect { TestJob.perform_later(TestJob) }.to raise_error(TypeError)

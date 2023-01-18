@@ -120,7 +120,7 @@ module GoodJob
         return if key.blank?
 
         key = key.respond_to?(:call) ? instance_exec(&key) : key
-        raise TypeError, "#{key.class} is not a valid type of concurrency key" unless VALID_TYPES.any? { |type| key.is_a?(type) }
+        raise TypeError, "Concurrency key must be a String; was a #{key.class}" unless VALID_TYPES.any? { |type| key.is_a?(type) }
 
         key
       end
