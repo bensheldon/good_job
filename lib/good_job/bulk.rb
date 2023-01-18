@@ -77,11 +77,19 @@ module GoodJob
             jobs = jobs.reject(&:provider_job_id) # Do not re-enqueue already enqueued jobs
 
             if adapter.respond_to?(:enqueue_all)
-              adapter.enqueue_all(jobs)
-            else
-              jobs.each do |active_job|
-                active_job.scheduled_at ? adapter.enqueue_at(active_job, active_job.scheduled_at) : adapter.enqueue(active_job)
+              unbulkable_jobs, bulkable_jobs = jobs.partition do |job|
+                job.respond_to?(:good_job_concurrency_key) && job.good_job_concurrency_key &&
+                  (job.class.good_job_concurrency_config[:enqueue_limit] || job.class.good_job_concurrency_config[:total_limit])
               end
+              adapter.enqueue_all(bulkable_jobs) if bulkable_jobs.any?
+            else
+              unbulkable_jobs = jobs
+            end
+
+            unbulkable_jobs.each do |job|
+              job.enqueue
+            rescue GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError
+              # ignore
             end
           end
         end

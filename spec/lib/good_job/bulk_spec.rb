@@ -93,10 +93,24 @@ describe GoodJob::Bulk do
     end
 
     it 'can handle non-GoodJob jobs that are directly inserted into the buffer' do
-      TestJob.queue_adapter = :inline
+      adapter = instance_double(ActiveJob::QueueAdapters::InlineAdapter, enqueue: nil, enqueue_at: nil)
+      TestJob.queue_adapter = adapter
 
       described_class.enqueue(TestJob.new)
       expect(GoodJob::Job.count).to eq 0
+      expect(adapter).to have_received(:enqueue).once
+    end
+
+    it 'does not enqueue jobs that fail enqueue concurrency' do
+      TestJob.include(GoodJob::ActiveJobExtensions::Concurrency)
+
+      TestJob.good_job_control_concurrency_with(total_limit: 1, key: 'test')
+      job_1 = TestJob.new
+      job_2 = TestJob.new
+
+      described_class.enqueue([job_1, job_2])
+      expect(job_1.provider_job_id).to be_present
+      expect(job_2.provider_job_id).to be_nil
     end
   end
 end
