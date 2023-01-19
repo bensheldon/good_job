@@ -183,7 +183,7 @@ GEM
       octokit (~> 4.6)
       rainbow (>= 2.2.1)
       rake (>= 10.0)
-    globalid (1.0.0)
+    globalid (1.0.1)
       activesupport (>= 5.0)
     highline (2.0.3)
     i18n (1.12.0)
@@ -222,7 +222,7 @@ GEM
     method_source (1.0.0)
     mini_mime (1.1.2)
     mini_portile2 (2.8.1)
-    minitest (5.16.3)
+    minitest (5.17.0)
     mixlib-cli (2.1.8)
     mixlib-config (3.0.27)
       tomlrb
