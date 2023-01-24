@@ -68,7 +68,7 @@ module GoodJob
         job_state[:scheduled_at] = execution.scheduled_at if execution.scheduled_at
 
         executed_locally = execute_async? && @scheduler&.create_thread(job_state)
-        Notifier.notify(job_state) unless executed_locally
+        Notifier.notify(job_state) if !executed_locally && GoodJob.configuration.enable_listen_notify
       end
 
       execution
@@ -125,7 +125,7 @@ module GoodJob
     def start_async
       return unless execute_async?
 
-      @notifier = GoodJob::Notifier.new
+      @notifier = GoodJob::Notifier.new(enable_listening: GoodJob.configuration.enable_listen_notify)
       @poller = GoodJob::Poller.new(poll_interval: GoodJob.configuration.poll_interval)
       @scheduler = GoodJob::Scheduler.from_configuration(GoodJob.configuration, warm_cache_on_initialize: true)
       @notifier.recipients << [@scheduler, :create_thread]

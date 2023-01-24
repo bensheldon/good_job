@@ -26,6 +26,8 @@ module GoodJob
     DEFAULT_SHUTDOWN_TIMEOUT = -1
     # Default to not running cron
     DEFAULT_ENABLE_CRON = false
+    # Default to enabling LISTEN/NOTIFY
+    DEFAULT_ENABLE_LISTEN_NOTIFY = true
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
@@ -329,6 +331,15 @@ module GoodJob
     def probe_port
       options[:probe_port] ||
         env['GOOD_JOB_PROBE_PORT']
+    end
+
+    def enable_listen_notify
+      ActiveModel::Type::Boolean.new.cast(
+        options[:enable_listen_notify] ||
+        rails_config[:enable_listen_notify] ||
+        env['GOOD_JOB_ENABLE_LISTEN_NOTIFY'] ||
+        DEFAULT_ENABLE_LISTEN_NOTIFY
+      )
     end
 
     private

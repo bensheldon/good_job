@@ -68,11 +68,12 @@ module GoodJob # :nodoc:
     attr_reader :recipients
 
     # @param recipients [Array<#call, Array(Object, Symbol)>]
-    def initialize(*recipients)
+    def initialize(*recipients, enable_listening:)
       @recipients = Concurrent::Array.new(recipients)
       @listening = Concurrent::AtomicBoolean.new(false)
       @connection_errors_count = Concurrent::AtomicFixnum.new(0)
       @connection_errors_reported = Concurrent::AtomicBoolean.new(false)
+      @enable_listening = enable_listening
 
       self.class.instances << self
 
@@ -165,6 +166,8 @@ module GoodJob # :nodoc:
     end
 
     def listen(delay: 0)
+      return unless @enable_listening
+
       future = Concurrent::ScheduledTask.new(delay, args: [@recipients, executor, @listening], executor: @executor) do |thr_recipients, thr_executor, thr_listening|
         with_connection do
           begin
