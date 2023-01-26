@@ -166,16 +166,14 @@ module GoodJob # :nodoc:
     end
 
     def listen(delay: 0)
-      return unless @enable_listening
-
       future = Concurrent::ScheduledTask.new(delay, args: [@recipients, executor, @listening], executor: @executor) do |thr_recipients, thr_executor, thr_listening|
         with_connection do
           begin
             run_callbacks :listen do
               ActiveSupport::Notifications.instrument("notifier_listen.good_job") do
-                connection.execute("LISTEN #{CHANNEL}")
+                connection.execute("LISTEN #{CHANNEL}") if @enable_listening
               end
-              thr_listening.make_true
+              thr_listening.make_true if @enable_listening
             end
 
             ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
@@ -199,7 +197,7 @@ module GoodJob # :nodoc:
           run_callbacks :unlisten do
             thr_listening.make_false
             ActiveSupport::Notifications.instrument("notifier_unlisten.good_job") do
-              connection.execute("UNLISTEN *")
+              connection.execute("UNLISTEN *") if @enable_listening
             end
           end
         end
@@ -210,10 +208,14 @@ module GoodJob # :nodoc:
     end
 
     def with_connection
-      self.connection = Execution.connection_pool.checkout.tap do |conn|
-        Execution.connection_pool.remove(conn)
+      if @enable_listening
+        self.connection = Execution.connection_pool.checkout.tap do |conn|
+          Execution.connection_pool.remove(conn)
+        end
+        connection.execute("SET application_name = #{connection.quote(self.class.name)}")
+      else
+        self.connection = nil
       end
-      connection.execute("SET application_name = #{connection.quote(self.class.name)}")
 
       yield
     ensure
@@ -223,11 +225,11 @@ module GoodJob # :nodoc:
 
     def wait_for_notify
       raw_connection = connection.raw_connection
-      if raw_connection.respond_to?(:wait_for_notify)
+      if raw_connection.respond_to?(:wait_for_notify) && @enable_listening
         raw_connection.wait_for_notify(WAIT_INTERVAL) do |channel, _pid, payload|
           yield(channel, payload)
         end
-      elsif raw_connection.respond_to?(:jdbc_connection)
+      elsif raw_connection.respond_to?(:jdbc_connection) && @enable_listening
         raw_connection.execute_query("SELECT 1")
         notifications = raw_connection.jdbc_connection.getNotifications
         Array(notifications).each do |notification|
