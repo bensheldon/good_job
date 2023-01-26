@@ -34,6 +34,19 @@ RSpec.describe GoodJob::Notifier do
       expect(RECEIVED_MESSAGE.true?).to be true
     end
 
+    it 'loops but does not receive a command if listening is not enabled' do
+      stub_const 'RECEIVED_MESSAGE', Concurrent::AtomicBoolean.new(false)
+
+      recipient = proc { |_payload| RECEIVED_MESSAGE.make_true }
+      notifier = described_class.new(recipient, enable_listening: false)
+      expect(notifier.listening?).to be false
+      described_class.notify(true)
+      sleep_until(max: 1, increments_of: 0.5) { RECEIVED_MESSAGE.false? }
+      notifier.shutdown
+
+      expect(RECEIVED_MESSAGE.false?).to be true
+    end
+
     it 'raises exception to GoodJob.on_thread_error' do
       stub_const('ExpectedError', Class.new(StandardError))
       on_thread_error = instance_double(Proc, call: nil)
