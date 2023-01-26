@@ -334,12 +334,11 @@ module GoodJob
     end
 
     def enable_listen_notify
-      ActiveModel::Type::Boolean.new.cast(
-        options[:enable_listen_notify] ||
-        rails_config[:enable_listen_notify] ||
-        env['GOOD_JOB_ENABLE_LISTEN_NOTIFY'] ||
-        DEFAULT_ENABLE_LISTEN_NOTIFY
-      )
+      return options[:enable_listen_notify] unless options[:enable_listen_notify].nil?
+      return rails_config[:enable_listen_notify] unless rails_config[:enable_listen_notify].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_LISTEN_NOTIFY']) unless env['GOOD_JOB_ENABLE_LISTEN_NOTIFY'].nil?
+
+      DEFAULT_ENABLE_LISTEN_NOTIFY
     end
 
     private
