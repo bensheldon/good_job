@@ -257,4 +257,18 @@ RSpec.describe GoodJob::Configuration do
       end
     end
   end
+
+  describe 'enable_listen_notify' do
+    it 'defaults to true' do
+      configuration = described_class.new({})
+      expect(configuration.enable_listen_notify).to be true
+    end
+
+    it 'can set false with 0 from ENV' do
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_ENABLE_LISTEN_NOTIFY' => '0' })
+
+      configuration = described_class.new({})
+      expect(configuration.enable_listen_notify).to be false
+    end
+  end
 end

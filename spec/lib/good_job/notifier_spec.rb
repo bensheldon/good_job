@@ -19,6 +19,17 @@ RSpec.describe GoodJob::Notifier do
     end
   end
 
+  describe '#connected?' do
+    it 'becomes true when the notifier is connected' do
+      notifier = described_class.new(enable_listening: true)
+      sleep_until(max: 5, increments_of: 0.5) { notifier.connected? }
+
+      expect do
+        notifier.shutdown
+      end.to change(notifier, :connected?).from(true).to(false)
+    end
+  end
+
   describe '#listen' do
     it 'loops until it receives a command' do
       stub_const 'RECEIVED_MESSAGE', Concurrent::AtomicBoolean.new(false)
