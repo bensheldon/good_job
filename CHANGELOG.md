@@ -1,10 +1,41 @@
 # Changelog
 
+## [v3.8.0](https://github.com/bensheldon/good_job/tree/v3.8.0) (2023-01-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.4...v3.8.0)
+
+**Implemented enhancements:**
+
+- Capture and log ActiveJob IDs that are interrupted when Scheduler is forced to shutdown [\#794](https://github.com/bensheldon/good_job/pull/794) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Ensure Concurrency Keys are string-like and return a better error when they cannot be cast to a string [\#791](https://github.com/bensheldon/good_job/pull/791) ([Earlopain](https://github.com/Earlopain))
+
+**Closed issues:**
+
+- Work is not being picked up at the expected rate [\#802](https://github.com/bensheldon/good_job/issues/802)
+- Cleaning up preserved jobs only removes a subset of the jobs [\#801](https://github.com/bensheldon/good_job/issues/801)
+- Dashboard fails to execute JS on latest Firefox 108 [\#792](https://github.com/bensheldon/good_job/issues/792)
+- Concurrency key doesn't handle Hash: TypeError \(can't cast Hash\) [\#784](https://github.com/bensheldon/good_job/issues/784)
+
+**Merged pull requests:**
+
+- Bump fugit from 1.8.0 to 1.8.1 [\#808](https://github.com/bensheldon/good_job/pull/808) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rubocop-rspec from 2.17.1 to 2.18.1 [\#807](https://github.com/bensheldon/good_job/pull/807) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump globalid from 1.0.0 to 1.0.1 [\#804](https://github.com/bensheldon/good_job/pull/804) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rack from 2.2.4 to 2.2.6.2 [\#803](https://github.com/bensheldon/good_job/pull/803) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump nokogiri from 1.13.10 to 1.14.0 [\#800](https://github.com/bensheldon/good_job/pull/800) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rubocop from 1.42.0 to 1.43.0 [\#799](https://github.com/bensheldon/good_job/pull/799) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rubocop-rspec from 2.16.0 to 2.17.1 [\#798](https://github.com/bensheldon/good_job/pull/798) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add French translation [\#795](https://github.com/bensheldon/good_job/pull/795) ([francois-ferrandis](https://github.com/francois-ferrandis))
+- Bump rubocop-rails from 2.17.3 to 2.17.4 [\#780](https://github.com/bensheldon/good_job/pull/780) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.7.4](https://github.com/bensheldon/good_job/tree/v3.7.4) (2023-01-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.3...v3.7.4)
 
-**Merged pull requests:**
+**Fixed bugs:**
 
 - Update to es-module-shims v1.6.3 and use an inline script entry-point; remove script.js entrypoint; remove sourcemap references [\#793](https://github.com/bensheldon/good_job/pull/793) ([bensheldon](https://github.com/bensheldon))
 
