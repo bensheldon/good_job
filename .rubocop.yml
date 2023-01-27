@@ -41,6 +41,9 @@ Layout/ParameterAlignment:
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
+Rails/I18nLocaleTexts:
+  Enabled: false
+
 Metrics:
   Enabled: false
 
