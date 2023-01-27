@@ -121,7 +121,11 @@ module GoodJob # :nodoc:
 
         if executor.shuttingdown? && timeout
           executor_wait = timeout.negative? ? nil : timeout
-          executor.kill unless executor.wait_for_termination(executor_wait)
+
+          unless executor.wait_for_termination(executor_wait)
+            instrument("scheduler_shutdown_kill", { active_job_ids: @performer.performing_active_job_ids.to_a })
+            executor.kill
+          end
         end
       end
     end

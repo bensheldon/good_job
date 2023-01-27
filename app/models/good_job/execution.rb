@@ -212,6 +212,7 @@ module GoodJob
         break if execution.blank?
         break :unlocked unless execution&.executable?
 
+        yield(execution) if block_given?
         result = execution.perform
       end
       execution&.run_callbacks(:perform_unlocked)
