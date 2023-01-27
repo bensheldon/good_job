@@ -4,6 +4,8 @@ module GoodJob
     module Concurrency
       extend ActiveSupport::Concern
 
+      VALID_TYPES = [String, Symbol, Numeric, Date, Time, TrueClass, FalseClass, NilClass].freeze
+
       class ConcurrencyExceededError < StandardError
         def backtrace
           [] # suppress backtrace
@@ -30,6 +32,11 @@ module GoodJob
           # Always allow jobs to be retried because the current job's execution will complete momentarily
           next(block.call) if CurrentThread.active_job_id == job.job_id
 
+          # Only generate the concurrency key on the initial enqueue in case it is dynamic
+          job.good_job_concurrency_key ||= job._good_job_concurrency_key
+          key = job.good_job_concurrency_key
+          next(block.call) if key.blank?
+
           enqueue_limit = job.class.good_job_concurrency_config[:enqueue_limit]
           enqueue_limit = instance_exec(&enqueue_limit) if enqueue_limit.respond_to?(:call)
           enqueue_limit = nil unless enqueue_limit.present? && (0...Float::INFINITY).cover?(enqueue_limit)
@@ -42,11 +49,6 @@ module GoodJob
 
           limit = enqueue_limit || total_limit
           next(block.call) unless limit
-
-          # Only generate the concurrency key on the initial enqueue in case it is dynamic
-          job.good_job_concurrency_key ||= job._good_job_concurrency_key
-          key = job.good_job_concurrency_key
-          next(block.call) if key.blank?
 
           GoodJob::Execution.advisory_lock_key(key, function: "pg_advisory_lock") do
             enqueue_concurrency = if enqueue_limit
@@ -117,11 +119,10 @@ module GoodJob
         key = self.class.good_job_concurrency_config[:key]
         return if key.blank?
 
-        if key.respond_to? :call
-          instance_exec(&key)
-        else
-          key
-        end
+        key = key.respond_to?(:call) ? instance_exec(&key) : key
+        raise TypeError, "Concurrency key must be a String; was a #{key.class}" unless VALID_TYPES.any? { |type| key.is_a?(type) }
+
+        key
       end
     end
   end

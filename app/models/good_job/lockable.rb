@@ -193,6 +193,7 @@ module GoodJob
         binds = [
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
         ]
+
         locked = connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).first['locked']
         return locked unless block_given?
         return nil unless locked
