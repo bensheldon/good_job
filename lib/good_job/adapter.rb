@@ -136,7 +136,8 @@ module GoodJob
         job_state[:scheduled_at] = execution.scheduled_at if execution.scheduled_at
 
         executed_locally = execute_async? && @scheduler&.create_thread(job_state)
-        Notifier.notify(job_state) unless executed_locally
+        notify_enabled = active_job.respond_to?(:good_job_notify) ? active_job.good_job_notify : true
+        Notifier.notify(job_state) if notify_enabled && !executed_locally
       end
 
       execution
