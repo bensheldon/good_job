@@ -34,10 +34,6 @@ module GoodJob
       render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "rails_ujs.js")
     end
 
-    def scripts_js
-      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "scripts.js")
-    end
-
     def style_css
       render file: GoodJob::Engine.root.join("app", "assets", "good_job", "style.css")
     end

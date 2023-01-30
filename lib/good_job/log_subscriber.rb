@@ -85,6 +85,19 @@ module GoodJob
       end
     end
 
+    def scheduler_shutdown_kill(event)
+      process_id = event.payload[:process_id]
+
+      warn(tags: [process_id]) do
+        active_job_ids = event.payload.fetch(:active_job_ids, [])
+        if active_job_ids.any?
+          "GoodJob scheduler has been killed. The following Active Jobs were interrupted: #{active_job_ids.join(' ')}"
+        else
+          "GoodJob scheduler has been killed."
+        end
+      end
+    end
+
     # @!macro notification_responder
     def scheduler_restart_pools(event)
       process_id = event.payload[:process_id]

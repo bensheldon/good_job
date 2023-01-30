@@ -2,6 +2,13 @@
 require 'rails_helper'
 
 describe GoodJob::CleanupTracker do
+  describe '#new' do
+    it 'raises an argument error when provided zero' do
+      expect { described_class.new(cleanup_interval_seconds: 0) }.to raise_error(ArgumentError)
+      expect { described_class.new(cleanup_interval_jobs: 0) }.to raise_error(ArgumentError)
+    end
+  end
+
   describe '#cleanup?' do
     context 'with default parameters' do
       it 'will never trigger a cleanup' do
@@ -15,7 +22,7 @@ describe GoodJob::CleanupTracker do
     end
 
     it 'will trigger a after cleanup_interval_jobs is exceeded' do
-      tracker = described_class.new(cleanup_interval_seconds: nil, cleanup_interval_jobs: 10)
+      tracker = described_class.new(cleanup_interval_seconds: false, cleanup_interval_jobs: 10)
 
       10.times { tracker.increment }
       expect(tracker.cleanup?).to be false

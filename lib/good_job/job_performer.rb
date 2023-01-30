@@ -10,6 +10,8 @@ module GoodJob
   # The JobPerformer must be safe to execute across multiple threads.
   #
   class JobPerformer
+    cattr_accessor :performing_active_job_ids, default: Concurrent::Set.new
+
     # @param queue_string [String] Queues to execute jobs from
     def initialize(queue_string)
       @queue_string = queue_string
@@ -24,7 +26,13 @@ module GoodJob
     # Perform the next eligible job
     # @return [Object, nil] Returns job result or +nil+ if no job was found
     def next
-      job_query.perform_with_advisory_lock(parsed_queues: parsed_queues, queue_select_limit: GoodJob.configuration.queue_select_limit)
+      active_job_id = nil
+      job_query.perform_with_advisory_lock(parsed_queues: parsed_queues, queue_select_limit: GoodJob.configuration.queue_select_limit) do |execution|
+        active_job_id = execution.active_job_id
+        performing_active_job_ids << active_job_id
+      end
+    ensure
+      performing_active_job_ids.delete(active_job_id)
     end
 
     # Tests whether this performer should be used in GoodJob's current state.
