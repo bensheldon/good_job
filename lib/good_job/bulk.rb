@@ -5,8 +5,15 @@ module GoodJob
   module Bulk
     Error = Class.new(StandardError)
 
+    # @!attribute [rw] current_buffer
+    #   @!scope class
+    #   Current buffer of jobs to be enqueued.
+    #   @return [GoodJob::Bulk::Buffer, nil]
     thread_mattr_accessor :current_buffer
 
+    # Capture jobs to a buffer. Pass either a block, or specific Active Jobs to be buffered.
+    # @param active_jobs [Array<ActiveJob::Base>] Active Jobs to be buffered.
+    # @param queue_adapter Override the jobs implict queue adapter with an explicit one.
     # @return [nil, Array<ActiveJob::Base>] The ActiveJob instances that have been buffered; nil if no active buffer
     def self.capture(active_jobs = nil, queue_adapter: nil)
       raise(ArgumentError, "Use either the block form or the argument form, not both") if block_given? && active_jobs
@@ -25,15 +32,8 @@ module GoodJob
       end
     end
 
-    # Temporarily unset the current buffer; used to enqueue buffered jobs
-    def self.unbuffer
-      original_buffer = current_buffer
-      self.current_buffer = nil
-      yield
-    ensure
-      self.current_buffer = original_buffer
-    end
-
+    # Capture jobs to a buffer and enqueue them all at once; or enqueue the current buffer.
+    # @param active_jobs [Array<ActiveJob::Base>] Active Jobs to be enqueued.
     # @return [Array<ActiveJob::Base>] The ActiveJob instances that have been captured; check provider_job_id to confirm enqueued.
     def self.enqueue(active_jobs = nil)
       raise(ArgumentError, "Use either the block form or the argument form, not both") if block_given? && active_jobs
@@ -52,6 +52,16 @@ module GoodJob
         current_buffer.enqueue
         current_buffer.active_jobs
       end
+    end
+
+    # Temporarily unset the current buffer; used to enqueue buffered jobs.
+    # @return [void]
+    def self.unbuffer
+      original_buffer = current_buffer
+      self.current_buffer = nil
+      yield
+    ensure
+      self.current_buffer = original_buffer
     end
 
     class Buffer
