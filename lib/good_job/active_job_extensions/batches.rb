@@ -5,14 +5,9 @@ module GoodJob
       extend ActiveSupport::Concern
 
       def batch
-        CurrentThread.execution&.batch
+        @_batch ||= CurrentThread.execution&.batch&.to_batch
       end
       alias batch? batch
-
-      def batch_callback
-        CurrentThread.execution&.batch_callback
-      end
-      alias batch_callback? batch_callback
     end
   end
 end

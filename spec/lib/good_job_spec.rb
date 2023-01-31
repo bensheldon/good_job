@@ -39,7 +39,7 @@ describe GoodJob do
     let!(:old_finished_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago) }
     let!(:old_finished_job_execution) { GoodJob::Execution.create!(active_job_id: old_finished_job.active_job_id, retried_good_job_id: old_finished_job.id, finished_at: 16.days.ago) }
     let!(:old_discarded_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago, error: "Error") }
-    let!(:old_batch) { GoodJob::Batch.create!(finished_at: 15.days.ago) }
+    let!(:old_batch) { GoodJob::BatchRecord.create!(finished_at: 15.days.ago) }
 
     it 'deletes finished jobs' do
       destroyed_records_count = described_class.cleanup_preserved_jobs

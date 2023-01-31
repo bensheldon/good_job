@@ -69,7 +69,7 @@ module GoodJob
       end
     end
 
-    belongs_to :batch, class_name: 'GoodJob::Batch', optional: true, inverse_of: :executions
+    belongs_to :batch, class_name: 'GoodJob::BatchRecord', optional: true, inverse_of: :executions
     belongs_to :batch_callback, class_name: 'GoodJob::Batch', optional: true
 
     belongs_to :job, class_name: 'GoodJob::Job', foreign_key: 'active_job_id', primary_key: 'active_job_id', optional: true, inverse_of: :executions
@@ -219,15 +219,15 @@ module GoodJob
       current_execution = CurrentThread.execution
 
       if reenqueued_current_execution
-        if GoodJob::Batch.migrated?
+        if GoodJob::BatchRecord.migrated?
           execution_args[:batch_id] = current_execution.batch_id
           execution_args[:batch_callback_id] = current_execution.batch_callback_id
         end
         execution_args[:cron_key] = current_execution.cron_key
       else
-        if GoodJob::Batch.migrated?
-          execution_args[:batch_id] = GoodJob::Batch.current_batch_id
-          execution_args[:batch_callback_id] = GoodJob::Batch.current_batch_callback_id
+        if GoodJob::BatchRecord.migrated?
+          execution_args[:batch_id] = GoodJob::BatchRecord.current_batch_id
+          execution_args[:batch_callback_id] = GoodJob::BatchRecord.current_batch_callback_id
         end
         execution_args[:cron_key] = CurrentThread.cron_key
         execution_args[:cron_at] = CurrentThread.cron_at
@@ -431,11 +431,11 @@ module GoodJob
     end
 
     def reset_batch_values(&block)
-      GoodJob::Batch.within_thread(batch_id: nil, batch_callback_id: nil, &block)
+      GoodJob::BatchRecord.within_thread(batch_id: nil, batch_callback_id: nil, &block)
     end
 
     def continue_discard_or_finish_batch
-      batch._continue_discard_or_finish(self) if GoodJob::Batch.migrated? && batch.present?
+      batch._continue_discard_or_finish(self) if GoodJob::BatchRecord.migrated? && batch.present?
     end
   end
 end

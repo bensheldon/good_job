@@ -1,4 +1,4 @@
-<% if GoodJob::Batch.migrated? %>
+<% if GoodJob::BatchRecord.migrated? %>
   <%= render 'good_job/batches/table', batches: @filter.records, filter: @filter %>
   <% if @filter.records.present? %>
     <nav aria-label="Batch pagination" class="mt-3">

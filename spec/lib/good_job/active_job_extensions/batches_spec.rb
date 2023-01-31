@@ -14,19 +14,11 @@ RSpec.describe GoodJob::ActiveJobExtensions::Batches do
         RESULTS << batch.properties[:some_property]
       end
     end)
-
-    stub_const 'TestCallbackJob', (Class.new(ActiveJob::Base) do
-      include GoodJob::ActiveJobExtensions::Batches
-
-      def perform(_batch)
-        RESULTS << batch_callback
-      end
-    end)
   end
 
   describe 'batch accessors' do
-    it 'access batch and batch_callback' do
-      batch = GoodJob::Batch.enqueue(TestCallbackJob, some_property: "Apple") do
+    it 'access batch' do
+      batch = GoodJob::Batch.enqueue(some_property: "Apple") do
         TestJob.perform_later
         TestJob.perform_later
       end
@@ -34,7 +26,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Batches do
       expect(batch).to be_a GoodJob::Batch
       expect(batch).to be_finished
 
-      expect(RESULTS).to eq ["Apple", "Apple", batch]
+      expect(RESULTS).to eq ["Apple", "Apple"]
     end
   end
 end

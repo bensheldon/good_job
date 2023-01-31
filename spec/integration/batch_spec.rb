@@ -85,6 +85,7 @@ RSpec.describe 'Batches' do
 
         last_job = GoodJob::Job.order(:created_at).last
         expect(last_job).to have_attributes(job_class: 'BatchCallbackJob')
+        expect(last_job.error).to be_nil
       end
     end
   end
@@ -142,7 +143,7 @@ RSpec.describe 'Batches' do
       end
 
       expect(GoodJob::Job.count).to eq 2
-      expect(batch.jobs.count).to eq 1
+      expect(batch.active_jobs.count).to eq 1
     end
   end
 
@@ -178,9 +179,8 @@ RSpec.describe 'Batches' do
       GoodJob.perform_inline
 
       expect(DONE.value).to be true
-      expect(batch.jobs.count).to eq 10
-      expect(batch.callback_jobs.count).to eq 3
-      expect(GoodJob::Execution.count).to eq 13
+      expect(batch.active_jobs.count).to eq 10
+      expect(batch.active_job_callbacks.count).to eq 3
     end
   end
 end

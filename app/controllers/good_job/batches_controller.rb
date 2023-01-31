@@ -6,7 +6,7 @@ module GoodJob
     end
 
     def show
-      @batch = GoodJob::Batch.find(params[:id])
+      @batch = GoodJob::BatchRecord.find(params[:id])
     end
   end
 end

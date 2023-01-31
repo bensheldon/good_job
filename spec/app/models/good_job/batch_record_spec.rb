@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-describe GoodJob::Batch do
+describe GoodJob::BatchRecord do
   before do
     stub_const 'TestJob', Class.new(ActiveJob::Base)
     TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
@@ -9,58 +9,58 @@ describe GoodJob::Batch do
 
   describe '.enqueue' do
     it 'creates a batch' do
-      batch = described_class.enqueue do
+      record = described_class.enqueue do
         TestJob.perform_later
         TestJob.perform_later
       end
 
-      expect(batch).to be_persisted
-      expect(batch.enqueued_at).to be_within(1.second).of(Time.current)
-      expect(batch.jobs.count).to eq 2
+      expect(record).to be_persisted
+      expect(record.enqueued_at).to be_within(1.second).of(Time.current)
+      expect(record.jobs.count).to eq 2
     end
   end
 
   describe '#add' do
-    let(:batch) { described_class.new }
+    let(:record) { described_class.new }
 
     it 'preserves the batch' do
-      batch.add do
+      record.add do
         TestJob.perform_later
         TestJob.perform_later
       end
 
-      expect(batch).to be_persisted
-      expect(batch.jobs.count).to eq 2
+      expect(record).to be_persisted
+      expect(record.jobs.count).to eq 2
     end
   end
 
   describe '#enqueue' do
-    let(:batch) { described_class.new }
+    let(:record) { described_class.new }
 
     it 'marks the job as enqueued' do
-      batch.enqueue do
+      record.enqueue do
         TestJob.perform_later
         TestJob.perform_later
       end
 
-      expect(batch.jobs.count).to eq 2
-      expect(batch.enqueued_at).to be_present
+      expect(record.jobs.count).to eq 2
+      expect(record.enqueued_at).to be_present
     end
 
     it 'can be used without a block' do
-      expect { batch.enqueue }.to change(batch, :enqueued_at).from(nil)
+      expect { record.enqueue }.to change(record, :enqueued_at).from(nil)
     end
 
     it 'does not overwrite an old value' do
-      batch.enqueued_at = 1.day.ago
-      expect { batch.enqueue }.not_to change(batch, :enqueued_at)
+      record.enqueued_at = 1.day.ago
+      expect { record.enqueue }.not_to change(record, :enqueued_at)
     end
 
     it 'can assign the callback job' do
-      batch = described_class.new
-      batch.enqueue(TestJob)
+      record = described_class.new
+      record.enqueue(TestJob)
 
-      expect(batch.callback_job_class).to eq "TestJob"
+      expect(record.callback_job_class).to eq "TestJob"
     end
   end
 
