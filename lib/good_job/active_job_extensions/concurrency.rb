@@ -25,40 +25,13 @@ module GoodJob
         class_attribute :good_job_concurrency_config, instance_accessor: false, default: {}
         attr_writer :good_job_concurrency_key
 
-        around_enqueue do |job, block|
-          # Don't attempt to enforce concurrency limits with other queue adapters.
-          next(block.call) unless job.class.queue_adapter.is_a?(GoodJob::Adapter)
-
-          # Always allow jobs to be retried because the current job's execution will complete momentarily
-          next(block.call) if CurrentThread.active_job_id == job.job_id
-
-          # Only generate the concurrency key on the initial enqueue in case it is dynamic
-          job.good_job_concurrency_key ||= job._good_job_concurrency_key
-          key = job.good_job_concurrency_key
-          next(block.call) if key.blank?
-
-          enqueue_limit = job.class.good_job_concurrency_config[:enqueue_limit]
-          enqueue_limit = instance_exec(&enqueue_limit) if enqueue_limit.respond_to?(:call)
-          enqueue_limit = nil unless enqueue_limit.present? && (0...Float::INFINITY).cover?(enqueue_limit)
-
-          unless enqueue_limit
-            total_limit = job.class.good_job_concurrency_config[:total_limit]
-            total_limit = instance_exec(&total_limit) if total_limit.respond_to?(:call)
-            total_limit = nil unless total_limit.present? && (0...Float::INFINITY).cover?(total_limit)
+        if ActiveJob.gem_version >= Gem::Version.new("6.1.0")
+          before_enqueue do |job|
+            good_job_enqueue_concurrency_check(job, on_abort: -> { throw(:abort) }, on_enqueue: nil)
           end
-
-          limit = enqueue_limit || total_limit
-          next(block.call) unless limit
-
-          GoodJob::Execution.advisory_lock_key(key, function: "pg_advisory_lock") do
-            enqueue_concurrency = if enqueue_limit
-                                    GoodJob::Execution.where(concurrency_key: key).unfinished.advisory_unlocked.count
-                                  else
-                                    GoodJob::Execution.where(concurrency_key: key).unfinished.count
-                                  end
-
-            # The job has not yet been enqueued, so check if adding it will go over the limit
-            block.call unless (enqueue_concurrency + 1) > limit
+        else
+          around_enqueue do |job, block|
+            good_job_enqueue_concurrency_check(job, on_abort: nil, on_enqueue: block)
           end
         end
 
@@ -111,6 +84,50 @@ module GoodJob
       # @return [Object] concurrency key
       def good_job_concurrency_key
         @good_job_concurrency_key || _good_job_concurrency_key
+      end
+
+      private
+
+      def good_job_enqueue_concurrency_check(job, on_abort:, on_enqueue:)
+        # Don't attempt to enforce concurrency limits with other queue adapters.
+        return on_enqueue&.call unless job.class.queue_adapter.is_a?(GoodJob::Adapter)
+
+        # Always allow jobs to be retried because the current job's execution will complete momentarily
+        return on_enqueue&.call if CurrentThread.active_job_id == job.job_id
+
+        # Only generate the concurrency key on the initial enqueue in case it is dynamic
+        job.good_job_concurrency_key ||= job._good_job_concurrency_key
+        key = job.good_job_concurrency_key
+        return on_enqueue&.call if key.blank?
+
+        enqueue_limit = job.class.good_job_concurrency_config[:enqueue_limit]
+        enqueue_limit = instance_exec(&enqueue_limit) if enqueue_limit.respond_to?(:call)
+        enqueue_limit = nil unless enqueue_limit.present? && (0...Float::INFINITY).cover?(enqueue_limit)
+
+        unless enqueue_limit
+          total_limit = job.class.good_job_concurrency_config[:total_limit]
+          total_limit = instance_exec(&total_limit) if total_limit.respond_to?(:call)
+          total_limit = nil unless total_limit.present? && (0...Float::INFINITY).cover?(total_limit)
+        end
+
+        limit = enqueue_limit || total_limit
+        return on_enqueue&.call unless limit
+
+        GoodJob::Execution.advisory_lock_key(key, function: "pg_advisory_lock") do
+          enqueue_concurrency = if enqueue_limit
+                                  GoodJob::Execution.where(concurrency_key: key).unfinished.advisory_unlocked.count
+                                else
+                                  GoodJob::Execution.where(concurrency_key: key).unfinished.count
+                                end
+
+          # The job has not yet been enqueued, so check if adding it will go over the limit
+          if (enqueue_concurrency + 1) > limit
+            logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its limit of #{limit} #{'job'.pluralize(limit)}"
+            on_abort&.call
+          else
+            on_enqueue&.call
+          end
+        end
       end
 
       # Generates the concurrency key from the configuration
