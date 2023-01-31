@@ -1,5 +1,24 @@
 # Changelog
 
+## [v3.9.0](https://github.com/bensheldon/good_job/tree/v3.9.0) (2023-01-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.8.0...v3.9.0)
+
+**Implemented enhancements:**
+
+- Abort enqueue when the concurrency limit is reached [\#820](https://github.com/bensheldon/good_job/pull/820) ([TAGraves](https://github.com/TAGraves))
+- Add bulk enqueue functionality [\#790](https://github.com/bensheldon/good_job/pull/790) ([julik](https://github.com/julik))
+
+**Merged pull requests:**
+
+- Bump alex-page/github-project-automation-plus from 0.8.2 to 0.8.3 [\#819](https://github.com/bensheldon/good_job/pull/819) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump concurrent-ruby from 1.1.10 to 1.2.0 [\#818](https://github.com/bensheldon/good_job/pull/818) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rails from 6.1.7 to 6.1.7.2 [\#817](https://github.com/bensheldon/good_job/pull/817) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump selenium-webdriver from 4.7.1 to 4.8.0 [\#816](https://github.com/bensheldon/good_job/pull/816) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rubocop from 1.43.0 to 1.44.1 [\#815](https://github.com/bensheldon/good_job/pull/815) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Ensure that anytime the Notifier uses autoloaded constants \(ActiveRecord\), they are wrapped with a Rails Executor [\#797](https://github.com/bensheldon/good_job/pull/797) ([bensheldon](https://github.com/bensheldon))
+- Remove support for Ruby 2.5 and JRuby 9.2; reactivate appraisal tests for Rails HEAD [\#756](https://github.com/bensheldon/good_job/pull/756) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.8.0](https://github.com/bensheldon/good_job/tree/v3.8.0) (2023-01-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.4...v3.8.0)
@@ -68,13 +87,16 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.7.1...v3.7.2)
 
+**Fixed bugs:**
+
+- Ignore ActiveJob::DeserializationError when discarding jobs [\#771](https://github.com/bensheldon/good_job/pull/771) ([nickcampbell18](https://github.com/nickcampbell18))
+
 **Closed issues:**
 
 - Unable to discard failed jobs which crashed with `ActiveJob::DeserializationError` [\#770](https://github.com/bensheldon/good_job/issues/770)
 
 **Merged pull requests:**
 
-- Ignore ActiveJob::DeserializationError when discarding jobs [\#771](https://github.com/bensheldon/good_job/pull/771) ([nickcampbell18](https://github.com/nickcampbell18))
 - Bump rubocop from 1.39.0 to 1.40.0 [\#769](https://github.com/bensheldon/good_job/pull/769) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v3.7.1](https://github.com/bensheldon/good_job/tree/v3.7.1) (2022-12-12)
