@@ -4,17 +4,20 @@ source "https://rubygems.org"
 
 gem "activerecord-jdbcpostgresql-adapter", platforms: [:jruby]
 gem "appraisal", branch: "fix-bundle-env", git: "https://github.com/bensheldon/appraisal.git"
+gem "matrix"
+gem "nokogiri"
 gem "pg", platforms: [:mri, :mingw, :x64_mingw]
 gem "rails", branch: "main", git: "https://github.com/rails/rails.git"
+gem "selenium-webdriver", "~> 4.0"
 
 platforms :ruby do
   gem "activerecord-explain-analyze"
-  gem "memory_profiler"
   gem "pry-byebug"
-  gem "rbtrace"
 
   group :lint do
-    gem "erb_lint", ">= 0.0.35"
+    gem "easy_translate"
+    gem "erb_lint"
+    gem "i18n-tasks"
     gem "mdl"
     gem "rubocop"
     gem "rubocop-performance"

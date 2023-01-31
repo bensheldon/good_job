@@ -67,7 +67,7 @@ jobs:
       # Validate Development Environment
       - name: bin/setup
         run: bin/rails db:test:prepare
-      - name: bin/setup
+      - name: bin/rspec
         run: bin/rspec
 
   test:
@@ -76,7 +76,7 @@ jobs:
     timeout-minutes: 15
     strategy:
       matrix:
-        ruby: [2.5, 2.6, 2.7, "3.0", 3.1, 3.2, jruby-9.3]
+        ruby: [2.6, 2.7, "3.0", 3.1, 3.2, jruby-9.3]
         pg: [14]
         include:
           - ruby: "3.0"
@@ -134,6 +134,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
+          rubygems: latest
       - name: Cache Appraisal gems
         uses: actions/cache@v3
         with:

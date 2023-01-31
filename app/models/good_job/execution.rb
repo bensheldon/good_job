@@ -43,10 +43,10 @@ module GoodJob
       case string.first
       when '-'
         exclude_queues = true
-        string = string[1..-1]
+        string = string[1..]
       when '+'
         ordered_queues = true
-        string = string[1..-1]
+        string = string[1..]
       end
 
       queues = string.split(',').map(&:strip)

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 require 'rails_helper'
+require 'uri'
+require 'net/http'
 
 RSpec.describe 'Server modes', skip_if_java: true do
   let(:port) { 3009 }
@@ -17,6 +19,10 @@ RSpec.describe 'Server modes', skip_if_java: true do
         wait_until(max: 30) do
           expect(shell.output).to include(/Listening on/)
           # In development, GoodJob starts up before Puma redirects logs to stdout
+
+          # Ensure Puma starts up and Rails fully bootstraps
+          Net::HTTP.get_response(URI("http://127.0.0.1:#{port}/good_job"))
+          # Cron should be enabled and enqueuing an ExampleJob every 5 seconds (defined in config/initializers/good_job.rb)
           expect(shell.output).to include(/Enqueued ExampleJob/)
         end
       end
