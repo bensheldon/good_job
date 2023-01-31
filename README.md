@@ -796,16 +796,23 @@ To explain where this value is used, here is the pseudo-query that GoodJob uses 
 
 ### Bulk enqueue
 
-GoodJob's Bulk-enqueue functionality can buffer and enqueue multiple jobs at once, using a single INSERT statement. This can useful and performant when enqueuing a large number of jobs.
+GoodJob's Bulk-enqueue functionality can buffer and enqueue multiple jobs at once, using a single INSERT statement. This can more performant when enqueuing a large number of jobs.
 
 ```ruby
-GoodJob::Bulk.enqueue do
+# Capture jobs using `.perform_later`:
+active_jobs = GoodJob::Bulk.enqueue do
   MyJob.perform_later
   AnotherJob.perform_later
+  # If an exception is raised within this block, no jobs will be inserted.
 end
-```
 
-All jobs are inserted at the `end` of the `GoodJob::Bulk.enqueue` block; if an exception is raised within the block, no jobs will be inserted.
+# All ActiveJob instances are returned from GoodJob::Bulk.enqueue.
+# Jobs that have been successfully enqueued have a `provider_job_id` set.
+active_jobs.all?(&:provider_job_id)
+
+# Bulk enqueue ActiveJob instances directly without using `.perform_later`:
+GoodJob::Bulk.enqueue(MyJob.new, AnotherJob.new)
+```
 
 ### Execute jobs async / in-process
 

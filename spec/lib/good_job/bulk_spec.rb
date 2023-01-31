@@ -76,11 +76,13 @@ describe GoodJob::Bulk do
     end
 
     it 'can enqueue Active Jobs directly' do
-      active_job = TestJob.new
-      result = described_class.enqueue(active_job)
+      active_jobs = [TestJob.new, TestJob.new]
+      result = described_class.enqueue(active_jobs)
 
-      expect(result).to eq [active_job]
-      expect(active_job.provider_job_id).to be_present
+      expect(result).to eq active_jobs
+
+      # Expect active_jobs to all have provider_job_id
+      expect(active_jobs.all?(&:provider_job_id)).to be true
     end
 
     it 'does not re-enqueue Active Jobs that have already been enqueued' do
