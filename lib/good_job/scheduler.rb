@@ -155,6 +155,19 @@ module GoodJob # :nodoc:
       if state
         return false unless performer.next?(state)
 
+        if state[:count]
+          # When given state for multiple jobs, try to create a thread for each one.
+          # Return true if a thread can be created for all of them, nil if partial or none.
+
+          state_without_count = state.without(:count)
+          result = state[:count].times do
+            value = create_thread(state_without_count)
+            break(value) unless value
+          end
+
+          return result.nil? ? nil : true
+        end
+
         if state[:scheduled_at]
           scheduled_at = if state[:scheduled_at].is_a? String
                            Time.zone.parse state[:scheduled_at]

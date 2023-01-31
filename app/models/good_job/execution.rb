@@ -197,6 +197,28 @@ module GoodJob
       end
     end)
 
+    # Construct a GoodJob::Execution from an ActiveJob instance.
+    def self.build_for_enqueue(active_job, overrides = {})
+      execution_args = {
+        active_job_id: active_job.job_id,
+        queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
+        priority: active_job.priority || DEFAULT_PRIORITY,
+        serialized_params: active_job.serialize,
+        scheduled_at: active_job.scheduled_at,
+      }
+
+      execution_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
+
+      if CurrentThread.cron_key
+        execution_args[:cron_key] = CurrentThread.cron_key
+        execution_args[:cron_at] = CurrentThread.cron_at
+      elsif CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
+        execution_args[:cron_key] = CurrentThread.execution.cron_key
+      end
+
+      new(**execution_args.merge(overrides))
+    end
+
     # Finds the next eligible Execution, acquire an advisory lock related to it, and
     # executes the job.
     # @return [ExecutionResult, nil]
@@ -244,33 +266,19 @@ module GoodJob
     # @param active_job [ActiveJob::Base]
     #   The job to enqueue.
     # @param scheduled_at [Float]
-    #   Epoch timestamp when the job should be executed.
+    #   Epoch timestamp when the job should be executed, if blank will delegate to the ActiveJob instance
     # @param create_with_advisory_lock [Boolean]
     #   Whether to establish a lock on the {Execution} record after it is created.
+    # @param persist_immediately [Boolean]
+    #   Whether to save the record immediately or just initialize it with values. When bulk-inserting
+    #   jobs the caller takes care of the persistence and sets this parameter to `false`
     # @return [Execution]
     #   The new {Execution} instance representing the queued ActiveJob job.
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
-        execution_args = {
-          active_job_id: active_job.job_id,
-          queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
-          priority: active_job.priority || DEFAULT_PRIORITY,
-          serialized_params: active_job.serialize,
-          scheduled_at: scheduled_at,
-          create_with_advisory_lock: create_with_advisory_lock,
-        }
+        execution = build_for_enqueue(active_job, { scheduled_at: scheduled_at })
 
-        execution_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
-
-        if CurrentThread.cron_key
-          execution_args[:cron_key] = CurrentThread.cron_key
-          execution_args[:cron_at] = CurrentThread.cron_at
-        elsif CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
-          execution_args[:cron_key] = CurrentThread.execution.cron_key
-        end
-
-        execution = GoodJob::Execution.new(**execution_args)
-
+        execution.create_with_advisory_lock = create_with_advisory_lock
         instrument_payload[:execution] = execution
 
         execution.save!

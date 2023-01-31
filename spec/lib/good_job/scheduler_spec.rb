@@ -140,6 +140,18 @@ RSpec.describe GoodJob::Scheduler do
 
       expect(scheduler.create_thread(queue_name: 'elephant')).to be false
     end
+
+    it 'uses state[:count] to create multiple threads' do
+      job_performer = instance_double(GoodJob::JobPerformer, next: nil, next?: true, name: '', next_at: [], cleanup: nil)
+      scheduler = described_class.new(job_performer, max_threads: 1)
+
+      result = scheduler.create_thread({ count: 10 })
+      if result
+        expect(job_performer).to have_received(:next).exactly(10).times
+      else
+        expect(job_performer).to have_received(:next).at_most(9).times
+      end
+    end
   end
 
   describe '#stats' do

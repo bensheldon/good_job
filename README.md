@@ -58,6 +58,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Database connections](#database-connections)
         - [Production setup](#production-setup)
         - [Queue performance with Queue Select Limit](#queue-performance-with-queue-select-limit)
+    - [Bulk enqueue](#bulk-enqueue)
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
     - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
@@ -791,6 +792,26 @@ To explain where this value is used, here is the pseudo-query that GoodJob uses 
     WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || '-' || active_job_id::text), 1, 16))::bit(64)::bigint)
     LIMIT 1
   )
+```
+
+### Bulk enqueue
+
+GoodJob's Bulk-enqueue functionality can buffer and enqueue multiple jobs at once, using a single INSERT statement. This can more performant when enqueuing a large number of jobs.
+
+```ruby
+# Capture jobs using `.perform_later`:
+active_jobs = GoodJob::Bulk.enqueue do
+  MyJob.perform_later
+  AnotherJob.perform_later
+  # If an exception is raised within this block, no jobs will be inserted.
+end
+
+# All ActiveJob instances are returned from GoodJob::Bulk.enqueue.
+# Jobs that have been successfully enqueued have a `provider_job_id` set.
+active_jobs.all?(&:provider_job_id)
+
+# Bulk enqueue ActiveJob instances directly without using `.perform_later`:
+GoodJob::Bulk.enqueue(MyJob.new, AnotherJob.new)
 ```
 
 ### Execute jobs async / in-process

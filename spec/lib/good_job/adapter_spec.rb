@@ -104,6 +104,53 @@ RSpec.describe GoodJob::Adapter do
     end
   end
 
+  describe '#enqueue_all' do
+    it 'enqueues multiple active jobs, returns the number of jobs enqueued, and sets provider_job_id' do
+      active_jobs = [ExampleJob.new, ExampleJob.new]
+      result = adapter.enqueue_all(active_jobs)
+      expect(result).to eq 2
+
+      provider_job_ids = active_jobs.map(&:provider_job_id)
+      expect(provider_job_ids).to all(be_present)
+    end
+
+    context 'when a job fails to enqueue' do
+      it 'does not set a provider_job_id' do
+        allow(GoodJob::Execution).to receive(:insert_all).and_wrap_original do |original_method, *args|
+          attributes, kwargs = *args
+          original_method.call(attributes[0, 1], **kwargs) #  pretend only the first item is successfully inserted
+        end
+
+        active_jobs = [ExampleJob.new, ExampleJob.new]
+        result = adapter.enqueue_all(active_jobs)
+        expect(result).to eq 1
+
+        provider_job_ids = active_jobs.map(&:provider_job_id)
+        expect(provider_job_ids).to include(nil)
+      end
+    end
+
+    context 'when the adapter is inline' do
+      let(:adapter) { described_class.new(execution_mode: :inline) }
+
+      it 'executes the jobs immediately' do
+        stub_const 'PERFORMED', []
+        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+          def perform
+            raise "Not advisory locked" unless GoodJob::Execution.find(provider_job_id).advisory_locked?
+
+            PERFORMED << Time.current
+          end
+        end)
+
+        active_jobs = [TestJob.new, TestJob.new]
+        result = adapter.enqueue_all(active_jobs)
+        expect(result).to eq 2
+        expect(PERFORMED.size).to eq 2
+      end
+    end
+  end
+
   describe '#shutdown' do
     it 'is callable' do
       expect { adapter.shutdown }.not_to raise_error
