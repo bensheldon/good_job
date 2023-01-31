@@ -27,11 +27,11 @@ module GoodJob
 
         if ActiveJob.gem_version >= Gem::Version.new("6.1.0")
           before_enqueue do |job|
-            _check_enqueue_concurrency(job, on_abort: -> { throw(:abort) }, on_enqueue: nil)
+            good_job_enqueue_concurrency_check(job, on_abort: -> { throw(:abort) }, on_enqueue: nil)
           end
         else
           around_enqueue do |job, block|
-            _check_enqueue_concurrency(job, on_abort: nil, on_enqueue: block)
+            good_job_enqueue_concurrency_check(job, on_abort: nil, on_enqueue: block)
           end
         end
 
@@ -86,7 +86,9 @@ module GoodJob
         @good_job_concurrency_key || _good_job_concurrency_key
       end
 
-      def _check_enqueue_concurrency(job, on_abort:, on_enqueue:)
+      private
+
+      def good_job_enqueue_concurrency_check(job, on_abort:, on_enqueue:)
         # Don't attempt to enforce concurrency limits with other queue adapters.
         return on_enqueue&.call unless job.class.queue_adapter.is_a?(GoodJob::Adapter)
 
@@ -120,7 +122,7 @@ module GoodJob
 
           # The job has not yet been enqueued, so check if adding it will go over the limit
           if (enqueue_concurrency + 1) > limit
-            GoodJob.logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its limit of #{limit} #{'job'.pluralize(limit)}"
+            logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its limit of #{limit} #{'job'.pluralize(limit)}"
             on_abort&.call
           else
             on_enqueue&.call
