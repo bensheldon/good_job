@@ -26,6 +26,9 @@ AllCops:
     - Brewfile
   NewCops: enable
 
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
 Layout/EmptyLineAfterMagicComment:
   Enabled: false
 
@@ -41,17 +44,14 @@ Layout/ParameterAlignment:
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
-Rails/I18nLocaleTexts:
-  Enabled: false
-
 Metrics:
   Enabled: false
 
 Naming/MemoizedInstanceVariableName:
   EnforcedStyleForLeadingUnderscores: required
 
-Rails/RakeEnvironment:
-  Enabled: false
+Naming/VariableNumber:
+  EnforcedStyle: snake_case
 
 Rails/ApplicationJob:
   Enabled: false
@@ -59,9 +59,15 @@ Rails/ApplicationJob:
 Rails/ApplicationRecord:
   Enabled: false
 
+Rails/I18nLocaleTexts:
+  Enabled: false
+
 Rails/Inquiry:
   Exclude:
     - spec/**/*
+
+Rails/RakeEnvironment:
+  Enabled: false
 
 Rails/SkipsModelValidations:
   Exclude:
@@ -90,10 +96,10 @@ RSpec/MultipleDescribes:
   Exclude:
     - spec/lib/tasks/*
 
-RSpec/NestedGroups:
+RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
-RSpec/MultipleMemoizedHelpers:
+RSpec/NestedGroups:
   Enabled: false
 
 Style/Documentation:
@@ -135,6 +141,3 @@ Style/TrailingCommaInArrayLiteral:
 
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
-
-Naming/VariableNumber:
-  EnforcedStyle: snake_case
