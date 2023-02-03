@@ -45,7 +45,7 @@ GoodJob::Execution.insert_all(jobs_data)
 puts "Inserted #{jobs_data.size} job records for a total of #{GoodJob::Execution.count} job records."
 
 100.times do
-  GoodJob::BatchRecord.enqueue(ExampleJob::BatchCallbackJob) do
+  GoodJob::Batch.enqueue(on_finish: ExampleJob::BatchCallbackJob) do
     (1..5).to_a.sample.times do
       job_type = [
         ExampleJob::SUCCESS_TYPE,

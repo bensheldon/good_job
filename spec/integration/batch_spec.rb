@@ -18,7 +18,7 @@ RSpec.describe 'Batches' do
     end)
 
     stub_const 'BatchCallbackJob', (Class.new(ActiveJob::Base) do
-      def perform(batch)
+      def perform(batch, options)
         # nil
       end
     end)
@@ -74,7 +74,7 @@ RSpec.describe 'Batches' do
 
     context 'when there is a callback' do
       it 'calls the callback with a batch' do
-        batch = GoodJob::Batch.enqueue(description: "foobar", callback_job_class: "BatchCallbackJob", foo: "bar") do
+        batch = GoodJob::Batch.enqueue(description: "foobar", on_finish: "BatchCallbackJob", foo: "bar") do
           TestJob.perform_later
         end
 
@@ -93,7 +93,7 @@ RSpec.describe 'Batches' do
   describe 'complex batching' do
     it 'can be used as instance object' do
       batch = GoodJob::Batch.new
-      batch.callback_job_class = "BatchCallbackJob"
+      batch.on_finish = "BatchCallbackJob"
       batch.callback_queue_name = "custom_queue"
       batch.callback_priority = 10
 
@@ -175,12 +175,73 @@ RSpec.describe 'Batches' do
     end
 
     it 'can enqueue multiple jobs' do
-      batch = GoodJob::Batch.enqueue("MyBatchJob", stage: 1)
+      batch = GoodJob::Batch.enqueue(on_finish: "MyBatchJob", stage: 1)
       GoodJob.perform_inline
 
       expect(DONE.value).to be true
       expect(batch.active_jobs.count).to eq 10
-      expect(batch.active_job_callbacks.count).to eq 3
+      expect(batch.callback_active_jobs.count).to eq 3
+    end
+  end
+
+  describe 'all callbacks are called and retryable' do
+    before do
+      stub_const 'RetryableError', Class.new(StandardError)
+      stub_const 'DiscardableError', Class.new(StandardError)
+      stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+        def perform(*args, **kwargs)
+        end
+      end)
+      stub_const 'DiscardedJob', (Class.new(ActiveJob::Base) do
+        discard_on 'DiscardableError'
+
+        def perform(*_args, **_kwargs)
+          raise DiscardableError
+        end
+      end)
+      stub_const 'RetriedJob', (Class.new(ActiveJob::Base) do
+        retry_on 'RetryableError', wait: 0, attempts: 2
+
+        def perform(*_args, **_kwargs)
+          raise RetryableError if executions == 1
+        end
+      end)
+    end
+
+    it 'calls discard callbacks' do
+      batch = GoodJob::Batch.enqueue(on_finish: "RetriedJob", on_success: "RetriedJob", on_discard: "RetriedJob", user: 'Alice') do
+        DiscardedJob.perform_later
+      end
+      GoodJob.perform_inline
+
+      expect(GoodJob::Job.count).to eq 3
+      expect(GoodJob::Execution.count).to eq 5
+      expect(GoodJob::Execution.where(batch_id: batch.id).count).to eq 1
+      expect(GoodJob::Execution.where(batch_callback_id: batch.id).count).to eq 4
+
+      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map(&:head_execution).map(&:active_job).map(&:arguments).map(&:second)
+      expect(callback_arguments).to eq [
+        { callback: "on_discard", properties: { user: "Alice" } },
+        { callback: "on_finish", properties: { user: "Alice" } },
+      ]
+    end
+
+    it 'calls success callbacks' do
+      batch = GoodJob::Batch.enqueue(on_finish: "RetriedJob", on_success: "RetriedJob", on_discard: "RetriedJob", user: 'Alice') do
+        TestJob.perform_later
+      end
+      GoodJob.perform_inline
+
+      expect(GoodJob::Job.count).to eq 3
+      expect(GoodJob::Execution.count).to eq 5
+      expect(GoodJob::Execution.where(batch_id: batch.id).count).to eq 1
+      expect(GoodJob::Execution.where(batch_callback_id: batch.id).count).to eq 4
+
+      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map(&:head_execution).map(&:active_job).map(&:arguments).map(&:second)
+      expect(callback_arguments).to eq [
+        { callback: "on_success", properties: { user: "Alice" } },
+        { callback: "on_finish", properties: { user: "Alice" } },
+      ]
     end
   end
 end

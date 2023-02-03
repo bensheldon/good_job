@@ -226,8 +226,8 @@ module GoodJob
         execution_args[:cron_key] = current_execution.cron_key
       else
         if GoodJob::BatchRecord.migrated?
-          execution_args[:batch_id] = GoodJob::BatchRecord.current_batch_id
-          execution_args[:batch_callback_id] = GoodJob::BatchRecord.current_batch_callback_id
+          execution_args[:batch_id] = GoodJob::Batch.current_batch_id
+          execution_args[:batch_callback_id] = GoodJob::Batch.current_batch_callback_id
         end
         execution_args[:cron_key] = CurrentThread.cron_key
         execution_args[:cron_at] = CurrentThread.cron_at
@@ -431,7 +431,7 @@ module GoodJob
     end
 
     def reset_batch_values(&block)
-      GoodJob::BatchRecord.within_thread(batch_id: nil, batch_callback_id: nil, &block)
+      GoodJob::Batch.within_thread(batch_id: nil, batch_callback_id: nil, &block)
     end
 
     def continue_discard_or_finish_batch

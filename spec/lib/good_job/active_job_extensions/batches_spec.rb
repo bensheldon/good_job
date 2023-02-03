@@ -26,7 +26,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Batches do
       expect(batch).to be_a GoodJob::Batch
       expect(batch).to be_finished
 
-      expect(RESULTS).to eq ["Apple", "Apple"]
+      expect(RESULTS).to eq %w[Apple Apple]
     end
   end
 end

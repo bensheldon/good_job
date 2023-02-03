@@ -13,7 +13,9 @@ class CreateGoodJobBatches < ActiveRecord::Migration[6.1]
       t.timestamps
       t.text :description
       t.jsonb :serialized_properties
-      t.text :callback_job_class
+      t.text :on_finish
+      t.text :on_success
+      t.text :on_discard
       t.text :callback_queue_name
       t.integer :callback_priority
       t.datetime :enqueued_at

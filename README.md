@@ -400,21 +400,26 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
 - A simple example that enqueues your `MyBatchCallbackJob` after the two jobs have finished, and passes along the current user as a batch property:
 
     ```ruby
-    GoodJob::Batch.enqueue(MyBatchCallbackJob, user: current_user) do
+    GoodJob::Batch.enqueue(on_finish: MyBatchCallbackJob, user: current_user) do
       MyJob.perform_later
       OtherJob.perform_later
     end
 
     # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, options)`
     class MyBatchCallbackJob < ApplicationJob
-      def perform(batch, options = {})
-        # Do something with the <GoodJob::Batch> instance; options is a hash is reserved for future use
+      # Callback jobs must accept a `batch` and `options` argument
+      def perform(batch, options)
+        # The batch object will contain the Batch's properties, which are mutable
         batch.properties[:user] # => <User id: 1, ...>
+
+        # Options is a hash containing further information about the callback
+        options[:callback] # => :on_finish
+        options[:properties] # => { user: <User id: 1, ...> } the Batch's properties at the time the callback job was enqueued
       end
     end
     ```
 
-- Jobs can be added to an existing batch. Jobs in a batch are enqueued and performed immediately, though the final callback job will not be enqueued until `GoodJob::Batch#enqueue` is called.
+- Jobs can be added to an existing batch. Jobs in a batch are enqueued and performed immediately/asynchronously. The final callback job will not be enqueued until `GoodJob::Batch#enqueue` is called.
 
     ```ruby
     batch = GoodJob::Batch.add do
@@ -423,10 +428,10 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
     batch.add do
       10.times { OtherJob.perform_later }
     end
-    batch.enqueue(MyBatchCallbackJob, age: 42)
+    batch.enqueue(on_finish: MyBatchCallbackJob, age: 42)
     ```
 
-- If you need to access the batch within a model, include [`GoodJob::ActiveJobExtensions::Batches`](lib/good_job/active_job_extensions/batches.rb) in your job class:
+- If you need to access the batch within a job that is part of the batch, include [`GoodJob::ActiveJobExtensions::Batches`](lib/good_job/active_job_extensions/batches.rb) in your job class:
 
   ```ruby
     class MyJob < ApplicationJob
@@ -438,27 +443,33 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
     end
     ```
 
-- [`GoodJob::Batch`](app/models/good_job/batch.rb) is an Active Record model and access its attributes like any other model:
+- [`GoodJob::Batch`](app/models/good_job/batch.rb) has a number of assignable attributes and methods:
 
 ```ruby
   batch = GoodJob::Batch.new
   batch.description = "My batch"
-  batch.callback_job_class = "MyBatchCallbackJob"
+  batch.on_finish = "MyBatchCallbackJob" # Callback job when all jobs have finished
+  batch.on_success = "MyBatchCallbackJob" # Callback job when/if all jobs have succeeded
+  batch.on_discard = "MyBatchCallbackJob" # Callback job when the first job in the batch is discarded
   batch.callback_queue_name = "special_queue"
-  batch.callback.priority = 10
+  batch.callback_priority = 10
   batch.properties = { age: 42 }
   batch.add do
     MyJob.perform_later
   end
   batch.enqueue
 
-  batch = GoodJob::Batch.where(callback_job_class: "MyBatchCallbackJob").first
   batch.discarded? # => Boolean
   batch.discarded_at # => <DateTime>
   batch.finished? # => Boolean
   batch.finished_at # => <DateTime>
   batch.succeeded? # => Boolean
-  batch.jobs # => <ActiveRecord::Relation of GoodJob::Job>
+  batch.active_jobs # => Array of ActiveJob::Base-inherited jobs that are part of the batch
+
+  batch = GoodJob::Batch.find(batch.id)
+  batch.description = "Updated batch description"
+  batch.save
+  batch.reload
 ```
 
 ### ActiveJob concurrency
