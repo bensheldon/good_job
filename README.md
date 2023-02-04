@@ -408,13 +408,12 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
     # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, options)`
     class MyBatchCallbackJob < ApplicationJob
       # Callback jobs must accept a `batch` and `options` argument
-      def perform(batch, options)
+      def perform(batch, params)
         # The batch object will contain the Batch's properties, which are mutable
         batch.properties[:user] # => <User id: 1, ...>
 
-        # Options is a hash containing further information about the callback
-        options[:callback] # => :on_finish
-        options[:properties] # => { user: <User id: 1, ...> } the Batch's properties at the time the callback job was enqueued
+        # Params is a hash containing additional context (more may be added in the future)
+        params[:event] # => :finish, :success, :discard
       end
     end
     ```
@@ -446,7 +445,7 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
 - [`GoodJob::Batch`](app/models/good_job/batch.rb) has a number of assignable attributes and methods:
 
 ```ruby
-  batch = GoodJob::Batch.new
+batch = GoodJob::Batch.new
 batch.description = "My batch"
 batch.on_finish = "MyBatchCallbackJob" # Callback job when all jobs have finished
 batch.on_success = "MyBatchCallbackJob" # Callback job when/if all jobs have succeeded
@@ -472,6 +471,30 @@ batch.save
 batch.reload
 ```
 
+### Batch callbacks
+
+Batch callbacks are Active Job jobs that are enqueued at certain events during the execution of jobs within the batch:
+
+- `:finish` - Enqueued when all jobs in the batch have finished, after all retries. Jobs will either be discarded or succeeded.
+- `:success` - Enqueued only when all jobs in the batch have finished and succeeded.
+- `:discard` - Enqueued immediately the first time a job in the batch is discarded.
+
+Callback jobs must accept a `batch` and `params` argument:
+
+```ruby
+class MyBatchCallbackJob < ApplicationJob
+  def perform(batch, params)
+    # The batch object will contain the Batch's properties
+    batch.properties[:user] # => <User id: 1, ...>
+    # Batches are mutable
+    batch.properties[:user] = User.find(2)
+    batch.save
+
+    # Params is a hash containing additional context (more may be added in the future)
+    params[:event] # => :finish, :success, :discard
+  end
+end
+```
 #### Complex batches
 
 Consider a multi-stage batch with both parallel and serial job steps:
@@ -529,6 +552,15 @@ end
 
 GoodJob::Batch.enqueue(on_finish: BatchJob)
 ```
+
+#### Other batch details
+
+- Whether to enqueue a callback job is evaluated once the batch is in an `enqueued?`-state by using `GoodJob::Batch.enqueue` or `batch.enqueue`.
+- Callback job enqueueing will be re-triggered if additional jobs are `enqueue`'d to the batch; use `add` to add jobs to the batch without retriggering callback jobs.
+- Callback jobs will be enqueued even if the batch contains no jobs.
+- Callback jobs perform asynchronously. It's possible that `:finish` and `:success` or `:discard` callback jobs perform at the same time. Keep this in mind when updating batch properties.
+- Batch properties are serialized using Active Job serialization. This is flexible, but can lead to deserialization errors if a GlobalID record is directly referenced but is subsequently deleted and thus unloadable.
+- 🚧Batches are a work in progress. Please let us know what would be helpful to improve their functionality and usefulness.
 
 ### ActiveJob concurrency
 

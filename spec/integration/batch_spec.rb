@@ -221,8 +221,8 @@ RSpec.describe 'Batches' do
 
       callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map(&:head_execution).map(&:active_job).map(&:arguments).map(&:second)
       expect(callback_arguments).to eq [
-        { callback: "on_discard", properties: { user: "Alice" } },
-        { callback: "on_finish", properties: { user: "Alice" } },
+        { event: :discard },
+        { event: :finish },
       ]
     end
 
@@ -239,8 +239,8 @@ RSpec.describe 'Batches' do
 
       callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map(&:head_execution).map(&:active_job).map(&:arguments).map(&:second)
       expect(callback_arguments).to eq [
-        { callback: "on_success", properties: { user: "Alice" } },
-        { callback: "on_finish", properties: { user: "Alice" } },
+        { event: :success },
+        { event: :finish },
       ]
     end
   end

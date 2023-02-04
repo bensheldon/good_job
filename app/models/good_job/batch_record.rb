@@ -49,13 +49,13 @@ module GoodJob
         Batch.within_thread(batch_id: nil, batch_callback_id: id) do
           if execution_discarded && discarded_at.blank?
             update(discarded_at: Time.current)
-            on_discard.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { callback: 'on_discard', properties: properties }) if on_discard.present?
+            on_discard.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :discard }) if on_discard.present?
           end
 
           if !finished_at && enqueued_at && jobs.where(finished_at: nil).count.zero?
             update(finished_at: Time.current)
-            on_success.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { callback: 'on_success', properties: properties }) if !discarded_at && on_success.present?
-            on_finish.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { callback: 'on_finish', properties: properties }) if on_finish.present?
+            on_success.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :success }) if !discarded_at && on_success.present?
+            on_finish.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :finish }) if on_finish.present?
           end
         end
       end
@@ -71,7 +71,7 @@ module GoodJob
       end
     end
 
-    attribute :serialized_properties, default: {} # Can be set as default value in `serialize` as of Rails v6.1
+    attribute :serialized_properties, :json, default: -> { {} } # Can be set as default value in `serialize` as of Rails v6.1
     serialize :serialized_properties, PropertySerializer
     alias_attribute :properties, :serialized_properties
 
