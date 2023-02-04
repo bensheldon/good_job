@@ -447,29 +447,87 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
 
 ```ruby
   batch = GoodJob::Batch.new
-  batch.description = "My batch"
-  batch.on_finish = "MyBatchCallbackJob" # Callback job when all jobs have finished
-  batch.on_success = "MyBatchCallbackJob" # Callback job when/if all jobs have succeeded
-  batch.on_discard = "MyBatchCallbackJob" # Callback job when the first job in the batch is discarded
-  batch.callback_queue_name = "special_queue"
-  batch.callback_priority = 10
-  batch.properties = { age: 42 }
-  batch.add do
-    MyJob.perform_later
+batch.description = "My batch"
+batch.on_finish = "MyBatchCallbackJob" # Callback job when all jobs have finished
+batch.on_success = "MyBatchCallbackJob" # Callback job when/if all jobs have succeeded
+batch.on_discard = "MyBatchCallbackJob" # Callback job when the first job in the batch is discarded
+batch.callback_queue_name = "special_queue"
+batch.callback_priority = 10
+batch.properties = { age: 42 }
+batch.add do
+  MyJob.perform_later
+end
+batch.enqueue
+
+batch.discarded? # => Boolean
+batch.discarded_at # => <DateTime>
+batch.finished? # => Boolean
+batch.finished_at # => <DateTime>
+batch.succeeded? # => Boolean
+batch.active_jobs # => Array of ActiveJob::Base-inherited jobs that are part of the batch
+
+batch = GoodJob::Batch.find(batch.id)
+batch.description = "Updated batch description"
+batch.save
+batch.reload
+```
+
+#### Complex batches
+
+Consider a multi-stage batch with both parallel and serial job steps:
+
+```mermaid
+graph TD
+    0{"BatchJob\n{ stage: nil }"}
+    0 --> a["WorkJob]\n{ step: a }"]
+    0 --> b["WorkJob]\n{ step: b }"]
+    0 --> c["WorkJob]\n{ step: c }"]
+    a --> 1
+    b --> 1
+    c --> 1
+    1{"BatchJob\n{ stage: 1 }"}
+    1 --> d["WorkJob]\n{ step: d }"]
+    1 --> e["WorkJob]\n{ step: e }"]
+    e --> f["WorkJob]\n{ step: f }"]
+    d --> 2
+    f --> 2
+    2{"BatchJob\n{ stage: 2 }"}
+```
+
+This can be implemented with a single, mutable batch job:
+
+```ruby
+class WorkJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Batches
+
+  def perform(step)
+    # ...
+    if step == 'e'
+      batch.add { WorkJob.perform_later('f') }
+    end
   end
-  batch.enqueue
+end
 
-  batch.discarded? # => Boolean
-  batch.discarded_at # => <DateTime>
-  batch.finished? # => Boolean
-  batch.finished_at # => <DateTime>
-  batch.succeeded? # => Boolean
-  batch.active_jobs # => Array of ActiveJob::Base-inherited jobs that are part of the batch
+class BatchJob < ApplicationJob
+  def perform(batch, options)
+    if batch.properties[:stage].nil?
+      batch.enqueue(stage: 1) do
+        WorkJob.perform_later('a')
+        WorkJob.perform_later('b')
+        WorkJob.perform_later('c')
+      end
+    elsif batch.properties[:stage] == 1
+      batch.enqueue(stage: 2) do
+        WorkJob.perform_later('d')
+        WorkJob.perform_later('e')
+      end
+    elsif batch.properties[:stage] == 2
+      # ...
+    end
+  end
+end
 
-  batch = GoodJob::Batch.find(batch.id)
-  batch.description = "Updated batch description"
-  batch.save
-  batch.reload
+GoodJob::Batch.enqueue(on_finish: BatchJob)
 ```
 
 ### ActiveJob concurrency
