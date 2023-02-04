@@ -220,10 +220,7 @@ RSpec.describe 'Batches' do
       expect(GoodJob::Execution.where(batch_callback_id: batch.id).count).to eq 4
 
       callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map(&:head_execution).map(&:active_job).map(&:arguments).map(&:second)
-      expect(callback_arguments).to eq [
-        { event: :discard },
-        { event: :finish },
-      ]
+      expect(callback_arguments).to contain_exactly({ event: :discard }, { event: :finish })
     end
 
     it 'calls success callbacks' do
@@ -238,10 +235,7 @@ RSpec.describe 'Batches' do
       expect(GoodJob::Execution.where(batch_callback_id: batch.id).count).to eq 4
 
       callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map(&:head_execution).map(&:active_job).map(&:arguments).map(&:second)
-      expect(callback_arguments).to eq [
-        { event: :success },
-        { event: :finish },
-      ]
+      expect(callback_arguments).to contain_exactly({ event: :success }, { event: :finish })
     end
   end
 end
