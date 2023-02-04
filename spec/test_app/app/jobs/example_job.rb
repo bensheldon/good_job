@@ -12,6 +12,24 @@ class ExampleJob < ApplicationJob
 
   retry_on(DeadError, attempts: 3) { nil }
 
+  class BatchJob < ApplicationJob
+    class CallbackJob < ApplicationJob
+      def perform(batch, params)
+      end
+    end
+    def perform
+      GoodJob::Batch.enqueue(on_finish: CallbackJob, description: "Example batch", foo: "bar") do
+        3.times { ExampleJob.perform_later(TYPES.sample) }
+      end
+    end
+  end
+
+  class BatchCallbackJob < ApplicationJob
+    def perform(batch, **options)
+      nil
+    end
+  end
+
   def perform(type = SUCCESS_TYPE)
     if type == SUCCESS_TYPE
       true

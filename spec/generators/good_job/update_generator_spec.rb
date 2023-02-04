@@ -16,8 +16,8 @@ describe GoodJob::UpdateGenerator, skip_if_java: true, type: :generator do
       end
 
       expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_jobs.rb")).not_to be_empty
-      # TODO: replace this when migrations are re-added
-      # expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_add_active_job_id_index_and_concurrency_key_index_to_good_jobs.rb")).not_to be_empty
+      # TODO: remove/replace this when migrations are removed/re-added
+      expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_job_settings.rb")).not_to be_empty
 
       quiet do
         run_in_example_app 'rails db:migrate'

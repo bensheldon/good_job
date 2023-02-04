@@ -8,6 +8,7 @@ require "good_job/engine"
 require "good_job/adapter"
 require "active_job/queue_adapters/good_job_adapter"
 require "good_job/active_job_extensions/concurrency"
+require "good_job/active_job_extensions/batches"
 
 require "good_job/assignable_connection"
 require "good_job/bulk"
@@ -143,7 +144,7 @@ module GoodJob
     end
   end
 
-  # Destroys preserved job records.
+  # Destroys preserved job and batch records.
   # By default, GoodJob destroys job records when the job is performed and this
   # method is not necessary. However, when `GoodJob.preserve_job_records = true`,
   # the jobs will be preserved in the database. This is useful when wanting to
@@ -151,7 +152,7 @@ module GoodJob
   # If you are preserving job records this way, use this method regularly to
   # destroy old records and preserve space in your database.
   # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
-  # @return [Integer] Number of jobs that were destroyed.
+  # @return [Integer] Number of job execution records and batches that were destroyed.
   def self.cleanup_preserved_jobs(older_than: nil)
     older_than ||= GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
@@ -160,10 +161,19 @@ module GoodJob
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
       old_jobs = GoodJob::Job.where('finished_at <= ?', timestamp)
       old_jobs = old_jobs.succeeded unless include_discarded
-      old_jobs_count = old_jobs.count
+      deleted_executions_count = GoodJob::Execution.where(job: old_jobs).delete_all
 
-      GoodJob::Execution.where(job: old_jobs).delete_all
-      payload[:destroyed_records_count] = old_jobs_count
+      if GoodJob::BatchRecord.migrated?
+        old_batches = GoodJob::BatchRecord.where('finished_at <= ?', timestamp)
+        old_batches = old_batches.succeeded unless include_discarded
+        deleted_batches_count = old_batches.delete_all
+      else
+        deleted_batches_count = 0
+      end
+
+      payload[:destroyed_executions_count] = deleted_executions_count
+      payload[:destroyed_batches_count] = deleted_batches_count
+      payload[:destroyed_records_count] = deleted_executions_count + deleted_batches_count
     end
   end
 

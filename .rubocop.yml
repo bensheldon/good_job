@@ -20,6 +20,7 @@ AllCops:
   Exclude:
     - pkg/**/*
     - spec/test_app/**/*
+    - tmp/**/*
     - vendor/**/*
     - scripts/**/*
     - gemfiles/**/*

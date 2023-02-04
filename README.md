@@ -41,9 +41,11 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Dashboard](#dashboard)
         - [API-only Rails applications](#api-only-rails-applications)
         - [Live Polling](#live-polling)
-    - [ActiveJob concurrency](#activejob-concurrency)
+    - [Concurrency controls](#concurrency-controls)
         - [How concurrency controls work](#how-concurrency-controls-work)
     - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
+    - [Bulk enqueue](#bulk-enqueue)
+    - [Batches](#batches)
     - [Updating](#updating)
         - [Upgrading minor versions](#upgrading-minor-versions)
         - [Upgrading v2 to v3](#upgrading-v2-to-v3)
@@ -58,7 +60,6 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Database connections](#database-connections)
         - [Production setup](#production-setup)
         - [Queue performance with Queue Select Limit](#queue-performance-with-queue-select-limit)
-    - [Bulk enqueue](#bulk-enqueue)
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
     - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
@@ -392,7 +393,7 @@ end
 
 The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
 
-### ActiveJob concurrency
+### Concurrency controls
 
 GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unnecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.
 
@@ -484,6 +485,196 @@ config.good_job.cron = {
   # etc.
 }
 ```
+
+### Bulk enqueue
+
+GoodJob's Bulk-enqueue functionality can buffer and enqueue multiple jobs at once, using a single INSERT statement. This can more performant when enqueuing a large number of jobs.
+
+```ruby
+# Capture jobs using `.perform_later`:
+active_jobs = GoodJob::Bulk.enqueue do
+  MyJob.perform_later
+  AnotherJob.perform_later
+  # If an exception is raised within this block, no jobs will be inserted.
+end
+
+# All ActiveJob instances are returned from GoodJob::Bulk.enqueue.
+# Jobs that have been successfully enqueued have a `provider_job_id` set.
+active_jobs.all?(&:provider_job_id)
+
+# Bulk enqueue ActiveJob instances directly without using `.perform_later`:
+GoodJob::Bulk.enqueue(MyJob.new, AnotherJob.new)
+```
+
+### Batches
+
+Batches track a set of jobs, and enqueue an optional callback job when all of the jobs have finished (succeeded or discarded).
+
+- A simple example that enqueues your `MyBatchCallbackJob` after the two jobs have finished, and passes along the current user as a batch property:
+
+    ```ruby
+    GoodJob::Batch.enqueue(on_finish: MyBatchCallbackJob, user: current_user) do
+      MyJob.perform_later
+      OtherJob.perform_later
+    end
+
+    # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, options)`
+    class MyBatchCallbackJob < ApplicationJob
+      # Callback jobs must accept a `batch` and `options` argument
+      def perform(batch, params)
+        # The batch object will contain the Batch's properties, which are mutable
+        batch.properties[:user] # => <User id: 1, ...>
+
+        # Params is a hash containing additional context (more may be added in the future)
+        params[:event] # => :finish, :success, :discard
+      end
+    end
+    ```
+
+- Jobs can be added to an existing batch. Jobs in a batch are enqueued and performed immediately/asynchronously. The final callback job will not be enqueued until `GoodJob::Batch#enqueue` is called.
+
+    ```ruby
+    batch = GoodJob::Batch.add do
+      10.times { MyJob.perform_later }
+    end
+    batch.add do
+      10.times { OtherJob.perform_later }
+    end
+    batch.enqueue(on_finish: MyBatchCallbackJob, age: 42)
+    ```
+
+- If you need to access the batch within a job that is part of the batch, include [`GoodJob::ActiveJobExtensions::Batches`](lib/good_job/active_job_extensions/batches.rb) in your job class:
+
+  ```ruby
+    class MyJob < ApplicationJob
+      include GoodJob::ActiveJobExtensions::Batches
+
+      def perform
+        self.batch # => <GoodJob::Batch id: 1, ...>
+      end
+    end
+    ```
+
+- [`GoodJob::Batch`](app/models/good_job/batch.rb) has a number of assignable attributes and methods:
+
+```ruby
+batch = GoodJob::Batch.new
+batch.description = "My batch"
+batch.on_finish = "MyBatchCallbackJob" # Callback job when all jobs have finished
+batch.on_success = "MyBatchCallbackJob" # Callback job when/if all jobs have succeeded
+batch.on_discard = "MyBatchCallbackJob" # Callback job when the first job in the batch is discarded
+batch.callback_queue_name = "special_queue" # Optional queue for callback jobs, otherwise will defer to job class
+batch.callback_priority = 10 # Optional priority name for callback jobs, otherwise will defer to job class
+batch.properties = { age: 42 } # Custom data and state to attach to the batch
+batch.add do
+  MyJob.perform_later
+end
+batch.enqueue
+
+batch.discarded? # => Boolean
+batch.discarded_at # => <DateTime>
+batch.finished? # => Boolean
+batch.finished_at # => <DateTime>
+batch.succeeded? # => Boolean
+batch.active_jobs # => Array of ActiveJob::Base-inherited jobs that are part of the batch
+
+batch = GoodJob::Batch.find(batch.id)
+batch.description = "Updated batch description"
+batch.save
+batch.reload
+```
+
+### Batch callback jobs
+
+Batch callbacks are Active Job jobs that are enqueued at certain events during the execution of jobs within the batch:
+
+- `:finish` - Enqueued when all jobs in the batch have finished, after all retries. Jobs will either be discarded or succeeded.
+- `:success` - Enqueued only when all jobs in the batch have finished and succeeded.
+- `:discard` - Enqueued immediately the first time a job in the batch is discarded.
+
+Callback jobs must accept a `batch` and `params` argument in their `perform` method:
+
+```ruby
+class MyBatchCallbackJob < ApplicationJob
+  def perform(batch, params)
+    # The batch object will contain the Batch's properties
+    batch.properties[:user] # => <User id: 1, ...>
+    # Batches are mutable
+    batch.properties[:user] = User.find(2)
+    batch.save
+
+    # Params is a hash containing additional context (more may be added in the future)
+    params[:event] # => :finish, :success, :discard
+  end
+end
+```
+
+#### Complex batches
+
+Consider a multi-stage batch with both parallel and serial job steps:
+
+```mermaid
+graph TD
+    0{"BatchJob\n{ stage: nil }"}
+    0 --> a["WorkJob]\n{ step: a }"]
+    0 --> b["WorkJob]\n{ step: b }"]
+    0 --> c["WorkJob]\n{ step: c }"]
+    a --> 1
+    b --> 1
+    c --> 1
+    1{"BatchJob\n{ stage: 1 }"}
+    1 --> d["WorkJob]\n{ step: d }"]
+    1 --> e["WorkJob]\n{ step: e }"]
+    e --> f["WorkJob]\n{ step: f }"]
+    d --> 2
+    f --> 2
+    2{"BatchJob\n{ stage: 2 }"}
+```
+
+This can be implemented with a single, mutable batch job:
+
+```ruby
+class WorkJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Batches
+
+  def perform(step)
+    # ...
+    if step == 'e'
+      batch.add { WorkJob.perform_later('f') }
+    end
+  end
+end
+
+class BatchJob < ApplicationJob
+  def perform(batch, options)
+    if batch.properties[:stage].nil?
+      batch.enqueue(stage: 1) do
+        WorkJob.perform_later('a')
+        WorkJob.perform_later('b')
+        WorkJob.perform_later('c')
+      end
+    elsif batch.properties[:stage] == 1
+      batch.enqueue(stage: 2) do
+        WorkJob.perform_later('d')
+        WorkJob.perform_later('e')
+      end
+    elsif batch.properties[:stage] == 2
+      # ...
+    end
+  end
+end
+
+GoodJob::Batch.enqueue(on_finish: BatchJob)
+```
+
+#### Other batch details
+
+- Whether to enqueue a callback job is evaluated once the batch is in an `enqueued?`-state by using `GoodJob::Batch.enqueue` or `batch.enqueue`.
+- Callback job enqueueing will be re-triggered if additional jobs are `enqueue`'d to the batch; use `add` to add jobs to the batch without retriggering callback jobs.
+- Callback jobs will be enqueued even if the batch contains no jobs.
+- Callback jobs perform asynchronously. It's possible that `:finish` and `:success` or `:discard` callback jobs perform at the same time. Keep this in mind when updating batch properties.
+- Batch properties are serialized using Active Job serialization. This is flexible, but can lead to deserialization errors if a GlobalID record is directly referenced but is subsequently deleted and thus unloadable.
+- 🚧Batches are a work in progress. Please let us know what would be helpful to improve their functionality and usefulness.
 
 ### Updating
 
@@ -792,26 +983,6 @@ To explain where this value is used, here is the pseudo-query that GoodJob uses 
     WHERE pg_try_advisory_lock(('x' || substr(md5('good_jobs' || '-' || active_job_id::text), 1, 16))::bit(64)::bigint)
     LIMIT 1
   )
-```
-
-### Bulk enqueue
-
-GoodJob's Bulk-enqueue functionality can buffer and enqueue multiple jobs at once, using a single INSERT statement. This can more performant when enqueuing a large number of jobs.
-
-```ruby
-# Capture jobs using `.perform_later`:
-active_jobs = GoodJob::Bulk.enqueue do
-  MyJob.perform_later
-  AnotherJob.perform_later
-  # If an exception is raised within this block, no jobs will be inserted.
-end
-
-# All ActiveJob instances are returned from GoodJob::Bulk.enqueue.
-# Jobs that have been successfully enqueued have a `provider_job_id` set.
-active_jobs.all?(&:provider_job_id)
-
-# Bulk enqueue ActiveJob instances directly without using `.perform_later`:
-GoodJob::Bulk.enqueue(MyJob.new, AnotherJob.new)
 ```
 
 ### Execute jobs async / in-process
