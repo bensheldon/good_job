@@ -1,5 +1,19 @@
 # Changelog
 
+## [v3.10.0](https://github.com/bensheldon/good_job/tree/v3.10.0) (2023-02-04)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.9.0...v3.10.0)
+
+**Implemented enhancements:**
+
+- Implement `GoodJob::Batch` [\#712](https://github.com/bensheldon/good_job/pull/712) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Support for Ruby 3.2 [\#785](https://github.com/bensheldon/good_job/issues/785)
+- Custom table names [\#748](https://github.com/bensheldon/good_job/issues/748)
+- Health check issue with cron scheduler job [\#741](https://github.com/bensheldon/good_job/issues/741)
+
 ## [v3.9.0](https://github.com/bensheldon/good_job/tree/v3.9.0) (2023-01-31)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.8.0...v3.9.0)
