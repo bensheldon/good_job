@@ -67,6 +67,11 @@ describe GoodJob::Batch do
   end
 
   describe '#properties' do
+    it 'defaults to an empty hash' do
+      batch = described_class.new
+      expect(batch.properties).to eq({})
+    end
+
     it 'serializes and deserializes values' do
       batch = described_class.new(properties: { foo: 'bar' })
       batch.save

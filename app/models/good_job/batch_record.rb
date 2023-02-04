@@ -71,7 +71,8 @@ module GoodJob
       end
     end
 
-    serialize :serialized_properties, PropertySerializer, default: {}
+    attribute :serialized_properties, default: {} # Can be set as default value in `serialize` as of Rails v6.1
+    serialize :serialized_properties, PropertySerializer
     alias_attribute :properties, :serialized_properties
 
     def properties=(value)
