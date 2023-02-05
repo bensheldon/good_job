@@ -25,7 +25,7 @@ class ExampleJob < ApplicationJob
   end
 
   class BatchCallbackJob < ApplicationJob
-    def perform(batch, **options)
+    def perform(batch, params)
       nil
     end
   end
