@@ -73,6 +73,11 @@ when 'demo'
         class: "OtherJob",
         set: { queue: :default },
       },
+      batch_example: {
+        description: "Enqueue a Batch",
+        cron: "*/30 * * * * *",
+        class: "ExampleJob::BatchJob",
+      },
     }
   end
 when 'production'
