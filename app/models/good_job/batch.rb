@@ -90,9 +90,12 @@ module GoodJob
 
       active_jobs = add(active_jobs, &block)
 
-      record.finished_at = nil
-      record.enqueued_at = Time.current if enqueued_at.nil?
-      record.save!
+      record.with_advisory_lock(function: "pg_advisory_lock") do
+        record.reload
+        record.finished_at = nil
+        record.enqueued_at = Time.current if enqueued_at.nil?
+        record.save!
+      end
 
       record._continue_discard_or_finish
       active_jobs

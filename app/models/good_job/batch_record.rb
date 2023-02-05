@@ -47,6 +47,7 @@ module GoodJob
       execution_discarded = execution && execution.error.present? && execution.retried_good_job_id.nil?
       with_advisory_lock(function: "pg_advisory_lock") do
         Batch.within_thread(batch_id: nil, batch_callback_id: id) do
+          reload
           if execution_discarded && discarded_at.blank?
             update(discarded_at: Time.current)
             on_discard.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :discard }) if on_discard.present?
