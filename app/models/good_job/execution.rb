@@ -315,10 +315,27 @@ module GoodJob
       run_callbacks(:perform) do
         raise PreviouslyPerformedError, 'Cannot perform a job that has already been performed' if finished_at
 
-        self.performed_at = Time.current
-        save! if GoodJob.preserve_job_records
+        result = GoodJob::CurrentThread.within do |current_thread|
+          current_thread.reset
+          current_thread.execution = self
 
-        result = execute
+          current_thread.execution_interrupted = performed_at if performed_at
+          update!(performed_at: Time.current)
+
+          ActiveSupport::Notifications.instrument("perform_job.good_job", { execution: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do
+            value = ActiveJob::Base.execute(active_job_data)
+
+            if value.is_a?(Exception)
+              handled_error = value
+              value = nil
+            end
+            handled_error ||= current_thread.error_on_retry || current_thread.error_on_discard
+
+            ExecutionResult.new(value: value, handled_error: handled_error, retried: current_thread.error_on_retry.present?)
+          rescue StandardError => e
+            ExecutionResult.new(value: nil, unhandled_error: e)
+          end
+        end
 
         job_error = result.handled_error || result.unhandled_error
         self.error = [job_error.class, ERROR_MESSAGE_SEPARATOR, job_error.message].join if job_error
@@ -405,28 +422,6 @@ module GoodJob
                        .tap do |job_data|
         job_data["provider_job_id"] = id
         job_data["good_job_concurrency_key"] = concurrency_key if concurrency_key
-      end
-    end
-
-    # @return [ExecutionResult]
-    def execute
-      GoodJob::CurrentThread.within do |current_thread|
-        current_thread.reset
-        current_thread.execution = self
-
-        ActiveSupport::Notifications.instrument("perform_job.good_job", { execution: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do
-          value = ActiveJob::Base.execute(active_job_data)
-
-          if value.is_a?(Exception)
-            handled_error = value
-            value = nil
-          end
-          handled_error ||= current_thread.error_on_retry || current_thread.error_on_discard
-
-          ExecutionResult.new(value: value, handled_error: handled_error, retried: current_thread.error_on_retry.present?)
-        rescue StandardError => e
-          ExecutionResult.new(value: nil, unhandled_error: e)
-        end
       end
     end
 

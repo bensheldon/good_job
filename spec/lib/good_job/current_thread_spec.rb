@@ -57,6 +57,7 @@ RSpec.describe GoodJob::CurrentThread do
         error_on_discard: false,
         error_on_retry: false,
         execution: instance_double(GoodJob::Execution),
+        execution_interrupted: nil,
       }
 
       described_class.reset(value)
