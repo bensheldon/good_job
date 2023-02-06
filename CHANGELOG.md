@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.11.1](https://github.com/bensheldon/good_job/tree/v3.11.1) (2023-02-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.11.0...v3.11.1)
+
+**Merged pull requests:**
+
+- UI improvement [\#829](https://github.com/bensheldon/good_job/pull/829) ([Ajmal](https://github.com/Ajmal))
+
 ## [v3.11.0](https://github.com/bensheldon/good_job/tree/v3.11.0) (2023-02-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.10.1...v3.11.0)
