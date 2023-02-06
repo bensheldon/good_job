@@ -1,7 +1,7 @@
-<div class="break-out bg-light border-bottom py-2 mb-3">
-  <div class="container-fluid pt-2">
+<div class="border-bottom py-2 mb-3">
+  <div class="pt-2">
     <div class="row align-items-center">
-      <div class="col-5">
+      <div class="col">
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb small mb-0">
             <li class="breadcrumb-item"><%= link_to "Batches", batches_path %></li>
@@ -16,7 +16,9 @@
 
 <div class="my-4">
   <h5>Attributes</h5>
-  <%= tag.pre JSON.pretty_generate @batch.display_attributes, class: 'text-wrap text-break' %>
+  <div class="bg-dark text-light p-3 rounded">
+    <%= tag.pre JSON.pretty_generate @batch.display_attributes, class: 'text-wrap text-break' %>
+  </div>
 </div>
 
 <div class="my-4">
