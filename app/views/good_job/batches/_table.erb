@@ -3,11 +3,11 @@
       <header class="list-group-item bg-light">
         <div class="row small text-muted text-uppercase align-items-center">
           <div class="col-4">Name</div>
-          <div class="col-1">Created</div>
-          <div class="col-1">Enqueued</div>
-          <div class="col-1">Discarded</div>
-          <div class="col-1">Finished</div>
-          <div class="col">Jobs</div>
+          <div class="col-md-1 d-none d-md-block">Created</div>
+          <div class="col-md-1 d-none d-md-block">Enqueued</div>
+          <div class="col-md-1 d-none d-md-block">Discarded</div>
+          <div class="col-md-1 d-none d-md-block">Finished</div>
+          <div class="col-md-1 d-none d-md-block">Jobs</div>
           <div class="col text-end">
             <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                            data: { bs_toggle: "collapse", bs_target: ".batch-properties" },
@@ -32,11 +32,32 @@
                   <div class="text-muted"><%= batch.description %></div>
                 <% end %>
               </div>
-              <div class="col-1 text-wrap"><%= relative_time(batch.created_at)  %></div>
-              <div class="col-1 text-wrap"><%= relative_time(batch.enqueued_at) if batch.enqueued_at %></div>
-              <div class="col-1 text-wrap"><%= relative_time(batch.discarded_at) if batch.discarded_at %></div>
-              <div class="col-1 text-wrap"><%= relative_time(batch.finished_at) if batch.finished_at %></div>
-              <div class="col"><%= batch.jobs.count %></div>
+              <div class="col-md-1 text-wrap">
+                <div class="d-md-none small text-muted mt-1">Created at</div>
+                <%= relative_time(batch.created_at) %>
+              </div>
+              <div class="col-md-1 text-wrap">
+                <% if batch.enqueued_at %>
+                  <div class="d-md-none small text-muted mt-1">Enqueued at</div>
+                  <%= relative_time(batch.enqueued_at) %>
+                <% end %>
+              </div>
+              <div class="col-md-1 text-wrap">
+                <% if batch.discarded_at %>
+                  <div class="d-md-none small text-muted mt-1">Discarded at</div>
+                  <%= relative_time(batch.discarded_at) %>
+                <% end %>
+              </div>
+              <div class="col-md-1 text-wrap">
+                <% if batch.finished_at %>
+                  <div class="d-md-none small text-muted mt-1">Finished at</div>
+                  <%= relative_time(batch.finished_at) %>
+                <% end %>
+              </div>
+              <div class="col">
+                <div class="d-md-none small text-muted mt-1">Jobs</div>
+                <%= batch.jobs.count %>
+              </div>
               <div class="col text-end">
                 <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
                                title: "Inspect",
