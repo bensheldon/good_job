@@ -30,7 +30,16 @@ RSpec.describe GoodJob::ActiveJobExtensions::NotifyOptions do
     it 'can be overridden by set(good_job_notify: true)' do
       TestJob.good_job_notify = false
       TestJob.set(good_job_notify: true).perform_later
-      expect(GoodJob::Notifier).to have_received(:notify)
+      expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default' })
+
+      GoodJob::Bulk.enqueue { TestJob.set(good_job_notify: true).perform_later }
+      expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default', count: 1 })
+    end
+
+    it 'works for bulk enqueuing' do
+      TestJob.good_job_notify = false
+      GoodJob::Bulk.enqueue(TestJob.new)
+      expect(GoodJob::Notifier).not_to have_received(:notify)
     end
   end
 
@@ -49,6 +58,11 @@ RSpec.describe GoodJob::ActiveJobExtensions::NotifyOptions do
 
       job = TestJob.set(good_job_notify: false).perform_later
       expect(job.serialize).to have_key('good_job_notify')
+    end
+
+    it 'works for bulk enqueuing' do
+      GoodJob::Bulk.enqueue { TestJob.set(good_job_notify: false).perform_later }
+      expect(GoodJob::Notifier).not_to have_received(:notify)
     end
 
     context 'when a job is retried' do
