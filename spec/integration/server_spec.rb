@@ -21,7 +21,12 @@ RSpec.describe 'Server modes', skip_if_java: true do
           # In development, GoodJob starts up before Puma redirects logs to stdout
 
           # Ensure Puma starts up and Rails fully bootstraps
-          Net::HTTP.get_response(URI("http://127.0.0.1:#{port}/good_job"))
+          begin
+            Net::HTTP.get_response(URI("http://127.0.0.1:#{port}/good_job"))
+          rescue Net::ReadTimeout
+            # Still booting
+          end
+
           # Cron should be enabled and enqueuing an ExampleJob every 5 seconds (defined in config/initializers/good_job.rb)
           expect(shell.output).to include(/Enqueued ExampleJob/)
         end
