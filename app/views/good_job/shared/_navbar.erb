@@ -15,6 +15,13 @@
         <% end %>
         </li>
         <li class="nav-item">
+          <%= link_to batches_path, class: ["nav-link", ("active" if controller_name == 'batches')] do %>
+            <%= "Batches" %>
+            <% batches_count = GoodJob::BatchRecord.migrated? ? GoodJob::BatchRecord.all.size : 0 %>
+            <span class="badge bg-secondary rounded-pill"><%= batches_count %></span>
+          <% end %>
+        </li>
+        <li class="nav-item">
           <%= link_to cron_entries_path, class: ["nav-link", ("active" if controller_name == 'cron_entries')] do %>
             <%= t(".cron_schedules") %>
             <% cron_entries_count = GoodJob::CronEntry.all.size %>

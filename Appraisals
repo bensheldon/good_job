@@ -22,10 +22,10 @@ if ruby_27_or_higher && !ruby_31_or_higher && !jruby
     gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
   end
 
-  # https://github.com/rails/rails/issues/43422
-  # appraise "rails-head" do
-  #   gem "rails", github: "rails/rails", branch: "main"
-  # end
+  appraise "rails-head" do
+    gem "rails", github: "rails/rails", branch: "main"
+    gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
+  end
 end
 
 if ruby_31_or_higher && !jruby

@@ -2,7 +2,7 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Scheduler do
-  let(:performer) { instance_double(GoodJob::JobPerformer, next: nil, name: '', next_at: [], cleanup: nil) }
+  let(:performer) { instance_double(GoodJob::JobPerformer, next: nil, name: '', next_at: [], cleanup: nil, performing_active_job_ids: Concurrent::Set.new) }
 
   after do
     described_class.instances.each(&:shutdown)
@@ -83,6 +83,27 @@ RSpec.describe GoodJob::Scheduler do
       expect { scheduler.shutdown }
         .to change(scheduler, :running?).from(true).to(false)
     end
+
+    context 'when threads are killed' do
+      before do
+        allow(performer).to receive(:performing_active_job_ids).and_return Concurrent::Set.new(%w[fake-id-1 fake-id-2])
+        allow(performer).to receive(:next) { sleep 99 }
+      end
+
+      it 'kills the threadpools and logs a message with the job ids' do
+        scheduler = described_class.new(performer)
+        scheduler.create_thread
+        sleep_until { scheduler.stats[:active_threads] > 0 }
+
+        captured_logs = []
+        allow(GoodJob::LogSubscriber.logger).to receive(:warn) { |&block| captured_logs << block.call }
+
+        scheduler.shutdown(timeout: 0)
+        expect(scheduler.shutdown?).to be true
+
+        expect(captured_logs).to contain_exactly("GoodJob scheduler has been killed. The following Active Jobs were interrupted: fake-id-1 fake-id-2")
+      end
+    end
   end
 
   describe '#restart' do
@@ -118,6 +139,18 @@ RSpec.describe GoodJob::Scheduler do
       scheduler = described_class.from_configuration(configuration)
 
       expect(scheduler.create_thread(queue_name: 'elephant')).to be false
+    end
+
+    it 'uses state[:count] to create multiple threads' do
+      job_performer = instance_double(GoodJob::JobPerformer, next: nil, next?: true, name: '', next_at: [], cleanup: nil)
+      scheduler = described_class.new(job_performer, max_threads: 1)
+
+      result = scheduler.create_thread({ count: 10 })
+      if result
+        expect(job_performer).to have_received(:next).exactly(10).times
+      else
+        expect(job_performer).to have_received(:next).at_most(9).times
+      end
     end
   end
 

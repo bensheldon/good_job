@@ -1,0 +1,61 @@
+  <div class="my-3 card" data-gj-poll-replace id="batches-table">
+    <div class="list-group list-group-flush text-nowrap table-batches" role="table">
+      <header class="list-group-item bg-light">
+        <div class="row small text-muted text-uppercase align-items-center">
+          <div class="col-4">Name</div>
+          <div class="col-1">Created</div>
+          <div class="col-1">Enqueued</div>
+          <div class="col-1">Discarded</div>
+          <div class="col-1">Finished</div>
+          <div class="col">Jobs</div>
+          <div class="col text-end">
+            <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
+                           data: { bs_toggle: "collapse", bs_target: ".batch-properties" },
+                           aria: { expanded: false, controls: batches.map { |batch| "##{dom_id(batch, "params")}" }.join(" ") } do %>
+              <%= render_icon "info" %>
+              <span class="visually-hidden">Inspect</span>
+            <% end %>
+          </div>
+        </div>
+      </header>
+
+      <% if batches.present? %>
+        <% batches.each do |batch| %>
+          <div id="<%= dom_id(batch) %>" class="list-group-item py-3" role="row">
+            <div class="row align-items-center">
+              <div class="col-4">
+                <%= link_to batch_path(batch), class: "text-decoration-none" do %>
+                  <code class="small text-muted">
+                    <%= batch.id %>
+                  </code>
+                  <h5 class=""><code><%= batch.on_finish %></code></h5>
+                  <div class="text-muted"><%= batch.description %></div>
+                <% end %>
+              </div>
+              <div class="col-1 text-wrap"><%= relative_time(batch.created_at)  %></div>
+              <div class="col-1 text-wrap"><%= relative_time(batch.enqueued_at) if batch.enqueued_at %></div>
+              <div class="col-1 text-wrap"><%= relative_time(batch.discarded_at) if batch.discarded_at %></div>
+              <div class="col-1 text-wrap"><%= relative_time(batch.finished_at) if batch.finished_at %></div>
+              <div class="col"><%= batch.jobs.count %></div>
+              <div class="col text-end">
+                <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
+                               title: "Inspect",
+                               data: { bs_toggle: "collapse", bs_target: "##{dom_id(batch, 'properties')}" },
+                               aria: { expanded: false, controls: dom_id(batch, "state") } do %>
+                  <%= render_icon "info" %>
+                  <span class="visually-hidden">Inspect</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+          <%= tag.div id: dom_id(batch, "properties"), class: "batch-properties list-group-item collapse small bg-dark text-light" do %>
+            <%= tag.pre JSON.pretty_generate(batch.properties) %>
+          <% end %>
+        <% end %>
+      <% else %>
+        <div class="list-group-item py-4 text-center text-muted">
+          No batches found.
+        </div>
+      <% end %>
+    </div>
+  </div>
