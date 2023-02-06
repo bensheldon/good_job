@@ -1,5 +1,22 @@
 # Changelog
 
+## [v3.10.1](https://github.com/bensheldon/good_job/tree/v3.10.1) (2023-02-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.10.0...v3.10.1)
+
+**Fixed bugs:**
+
+- Ensure batch is reloaded before updating on multiple enqueues [\#824](https://github.com/bensheldon/good_job/pull/824) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Can't batch.enqueue the callback after retrying a job within the batch [\#822](https://github.com/bensheldon/good_job/issues/822)
+
+**Merged pull requests:**
+
+- In tests, retry when connecting to Puma returns Net::ReadTimeout [\#825](https://github.com/bensheldon/good_job/pull/825) ([bensheldon](https://github.com/bensheldon))
+- Add Batch enqueue example to Demo's cron configuration [\#823](https://github.com/bensheldon/good_job/pull/823) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.10.0](https://github.com/bensheldon/good_job/tree/v3.10.0) (2023-02-04)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.9.0...v3.10.0)
