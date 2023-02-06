@@ -1,3 +1,7 @@
+<div class="border-bottom">
+  <h2 class="pt-3 pb-2">Batches</h2>
+</div>
+
 <% if GoodJob::BatchRecord.migrated? %>
   <%= render 'good_job/batches/table', batches: @filter.records, filter: @filter %>
   <% if @filter.records.present? %>

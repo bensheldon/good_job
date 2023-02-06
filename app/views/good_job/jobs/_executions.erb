@@ -4,16 +4,16 @@
     <% executions.each do |execution| %>
       <%= tag.div id: dom_id(execution), class: "list-group-item py-3" do %>
         <div class="row align-items-center text-nowrap">
-          <div class="col-5 d-flex gap-2">
+          <div class="col-md-5 d-flex gap-2">
             <%= tag.span execution.number, class: "badge bg-secondary bg-opacity-50 rounded-pill" %>
             <%= tag.code link_to(execution.id, "##{dom_id(execution)}", class: "text-muted text-decoration-none small") %>
           </div>
-          <div class="col-2 small">
+          <div class="col-md-2 small">
             <% if execution.queue_latency %>
               <%= format_duration execution.queue_latency %> <span class="text-muted">in queue</span>
             <% end %>
           </div>
-          <div class="col-2 small">
+          <div class="col-md-2 small">
             <% if execution.runtime_latency %>
               <%= format_duration execution.runtime_latency %> <span class="text-muted">runtime</span>
             <% end %>
@@ -22,16 +22,15 @@
             <div class="d-flex gap-3 align-items-center justify-content-end">
               <%= tag.span relative_time(execution.last_status_at, include_seconds: true), class: "small" %>
               <%= status_badge execution.status %>
+            
+              <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
+                title: "Inspect",
+                data: { bs_toggle: "collapse", bs_target: "##{dom_id(execution, 'params')}" },
+                aria: { expanded: false, controls: dom_id(execution, "params") } do %>
+                <%= render_icon "info" %>
+                <span class="visually-hidden">Inspect</span>
+              <% end %>
             </div>
-          </div>
-          <div class="col-auto">
-            <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
-              title: "Inspect",
-              data: { bs_toggle: "collapse", bs_target: "##{dom_id(execution, 'params')}" },
-              aria: { expanded: false, controls: dom_id(execution, "params") } do %>
-              <%= render_icon "info" %>
-              <span class="visually-hidden">Inspect</span>
-            <% end %>
           </div>
         </div>
         <% if execution.error %>

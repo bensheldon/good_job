@@ -7,7 +7,7 @@
           <%= label_tag('toggle_job_ids', "Toggle all jobs", class: "visually-hidden") %>
           <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %>
         </div>
-        <div class="col-4">
+        <div class="col-md-4">
           <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'btn btn-sm btn-outline-secondary', title: "Reschedule all", data: { confirm: "Are you sure you want to reschedule the selected jobs?", disable: true } do %>
             <span class="me-1"><%= render_icon "skip_forward" %></span> Reschedule
           <% end %>
@@ -33,9 +33,9 @@
           </div>
 
         </div>
-        <div class="col-1">Queue</div>
-        <div class="col-1">Priority</div>
-        <div class="col-1 text-end">Attempts</div>
+        <div class="d-none d-md-block col-md-1">Queue</div>
+        <div class="d-none d-md-block col-md-1">Priority</div>
+        <div class="d-none d-md-block col-md-1 text-end">Attempts</div>
         <div class="col text-end">
           <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                   data: { bs_toggle: "collapse", bs_target: ".job-params" },
@@ -64,17 +64,18 @@
             <div class="col-auto">
               <%= check_box_tag 'job_ids[]', job.id, false, id: dom_id(job, :checkbox), data: { "checkbox-toggle-each": "job_ids" } %>
             </div>
-            <div class="col-4">
+            <div class="col-md-4">
               <%= tag.code link_to(job.id, job_path(job), class: "small text-muted text-decoration-none") %>
               <%= tag.h5 tag.code(link_to(job.job_class, job_path(job), class: "text-reset text-decoration-none")), class: "text-reset mb-0" %>
             </div>
-            <div class="col-1">
+            <div class="col-md-1">
               <span class="badge bg-primary bg-opacity-25 text-dark font-monospace"><%= job.queue_name %></span>
             </div>
-            <div class="col-1 small text-center">
+            <div class="col-md-1 small text-md-center">
               <span class="font-monospace fw-bold"><%= job.priority %></span>
+              <span class="d-md-none">Priority</span>
             </div>
-            <div class="col-1 text-center">
+            <div class="col-md-1 text-md-center">
               <% if job.executions_count > 0 && job.status != :succeeded %>
                 <%= tag.span job.executions_count, class: "badge rounded-pill bg-danger", data: {
                       bs_toggle: "popover",
@@ -85,6 +86,7 @@
               <% else %>
                 <span class="badge bg-secondary bg-opacity-50 rounded-pill"><%= job.executions_count %></span>
               <% end %>
+              <span class="d-md-none small">Attemp</span>
             </div>
             <div class="col d-flex gap-3 align-items-center justify-content-end">
               <%= tag.span relative_time(job.last_status_at), class: "small" %>
