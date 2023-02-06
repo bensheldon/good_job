@@ -4,7 +4,14 @@ require 'rails_helper'
 describe GoodJob::Batch do
   before do
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
-    stub_const 'TestJob', Class.new(ActiveJob::Base)
+    stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+      def perform
+      end
+    end)
+    stub_const 'CallbackJob', (Class.new(ActiveJob::Base) do
+      def perform(batch, params)
+      end
+    end)
   end
 
   describe '.enqueue' do
@@ -17,6 +24,16 @@ describe GoodJob::Batch do
       expect(batch).to be_persisted
       expect(batch.enqueued_at).to be_within(1.second).of(Time.current)
       expect(batch.active_jobs.count).to eq 2
+    end
+
+    it 'resets callbacks' do
+      batch = described_class.new(on_finish: CallbackJob)
+      batch.enqueue { TestJob.perform_later }  # 1st time triggers callback
+      GoodJob.perform_inline
+      batch.enqueue { TestJob.perform_later }  # 2nd time does not trigger callback (finished_at didn't update to nil on the stale reference to batch_record)
+      GoodJob.perform_inline
+
+      expect(batch.callback_active_jobs.count).to eq 2
     end
   end
 
@@ -51,9 +68,9 @@ describe GoodJob::Batch do
       expect { batch.enqueue }.to change(batch, :enqueued_at).from(nil)
     end
 
-    it 'does not overwrite an old value' do
-      batch._record.update(enqueued_at: 1.day.ago)
-      expect { batch.enqueue }.not_to change(batch, :enqueued_at)
+    it 'does updates the enqueued_at and clears finished_at' do
+      batch._record.update(enqueued_at: 1.day.ago, finished_at: 1.day.ago)
+      expect { batch.enqueue(TestJob.new) }.to change(batch, :enqueued_at).and change(batch, :finished_at).to(nil)
     end
 
     it 'can assign callback jobs' do

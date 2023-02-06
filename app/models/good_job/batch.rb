@@ -86,15 +86,23 @@ module GoodJob
     # @return [Array<ActiveJob::Base>] Active jobs added to the batch
     def enqueue(active_jobs = [], **properties, &block)
       assign_properties(properties)
-      record.save!
+      if record.new_record?
+        record.save!
+      else
+        record.with_advisory_lock(function: "pg_advisory_lock") do
+          record.enqueued_at_will_change!
+          record.finished_at_will_change!
+          record.update!(enqueued_at: nil, finished_at: nil)
+        end
+      end
 
       active_jobs = add(active_jobs, &block)
 
-      record.finished_at = nil
-      record.enqueued_at = Time.current if enqueued_at.nil?
-      record.save!
+      record.with_advisory_lock(function: "pg_advisory_lock") do
+        record.update!(enqueued_at: Time.current)
+        record._continue_discard_or_finish(lock: false)
+      end
 
-      record._continue_discard_or_finish
       active_jobs
     end
 
