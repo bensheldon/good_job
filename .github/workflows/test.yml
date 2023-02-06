@@ -79,13 +79,13 @@ jobs:
         ruby: [2.6, 2.7, "3.0", 3.1, 3.2, jruby-9.3]
         pg: [14]
         include:
-          - ruby: "3.0"
+          - ruby: 3.2
             pg: 10
-          - ruby: "3.0"
+          - ruby: 3.2
             pg: 11
-          - ruby: "3.0"
+          - ruby: 3.2
             pg: 12
-          - ruby: "3.0"
+          - ruby: 3.2
             pg: 13
           - ruby: jruby-9.3
             pg: 10
