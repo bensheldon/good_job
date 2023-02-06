@@ -68,9 +68,9 @@ describe GoodJob::Batch do
       expect { batch.enqueue }.to change(batch, :enqueued_at).from(nil)
     end
 
-    it 'does not overwrite an old value' do
-      batch._record.update(enqueued_at: 1.day.ago)
-      expect { batch.enqueue }.not_to change(batch, :enqueued_at)
+    it 'does updates the enqueued_at and clears finished_at' do
+      batch._record.update(enqueued_at: 1.day.ago, finished_at: 1.day.ago)
+      expect { batch.enqueue(TestJob.new) }.to change(batch, :enqueued_at).and change(batch, :finished_at).to(nil)
     end
 
     it 'can assign callback jobs' do
