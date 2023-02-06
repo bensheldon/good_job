@@ -199,7 +199,7 @@ module GoodJob
     def start_async
       return unless execute_async?
 
-      @notifier = GoodJob::Notifier.new
+      @notifier = GoodJob::Notifier.new(enable_listening: GoodJob.configuration.enable_listen_notify)
       @poller = GoodJob::Poller.new(poll_interval: GoodJob.configuration.poll_interval)
       @scheduler = GoodJob::Scheduler.from_configuration(GoodJob.configuration, warm_cache_on_initialize: true)
       @notifier.recipients << [@scheduler, :create_thread]
@@ -235,6 +235,7 @@ module GoodJob
 
     def send_notify?(active_job)
       return true unless active_job.respond_to?(:good_job_notify)
+      return false unless GoodJob.configuration.enable_listen_notify
 
       !(active_job.good_job_notify == false || (active_job.class.good_job_notify == false && active_job.good_job_notify.nil?))
     end
