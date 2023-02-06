@@ -71,7 +71,7 @@ RSpec.describe GoodJob::Adapter do
     context 'when async' do
       it 'triggers an execution thread and the notifier' do
         allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
-        allow(GoodJob::Notifier).to receive(:notify)
+        allow(GoodJob::Notifier).to receive(:notify).with({ queue_name: 'default' })
 
         scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
         allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
@@ -105,6 +105,10 @@ RSpec.describe GoodJob::Adapter do
   end
 
   describe '#enqueue_all' do
+    before do
+      allow(GoodJob::Notifier).to receive(:notify)
+    end
+
     it 'enqueues multiple active jobs, returns the number of jobs enqueued, and sets provider_job_id' do
       active_jobs = [ExampleJob.new, ExampleJob.new]
       result = adapter.enqueue_all(active_jobs)
@@ -127,6 +131,7 @@ RSpec.describe GoodJob::Adapter do
 
         provider_job_ids = active_jobs.map(&:provider_job_id)
         expect(provider_job_ids).to include(nil)
+        expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default', count: 1 })
       end
     end
 
