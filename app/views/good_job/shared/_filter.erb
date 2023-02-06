@@ -1,13 +1,15 @@
-<div data-live-poll-region id="filter">
-  <div class="bg-light break-out">
-    <h2 class="container-fluid pt-3 pb-2"><%= title %></h2>
+<div data-live-poll-region id="filter" class="">
+  <div class="">
+    <div class="border-bottom mb-3">
+      <h2 class="pt-3 pb-2"><%= title %></h2>
+    </div>
 
-    <%= form_with(url: "", method: :get, local: true, id: "filter_form", class: "container-fluid") do |form| %>
+    <%= form_with(url: "", method: :get, local: true, id: "filter_form", class: "") do |form| %>
       <%= hidden_field_tag :poll, params[:poll] %>
       <%= hidden_field_tag :state, params[:state] %>
       <%= hidden_field_tag :locale, params[:locale] if params[:locale] %>
-      <div class="d-flex flex-row w-100">
-        <div class="me-2">
+      <div class="d-md-flex flex-row w-100">
+        <div class="me-md-2 mb-2 mb-md-0">
           <%= label_tag "job_queue_filter", "Queue name", class: "visually-hidden" %>
           <select name="queue_name" id="job_queue_filter" class="form-select form-select-sm">
             <option value="" <%= "selected='selected'" if params[:queue_name].blank? %>>All queues</option>
@@ -18,7 +20,7 @@
           </select>
         </div>
 
-        <div class="me-2">
+        <div class="me-md-2 mb-2 mb-md-0">
           <%= label_tag "job_class_filter", "Job name", class: "visually-hidden" %>
           <select name="job_class" id="job_class_filter" class="form-select form-select-sm">
             <option value="" <%= "selected='selected'" if params[:job_class].blank? %>>All jobs</option>
@@ -29,7 +31,7 @@
           </select>
         </div>
 
-        <div class="me-2 flex-fill">
+        <div class="me-md-2 mb-2 mb-md-0 flex-fill">
           <%= label_tag "query", "Search", class: "visually-hidden" %>
           <%= search_field_tag "query", params[:query], class: "form-control form-control-sm", placeholder: "Search by class, job id, job params, and error text." %>
         </div>
@@ -45,7 +47,7 @@
       </div>
     <% end %>
 
-    <ul class="nav nav-tabs bg-light px-3 my-3">
+    <ul class="nav nav-tabs my-3">
       <li class="nav-item">
         <%= link_to "All", filter.to_params(state: nil), class: "nav-link #{"active" unless params[:state].present?}" %>
       </li>
