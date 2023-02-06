@@ -95,7 +95,7 @@ module GoodJob
 
       Daemon.new(pidfile: configuration.pidfile).daemonize if configuration.daemonize?
 
-      notifier = GoodJob::Notifier.new
+      notifier = GoodJob::Notifier.new(enable_listening: GoodJob.configuration.enable_listen_notify)
       poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
       scheduler = GoodJob::Scheduler.from_configuration(configuration, warm_cache_on_initialize: true)
       notifier.recipients << [scheduler, :create_thread]

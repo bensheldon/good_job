@@ -4,7 +4,7 @@ require 'rails_helper'
 describe GoodJob do
   let(:configuration) { GoodJob::Configuration.new({ queues: 'mice:1', poll_interval: -1 }) }
   let!(:scheduler) { GoodJob::Scheduler.from_configuration(configuration) }
-  let!(:notifier) { GoodJob::Notifier.new([scheduler, :create_thread]) }
+  let!(:notifier) { GoodJob::Notifier.new([scheduler, :create_thread], enable_listening: true) }
 
   describe '.shutdown' do
     it 'shuts down all scheduler and notifier instances' do
