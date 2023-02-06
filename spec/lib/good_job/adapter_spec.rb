@@ -200,6 +200,20 @@ RSpec.describe GoodJob::Adapter do
     context 'when execution mode async_server' do
       let(:adapter) { described_class.new(execution_mode: :async_server) }
 
+      before do
+        scheduler = instance_double(GoodJob::Scheduler)
+        allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
+
+        notifier = instance_double(GoodJob::Notifier, recipients: [])
+        allow(GoodJob::Notifier).to receive(:new).and_return(notifier)
+
+        poller = instance_double(GoodJob::Poller, recipients: [])
+        allow(GoodJob::Poller).to receive(:new).and_return(poller)
+
+        cron_manager = instance_double(GoodJob::CronManager)
+        allow(GoodJob::CronManager).to receive(:new).and_return(cron_manager)
+      end
+
       context 'when Rails::Server is defined' do
         before do
           stub_const("Rails::Server", Class.new)
