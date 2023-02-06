@@ -1,22 +1,22 @@
-<div class="break-out bg-light border-bottom py-2 mb-3">
-  <div class="container-fluid pt-2">
+<div class="border-bottom py-2 mb-3">
+  <div class="pt-2">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb small mb-0">
+        <li class="breadcrumb-item"><%= link_to "Jobs", jobs_path %></li>
+        <li class="breadcrumb-item active" aria-current="page"><%= tag.code @job.id, class: "text-muted" %></li>
+      </ol>
+    </nav>
     <div class="row align-items-center">
-      <div class="col-5">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb small mb-0">
-            <li class="breadcrumb-item"><%= link_to "Jobs", jobs_path %></li>
-            <li class="breadcrumb-item active" aria-current="page"><%= tag.code @job.id, class: "text-muted" %></li>
-          </ol>
-        </nav>
-        <h2 class="mb-0"><%= tag.code @job.job_class %></h2>
+      <div class="col-md-5">
+        <h2 class="mb-2 mb-md-0"><%= tag.code @job.job_class %></h2>
       </div>
-      <div class="col-2">
+      <div class="col-6 col-md-2">
         <div class="small text-muted text-uppercase">Queue</div>
         <div class="badge bg-primary bg-opacity-25 text-dark font-monospace my-2">
           <%= tag.strong @job.queue_name %>
         </div>
       </div>
-      <div class="col-2">
+      <div class="col-6 col-md-2">
         <div class="small text-muted text-uppercase">Priority</div>
         <div class="font-monospace fw-bold small my-2"><%= tag.strong @job.priority %></div>
       </div>
