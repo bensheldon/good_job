@@ -2,18 +2,20 @@
 module GoodJob
   module ActiveJobExtensions
     # Allows configuring whether GoodJob should emit a NOTIFY event when a job is enqueued.
-    # Configuration will apply to initial enqueue and subsequent retries.
+    # Configuration will apply either globally to the Job Class, or individually to jobs
+    # on initial enqueue and subsequent retries.
     #
     # @example
     #   # Include the concern to your job class:
     #   class MyJob < ApplicationJob
     #     include GoodJob::ActiveJobExtensions::Notify
+    #     self.good_job_notify = false
     #   end
     #
-    #   # Configure the job to not notify:
+    #   # Or, configure jobs individually to not notify:
     #   MyJob.set(good_job_notify: false).perform_later
     #
-    module Notify
+    module NotifyOptions
       extend ActiveSupport::Concern
 
       module Prepends
@@ -37,6 +39,7 @@ module GoodJob
 
       included do
         prepend Prepends
+        class_attribute :good_job_notify, instance_accessor: false, instance_predicate: false, default: nil
         attr_accessor :good_job_notify
       end
     end
