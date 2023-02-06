@@ -1,5 +1,20 @@
 # Changelog
 
+## [v3.11.0](https://github.com/bensheldon/good_job/tree/v3.11.0) (2023-02-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.10.1...v3.11.0)
+
+**Implemented enhancements:**
+
+- Create ActiveJob extension to disable sending a NOTIFY on enqueue and retry [\#814](https://github.com/bensheldon/good_job/pull/814) ([bensheldon](https://github.com/bensheldon))
+- Add global enable\_listen\_notify configuration to disable both notify and listen [\#810](https://github.com/bensheldon/good_job/pull/810) ([mitchellhenke](https://github.com/mitchellhenke))
+
+**Merged pull requests:**
+
+- Test Matrix: Use Ruby 3.2 to test against all Postgres versions; add PG 15, remove PG 10 [\#828](https://github.com/bensheldon/good_job/pull/828) ([bensheldon](https://github.com/bensheldon))
+- Bump nokogiri from 1.14.0 to 1.14.1 [\#827](https://github.com/bensheldon/good_job/pull/827) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rubocop-performance from 1.15.2 to 1.16.0 [\#826](https://github.com/bensheldon/good_job/pull/826) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.10.1](https://github.com/bensheldon/good_job/tree/v3.10.1) (2023-02-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.10.0...v3.10.1)
