@@ -55,6 +55,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         - [Exceptions](#exceptions)
         - [Retries](#retries)
         - [ActionMailer retries](#actionmailer-retries)
+        - [Interrupts](#interrupts)
     - [Timeouts](#timeouts)
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
     - [Database connections](#database-connections)
@@ -828,6 +829,23 @@ end
 
 Note, that `ActionMailer::MailDeliveryJob` is a default since Rails 6.0. Be sure that your app is using that class, as it
 might also be configured to use (deprecated now) `ActionMailer::DeliveryJob`.
+
+### Interrupts
+
+Jobs will be automatically retried if the process is interrupted while performing a job, for example as the result of a `SIGKILL` or power failure.
+
+If you need more control over interrupt-caused retries, include the `GoodJob::ActiveJobExtensions::InterruptErrors` extension in your job closs. When an interrupted job is retried, the extension will raise a `GoodJob::InterruptError` exception within the job, which allows you to use ActiveJob's `retry_on` and `discard_on` to control the behavior of the job.
+
+```ruby
+class MyJob < ApplicationJob
+  # The extension must be included before other extensions
+  include GoodJob::ActiveJobExtensions::InterruptErrors
+  # Discard the job if it is interrupted
+  discard_on InterruptError
+  # Retry the job if it is interrupted
+  retry_on InterruptError, wait: 0, attempts: Float::INFINITY
+end
+```
 
 ### Timeouts
 
