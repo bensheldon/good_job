@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.12.0](https://github.com/bensheldon/good_job/tree/v3.12.0) (2023-02-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.11.1...v3.12.0)
+
+**Merged pull requests:**
+
+- Create `InterruptErrors` extension to raise an exception when an interrupted job is retried [\#830](https://github.com/bensheldon/good_job/pull/830) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.11.1](https://github.com/bensheldon/good_job/tree/v3.11.1) (2023-02-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.11.0...v3.11.1)
