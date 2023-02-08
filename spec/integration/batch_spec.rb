@@ -238,4 +238,29 @@ RSpec.describe 'Batches' do
       expect(callback_arguments).to contain_exactly({ event: :success }, { event: :finish })
     end
   end
+
+  describe 'aggressive async batching' do
+    it 'can execute multiple jobs' do
+      allow(GoodJob.configuration).to receive(:max_threads).and_return(10)
+      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :async_all)
+      expect(ActiveJob::Base.queue_adapter.execute_async?).to be true
+
+      stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+        discard_on 'ExpectedError'
+        def perform(id)
+          sleep(0.1 * rand(10))
+          raise ExpectedError if id == 25
+        end
+      end)
+
+      batch = GoodJob::Batch.new
+      batch.on_discard = "BatchCallbackJob"
+      batch.on_finish = "BatchCallbackJob"
+      batch.enqueue do
+        50.times { |i| TestJob.perform_later(i) }
+      end
+
+      wait_until { expect(GoodJob::Job.finished.count).to eq 52 }
+    end
+  end
 end
