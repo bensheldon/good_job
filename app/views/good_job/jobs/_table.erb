@@ -76,7 +76,7 @@
               <%= job.priority %>
             </div>
             <div class="col-4 col-lg-1 text-lg-end">
-              <div class="d-lg-none small text-muted mt-1">Attemp</div>
+              <div class="d-lg-none small text-muted mt-1">Attempts</div>
               <% if job.executions_count > 0 && job.status != :succeeded %>
                 <%= tag.span job.executions_count, class: "badge rounded-pill bg-danger", data: {
                       bs_toggle: "popover",
@@ -92,7 +92,7 @@
               <div class="d-flex gap-3 align-items-center justify-content-end">
                 <%= tag.span relative_time(job.last_status_at), class: "small" %>
                 <%= status_badge job.status %>
-             
+
                 <div class="dropdown float-end">
                   <button class="d-flex align-items-center btn btn-sm" type="button" id="<%= dom_id(job, :actions) %>" data-bs-toggle="dropdown" aria-expanded="false">
                     <%= render "good_job/shared/icons/dots" %>
