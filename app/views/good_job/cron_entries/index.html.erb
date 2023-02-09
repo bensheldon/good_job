@@ -6,11 +6,11 @@
   <div class="list-group list-group-flush text-nowrap" role="table">
     <header class="list-group-item bg-light">
       <div class="row small text-muted text-uppercase align-items-center">
-        <div class="col"></div>
-        <div class="col">Class</div>
-        <div class="col">Schedule</div>
-        <div class="col">Next scheduled</div>
-        <div class="col">Last run</div>
+        <div class="col-12 col-lg-2"></div>
+        <div class="col-6 col-lg-2 d-none d-lg-block">Class</div>
+        <div class="col-6 col-lg-2 d-none d-lg-block">Schedule</div>
+        <div class="col-6 col-lg-2 d-none d-lg-block">Next scheduled</div>
+        <div class="col-6 col-lg-2 d-none d-lg-block">Last run</div>
         <div class="col text-end">
           <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                          data: { bs_toggle: "collapse", bs_target: ".cron-entry-properties" },
@@ -24,15 +24,22 @@
     <% @cron_entries.each do |cron_entry| %>
       <div id="<%= dom_id(cron_entry) %>" class="list-group-item py-3" role="row">
         <div class="row align-items-center">
-          <div class="col">
+          <div class="col-12 col-lg-2">
             <div class="small font-monospace"><%= cron_entry.key %></div>
-            <div class="small text-muted"><%= cron_entry.description %></div>
+            <div class="small text-muted text-wrap"><%= cron_entry.description %></div>
           </div>
-          <div class="col"><%= tag.span tag.code(cron_entry.job_class), class: "fs-5 mb-0" %></div>
-          <div class="col font-monospace fw-bold"><%= cron_entry.schedule %></div>
-          <div class="col small"><%= relative_time cron_entry.next_at %></div>
-          <div class="col small">
+          <div class="col-12 col-lg-2 text-wrap"><%= tag.span tag.code(cron_entry.job_class), class: "fs-5 mb-0" %></div>
+          <div class="col-6 col-lg-2 text-wrap">
+            <div class="d-lg-none small text-muted mt-1">Schedule</div>
+            <span class="font-monospace fw-bold"><%= cron_entry.schedule %></span>
+          </div>
+          <div class="col-6 col-lg-2 text-wrap small">
+            <div class="d-lg-none small text-muted mt-1">Next scheduled</div>
+            <%= relative_time cron_entry.next_at %>
+          </div>
+          <div class="col-6 col-lg-2 text-wrap small">
             <% if cron_entry.last_job.present? %>
+              <div class="d-lg-none small text-muted mt-1">Last run</div>
               <%= link_to relative_time(cron_entry.last_at), cron_entry_path(cron_entry), title: "Job #{cron_entry.last_job.id}" %>
             <% end %>
           </div>
