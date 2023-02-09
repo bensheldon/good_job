@@ -16,6 +16,27 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end)
   end
 
+  describe 'when extension is only included but not configured' do
+    it 'does not limit concurrency' do
+      expect do
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+      end.not_to raise_error
+    end
+  end
+
+  describe 'when concurrency key is nil' do
+    it 'does not limit concurrency' do
+      TestJob.good_job_control_concurrency_with(
+        total_limit: -> { 1 },
+        key: -> {}
+      )
+
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+    end
+  end
+
   describe '.good_job_control_concurrency_with' do
     describe 'total_limit:', skip_rails_5: true do
       before do

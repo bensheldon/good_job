@@ -86,6 +86,18 @@ module GoodJob
         @good_job_concurrency_key || _good_job_concurrency_key
       end
 
+      # Generates the concurrency key from the configuration
+      # @return [Object] concurrency key
+      def _good_job_concurrency_key
+        key = self.class.good_job_concurrency_config[:key]
+        return if key.blank?
+
+        key = key.respond_to?(:call) ? instance_exec(&key) : key
+        raise TypeError, "Concurrency key must be a String; was a #{key.class}" unless VALID_TYPES.any? { |type| key.is_a?(type) }
+
+        key
+      end
+
       private
 
       def good_job_enqueue_concurrency_check(job, on_abort:, on_enqueue:)
@@ -128,18 +140,6 @@ module GoodJob
             on_enqueue&.call
           end
         end
-      end
-
-      # Generates the concurrency key from the configuration
-      # @return [Object] concurrency key
-      def _good_job_concurrency_key
-        key = self.class.good_job_concurrency_config[:key]
-        return if key.blank?
-
-        key = key.respond_to?(:call) ? instance_exec(&key) : key
-        raise TypeError, "Concurrency key must be a String; was a #{key.class}" unless VALID_TYPES.any? { |type| key.is_a?(type) }
-
-        key
       end
     end
   end
