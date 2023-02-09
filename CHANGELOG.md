@@ -1,10 +1,27 @@
 # Changelog
 
+## [v3.12.1](https://github.com/bensheldon/good_job/tree/v3.12.1) (2023-02-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.0...v3.12.1)
+
+**Fixed bugs:**
+
+- Fix "NoMethodError: private method `\_good\_job\_concurrency\_key' if key is nil" [\#836](https://github.com/bensheldon/good_job/pull/836) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- NoMethodError: private method `\_good\_job\_concurrency\_key' if key is nil [\#835](https://github.com/bensheldon/good_job/issues/835)
+- Jobs go back into the queued state when a worker is killed [\#821](https://github.com/bensheldon/good_job/issues/821)
+
+**Merged pull requests:**
+
+- Dashboard's tables update [\#834](https://github.com/bensheldon/good_job/pull/834) ([Ajmal](https://github.com/Ajmal))
+
 ## [v3.12.0](https://github.com/bensheldon/good_job/tree/v3.12.0) (2023-02-07)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.11.1...v3.12.0)
 
-**Merged pull requests:**
+**Implemented enhancements:**
 
 - Create `InterruptErrors` extension to raise an exception when an interrupted job is retried [\#830](https://github.com/bensheldon/good_job/pull/830) ([bensheldon](https://github.com/bensheldon))
 
