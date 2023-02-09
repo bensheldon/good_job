@@ -59,7 +59,7 @@
                 <%= batch.jobs.count %>
               </div>
               <div class="col text-end">
-                <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
+                <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                                title: "Inspect",
                                data: { bs_toggle: "collapse", bs_target: "##{dom_id(batch, 'properties')}" },
                                aria: { expanded: false, controls: dom_id(batch, "state") } do %>

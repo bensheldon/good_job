@@ -50,7 +50,7 @@
                 <%= tag.span relative_time(job.last_status_at), class: "small" %>
                 <%= status_badge job.status %>
               
-                <div class="dropdown float-end ms-auto">
+                <div class="dropdown float-end">
                   <button class="d-flex align-items-center btn btn-sm" type="button" id="<%= dom_id(job, :actions) %>" data-bs-toggle="dropdown" aria-expanded="false">
                     <%= render "good_job/shared/icons/dots" %>
                     <span class="visually-hidden">Actions</span>
