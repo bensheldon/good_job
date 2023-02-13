@@ -834,7 +834,7 @@ might also be configured to use (deprecated now) `ActionMailer::DeliveryJob`.
 
 Jobs will be automatically retried if the process is interrupted while performing a job, for example as the result of a `SIGKILL` or power failure.
 
-If you need more control over interrupt-caused retries, include the `GoodJob::ActiveJobExtensions::InterruptErrors` extension in your job closs. When an interrupted job is retried, the extension will raise a `GoodJob::InterruptError` exception within the job, which allows you to use ActiveJob's `retry_on` and `discard_on` to control the behavior of the job.
+If you need more control over interrupt-caused retries, include the `GoodJob::ActiveJobExtensions::InterruptErrors` extension in your job class. When an interrupted job is retried, the extension will raise a `GoodJob::InterruptError` exception within the job, which allows you to use ActiveJob's `retry_on` and `discard_on` to control the behavior of the job.
 
 ```ruby
 class MyJob < ApplicationJob
