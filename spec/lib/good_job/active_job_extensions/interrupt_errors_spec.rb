@@ -34,7 +34,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
     end
   end
 
-  context 'when dequeued job does ot have performed at' do
+  context 'when dequeued job does not have performed at' do
     before do
       TestJob.perform_later
     end
