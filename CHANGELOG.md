@@ -1,5 +1,23 @@
 # Changelog
 
+## [v3.12.2](https://github.com/bensheldon/good_job/tree/v3.12.2) (2023-02-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.1...v3.12.2)
+
+**Fixed bugs:**
+
+- Ensure all i18n locale keys are under `good_job` namespace [\#850](https://github.com/bensheldon/good_job/pull/850) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Override locales and conflict with rails-i18n [\#847](https://github.com/bensheldon/good_job/issues/847)
+
+**Merged pull requests:**
+
+- Add rack-mini-profiler to development [\#848](https://github.com/bensheldon/good_job/pull/848) ([bensheldon](https://github.com/bensheldon))
+- Fix typo of "class" in README [\#845](https://github.com/bensheldon/good_job/pull/845) ([mthadley](https://github.com/mthadley))
+- spelling: add n to 'not' [\#841](https://github.com/bensheldon/good_job/pull/841) ([michaelglass](https://github.com/michaelglass))
+
 ## [v3.12.1](https://github.com/bensheldon/good_job/tree/v3.12.1) (2023-02-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.0...v3.12.1)
