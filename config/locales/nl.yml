@@ -1,51 +1,69 @@
 ---
 nl:
-  datetime:
-    distance_in_words:
-      about_x_hours:
-        one: ongeveer 1 uur
-        other: ongeveer %{count} uren
-      about_x_months:
-        one: ongeveer 1 maand
-        other: ongeveer %{count} maanden
-      about_x_years:
-        one: ongeveer 1 jaar
-        other: ongeveer %{count} jaren
-      almost_x_years:
-        one: bijna 1 jaar
-        other: bijna %{count} jaren
-      half_a_minute: halve minuut
-      less_than_x_minutes:
-        one: minder dan één minuut
-        other: minder dan %{count} minuten
-      less_than_x_seconds:
-        one: minder dan 1 seconde
-        other: minder dan %{count} seconden
-      over_x_years:
-        one: meer dan 1 jaar
-        other: meer dan %{count} jaren
-      x_days:
-        one: 1 dag
-        other: "%{count} dagen"
-      x_minutes:
-        one: 1 minuut
-        other: "%{count} minuten"
-      x_months:
-        one: 1 maand
-        other: "%{count} maanden"
-      x_seconds:
-        one: 1 seconde
-        other: "%{count} seconden"
-      x_years:
-        one: 1 jaar
-        other: "%{count} jaren"
-  duration:
-    hours: "%{hour}h %{min}m"
-    less_than_10_seconds: "%{sec}s"
-    milliseconds: "%{ms}ms"
-    minutes: "%{min}m %{sec}s"
-    seconds: "%{sec}s"
   good_job:
+    datetime:
+      distance_in_words:
+        about_x_hours:
+          one: ongeveer 1 uur
+          other: ongeveer %{count} uren
+        about_x_months:
+          one: ongeveer 1 maand
+          other: ongeveer %{count} maanden
+        about_x_years:
+          one: ongeveer 1 jaar
+          other: ongeveer %{count} jaren
+        almost_x_years:
+          one: bijna 1 jaar
+          other: bijna %{count} jaren
+        half_a_minute: halve minuut
+        less_than_x_minutes:
+          one: minder dan één minuut
+          other: minder dan %{count} minuten
+        less_than_x_seconds:
+          one: minder dan 1 seconde
+          other: minder dan %{count} seconden
+        over_x_years:
+          one: meer dan 1 jaar
+          other: meer dan %{count} jaren
+        x_days:
+          one: 1 dag
+          other: "%{count} dagen"
+        x_minutes:
+          one: 1 minuut
+          other: "%{count} minuten"
+        x_months:
+          one: 1 maand
+          other: "%{count} maanden"
+        x_seconds:
+          one: 1 seconde
+          other: "%{count} seconden"
+        x_years:
+          one: 1 jaar
+          other: "%{count} jaren"
+    duration:
+      hours: "%{hour}h %{min}m"
+      less_than_10_seconds: "%{sec}s"
+      milliseconds: "%{ms}ms"
+      minutes: "%{min}m %{sec}s"
+      seconds: "%{sec}s"
+    number:
+      format:
+        delimiter: "."
+        separator: ","
+      human:
+        decimal_units:
+          format: "%n%u"
+          units:
+            billion: B
+            million: M
+            quadrillion: Q
+            thousand: K
+            trillion: T
+            unit: ''
+        format:
+          delimiter: "."
+          precision: 3
+          separator: ","
     shared:
       footer:
         last_update_html: Laatst bijgewerkt <time id="page-updated-at" datetime="%{time}">%{time}</time>
@@ -63,21 +81,3 @@ nl:
       running: Rennen
       scheduled: Gepland
       succeeded: Geslaagd
-  number:
-    format:
-      delimiter: "."
-      separator: ","
-    human:
-      decimal_units:
-        format: "%n%u"
-        units:
-          billion: B
-          million: M
-          quadrillion: Q
-          thousand: K
-          trillion: T
-          unit: ''
-      format:
-        delimiter: "."
-        precision: 3
-        separator: ","

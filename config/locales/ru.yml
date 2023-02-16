@@ -1,75 +1,93 @@
 ---
 ru:
-  datetime:
-    distance_in_words:
-      about_x_hours:
-        few: около %{count} часов
-        many: около %{count} часов
-        one: около 1 часа
-        other: около %{count} часа
-      about_x_months:
-        few: около %{count} месяцев
-        many: около %{count} месяцев
-        one: около 1 месяца
-        other: около %{count} месяца
-      about_x_years:
-        few: около %{count} лет
-        many: около %{count} лет
-        one: около 1 года
-        other: около %{count} лет
-      almost_x_years:
-        few: почти %{count} года
-        many: почти %{count} лет
-        one: почти 1 год
-        other: почти %{count} лет
-      half_a_minute: полминуты
-      less_than_x_minutes:
-        few: меньше %{count} минут
-        many: меньше %{count} минут
-        one: меньше 1 минуты
-        other: меньше %{count} минуты
-      less_than_x_seconds:
-        few: меньше %{count} секунд
-        many: меньше %{count} секунд
-        one: меньше 1 секунды
-        other: меньше %{count} секунды
-      over_x_years:
-        few: больше %{count} лет
-        many: больше %{count} лет
-        one: больше 1 года
-        other: больше %{count} лет
-      x_days:
-        few: "%{count} дня"
-        many: "%{count} дней"
-        one: 1 день
-        other: "%{count} дня"
-      x_minutes:
-        few: "%{count} минуты"
-        many: "%{count} минут"
-        one: 1 минуту
-        other: "%{count} минуты"
-      x_months:
-        few: "%{count} месяца"
-        many: "%{count} месяцев"
-        one: 1 месяц
-        other: "%{count} месяца"
-      x_seconds:
-        few: "%{count} секунды"
-        many: "%{count} секунд"
-        one: 1 секунду
-        other: "%{count} секунды"
-      x_years:
-        few: "%{count} года"
-        many: "%{count} лет"
-        one: 1 год
-        other: "%{count} года"
-  duration:
-    hours: "%{hour}h %{min}m"
-    less_than_10_seconds: "%{sec}s"
-    milliseconds: "%{ms}мс"
-    minutes: "%{min}м %{sec}с"
-    seconds: "%{sec}s"
   good_job:
+    datetime:
+      distance_in_words:
+        about_x_hours:
+          few: около %{count} часов
+          many: около %{count} часов
+          one: около 1 часа
+          other: около %{count} часа
+        about_x_months:
+          few: около %{count} месяцев
+          many: около %{count} месяцев
+          one: около 1 месяца
+          other: около %{count} месяца
+        about_x_years:
+          few: около %{count} лет
+          many: около %{count} лет
+          one: около 1 года
+          other: около %{count} лет
+        almost_x_years:
+          few: почти %{count} года
+          many: почти %{count} лет
+          one: почти 1 год
+          other: почти %{count} лет
+        half_a_minute: полминуты
+        less_than_x_minutes:
+          few: меньше %{count} минут
+          many: меньше %{count} минут
+          one: меньше 1 минуты
+          other: меньше %{count} минуты
+        less_than_x_seconds:
+          few: меньше %{count} секунд
+          many: меньше %{count} секунд
+          one: меньше 1 секунды
+          other: меньше %{count} секунды
+        over_x_years:
+          few: больше %{count} лет
+          many: больше %{count} лет
+          one: больше 1 года
+          other: больше %{count} лет
+        x_days:
+          few: "%{count} дня"
+          many: "%{count} дней"
+          one: 1 день
+          other: "%{count} дня"
+        x_minutes:
+          few: "%{count} минуты"
+          many: "%{count} минут"
+          one: 1 минуту
+          other: "%{count} минуты"
+        x_months:
+          few: "%{count} месяца"
+          many: "%{count} месяцев"
+          one: 1 месяц
+          other: "%{count} месяца"
+        x_seconds:
+          few: "%{count} секунды"
+          many: "%{count} секунд"
+          one: 1 секунду
+          other: "%{count} секунды"
+        x_years:
+          few: "%{count} года"
+          many: "%{count} лет"
+          one: 1 год
+          other: "%{count} года"
+    duration:
+      hours: "%{hour}h %{min}m"
+      less_than_10_seconds: "%{sec}s"
+      milliseconds: "%{ms}мс"
+      minutes: "%{min}м %{sec}с"
+      seconds: "%{sec}s"
+    number:
+      format:
+        delimiter: " "
+        separator: ","
+      human:
+        decimal_units:
+          format: "%n%u"
+          units:
+            billion: Б
+            million: М
+            quadrillion: Q
+            thousand: К
+            trillion: Т
+            unit: ''
+        format:
+          delimiter: " "
+          precision: 3
+          separator: ","
     shared:
       footer:
         last_update_html: Последнее обновление <time id="page-updated-at" datetime="%{time}">%{time}</time>
@@ -87,21 +105,3 @@ ru:
       running: Бег
       scheduled: по расписанию
       succeeded: удалось
-  number:
-    format:
-      delimiter: " "
-      separator: ","
-    human:
-      decimal_units:
-        format: "%n%u"
-        units:
-          billion: Б
-          million: М
-          quadrillion: Q
-          thousand: К
-          trillion: Т
-          unit: ''
-      format:
-        delimiter: " "
-        precision: 3
-        separator: ","

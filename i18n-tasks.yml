@@ -96,9 +96,9 @@ search:
 ## Consider these keys used:
 ignore_unused:
  - "activerecord.attributes.*"
- - "datetime.*"
+ - "good_job.datetime.*"
  - "good_job.status.*"
- - "number.*"
+ - "good_job.number.*"
 
 ## Exclude these keys from the `i18n-tasks eq-base' report:
 # ignore_eq_base:
