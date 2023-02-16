@@ -11,7 +11,7 @@
           <%= link_to jobs_path, class: ["nav-link", ("active" if controller_name == 'jobs')] do %>
             <%= t(".jobs") %>
             <% jobs_count = GoodJob::Job.count %>
-            <span class="badge bg-secondary rounded-pill"><%= number_to_human(jobs_count) %></span>
+            <span class="badge bg-secondary rounded-pill"><%= number_to_human(jobs_count, unit: "good_job.number") %></span>
         <% end %>
         </li>
         <li class="nav-item">

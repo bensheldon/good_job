@@ -5,20 +5,21 @@ module GoodJob
       return unless sec
 
       if sec < 1
-        t 'duration.milliseconds', ms: (sec * 1000).floor
+        t 'good_job.duration.milliseconds', ms: (sec * 1000).floor
       elsif sec < 10
-        t 'duration.less_than_10_seconds', sec: sec.floor
+        t 'good_job.duration.less_than_10_seconds', sec: sec.floor
       elsif sec < 60
-        t 'duration.seconds', sec: sec.floor
+        t 'good_job.duration.seconds', sec: sec.floor
       elsif sec < 3600
-        t 'duration.minutes', min: (sec / 60).floor, sec: (sec % 60).floor
+        t 'good_job.duration.minutes', min: (sec / 60).floor, sec: (sec % 60).floor
       else
-        t 'duration.hours', hour: (sec / 3600).floor, min: ((sec % 3600) / 60).floor
+        t 'good_job.duration.hours', hour: (sec / 3600).floor, min: ((sec % 3600) / 60).floor
       end
     end
 
-    def relative_time(timestamp, **args)
-      text = timestamp.future? ? "in #{time_ago_in_words(timestamp, **args)}" : "#{time_ago_in_words(timestamp, **args)} ago"
+    def relative_time(timestamp, **options)
+      options = options.reverse_merge({ scope: "good_job.datetime.distance_in_words" })
+      text = timestamp.future? ? "in #{time_ago_in_words(timestamp, **options)}" : "#{time_ago_in_words(timestamp, **options)} ago"
       tag.time(text, datetime: timestamp, title: timestamp)
     end
 

@@ -1,75 +1,93 @@
 ---
 ua:
-  datetime:
-    distance_in_words:
-      about_x_hours:
-        few: близько %{count} години
-        many: близько %{count} годин
-        one: близько 1 години
-        other: близько %{count} години
-      about_x_months:
-        few: близько %{count} місяців
-        many: близько %{count} місяців
-        one: близько 1 місяцю
-        other: близько %{count} місяцю
-      about_x_years:
-        few: близько %{count} років
-        many: близько %{count} років
-        one: близько 1 року
-        other: близько %{count} років
-      almost_x_years:
-        few: майже %{count} роки
-        many: майже %{count} років
-        one: майже 1 рік
-        other: майже %{count} років
-      half_a_minute: пів хвилини
-      less_than_x_minutes:
-        few: менше %{count} хвилин
-        many: менше %{count} хвилин
-        one: менше 1 хвилини
-        other: менше %{count} хвилини
-      less_than_x_seconds:
-        few: менше %{count} секунд
-        many: менше %{count} секунд
-        one: менше 1 секунди
-        other: менше %{count} секунди
-      over_x_years:
-        few: більше %{count} років
-        many: більше %{count} років
-        one: більше 1 року
-        other: більше %{count} років
-      x_days:
-        few: "%{count} дня"
-        many: "%{count} днів"
-        one: 1 день
-        other: "%{count} дня"
-      x_minutes:
-        few: "%{count} хвилини"
-        many: "%{count} хвилин"
-        one: 1 хвилину
-        other: "%{count} хвилини"
-      x_months:
-        few: "%{count} місяцю"
-        many: "%{count} місяців"
-        one: 1 місяць
-        other: "%{count} місяцю"
-      x_seconds:
-        few: "%{count} секунди"
-        many: "%{count} секунд"
-        one: 1 секунду
-        other: "%{count} секунди"
-      x_years:
-        few: "%{count} року"
-        many: "%{count} років"
-        one: 1 рік
-        other: "%{count} року"
-  duration:
-    hours: "%{hour}h %{min}m"
-    less_than_10_seconds: "%{sec}s"
-    milliseconds: "%{ms}мс"
-    minutes: "%{min}м %{sec}с"
-    seconds: "%{sec}s"
   good_job:
+    datetime:
+      distance_in_words:
+        about_x_hours:
+          few: близько %{count} години
+          many: близько %{count} годин
+          one: близько 1 години
+          other: близько %{count} години
+        about_x_months:
+          few: близько %{count} місяців
+          many: близько %{count} місяців
+          one: близько 1 місяцю
+          other: близько %{count} місяцю
+        about_x_years:
+          few: близько %{count} років
+          many: близько %{count} років
+          one: близько 1 року
+          other: близько %{count} років
+        almost_x_years:
+          few: майже %{count} роки
+          many: майже %{count} років
+          one: майже 1 рік
+          other: майже %{count} років
+        half_a_minute: пів хвилини
+        less_than_x_minutes:
+          few: менше %{count} хвилин
+          many: менше %{count} хвилин
+          one: менше 1 хвилини
+          other: менше %{count} хвилини
+        less_than_x_seconds:
+          few: менше %{count} секунд
+          many: менше %{count} секунд
+          one: менше 1 секунди
+          other: менше %{count} секунди
+        over_x_years:
+          few: більше %{count} років
+          many: більше %{count} років
+          one: більше 1 року
+          other: більше %{count} років
+        x_days:
+          few: "%{count} дня"
+          many: "%{count} днів"
+          one: 1 день
+          other: "%{count} дня"
+        x_minutes:
+          few: "%{count} хвилини"
+          many: "%{count} хвилин"
+          one: 1 хвилину
+          other: "%{count} хвилини"
+        x_months:
+          few: "%{count} місяцю"
+          many: "%{count} місяців"
+          one: 1 місяць
+          other: "%{count} місяцю"
+        x_seconds:
+          few: "%{count} секунди"
+          many: "%{count} секунд"
+          one: 1 секунду
+          other: "%{count} секунди"
+        x_years:
+          few: "%{count} року"
+          many: "%{count} років"
+          one: 1 рік
+          other: "%{count} року"
+    duration:
+      hours: "%{hour}h %{min}m"
+      less_than_10_seconds: "%{sec}s"
+      milliseconds: "%{ms}мс"
+      minutes: "%{min}м %{sec}с"
+      seconds: "%{sec}s"
+    number:
+      format:
+        delimiter: " "
+        separator: ","
+      human:
+        decimal_units:
+          format: "%n%u"
+          units:
+            billion: Блн
+            million: Млн
+            quadrillion: Q
+            thousand: Тис
+            trillion: Трил
+            unit: ''
+        format:
+          delimiter: " "
+          precision: 3
+          separator: ","
     shared:
       footer:
         last_update_html: Оснаннє оновлення <time id="page-updated-at" datetime="%{time}">%{time}</time>
@@ -87,21 +105,3 @@ ua:
       running: Біг
       scheduled: за розкладом
       succeeded: вдалося
-  number:
-    format:
-      delimiter: " "
-      separator: ","
-    human:
-      decimal_units:
-        format: "%n%u"
-        units:
-          billion: Блн
-          million: Млн
-          quadrillion: Q
-          thousand: Тис
-          trillion: Трил
-          unit: ''
-      format:
-        delimiter: " "
-        precision: 3
-        separator: ","
