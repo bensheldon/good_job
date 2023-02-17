@@ -2,7 +2,7 @@
 class CreateIndexGoodJobsJobsOnPriorityCreatedAtWhenUnfinished < ActiveRecord::Migration<%= migration_version %>
   disable_ddl_transaction!
 
-   def change
+  def change
     reversible do |dir|
       dir.up do
         # Ensure this incremental update migration is idempotent
