@@ -10,6 +10,8 @@ RSpec.describe GoodJob::CronManager do
       expect do
         cron_manager.start
       end.to change(cron_manager, :running?).from(false).to true
+
+      cron_manager.shutdown
     end
   end
 

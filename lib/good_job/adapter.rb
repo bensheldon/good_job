@@ -98,7 +98,7 @@ module GoodJob
             state = { queue_name: queue_name, count: executions_by_queue_and_scheduled_at.size }
             state[:scheduled_at] = scheduled_at if scheduled_at
 
-            executed_locally = execute_async? && @scheduler&.create_thread(state)
+            executed_locally = execute_async? && @capsule&.execute(state)
             unless executed_locally
               state[:count] = job_id_to_active_jobs.values_at(*executions_by_queue_and_scheduled_at.map(&:active_job_id)).count { |active_job| send_notify?(active_job) }
               Notifier.notify(state) unless state[:count].zero?
@@ -141,7 +141,7 @@ module GoodJob
         job_state = { queue_name: execution.queue_name }
         job_state[:scheduled_at] = execution.scheduled_at if execution.scheduled_at
 
-        executed_locally = execute_async? && @scheduler&.create_thread(job_state)
+        executed_locally = execute_async? && @capsule&.execute(job_state)
         Notifier.notify(job_state) if !executed_locally && send_notify?(active_job)
       end
 
@@ -150,20 +150,13 @@ module GoodJob
 
     # Shut down the thread pool executors.
     # @param timeout [nil, Numeric, Symbol] Seconds to wait for active threads.
-    #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
-    #   * +-1+, the scheduler will wait until the shutdown is complete.
-    #   * +0+, the scheduler will immediately shutdown and stop any threads.
+    #   * +nil+ trigger a shutdown but not wait for it to complete.
+    #   * +-1+ wait until the shutdown is complete.
+    #   * +0+ immediately shutdown and stop any threads.
     #   * A positive number will wait that many seconds before stopping any remaining active threads.
     # @return [void]
     def shutdown(timeout: :default)
-      timeout = if timeout == :default
-                  GoodJob.configuration.shutdown_timeout
-                else
-                  timeout
-                end
-
-      executables = [@notifier, @poller, @scheduler].compact
-      GoodJob._shutdown_all(executables, timeout: timeout)
+      @capsule&.shutdown(timeout: timeout)
       @_async_started = false
     end
 
@@ -199,13 +192,8 @@ module GoodJob
     def start_async
       return unless execute_async?
 
-      @notifier = GoodJob::Notifier.new(enable_listening: GoodJob.configuration.enable_listen_notify)
-      @poller = GoodJob::Poller.new(poll_interval: GoodJob.configuration.poll_interval)
-      @scheduler = GoodJob::Scheduler.from_configuration(GoodJob.configuration, warm_cache_on_initialize: true)
-      @notifier.recipients << [@scheduler, :create_thread]
-      @poller.recipients << [@scheduler, :create_thread]
-
-      @cron_manager = GoodJob::CronManager.new(GoodJob.configuration.cron_entries, start_on_initialize: true) if GoodJob.configuration.enable_cron?
+      @capsule = GoodJob::Capsule.new
+      @capsule.start
 
       @_async_started = true
     end

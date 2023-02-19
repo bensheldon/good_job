@@ -24,26 +24,23 @@ RSpec.describe GoodJob::Process do
 
   describe '.register' do
     it 'registers the process' do
-      process = nil
       expect do
-        process = described_class.register
+        described_class.register
       end.to change(described_class, :count).by(1)
-
-      process.deregister
     end
 
     context 'when there is already an existing record' do
-      it 'returns nil' do
-        described_class.create!(id: described_class.current_id)
-        expect(described_class.register).to be_nil
+      it 'updates the state and updated_at' do
+        travel_to(1.hour.ago) { described_class.register }
+        expect { described_class.register }.to change { described_class.first.updated_at }
       end
     end
   end
 
-  describe '#deregister' do
-    it 'deregisters the record' do
-      process = described_class.register
-      expect { process.deregister }.to change(described_class, :count).by(-1)
+  describe '.unregister' do
+    it 'removes the record' do
+      described_class.register
+      expect { described_class.unregister }.to change(described_class, :count).by(-1)
     end
   end
 

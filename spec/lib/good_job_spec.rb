@@ -3,20 +3,22 @@ require 'rails_helper'
 
 describe GoodJob do
   let(:configuration) { GoodJob::Configuration.new({ queues: 'mice:1', poll_interval: -1 }) }
-  let!(:scheduler) { GoodJob::Scheduler.from_configuration(configuration) }
-  let!(:notifier) { GoodJob::Notifier.new([scheduler, :create_thread], enable_listening: true) }
 
   describe '.shutdown' do
-    it 'shuts down all scheduler and notifier instances' do
-      described_class.shutdown
-
-      expect(scheduler.shutdown?).to be true
-      expect(notifier.shutdown?).to be true
+    it 'shuts down all capsules' do
+      capsule = GoodJob::Capsule.new(configuration: configuration)
+      capsule.start
+      expect { described_class.shutdown }.to change(capsule, :shutdown?).from(false).to(true)
     end
   end
 
   describe '.shutdown?' do
     it 'shuts down all scheduler and notifier instances' do
+      expect do
+        capsule = GoodJob::Capsule.new(configuration: configuration)
+        capsule.start
+      end.to change(described_class, :shutdown?).from(true).to(false)
+
       expect do
         described_class.shutdown
       end.to change(described_class, :shutdown?).from(false).to(true)
@@ -24,12 +26,14 @@ describe GoodJob do
   end
 
   describe '.restart' do
-    it 'restarts down all scheduler and notifier instances' do
-      described_class.shutdown
+    it 'does nothing when there are no capsule instances' do
+      expect(GoodJob::Capsule.instances).to be_empty
+      expect { described_class.restart }.not_to change(described_class, :shutdown?).from(true)
+    end
 
-      expect do
-        described_class.restart
-      end.to change(described_class, :shutdown?).from(true).to(false)
+    it 'restarts down all capsule instances' do
+      GoodJob::Capsule.new(configuration: configuration)
+      expect { described_class.restart }.to change(described_class, :shutdown?).from(true).to(false)
     end
   end
 

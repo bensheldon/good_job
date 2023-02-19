@@ -15,6 +15,7 @@ require "good_job/active_job_extensions/notify_options"
 
 require "good_job/assignable_connection"
 require "good_job/bulk"
+require "good_job/capsule"
 require "good_job/cleanup_tracker"
 require "good_job/cli"
 require "good_job/configuration"
@@ -28,6 +29,7 @@ require "good_job/multi_scheduler"
 require "good_job/notifier"
 require "good_job/poller"
 require "good_job/probe_server"
+require "good_job/process_manager"
 require "good_job/scheduler"
 
 # GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
@@ -111,13 +113,13 @@ module GoodJob
   # @param wait [Boolean] whether to wait for shutdown
   # @return [void]
   def self.shutdown(timeout: -1)
-    _shutdown_all(_executables, timeout: timeout)
+    _shutdown_all(Capsule.instances, timeout: timeout)
   end
 
   # Tests whether jobs have stopped executing.
   # @return [Boolean] whether background threads are shut down
   def self.shutdown?
-    _executables.all?(&:shutdown?)
+    Capsule.instances.all?(&:shutdown?)
   end
 
   # Stops and restarts executing jobs.
@@ -128,7 +130,7 @@ module GoodJob
   # @param timeout [Numeric, nil] Seconds to wait for active threads to finish.
   # @return [void]
   def self.restart(timeout: -1)
-    _shutdown_all(_executables, :restart, timeout: timeout)
+    _shutdown_all(Capsule.instances, :restart, timeout: timeout)
   end
 
   # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager})
@@ -192,15 +194,6 @@ module GoodJob
       break unless result
       raise result.unhandled_error if result.unhandled_error
     end
-  end
-
-  def self._executables
-    [].concat(
-      CronManager.instances,
-      Notifier.instances,
-      Poller.instances,
-      Scheduler.instances
-    )
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)

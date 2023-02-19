@@ -7,17 +7,16 @@ module GoodJob # :nodoc:
     include AssignableConnection
     include Lockable
 
-    self.table_name = 'good_job_processes'
+    HEARTBEAT_INTERVAL = ProcessManager::HEARTBEAT_INTERVAL
+    EXPIRED_INTERVAL = ProcessManager::EXPIRED_INTERVAL
 
-    cattr_reader :mutex, default: Mutex.new
-    cattr_accessor :_current_id, default: nil
-    cattr_accessor :_pid, default: nil
+    self.table_name = 'good_job_processes'
 
     # Processes that are active and locked.
     # @!method active
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :active, -> { advisory_locked }
+    scope :active, -> { advisory_locked.or(where('updated_at > ?', EXPIRED_INTERVAL.ago)) }
 
     # Processes that are inactive and unlocked (e.g. SIGKILLed)
     # @!method active
@@ -25,16 +24,20 @@ module GoodJob # :nodoc:
     # @return [ActiveRecord::Relation]
     scope :inactive, -> { advisory_unlocked }
 
-    # UUID that is unique to the current process and changes when forked.
-    # @return [String]
+    # Processes that require a heartbeat
+    # @!method active
+    # @!scope class
+    # @return [ActiveRecord::Relation]
+    scope :stale, -> { where('updated_at < ?', HEARTBEAT_INTERVAL.ago) }
+
+    # Processes that have failed their heartbeat
+    # @!method active
+    # @!scope class
+    # @return [ActiveRecord::Relation]
+    scope :expired, -> { where('updated_at < ?', EXPIRED_INTERVAL.ago) }
+
     def self.current_id
-      mutex.synchronize do
-        if _current_id.nil? || _pid != ::Process.pid
-          self._current_id = SecureRandom.uuid
-          self._pid = ::Process.pid
-        end
-        _current_id
-      end
+      ProcessManager.current_process_id
     end
 
     # Hash representing metadata about the current process.
@@ -54,23 +57,27 @@ module GoodJob # :nodoc:
 
     # Deletes all inactive process records.
     def self.cleanup
-      inactive.delete_all
+      inactive.expired.delete_all
     end
 
-    # Registers the current process in the database
+    # Registers or updates the current process in the database
     # @return [GoodJob::Process]
     def self.register
-      create(id: current_id, state: current_state, create_with_advisory_lock: true)
-    rescue ActiveRecord::RecordNotUnique
-      nil
+      find_or_initialize_by(id: current_id).tap do |process|
+        process.update!(updated_at: Time.current, state: current_state)
+      end
     end
 
-    # Unregisters the instance.
-    def deregister
-      return unless owns_advisory_lock?
+    def self.unregister
+      where(id: current_id).delete_all
+    end
 
-      destroy!
-      advisory_unlock
+    def stale?
+      updated_at < HEARTBEAT_INTERVAL.ago
+    end
+
+    def expired?
+      updated_at < EXPIRED_INTERVAL.ago
     end
 
     def basename
