@@ -234,8 +234,8 @@ module GoodJob
     end
 
     def send_notify?(active_job)
-      return true unless active_job.respond_to?(:good_job_notify)
       return false unless GoodJob.configuration.enable_listen_notify
+      return true unless active_job.respond_to?(:good_job_notify)
 
       !(active_job.good_job_notify == false || (active_job.class.good_job_notify == false && active_job.good_job_notify.nil?))
     end
