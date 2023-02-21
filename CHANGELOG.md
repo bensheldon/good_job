@@ -1,5 +1,19 @@
 # Changelog
 
+## [v3.12.3](https://github.com/bensheldon/good_job/tree/v3.12.3) (2023-02-21)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.2...v3.12.3)
+
+**Closed issues:**
+
+- \[Not Critical\] Too much space \(One\) in db/migrate/XXXXXX\_create\_index\_good\_jobs\_jobs\_on\_priority\_created\_at\_when\_unfinished.rb [\#851](https://github.com/bensheldon/good_job/issues/851)
+- Use timestamps with timezone when set as the default for postgresql. [\#668](https://github.com/bensheldon/good_job/issues/668)
+
+**Merged pull requests:**
+
+- Fix bug where notification check does not use configuration [\#857](https://github.com/bensheldon/good_job/pull/857) ([mitchellhenke](https://github.com/mitchellhenke))
+- Fix template for the update migrations 03 index \(\#851\) [\#852](https://github.com/bensheldon/good_job/pull/852) ([julienanne](https://github.com/julienanne))
+
 ## [v3.12.2](https://github.com/bensheldon/good_job/tree/v3.12.2) (2023-02-16)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.1...v3.12.2)
