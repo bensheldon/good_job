@@ -11,3 +11,4 @@ doc
 gemfiles/*.gemfile.lock
 tmp/rspec_examples.txt
 .DS_Store
+tmp/example_app

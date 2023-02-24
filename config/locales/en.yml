@@ -52,7 +52,10 @@ en:
         separator: "."
       human:
         decimal_units:
+          delimiter: ","
           format: "%n%u"
+          precision: 3
+          separator: "."
           units:
             billion: B
             million: M
@@ -60,10 +63,6 @@ en:
             thousand: K
             trillion: T
             unit: ''
-        format:
-          delimiter: ","
-          precision: 3
-          separator: "."
     shared:
       footer:
         last_update_html: Last updated <time id="page-updated-at" datetime="%{time}">%{time}</time>
