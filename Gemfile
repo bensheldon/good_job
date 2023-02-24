@@ -16,7 +16,7 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
-gem 'appraisal', github: "bensheldon/appraisal", branch: "fix-bundle-env" # https://github.com/thoughtbot/appraisal/pull/174
+gem 'appraisal', github: 'thoughtbot/appraisal', branch: 'main'
 gem 'matrix'
 gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
