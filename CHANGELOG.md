@@ -1,5 +1,19 @@
 # Changelog
 
+## [v3.12.4](https://github.com/bensheldon/good_job/tree/v3.12.4) (2023-02-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.3...v3.12.4)
+
+**Closed issues:**
+
+- Rails 7.1 - Serialized columns like a store now needs a `coder: JSON` [\#863](https://github.com/bensheldon/good_job/issues/863)
+- Does good\_job automatically retry on ActiveRecord::LockWaitTimeout? [\#860](https://github.com/bensheldon/good_job/issues/860)
+- race condition for batches callback [\#832](https://github.com/bensheldon/good_job/issues/832)
+
+**Merged pull requests:**
+
+- Add serialize coder kwarg for Rails 7.1-alpha [\#864](https://github.com/bensheldon/good_job/pull/864) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.12.3](https://github.com/bensheldon/good_job/tree/v3.12.3) (2023-02-21)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.2...v3.12.3)
