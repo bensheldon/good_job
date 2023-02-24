@@ -76,7 +76,10 @@ ua:
         separator: ","
       human:
         decimal_units:
+          delimiter: " "
           format: "%n%u"
+          precision: 3
+          separator: ","
           units:
             billion: Блн
             million: Млн
@@ -84,10 +87,6 @@ ua:
             thousand: Тис
             trillion: Трил
             unit: ''
-        format:
-          delimiter: " "
-          precision: 3
-          separator: ","
     shared:
       footer:
         last_update_html: Оснаннє оновлення <time id="page-updated-at" datetime="%{time}">%{time}</time>

@@ -15,7 +15,7 @@
             <option value="" <%= "selected='selected'" if params[:queue_name].blank? %>>All queues</option>
 
             <% filter.queues.each do |name, count| %>
-              <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:queue_name] == name %>><%= name %> (<%= number_with_delimiter(count) %>)</option>
+              <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:queue_name] == name %>><%= name %> (<%= number_with_delimiter(count, t('good_job.number.format')) %>)</option>
             <% end %>
           </select>
         </div>
@@ -26,7 +26,7 @@
             <option value="" <%= "selected='selected'" if params[:job_class].blank? %>>All jobs</option>
 
             <% filter.job_classes.each do |name, count| %>
-              <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:job_class] == name %>><%= name %> (<%= number_with_delimiter(count) %>)</option>
+              <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:job_class] == name %>><%= name %> (<%= number_with_delimiter(count, t('good_job.number.format')) %>)</option>
             <% end %>
           </select>
         </div>
@@ -56,7 +56,7 @@
         <li class="nav-item">
           <%= link_to filter.to_params(state: name), class: "nav-link #{"active" if params[:state] == name}" do %>
             <%= t(name, scope: 'good_job.status') %>
-            <span class="badge bg-primary rounded-pill <%= "bg-secondary" if count == 0 %>"><%= number_with_delimiter(count) %></span>
+            <span class="badge bg-primary rounded-pill <%= "bg-secondary" if count == 0 %>"><%= number_with_delimiter(count, t('good_job.number.format')) %></span>
           <% end %>
         </li>
       <% end %>
