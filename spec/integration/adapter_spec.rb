@@ -66,7 +66,8 @@ RSpec.describe 'Adapter Integration' do
   end
 
   describe 'Async execution mode' do
-    let(:adapter) { GoodJob::Adapter.new execution_mode: :async_all }
+    let(:capsule) { GoodJob::Capsule.new(configuration: GoodJob::Configuration.new({ max_threads: 5, queue_string: '*' })) }
+    let(:adapter) { GoodJob::Adapter.new(execution_mode: :async_all, _capsule: capsule) }
 
     it 'executes the job', skip_if_java: true do
       elephant_adapter = GoodJob::Adapter.new execution_mode: :async_all

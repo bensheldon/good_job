@@ -22,6 +22,16 @@ RSpec.configure do |config|
   config.after do
     GoodJob.shutdown(timeout: -1)
 
+    executables = [].concat(
+      GoodJob::CronManager.instances,
+      GoodJob::Notifier.instances,
+      GoodJob::Poller.instances,
+      GoodJob::Scheduler.instances,
+      GoodJob::CronManager.instances,
+      GoodJob::Capsule.instances
+    )
+    GoodJob._shutdown_all(executables, timeout: -1)
+
     expect(THREAD_ERRORS).to be_empty
 
     expect(GoodJob::Notifier.instances).to all be_shutdown
@@ -35,6 +45,9 @@ RSpec.configure do |config|
 
     expect(GoodJob::Scheduler.instances).to all be_shutdown
     GoodJob::Scheduler.instances.clear
+
+    expect(GoodJob::Capsule.instances).to all be_shutdown
+    GoodJob::Capsule.instances.clear
 
     expect(PgLock.current_database.advisory_lock.owns.count).to eq(0), "Existing owned advisory locks AFTER test run"
 

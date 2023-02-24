@@ -15,6 +15,7 @@ require "good_job/active_job_extensions/notify_options"
 
 require "good_job/assignable_connection"
 require "good_job/bulk"
+require "good_job/capsule"
 require "good_job/cleanup_tracker"
 require "good_job/cli"
 require "good_job/configuration"
@@ -91,6 +92,12 @@ module GoodJob
   #   @return [GoodJob::Configuration, nil]
   mattr_accessor :configuration, default: GoodJob::Configuration.new({})
 
+  # @!attribute [rw] capsule
+  #   @!scope class
+  #   Global/default execution capsule for GoodJob.
+  #   @return [GoodJob::Capsule, nil]
+  mattr_accessor :capsule, default: GoodJob::Capsule.new(configuration: configuration)
+
   # Called with exception when a GoodJob thread raises an exception
   # @param exception [Exception] Exception that was raised
   # @return [void]
@@ -108,16 +115,15 @@ module GoodJob
   #   * +-1+, the scheduler will wait until the shutdown is complete.
   #   * +0+, the scheduler will immediately shutdown and stop any active tasks.
   #   * +1..+, the scheduler will wait that many seconds before stopping any remaining active tasks.
-  # @param wait [Boolean] whether to wait for shutdown
   # @return [void]
   def self.shutdown(timeout: -1)
-    _shutdown_all(_executables, timeout: timeout)
+    _shutdown_all(Capsule.instances, timeout: timeout)
   end
 
   # Tests whether jobs have stopped executing.
   # @return [Boolean] whether background threads are shut down
   def self.shutdown?
-    _executables.all?(&:shutdown?)
+    Capsule.instances.all?(&:shutdown?)
   end
 
   # Stops and restarts executing jobs.
@@ -128,7 +134,7 @@ module GoodJob
   # @param timeout [Numeric, nil] Seconds to wait for active threads to finish.
   # @return [void]
   def self.restart(timeout: -1)
-    _shutdown_all(_executables, :restart, timeout: timeout)
+    _shutdown_all(Capsule.instances, :restart, timeout: timeout)
   end
 
   # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager})
@@ -154,7 +160,7 @@ module GoodJob
   # analyze or inspect job performance.
   # If you are preserving job records this way, use this method regularly to
   # destroy old records and preserve space in your database.
-  # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
+  # @param older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
   # @return [Integer] Number of job execution records and batches that were destroyed.
   def self.cleanup_preserved_jobs(older_than: nil)
     older_than ||= GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago
@@ -192,15 +198,6 @@ module GoodJob
       break unless result
       raise result.unhandled_error if result.unhandled_error
     end
-  end
-
-  def self._executables
-    [].concat(
-      CronManager.instances,
-      Notifier.instances,
-      Poller.instances,
-      Scheduler.instances
-    )
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)
