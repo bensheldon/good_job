@@ -15,7 +15,7 @@ jobs:
       BUNDLE_PATH: vendor/bundle
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Dependencies
       - name: Set up Ruby
@@ -55,7 +55,7 @@ jobs:
           --health-retries 5
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # Dependencies
       - name: Set up Ruby
@@ -119,7 +119,7 @@ jobs:
       - uses: browser-actions/setup-chrome@latest
       - run: chrome --version
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Update .ruby-version with matrix value
         run: echo "${{ matrix.ruby }}" >| .ruby-version
       # Dependencies
