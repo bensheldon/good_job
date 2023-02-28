@@ -1,47 +1,45 @@
 # frozen_string_literal: true
 module GoodJob
   class AssetsController < ActionController::Base # rubocop:disable Rails/ApplicationController
-    skip_before_action :verify_authenticity_token, raise: false
+    skip_after_action :verify_same_origin_request
+
+    STATIC_ASSETS = {
+      css: {
+        bootstrap: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "bootstrap", "bootstrap.min.css"),
+        style: GoodJob::Engine.root.join("app", "assets", "good_job", "style.css"),
+      },
+      js: {
+        bootstrap: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "bootstrap", "bootstrap.bundle.min.js"),
+        chartjs: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "chartjs", "chart.min.js"),
+        es_module_shims: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "es_module_shims.js"),
+        rails_ujs: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "rails_ujs.js"),
+      },
+    }.freeze
+
+    MODULE_OVERRIDES = {
+      application: GoodJob::Engine.root.join("app", "assets", "good_job", "application.js"),
+      stimulus: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "stimulus.js"),
+    }.freeze
 
     def self.js_modules
       @_js_modules ||= GoodJob::Engine.root.join("app", "assets", "good_job", "modules").children.select(&:file?).each_with_object({}) do |file, modules|
         key = File.basename(file.basename.to_s, ".js").to_sym
         modules[key] = file
-      end
+      end.merge(MODULE_OVERRIDES)
     end
 
     before_action do
       expires_in 1.year, public: true
     end
 
-    def es_module_shims_js
-      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "es_module_shims.js")
+    def static
+      render file: STATIC_ASSETS.dig(params[:format].to_sym, params[:name].to_sym) || raise(ActionController::RoutingError, 'Not Found')
     end
 
-    def bootstrap_css
-      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "bootstrap", "bootstrap.min.css")
-    end
+    def module
+      raise(ActionController::RoutingError, 'Not Found') if params[:format] != "js"
 
-    def bootstrap_js
-      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "bootstrap", "bootstrap.bundle.min.js")
-    end
-
-    def chartjs_js
-      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "chartjs", "chart.min.js")
-    end
-
-    def rails_ujs_js
-      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "vendor", "rails_ujs.js")
-    end
-
-    def style_css
-      render file: GoodJob::Engine.root.join("app", "assets", "good_job", "style.css")
-    end
-
-    def modules_js
-      module_name = params[:module].to_sym
-      module_file = self.class.js_modules.fetch(module_name) { raise ActionController::RoutingError, 'Not Found' }
-      render file: module_file
+      render file: self.class.js_modules[params[:name].to_sym] || raise(ActionController::RoutingError, 'Not Found')
     end
   end
 end

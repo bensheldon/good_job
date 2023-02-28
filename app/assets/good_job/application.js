@@ -7,6 +7,9 @@ import showToasts from "toasts";
 import setupPopovers from "popovers";
 import LivePoll from "live_poll";
 
+import { Application } from "stimulus";
+window.Stimulus = Application.start();
+
 documentReady(function() {
   renderCharts();
   showToasts();
@@ -16,3 +19,4 @@ documentReady(function() {
   const livePoll = new LivePoll
   livePoll.start();
 });
+
