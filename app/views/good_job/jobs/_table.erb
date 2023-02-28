@@ -82,7 +82,7 @@
                       bs_toggle: "popover",
                       bs_trigger: "hover focus click",
                       bs_placement: "bottom",
-                      bs_content: job.recent_error
+                      bs_content: job.display_error,
                 } %>
               <% else %>
                 <span class="badge bg-secondary bg-opacity-50 rounded-pill"><%= job.executions_count %></span>
