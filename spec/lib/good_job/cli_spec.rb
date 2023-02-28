@@ -2,22 +2,22 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::CLI do
-  let(:scheduler_mock) { instance_double GoodJob::Scheduler, shutdown?: false, shutdown: nil }
+  let(:capsule_mock) { instance_double GoodJob::Capsule, start: nil, shutdown?: false, shutdown: nil }
 
   before do
     stub_const 'GoodJob::CLI::RAILS_ENVIRONMENT_RB', File.expand_path("spec/test_app/config/environment.rb")
     allow(GoodJob).to receive(:configuration).and_return(GoodJob::Configuration.new({}))
-    allow(GoodJob::Scheduler).to receive(:new).and_return scheduler_mock
+    allow(GoodJob::Capsule).to receive(:new).and_return capsule_mock
   end
 
   describe '#start' do
-    it 'initializes a scheduler' do
+    it 'initializes a capsule' do
       allow(Kernel).to receive(:loop)
 
       cli = described_class.new([], {}, {})
       cli.start
 
-      expect(GoodJob::Scheduler).to have_received(:new)
+      expect(GoodJob::Capsule).to have_received(:new)
     end
 
     it 'can gracefully shut down on INT signal' do
@@ -30,50 +30,20 @@ RSpec.describe GoodJob::CLI do
 
       sleep_until { cli_thread.fulfilled? }
 
-      expect(GoodJob::Scheduler).to have_received(:new)
-      expect(scheduler_mock).to have_received(:shutdown)
+      expect(GoodJob::Capsule).to have_received(:new)
+      expect(capsule_mock).to have_received(:shutdown)
     end
 
-    describe 'max threads' do
-      it 'defaults to --max_threads, GOOD_JOB_MAX_THREADS, RAILS_MAX_THREADS, database connection pool size' do
+    describe 'configuration options' do
+      before do
         allow(Kernel).to receive(:loop)
-        allow(GoodJob.configuration).to receive(:env).and_return(ENV.to_h.merge({ 'RAILS_MAX_THREADS' => 3, 'GOOD_JOB_MAX_THREADS' => 2 }))
-        allow(ActiveRecord::Base.connection_pool).to receive(:size).and_return(1)
-
-        cli = described_class.new([], { max_threads: 4 }, {})
-        cli.start
-
-        expect(GoodJob::Scheduler).to have_received(:new).with(
-          a_kind_of(GoodJob::JobPerformer),
-          max_threads: 4,
-          max_cache: GoodJob::Configuration::DEFAULT_MAX_CACHE,
-          warm_cache_on_initialize: true,
-          cleanup_interval_seconds: GoodJob::Configuration::DEFAULT_CLEANUP_INTERVAL_SECONDS,
-          cleanup_interval_jobs: GoodJob::Configuration::DEFAULT_CLEANUP_INTERVAL_JOBS
-        )
       end
-    end
 
-    describe 'queues' do
-      before { allow(Kernel).to receive(:loop) }
-
-      around { |example| freeze_time { example.run } }
-
-      it 'defaults to --queues, GOOD_JOB_QUEUES, all queues' do
-        cli = described_class.new([], { queues: 'mice,elephant' }, {})
-        stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_QUEUES' => 'elephant,whale' })
-
-        performer = nil
-        allow(GoodJob::Scheduler).to receive(:new) do |performer_arg, _options|
-          performer = performer_arg
-          scheduler_mock
-        end
-
+      it 'merges options into GoodJob.configuration' do
+        cli = described_class.new([], { poll_interval: 5 }, {})
         cli.start
-        expect(GoodJob::Scheduler).to have_received(:new).with(a_kind_of(GoodJob::JobPerformer), a_kind_of(Hash))
 
-        performer_query = performer.send(:job_query)
-        expect(performer_query.to_sql).to eq GoodJob::Execution.where(queue_name: %w[mice elephant]).to_sql
+        expect(GoodJob.configuration.poll_interval).to eq 5
       end
     end
 

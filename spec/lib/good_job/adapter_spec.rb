@@ -69,20 +69,19 @@ RSpec.describe GoodJob::Adapter do
     end
 
     context 'when async' do
-      it 'triggers an execution thread and the notifier' do
+      it 'triggers the capsule and the notifier' do
         allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
         allow(GoodJob::Notifier).to receive(:notify).with({ queue_name: 'default' })
 
-        scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
-        allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
-
-        poller = instance_double(GoodJob::Poller, recipients: [], shutdown: nil)
-        allow(GoodJob::Poller).to receive(:new).and_return(poller)
+        capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil)
+        allow(GoodJob).to receive(:capsule).and_return(capsule)
+        allow(capsule).to receive(:start)
 
         adapter = described_class.new(execution_mode: :async_all)
         adapter.enqueue(active_job)
 
-        expect(scheduler).to have_received(:create_thread)
+        expect(capsule).to have_received(:start)
+        expect(capsule).to have_received(:create_thread)
         expect(GoodJob::Notifier).to have_received(:notify)
       end
     end
@@ -201,17 +200,8 @@ RSpec.describe GoodJob::Adapter do
       let(:adapter) { described_class.new(execution_mode: :async_server) }
 
       before do
-        scheduler = instance_double(GoodJob::Scheduler)
-        allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
-
-        notifier = instance_double(GoodJob::Notifier, recipients: [])
-        allow(GoodJob::Notifier).to receive(:new).and_return(notifier)
-
-        poller = instance_double(GoodJob::Poller, recipients: [])
-        allow(GoodJob::Poller).to receive(:new).and_return(poller)
-
-        cron_manager = instance_double(GoodJob::CronManager)
-        allow(GoodJob::CronManager).to receive(:new).and_return(cron_manager)
+        capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil)
+        allow(GoodJob::Capsule).to receive(:new).and_return(capsule)
       end
 
       context 'when Rails::Server is defined' do
