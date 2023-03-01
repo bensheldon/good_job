@@ -27,8 +27,8 @@ GoodJob::Engine.routes.draw do
 
   resources :processes, only: %i[index]
 
-  scope :assets, controller: :assets do
-    get "modules/:name", action: :module, as: :module_asset, constraints: { format: 'js' }
-    get "static/:name", action: :static, as: :static_asset, constraints: { format: %w[css js] }
+  scope :frontend, controller: :frontends do
+    get "modules/:name", action: :module, as: :frontend_module, constraints: { format: 'js' }
+    get "static/:name", action: :static, as: :frontend_static, constraints: { format: %w[css js] }
   end
 end
