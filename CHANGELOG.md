@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.12.7](https://github.com/bensheldon/good_job/tree/v3.12.7) (2023-03-01)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.6...v3.12.7)
+
+**Fixed bugs:**
+
+- Rename "assets" to "frontends" to avoid Asset Pipeline collisions [\#874](https://github.com/bensheldon/good_job/pull/874) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- GoodJob's JavaScript takes precedence over application's JavaScript in GoodJob 3.12.6, Rails 7 [\#873](https://github.com/bensheldon/good_job/issues/873)
+
 ## [v3.12.6](https://github.com/bensheldon/good_job/tree/v3.12.6) (2023-03-01)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.5...v3.12.6)
