@@ -8,15 +8,15 @@
   <%= csp_meta_tag %>
 
   <%# Do not use asset tag helpers to avoid paths being overriden by config.asset_host %>
-  <%= tag.link rel: "stylesheet", href: static_asset_path(:bootstrap, format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
-  <%= tag.link rel: "stylesheet", href: static_asset_path(:style, format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+  <%= tag.link rel: "stylesheet", href: frontend_static_path(:bootstrap, format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+  <%= tag.link rel: "stylesheet", href: frontend_static_path(:style, format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
 
-  <%= tag.script "", src: static_asset_path(:bootstrap, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
-  <%= tag.script "", src: static_asset_path(:chartjs, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
-  <%= tag.script "", src: static_asset_path(:rails_ujs, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+  <%= tag.script "", src: frontend_static_path(:bootstrap, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+  <%= tag.script "", src: frontend_static_path(:chartjs, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+  <%= tag.script "", src: frontend_static_path(:rails_ujs, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
 
-  <%= tag.script "", src: static_asset_path(:es_module_shims, format: :js, v: GoodJob::VERSION, locale: nil), async: true, nonce: content_security_policy_nonce %>
-  <% importmaps = GoodJob::AssetsController.js_modules.keys.index_with { |module_name| module_asset_path(module_name, format: :js, locale: nil, v: GoodJob::VERSION) } %>
+  <%= tag.script "", src: frontend_static_path(:es_module_shims, format: :js, v: GoodJob::VERSION, locale: nil), async: true, nonce: content_security_policy_nonce %>
+  <% importmaps = GoodJob::FrontendsController.js_modules.keys.index_with { |module_name| frontend_module_path(module_name, format: :js, locale: nil, v: GoodJob::VERSION) } %>
   <%= tag.script({ imports: importmaps }.to_json.html_safe, type: "importmap", nonce: content_security_policy_nonce) %>
   <%= tag.script "", type: "module", nonce: content_security_policy_nonce do %> import "application"; <% end %>
 </head>
