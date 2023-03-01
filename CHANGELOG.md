@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.12.6](https://github.com/bensheldon/good_job/tree/v3.12.6) (2023-03-01)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.5...v3.12.6)
+
+**Merged pull requests:**
+
+- Update and cleanup js and css assets; add Stimulus [\#870](https://github.com/bensheldon/good_job/pull/870) ([bensheldon](https://github.com/bensheldon))
+- Bump actions/add-to-project from 0.4.0 to 0.4.1 [\#869](https://github.com/bensheldon/good_job/pull/869) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/checkout from 2 to 3 [\#868](https://github.com/bensheldon/good_job/pull/868) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rubocop-rails from 2.17.4 to 2.18.0 [\#867](https://github.com/bensheldon/good_job/pull/867) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump pg from 1.4.5 to 1.4.6 [\#866](https://github.com/bensheldon/good_job/pull/866) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Extract GoodJob::Capsule [\#861](https://github.com/bensheldon/good_job/pull/861) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.12.5](https://github.com/bensheldon/good_job/tree/v3.12.5) (2023-02-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.4...v3.12.5)
