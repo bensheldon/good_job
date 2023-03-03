@@ -55,9 +55,11 @@ module GoodJob
     end
 
     # Shutdown and then start the capsule again.
-    # @param timeout [nil, Numeric, Symbol] Seconds to wait for active threads.
+    # @param timeout [Numeric, Symbol] Seconds to wait for active threads.
     # @return [void]
     def restart(timeout: :default)
+      raise ArgumentError, "Capsule#restart cannot be called with a timeout of nil" if timeout.nil?
+
       shutdown(timeout: timeout)
       start
     end

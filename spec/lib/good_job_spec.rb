@@ -13,7 +13,7 @@ describe GoodJob do
   end
 
   describe '.shutdown?' do
-    it 'shuts down all scheduler and notifier instances' do
+    it 'returns whether any capsules are running' do
       expect do
         capsule = GoodJob::Capsule.new(configuration: configuration)
         capsule.start

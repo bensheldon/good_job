@@ -114,6 +114,17 @@ RSpec.describe GoodJob::Scheduler do
       expect { scheduler.restart }
         .to change(scheduler, :running?).from(false).to(true)
     end
+
+    it 'can be called multiple times' do
+      scheduler = described_class.new(performer)
+      scheduler.shutdown
+      expect do
+        scheduler.restart
+        scheduler.restart
+        scheduler.restart
+      end.not_to raise_error
+      scheduler.shutdown
+    end
   end
 
   describe '#create_thread' do
