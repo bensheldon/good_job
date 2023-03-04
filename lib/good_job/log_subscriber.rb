@@ -168,6 +168,12 @@ module GoodJob
       GoodJob::LogSubscriber.logger
     end
 
+    # Are any of the loggers associated with this {LogSubscriber} instance writing to STDOUT
+    # @return [Boolean]
+    def logging_to_stdout?
+      GoodJob::LogSubscriber.logging_to_stdout?
+    end
+
     class << self
       # Tracks all loggers that {LogSubscriber} is writing to. You can write to
       # multiple logs by appending to this array. After updating it, you should
@@ -192,10 +198,18 @@ module GoodJob
         @_logger ||= begin
           logger = Logger.new(StringIO.new)
           loggers.each do |each_logger|
+            @_logging_to_stdout = true if ActiveSupport::Logger.logger_outputs_to?(each_logger, $stdout)
             logger.extend(ActiveSupport::Logger.broadcast(each_logger))
           end
           logger
         end
+      end
+
+      # Are any of the loggers attached to {LogSubscriber} writing to STDOUT.
+      # @return [Boolean] true if any loggers are writing to STDOUT and false otherwise
+      def logging_to_stdout?
+        logger if @_logger.nil?
+        @_logging_to_stdout.equal?(true)
       end
 
       # Reset {LogSubscriber.logger} and force it to rebuild a new shortcut to
@@ -204,6 +218,7 @@ module GoodJob
       # @return [void]
       def reset_logger
         @_logger = nil
+        @_logging_to_stdout = nil
       end
     end
 
@@ -243,13 +258,15 @@ module GoodJob
     #
     %w(info debug warn error fatal unknown).each do |level|
       class_eval <<-METHOD, __FILE__, __LINE__ + 1
-        def #{level}(progname = nil, tags: [], &block)   # def info(progname = nil, tags: [], &block)
-          return unless logger                           #   return unless logger
-                                                         #
-          tag_logger(*tags) do                           #   tag_logger(*tags) do
-            logger.#{level}(progname, &block)            #     logger.info(progname, &block)
-          end                                            #   end
-        end                                              #
+        def #{level}(progname = nil, tags: [], &block)          # def info(progname = nil, tags: [], &block)
+          return unless logger                                  #   return unless logger
+                                                                #
+          tag_logger(*tags) do                                  #   tag_logger(*tags) do
+            logger.#{level}(progname, &block)                   #     logger.info(progname, &block)
+          end                                                   #   end
+                                                                #
+          $stdout.flush if logging_to_stdout? && !$stdout.sync  #   $stdout.flush if logging_to_stdout? && !$stdout.sync
+        end                                                     # end
       METHOD
     end
   end

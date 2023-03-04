@@ -36,5 +36,49 @@ RSpec.describe GoodJob::LogSubscriber do
       subscriber.scheduler_create_pool(event)
       expect(logs.string).to include("GoodJob #{GoodJob::VERSION} started scheduler with queues= max_threads=")
     end
+
+    it 'flushes stdout if writing to stdout and sync is false' do
+      allow($stdout).to receive(:flush)
+      allow($stdout).to receive(:sync).and_return(false)
+      described_class.loggers << Logger.new($stdout)
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", {})
+
+      subscriber.scheduler_create_pool(event)
+      expect($stdout).to have_received(:flush)
+    end
+
+    it 'does not flush stdout if not writing to stdout' do
+      allow($stdout).to receive(:flush)
+      allow($stdout).to receive(:sync).and_return(false)
+      described_class.loggers << Logger.new(logs)
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", {})
+
+      subscriber.scheduler_create_pool(event)
+      expect($stdout).not_to have_received(:flush)
+    end
+
+    it 'does not flush stdout if writing to stdout and sync is true' do
+      allow($stdout).to receive(:flush)
+      allow($stdout).to receive(:sync).and_return(true)
+      described_class.loggers << Logger.new($stdout)
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", {})
+
+      subscriber.scheduler_create_pool(event)
+      expect($stdout).not_to have_received(:flush)
+    end
+  end
+
+  describe ".logging_to_stdout?" do
+    it "returns true if logger attached to LogSubscriber writes to STDOUT" do
+      described_class.loggers << Logger.new($stdout)
+
+      expect(described_class.logging_to_stdout?).to be(true)
+    end
+
+    it "returns false if logger attached to LogSubscriber does not write to STDOUT" do
+      described_class.loggers << Logger.new(StringIO.new)
+
+      expect(described_class.logging_to_stdout?).to be(false)
+    end
   end
 end
