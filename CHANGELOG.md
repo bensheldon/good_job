@@ -1,5 +1,21 @@
 # Changelog
 
+## [v3.12.8](https://github.com/bensheldon/good_job/tree/v3.12.8) (2023-03-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.7...v3.12.8)
+
+**Fixed bugs:**
+
+- Add `raise: false` to FrontendsController after action skip [\#881](https://github.com/bensheldon/good_job/pull/881) ([simi](https://github.com/simi))
+
+**Closed issues:**
+
+- GoodJob's JavaScript takes precedence over application's JavaScript in GoodJob 3.12.6, Rails 7 [\#873](https://github.com/bensheldon/good_job/issues/873)
+
+**Merged pull requests:**
+
+- Rewrite flaky tests: don't allow nil timeout for restart [\#872](https://github.com/bensheldon/good_job/pull/872) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.12.7](https://github.com/bensheldon/good_job/tree/v3.12.7) (2023-03-01)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.6...v3.12.7)
@@ -7,10 +23,6 @@
 **Fixed bugs:**
 
 - Rename "assets" to "frontends" to avoid Asset Pipeline collisions [\#874](https://github.com/bensheldon/good_job/pull/874) ([bensheldon](https://github.com/bensheldon))
-
-**Closed issues:**
-
-- GoodJob's JavaScript takes precedence over application's JavaScript in GoodJob 3.12.6, Rails 7 [\#873](https://github.com/bensheldon/good_job/issues/873)
 
 ## [v3.12.6](https://github.com/bensheldon/good_job/tree/v3.12.6) (2023-03-01)
 
@@ -158,7 +170,7 @@
 
 **Closed issues:**
 
-- Support for Ruby 3.2 [\#785](https://github.com/bensheldon/good_job/issues/785)
+- Support for Rails 6.1 / Ruby 3.2 [\#785](https://github.com/bensheldon/good_job/issues/785)
 - Custom table names [\#748](https://github.com/bensheldon/good_job/issues/748)
 - Health check issue with cron scheduler job [\#741](https://github.com/bensheldon/good_job/issues/741)
 
