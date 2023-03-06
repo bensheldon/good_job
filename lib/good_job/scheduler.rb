@@ -132,11 +132,13 @@ module GoodJob # :nodoc:
 
     # Restart the Scheduler.
     # When shutdown, start; or shutdown and start.
-    # @param timeout [nil, Numeric] Seconds to wait for actively executing jobs to finish; shares same values as {#shutdown}.
+    # @param timeout [Numeric] Seconds to wait for actively executing jobs to finish; shares same values as {#shutdown}.
     # @return [void]
     def restart(timeout: -1)
+      raise ArgumentError, "Scheduler#restart cannot be called with a timeout of nil" if timeout.nil?
+
       instrument("scheduler_restart_pools") do
-        shutdown(timeout: timeout) if running?
+        shutdown(timeout: timeout)
         create_executor
         warm_cache
       end
