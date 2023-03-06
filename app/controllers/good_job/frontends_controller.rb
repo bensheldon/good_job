@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module GoodJob
   class FrontendsController < ActionController::Base # rubocop:disable Rails/ApplicationController
-    skip_after_action :verify_same_origin_request
+    skip_after_action :verify_same_origin_request, raise: false
 
     STATIC_ASSETS = {
       css: {
