@@ -53,6 +53,46 @@ RSpec.describe GoodJob::Execution do
 
       locked_execution.advisory_unlock
     end
+
+    describe 'deprecation of higher is higher priority order, change to smaller is higher priority' do
+      before { allow(ActiveSupport::Deprecation).to receive(:warn) }
+
+      context 'when smaller_number_higher_priority is not set' do
+        before { allow(Rails.application.config).to receive(:good_job).and_return({}) }
+
+        it 'does not warn when priority is not set' do
+          active_job.priority = nil
+          described_class.enqueue(active_job)
+          expect(ActiveSupport::Deprecation).not_to have_received(:warn)
+        end
+
+        it 'does warn when priority is set' do
+          active_job.priority = 50
+          described_class.enqueue(active_job)
+          expect(ActiveSupport::Deprecation).to have_received(:warn)
+        end
+      end
+
+      context 'when smaller_number_higher_priority=true' do
+        before { allow(Rails.application.config).to receive(:good_job).and_return(smaller_number_is_higher_priority: true) }
+
+        it 'does not warn' do
+          active_job.priority = 50
+          described_class.enqueue(active_job)
+          expect(ActiveSupport::Deprecation).not_to have_received(:warn)
+        end
+      end
+
+      context 'when smaller_number_higher_priority=false' do
+        before { allow(Rails.application.config).to receive(:good_job).and_return(smaller_number_is_higher_priority: false) }
+
+        it 'does not warn' do
+          active_job.priority = 50
+          described_class.enqueue(active_job)
+          expect(ActiveSupport::Deprecation).not_to have_received(:warn)
+        end
+      end
+    end
   end
 
   describe '.perform_with_advisory_lock' do
@@ -92,8 +132,8 @@ RSpec.describe GoodJob::Execution do
 
       let!(:older_job) { described_class.create!(job_params.merge(created_at: 10.minutes.ago)) }
       let!(:newer_job) { described_class.create!(job_params.merge(created_at: 5.minutes.ago)) }
-      let!(:low_priority_job) { described_class.create!(job_params.merge(priority: 5)) }
-      let!(:high_priority_job) { described_class.create!(job_params.merge(priority: 100)) }
+      let!(:low_priority_job) { described_class.create!(job_params.merge(priority: 20)) }
+      let!(:high_priority_job) { described_class.create!(job_params.merge(priority: -20)) }
 
       it "orders by priority ascending and creation descending" do
         4.times do
@@ -101,9 +141,9 @@ RSpec.describe GoodJob::Execution do
         end
         expect(described_class.all.order(finished_at: :asc).to_a).to eq([
                                                                           high_priority_job,
-                                                                          low_priority_job,
                                                                           older_job,
                                                                           newer_job,
+                                                                          low_priority_job,
                                                                         ])
       end
     end
@@ -176,6 +216,26 @@ RSpec.describe GoodJob::Execution do
       expect(query_sql).to include(
         "ORDER BY (CASE WHEN queue_name = 'one' THEN 0 WHEN queue_name = 'two' THEN 1 WHEN queue_name = 'three' THEN 2 ELSE 3 END)"
       )
+    end
+  end
+
+  describe '.priority_ordered' do
+    let!(:small_priority_job) { described_class.create!(priority: -50) }
+    let!(:large_priority_job) { described_class.create!(priority: 50) }
+
+    it 'smaller_number_is_higher_priority=true orders with smaller number being HIGHER priority' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ smaller_number_is_higher_priority: true })
+      expect(described_class.priority_ordered.pluck(:priority)).to eq([-50, 50])
+    end
+
+    it 'smaller_number_is_higher_priority=false orders with smaller priority being LOWER priority' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ smaller_number_is_higher_priority: false })
+      expect(described_class.priority_ordered.pluck(:priority)).to eq([50, -50])
+    end
+
+    it 'smaller_number_is_higher_priority=false orders with lower priority being LOWER priority' do
+      allow(Rails.application.config).to receive(:good_job).and_return({})
+      expect(described_class.priority_ordered.pluck(:priority)).to eq([50, -50])
     end
   end
 

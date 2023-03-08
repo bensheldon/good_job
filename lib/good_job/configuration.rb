@@ -341,6 +341,10 @@ module GoodJob
       DEFAULT_ENABLE_LISTEN_NOTIFY
     end
 
+    def smaller_number_is_higher_priority
+      rails_config[:smaller_number_is_higher_priority]
+    end
+
     private
 
     def rails_config

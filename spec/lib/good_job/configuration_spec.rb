@@ -258,7 +258,7 @@ RSpec.describe GoodJob::Configuration do
     end
   end
 
-  describe 'enable_listen_notify' do
+  describe '#enable_listen_notify' do
     it 'defaults to true' do
       configuration = described_class.new({})
       expect(configuration.enable_listen_notify).to be true
@@ -269,6 +269,14 @@ RSpec.describe GoodJob::Configuration do
 
       configuration = described_class.new({})
       expect(configuration.enable_listen_notify).to be false
+    end
+  end
+
+  describe '#smaller_number_is_higher_priority' do
+    it 'delegates to rails configuration' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ smaller_number_is_higher_priority: true })
+      configuration = described_class.new({})
+      expect(configuration.smaller_number_is_higher_priority).to be true
     end
   end
 end

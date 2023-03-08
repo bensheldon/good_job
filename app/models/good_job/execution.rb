@@ -108,7 +108,13 @@ module GoodJob
     # @!method priority_ordered
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :priority_ordered, -> { order('priority DESC NULLS LAST') }
+    scope :priority_ordered, (lambda do
+      if GoodJob.configuration.smaller_number_is_higher_priority
+        order('priority ASC NULLS LAST')
+      else
+        order('priority DESC NULLS LAST')
+      end
+    end)
 
     # Order executions by created_at, for first-in first-out
     # @!method creation_ordered
@@ -206,6 +212,14 @@ module GoodJob
 
     # Construct a GoodJob::Execution from an ActiveJob instance.
     def self.build_for_enqueue(active_job, overrides = {})
+      if active_job.priority && GoodJob.configuration.smaller_number_is_higher_priority.nil?
+        ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+          The next major version of GoodJob (v4.0) will change job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority.
+            To opt-in to this behavior now, set `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or application.rb.
+            To not opt-in yet, but silence this deprecation warning, set `config.good_job.smaller_number_is_higher_priority = false`.
+        DEPRECATION
+      end
+
       execution_args = {
         active_job_id: active_job.job_id,
         queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
