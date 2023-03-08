@@ -136,6 +136,16 @@ module GoodJob
       error || executions[-2]&.error
     end
 
+    # Errors for the job to be displayed in the Dashboard.
+    # @return [String]
+    def display_error
+      return error if error.present?
+
+      serialized_params.fetch('exception_executions', {}).map do |exception, count|
+        "#{exception}: #{count}"
+      end.join(', ')
+    end
+
     # Return formatted serialized_params for display in the dashboard
     # @return [Hash]
     def display_serialized_params

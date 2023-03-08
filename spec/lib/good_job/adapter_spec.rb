@@ -71,7 +71,7 @@ RSpec.describe GoodJob::Adapter do
     context 'when async' do
       it 'triggers the capsule and the notifier' do
         allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
-        allow(GoodJob::Notifier).to receive(:notify).with({ queue_name: 'default' })
+        allow(GoodJob::Notifier).to receive(:notify)
 
         capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil)
         allow(GoodJob).to receive(:capsule).and_return(capsule)
@@ -82,7 +82,7 @@ RSpec.describe GoodJob::Adapter do
 
         expect(capsule).to have_received(:start)
         expect(capsule).to have_received(:create_thread)
-        expect(GoodJob::Notifier).to have_received(:notify)
+        expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default' })
       end
     end
   end
