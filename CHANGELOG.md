@@ -1,5 +1,28 @@
 # Changelog
 
+## [v3.13.0](https://github.com/bensheldon/good_job/tree/v3.13.0) (2023-03-08)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.8...v3.13.0)
+
+**Implemented enhancements:**
+
+- If logging to STDOUT in CLI set $stdout.sync = true [\#882](https://github.com/bensheldon/good_job/pull/882) ([blafri](https://github.com/blafri))
+
+**Fixed bugs:**
+
+- Don't load all Executions on Jobs Dashboard [\#878](https://github.com/bensheldon/good_job/pull/878) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- No route matches \[POST\] "/scheduler-dashboard/jobs/\<id\>/retry" [\#880](https://github.com/bensheldon/good_job/issues/880)
+- What is `concurrency_key` used for? [\#877](https://github.com/bensheldon/good_job/issues/877)
+- ArgumentError in GoodJob::Jobs\#index [\#875](https://github.com/bensheldon/good_job/issues/875)
+- Nonworking dashboard for job with many retries [\#809](https://github.com/bensheldon/good_job/issues/809)
+
+**Merged pull requests:**
+
+- Add aggressive test for async Batches [\#833](https://github.com/bensheldon/good_job/pull/833) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.12.8](https://github.com/bensheldon/good_job/tree/v3.12.8) (2023-03-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.7...v3.12.8)
