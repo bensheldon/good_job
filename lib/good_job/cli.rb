@@ -148,7 +148,10 @@ module GoodJob
       # Rails or from the application can be set up here.
       def set_up_application!
         require RAILS_ENVIRONMENT_RB
-        return if !GoodJob::CLI.log_to_stdout? || ActiveSupport::Logger.logger_outputs_to?(GoodJob.logger, $stdout)
+        return unless GoodJob::CLI.log_to_stdout?
+
+        $stdout.sync = true
+        return if ActiveSupport::Logger.logger_outputs_to?(GoodJob.logger, $stdout)
 
         GoodJob::LogSubscriber.loggers << ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
         GoodJob::LogSubscriber.reset_logger
