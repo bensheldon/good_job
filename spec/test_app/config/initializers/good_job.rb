@@ -1,6 +1,6 @@
 Rails.application.configure do
-  # TODO: Remove on GoodJob 3.0 release
-  config.good_job.inline_execution_respects_schedule = true
+  # TODO: Remove on GoodJob 4.0 release
+  config.good_job.smaller_number_is_higher_priority = true
 
   config.good_job.cron = {
     example: {
