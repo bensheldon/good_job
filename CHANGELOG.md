@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.14.0](https://github.com/bensheldon/good_job/tree/v3.14.0) (2023-03-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.13.0...v3.14.0)
+
+**Implemented enhancements:**
+
+- Deprecate definition of job priority, change to "smaller number is higher priority" to align with Active Job definition [\#883](https://github.com/bensheldon/good_job/pull/883) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.13.0](https://github.com/bensheldon/good_job/tree/v3.13.0) (2023-03-08)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.12.8...v3.13.0)
