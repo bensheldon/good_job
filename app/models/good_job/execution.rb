@@ -345,9 +345,15 @@ module GoodJob
             end
             handled_error ||= current_thread.error_on_retry || current_thread.error_on_discard
 
-            instrument_payload[:execution_result] = ExecutionResult.new(value: value, handled_error: handled_error, retried: current_thread.error_on_retry.present?)
+            instrument_payload.merge!(
+              value: value,
+              handled_error: handled_error,
+              retried: current_thread.error_on_retry.present?
+            )
+            ExecutionResult.new(value: value, handled_error: handled_error, retried: current_thread.error_on_retry.present?)
           rescue StandardError => e
-            instrument_payload[:execution_result] = ExecutionResult.new(value: nil, unhandled_error: e)
+            instrument_payload[:unhandled_error] = e
+            ExecutionResult.new(value: nil, unhandled_error: e)
           end
         end
 
