@@ -336,7 +336,7 @@ module GoodJob
           current_thread.execution_interrupted = performed_at if performed_at
           update!(performed_at: Time.current)
 
-          ActiveSupport::Notifications.instrument("perform_job.good_job", { execution: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do
+          ActiveSupport::Notifications.instrument("perform_job.good_job", { execution: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do |instrument_payload|
             value = ActiveJob::Base.execute(active_job_data)
 
             if value.is_a?(Exception)
@@ -345,8 +345,14 @@ module GoodJob
             end
             handled_error ||= current_thread.error_on_retry || current_thread.error_on_discard
 
+            instrument_payload.merge!(
+              value: value,
+              handled_error: handled_error,
+              retried: current_thread.error_on_retry.present?
+            )
             ExecutionResult.new(value: value, handled_error: handled_error, retried: current_thread.error_on_retry.present?)
           rescue StandardError => e
+            instrument_payload[:unhandled_error] = e
             ExecutionResult.new(value: nil, unhandled_error: e)
           end
         end
