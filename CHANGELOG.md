@@ -1,5 +1,15 @@
 # Changelog
 
+## [v3.14.1](https://github.com/bensheldon/good_job/tree/v3.14.1) (2023-03-14)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.14.0...v3.14.1)
+
+**Merged pull requests:**
+
+- Allow joining executions to jobs scoped by state [\#886](https://github.com/bensheldon/good_job/pull/886) ([segiddins](https://github.com/segiddins))
+- Add execution\_result to event payload for perform\_job.good\_job [\#885](https://github.com/bensheldon/good_job/pull/885) ([segiddins](https://github.com/segiddins))
+- Bump rack from 2.2.6.2 to 2.2.6.3 [\#884](https://github.com/bensheldon/good_job/pull/884) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.14.0](https://github.com/bensheldon/good_job/tree/v3.14.0) (2023-03-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.13.0...v3.14.0)
