@@ -28,20 +28,20 @@ module GoodJob
         Arel::Nodes::Grouping.new(Arel::Nodes::InfixOperation.new('->>', json, Arel::Nodes.build_quoted(attr)))
       end
 
-      def job_class
+      def params_job_class
         json_string(arel_table['serialized_params'], 'job_class')
       end
 
-      def scheduled_at_created_at
-        arel_table.coalesce(arel_table['scheduled_at'], arel_table['created_at'])
-      end
-
-      def execution_count
+      def params_execution_count
         Arel::Nodes::InfixOperation.new(
           '::',
           json_string(arel_table['serialized_params'], 'executions'),
           Arel.sql('integer')
         )
+      end
+
+      def coalesce_scheduled_at_created_at
+        arel_table.coalesce(arel_table['scheduled_at'], arel_table['created_at'])
       end
     end
 
@@ -59,7 +59,7 @@ module GoodJob
     # @!scope class
     # @param string [String] Execution class name
     # @return [ActiveRecord::Relation]
-    scope :job_class, ->(job_class) { where(job_class.eq(job_class)) }
+    scope :job_class, ->(name) { where(params_job_class.eq(name)) }
 
     # Get Jobs finished before the given timestamp.
     # @!method finished_before(timestamp)
@@ -69,11 +69,11 @@ module GoodJob
     scope :finished_before, ->(timestamp) { where(arel_table['finished_at'].lteq(timestamp)) }
 
     # First execution will run in the future
-    scope :scheduled, -> { where(finished_at: nil).where(scheduled_at_created_at.gt(DateTime.current)).where(execution_count.lt(2)) }
+    scope :scheduled, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(DateTime.current)).where(params_execution_count.lt(2)) }
     # Execution errored, will run in the future
-    scope :retried, -> { where(finished_at: nil).where(scheduled_at_created_at.gt(DateTime.current)).where(execution_count.gt(1)) }
+    scope :retried, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(DateTime.current)).where(params_execution_count.gt(1)) }
     # Immediate/Scheduled time to run has passed, waiting for an available thread run
-    scope :queued, -> { where(finished_at: nil).where(scheduled_at_created_at.lteq(DateTime.current)).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
+    scope :queued, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.lteq(DateTime.current)).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
     # Advisory locked and executing
     scope :running, -> { where(finished_at: nil).joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
     # Finished executing (succeeded or discarded)
