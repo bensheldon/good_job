@@ -1,5 +1,14 @@
 # Changelog
 
+## [v3.14.2](https://github.com/bensheldon/good_job/tree/v3.14.2) (2023-03-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.14.1...v3.14.2)
+
+**Merged pull requests:**
+
+- Bump rack from 2.2.6.3 to 2.2.6.4 [\#893](https://github.com/bensheldon/good_job/pull/893) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Remove non-ActiveRecord::Base backed association [\#892](https://github.com/bensheldon/good_job/pull/892) ([rrunyon](https://github.com/rrunyon))
+
 ## [v3.14.1](https://github.com/bensheldon/good_job/tree/v3.14.1) (2023-03-14)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.14.0...v3.14.1)
