@@ -70,7 +70,6 @@ module GoodJob
     end
 
     belongs_to :batch, class_name: 'GoodJob::BatchRecord', optional: true, inverse_of: :executions
-    belongs_to :batch_callback, class_name: 'GoodJob::Batch', optional: true
 
     belongs_to :job, class_name: 'GoodJob::Job', foreign_key: 'active_job_id', primary_key: 'active_job_id', optional: true, inverse_of: :executions
     after_destroy -> { self.class.active_job_id(active_job_id).delete_all }, if: -> { @_destroy_job }
