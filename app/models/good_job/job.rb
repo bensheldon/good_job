@@ -5,7 +5,7 @@ module GoodJob
   # The +good_jobs+ table is a table of individual {GoodJob::Execution}s that share the same +active_job_id+.
   # A single row from the +good_jobs+ table of executions is fetched to represent a Job.
   #
-  class Job < BaseRecord
+  class Job < BaseExecution
     include Filterable
     include Lockable
     include Reportable
@@ -23,26 +23,6 @@ module GoodJob
       def table_name=(_value)
         raise NotImplementedError, 'Assign GoodJob::Execution.table_name directly'
       end
-
-      def json_string(json, attr)
-        Arel::Nodes::Grouping.new(Arel::Nodes::InfixOperation.new('->>', json, Arel::Nodes.build_quoted(attr)))
-      end
-
-      def params_job_class
-        json_string(arel_table['serialized_params'], 'job_class')
-      end
-
-      def params_execution_count
-        Arel::Nodes::InfixOperation.new(
-          '::',
-          json_string(arel_table['serialized_params'], 'executions'),
-          Arel.sql('integer')
-        )
-      end
-
-      def coalesce_scheduled_at_created_at
-        arel_table.coalesce(arel_table['scheduled_at'], arel_table['created_at'])
-      end
     end
 
     self.primary_key = 'active_job_id'
@@ -53,13 +33,6 @@ module GoodJob
 
     # Only the most-recent unretried execution represents a "Job"
     default_scope { where(retried_good_job_id: nil) }
-
-    # Get Jobs with given class name
-    # @!method job_class
-    # @!scope class
-    # @param string [String] Execution class name
-    # @return [ActiveRecord::Relation]
-    scope :job_class, ->(name) { where(params_job_class.eq(name)) }
 
     # Get Jobs finished before the given timestamp.
     # @!method finished_before(timestamp)
@@ -87,12 +60,6 @@ module GoodJob
     # @return [String]
     def id
       active_job_id
-    end
-
-    # The ActiveJob job class, as a string
-    # @return [String]
-    def job_class
-      serialized_params['job_class']
     end
 
     # Override #reload to add a custom scope to ensure the reloaded record is the head execution
