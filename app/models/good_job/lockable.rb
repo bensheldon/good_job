@@ -232,7 +232,7 @@ module GoodJob
       end
 
       def pg_backend_pid
-        connection.connection.select_value('SELECT pg_backend_pid()')
+        connection.select_value('SELECT pg_backend_pid()')
       end
 
       # Postgres advisory unlocking function for the class
