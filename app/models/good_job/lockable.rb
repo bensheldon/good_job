@@ -89,7 +89,7 @@ module GoodJob
       # @param column [String, Symbol] column values to Advisory Lock against
       # @return [ActiveRecord::Relation]
       scope :includes_advisory_locks, (lambda do |column: _advisory_lockable_column|
-        owns_advisory_lock_sql = "#{connection.quote_table_name('pg_locks')}.#{connection.quote_column_name('pid')} = pg_backend_pid() AS owns_advisory_lock"
+        owns_advisory_lock_sql = "#{connection.quote_table_name('pg_locks')}.#{connection.quote_column_name('pid')} = #{pg_backend_pid} AS owns_advisory_lock"
         joins_advisory_locks(column: column).select("#{quoted_table_name}.*, #{connection.quote_table_name('pg_locks')}.locktype, #{owns_advisory_lock_sql}")
       end)
 
@@ -113,7 +113,7 @@ module GoodJob
       # @!scope class
       # @param column [String, Symbol] column values to Advisory Lock against
       # @return [ActiveRecord::Relation]
-      scope :owns_advisory_locked, ->(column: _advisory_lockable_column) { joins_advisory_locks(column: column).where('"pg_locks"."pid" = pg_backend_pid()') }
+      scope :owns_advisory_locked, ->(column: _advisory_lockable_column) { joins_advisory_locks(column: column).where('"pg_locks"."pid" = ?', pg_backend_pid) }
 
       # Whether an advisory lock should be acquired in the same transaction
       # that created the record.
@@ -229,6 +229,10 @@ module GoodJob
         return @_supports_cte_materialization_specifiers if defined?(@_supports_cte_materialization_specifiers)
 
         @_supports_cte_materialization_specifiers = connection.postgresql_version >= 120000
+      end
+
+      def pg_backend_pid
+        connection.connection.select_value('SELECT pg_backend_pid()')
       end
 
       # Postgres advisory unlocking function for the class
@@ -350,7 +354,7 @@ module GoodJob
           AND pg_locks.objsubid = 1
           AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
           AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
-          AND pg_locks.pid = pg_backend_pid()
+          AND pg_locks.pid = #{self.class.pg_backend_pid}
       SQL
       binds = [
         ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
