@@ -298,30 +298,6 @@ RSpec.describe GoodJob::Execution do
     end
   end
 
-  describe '#executable?' do
-    let(:good_job) { described_class.create!(active_job_id: SecureRandom.uuid) }
-
-    it 'is true when locked' do
-      good_job.with_advisory_lock do
-        expect(good_job.executable?).to be true
-      end
-    end
-
-    it 'is false when job no longer exists' do
-      good_job.with_advisory_lock do
-        good_job.destroy!
-        expect(good_job.executable?).to be false
-      end
-    end
-
-    it 'is false when the job has finished' do
-      good_job.with_advisory_lock do
-        good_job.update! finished_at: Time.current
-        expect(good_job.executable?).to be false
-      end
-    end
-  end
-
   describe '#perform' do
     let(:active_job) { TestJob.new("a string") }
     let!(:good_job) { described_class.enqueue(active_job) }

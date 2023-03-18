@@ -259,13 +259,22 @@ module GoodJob
     def self.perform_with_advisory_lock(parsed_queues: nil, queue_select_limit: nil)
       execution = nil
       result = nil
+
       unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true, select_limit: queue_select_limit) do |executions|
         execution = executions.first
         break if execution.blank?
-        break :unlocked unless execution&.executable?
 
-        yield(execution) if block_given?
-        result = execution.perform
+        # Infrequently, the previous fetch-and-lock query will return a job that is not actually advisory locked.
+        # Explicitly take a 2nd lock to ensure we have the lock.
+        successfully_locked = false
+        execution.with_advisory_lock do
+          successfully_locked = true
+
+          yield(execution) if block_given?
+          result = execution.perform
+        end
+
+        break :unlocked unless successfully_locked
       end
       execution&.run_callbacks(:perform_unlocked)
 
@@ -371,12 +380,6 @@ module GoodJob
 
         result
       end
-    end
-
-    # Tests whether this job is safe to be executed by this thread.
-    # @return [Boolean]
-    def executable?
-      self.class.unscoped.unfinished.owns_advisory_locked.exists?(id: id)
     end
 
     # Build an ActiveJob instance and deserialize the arguments, using `#active_job_data`.
