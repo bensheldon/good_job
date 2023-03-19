@@ -88,7 +88,7 @@ RSpec.describe 'Schedule Integration' do
         rerun_provider_job_ids = jobs_tally.select { |_key, value| value > 1 }.keys
         rerun_jobs = RUN_JOBS.select { |(provider_job_id, _job_id, _thread_name)| rerun_provider_job_ids.include? provider_job_id }
 
-        "Expected run jobs(#{RUN_JOBS.size}) to equal number of jobs (#{number_of_jobs}). Instead ran jobs multiple times:\n#{PP.pp(rerun_jobs, '')}"
+        "Expected run jobs(#{RUN_JOBS.size}) to equal number of jobs (#{number_of_jobs}). Instead ran jobs multiple times:\n#{PP.pp(rerun_jobs)}"
       }
     end
   end
