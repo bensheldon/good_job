@@ -142,7 +142,7 @@ en:
           retry_all: Retry all
           title: Actions
         no_jobs_found: No jobs found.
-        toggle_actions: Toggle actions
+        toggle_actions: Toggle Actions
         toggle_all_jobs: Toggle all jobs
     models:
       batch:
