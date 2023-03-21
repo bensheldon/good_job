@@ -19,7 +19,7 @@ module GoodJob
 
     def relative_time(timestamp, **options)
       options = options.reverse_merge({ scope: "good_job.datetime.distance_in_words" })
-      text = t("good_job.helpers.relative_time.#{timestamp.future? ? "future" : "past"}", time: time_ago_in_words(timestamp, **options))
+      text = t("good_job.helpers.relative_time.#{timestamp.future? ? 'future' : 'past'}", time: time_ago_in_words(timestamp, **options))
       tag.time(text, datetime: timestamp, title: timestamp)
     end
 

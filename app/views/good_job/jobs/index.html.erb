@@ -4,11 +4,11 @@
 <div data-live-poll-region="jobs-table">
   <%= render 'good_job/jobs/table', jobs: @filter.records, filter: @filter %>
   <% if @filter.records.present? %>
-    <nav aria-label="Job pagination" class="mt-3">
+    <nav aria-label="<%= t ".job_pagination" %>" class="mt-3">
       <ul class="pagination">
         <li class="page-item">
           <%= link_to(@filter.to_params(after_scheduled_at: (@filter.last.scheduled_at || @filter.last.created_at), after_id: @filter.last.id), class: "page-link") do %>
-            <%=t ".older_jobs" %> <span aria-hidden="true">&raquo;</span>
+            <%= t ".older_jobs" %> <span aria-hidden="true">&raquo;</span>
           <% end %>
         </li>
       </ul>
