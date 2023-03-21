@@ -1,6 +1,48 @@
 ---
 en:
   good_job:
+    actions:
+      destroy: Destroy
+      discard: Discard
+      inspect: Inspect
+      reschedule: Reschedule
+      retry: Retry
+    batch:
+      created: Created
+      discarded: Discarded
+      enqueued: Enqueued
+      finished: Finished
+      jobs: Jobs
+      name: Name
+    batches:
+      index:
+        older_batches: Older batches
+      jobs:
+        no_jobs_found: No jobs found.
+        jobs: Jobs
+      show:
+        attributes: Attributes
+        batched_jobs: Batched Jobs
+        callback_jobs: Callback Jobs
+      table:
+        no_batches_found: No batches found.
+    cron:
+      class: Class
+      last_run: Last run
+      next_scheduled: Next scheduled
+      schedule: Schedule
+    cron_entries:
+      actions:
+        confirm_disable: Confirm disable cron entry
+        confirm_enable: Confirm enable cron entry
+        confirm_enqueue: Confirm enqueue cron entry now
+        disable: Disable cron entry
+        enable: Enable cron entry
+        enqueue: Enqueue cron entry now
+        inspect: Inspect
+      index:
+        no_cron_schedules_found: No cron schedules found.
+        title: Cron Schedules
     datetime:
       distance_in_words:
         about_x_hours:
@@ -46,6 +88,35 @@ en:
       milliseconds: "%{ms}ms"
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
+    helpers:
+      relative_time:
+        future: "in %{time}"
+        past: "%{time} ago"
+    job:
+      arguments: Arguments
+      attempts: Attempts
+      priority: Priority
+      queue: Queue
+    jobs:
+      destroy:
+        notice: Job has been destroyed
+      discarded:
+        notice: Job has been discarded
+      executions:
+        error: Error
+        in_queue: in queue
+        runtime: runtime
+        title: Executions
+      index:
+        older_jobs: Older jobs
+      rescheduled:
+        notice: Job has been rescheduled
+      retry:
+        notice: Job has been retried
+      show:
+        jobs: Jobs
+      table:
+        no_jobs_found: No jobs found.
     number:
       format:
         delimiter: ","
@@ -62,8 +133,24 @@ en:
             quadrillion: Q
             thousand: K
             trillion: T
-            unit: ''
+            unit: ""
+    processes:
+      actions:
+        inspect: Inspect
+      index:
+        no_good_job_processes_found: No GoodJob processes found.
+        process: Process
+        schedulers: Schedulers
+        started: Started
+        title: Processes
     shared:
+      filter:
+        all: All
+        all_jobs: All jobs
+        all_queues: All queues
+        clear: Clear
+        placeholder: Search by class, job id, job params, and error text.
+        search: Search
       footer:
         last_update_html: Last updated <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: Remember, you're doing a Good Job too!

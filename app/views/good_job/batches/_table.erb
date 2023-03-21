@@ -2,12 +2,12 @@
     <div class="list-group list-group-flush text-nowrap table-batches" role="table">
       <header class="list-group-item bg-light">
         <div class="row small text-muted text-uppercase align-items-center">
-          <div class="col-4">Name</div>
-          <div class="col-lg-1 d-none d-lg-block">Created</div>
-          <div class="col-lg-1 d-none d-lg-block">Enqueued</div>
-          <div class="col-lg-1 d-none d-lg-block">Discarded</div>
-          <div class="col-lg-1 d-none d-lg-block">Finished</div>
-          <div class="col-lg-1 d-none d-lg-block">Jobs</div>
+          <div class="col-4"><%=t "good_job.batch.name" %></div>
+          <div class="col-lg-1 d-none d-lg-block"><%=t "good_job.batch.created" %></div>
+          <div class="col-lg-1 d-none d-lg-block"><%=t "good_job.batch.enqueued" %></div>
+          <div class="col-lg-1 d-none d-lg-block"><%=t "good_job.batch.discarded" %></div>
+          <div class="col-lg-1 d-none d-lg-block"><%=t "good_job.batch.finished" %></div>
+          <div class="col-lg-1 d-none d-lg-block"><%=t "good_job.batch.jobs" %></div>
           <div class="col text-end">
             <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                            data: { bs_toggle: "collapse", bs_target: ".batch-properties" },
@@ -60,7 +60,7 @@
               </div>
               <div class="col text-end">
                 <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
-                               title: "Inspect",
+                               title: t("good_job.actions.inspect"),
                                data: { bs_toggle: "collapse", bs_target: "##{dom_id(batch, 'properties')}" },
                                aria: { expanded: false, controls: dom_id(batch, "state") } do %>
                   <%= render_icon "info" %>
@@ -75,7 +75,7 @@
         <% end %>
       <% else %>
         <div class="list-group-item py-4 text-center text-muted">
-          No batches found.
+          <%=t ".no_batches_found" %>
         </div>
       <% end %>
     </div>

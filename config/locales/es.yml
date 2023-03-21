@@ -1,6 +1,48 @@
 ---
 es:
   good_job:
+    actions:
+      destroy: Eliminar
+      discard: Descartar
+      inspect: Inspeccionar
+      reschedule: Reprogramar
+      retry: Reintentar
+    batch:
+      created: Creado
+      discarded: Descartado
+      enqueued: Encolado
+      finished: Finalizado
+      jobs: Tareas
+      name: Nombre
+    batches:
+      index:
+        older_batches: Batches anteriores
+      jobs:
+        no_jobs_found: No hay tareas.
+        jobs: Tareas
+      show:
+        attributes: Atributos
+        batched_jobs: Batched Jobs
+        callback_jobs: Callback Jobs
+      table:
+        no_batches_found: No hay batches.
+    cron:
+      class: Clase
+      last_run: Última ejecución
+      next_scheduled: Próxima ejecución
+      schedule: Cronograma
+    cron_entries:
+      actions:
+        confirm_disable: Confirmar deshabilitación de la tarea programada
+        confirm_enable: Confirmar habilitación de la tarea programada
+        confirm_enqueue: Confirmar encolado de tarea programada
+        disable: Deshabilitar tarea programada
+        enable: Habilitar tarea programada
+        enqueue: Encolar tarea programada ahora
+        inspect: Inspeccionar
+      index:
+        no_cron_schedules_found: No hay tareas programadas.
+        title: Tareas Programadas
     datetime:
       distance_in_words:
         about_x_hours:
@@ -46,6 +88,35 @@ es:
       milliseconds: "%{ms}ms"
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
+    helpers:
+      relative_time:
+        future: "en %{time}"
+        past: "%{time} atrás"
+    job:
+      arguments: Argumentos
+      attempts: Intentos
+      priority: Prioridad
+      queue: Cola
+    jobs:
+      destroy:
+        notice: La tarea ha sido eliminada
+      discard:
+        notice: La tarea ha sido descartada
+      executions:
+        error: Error
+        in_queue: en cola
+        runtime: en ejecución
+        title: Ejecuciones
+      index:
+        older_jobs: Tareas anteriores
+      reschedule:
+        notice: La tarea ha sido reprogramada
+      retry:
+        notice: La tarea ha sido reintentada
+      show:
+        jobs: Tareas
+      table:
+        no_jobs_found: No hay tareas.
     number:
       format:
         delimiter: " "
@@ -62,8 +133,24 @@ es:
             quadrillion: q
             thousand: k
             trillion: T
-            unit: ''
+            unit: ""
+    processes:
+      actions:
+        inspect: Inspeccionar
+      index:
+        no_good_job_processes_found: No hay procesos de GoodJob.
+        process: Proceso
+        schedulers: Schedulers
+        started: Iniciado
+        title: Procesos
     shared:
+      filter:
+        all: Todas
+        all_jobs: Todas las tareas
+        all_queues: Todas las colas
+        clear: Limpiar
+        placeholder: Buscar por clase, id de tarea, parámetros y mensaje de error.
+        search: Buscar
       footer:
         last_update_html: Última actualización <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: "¡Recuerda, también tú estás haciendo un buen trabajo!"
@@ -74,9 +161,19 @@ es:
         name: "GoodJob 👍"
         processes: Procesos
     status:
-      discarded: Descartado
-      queued: Puesto en cola
-      retried: reintentado
+      discarded:
+        one: Descartada
+        other: Descartadas
+      queued:
+        one: Encolada
+        other: Encoladas
+      retried:
+        one: Reintentada
+        other: Reintentadas
       running: Corriendo
-      scheduled: Programado
-      succeeded: Acierto
+      scheduled:
+        one: Programada
+        other: Programadas
+      succeeded:
+        one: Exitosa
+        other: Exitosas

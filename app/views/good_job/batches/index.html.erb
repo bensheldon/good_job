@@ -9,7 +9,7 @@
       <ul class="pagination">
         <li class="page-item">
           <%= link_to(@filter.to_params(after_created_at: @filter.last.created_at, after_id: @filter.last.id), class: "page-link") do %>
-            Older batches <span aria-hidden="true">&raquo;</span>
+            <%=t ".older_batches" %> <span aria-hidden="true">&raquo;</span>
           <% end %>
         </li>
       </ul>

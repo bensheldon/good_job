@@ -1,4 +1,4 @@
-<%= render 'good_job/shared/filter', title: "Jobs", filter: @filter %>
+<%= render 'good_job/shared/filter', title: t("good_job.shared.navbar.jobs"), filter: @filter %>
 <%= render 'good_job/shared/chart', chart_data: GoodJob::ScheduledByQueueChart.new(@filter).data %>
 
 <div data-live-poll-region="jobs-table">
@@ -8,7 +8,7 @@
       <ul class="pagination">
         <li class="page-item">
           <%= link_to(@filter.to_params(after_scheduled_at: (@filter.last.scheduled_at || @filter.last.created_at), after_id: @filter.last.id), class: "page-link") do %>
-            Older jobs <span aria-hidden="true">&raquo;</span>
+            <%=t ".older_jobs" %> <span aria-hidden="true">&raquo;</span>
           <% end %>
         </li>
       </ul>
