@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
-  class Execution < BaseRecord
+  class Execution < BaseExecution
     include Lockable
     include Filterable
     include Reportable
@@ -82,14 +82,6 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :active_job_id, ->(active_job_id) { where(active_job_id: active_job_id) }
 
-    # Get executions with given class name
-    # @!method job_class
-    # @!scope class
-    # @param string [String]
-    #   Execution class name
-    # @return [ActiveRecord::Relation]
-    scope :job_class, ->(job_class) { where("serialized_params->>'job_class' = ?", job_class) }
-
     # Get executions that have not yet finished (succeeded or discarded).
     # @!method unfinished
     # @!scope class
@@ -119,7 +111,7 @@ module GoodJob
     # @!method creation_ordered
     # @!scope class
     # @return [ActiveRecord:Relation]
-    scope :creation_ordered, -> { order('created_at ASC') }
+    scope :creation_ordered, -> { order(created_at: :asc) }
 
     # Order executions for de-queueing
     # @!method dequeueing_ordered
@@ -155,7 +147,7 @@ module GoodJob
     # @!method schedule_ordered
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :schedule_ordered, -> { order(Arel.sql('COALESCE(scheduled_at, created_at) ASC')) }
+    scope :schedule_ordered, -> { order(coalesce_scheduled_at_created_at.asc) }
 
     # Get Jobs were completed before the given timestamp. If no timestamp is
     # provided, get all jobs that have been completed. By default, GoodJob
