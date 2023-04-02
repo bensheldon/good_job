@@ -1,5 +1,5 @@
 <% title = capture do %>
-  Cron Entry Key: <code><%= @cron_entry.id %></code>
+  <%= t ".cron_entry_key" %>: <code><%= @cron_entry.id %></code>
 <% end %>
 
 <%= render 'good_job/shared/filter', title: title, filter: @jobs_filter %>

@@ -4,43 +4,43 @@
     <header class="list-group-item bg-light">
       <div class="row small text-muted text-uppercase align-items-center">
         <div class="col-lg-4 d-flex gap-2 flex-wrap">
-          <%= label_tag('toggle_job_ids', "Toggle all jobs", class: "visually-hidden") %>
+          <%= label_tag('toggle_job_ids', t(".toggle_all_jobs"), class: "visually-hidden") %>
           <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %>
 
-          <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'ms-1 btn btn-sm btn-outline-secondary', title: "Reschedule all", data: { confirm: "Are you sure you want to reschedule the selected jobs?", disable: true } do %>
-            <span class="me-1"><%= render_icon "skip_forward" %></span> Reschedule
+          <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'ms-1 btn btn-sm btn-outline-secondary', title: t(".actions.reschedule_all"), data: { confirm: t(".actions.confirm_reschedule_all"), disable: true } do %>
+            <span class="me-1"><%= render_icon "skip_forward" %></span> <%=t "good_job.actions.reschedule" %>
           <% end %>
 
-          <%= form.button type: 'submit', name: 'mass_action', value: 'retry', class: 'btn btn-sm btn-outline-secondary', title: "Retry all", data: { confirm: "Are you sure you want to retry the selected jobs?", disable: true } do %>
-            <span class="me-1"><%= render_icon "arrow_clockwise" %></span> Retry
+          <%= form.button type: 'submit', name: 'mass_action', value: 'retry', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.retry_all"), data: { confirm: t(".actions.confirm_retry_all"), disable: true } do %>
+            <span class="me-1"><%= render_icon "arrow_clockwise" %></span> <%=t "good_job.actions.retry" %>
           <% end %>
 
           <div class="btn-group" role="group">
-            <%= form.button type: 'submit', name: 'mass_action', value: 'discard', class: 'btn btn-sm btn-outline-secondary', title: "Discard all", data: { confirm: "Are you usure you want to discard the selected jobs?", disable: true } do %>
-              <span class="me-1"><%= render_icon "stop" %></span> Discard
+            <%= form.button type: 'submit', name: 'mass_action', value: 'discard', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.discard_all"), data: { confirm: t(".actions.confirm_discard_all"), disable: true } do %>
+              <span class="me-1"><%= render_icon "stop" %></span> <%=t "good_job.actions.discard" %>
             <% end %>
             <button id="destroy-dropdown-toggle" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-              <span class="visually-hidden">Toggle Actions</span>
+              <span class="visually-hidden"><%=t ".toggle_actions" %></span>
             </button>
             <div class="dropdown-menu" aria-labelledby="destroy-dropdown-toggle">
               <li>
-                <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn', title: "Destroy all", data: { confirm: "Are you sure you want to destroy the selected jobs?", disable: true } do %>
-                  <span class="me-1"><%= render_icon "trash" %></span> Destroy
+                <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn', title: t(".actions.destroy_all"), data: { confirm: t(".actions.confirm_destroy_all"), disable: true } do %>
+                  <span class="me-1"><%= render_icon "trash" %></span> <%=t "good_job.actions.destroy" %>
                 <% end %>
               </li>
             </div>
           </div>
 
         </div>
-        <div class="d-none d-lg-block col-lg-1 text-lg-center">Queue</div>
-        <div class="d-none d-lg-block col-lg-1 text-lg-end">Priority</div>
-        <div class="d-none d-lg-block col-lg-1 text-lg-end">Attempts</div>
+        <div class="d-none d-lg-block col-lg-1 text-lg-center"><%=t "good_job.models.job.queue" %></div>
+        <div class="d-none d-lg-block col-lg-1 text-lg-end"><%=t "good_job.models.job.priority" %></div>
+        <div class="d-none d-lg-block col-lg-1 text-lg-end"><%=t "good_job.models.job.attempts" %></div>
         <div class="col text-end">
           <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                   data: { bs_toggle: "collapse", bs_target: ".job-params" },
                   aria: { expanded: false, controls: jobs.map { |job| "##{dom_id(job, "params")}" }.join(" ") } do %>
               <%= render_icon "info" %>
-              <span class="visually-hidden">Inspect</span>
+              <span class="visually-hidden"><%=t "good_job.actions.inspect" %></span>
           <% end %>
         </div>
       </div>
@@ -51,7 +51,7 @@
           <%= check_box_tag "all_job_ids", 1, false, disabled: true, data: { "checkbox-toggle-show": "job_ids"} %>
         </div>
         <div class="col-auto">
-          Apply to all <%= filter.filtered_count %> <%= "job".pluralize(filter.filtered_count) %>.
+          <%=t ".actions.apply_to_all", count: filter.filtered_count %>
         </div>
       </div>
     </label>
@@ -68,15 +68,15 @@
               </div>
             </div>
             <div class="col-4 col-lg-1 text-lg-center">
-              <div class="d-lg-none small text-muted mt-1">Queue</div>
+              <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.job.queue" %></div>
               <span class="badge bg-primary bg-opacity-25 text-dark font-monospace"><%= job.queue_name %></span>
             </div>
             <div class="col-4 col-lg-1 text-lg-end">
-              <div class="d-lg-none small text-muted mt-1">Priority</div>
+              <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.job.priority" %></div>
               <%= job.priority %>
             </div>
             <div class="col-4 col-lg-1 text-lg-end">
-              <div class="d-lg-none small text-muted mt-1">Attempts</div>
+              <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.job.attempts" %></div>
               <% if job.executions_count > 0 && job.status != :succeeded %>
                 <%= tag.span job.executions_count, class: "badge rounded-pill bg-danger", data: {
                       bs_toggle: "popover",
@@ -96,33 +96,33 @@
                 <div class="dropdown float-end">
                   <button class="d-flex align-items-center btn btn-sm" type="button" id="<%= dom_id(job, :actions) %>" data-bs-toggle="dropdown" aria-expanded="false">
                     <%= render "good_job/shared/icons/dots" %>
-                    <span class="visually-hidden">Actions</span>
+                    <span class="visually-hidden"><%=t ".actions.title" %></span>
                   </button>
                   <ul class="dropdown-menu shadow" aria-labelledby="<%= dom_id(job, :actions) %>">
                     <li>
                       <% job_reschedulable = job.status.in? [:scheduled, :retried, :queued] %>
-                      <%= link_to reschedule_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_reschedulable}", title: "Reschedule job", data: { confirm: "Confirm reschedule", disable: true } do %>
+                      <%= link_to reschedule_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_reschedulable}", title: t("good_job.jobs.actions.reschedule"), data: { confirm: t("good_job.jobs.actions.confirm_reschedule"), disable: true } do %>
                         <%= render "good_job/shared/icons/skip_forward" %>
-                        Reschedule
+                        <%=t "good_job.actions.reschedule" %>
                       <% end %>
                     </li>
                     <li>
                       <% job_discardable = job.status.in? [:scheduled, :retried, :queued] %>
-                      <%= link_to discard_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_discardable}", title: "Discard job", data: { confirm: "Confirm discard", disable: true } do %>
+                      <%= link_to discard_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_discardable}", title: t("good_job.jobs.actions.discard"), data: { confirm: t("good_job.jobs.actions.confirm_discard"), disable: true } do %>
                         <%= render "good_job/shared/icons/stop" %>
-                        Discard
+                        <%=t "good_job.actions.discard" %>
                       <% end %>
                     </li>
                     <li>
-                      <%= link_to retry_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job.status == :discarded}", title: "Retry job", data: { confirm: "Confirm retry", disable: true } do %>
+                      <%= link_to retry_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job.status == :discarded}", title: t("good_job.jobs.actions.retry"), data: { confirm: t("good_job.jobs.actions.confirm_retry"), disable: true } do %>
                         <%= render "good_job/shared/icons/arrow_clockwise" %>
-                        Retry
+                        <%=t "good_job.actions.retry" %>
                       <% end %>
                     </li>
                     <li>
-                      <%= link_to job_path(job.id), method: :delete, class: "dropdown-item #{'disabled' unless job.status.in? [:discarded, :succeeded]}", title: "Destroy job", data: { confirm: "Confirm destroy", disable: true } do %>
+                      <%= link_to job_path(job.id), method: :delete, class: "dropdown-item #{'disabled' unless job.status.in? [:discarded, :succeeded]}", title: t("good_job.jobs.actions.destroy"), data: { confirm: t("good_job.jobs.actions.confirm_destroy"), disable: true } do %>
                         <%= render_icon "trash" %>
-                        Destroy
+                        <%=t "good_job.actions.destroy" %>
                       <% end %>
                     </li>
 
@@ -132,7 +132,7 @@
                         data: { bs_toggle: "collapse" },
                         aria: { expanded: false, controls: dom_id(job, "params") } do %>
                         <%= render_icon "info" %>
-                        Inspect
+                        <%=t "good_job.actions.inspect" %>
                       <% end %>
                     </li>
                   </ul>
@@ -147,7 +147,7 @@
       <% end %>
     <% else %>
       <div class="list-group-item py-4 text-center text-muted">
-        No jobs found.
+        <%=t ".no_jobs_found" %>
       </div>
     <% end %>
   </div>

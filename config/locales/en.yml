@@ -1,6 +1,55 @@
 ---
 en:
   good_job:
+    actions:
+      destroy: Destroy
+      discard: Discard
+      inspect: Inspect
+      reschedule: Reschedule
+      retry: Retry
+    batches:
+      index:
+        older_batches: Older batches
+        pending_migrations: GoodJob has pending database migrations.
+        title: Batches
+      jobs:
+        actions:
+          confirm_destroy: Are you sure you want to destroy this job?
+          confirm_discard: Are you sure you want to discard this job?
+          confirm_reschedule: Are you sure you want to reschedule this job?
+          confirm_retry: Are you sure you want to retry this job?
+          destroy: Destroy Job
+          discard: Discard Job
+          reschedule: Reschedule Job
+          retry: Retry Job
+          title: Actions
+        no_jobs_found: No jobs found.
+      show:
+        attributes: Attributes
+        batched_jobs: Batched Jobs
+        callback_jobs: Callback Jobs
+      table:
+        no_batches_found: No batches found.
+    cron_entries:
+      actions:
+        confirm_disable: Are you sure you want to disable this cron entry?
+        confirm_enable: Are you sure you want to confirm this cron entry?
+        confirm_enqueue: Are you sure you want to enqueue this cron entry?
+        disable: Disable cron entry
+        enable: Enable cron entry
+        enqueue: Enqueue cron entry now
+      disable:
+        notice: Cron entry has been disabled.
+      enable:
+        notice: Cron entry has been enabled.
+      enqueue:
+        notice: Cron entry has been enqueued.
+      index:
+        no_cron_schedules_found: No cron schedules found.
+        title: Cron Schedules
+      pending_migrations: Requires pending GoodJob database migration.
+      show:
+        cron_entry_key: Cron Entry Key
     datetime:
       distance_in_words:
         about_x_hours:
@@ -46,6 +95,77 @@ en:
       milliseconds: "%{ms}ms"
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
+    helpers:
+      relative_time:
+        future: in %{time}
+        past: "%{time} ago"
+    jobs:
+      actions:
+        confirm_destroy: Are you sure you want to destroy the job?
+        confirm_discard: Are you usure you want to discard the job?
+        confirm_reschedule: Are you sure you want to reschedule the job?
+        confirm_retry: Are you sure you want to retry the job?
+        destroy: Destroy job
+        discard: Discard job
+        reschedule: Reschedule job
+        retry: Retry job
+      destroy:
+        notice: Job has been destroyed
+      discard:
+        notice: Job has been discarded
+      executions:
+        error: Error
+        in_queue: in queue
+        runtime: runtime
+        title: Executions
+      index:
+        job_pagination: Job pagination
+        older_jobs: Older jobs
+      reschedule:
+        notice: Job has been rescheduled
+      retry:
+        notice: Job has been retried
+      show:
+        jobs: Jobs
+      table:
+        actions:
+          apply_to_all:
+            one: Apply to all 1 job.
+            other: Apply to all %{count} jobs.
+          confirm_destroy_all: Are you sure you want to destroy the selected jobs?
+          confirm_discard_all: Are you usure you want to discard the selected jobs?
+          confirm_reschedule_all: Are you sure you want to reschedule the selected jobs?
+          confirm_retry_all: Are you sure you want to retry the selected jobs?
+          destroy_all: Destroy all
+          discard_all: Discard all
+          reschedule_all: Reschedule all
+          retry_all: Retry all
+          title: Actions
+        no_jobs_found: No jobs found.
+        toggle_actions: Toggle Actions
+        toggle_all_jobs: Toggle all jobs
+    models:
+      batch:
+        created: Created
+        created_at: Created at
+        discarded: Discarded
+        discarded_at: Discarded at
+        enqueued: Enqueued
+        enqueued_at: Enqueued at
+        finished: Finished
+        finished_at: Finished at
+        jobs: Jobs
+        name: Name
+      cron:
+        class: Class
+        last_run: Last run
+        next_scheduled: Next scheduled
+        schedule: Schedule
+      job:
+        arguments: Arguments
+        attempts: Attempts
+        priority: Priority
+        queue: Queue
     number:
       format:
         delimiter: ","
@@ -63,11 +183,28 @@ en:
             thousand: K
             trillion: T
             unit: ''
+    processes:
+      index:
+        no_good_job_processes_found: No GoodJob processes found.
+        process: Process
+        schedulers: Schedulers
+        started: Started
+        title: Processes
     shared:
+      filter:
+        all: All
+        all_jobs: All jobs
+        all_queues: All queues
+        clear: Clear
+        job_name: Job name
+        placeholder: Search by class, job id, job params, and error text.
+        queue_name: Queue name
+        search: Search
       footer:
         last_update_html: Last updated <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: Remember, you're doing a Good Job too!
       navbar:
+        batches: Batches
         cron_schedules: Cron
         jobs: Jobs
         live_poll: Live Poll

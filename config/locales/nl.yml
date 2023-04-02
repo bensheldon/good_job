@@ -1,6 +1,55 @@
 ---
 nl:
   good_job:
+    actions:
+      destroy: Vernietigen
+      discard: Weggooien
+      inspect: Inspecteren
+      reschedule: Opnieuw plannen
+      retry: Opnieuw proberen
+    batches:
+      index:
+        older_batches: Oudere partijen
+        pending_migrations: GoodJob heeft databasemigraties in behandeling.
+        title: Partijen
+      jobs:
+        actions:
+          confirm_destroy: Weet je zeker dat je deze baan wilt vernietigen?
+          confirm_discard: Weet u zeker dat u deze vacature wilt verwijderen?
+          confirm_reschedule: Weet u zeker dat u deze taak opnieuw wilt inplannen?
+          confirm_retry: Weet u zeker dat u deze taak opnieuw wilt proberen?
+          destroy: Vernietig baan
+          discard: Gooi taak weg
+          reschedule: Taak opnieuw plannen
+          retry: Taak opnieuw
+          title: Acties
+        no_jobs_found: Geen vacatures gevonden.
+      show:
+        attributes: attributen
+        batched_jobs: Gegroepeerde banen
+        callback_jobs: Terugbelopdrachten
+      table:
+        no_batches_found: Geen batches gevonden.
+    cron_entries:
+      actions:
+        confirm_disable: Weet u zeker dat u deze cron-vermelding wilt uitschakelen?
+        confirm_enable: Weet u zeker dat u deze cron-invoer wilt bevestigen?
+        confirm_enqueue: Weet u zeker dat u deze cron-vermelding in de wachtrij wilt plaatsen?
+        disable: Schakel cron-invoer uit
+        enable: Schakel cron-invoer in
+        enqueue: Zet cron-invoer nu in de wachtrij
+      disable:
+        notice: Cron-invoer is uitgeschakeld.
+      enable:
+        notice: Cron-invoer is ingeschakeld.
+      enqueue:
+        notice: Cron-invoer is in de wachtrij geplaatst.
+      index:
+        no_cron_schedules_found: Geen cron-schema's gevonden.
+        title: Cron-schema's
+      pending_migrations: Vereist GoodJob-databasemigratie in afwachting.
+      show:
+        cron_entry_key: Cron-invoersleutel
     datetime:
       distance_in_words:
         about_x_hours:
@@ -41,11 +90,82 @@ nl:
           one: 1 jaar
           other: "%{count} jaren"
     duration:
-      hours: "%{hour}h %{min}m"
+      hours: "%{hour}u %{min}m"
       less_than_10_seconds: "%{sec}s"
       milliseconds: "%{ms}ms"
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
+    helpers:
+      relative_time:
+        future: op %{time}
+        past: "%{time} geleden"
+    jobs:
+      actions:
+        confirm_destroy: Weet je zeker dat je de baan wilt vernietigen?
+        confirm_discard: Wilt u de baan afwijzen?
+        confirm_reschedule: Weet u zeker dat u de taak opnieuw wilt inplannen?
+        confirm_retry: Weet u zeker dat u de taak opnieuw wilt proberen?
+        destroy: Baan vernietigen
+        discard: Gooi de baan weg
+        reschedule: Taak opnieuw plannen
+        retry: Taak opnieuw proberen
+      destroy:
+        notice: Job is vernietigd
+      discard:
+        notice: Job is weggegooid
+      executions:
+        error: Fout
+        in_queue: in de wachtrij
+        runtime: looptijd
+        title: Executies
+      index:
+        job_pagination: Taak paginering
+        older_jobs: Oudere banen
+      reschedule:
+        notice: Taak is opnieuw ingepland
+      retry:
+        notice: Taak is opnieuw geprobeerd
+      show:
+        jobs: Banen
+      table:
+        actions:
+          apply_to_all:
+            one:
+            other:
+          confirm_destroy_all: Weet u zeker dat u de geselecteerde jobs wilt vernietigen?
+          confirm_discard_all: Wilt u de geselecteerde jobs verwijderen?
+          confirm_reschedule_all: Weet u zeker dat u de geselecteerde taken opnieuw wilt inplannen?
+          confirm_retry_all: Weet u zeker dat u de geselecteerde taken opnieuw wilt proberen?
+          destroy_all: Vernietig alles
+          discard_all: Gooi alles weg
+          reschedule_all: Alles opnieuw plannen
+          retry_all: Alles opnieuw proberen
+          title: Acties
+        no_jobs_found: Geen vacatures gevonden.
+        toggle_actions: Acties wisselen
+        toggle_all_jobs: Wissel alle vacatures af
+    models:
+      batch:
+        created: Gemaakt
+        created_at: Gemaakt bij
+        discarded: weggegooid
+        discarded_at: Weggegooid bij
+        enqueued: In de wachtrij geplaatst
+        enqueued_at: In de wachtrij geplaatst bij
+        finished: Afgerond
+        finished_at: Geëindigd om
+        jobs: Banen
+        name: Naam
+      cron:
+        class: Klas
+        last_run: Laatste ronde
+        next_scheduled: Volgende gepland
+        schedule: Schema
+      job:
+        arguments: Argumenten
+        attempts: Pogingen
+        priority: Prioriteit
+        queue: Wachtrij
     number:
       format:
         delimiter: "."
@@ -63,11 +183,28 @@ nl:
             thousand: K
             trillion: T
             unit: ''
+    processes:
+      index:
+        no_good_job_processes_found: Geen GoodJob-processen gevonden.
+        process: Proces
+        schedulers: Planners
+        started: Begonnen
+        title: Processen
     shared:
+      filter:
+        all: Alle
+        all_jobs: Alle banen
+        all_queues: Alle wachtrijen
+        clear: Duidelijk
+        job_name: Taak naam
+        placeholder: Zoek op klasse, taak-ID, taakparameters en fouttekst.
+        queue_name: Wachtrij naam
+        search: Zoekopdracht
       footer:
         last_update_html: Laatst bijgewerkt <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: 'Onthoud: jij levert ook goed werk!'
       navbar:
+        batches: Batches
         cron_schedules: Cron
         jobs: Taken
         live_poll: Live Poll

@@ -16,7 +16,7 @@
         </li>
         <li class="nav-item">
           <%= link_to batches_path, class: ["nav-link", ("active" if controller_name == 'batches')] do %>
-            <%= "Batches" %>
+            <%=t ".batches" %>
             <% batches_count = GoodJob::BatchRecord.migrated? ? GoodJob::BatchRecord.all.size : 0 %>
             <span class="badge bg-secondary rounded-pill"><%= number_to_human(batches_count, **translate_hash("good_job.number.human.decimal_units")) %></span>
           <% end %>

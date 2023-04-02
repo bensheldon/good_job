@@ -1,97 +1,212 @@
 ---
 ua:
   good_job:
+    actions:
+      destroy: Видалити
+      discard: Відхилити
+      inspect: Оглянути
+      reschedule: Перепланувати
+      retry: Повторити
+    batches:
+      index:
+        older_batches: Старі пакети
+        pending_migrations: GoodJob має невиконані міграції бази даних.
+        title: Пакети
+      jobs:
+        actions:
+          confirm_destroy: Ви впевнені, що хочете видалити цю задачу?
+          confirm_discard: Ви впевнені, що хочете відхилити цю задачу?
+          confirm_reschedule: Ви впевнені, що хочете перепланувати цю задачу?
+          confirm_retry: Ви впевнені, що хочете повторити цю задачу?
+          destroy: Видалити задачу
+          discard: Відхилити задачу
+          reschedule: Перепланувати задачу
+          retry: Повторити задачу
+          title: Дії
+        no_jobs_found: Задачі не знайдені.
+      show:
+        attributes: Атрибути
+        batched_jobs: Задачі в пакеті
+        callback_jobs: Задачі з зворотнім викликом
+      table:
+        no_batches_found: Пакети не знайдені.
+    cron_entries:
+      actions:
+        confirm_disable: Ви впевнені, що хочете вимкнути цю cron-запис?
+        confirm_enable: Ви впевнені, що хочете увімкнути цю cron-запис?
+        confirm_enqueue: Ви впевнені, що хочете запустити цю cron-запис?
+        disable: Вимкнути cron-запис
+        enable: Увімкнути cron-запис
+        enqueue: Запустити cron-запис зараз
+      disable:
+        notice: Cron-запис був вимкнений.
+      enable:
+        notice: Cron-запис був увімкнений.
+      enqueue:
+        notice: Cron-запис був запущений.
+      index:
+        no_cron_schedules_found: Cron-розклади не знайдені.
+        title: Cron-розклади
+      pending_migrations: Вимагає невиконаних міграцій бази даних GoodJob.
+      show:
+        cron_entry_key: Ключ cron-запису
     datetime:
       distance_in_words:
         about_x_hours:
-          few: близько %{count} години
-          many: близько %{count} годин
           one: близько 1 години
-          other: близько %{count} години
+          other: близько %{count} годин
         about_x_months:
-          few: близько %{count} місяців
-          many: близько %{count} місяців
-          one: близько 1 місяцю
-          other: близько %{count} місяцю
+          one: близько 1 місяця
+          other: близько %{count} місяців
         about_x_years:
-          few: близько %{count} років
-          many: близько %{count} років
           one: близько 1 року
           other: близько %{count} років
         almost_x_years:
-          few: майже %{count} роки
-          many: майже %{count} років
           one: майже 1 рік
           other: майже %{count} років
-        half_a_minute: пів хвилини
+        half_a_minute: півхвилини
         less_than_x_minutes:
-          few: менше %{count} хвилин
-          many: менше %{count} хвилин
           one: менше 1 хвилини
-          other: менше %{count} хвилини
+          other: менше %{count} хвилин
         less_than_x_seconds:
-          few: менше %{count} секунд
-          many: менше %{count} секунд
           one: менше 1 секунди
-          other: менше %{count} секунди
+          other: менше %{count} секунд
         over_x_years:
-          few: більше %{count} років
-          many: більше %{count} років
-          one: більше 1 року
-          other: більше %{count} років
+          one: понад 1 рік
+          other: понад %{count} років
         x_days:
-          few: "%{count} дня"
-          many: "%{count} днів"
           one: 1 день
-          other: "%{count} дня"
+          other: "%{count} днів"
         x_minutes:
-          few: "%{count} хвилини"
-          many: "%{count} хвилин"
-          one: 1 хвилину
-          other: "%{count} хвилини"
+          one: 1 хвилина
+          other: "%{count} хвилин"
         x_months:
-          few: "%{count} місяцю"
-          many: "%{count} місяців"
           one: 1 місяць
-          other: "%{count} місяцю"
+          other: "%{count} місяців"
         x_seconds:
-          few: "%{count} секунди"
-          many: "%{count} секунд"
-          one: 1 секунду
-          other: "%{count} секунди"
+          one: 1 секунда
+          other: "%{count} секунд"
         x_years:
-          few: "%{count} року"
-          many: "%{count} років"
           one: 1 рік
-          other: "%{count} року"
+          other: "%{count} років"
     duration:
-      hours: "%{hour}h %{min}m"
-      less_than_10_seconds: "%{sec}s"
+      hours: "%{hour}г %{min}хв"
+      less_than_10_seconds: "%{sec}с"
       milliseconds: "%{ms}мс"
-      minutes: "%{min}м %{sec}с"
-      seconds: "%{sec}s"
+      minutes: "%{min}хв %{sec}с"
+      seconds: "%{sec}с"
+    helpers:
+      relative_time:
+        future: за %{time}
+        past: "%{time} тому"
+    jobs:
+      actions:
+        confirm_destroy: Ви впевнені, що хочете видалити завдання?
+        confirm_discard: Ви впевнені, що хочете відхилити завдання?
+        confirm_reschedule: Ви впевнені, що хочете перепланувати завдання?
+        confirm_retry: Ви впевнені, що хочете повторити завдання?
+        destroy: Видалити завдання
+        discard: Відхилити завдання
+        reschedule: Перепланувати завдання
+        retry: Повторити завдання
+      destroy:
+        notice: Завдання було видалено
+      discard:
+        notice: Завдання було відхилено
+      executions:
+        error: Помилка
+        in_queue: у черзі
+        runtime: час виконання
+        title: Виконання
+      index:
+        job_pagination: Пагінація робіт
+        older_jobs: Старі роботи
+      reschedule:
+        notice: Роботу переплановано
+      retry:
+        notice: Роботу повторно спробовано виконати
+      show:
+        jobs: Роботи
+      table:
+        actions:
+          apply_to_all:
+            few: Застосувати до всіх %{count} робіт.
+            many: Застосувати до всіх %{count} робіт.
+            one: Застосувати до всіх 1 роботи.
+            other: Застосувати до всіх %{count} робіт.
+          confirm_destroy_all: Ви впевнені, що хочете видалити вибрані роботи?
+          confirm_discard_all: Ви впевнені, що хочете відкинути вибрані роботи?
+          confirm_reschedule_all: Ви впевнені, що хочете перепланувати вибрані роботи?
+          confirm_retry_all: Ви впевнені, що хочете повторно спробувати виконати вибрані роботи?
+          destroy_all: Видалити все
+          discard_all: Відкинути все
+          reschedule_all: Перепланувати все
+          retry_all: Повторити спробу для всіх
+          title: Дії
+        no_jobs_found: Роботів не знайдено.
+        toggle_actions: Показати дії
+        toggle_all_jobs: Показати всі роботи
+    models:
+      batch:
+        created: Створено
+        created_at: Створено о
+        discarded: Відхилено
+        discarded_at: Відхилено о
+        enqueued: У черзі
+        enqueued_at: У черзі о
+        finished: Завершено
+        finished_at: Завершено о
+        jobs: Роботи
+        name: Назва
+      cron:
+        class: Клас
+        last_run: Останній запуск
+        next_scheduled: Наступне заплановане
+        schedule: Розклад
+      job:
+        arguments: Аргументи
+        attempts: Спроби
+        priority: Пріоритет
+        queue: Черга
     number:
       format:
-        delimiter: " "
-        separator: ","
+        delimiter: ","
+        separator: "."
       human:
         decimal_units:
-          delimiter: " "
+          delimiter: ","
           format: "%n%u"
           precision: 3
-          separator: ","
+          separator: "."
           units:
-            billion: Блн
+            billion: Млрд
             million: Млн
-            quadrillion: Q
+            quadrillion: Квадрильйон
             thousand: Тис
-            trillion: Трил
+            trillion: Трлн
             unit: ''
+    processes:
+      index:
+        no_good_job_processes_found: Процеси GoodJob не знайдені.
+        process: Процес
+        schedulers: Планувальники
+        started: Розпочато
+        title: Процеси
     shared:
+      filter:
+        all: Всі
+        all_jobs: Усі роботи
+        all_queues: Усі черги
+        clear: Очистити
+        job_name: Назва роботи
+        placeholder: Пошук за класом, ідентифікатором роботи, параметрами роботи та текстом помилки.
+        queue_name: Назва черги
+        search: Пошук
       footer:
-        last_update_html: Оснаннє оновлення <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: Запам'ятай, ти теж робиш Good Job!
+        last_update_html: Останнє оновлення <time id="page-updated-at" datetime="%{time}">%{time}</time>
+        wording: Пам'ятайте, ви теж робите хорошу роботу!
       navbar:
+        batches: Batches
         cron_schedules: Cron
         jobs: Задачі
         live_poll: Живе Опитування
@@ -99,8 +214,8 @@ ua:
         processes: Процеси
     status:
       discarded: Відхилено
-      queued: В черзі
-      retried: Повторна спроба
-      running: Біг
-      scheduled: за розкладом
-      succeeded: вдалося
+      queued: У черзі
+      retried: Повторно спробовано
+      running: Виконується
+      scheduled: Заплановано
+      succeeded: Успішно виконано

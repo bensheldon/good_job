@@ -1,5 +1,5 @@
 <div class="border-bottom">
-  <h2 class="pt-3 pb-2">Batches</h2>
+  <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
 </div>
 
 <% if GoodJob::BatchRecord.migrated? %>
@@ -9,12 +9,12 @@
       <ul class="pagination">
         <li class="page-item">
           <%= link_to(@filter.to_params(after_created_at: @filter.last.created_at, after_id: @filter.last.id), class: "page-link") do %>
-            Older batches <span aria-hidden="true">&raquo;</span>
+            <%= t ".older_batches" %> <span aria-hidden="true">&raquo;</span>
           <% end %>
         </li>
       </ul>
     </nav>
   <% end %>
 <% else %>
-  <h3 class="text-center my-5">GoodJob has pending database migrations.</h3>
+  <h3 class="text-center my-5"><%= t ".pending_migrations" %></h3>
 <% end %>

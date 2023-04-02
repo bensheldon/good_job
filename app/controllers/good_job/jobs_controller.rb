@@ -62,25 +62,25 @@ module GoodJob
     def discard
       @job = Job.find(params[:id])
       @job.discard_job(DISCARD_MESSAGE)
-      redirect_back(fallback_location: jobs_path, notice: "Job has been discarded")
+      redirect_back(fallback_location: jobs_path, notice: t(".notice"))
     end
 
     def reschedule
       @job = Job.find(params[:id])
       @job.reschedule_job
-      redirect_back(fallback_location: jobs_path, notice: "Job has been rescheduled")
+      redirect_back(fallback_location: jobs_path, notice: t(".notice"))
     end
 
     def retry
       @job = Job.find(params[:id])
       @job.retry_job
-      redirect_back(fallback_location: jobs_path, notice: "Job has been retried")
+      redirect_back(fallback_location: jobs_path, notice: t(".notice"))
     end
 
     def destroy
       @job = Job.find(params[:id])
       @job.destroy_job
-      redirect_to jobs_path, notice: "Job has been destroyed"
+      redirect_to jobs_path, notice: t(".notice")
     end
 
     private

@@ -19,7 +19,7 @@ module GoodJob
 
     def relative_time(timestamp, **options)
       options = options.reverse_merge({ scope: "good_job.datetime.distance_in_words" })
-      text = timestamp.future? ? "in #{time_ago_in_words(timestamp, **options)}" : "#{time_ago_in_words(timestamp, **options)} ago"
+      text = t("good_job.helpers.relative_time.#{timestamp.future? ? 'future' : 'past'}", time: time_ago_in_words(timestamp, **options))
       tag.time(text, datetime: timestamp, title: timestamp)
     end
 
@@ -42,7 +42,7 @@ module GoodJob
     }.freeze
 
     def status_badge(status)
-      content_tag :span, status_icon(status, class: "text-white") + t(status, scope: 'good_job.status'),
+      content_tag :span, status_icon(status, class: "text-white") + t(status, scope: 'good_job.status', count: 1),
                   class: "badge rounded-pill bg-#{STATUS_COLOR.fetch(status)} d-inline-flex gap-2 ps-1 pe-3 align-items-center"
     end
 

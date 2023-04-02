@@ -1,4 +1,4 @@
-<h5>Executions</h5>
+<h5><%=t ".title" %></h5>
 <div class="card mb-4" data-live-poll-region="executions-table">
   <div class="list-group list-group-flush">
     <% executions.each do |execution| %>
@@ -10,32 +10,32 @@
           </div>
           <div class="col-md-2 small">
             <% if execution.queue_latency %>
-              <%= format_duration execution.queue_latency %> <span class="text-muted">in queue</span>
+              <%= format_duration execution.queue_latency %> <span class="text-muted"><%=t ".in_queue" %></span>
             <% end %>
           </div>
           <div class="col-md-2 small">
             <% if execution.runtime_latency %>
-              <%= format_duration execution.runtime_latency %> <span class="text-muted">runtime</span>
+              <%= format_duration execution.runtime_latency %> <span class="text-muted"><%=t ".runtime" %></span>
             <% end %>
           </div>
           <div class="col">
             <div class="d-flex gap-3 align-items-center justify-content-end">
               <%= tag.span relative_time(execution.last_status_at, include_seconds: true), class: "small" %>
               <%= status_badge execution.status %>
-            
+
               <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
-                title: "Inspect",
+                title: t("good_job.actions.inspect"),
                 data: { bs_toggle: "collapse", bs_target: "##{dom_id(execution, 'params')}" },
                 aria: { expanded: false, controls: dom_id(execution, "params") } do %>
                 <%= render_icon "info" %>
-                <span class="visually-hidden">Inspect</span>
+                <span class="visually-hidden"><%=t "good_job.actions.inspect" %></span>
               <% end %>
             </div>
           </div>
         </div>
         <% if execution.error %>
           <div class="mt-3 small">
-            <strong class="small">Error:</strong>
+            <strong class="small"><%=t ".error" %>:</strong>
             <code class="text-wrap text-break m-0 text-black"><%= execution.error %></code>
           </div>
         <% end %>

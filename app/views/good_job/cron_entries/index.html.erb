@@ -1,5 +1,5 @@
 <div class="border-bottom">
-  <h2 class="pt-3 pb-2">Cron Schedules</h2>
+  <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
 </div>
 
 <div class="card my-3">
@@ -7,16 +7,16 @@
     <header class="list-group-item bg-light">
       <div class="row small text-muted text-uppercase align-items-center">
         <div class="col-12 col-lg-2"></div>
-        <div class="col-6 col-lg-2 d-none d-lg-block">Class</div>
-        <div class="col-6 col-lg-2 d-none d-lg-block">Schedule</div>
-        <div class="col-6 col-lg-2 d-none d-lg-block">Next scheduled</div>
-        <div class="col-6 col-lg-2 d-none d-lg-block">Last run</div>
+        <div class="col-6 col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.class" %></div>
+        <div class="col-6 col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.schedule" %></div>
+        <div class="col-6 col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.next_scheduled" %></div>
+        <div class="col-6 col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.last_run" %></div>
         <div class="col text-end">
           <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                          data: { bs_toggle: "collapse", bs_target: ".cron-entry-properties" },
                          aria: { expanded: false, controls: @cron_entries.map { |cron_entry| "##{dom_id(cron_entry, 'properties')}" }.join(" ") } do %>
             <%= render_icon "info" %>
-            <span class="visually-hidden">Inspect</span>
+            <span class="visually-hidden"><%= t "good_job.actions.inspect" %></span>
           <% end %>
         </div>
       </div>
@@ -30,40 +30,40 @@
           </div>
           <div class="col-12 col-lg-2 text-wrap"><%= tag.span tag.code(cron_entry.job_class), class: "fs-5 mb-0" %></div>
           <div class="col-6 col-lg-2 text-wrap">
-            <div class="d-lg-none small text-muted mt-1">Schedule</div>
+            <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.schedule" %></div>
             <span class="font-monospace fw-bold"><%= cron_entry.schedule %></span>
           </div>
           <div class="col-6 col-lg-2 text-wrap small">
-            <div class="d-lg-none small text-muted mt-1">Next scheduled</div>
+            <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.next_scheduled" %></div>
             <%= relative_time cron_entry.next_at %>
           </div>
           <div class="col-6 col-lg-2 text-wrap small">
             <% if cron_entry.last_job.present? %>
-              <div class="d-lg-none small text-muted mt-1">Last run</div>
+              <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.last_run" %></div>
               <%= link_to relative_time(cron_entry.last_at), cron_entry_path(cron_entry), title: "Job #{cron_entry.last_job.id}" %>
             <% end %>
           </div>
           <div class="col d-flex gap-3 justify-content-end">
-            <%= button_to enqueue_cron_entry_path(cron_entry), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Enqueue cron entry now" }, title: "Enqueue cron entry now", data: { confirm: "Confirm enqueue cron entry now" } do %>
+            <%= button_to enqueue_cron_entry_path(cron_entry), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.enqueue") }, title: t("good_job.cron_entries.actions.enqueue"), data: { confirm: t("good_job.cron_entries.actions.confirm_enqueue") } do %>
               <%= render_icon "skip_forward" %>
             <% end %>
 
             <% if cron_entry.enabled? %>
-              <%= button_to disable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Disable cron entry" }, title: "Disable cron entry", data: { confirm: "Confirm disable cron entry" } do %>
+              <%= button_to disable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.disable") }, title: t("good_job.cron_entries.actions.disable"), data: { confirm: t("good_job.cron_entries.actions.confirm_disable") } do %>
                 <%= render_icon "pause" %>
               <% end %>
             <% else %>
-              <%= button_to enable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: "Enable cron entry" }, title: "Enable cron entry", data: { confirm: "Confirm enable cron entry" } do %>
+              <%= button_to enable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.enable") }, title: t("good_job.cron_entries.actions.enable"), data: { confirm: t("good_job.cron_entries.actions.confirm_enable") } do %>
                 <%= render_icon "play" %>
               <% end %>
             <% end %>
 
             <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
-                           title: "Inspect",
+                           title: t("good_job.actions.inspect"),
                            data: { bs_toggle: "collapse", bs_target: "##{dom_id(cron_entry, 'properties')}" },
                            aria: { expanded: false, controls: dom_id(cron_entry, "properties") } do %>
               <%= render_icon "info" %>
-              <span class="visually-hidden">Inspect</span>
+              <span class="visually-hidden"><%= t "good_job.actions.inspect" %></span>
             <% end %>
           </div>
         </div>
@@ -74,7 +74,7 @@
     <% end %>
     <% if @cron_entries.empty? %>
       <div class="list-group-item py-4 text-center text-muted">
-        No cron schedules found.
+        <%= t ".no_cron_schedules_found" %>
       </div>
     <% end %>
   </div>

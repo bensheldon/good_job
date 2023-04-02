@@ -1,6 +1,55 @@
 ---
 ru:
   good_job:
+    actions:
+      destroy: Разрушать
+      discard: Отказаться
+      inspect: Осмотреть
+      reschedule: Перенести
+      retry: Повторить попытку
+    batches:
+      index:
+        older_batches: Старые партии
+        pending_migrations: У GoodJob есть ожидающие миграции базы данных.
+        title: Пакеты
+      jobs:
+        actions:
+          confirm_destroy: Вы уверены, что хотите уничтожить эту работу?
+          confirm_discard: Вы уверены, что хотите отказаться от этого задания?
+          confirm_reschedule: Вы уверены, что хотите перенести это задание?
+          confirm_retry: Вы уверены, что хотите повторить это задание?
+          destroy: Уничтожить работу
+          discard: Отменить задание
+          reschedule: Перенести задание
+          retry: Повторить задание
+          title: Действия
+        no_jobs_found: Вакансий не найдено.
+      show:
+        attributes: Атрибуты
+        batched_jobs: Пакетные задания
+        callback_jobs: Задания обратного вызова
+      table:
+        no_batches_found: Партии не найдены.
+    cron_entries:
+      actions:
+        confirm_disable: Вы уверены, что хотите отключить эту запись cron?
+        confirm_enable: Вы уверены, что хотите подтвердить эту запись cron?
+        confirm_enqueue: Вы уверены, что хотите поставить эту запись cron в очередь?
+        disable: Отключить запись cron
+        enable: Включить запись cron
+        enqueue: Поставить в очередь запись cron сейчас
+      disable:
+        notice: Запись Cron отключена.
+      enable:
+        notice: Запись Cron включена.
+      enqueue:
+        notice: Запись Cron поставлена в очередь.
+      index:
+        no_cron_schedules_found: Расписания cron не найдены.
+        title: Расписания Cron
+      pending_migrations: Требуется отложенная миграция базы данных GoodJob.
+      show:
+        cron_entry_key: Ключ входа в Крон
     datetime:
       distance_in_words:
         about_x_hours:
@@ -65,11 +114,84 @@ ru:
           one: 1 год
           other: "%{count} года"
     duration:
-      hours: "%{hour}h %{min}m"
+      hours: "%{hour}ч %{min}м"
       less_than_10_seconds: "%{sec}s"
       milliseconds: "%{ms}мс"
       minutes: "%{min}м %{sec}с"
       seconds: "%{sec}s"
+    helpers:
+      relative_time:
+        future: в %{time}
+        past: "%{time} назад"
+    jobs:
+      actions:
+        confirm_destroy: Вы уверены, что хотите уничтожить задание?
+        confirm_discard: Вы уверены, что хотите отказаться от задания?
+        confirm_reschedule: Вы уверены, что хотите перенести задание?
+        confirm_retry: Вы уверены, что хотите повторить задание?
+        destroy: Уничтожить работу
+        discard: Отменить задание
+        reschedule: Перенести задание
+        retry: Повторить задание
+      destroy:
+        notice: Работа была уничтожена
+      discard:
+        notice: Работа удалена
+      executions:
+        error: Ошибка
+        in_queue: в очереди
+        runtime: время выполнения
+        title: Казни
+      index:
+        job_pagination: Пагинация вакансий
+        older_jobs: Старые рабочие места
+      reschedule:
+        notice: Работа была перенесена
+      retry:
+        notice: Задание было повторено
+      show:
+        jobs: Работа
+      table:
+        actions:
+          apply_to_all:
+            few: около %{count} часов
+            many: около %{count} часов
+            one: около 1 часа
+            other: около %{count} часа
+          confirm_destroy_all: Вы уверены, что хотите уничтожить выбранные задания?
+          confirm_discard_all: Вы действительно хотите отказаться от выбранных заданий?
+          confirm_reschedule_all: Вы уверены, что хотите изменить расписание выбранных заданий?
+          confirm_retry_all: Вы уверены, что хотите повторить выбранные задания?
+          destroy_all: Уничтожить все
+          discard_all: Отменить все
+          reschedule_all: Перенести все
+          retry_all: Повторить все
+          title: Действия
+        no_jobs_found: Вакансий не найдено.
+        toggle_actions: Переключить действия
+        toggle_all_jobs: Переключить все задания
+    models:
+      batch:
+        created: Созданный
+        created_at: Создан в
+        discarded: Отброшено
+        discarded_at: Отброшено в
+        enqueued: В очереди
+        enqueued_at: В очереди в
+        finished: Законченный
+        finished_at: Закончено в
+        jobs: Работа
+        name: Имя
+      cron:
+        class: Сорт
+        last_run: Последний запуск
+        next_scheduled: Следующий по расписанию
+        schedule: Расписание
+      job:
+        arguments: Аргументы
+        attempts: Попытки
+        priority: приоритет
+        queue: Очередь
     number:
       format:
         delimiter: " "
@@ -87,11 +209,28 @@ ru:
             thousand: К
             trillion: Т
             unit: ''
+    processes:
+      index:
+        no_good_job_processes_found: Процессы GoodJob не найдены.
+        process: Процесс
+        schedulers: Планировщики
+        started: Начал
+        title: Процессы
     shared:
+      filter:
+        all: Все
+        all_jobs: Все вакансии
+        all_queues: Все очереди
+        clear: Прозрачный
+        job_name: Название работы
+        placeholder: Поиск по классу, идентификатору задания, параметрам задания и тексту ошибки.
+        queue_name: Имя очереди
+        search: Поиск
       footer:
         last_update_html: Последнее обновление <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: Запомни, ты делаешь Good Job тоже!
       navbar:
+        batches: Batches
         cron_schedules: Cron
         jobs: Задачи
         live_poll: Живой Опрос

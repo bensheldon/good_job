@@ -1,6 +1,55 @@
 ---
 es:
   good_job:
+    actions:
+      destroy: Eliminar
+      discard: Descartar
+      inspect: Inspeccionar
+      reschedule: Reprogramar
+      retry: Reintentar
+    batches:
+      index:
+        older_batches: Batches anteriores
+        pending_migrations: GoodJob tiene migraciones pendientes.
+        title: Batches
+      jobs:
+        actions:
+          confirm_destroy: "¿Estás seguro que querés eliminar esta tarea?"
+          confirm_discard: "¿Estás seguro que querés descartar esta tarea?"
+          confirm_reschedule: "¿Estás seguro que querés reprogramar esta tarea?"
+          confirm_retry: "¿Estás seguro que querés reintentar esta tarea?"
+          destroy: Eliminar tarea
+          discard: Descartar tarea
+          reschedule: Reprogramar tarea
+          retry: Reintentar tarea
+          title: Acciones
+        no_jobs_found: No hay tareas.
+      show:
+        attributes: Atributos
+        batched_jobs: Batched Jobs
+        callback_jobs: Callback Jobs
+      table:
+        no_batches_found: No hay batches.
+    cron_entries:
+      actions:
+        confirm_disable: "¿Estás seguro que querés deshabilitar esta tarea programada?"
+        confirm_enable: "¿Estás seguro que querés confirmar esta tarea programada?"
+        confirm_enqueue: "¿Estás seguro que querés encolar esta tarea programada?"
+        disable: Deshabilitar tarea programada
+        enable: Habilitar tarea programada
+        enqueue: Encolar tarea programada ahora
+      disable:
+        notice: La tarea programada ha sido deshabilitada.
+      enable:
+        notice: La tarea programada ha sido habilitada.
+      enqueue:
+        notice: La tarea programada ha sido encolada.
+      index:
+        no_cron_schedules_found: No hay tareas programadas.
+        title: Tareas Programadas
+      pending_migrations: Require las migraciones de GoodJob pendientes.
+      show:
+        cron_entry_key: Cron Entry Key
     datetime:
       distance_in_words:
         about_x_hours:
@@ -46,6 +95,77 @@ es:
       milliseconds: "%{ms}ms"
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
+    helpers:
+      relative_time:
+        future: en %{time}
+        past: "%{time} atrás"
+    jobs:
+      actions:
+        confirm_destroy: "¿Estás seguro que querés eliminar esta tarea?"
+        confirm_discard: "¿Estás seguro que querés descartar esta tarea?"
+        confirm_reschedule: "¿Estás seguro que querés reprogramar esta tarea?"
+        confirm_retry: "¿Estás seguro que querés reintentar esta tarea?"
+        destroy: Eliminar tarea
+        discard: Descartar tarea
+        reschedule: Reprogramar tarea
+        retry: Reiuntentar tarea
+      destroy:
+        notice: La tarea ha sido eliminada
+      discard:
+        notice: La tarea ha sido descartada
+      executions:
+        error: Error
+        in_queue: en cola
+        runtime: en ejecución
+        title: Ejecuciones
+      index:
+        job_pagination: Paginación de tareas
+        older_jobs: Tareas anteriores
+      reschedule:
+        notice: La tarea ha sido reprogramada
+      retry:
+        notice: La tarea ha sido reintentada
+      show:
+        jobs: Tareas
+      table:
+        actions:
+          apply_to_all:
+            one: Aplicar a 1 tarea.
+            other: Aplicar a %{count} tareas.
+          confirm_destroy_all: "¿Estás seguro que querés eliminar las tareas seleccionadas?"
+          confirm_discard_all: "¿Estás seguro que querés descartar las tareas seleccionadas?"
+          confirm_reschedule_all: "¿Estás seguro que querés reprogramar las tareas seleccionadas?"
+          confirm_retry_all: "¿Estás seguro que querés reintentar las tareas seleccionadas?"
+          destroy_all: Eliminar todas
+          discard_all: Descartar todas
+          reschedule_all: Reprogramar todas
+          retry_all: Reintentar todas
+          title: Acciones
+        no_jobs_found: No hay tareas.
+        toggle_actions: Conmutar acciones
+        toggle_all_jobs: Conmutar todas las tareas
+    models:
+      batch:
+        created: Creado
+        created_at: Fecha de creación
+        discarded: Descartado
+        discarded_at: Fecha de descarte
+        enqueued: Encolado
+        enqueued_at: Fecha de encolado
+        finished: Finalizado
+        finished_at: Fecha de finalización
+        jobs: Tareas
+        name: Nombre
+      cron:
+        class: Clase
+        last_run: Última ejecución
+        next_scheduled: Próxima ejecución
+        schedule: Cronograma
+      job:
+        arguments: Argumentos
+        attempts: Intentos
+        priority: Prioridad
+        queue: Cola
     number:
       format:
         delimiter: " "
@@ -63,20 +183,47 @@ es:
             thousand: k
             trillion: T
             unit: ''
+    processes:
+      index:
+        no_good_job_processes_found: No hay procesos de GoodJob.
+        process: Proceso
+        schedulers: Schedulers
+        started: Iniciado
+        title: Procesos
     shared:
+      filter:
+        all: Todas
+        all_jobs: Todas las tareas
+        all_queues: Todas las colas
+        clear: Limpiar
+        job_name: Nombre de la tarea
+        placeholder: Buscar por clase, id de tarea, parámetros y mensaje de error.
+        queue_name: Nombre de la cola
+        search: Buscar
       footer:
         last_update_html: Última actualización <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: "¡Recuerda, también tú estás haciendo un buen trabajo!"
       navbar:
+        batches: Batches
         cron_schedules: Cron
         jobs: Tareas
         live_poll: En vivo
         name: "GoodJob 👍"
         processes: Procesos
     status:
-      discarded: Descartado
-      queued: Puesto en cola
-      retried: reintentado
+      discarded:
+        one: Descartada
+        other: Descartadas
+      queued:
+        one: Encolada
+        other: Encoladas
+      retried:
+        one: Reintentada
+        other: Reintentadas
       running: Corriendo
-      scheduled: Programado
-      succeeded: Acierto
+      scheduled:
+        one: Programada
+        other: Programadas
+      succeeded:
+        one: Exitosa
+        other: Exitosas

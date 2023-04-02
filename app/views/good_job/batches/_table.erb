@@ -2,18 +2,18 @@
     <div class="list-group list-group-flush text-nowrap table-batches" role="table">
       <header class="list-group-item bg-light">
         <div class="row small text-muted text-uppercase align-items-center">
-          <div class="col-4">Name</div>
-          <div class="col-lg-1 d-none d-lg-block">Created</div>
-          <div class="col-lg-1 d-none d-lg-block">Enqueued</div>
-          <div class="col-lg-1 d-none d-lg-block">Discarded</div>
-          <div class="col-lg-1 d-none d-lg-block">Finished</div>
-          <div class="col-lg-1 d-none d-lg-block">Jobs</div>
+          <div class="col-4"><%=t "good_job.models.batch.name" %></div>
+          <div class="col-lg-1 d-none d-lg-block"><%=t "good_job.models.batch.created" %></div>
+          <div class="col-lg-1 d-none d-lg-block"><%=t "good_job.models.batch.enqueued" %></div>
+          <div class="col-lg-1 d-none d-lg-block"><%=t "good_job.models.batch.discarded" %></div>
+          <div class="col-lg-1 d-none d-lg-block"><%=t "good_job.models.batch.finished" %></div>
+          <div class="col-lg-1 d-none d-lg-block"><%=t "good_job.models.batch.jobs" %></div>
           <div class="col text-end">
             <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                            data: { bs_toggle: "collapse", bs_target: ".batch-properties" },
                            aria: { expanded: false, controls: batches.map { |batch| "##{dom_id(batch, "params")}" }.join(" ") } do %>
               <%= render_icon "info" %>
-              <span class="visually-hidden">Inspect</span>
+              <span class="visually-hidden"><%=t "good_job.actions.inspect" %></span>
             <% end %>
           </div>
         </div>
@@ -33,38 +33,38 @@
                 <% end %>
               </div>
               <div class="col-6 col-lg-1 text-wrap">
-                <div class="d-lg-none small text-muted mt-1">Created at</div>
+                <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.batch.created_at" %></div>
                 <%= relative_time(batch.created_at) %>
               </div>
               <div class="col-6 col-lg-1 text-wrap">
                 <% if batch.enqueued_at %>
-                  <div class="d-lg-none small text-muted mt-1">Enqueued at</div>
+                  <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.batch.enqueued_at" %></div>
                   <%= relative_time(batch.enqueued_at) %>
                 <% end %>
               </div>
               <div class="col-6 col-lg-1 text-wrap">
                 <% if batch.discarded_at %>
-                  <div class="d-lg-none small text-muted mt-1">Discarded at</div>
+                  <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.batch.discarded_at" %></div>
                   <%= relative_time(batch.discarded_at) %>
                 <% end %>
               </div>
               <div class="col-6 col-lg-1 text-wrap">
                 <% if batch.finished_at %>
-                  <div class="d-lg-none small text-muted mt-1">Finished at</div>
+                  <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.batch.finished_at" %></div>
                   <%= relative_time(batch.finished_at) %>
                 <% end %>
               </div>
               <div class="col-6 col-lg-1">
-                <div class="d-lg-none small text-muted mt-1">Jobs</div>
+                <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.batch.jobs" %></div>
                 <%= batch.jobs.count %>
               </div>
               <div class="col text-end">
                 <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
-                               title: "Inspect",
+                               title: t("good_job.actions.inspect"),
                                data: { bs_toggle: "collapse", bs_target: "##{dom_id(batch, 'properties')}" },
                                aria: { expanded: false, controls: dom_id(batch, "state") } do %>
                   <%= render_icon "info" %>
-                  <span class="visually-hidden">Inspect</span>
+                  <span class="visually-hidden"><%=t "good_job.actions.inspect" %></span>
                 <% end %>
               </div>
             </div>
@@ -75,7 +75,7 @@
         <% end %>
       <% else %>
         <div class="list-group-item py-4 text-center text-muted">
-          No batches found.
+          <%=t ".no_batches_found" %>
         </div>
       <% end %>
     </div>
