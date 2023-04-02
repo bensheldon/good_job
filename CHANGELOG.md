@@ -1,5 +1,27 @@
 # Changelog
 
+## [v3.15.0](https://github.com/bensheldon/good_job/tree/v3.15.0) (2023-04-02)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.14.2...v3.15.0)
+
+**Implemented enhancements:**
+
+- Extract more Dashboard strings into localization strings [\#899](https://github.com/bensheldon/good_job/pull/899) ([patriciomacadden](https://github.com/patriciomacadden))
+
+**Closed issues:**
+
+- ActionView::Template::Error - undefined method `symbolize\_keys' [\#889](https://github.com/bensheldon/good_job/issues/889)
+
+**Merged pull requests:**
+
+- Bump benchmark-ips from 2.11.0 to 2.12.0 [\#907](https://github.com/bensheldon/good_job/pull/907) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump selenium-webdriver from 4.8.1 to 4.8.6 [\#905](https://github.com/bensheldon/good_job/pull/905) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rails from 7.0.4.2 to 7.0.4.3 [\#904](https://github.com/bensheldon/good_job/pull/904) ([dependabot[bot]](https://github.com/apps/dependabot))
+- feat: locales for de [\#903](https://github.com/bensheldon/good_job/pull/903) ([eric-christian](https://github.com/eric-christian))
+- Update README.md [\#902](https://github.com/bensheldon/good_job/pull/902) ([ain2108](https://github.com/ain2108))
+- Extract shared methods/scopes into a BaseExecution to share between Execution and Job models [\#894](https://github.com/bensheldon/good_job/pull/894) ([bensheldon](https://github.com/bensheldon))
+- Add translate\_hash to handle missing translation keys that return hashes; only show translatable/available locales in dropdown [\#891](https://github.com/bensheldon/good_job/pull/891) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.14.2](https://github.com/bensheldon/good_job/tree/v3.14.2) (2023-03-16)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.14.1...v3.14.2)
