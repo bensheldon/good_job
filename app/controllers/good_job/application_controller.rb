@@ -47,5 +47,6 @@ module GoodJob
     def good_job_available_locales
       @_good_job_available_locales ||= GoodJob::Engine.root.join("config/locales").glob("*.yml").map { |path| File.basename(path, ".yml").to_sym }.uniq
     end
+    helper_method :good_job_available_locales
   end
 end

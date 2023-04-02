@@ -11,14 +11,14 @@
           <%= link_to jobs_path, class: ["nav-link", ("active" if controller_name == 'jobs')] do %>
             <%= t(".jobs") %>
             <% jobs_count = GoodJob::Job.count %>
-            <span class="badge bg-secondary rounded-pill"><%= number_to_human(jobs_count, **I18n.t("good_job.number.human.decimal_units")) %></span>
+            <span class="badge bg-secondary rounded-pill"><%= number_to_human(jobs_count, **translate_hash("good_job.number.human.decimal_units")) %></span>
         <% end %>
         </li>
         <li class="nav-item">
           <%= link_to batches_path, class: ["nav-link", ("active" if controller_name == 'batches')] do %>
             <%= "Batches" %>
             <% batches_count = GoodJob::BatchRecord.migrated? ? GoodJob::BatchRecord.all.size : 0 %>
-            <span class="badge bg-secondary rounded-pill"><%= number_to_human(batches_count, units: I18n.t("good_job.number.human.decimal_units.units"), precision: 3) %></span>
+            <span class="badge bg-secondary rounded-pill"><%= number_to_human(batches_count, **translate_hash("good_job.number.human.decimal_units")) %></span>
           <% end %>
         </li>
         <li class="nav-item">
@@ -49,7 +49,8 @@
           </a>
 
           <ul class="dropdown-menu" aria-labelledby="localeOptions">
-            <% I18n.available_locales.reject { |locale| locale == I18n.locale }.each do |locale| %>
+            <% possible_locales = I18n.enforce_available_locales ? (good_job_available_locales & I18n.available_locales) : good_job_available_locales %>
+            <% possible_locales.reject { |locale| locale == I18n.locale }.each do |locale| %>
               <li><%= link_to locale, url_for(locale: locale), class: "dropdown-item" %></li>
             <% end %>
           </ul>

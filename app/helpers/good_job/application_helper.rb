@@ -57,5 +57,14 @@ module GoodJob
       partial = lookup_context.find_template("good_job/shared/icons/#{name}", [], true)
       partial.render(self, {})
     end
+
+    def translate_hash(key, **options)
+      translation_exists?(key, **options) ? translate(key, **options) : {}
+    end
+
+    def translation_exists?(key, **options)
+      true if good_job_available_locales.include?(I18n.locale)
+      I18n.exists?(scope_key_by_partial(key), **options)
+    end
   end
 end
