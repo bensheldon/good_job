@@ -118,7 +118,7 @@ GEM
       async
     async-pool (0.3.12)
       async (>= 1.25)
-    benchmark-ips (2.11.0)
+    benchmark-ips (2.12.0)
     better_html (2.0.1)
       actionview (>= 6.0)
       activesupport (>= 6.0)
