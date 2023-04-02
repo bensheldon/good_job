@@ -2,54 +2,54 @@
 fr:
   good_job:
     actions:
-      destroy: Destroy
-      discard: Discard
-      inspect: Inspect
-      reschedule: Reschedule
-      retry: Retry
+      destroy: Détruire
+      discard: Jeter
+      inspect: Inspecter
+      reschedule: Reprogrammer
+      retry: Recommencez
     batches:
       index:
-        older_batches: Older batches
-        pending_migrations: GoodJob has pending database migrations.
-        title: Batches
+        older_batches: Lots plus anciens
+        pending_migrations: GoodJob a des migrations de bases de données en attente.
+        title: Lots
       jobs:
         actions:
-          confirm_destroy: Are you sure you want to destroy this job?
-          confirm_discard: Are you sure you want to discard this job?
-          confirm_reschedule: Are you sure you want to reschedule this job?
-          confirm_retry: Are you sure you want to retry this job?
-          destroy: Destroy Job
-          discard: Discard Job
-          reschedule: Reschedule Job
-          retry: Retry Job
+          confirm_destroy: Êtes-vous sûr de vouloir détruire ce travail ?
+          confirm_discard: Voulez-vous vraiment supprimer cette tâche ?
+          confirm_reschedule: Êtes-vous sûr de vouloir reprogrammer ce travail ?
+          confirm_retry: Êtes-vous sûr de vouloir réessayer ce travail ?
+          destroy: Détruire le travail
+          discard: Supprimer le travail
+          reschedule: Replanifier le travail
+          retry: Réessayer le travail
           title: Actions
-        no_jobs_found: No jobs found.
+        no_jobs_found: Aucun emploi trouvé.
       show:
-        attributes: Attributes
-        batched_jobs: Batched Jobs
-        callback_jobs: Callback Jobs
+        attributes: Les attributs
+        batched_jobs: Tâches groupées
+        callback_jobs: Tâches de rappel
       table:
-        no_batches_found: No batches found.
+        no_batches_found: Aucun lot trouvé.
     cron_entries:
       actions:
-        confirm_disable: Are you sure you want to disable this cron entry?
-        confirm_enable: Are you sure you want to confirm this cron entry?
-        confirm_enqueue: Are you sure you want to enqueue this cron entry?
-        disable: Disable cron entry
-        enable: Enable cron entry
-        enqueue: Enqueue cron entry now
+        confirm_disable: Voulez-vous vraiment désactiver cette entrée cron ?
+        confirm_enable: Voulez-vous vraiment confirmer cette entrée cron ?
+        confirm_enqueue: Voulez-vous vraiment mettre en file d'attente cette entrée cron ?
+        disable: Désactiver l'entrée cron
+        enable: Activer l'entrée cron
+        enqueue: Mettre en file d'attente l'entrée cron maintenant
       disable:
-        notice: Cron entry has been disabled.
+        notice: L'entrée Cron a été désactivée.
       enable:
-        notice: Cron entry has been enabled.
+        notice: L'entrée Cron a été activée.
       enqueue:
-        notice: Cron entry has been enqueued.
+        notice: L'entrée Cron a été mise en file d'attente.
       index:
-        no_cron_schedules_found: No cron schedules found.
-        title: Cron Schedules
-      pending_migrations: Requires pending GoodJob database migration.
+        no_cron_schedules_found: Aucune planification cron trouvée.
+        title: Horaires Cron
+      pending_migrations: Nécessite une migration de la base de données GoodJob en attente.
       show:
-        cron_entry_key: Cron Entry Key
+        cron_entry_key: Clé d'entrée Cron
     datetime:
       distance_in_words:
         about_x_hours:
@@ -78,8 +78,8 @@ fr:
           one: 1 jour
           other: "%{count} jours"
         x_minutes:
-          one: 1 minute
-          other: "%{count} minutes"
+          one:
+          other:
         x_months:
           one: 1 mois
           other: "%{count} mois"
@@ -97,75 +97,75 @@ fr:
       seconds: "%{sec}s"
     helpers:
       relative_time:
-        future: in %{time}
-        past: "%{time} ago"
+        future: en %{time}
+        past: Il y a %{time}
     jobs:
       actions:
-        confirm_destroy: Are you sure you want to destroy the job?
-        confirm_discard: Are you usure you want to discard the job?
-        confirm_reschedule: Are you sure you want to reschedule the job?
-        confirm_retry: Are you sure you want to retry the job?
-        destroy: Destroy job
-        discard: Discard job
-        reschedule: Reschedule job
-        retry: Retry job
+        confirm_destroy: Êtes-vous sûr de vouloir détruire le travail ?
+        confirm_discard: Êtes-vous usure que vous voulez jeter le travail?
+        confirm_reschedule: Êtes-vous sûr de vouloir replanifier le travail ?
+        confirm_retry: Êtes-vous sûr de vouloir réessayer le travail ?
+        destroy: Détruire le travail
+        discard: Supprimer la tâche
+        reschedule: Replanifier le travail
+        retry: Réessayer la tâche
       destroy:
-        notice: Job has been destroyed
+        notice: Le travail a été détruit
       discard:
-        notice: Job has been discarded
+        notice: Le travail a été supprimé
       executions:
-        error: Error
-        in_queue: in queue
-        runtime: runtime
-        title: Executions
+        error: Erreur
+        in_queue: dans la queue
+        runtime: Durée
+        title: Exécutions
       index:
-        job_pagination: Job pagination
-        older_jobs: Older jobs
+        job_pagination: Pagination de l'emploi
+        older_jobs: Emplois plus anciens
       reschedule:
-        notice: Job has been rescheduled
+        notice: Le travail a été reprogrammé
       retry:
-        notice: Job has been retried
+        notice: Le travail a été réessayé
       show:
-        jobs: Jobs
+        jobs: Emplois
       table:
         actions:
           apply_to_all:
-            one: Apply to all 1 job.
-            other: Apply to all %{count} jobs.
-          confirm_destroy_all: Are you sure you want to destroy the selected jobs?
-          confirm_discard_all: Are you usure you want to discard the selected jobs?
-          confirm_reschedule_all: Are you sure you want to reschedule the selected jobs?
-          confirm_retry_all: Are you sure you want to retry the selected jobs?
-          destroy_all: Destroy all
-          discard_all: Discard all
-          reschedule_all: Reschedule all
-          retry_all: Retry all
+            one:
+            other:
+          confirm_destroy_all: Voulez-vous vraiment détruire les travaux sélectionnés ?
+          confirm_discard_all: Êtes-vous usure que vous souhaitez supprimer les emplois sélectionnés?
+          confirm_reschedule_all: Voulez-vous vraiment reprogrammer les tâches sélectionnées ?
+          confirm_retry_all: Voulez-vous vraiment réessayer les tâches sélectionnées ?
+          destroy_all: Détruisez tout
+          discard_all: Jeter tout
+          reschedule_all: Reprogrammer tout
+          retry_all: Tout réessayer
           title: Actions
-        no_jobs_found: No jobs found.
-        toggle_actions: Toggle Actions
-        toggle_all_jobs: Toggle all jobs
+        no_jobs_found: Aucun emploi trouvé.
+        toggle_actions: Basculer les actions
+        toggle_all_jobs: Basculer tous les travaux
     models:
       batch:
-        created: Created
-        created_at: Created at
-        discarded: Discarded
-        discarded_at: Discarded at
-        enqueued: Enqueued
-        enqueued_at: Enqueued at
-        finished: Finished
-        finished_at: Finished at
-        jobs: Jobs
-        name: Name
+        created: Créé
+        created_at: Créé à
+        discarded: Mis au rebut
+        discarded_at: Jeté à
+        enqueued: En file d'attente
+        enqueued_at: En file d'attente à
+        finished: Fini
+        finished_at: Terminé à
+        jobs: Emplois
+        name: Nom
       cron:
-        class: Class
-        last_run: Last run
-        next_scheduled: Next scheduled
-        schedule: Schedule
+        class: Classe
+        last_run: Dernier tour
+        next_scheduled: Prochain rendez-vous
+        schedule: Calendrier
       job:
         arguments: Arguments
-        attempts: Attempts
-        priority: Priority
-        queue: Queue
+        attempts: Tentatives
+        priority: Priorité
+        queue: File d'attente
     number:
       format:
         delimiter: " "
@@ -181,25 +181,25 @@ fr:
             million: M
             quadrillion: q
             thousand: k
-            trillion: T
+            trillion: J
             unit: ''
     processes:
       index:
-        no_good_job_processes_found: No GoodJob processes found.
-        process: Process
-        schedulers: Schedulers
-        started: Started
-        title: Processes
+        no_good_job_processes_found: Aucun processus GoodJob trouvé.
+        process: Processus
+        schedulers: Planificateurs
+        started: Commencé
+        title: Processus
     shared:
       filter:
-        all: All
-        all_jobs: All jobs
-        all_queues: All queues
-        clear: Clear
-        job_name: Job name
-        placeholder: Search by class, job id, job params, and error text.
-        queue_name: Queue name
-        search: Search
+        all: Tous
+        all_jobs: Tous les emplois
+        all_queues: Toutes les files d'attente
+        clear: Clair
+        job_name: Nom du travail
+        placeholder: Recherche par classe, ID de tâche, paramètres de tâche et texte d'erreur.
+        queue_name: Nom de la file d'attente
+        search: Recherche
       footer:
         last_update_html: Dernière mise à jour <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: N'oublie pas, toi aussi tu fais du bon boulot !

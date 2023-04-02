@@ -2,54 +2,54 @@
 ru:
   good_job:
     actions:
-      destroy: Destroy
-      discard: Discard
-      inspect: Inspect
-      reschedule: Reschedule
-      retry: Retry
+      destroy: Разрушать
+      discard: Отказаться
+      inspect: Осмотреть
+      reschedule: Перенести
+      retry: Повторить попытку
     batches:
       index:
-        older_batches: Older batches
-        pending_migrations: GoodJob has pending database migrations.
-        title: Batches
+        older_batches: Старые партии
+        pending_migrations: У GoodJob есть ожидающие миграции базы данных.
+        title: Пакеты
       jobs:
         actions:
-          confirm_destroy: Are you sure you want to destroy this job?
-          confirm_discard: Are you sure you want to discard this job?
-          confirm_reschedule: Are you sure you want to reschedule this job?
-          confirm_retry: Are you sure you want to retry this job?
-          destroy: Destroy Job
-          discard: Discard Job
-          reschedule: Reschedule Job
-          retry: Retry Job
-          title: Actions
-        no_jobs_found: No jobs found.
+          confirm_destroy: Вы уверены, что хотите уничтожить эту работу?
+          confirm_discard: Вы уверены, что хотите отказаться от этого задания?
+          confirm_reschedule: Вы уверены, что хотите перенести это задание?
+          confirm_retry: Вы уверены, что хотите повторить это задание?
+          destroy: Уничтожить работу
+          discard: Отменить задание
+          reschedule: Перенести задание
+          retry: Повторить задание
+          title: Действия
+        no_jobs_found: Вакансий не найдено.
       show:
-        attributes: Attributes
-        batched_jobs: Batched Jobs
-        callback_jobs: Callback Jobs
+        attributes: Атрибуты
+        batched_jobs: Пакетные задания
+        callback_jobs: Задания обратного вызова
       table:
-        no_batches_found: No batches found.
+        no_batches_found: Партии не найдены.
     cron_entries:
       actions:
-        confirm_disable: Are you sure you want to disable this cron entry?
-        confirm_enable: Are you sure you want to confirm this cron entry?
-        confirm_enqueue: Are you sure you want to enqueue this cron entry?
-        disable: Disable cron entry
-        enable: Enable cron entry
-        enqueue: Enqueue cron entry now
+        confirm_disable: Вы уверены, что хотите отключить эту запись cron?
+        confirm_enable: Вы уверены, что хотите подтвердить эту запись cron?
+        confirm_enqueue: Вы уверены, что хотите поставить эту запись cron в очередь?
+        disable: Отключить запись cron
+        enable: Включить запись cron
+        enqueue: Поставить в очередь запись cron сейчас
       disable:
-        notice: Cron entry has been disabled.
+        notice: Запись Cron отключена.
       enable:
-        notice: Cron entry has been enabled.
+        notice: Запись Cron включена.
       enqueue:
-        notice: Cron entry has been enqueued.
+        notice: Запись Cron поставлена в очередь.
       index:
-        no_cron_schedules_found: No cron schedules found.
-        title: Cron Schedules
-      pending_migrations: Requires pending GoodJob database migration.
+        no_cron_schedules_found: Расписания cron не найдены.
+        title: Расписания Cron
+      pending_migrations: Требуется отложенная миграция базы данных GoodJob.
       show:
-        cron_entry_key: Cron Entry Key
+        cron_entry_key: Ключ входа в Крон
     datetime:
       distance_in_words:
         about_x_hours:
@@ -114,82 +114,84 @@ ru:
           one: 1 год
           other: "%{count} года"
     duration:
-      hours: "%{hour}h %{min}m"
+      hours: "%{hour}ч %{min}м"
       less_than_10_seconds: "%{sec}s"
       milliseconds: "%{ms}мс"
       minutes: "%{min}м %{sec}с"
       seconds: "%{sec}s"
     helpers:
       relative_time:
-        future: in %{time}
-        past: "%{time} ago"
+        future: в %{time}
+        past: "%{time} назад"
     jobs:
       actions:
-        confirm_destroy: Are you sure you want to destroy the job?
-        confirm_discard: Are you usure you want to discard the job?
-        confirm_reschedule: Are you sure you want to reschedule the job?
-        confirm_retry: Are you sure you want to retry the job?
-        destroy: Destroy job
-        discard: Discard job
-        reschedule: Reschedule job
-        retry: Retry job
+        confirm_destroy: Вы уверены, что хотите уничтожить задание?
+        confirm_discard: Вы уверены, что хотите отказаться от задания?
+        confirm_reschedule: Вы уверены, что хотите перенести задание?
+        confirm_retry: Вы уверены, что хотите повторить задание?
+        destroy: Уничтожить работу
+        discard: Отменить задание
+        reschedule: Перенести задание
+        retry: Повторить задание
       destroy:
-        notice: Job has been destroyed
+        notice: Работа была уничтожена
       discard:
-        notice: Job has been discarded
+        notice: Работа удалена
       executions:
-        error: Error
-        in_queue: in queue
-        runtime: runtime
-        title: Executions
+        error: Ошибка
+        in_queue: в очереди
+        runtime: время выполнения
+        title: Казни
       index:
-        job_pagination: Job pagination
-        older_jobs: Older jobs
+        job_pagination: Пагинация вакансий
+        older_jobs: Старые рабочие места
       reschedule:
-        notice: Job has been rescheduled
+        notice: Работа была перенесена
       retry:
-        notice: Job has been retried
+        notice: Задание было повторено
       show:
-        jobs: Jobs
+        jobs: Работа
       table:
         actions:
           apply_to_all:
-            one: Apply to all 1 job.
-            other: Apply to all %{count} jobs.
-          confirm_destroy_all: Are you sure you want to destroy the selected jobs?
-          confirm_discard_all: Are you usure you want to discard the selected jobs?
-          confirm_reschedule_all: Are you sure you want to reschedule the selected jobs?
-          confirm_retry_all: Are you sure you want to retry the selected jobs?
-          destroy_all: Destroy all
-          discard_all: Discard all
-          reschedule_all: Reschedule all
-          retry_all: Retry all
-          title: Actions
-        no_jobs_found: No jobs found.
-        toggle_actions: Toggle Actions
-        toggle_all_jobs: Toggle all jobs
+            few: около %{count} часов
+            many: около %{count} часов
+            one: около 1 часа
+            other: около %{count} часа
+          confirm_destroy_all: Вы уверены, что хотите уничтожить выбранные задания?
+          confirm_discard_all: Вы действительно хотите отказаться от выбранных заданий?
+          confirm_reschedule_all: Вы уверены, что хотите изменить расписание выбранных заданий?
+          confirm_retry_all: Вы уверены, что хотите повторить выбранные задания?
+          destroy_all: Уничтожить все
+          discard_all: Отменить все
+          reschedule_all: Перенести все
+          retry_all: Повторить все
+          title: Действия
+        no_jobs_found: Вакансий не найдено.
+        toggle_actions: Переключить действия
+        toggle_all_jobs: Переключить все задания
     models:
       batch:
-        created: Created
-        created_at: Created at
-        discarded: Discarded
-        discarded_at: Discarded at
-        enqueued: Enqueued
-        enqueued_at: Enqueued at
-        finished: Finished
-        finished_at: Finished at
-        jobs: Jobs
-        name: Name
+        created: Созданный
+        created_at: Создан в
+        discarded: Отброшено
+        discarded_at: Отброшено в
+        enqueued: В очереди
+        enqueued_at: В очереди в
+        finished: Законченный
+        finished_at: Закончено в
+        jobs: Работа
+        name: Имя
       cron:
-        class: Class
-        last_run: Last run
-        next_scheduled: Next scheduled
-        schedule: Schedule
+        class: Сорт
+        last_run: Последний запуск
+        next_scheduled: Следующий по расписанию
+        schedule: Расписание
       job:
-        arguments: Arguments
-        attempts: Attempts
-        priority: Priority
-        queue: Queue
+        arguments: Аргументы
+        attempts: Попытки
+        priority: приоритет
+        queue: Очередь
     number:
       format:
         delimiter: " "
@@ -209,21 +211,21 @@ ru:
             unit: ''
     processes:
       index:
-        no_good_job_processes_found: No GoodJob processes found.
-        process: Process
-        schedulers: Schedulers
-        started: Started
-        title: Processes
+        no_good_job_processes_found: Процессы GoodJob не найдены.
+        process: Процесс
+        schedulers: Планировщики
+        started: Начал
+        title: Процессы
     shared:
       filter:
-        all: All
-        all_jobs: All jobs
-        all_queues: All queues
-        clear: Clear
-        job_name: Job name
-        placeholder: Search by class, job id, job params, and error text.
-        queue_name: Queue name
-        search: Search
+        all: Все
+        all_jobs: Все вакансии
+        all_queues: Все очереди
+        clear: Прозрачный
+        job_name: Название работы
+        placeholder: Поиск по классу, идентификатору задания, параметрам задания и тексту ошибки.
+        queue_name: Имя очереди
+        search: Поиск
       footer:
         last_update_html: Последнее обновление <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: Запомни, ты делаешь Good Job тоже!
