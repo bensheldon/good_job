@@ -136,17 +136,17 @@ describe GoodJob do
 
   describe '.system_info' do
     it 'returns expecrted systen information' do
-      system_info = GoodJob.system_info
-      expect(system_info.keys).to eq [
-        "VERSION",
-        "RUBY_VERSION",
-        "RAILS_VERSION",
-        "RAILS_ENV",
-        "EXECUTION_MODE",
-        "QUEUES",
-        "POLL_INTERVAL",
-        "NOTIFIER_LISTENING",
-        "PROCESSES",
+      system_info = described_class.system_info
+      expect(system_info.keys).to eq %w[
+        VERSION
+        RUBY_VERSION
+        RAILS_VERSION
+        RAILS_ENV
+        EXECUTION_MODE
+        QUEUES
+        POLL_INTERVAL
+        NOTIFIER_LISTENING
+        PROCESSES
       ]
 
       expect(system_info["EXECUTION_MODE"]).to eq :inline

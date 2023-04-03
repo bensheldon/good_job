@@ -200,7 +200,7 @@ module GoodJob
     end
   end
 
-  def self.system_info()
+  def self.system_info
     {
       "VERSION" => VERSION,
       "RUBY_VERSION" => RUBY_VERSION,
@@ -210,7 +210,7 @@ module GoodJob
       "QUEUES" => configuration.queue_string,
       "POLL_INTERVAL" => configuration.poll_interval,
       "NOTIFIER_LISTENING" => configuration.enable_listen_notify,
-      "PROCESSES" => "[" + Process.all.map { |p| p.current_state.to_s }.join(',') + "]",
+      "PROCESSES" => "[#{Process.all.map { |p| p.current_state.to_s }.join(',')}]",
     }
   end
 
