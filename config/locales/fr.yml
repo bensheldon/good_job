@@ -78,8 +78,8 @@ fr:
           one: 1 jour
           other: "%{count} jours"
         x_minutes:
-          one:
-          other:
+          one: 1 minute
+          other: "%{count} minutes"
         x_months:
           one: 1 mois
           other: "%{count} mois"
@@ -130,8 +130,8 @@ fr:
       table:
         actions:
           apply_to_all:
-            one:
-            other:
+            one: Appliquer à tous les 1 travail.
+            other: Appliquer à tous les %{count} travaux.
           confirm_destroy_all: Voulez-vous vraiment détruire les travaux sélectionnés ?
           confirm_discard_all: Êtes-vous usure que vous souhaitez supprimer les emplois sélectionnés?
           confirm_reschedule_all: Voulez-vous vraiment reprogrammer les tâches sélectionnées ?

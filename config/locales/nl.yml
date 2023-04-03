@@ -130,8 +130,8 @@ nl:
       table:
         actions:
           apply_to_all:
-            one:
-            other:
+            one: Toepassen op alle 1 baan.
+            other: Toepassen op alle %{count} banen.
           confirm_destroy_all: Weet u zeker dat u de geselecteerde jobs wilt vernietigen?
           confirm_discard_all: Wilt u de geselecteerde jobs verwijderen?
           confirm_reschedule_all: Weet u zeker dat u de geselecteerde taken opnieuw wilt inplannen?
