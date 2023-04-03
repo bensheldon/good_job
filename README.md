@@ -537,6 +537,7 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
 - Jobs can be added to an existing batch. Jobs in a batch are enqueued and performed immediately/asynchronously. The final callback job will not be enqueued until `GoodJob::Batch#enqueue` is called.
 
     ```ruby
+    batch = GoodJob::Batch.new 
     batch = GoodJob::Batch.add do
       10.times { MyJob.perform_later }
     end
