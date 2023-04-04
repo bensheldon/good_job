@@ -114,7 +114,7 @@ RSpec.describe GoodJob::Adapter do
       expect(result).to eq 2
 
       provider_job_ids = active_jobs.map(&:provider_job_id)
-      expect(provider_job_ids).to all(be_present)
+      expect(provider_job_ids).to all be_present
     end
 
     context 'when a job fails to enqueue' do
@@ -128,9 +128,21 @@ RSpec.describe GoodJob::Adapter do
         result = adapter.enqueue_all(active_jobs)
         expect(result).to eq 1
 
-        provider_job_ids = active_jobs.map(&:provider_job_id)
-        expect(provider_job_ids).to include(nil)
+        expect(active_jobs.map(&:provider_job_id)).to eq [active_jobs.first.provider_job_id, nil]
         expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default', count: 1 })
+      end
+
+      it 'sets successfully_enqueued, if Rails supports it' do
+        allow(GoodJob::Execution).to receive(:insert_all).and_wrap_original do |original_method, *args|
+          attributes, kwargs = *args
+          original_method.call(attributes[0, 1], **kwargs) #  pretend only the first item is successfully inserted
+        end
+
+        active_jobs = [ExampleJob.new, ExampleJob.new]
+        result = adapter.enqueue_all(active_jobs)
+        expect(result).to eq 1
+
+        expect(active_jobs.map(&:successfully_enqueued?)).to eq [true, false] if ActiveJob::Base.method_defined?(:successfully_enqueued?)
       end
     end
 
