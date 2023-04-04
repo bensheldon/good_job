@@ -108,10 +108,10 @@ module GoodJob # :nodoc:
         configured_job = job_class.constantize.set(set_value)
         I18n.with_locale(I18n.default_locale) do
           kwargs_value.present? ? configured_job.perform_later(*args_value, **kwargs_value) : configured_job.perform_later(*args_value)
+        rescue ActiveRecord::RecordNotUnique # only raised in Rails < v7.0; Rails 7.0+ uses ActiveJob::EnqueueError
+          false
         end
       end
-    rescue ActiveRecord::RecordNotUnique
-      false
     end
 
     def last_job

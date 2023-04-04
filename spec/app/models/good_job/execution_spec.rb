@@ -54,6 +54,23 @@ RSpec.describe GoodJob::Execution do
       locked_execution.advisory_unlock
     end
 
+    context 'when there are cron enqueue errors' do
+      it 'raises ActiveRecord::RecordNotUnique or ActiveJob::EnqueueError if available' do
+        GoodJob::CurrentThread.within do |current_thread|
+          current_thread.cron_at = Time.zone.now.at_midnight
+          current_thread.cron_key = 'test'
+
+          expect(described_class.enqueue(TestJob.new)).to be_a described_class
+
+          if ActiveJob.const_defined?(:EnqueueError)
+            expect { described_class.enqueue(TestJob.new) }.to raise_error(ActiveJob::EnqueueError)
+          else
+            expect { described_class.enqueue(TestJob.new) }.to raise_error(ActiveRecord::RecordNotUnique)
+          end
+        end
+      end
+    end
+
     describe 'deprecation of higher is higher priority order, change to smaller is higher priority' do
       before { allow(ActiveSupport::Deprecation).to receive(:warn) }
 

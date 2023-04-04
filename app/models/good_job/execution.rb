@@ -303,9 +303,18 @@ module GoodJob
         execution.create_with_advisory_lock = create_with_advisory_lock
         instrument_payload[:execution] = execution
 
-        execution.save!
-        active_job.provider_job_id = execution.id
-        CurrentThread.execution.retried_good_job_id = execution.id if CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
+        begin
+          execution.save!
+
+          active_job.provider_job_id = execution.id
+          CurrentThread.execution.retried_good_job_id = execution.id if CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
+        rescue ActiveRecord::RecordNotUnique
+          if CurrentThread.cron_at && defined?(ActiveJob::EnqueueError) # rubocop:disable Style/GuardClause
+            raise(ActiveJob::EnqueueError, "Cron job execution.cron_key has already been enqueued.")
+          else
+            raise
+          end
+        end
 
         execution
       end

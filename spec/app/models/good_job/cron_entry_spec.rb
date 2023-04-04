@@ -106,6 +106,14 @@ describe GoodJob::CronEntry do
       I18n.default_locale = :en
     end
 
+    it 'handles job errors if the job has already been inserted' do
+      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+      cron_at = Time.zone.now.at_midnight
+
+      expect(entry.enqueue(cron_at)).to be_a TestJob
+      expect(entry.enqueue(cron_at)).to be false
+    end
+
     describe 'job execution' do
       it 'executes the job properly' do
         perform_enqueued_jobs do
