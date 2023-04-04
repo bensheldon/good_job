@@ -5,11 +5,16 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = false
 
   config.before(:suite) do
-    ActiveRecord::Tasks::DatabaseTasks.truncate_all
+    ApplicationRecord.connection_pool.with_connection do |connection|
+      connection.truncate_tables(*connection.tables)
+    end
   end
 
   config.around do |example|
     example.run
-    ActiveRecord::Tasks::DatabaseTasks.truncate_all
+
+    ApplicationRecord.connection_pool.with_connection do |connection|
+      connection.truncate_tables(*connection.tables)
+    end
   end
 end
