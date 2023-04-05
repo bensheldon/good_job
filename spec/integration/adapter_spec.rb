@@ -36,6 +36,18 @@ RSpec.describe 'Adapter Integration' do
         expect(enqueued_job.provider_job_id).to eq execution.id
       end
 
+      it 'assigns successfully_enqueued' do
+        ok_job = TestJob.perform_later
+        expect { ok_job.enqueue }.not_to raise_error
+        expect(ok_job.successfully_enqueued?).to be true if ok_job.respond_to?(:successfully_enqueued?)
+
+        allow(TestJob.queue_adapter).to receive(:enqueue).and_raise(StandardError)
+
+        bad_job = TestJob.new
+        expect { bad_job.enqueue }.to raise_error(StandardError)
+        expect(bad_job.successfully_enqueued?).to be false if bad_job.respond_to?(:successfully_enqueued?)
+      end
+
       it 'without a scheduled time' do
         expect do
           TestJob.perform_later('first', 'second', keyword_arg: 'keyword_arg')
