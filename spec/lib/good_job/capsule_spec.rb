@@ -24,7 +24,7 @@ describe GoodJob::Capsule do
       capsule = described_class.new
       Array.new(100) { Thread.new { capsule.start } }.each(&:join)
       capsule.shutdown
-      expect(GoodJob::Scheduler.instances.size).to eq 1
+      expect(GoodJob::Scheduler.instances.size).to eq(1), "Found more than 1 scheduler instance: #{GoodJob::Scheduler.instances.map(&:name).join(", ")}"
     end
   end
 

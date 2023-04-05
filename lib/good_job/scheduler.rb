@@ -76,6 +76,12 @@ module GoodJob # :nodoc:
 
       self.class.instances << self
 
+      @id = SecureRandom.uuid
+
+      source = ActiveSupport::BacktraceCleaner.new.clean(caller.lazy.reject { |line| line.include? File.expand_path(File.dirname(__FILE__)) }).first
+      puts "\nCreated GoodJob::Scheduler `#{@id}`"
+      puts  "↳ #{source}"
+
       @performer = performer
 
       @max_cache = max_cache || 0
@@ -84,7 +90,7 @@ module GoodJob # :nodoc:
         @executor_options[:max_threads] = max_threads
         @executor_options[:max_queue] = max_threads
       end
-      @name = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@executor_options[:max_threads]})"
+      @name = "GoodJob::Scheduler(id=#{@id} queues=#{@performer.name} max_threads=#{@executor_options[:max_threads]})"
       @executor_options[:name] = name
 
       @cleanup_tracker = CleanupTracker.new(cleanup_interval_seconds: cleanup_interval_seconds, cleanup_interval_jobs: cleanup_interval_jobs)

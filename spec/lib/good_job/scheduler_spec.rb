@@ -10,8 +10,9 @@ RSpec.describe GoodJob::Scheduler do
 
   describe 'name' do
     it 'is human readable and contains configuration values' do
+      allow(SecureRandom).to receive(:uuid).and_return('1234')
       scheduler = described_class.new(performer)
-      expect(scheduler.name).to eq('GoodJob::Scheduler(queues= max_threads=5)')
+      expect(scheduler.name).to eq("GoodJob::Scheduler(id=1234 queues= max_threads=5)")
     end
   end
 
