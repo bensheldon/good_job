@@ -7,17 +7,18 @@ RSpec.describe GoodJob::CLI do
   before do
     stub_const 'GoodJob::CLI::RAILS_ENVIRONMENT_RB', File.expand_path("spec/test_app/config/environment.rb")
     allow(GoodJob).to receive(:configuration).and_return(GoodJob::Configuration.new({}))
-    allow(GoodJob::Capsule).to receive(:new).and_return capsule_mock
+    allow(GoodJob).to receive(:capsule).and_return capsule_mock
   end
 
   describe '#start' do
-    it 'initializes a capsule' do
+    it 'starts and stops a capsule' do
       allow(Kernel).to receive(:loop)
 
       cli = described_class.new([], {}, {})
       cli.start
 
-      expect(GoodJob::Capsule).to have_received(:new)
+      expect(capsule_mock).to have_received(:start)
+      expect(capsule_mock).to have_received(:shutdown)
     end
 
     it 'can gracefully shut down on INT signal' do
@@ -30,7 +31,6 @@ RSpec.describe GoodJob::CLI do
 
       sleep_until { cli_thread.fulfilled? }
 
-      expect(GoodJob::Capsule).to have_received(:new)
       expect(capsule_mock).to have_received(:shutdown)
     end
 

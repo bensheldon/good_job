@@ -27,7 +27,7 @@ describe GoodJob do
 
   describe '.restart' do
     it 'does nothing when there are no capsule instances' do
-      expect(GoodJob::Capsule.instances).to be_empty
+      GoodJob::Capsule.instances.clear
       expect { described_class.restart }.not_to change(described_class, :shutdown?).from(true)
     end
 

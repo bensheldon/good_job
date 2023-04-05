@@ -92,10 +92,10 @@ module GoodJob
       set_up_application!
       GoodJob.configuration.options.merge!(options.symbolize_keys)
       configuration = GoodJob.configuration
+      capsule = GoodJob.capsule
 
       Daemon.new(pidfile: configuration.pidfile).daemonize if configuration.daemonize?
 
-      capsule = GoodJob::Capsule.new
       capsule.start
 
       if configuration.probe_port

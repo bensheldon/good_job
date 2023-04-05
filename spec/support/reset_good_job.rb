@@ -49,6 +49,10 @@ RSpec.configure do |config|
     expect(GoodJob::Capsule.instances).to all be_shutdown
     GoodJob::Capsule.instances.clear
 
+    # always make sure there is a capsule; unstub it first if necessary
+    RSpec::Mocks.space.proxy_for(GoodJob::Capsule).reset
+    GoodJob.capsule = GoodJob::Capsule.new
+
     expect(PgLock.current_database.advisory_lock.owns.count).to eq(0), "Existing owned advisory locks AFTER test run"
 
     other_locks = PgLock.current_database.advisory_lock.others
