@@ -123,7 +123,7 @@ describe 'Jobs', js: true do
           accept_confirm { click_on 'Retry job' }
         end
         expect(page).to have_content "Job has been retried"
-      end.to change { discarded_job.executions.reload.size }.by(1)
+      end.to change { discarded_job.reload.status }.from(:discarded).to(:queued)
     end
 
     it 'can discard jobs' do

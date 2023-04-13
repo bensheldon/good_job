@@ -30,6 +30,7 @@ module GoodJob
 
     belongs_to :batch, class_name: 'GoodJob::BatchRecord', inverse_of: :jobs, optional: true
     has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
+    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', inverse_of: :job, dependent: :delete_all
 
     # Only the most-recent unretried execution represents a "Job"
     default_scope { where(retried_good_job_id: nil) }
@@ -191,9 +192,10 @@ module GoodJob
 
           execution.class.transaction(joinable: false, requires_new: true) do
             new_active_job = active_job.retry_job(wait: 0, error: execution.error)
-            execution.save
+            execution.save!
           end
         end
+
         new_active_job
       end
     end
@@ -213,7 +215,7 @@ module GoodJob
         update_execution = proc do
           execution.update(
             finished_at: Time.current,
-            error: [job_error.class, GoodJob::Execution::ERROR_MESSAGE_SEPARATOR, job_error.message].join
+            error: GoodJob::Execution.format_error(job_error)
           )
         end
 

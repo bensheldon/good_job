@@ -3,6 +3,8 @@ require 'rails_helper'
 
 RSpec.describe GoodJob::Execution do
   before do
+    allow(described_class).to receive(:discrete_support?).and_return(false)
+
     stub_const "RUN_JOBS", Concurrent::Array.new
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       self.queue_name = 'test'
@@ -618,6 +620,66 @@ RSpec.describe GoodJob::Execution do
               finished_at: within(1.second).of(Time.current)
             )
           end
+        end
+      end
+    end
+
+    context 'when Discrete' do
+      before do
+        ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+        allow(described_class).to receive(:discrete_support?).and_return(true)
+        good_job.update!(is_discrete: true)
+      end
+
+      it 'creates a DiscreteExecution record' do
+        good_job.perform
+
+        dexecution = good_job.discrete_executions.first
+        expect(dexecution).to be_present
+        expect(dexecution).to have_attributes(
+          active_job_id: good_job.active_job_id,
+          created_at: good_job.performed_at,
+          perform_expected_at: good_job.scheduled_at || good_job.created_at,
+          finished_at: within(1.second).of(Time.current),
+          error: nil,
+          serialized_params: good_job.serialized_params
+        )
+      end
+
+      context 'when ActiveJob rescues an error' do
+        let(:active_job) { TestJob.new("a string", raise_error: true) }
+        let!(:good_job) { described_class.enqueue(active_job) }
+
+        before do
+          allow(described_class).to receive(:discrete_support?).and_return(true)
+          allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+          TestJob.retry_on(StandardError, wait: 1.hour, attempts: 2) { nil }
+          good_job.update!(is_discrete: true)
+        end
+
+        it 'updates the existing Execution/Job record instead of creating a new one' do
+          expect { good_job.perform }
+            .to not_change(described_class, :count)
+            .and change { good_job.reload.serialized_params["executions"] }.by(1)
+            .and not_change { good_job.reload.id }
+            .and not_change { described_class.count }
+
+          expect(good_job).to have_attributes(
+            error: "TestJob::ExpectedError: Raised expected error",
+            created_at: within(1.second).of(Time.current),
+            performed_at: nil,
+            finished_at: nil,
+            scheduled_at: within(10.minutes).of(1.hour.from_now) # interval because of retry jitter
+          )
+          expect(GoodJob::DiscreteExecution.count).to eq(1)
+          discrete_execution = good_job.discrete_executions.first
+          expect(discrete_execution).to have_attributes(
+            active_job_id: good_job.active_job_id,
+            error: "TestJob::ExpectedError: Raised expected error",
+            created_at: within(1.second).of(Time.current),
+            perform_expected_at: within(1.second).of(Time.current),
+            finished_at: within(1.second).of(Time.current)
+          )
         end
       end
     end

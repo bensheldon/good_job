@@ -170,19 +170,31 @@ module GoodJob
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
       old_jobs = GoodJob::Job.where('finished_at <= ?', timestamp)
       old_jobs = old_jobs.succeeded unless include_discarded
+
+      deleted_discrete_executions_count = if GoodJob::DiscreteExecution.migrated?
+                                            GoodJob::DiscreteExecution.where(job: old_jobs).delete_all
+                                          else
+                                            0
+                                          end
+
       deleted_executions_count = GoodJob::Execution.where(job: old_jobs).delete_all
 
-      if GoodJob::BatchRecord.migrated?
-        old_batches = GoodJob::BatchRecord.where('finished_at <= ?', timestamp)
-        old_batches = old_batches.succeeded unless include_discarded
-        deleted_batches_count = old_batches.delete_all
-      else
-        deleted_batches_count = 0
-      end
+      deleted_batches_count = if GoodJob::BatchRecord.migrated?
+                                old_batches = GoodJob::BatchRecord.where('finished_at <= ?', timestamp)
+                                old_batches = old_batches.succeeded unless include_discarded
+                                old_batches.delete_all
+                              else
+                                0
+                              end
 
-      payload[:destroyed_executions_count] = deleted_executions_count
       payload[:destroyed_batches_count] = deleted_batches_count
-      payload[:destroyed_records_count] = deleted_executions_count + deleted_batches_count
+      payload[:destroyed_discrete_executions_count] = deleted_discrete_executions_count
+      payload[:destroyed_executions_count] = deleted_executions_count
+
+      destroyed_records_count = deleted_batches_count + deleted_discrete_executions_count + deleted_executions_count
+      payload[:destroyed_records_count] = destroyed_records_count
+
+      destroyed_records_count
     end
   end
 

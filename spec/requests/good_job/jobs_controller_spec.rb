@@ -92,19 +92,22 @@ describe GoodJob::JobsController do
     describe 'mass_action=retry' do
       before do
         job.update(error: "Error message")
+        job.discrete_executions.first.update(error: "Error message")
       end
 
       it 'retries the job' do
-        put good_job.mass_update_jobs_path, params: {
-          mass_action: 'retry',
-          job_ids: [job.id],
-        }
+        expect do
+          put good_job.mass_update_jobs_path, params: {
+            mass_action: 'retry',
+            job_ids: [job.id],
+          }
+        end.to change { job.reload.status }.from(:discarded).to(:succeeded)
 
         expect(response).to have_http_status(:found)
         expect(flash[:notice]).to eq('Successfully retried 1 job')
 
         job.reload
-        expect(job.executions.count).to eq 2
+        expect(job.discrete_executions.count).to eq 2
       end
     end
 
