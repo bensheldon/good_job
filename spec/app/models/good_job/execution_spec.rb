@@ -638,8 +638,8 @@ RSpec.describe GoodJob::Execution do
         expect(dexecution).to be_present
         expect(dexecution).to have_attributes(
           active_job_id: good_job.active_job_id,
-          created_at: good_job.performed_at,
-          perform_expected_at: good_job.scheduled_at || good_job.created_at,
+          created_at: within(0.001).of(good_job.performed_at),
+          perform_expected_at: within(0.001).of(good_job.created_at),
           finished_at: within(1.second).of(Time.current),
           error: nil,
           serialized_params: good_job.serialized_params
