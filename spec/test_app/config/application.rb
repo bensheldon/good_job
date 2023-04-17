@@ -17,6 +17,8 @@ module TestApp
     # the framework and any gems in your application.
     #
 
+    config.active_job.queue_adapter = :good_job
+
     # config.middleware.insert_before Rack::Sendfile, ActionDispatch::DebugLocks
     config.log_level = :debug
 

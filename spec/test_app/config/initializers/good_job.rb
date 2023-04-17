@@ -13,7 +13,6 @@ end
 
 case Rails.env
 when 'development'
-  ActiveJob::Base.queue_adapter = :good_job
   GoodJob.on_thread_error = -> (error) { Rails.logger.warn("#{error}\n#{error.backtrace}") }
 
   Rails.application.configure do
@@ -44,8 +43,6 @@ when 'development'
 when 'test'
   # test
 when 'demo'
-  ActiveJob::Base.queue_adapter = :good_job
-
   Rails.application.configure do
     config.good_job.execution_mode = :async
     config.good_job.poll_interval = 30
@@ -81,5 +78,7 @@ when 'demo'
     }
   end
 when 'production'
-  ActiveJob::Base.queue_adapter = :good_job
+  # production
+else
+  raise "Unconfigured environment for GoodJob"
 end
