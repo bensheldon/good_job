@@ -1,5 +1,33 @@
 # Changelog
 
+## [v3.15.1](https://github.com/bensheldon/good_job/tree/v3.15.1) (2023-04-17)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.0...v3.15.1)
+
+**Implemented enhancements:**
+
+- Support for Batches? [\#417](https://github.com/bensheldon/good_job/issues/417)
+
+**Fixed bugs:**
+
+- Fix setting of locale via routes `mount ... defaults: { locale: :en }` [\#923](https://github.com/bensheldon/good_job/pull/923) ([bensheldon](https://github.com/bensheldon))
+- Set `successfully_enqueued?` when using `perform_all_later` [\#917](https://github.com/bensheldon/good_job/pull/917) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- GoodJob has pending database migrations after v2 -\> v3  [\#920](https://github.com/bensheldon/good_job/issues/920)
+- Batch docs in README suggest `Batch#add` is a class method, but it's not [\#912](https://github.com/bensheldon/good_job/issues/912)
+- How do I clear queue during tests? [\#887](https://github.com/bensheldon/good_job/issues/887)
+- Implement batch functionality [\#691](https://github.com/bensheldon/good_job/issues/691)
+
+**Merged pull requests:**
+
+- In tests, directly use `connection.truncate_tables` instead of  `ActiveRecord::Tasks::DatabaseTasks.truncate_all` [\#918](https://github.com/bensheldon/good_job/pull/918) ([bensheldon](https://github.com/bensheldon))
+- Use `GoodJob.capsule` in CLI instead of creating a new Capsule [\#916](https://github.com/bensheldon/good_job/pull/916) ([bensheldon](https://github.com/bensheldon))
+- Fix lint: missing fr and nl translations; readme whitespace [\#914](https://github.com/bensheldon/good_job/pull/914) ([bensheldon](https://github.com/bensheldon))
+- Switches from Chrome to Chromium to support Apple M1/Arm CPUs [\#910](https://github.com/bensheldon/good_job/pull/910) ([ckdake](https://github.com/ckdake))
+- Bump erb\_lint from 0.3.1 to 0.4.0 [\#906](https://github.com/bensheldon/good_job/pull/906) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.15.0](https://github.com/bensheldon/good_job/tree/v3.15.0) (2023-04-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.14.2...v3.15.0)
