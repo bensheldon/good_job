@@ -162,22 +162,27 @@ module GoodJob
   # destroy old records and preserve space in your database.
   # @param older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
   # @return [Integer] Number of job execution records and batches that were destroyed.
-  def self.cleanup_preserved_jobs(older_than: nil)
+  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000)
     older_than ||= GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
     include_discarded = GoodJob.configuration.cleanup_discarded_jobs?
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
-      old_jobs = GoodJob::Job.where('finished_at <= ?', timestamp)
-      old_jobs = old_jobs.succeeded unless include_discarded
-      deleted_executions_count = GoodJob::Execution.where(job: old_jobs).delete_all
+      deleted_executions_count = 0
+      deleted_batches_count = 0
+
+      jobs_query = GoodJob::Job.where('finished_at <= ?', timestamp)
+      jobs_query = jobs_query.succeeded unless include_discarded
+      jobs_query.in_batches(of: in_batches_of).each do |relation|
+        deleted_executions_count += GoodJob::Execution.where(job: relation).delete_all
+      end
 
       if GoodJob::BatchRecord.migrated?
-        old_batches = GoodJob::BatchRecord.where('finished_at <= ?', timestamp)
-        old_batches = old_batches.succeeded unless include_discarded
-        deleted_batches_count = old_batches.delete_all
-      else
-        deleted_batches_count = 0
+        batches_query = GoodJob::BatchRecord.where('finished_at <= ?', timestamp)
+        batches_query = batches_query.succeeded unless include_discarded
+        batches_query.in_batches(of: in_batches_of).each do |relation|
+          deleted_batches_count += relation.delete_all
+        end
       end
 
       payload[:destroyed_executions_count] = deleted_executions_count
