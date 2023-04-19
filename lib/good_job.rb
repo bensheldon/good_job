@@ -171,17 +171,23 @@ module GoodJob
       deleted_executions_count = 0
       deleted_batches_count = 0
 
-      jobs_query = GoodJob::Job.where('finished_at <= ?', timestamp)
+      jobs_query = GoodJob::Job.where('finished_at <= ?', timestamp).order(finished_at: :asc).limit(in_batches_of)
       jobs_query = jobs_query.succeeded unless include_discarded
-      jobs_query.in_batches(of: in_batches_of).each do |relation|
-        deleted_executions_count += GoodJob::Execution.where(job: relation).delete_all
+      loop do
+        deleted = GoodJob::Execution.where(job: jobs_query).delete_all
+        break if deleted.zero?
+
+        deleted_executions_count += deleted
       end
 
       if GoodJob::BatchRecord.migrated?
-        batches_query = GoodJob::BatchRecord.where('finished_at <= ?', timestamp)
+        batches_query = GoodJob::BatchRecord.where('finished_at <= ?', timestamp).limit(in_batches_of)
         batches_query = batches_query.succeeded unless include_discarded
-        batches_query.in_batches(of: in_batches_of).each do |relation|
-          deleted_batches_count += relation.delete_all
+        loop do
+          deleted = batches_query.delete_all
+          break if deleted.zero?
+
+          deleted_batches_count += deleted
         end
       end
 
