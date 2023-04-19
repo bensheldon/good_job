@@ -46,7 +46,7 @@ describe GoodJob do
     let!(:old_batch) { GoodJob::BatchRecord.create!(finished_at: 15.days.ago) }
 
     it 'deletes finished jobs' do
-      destroyed_records_count = described_class.cleanup_preserved_jobs
+      destroyed_records_count = described_class.cleanup_preserved_jobs(in_batches_of: 1)
 
       expect(destroyed_records_count).to eq 4
 
