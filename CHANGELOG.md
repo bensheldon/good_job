@@ -1,5 +1,19 @@
 # Changelog
 
+## [v3.15.2](https://github.com/bensheldon/good_job/tree/v3.15.2) (2023-04-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.1...v3.15.2)
+
+**Closed issues:**
+
+- Cleaning up preserved jobs giving me timeout [\#933](https://github.com/bensheldon/good_job/issues/933)
+- uninitialized constant GoodJob::ActiveJobJob \(NameError\) [\#932](https://github.com/bensheldon/good_job/issues/932)
+
+**Merged pull requests:**
+
+- Use batched queries in `GoodJob::self.cleanup_preserved_jobs` [\#934](https://github.com/bensheldon/good_job/pull/934) ([bensheldon](https://github.com/bensheldon))
+- Bump nokogiri from 1.14.2 to 1.14.3 [\#926](https://github.com/bensheldon/good_job/pull/926) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.15.1](https://github.com/bensheldon/good_job/tree/v3.15.1) (2023-04-17)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.0...v3.15.1)
