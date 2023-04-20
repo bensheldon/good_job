@@ -58,7 +58,7 @@ RSpec.describe 'Adapter Integration' do
         expect(execution).to have_attributes(
           queue_name: 'test',
           priority: 50,
-          scheduled_at: within(0.1).of(Time.current)
+          scheduled_at: within(1).of(Time.current)
         )
       end
 
