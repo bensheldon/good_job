@@ -35,7 +35,9 @@ module GoodJob
     end
 
     def current_locale
-      if params[:locale]
+      if request.GET['locale']
+        request.GET['locale']
+      elsif params[:locale]
         params[:locale]
       elsif good_job_available_locales.exclude?(I18n.default_locale) && I18n.available_locales.include?(:en)
         :en
