@@ -314,6 +314,8 @@ module GoodJob
           if current_execution.discrete?
             execution = current_execution
             execution.assign_attributes(enqueue_args(active_job, { scheduled_at: scheduled_at }))
+            execution.scheduled_at ||= Time.current
+            execution.performed_at = nil
             execution.finished_at = nil
           else
             execution = build_for_enqueue(active_job, { scheduled_at: scheduled_at })
@@ -376,8 +378,8 @@ module GoodJob
           if discrete?
             transaction do
               now = Time.current
-              discrete_execution = discrete_executions.create!(serialized_params: serialized_params, perform_expected_at: scheduled_at || created_at, created_at: now)
-              update!(performed_at: now, executions_count: (executions_count || 0) + 1)
+              discrete_execution = discrete_executions.create!(serialized_params: serialized_params, scheduled_at: (scheduled_at || created_at), created_at: now)
+              update!(performed_at: now, executions_count: ((executions_count || 0) + 1))
             end
           else
             update!(performed_at: Time.current)
@@ -419,8 +421,7 @@ module GoodJob
           if discrete_execution
             transaction do
               discrete_execution.update!(finished_at: Time.current)
-              self.performed_at = nil # TODO: will this break something to unset this?
-              save!
+              update!(performed_at: nil, finished_at: nil, retried_good_job_id: nil)
             end
           else
             save!

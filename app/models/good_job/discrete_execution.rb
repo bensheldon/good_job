@@ -17,19 +17,16 @@ module GoodJob # :nodoc:
 
     # Time between when this job was expected to run and when it started running
     def queue_latency
-      now = Time.zone.now
-      actual_start = performed_at || finished_at || now
-
-      actual_start - perform_expected_at unless perform_expected_at >= now
+      created_at - scheduled_at
     end
 
     # Time between when this job started and finished
     def runtime_latency
-      (finished_at || Time.zone.now) - performed_at if performed_at
+      (finished_at || Time.current) - performed_at if performed_at
     end
 
     def last_status_at
-      finished_at || performed_at || perform_expected_at || created_at
+      finished_at || created_at
     end
 
     def status
@@ -41,16 +38,8 @@ module GoodJob # :nodoc:
         else
           :succeeded
         end
-      elsif (perform_expected_at || created_at) > DateTime.current
-        if serialized_params.fetch('executions', 0) > 1
-          :retried
-        else
-          :scheduled
-        end
-      elsif performed_at.present?
-        :running
       else
-        :queued
+        :running
       end
     end
 

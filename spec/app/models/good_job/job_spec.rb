@@ -22,7 +22,7 @@ RSpec.describe GoodJob::Job do
       }
     ).tap do |job|
       job.discrete_executions.create!(
-        perform_expected_at: 1.minute.ago,
+        scheduled_at: 1.minute.ago,
         created_at: 1.minute.ago,
         finished_at: 1.minute.ago,
         error: "TestJob::Error: TestJob::Error"

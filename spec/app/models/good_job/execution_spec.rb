@@ -666,15 +666,20 @@ RSpec.describe GoodJob::Execution do
         good_job.update!(is_discrete: true)
       end
 
-      it 'creates a DiscreteExecution record' do
+      it 'updates the Execution record and creates a DiscreteExecution record' do
         good_job.perform
+
+        expect(good_job.reload).to have_attributes(
+          executions_count: 1,
+          finished_at: within(1.second).of(Time.current)
+        )
 
         dexecution = good_job.discrete_executions.first
         expect(dexecution).to be_present
         expect(dexecution).to have_attributes(
           active_job_id: good_job.active_job_id,
           created_at: within(0.001).of(good_job.performed_at),
-          perform_expected_at: within(0.001).of(good_job.created_at),
+          scheduled_at: within(0.001).of(good_job.created_at),
           finished_at: within(1.second).of(Time.current),
           error: nil,
           serialized_params: good_job.serialized_params
@@ -696,10 +701,10 @@ RSpec.describe GoodJob::Execution do
           expect { good_job.perform }
             .to not_change(described_class, :count)
             .and change { good_job.reload.serialized_params["executions"] }.by(1)
-                                                                           .and not_change { good_job.reload.id }
+            .and not_change { good_job.reload.id }
             .and not_change { described_class.count }
 
-          expect(good_job).to have_attributes(
+          expect(good_job.reload).to have_attributes(
             error: "TestJob::ExpectedError: Raised expected error",
             created_at: within(1.second).of(Time.current),
             performed_at: nil,
@@ -712,7 +717,7 @@ RSpec.describe GoodJob::Execution do
             active_job_id: good_job.active_job_id,
             error: "TestJob::ExpectedError: Raised expected error",
             created_at: within(1.second).of(Time.current),
-            perform_expected_at: within(1.second).of(Time.current),
+            scheduled_at: within(1.second).of(Time.current),
             finished_at: within(1.second).of(Time.current)
           )
         end

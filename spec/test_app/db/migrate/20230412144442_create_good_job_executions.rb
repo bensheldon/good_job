@@ -12,9 +12,9 @@ class CreateGoodJobExecutions < ActiveRecord::Migration[7.0]
     create_table :good_job_executions, id: :uuid do |t|
       t.timestamps
 
-      t.uuid :active_job_id
+      t.uuid :active_job_id, null: false
       t.jsonb :serialized_params
-      t.datetime :perform_expected_at
+      t.datetime :scheduled_at
       t.datetime :finished_at
       t.text :error
 

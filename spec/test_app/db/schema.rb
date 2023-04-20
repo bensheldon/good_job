@@ -33,9 +33,9 @@ ActiveRecord::Schema.define(version: 2023_04_12_144442) do
   create_table "good_job_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "active_job_id"
+    t.uuid "active_job_id", null: false
     t.jsonb "serialized_params"
-    t.datetime "perform_expected_at"
+    t.datetime "scheduled_at"
     t.datetime "finished_at"
     t.text "error"
     t.index ["active_job_id", "created_at"], name: "index_good_job_executions_on_active_job_id_and_created_at"
