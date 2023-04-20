@@ -23,6 +23,41 @@ RSpec.describe GoodJob::Execution do
   describe '.enqueue' do
     let(:active_job) { TestJob.new }
 
+    context 'when discrete' do
+      before do
+        allow(described_class).to receive(:discrete_support?).and_return(true)
+      end
+
+      it 'assigns is discrete, id, scheduled_at' do
+        expect { described_class.enqueue(active_job) }.to change(described_class, :count).by(1)
+
+        execution = described_class.last
+        expect(execution).to have_attributes(
+          is_discrete: true,
+          id: active_job.job_id,
+          active_job_id: active_job.job_id,
+          created_at: execution.scheduled_at,
+          scheduled_at: execution.created_at
+        )
+      end
+    end
+
+    context 'when NOT discrete' do
+      before { allow(described_class).to receive(:discrete_support?).and_return(false) }
+
+      it 'does not assign id, scheduled_at' do
+        expect { described_class.enqueue(active_job) }.to change(described_class, :count).by(1)
+
+        execution = described_class.last
+        expect(execution.id).not_to eq(active_job.job_id)
+        expect(execution).to have_attributes(
+          is_discrete: nil,
+          active_job_id: active_job.job_id,
+          scheduled_at: nil
+        )
+      end
+    end
+
     it 'creates a new GoodJob record' do
       execution = nil
 
@@ -661,7 +696,7 @@ RSpec.describe GoodJob::Execution do
           expect { good_job.perform }
             .to not_change(described_class, :count)
             .and change { good_job.reload.serialized_params["executions"] }.by(1)
-            .and not_change { good_job.reload.id }
+                                                                           .and not_change { good_job.reload.id }
             .and not_change { described_class.count }
 
           expect(good_job).to have_attributes(

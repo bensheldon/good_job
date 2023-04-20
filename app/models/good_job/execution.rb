@@ -74,7 +74,7 @@ module GoodJob
     has_many :discrete_executions, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: 'active_job_id', inverse_of: :execution # rubocop:disable Rails/HasManyOrHasOneDependent
 
     after_destroy lambda {
-      discrete_executions.delete_all if discrete?
+      GoodJob::DiscreteExecution.where(active_job_id: active_job_id).delete_all if discrete? # TODO: move into association `dependent: :delete_all` after v4
       self.class.active_job_id(active_job_id).delete_all
     }, if: -> { @_destroy_job }
 
@@ -226,10 +226,7 @@ module GoodJob
         serialized_params: active_job.serialize,
         scheduled_at: active_job.scheduled_at,
       }
-      if discrete_support?
-        execution_args[:is_discrete] = true
-        execution_args[:executions_count] = 0
-      end
+
       execution_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
 
       reenqueued_current_execution = CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
@@ -313,22 +310,31 @@ module GoodJob
         current_execution = CurrentThread.execution
 
         retried = current_execution && current_execution.active_job_id == active_job.job_id
-        if retried && current_execution.discrete?
-          current_execution.assign_attributes(enqueue_args(active_job, { scheduled_at: scheduled_at }))
-          current_execution.finished_at = nil
-          current_execution.advisory_lock if create_with_advisory_lock
-          execution = current_execution
+        if retried
+          if current_execution.discrete?
+            execution = current_execution
+            execution.assign_attributes(enqueue_args(active_job, { scheduled_at: scheduled_at }))
+            execution.finished_at = nil
+          else
+            execution = build_for_enqueue(active_job, { scheduled_at: scheduled_at })
+          end
         else
           execution = build_for_enqueue(active_job, { scheduled_at: scheduled_at })
-          execution.is_discrete = nil if retried && discrete_support? && !current_execution.is_discrete?
-          execution.create_with_advisory_lock = create_with_advisory_lock
-
-          instrument_payload[:execution] = execution
-
-          execution.save!
-          CurrentThread.execution.retried_good_job_id = execution.id if retried
+          execution.make_discrete if discrete_support?
         end
 
+        if create_with_advisory_lock
+          if execution.persisted?
+            execution.advisory_lock
+          else
+            execution.create_with_advisory_lock = true
+          end
+        end
+
+        instrument_payload[:execution] = execution
+        execution.save!
+
+        CurrentThread.execution.retried_good_job_id = execution.id if retried && !CurrentThread.execution.discrete?
         active_job.provider_job_id = execution.id
         execution
       end
@@ -448,6 +454,16 @@ module GoodJob
     # @return [Boolean]
     def executable?
       self.class.unscoped.unfinished.owns_advisory_locked.exists?(id: id)
+    end
+
+    def make_discrete
+      self.is_discrete = true
+      self.id = active_job_id
+      self.executions_count ||= 0
+
+      current_time = Time.current
+      self.created_at ||= current_time
+      self.scheduled_at ||= current_time
     end
 
     # Build an ActiveJob instance and deserialize the arguments, using `#active_job_data`.

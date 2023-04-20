@@ -30,7 +30,11 @@ module GoodJob
 
     belongs_to :batch, class_name: 'GoodJob::BatchRecord', inverse_of: :jobs, optional: true
     has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
-    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', inverse_of: :job, dependent: :delete_all
+    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
+
+    after_destroy lambda {
+      GoodJob::DiscreteExecution.where(active_job_id: active_job_id).delete_all if discrete? # TODO: move into association `dependent: :delete_all` after v4
+    }
 
     # Only the most-recent unretried execution represents a "Job"
     default_scope { where(retried_good_job_id: nil) }

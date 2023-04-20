@@ -30,10 +30,10 @@ RSpec.describe GoodJob::ActiveJobExtensions::NotifyOptions do
     it 'can be overridden by set(good_job_notify: true)' do
       TestJob.good_job_notify = false
       TestJob.set(good_job_notify: true).perform_later
-      expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default' })
+      expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default', scheduled_at: within(0.1).of(Time.current) })
 
       GoodJob::Bulk.enqueue { TestJob.set(good_job_notify: true).perform_later }
-      expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default', count: 1 })
+      expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default', count: 1, scheduled_at: within(0.1).of(Time.current) })
     end
 
     it 'works for bulk enqueuing' do
