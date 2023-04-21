@@ -47,7 +47,7 @@ module GoodJob
     # The ActiveJob job class, as a string
     # @return [String]
     def job_class
-      serialized_params['job_class']
+      discrete? ? attributes['job_class'] : serialized_params['job_class']
     end
 
     def discrete?

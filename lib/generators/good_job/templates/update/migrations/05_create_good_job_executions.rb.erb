@@ -13,6 +13,8 @@ class CreateGoodJobExecutions < ActiveRecord::Migration<%= migration_version %>
       t.timestamps
 
       t.uuid :active_job_id, null: false
+      t.text :job_class
+      t.text :queue_name
       t.jsonb :serialized_params
       t.datetime :scheduled_at
       t.datetime :finished_at
@@ -24,6 +26,7 @@ class CreateGoodJobExecutions < ActiveRecord::Migration<%= migration_version %>
     change_table :good_jobs do |t|
       t.boolean :is_discrete
       t.integer :executions_count
+      t.text :job_class
     end
   end
 end

@@ -34,6 +34,8 @@ ActiveRecord::Schema.define(version: 2023_04_12_144442) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "active_job_id", null: false
+    t.text "job_class"
+    t.text "queue_name"
     t.jsonb "serialized_params"
     t.datetime "scheduled_at"
     t.datetime "finished_at"
@@ -74,6 +76,7 @@ ActiveRecord::Schema.define(version: 2023_04_12_144442) do
     t.uuid "batch_callback_id"
     t.boolean "is_discrete"
     t.integer "executions_count"
+    t.text "job_class"
     t.index ["active_job_id", "created_at"], name: "index_good_jobs_on_active_job_id_and_created_at"
     t.index ["active_job_id"], name: "index_good_jobs_on_active_job_id"
     t.index ["batch_callback_id"], name: "index_good_jobs_on_batch_callback_id", where: "(batch_callback_id IS NOT NULL)"

@@ -61,6 +61,8 @@ module GoodJob
     # Errored but will not be retried
     scope :discarded, -> { finished.where.not(error: nil) }
 
+    scope :unfinished_undiscrete, -> { where(finished_at: nil, retried_good_job_id: nil, is_discrete: [nil, false]) }
+
     # The job's ActiveJob UUID
     # @return [String]
     def id

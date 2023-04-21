@@ -678,6 +678,8 @@ RSpec.describe GoodJob::Execution do
         expect(dexecution).to be_present
         expect(dexecution).to have_attributes(
           active_job_id: good_job.active_job_id,
+          job_class: good_job.job_class,
+          queue_name: good_job.queue_name,
           created_at: within(0.001).of(good_job.performed_at),
           scheduled_at: within(0.001).of(good_job.created_at),
           finished_at: within(1.second).of(Time.current),

@@ -378,7 +378,13 @@ module GoodJob
           if discrete?
             transaction do
               now = Time.current
-              discrete_execution = discrete_executions.create!(serialized_params: serialized_params, scheduled_at: (scheduled_at || created_at), created_at: now)
+              discrete_execution = discrete_executions.create!(
+                job_class: job_class,
+                queue_name: queue_name,
+                serialized_params: serialized_params,
+                scheduled_at: (scheduled_at || created_at),
+                created_at: now
+              )
               update!(performed_at: now, executions_count: ((executions_count || 0) + 1))
             end
           else
@@ -460,6 +466,7 @@ module GoodJob
     def make_discrete
       self.is_discrete = true
       self.id = active_job_id
+      self.job_class = serialized_params['job_class']
       self.executions_count ||= 0
 
       current_time = Time.current
