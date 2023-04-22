@@ -7,6 +7,8 @@ Rails.application.configure do
   config.cache_classes = true
   config.eager_load = true
 
+  config.active_job.queue_adapter = :test
+
   # Raises error for missing translations.
   if Gem::Version.new(Rails.version) < Gem::Version.new('6.1')
     config.action_view.raise_on_missing_translations = true
