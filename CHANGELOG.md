@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.15.3](https://github.com/bensheldon/good_job/tree/v3.15.3) (2023-04-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.2...v3.15.3)
+
+**Merged pull requests:**
+
+- Eagerly autoload `ActiveJob::Base`; clean up framework deferred-loading logic to use nested `on_load` blocks [\#931](https://github.com/bensheldon/good_job/pull/931) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.15.2](https://github.com/bensheldon/good_job/tree/v3.15.2) (2023-04-19)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.1...v3.15.2)
