@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.15.4](https://github.com/bensheldon/good_job/tree/v3.15.4) (2023-04-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.3...v3.15.4)
+
+**Merged pull requests:**
+
+- Create "discrete" `good_job_executions` table to separate Job records from Execution records and have a 1-to-1 correspondence between `good_jobs` records and Active Job jobs [\#928](https://github.com/bensheldon/good_job/pull/928) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.15.3](https://github.com/bensheldon/good_job/tree/v3.15.3) (2023-04-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.2...v3.15.3)
