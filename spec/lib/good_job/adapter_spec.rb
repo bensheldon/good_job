@@ -129,7 +129,7 @@ RSpec.describe GoodJob::Adapter do
         expect(result).to eq 1
 
         expect(active_jobs.map(&:provider_job_id)).to eq [active_jobs.first.provider_job_id, nil]
-        expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default', count: 1 })
+        expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default', count: 1, scheduled_at: within(0.1).of(Time.current) })
       end
 
       it 'sets successfully_enqueued, if Rails supports it' do

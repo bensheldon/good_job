@@ -30,6 +30,11 @@ module GoodJob
 
     belongs_to :batch, class_name: 'GoodJob::BatchRecord', inverse_of: :jobs, optional: true
     has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
+    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
+
+    after_destroy lambda {
+      GoodJob::DiscreteExecution.where(active_job_id: active_job_id).delete_all if discrete? # TODO: move into association `dependent: :delete_all` after v4
+    }
 
     # Only the most-recent unretried execution represents a "Job"
     default_scope { where(retried_good_job_id: nil) }
@@ -55,6 +60,8 @@ module GoodJob
     scope :succeeded, -> { finished.where(error: nil) }
     # Errored but will not be retried
     scope :discarded, -> { finished.where.not(error: nil) }
+
+    scope :unfinished_undiscrete, -> { where(finished_at: nil, retried_good_job_id: nil, is_discrete: [nil, false]) }
 
     # The job's ActiveJob UUID
     # @return [String]
@@ -191,9 +198,10 @@ module GoodJob
 
           execution.class.transaction(joinable: false, requires_new: true) do
             new_active_job = active_job.retry_job(wait: 0, error: execution.error)
-            execution.save
+            execution.save!
           end
         end
+
         new_active_job
       end
     end
@@ -213,7 +221,7 @@ module GoodJob
         update_execution = proc do
           execution.update(
             finished_at: Time.current,
-            error: [job_error.class, GoodJob::Execution::ERROR_MESSAGE_SEPARATOR, job_error.message].join
+            error: GoodJob::Execution.format_error(job_error)
           )
         end
 

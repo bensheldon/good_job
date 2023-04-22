@@ -37,7 +37,7 @@ RSpec.describe 'Adapter Integration' do
       end
 
       it 'assigns successfully_enqueued' do
-        ok_job = TestJob.perform_later
+        ok_job = TestJob.new
         expect { ok_job.enqueue }.not_to raise_error
         expect(ok_job.successfully_enqueued?).to be true if ok_job.respond_to?(:successfully_enqueued?)
 
@@ -58,7 +58,7 @@ RSpec.describe 'Adapter Integration' do
         expect(execution).to have_attributes(
           queue_name: 'test',
           priority: 50,
-          scheduled_at: nil
+          scheduled_at: within(1).of(Time.current)
         )
       end
 

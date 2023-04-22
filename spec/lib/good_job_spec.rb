@@ -42,17 +42,20 @@ describe GoodJob do
     let!(:old_unfinished_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, scheduled_at: 15.days.ago, finished_at: nil) }
     let!(:old_finished_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago) }
     let!(:old_finished_job_execution) { GoodJob::Execution.create!(active_job_id: old_finished_job.active_job_id, retried_good_job_id: old_finished_job.id, finished_at: 16.days.ago) }
+    let!(:old_finished_job_discrete_execution) { GoodJob::DiscreteExecution.create!(active_job_id: old_finished_job.active_job_id, finished_at: 16.days.ago) }
     let!(:old_discarded_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago, error: "Error") }
     let!(:old_batch) { GoodJob::BatchRecord.create!(finished_at: 15.days.ago) }
 
     it 'deletes finished jobs' do
       destroyed_records_count = described_class.cleanup_preserved_jobs(in_batches_of: 1)
 
-      expect(destroyed_records_count).to eq 4
+      expect(destroyed_records_count).to eq 5
 
       expect { recent_job.reload }.not_to raise_error
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
@@ -60,12 +63,15 @@ describe GoodJob do
     it 'takes arguments' do
       destroyed_records_count = described_class.cleanup_preserved_jobs(older_than: 10.seconds)
 
-      expect(destroyed_records_count).to eq 5
+      expect(destroyed_records_count).to eq 6
 
       expect { recent_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
     it 'is instrumented' do
@@ -83,12 +89,15 @@ describe GoodJob do
       allow(described_class.configuration).to receive(:env).and_return ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_DISCARDED_JOBS' => 'false' })
       destroyed_records_count = described_class.cleanup_preserved_jobs
 
-      expect(destroyed_records_count).to eq 3
+      expect(destroyed_records_count).to eq 4
 
       expect { recent_job.reload }.not_to raise_error
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.not_to raise_error
+      expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
   end
 

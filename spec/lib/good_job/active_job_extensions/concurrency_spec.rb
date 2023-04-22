@@ -113,19 +113,21 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
 
       it "will error and retry jobs if concurrency is exceeded" do
-        TestJob.perform_later(name: "Alice")
+        active_job = TestJob.perform_later(name: "Alice")
 
         performer = GoodJob::JobPerformer.new('*')
         scheduler = GoodJob::Scheduler.new(performer, max_threads: 5)
         5.times { scheduler.create_thread }
 
         sleep_until(max: 10, increments_of: 0.5) do
-          GoodJob::Execution.where(concurrency_key: "Alice").finished.count >= 1
+          GoodJob::DiscreteExecution.where(active_job_id: active_job.job_id).finished.count >= 1
         end
         scheduler.shutdown
 
-        expect(GoodJob::Execution.count).to be >= 1
-        expect(GoodJob::Execution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
+        expect(GoodJob::Job.find_by(active_job_id: active_job.job_id).concurrency_key).to eq "Alice"
+
+        expect(GoodJob::DiscreteExecution.count).to be >= 1
+        expect(GoodJob::DiscreteExecution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
       end
 
       it 'is ignored with the job is executed via perform_now' do
@@ -153,17 +155,37 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         end)
       end
 
-      it 'preserves the key value across retries' do
-        TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
-        begin
-          GoodJob.perform_inline
-        rescue StandardError
-          nil
+      describe 'retries' do
+        it 'preserves the value' do
+          TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
+
+          begin
+            GoodJob.perform_inline
+          rescue StandardError
+            nil
+          end
+
+          expect(GoodJob::Execution.count).to eq 1
+          expect(GoodJob::Execution.first.concurrency_key).to be_present
+          expect(GoodJob::Job.first).not_to be_finished
         end
 
-        expect(GoodJob::Execution.count).to eq 2
-        first_execution, retried_execution = GoodJob::Execution.order(created_at: :asc).to_a
-        expect(retried_execution.concurrency_key).to eq first_execution.concurrency_key
+        context 'when not discrete' do
+          it 'preserves the key value across retries' do
+            TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
+            GoodJob::Job.first.update!(is_discrete: false)
+
+            begin
+              GoodJob.perform_inline
+            rescue StandardError
+              nil
+            end
+
+            expect(GoodJob::Execution.count).to eq 2
+            first_execution, retried_execution = GoodJob::Execution.order(created_at: :asc).to_a
+            expect(retried_execution.concurrency_key).to eq first_execution.concurrency_key
+          end
+        end
       end
     end
 

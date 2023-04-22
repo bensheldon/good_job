@@ -4,7 +4,7 @@ class ExampleJob < ApplicationJob
 
   TYPES = [
     SUCCESS_TYPE = 'success',
-    ERROR_ONCE_TYPE = 'error_once',
+      ERROR_ONCE_TYPE = 'error_once',
     ERROR_FIVE_TIMES_TYPE = 'error_five_times',
     DEAD_TYPE = 'dead',
     SLOW_TYPE = 'slow',

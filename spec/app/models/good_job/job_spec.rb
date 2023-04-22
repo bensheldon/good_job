@@ -2,23 +2,38 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Job do
-  subject(:job) { described_class.find(head_execution.active_job_id) }
+  let(:active_job_id) { SecureRandom.uuid }
 
-  before do
-    allow(GoodJob).to receive(:preserve_job_records).and_return(true)
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
-
-    stub_const 'TestJob', (Class.new(ActiveJob::Base) do
-      def perform(feline = nil, canine: nil)
-      end
-    end)
-    stub_const 'TestJob::Error', Class.new(StandardError)
+  let(:job) do
+    described_class.create!(
+      is_discrete: true,
+      active_job_id: active_job_id,
+      scheduled_at: 10.minutes.from_now,
+      queue_name: 'mice',
+      priority: 10,
+      serialized_params: {
+        'job_id' => active_job_id,
+        'job_class' => 'TestJob',
+        'executions' => 1,
+        'exception_executions' => { 'TestJob::Error' => 1 },
+        'queue_name' => 'mice',
+        'priority' => 10,
+        'arguments' => ['cat', { 'canine' => 'dog' }],
+      }
+    ).tap do |job|
+      job.discrete_executions.create!(
+        scheduled_at: 1.minute.ago,
+        created_at: 1.minute.ago,
+        finished_at: 1.minute.ago,
+        error: "TestJob::Error: TestJob::Error"
+      )
+    end
   end
+  let(:undiscrete_job) { described_class.find(head_execution.active_job_id) }
 
-  let!(:tail_execution) do
-    active_job_id = SecureRandom.uuid
+  let(:tail_execution) do
     GoodJob::Execution.create!(
-      active_job_id: SecureRandom.uuid,
+      active_job_id: active_job_id,
       created_at: 1.minute.ago,
       queue_name: 'mice',
       priority: 10,
@@ -33,7 +48,7 @@ RSpec.describe GoodJob::Job do
     )
   end
 
-  let!(:head_execution) do
+  let(:head_execution) do
     GoodJob::Execution.create!(
       active_job_id: tail_execution.active_job_id,
       scheduled_at: 10.minutes.from_now,
@@ -57,6 +72,18 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  before do
+    allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+
+    stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+      def perform
+        raise "Didn't expect to perform this job"
+      end
+    end)
+    stub_const 'TestJob::Error', Class.new(StandardError)
+  end
+
   describe '.find' do
     it 'returns a record that is the same as the head execution' do
       job = described_class.find(head_execution.active_job_id)
@@ -66,7 +93,7 @@ RSpec.describe GoodJob::Job do
 
   describe '#id' do
     it 'is the ActiveJob ID' do
-      expect(job.id).to eq head_execution.active_job_id
+      expect(job.id).to eq job.active_job_id
     end
   end
 
@@ -78,6 +105,7 @@ RSpec.describe GoodJob::Job do
 
   describe '#head_execution' do
     it 'is the head execution (which should be the same record)' do
+      job = undiscrete_job
       expect(job.head_execution).to eq head_execution
       expect(job._execution_id).to eq head_execution.id
     end
@@ -85,6 +113,7 @@ RSpec.describe GoodJob::Job do
 
   describe '#tail_execution' do
     it 'is the tail execution' do
+      job = undiscrete_job
       expect(job.tail_execution).to eq tail_execution
     end
   end
@@ -160,29 +189,50 @@ RSpec.describe GoodJob::Job do
   describe '#retry_job' do
     context 'when job is retried' do
       before do
-        head_execution.update!(
+        job.update!(
           finished_at: Time.current,
           error: "TestJob::Error: TestJob::Error"
         )
       end
 
-      it 'enqueues another execution and updates the original job' do
-        original_head_execution = job.head_execution
+      it 'updates the original job' do
+        expect(job).to be_discrete
 
         expect do
           job.retry_job
-        end.to change { job.executions.reload.size }.by(1)
+        end.to change { job.reload.finished? }.from(true).to(false)
+        expect(job.executions.count).to eq 1
+      end
 
-        new_head_execution = job.head_execution(reload: true)
-        expect(new_head_execution.serialized_params).to include(
-          "executions" => 2,
-          "queue_name" => "mice",
-          "priority" => 10,
-          "arguments" => ['cat', hash_including('canine' => 'dog')]
-        )
+      context 'when job is not discrete' do
+        let(:job) { undiscrete_job }
 
-        original_head_execution.reload
-        expect(original_head_execution.retried_good_job_id).to eq new_head_execution.id
+        before do
+          head_execution.update!(
+            finished_at: Time.current,
+            error: "TestJob::Error: TestJob::Error"
+          )
+        end
+
+        it 'enqueues another execution and updates the original job' do
+          original_head_execution = undiscrete_job.head_execution
+
+          expect do
+            job.retry_job
+          end.to change { job.executions.reload.size }.by(1)
+          expect(job.reload).not_to be_finished
+
+          new_head_execution = job.head_execution(reload: true)
+          expect(new_head_execution.serialized_params).to include(
+            "executions" => 2,
+            "queue_name" => "mice",
+            "priority" => 10,
+            "arguments" => ['cat', hash_including('canine' => 'dog')]
+          )
+
+          original_head_execution.reload
+          expect(original_head_execution.retried_good_job_id).to eq new_head_execution.id
+        end
       end
     end
 
@@ -279,23 +329,41 @@ RSpec.describe GoodJob::Job do
   end
 
   describe '#destroy_job' do
-    context 'when a job is finished' do
-      before do
-        job.head_execution.update! finished_at: Time.current
-      end
+    it 'destroys job and executions' do
+      job.update! finished_at: Time.current
+      job.destroy_job
 
-      it 'destroys all the job executions' do
-        job.destroy_job
-
-        expect { head_execution.reload }.to raise_error ActiveRecord::RecordNotFound
-        expect { tail_execution.reload }.to raise_error ActiveRecord::RecordNotFound
-        expect { job.reload }.to raise_error ActiveRecord::RecordNotFound
-      end
+      expect { job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect(GoodJob::DiscreteExecution.count).to eq 0
     end
 
     context 'when a job is not finished' do
       it 'raises an ActionForStateMismatchError' do
         expect { job.destroy_job }.to raise_error GoodJob::Job::ActionForStateMismatchError
+      end
+    end
+
+    context "when undiscrete job" do
+      let(:job) { undiscrete_job }
+
+      context 'when a job is finished' do
+        before do
+          job.head_execution.update! finished_at: Time.current
+        end
+
+        it 'destroys all the job executions' do
+          job.destroy_job
+
+          expect { head_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+          expect { tail_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+          expect { job.reload }.to raise_error ActiveRecord::RecordNotFound
+        end
+      end
+
+      context 'when a job is not finished' do
+        it 'raises an ActionForStateMismatchError' do
+          expect { job.destroy_job }.to raise_error GoodJob::Job::ActionForStateMismatchError
+        end
       end
     end
   end

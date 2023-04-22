@@ -22,6 +22,10 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
 
       t.uuid :batch_id
       t.uuid :batch_callback_id
+
+      t.boolean :is_discrete
+      t.integer :executions_count
+      t.text :job_class
     end
 
     create_table :good_job_batches, id: :uuid do |t|
@@ -36,6 +40,18 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       t.datetime :enqueued_at
       t.datetime :discarded_at
       t.datetime :finished_at
+    end
+
+    create_table :good_job_executions, id: :uuid do |t|
+      t.timestamps
+
+      t.uuid :active_job_id, null: false
+      t.text :job_class
+      t.text :queue_name
+      t.jsonb :serialized_params
+      t.datetime :scheduled_at
+      t.datetime :finished_at
+      t.text :error
     end
 
     create_table :good_job_processes, id: :uuid do |t|
@@ -62,5 +78,7 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       where: "finished_at IS NULL", name: :index_good_jobs_jobs_on_priority_created_at_when_unfinished
     add_index :good_jobs, [:batch_id], where: "batch_id IS NOT NULL"
     add_index :good_jobs, [:batch_callback_id], where: "batch_callback_id IS NOT NULL"
+
+    add_index :good_job_executions, [:active_job_id, :created_at], name: :index_good_job_executions_on_active_job_id_and_created_at
   end
 end

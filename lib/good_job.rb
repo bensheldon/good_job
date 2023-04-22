@@ -170,14 +170,19 @@ module GoodJob
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
       deleted_executions_count = 0
       deleted_batches_count = 0
+      deleted_discrete_executions_count = 0
 
       jobs_query = GoodJob::Job.where('finished_at <= ?', timestamp).order(finished_at: :asc).limit(in_batches_of)
       jobs_query = jobs_query.succeeded unless include_discarded
       loop do
-        deleted = GoodJob::Execution.where(job: jobs_query).delete_all
-        break if deleted.zero?
+        active_job_ids = jobs_query.pluck(:active_job_id)
+        break if active_job_ids.empty?
 
-        deleted_executions_count += deleted
+        deleted_discrete_executions = GoodJob::DiscreteExecution.where(active_job_id: active_job_ids).delete_all
+        deleted_discrete_executions_count += deleted_discrete_executions
+
+        deleted_executions = GoodJob::Execution.where(active_job_id: active_job_ids).delete_all
+        deleted_executions_count += deleted_executions
       end
 
       if GoodJob::BatchRecord.migrated?
@@ -191,9 +196,14 @@ module GoodJob
         end
       end
 
-      payload[:destroyed_executions_count] = deleted_executions_count
       payload[:destroyed_batches_count] = deleted_batches_count
-      payload[:destroyed_records_count] = deleted_executions_count + deleted_batches_count
+      payload[:destroyed_discrete_executions_count] = deleted_discrete_executions_count
+      payload[:destroyed_executions_count] = deleted_executions_count
+
+      destroyed_records_count = deleted_batches_count + deleted_discrete_executions_count + deleted_executions_count
+      payload[:destroyed_records_count] = destroyed_records_count
+
+      destroyed_records_count
     end
   end
 

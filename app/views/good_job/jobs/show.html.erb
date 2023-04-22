@@ -3,7 +3,12 @@
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb small mb-0">
         <li class="breadcrumb-item"><%= link_to t(".jobs"), jobs_path %></li>
-        <li class="breadcrumb-item active" aria-current="page"><%= tag.code @job.id, class: "text-muted" %></li>
+        <li class="breadcrumb-item active" aria-current="page">
+          <%= tag.code @job.id, class: "text-muted" %>
+          <% if @job.discrete? %>
+            <span class="badge bg-info text-dark">Discrete</span>
+          <% end %>
+        </li>
       </ol>
     </nav>
     <div class="row align-items-center">
@@ -21,6 +26,10 @@
         <div class="font-monospace fw-bold small my-2"><%= tag.strong @job.priority %></div>
       </div>
       <div class="col text-end">
+        <div class="mb-2">
+          <%= tag.span relative_time(@job.last_status_at), class: "small" %>
+          <%= status_badge @job.status %>
+        </div>
         <% if @job.status.in? [:scheduled, :retried, :queued] %>
           <%= button_to reschedule_job_path(@job.id), method: :put,
               class: "btn btn-sm btn-outline-primary",
@@ -59,8 +68,25 @@
 </div>
 
 <div class="my-4">
-  <h5><%= t "good_job.models.job.arguments" %></h5>
-  <%= tag.pre @job.serialized_params["arguments"].map(&:inspect).join(', '), class: 'text-wrap text-break' %>
+  <h5>
+    <%= t "good_job.models.job.arguments" %>
+    <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
+                   title: t("good_job.actions.inspect"),
+                   data: { bs_toggle: "collapse", bs_target: "##{dom_id(@job, 'params')}" },
+                   aria: { expanded: false, controls: dom_id(@job, "params") } do %>
+      <%= render_icon "info" %>
+      <span class="visually-hidden"><%= t "good_job.actions.inspect" %></span>
+    <% end %>
+  </h5>
 </div>
+<%= tag.pre @job.serialized_params["arguments"].map(&:inspect).join(', '), class: 'text-wrap text-break' %>
 
-<%= render 'executions', executions: @job.executions.includes_advisory_locks.reverse %>
+<%= tag.div id: dom_id(@job, "params"), class: "list-group-item collapse small bg-dark text-light" do %>
+  <%= tag.pre JSON.pretty_generate(@job.display_serialized_params) %>
+<% end %>
+
+<% if @job.discrete? %>
+  <%= render 'executions', executions: @job.discrete_executions.reverse %>
+<% else %>
+  <%= render 'executions', executions: @job.executions.includes_advisory_locks.reverse %>
+<% end %>

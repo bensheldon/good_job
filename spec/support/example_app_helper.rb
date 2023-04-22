@@ -48,6 +48,7 @@ module ExampleAppHelper
     tables = %i[
       good_jobs
       good_job_batches
+      good_job_executions
       good_job_processes
       good_job_settings
     ]

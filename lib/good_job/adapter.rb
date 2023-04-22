@@ -50,11 +50,15 @@ module GoodJob
 
       current_time = Time.current
       executions = active_jobs.map do |active_job|
-        GoodJob::Execution.build_for_enqueue(active_job, {
-                                               id: SecureRandom.uuid,
-                                               created_at: current_time,
-                                               updated_at: current_time,
-                                             })
+        GoodJob::Execution.build_for_enqueue(active_job).tap do |execution|
+          if GoodJob::Execution.discrete_support?
+            execution.make_discrete
+            execution.scheduled_at = current_time if execution.scheduled_at == execution.created_at
+          end
+
+          execution.created_at = current_time
+          execution.updated_at = current_time
+        end
       end
 
       inline_executions = []

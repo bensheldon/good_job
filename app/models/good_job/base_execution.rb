@@ -33,12 +33,25 @@ module GoodJob
       def coalesce_scheduled_at_created_at
         arel_table.coalesce(arel_table['scheduled_at'], arel_table['created_at'])
       end
+
+      def discrete_support?
+        if connection.table_exists?('good_job_executions')
+          true
+        else
+          migration_pending_warning!
+          false
+        end
+      end
     end
 
     # The ActiveJob job class, as a string
     # @return [String]
     def job_class
-      serialized_params['job_class']
+      discrete? ? attributes['job_class'] : serialized_params['job_class']
+    end
+
+    def discrete?
+      self.class.discrete_support? && is_discrete?
     end
   end
 end
