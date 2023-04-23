@@ -1,0 +1,219 @@
+---
+ja:
+  good_job:
+    actions:
+      destroy: 削除する
+      discard: 破棄する
+      inspect: 調査する
+      reschedule: 再スケジュールする
+      retry: 再試行する
+    batches:
+      index:
+        older_batches: より古いバッチ
+        pending_migrations: GoodJobに保留中のデータベースマイグレーションがあります。
+        title: バッチ
+      jobs:
+        actions:
+          confirm_destroy: このジョブを削除してもよろしいですか？
+          confirm_discard: このジョブを破棄してもよろしいですか？
+          confirm_reschedule: このジョブを再スケジュールしてもよろしいですか？
+          confirm_retry: このジョブを再試行してもよろしいですか？
+          destroy: ジョブを削除する
+          discard: ジョブを破棄する
+          reschedule: ジョブを再スケジュールする
+          retry: ジョブを再試行する
+          title: アクション
+        no_jobs_found: ジョブが見つかりませんでした。
+      show:
+        attributes: 属性
+        batched_jobs: バッチ処理されたジョブ
+        callback_jobs: コールバックジョブ
+      table:
+        no_batches_found: バッチが見つかりませんでした。
+    cron_entries:
+      actions:
+        confirm_disable: このcronエントリを無効化してもよろしいですか？
+        confirm_enable: このcronエントリを有効化してもよろしいですか？
+        confirm_enqueue: このcronエントリをキューに入れてもよろしいですか？
+        disable: cronエントリを無効化する
+        enable: cronエントリを有効化する
+        enqueue: cronエントリをすぐにキューに入れる
+      disable:
+        notice: cronエントリが無効化されました。
+      enable:
+        notice: cronエントリが有効化されました。
+      enqueue:
+        notice: cronエントリがキューに入れられました。
+      index:
+        no_cron_schedules_found: cronスケジュールが見つかりませんでした。
+        title: cronスケジュール
+      pending_migrations: GoodJobの保留中のデータベースマイグレーションが必要です。
+      show:
+        cron_entry_key: cronエントリキー
+    datetime:
+      distance_in_words:
+        about_x_hours:
+          one: 約1時間
+          other: 約%{count}時間
+        about_x_months:
+          one: 約1ヶ月
+          other: 約%{count}ヶ月
+        about_x_years:
+          one: 約1年
+          other: 約%{count}年
+        almost_x_years:
+          one: ほぼ1年
+          other: ほぼ%{count}年
+        half_a_minute: 半分ぐらい
+        less_than_x_minutes:
+          one: 1分未満
+          other: "%{count}分未満"
+        less_than_x_seconds:
+          one: 1秒未満
+          other: "%{count}秒未満"
+        over_x_years:
+          one: 1年以上
+          other: "%{count}年以上"
+        x_days:
+          one: 1日
+          other: "%{count}日"
+        x_minutes:
+          one: 1分
+          other: "%{count}分"
+        x_months:
+          one: 1ヶ月
+          other: "%{count}ヶ月"
+        x_seconds:
+          one: 1秒
+          other: "%{count}秒"
+        x_years:
+          one: 1年
+          other: "%{count}年"
+    duration:
+      hours: "%{hour}時間 %{min}分"
+      less_than_10_seconds: "%{sec}秒"
+      milliseconds: "%{ms}ミリ秒"
+      minutes: "%{min}分 %{sec}秒"
+      seconds: "%{sec}秒"
+    helpers:
+      relative_time:
+        future: "%{time}後"
+        past: "%{time}前"
+    jobs:
+      actions:
+        confirm_destroy: ジョブを削除してもよろしいですか？
+        confirm_discard: ジョブを破棄してもよろしいですか？
+        confirm_reschedule: ジョブを再スケジュールしてもよろしいですか？
+        confirm_retry: ジョブを再試行してもよろしいですか？
+        destroy: ジョブを削除
+        discard: ジョブを破棄
+        reschedule: ジョブを再スケジュール
+        retry: ジョブを再試行
+      destroy:
+        notice: ジョブが削除されました
+      discard:
+        notice: ジョブが破棄されました
+      executions:
+        error: エラー
+        in_queue: 待機中
+        runtime: 実行時間
+        title: 実行
+      index:
+        job_pagination: ジョブのページネーション
+        older_jobs: 古いジョブ
+      reschedule:
+        notice: ジョブが再スケジュールされました
+      retry:
+        notice: ジョブが再試行されました
+      show:
+        jobs: ジョブ
+      table:
+        actions:
+          apply_to_all:
+            one: すべての1つのジョブに適用する
+            other: すべての%{count}個のジョブに適用する
+          confirm_destroy_all: 選択したジョブをすべて削除してもよろしいですか？
+          confirm_discard_all: 選択したジョブをすべて破棄してもよろしいですか？
+          confirm_reschedule_all: 選択したジョブをすべて再スケジュールしてもよろしいですか？
+          confirm_retry_all: 選択したジョブをすべて再試行してもよろしいですか？
+          destroy_all: すべて削除
+          discard_all: すべて破棄
+          reschedule_all: すべて再スケジュール
+          retry_all: すべて再試行
+          title: アクション
+        no_jobs_found: ジョブが見つかりませんでした
+        toggle_actions: アクションを切り替える
+        toggle_all_jobs: すべてのジョブを切り替える
+    models:
+      batch:
+        created: 作成された
+        created_at: 作成日時
+        discarded: 破棄された
+        discarded_at: 破棄日時
+        enqueued: キューに追加された
+        enqueued_at: キューに追加された日時
+        finished: 終了した
+        finished_at: 終了日時
+        jobs: ジョブ
+        name: 名前
+      cron:
+        class: クラス
+        last_run: 前回実行日時
+        next_scheduled: 次回予定日時
+        schedule: スケジュール
+      job:
+        arguments: 引数
+        attempts: 試行回数
+        priority: 優先度
+        queue: キュー
+    number:
+      format:
+        delimiter: ","
+        separator: "."
+      human:
+        decimal_units:
+          delimiter: ","
+          format: "%n%u"
+          precision: 3
+          separator: "."
+          units:
+            billion: B
+            million: M
+            quadrillion: Q
+            thousand: K
+            trillion: T
+            unit: ''
+    processes:
+      index:
+        no_good_job_processes_found: GoodJobのプロセスが見つかりませんでした。
+        process: プロセス
+        schedulers: スケジューラー
+        started: 開始日時
+        title: プロセス
+    shared:
+      filter:
+        all: 全て
+        all_jobs: 全てのジョブ
+        all_queues: 全てのキュー
+        clear: クリア
+        job_name: ジョブ名
+        placeholder: クラス名、ジョブID、ジョブパラメータ、エラーテキストで検索
+        queue_name: キュー名
+        search: 検索
+      footer:
+        last_update_html: 最終更新 <time id="page-updated-at" datetime="%{time}">%{time}</time>
+        wording: Remember, you're doing a Good Job too!
+      navbar:
+        batches: バッチ
+        cron_schedules: Cron
+        jobs: ジョブ
+        live_poll: リアルタイム更新
+        name: "GoodJob 👍"
+        processes: プロセス
+    status:
+      discarded: 破棄済み
+      queued: 処理待ち
+      retried: 再試行済み
+      running: 実行中
+      scheduled: スケジュール待ち
+      succeeded: 成功済み
