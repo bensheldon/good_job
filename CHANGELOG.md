@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.15.5](https://github.com/bensheldon/good_job/tree/v3.15.5) (2023-04-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.4...v3.15.5)
+
+**Fixed bugs:**
+
+- Fix `GoodJob.cleanup_preserved_jobs` to add missing guard for unmigrated discrete executions [\#938](https://github.com/bensheldon/good_job/pull/938) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Update to 3.15.4 breaks cleanup\_preserved\_jobs [\#937](https://github.com/bensheldon/good_job/issues/937)
+
 ## [v3.15.4](https://github.com/bensheldon/good_job/tree/v3.15.4) (2023-04-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.3...v3.15.4)
