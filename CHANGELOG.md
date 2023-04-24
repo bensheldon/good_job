@@ -1,5 +1,14 @@
 # Changelog
 
+## [v3.15.6](https://github.com/bensheldon/good_job/tree/v3.15.6) (2023-04-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.5...v3.15.6)
+
+**Merged pull requests:**
+
+- Refine french translations [\#936](https://github.com/bensheldon/good_job/pull/936) ([francois-ferrandis](https://github.com/francois-ferrandis))
+- feat: locales for ja [\#935](https://github.com/bensheldon/good_job/pull/935) ([aki77](https://github.com/aki77))
+
 ## [v3.15.5](https://github.com/bensheldon/good_job/tree/v3.15.5) (2023-04-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.4...v3.15.5)
