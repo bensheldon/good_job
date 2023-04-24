@@ -178,8 +178,10 @@ module GoodJob
         active_job_ids = jobs_query.pluck(:active_job_id)
         break if active_job_ids.empty?
 
-        deleted_discrete_executions = GoodJob::DiscreteExecution.where(active_job_id: active_job_ids).delete_all
-        deleted_discrete_executions_count += deleted_discrete_executions
+        if GoodJob::Execution.discrete_support?
+          deleted_discrete_executions = GoodJob::DiscreteExecution.where(active_job_id: active_job_ids).delete_all
+          deleted_discrete_executions_count += deleted_discrete_executions
+        end
 
         deleted_executions = GoodJob::Execution.where(active_job_id: active_job_ids).delete_all
         deleted_executions_count += deleted_executions
