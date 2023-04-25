@@ -223,5 +223,19 @@ module GoodJob
     end
   end
 
+  def self.system_info
+    {
+      "VERSION" => VERSION,
+      "RUBY_VERSION" => RUBY_VERSION,
+      "RAILS_VERSION" => Rails.version,
+      "RAILS_ENV" => Rails.env,
+      "EXECUTION_MODE" => configuration.execution_mode,
+      "QUEUES" => configuration.queue_string,
+      "POLL_INTERVAL" => configuration.poll_interval,
+      "NOTIFIER_LISTENING" => configuration.enable_listen_notify,
+      "PROCESSES" => "[#{Process.all.map { |p| p.current_state.to_s }.join(',')}]",
+    }
+  end
+
   ActiveSupport.run_load_hooks(:good_job, self)
 end
