@@ -1,5 +1,22 @@
 # Changelog
 
+## [v3.15.7](https://github.com/bensheldon/good_job/tree/v3.15.7) (2023-04-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.6...v3.15.7)
+
+**Fixed bugs:**
+
+- Fix Lockable's `SELECT 1 AS one` queries missing `LIMIT 1` [\#946](https://github.com/bensheldon/good_job/pull/946) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Issue with performing jobs that use ActionMailer::Parameterized [\#944](https://github.com/bensheldon/good_job/issues/944)
+- Deprecation warning on the deprecation warning [\#943](https://github.com/bensheldon/good_job/issues/943)
+
+**Merged pull requests:**
+
+- Replace class usage of ActiveSupport::Deprecator with gem-specific instance [\#945](https://github.com/bensheldon/good_job/pull/945) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.15.6](https://github.com/bensheldon/good_job/tree/v3.15.6) (2023-04-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.5...v3.15.6)
