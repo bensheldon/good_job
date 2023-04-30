@@ -21,17 +21,18 @@ if ruby_27_or_higher && !ruby_31_or_higher && !jruby
     gem "rails", "~> 7.0.0"
     gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
   end
-
-  appraise "rails-head" do
-    gem "rails", github: "rails/rails", branch: "main"
-    gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
-  end
 end
 
 if ruby_31_or_higher && !jruby
   appraise "rails-7.0-ruby-3.1" do
     gem "capybara", "~> 3.36" # For Ruby 3.1 support https://github.com/teamcapybara/capybara/pull/2468
     gem "rails", "~> 7.0.1" # Ruby 3.1 requires Rails 7.0.1+
+    gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
+  end
+
+  appraise "rails-head" do
+    gem "capybara", "~> 3.36"
+    gem "rails", github: "rails/rails", branch: "main"
     gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
   end
 end

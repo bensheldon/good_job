@@ -212,7 +212,7 @@ module GoodJob
     # Construct arguments for GoodJob::Execution from an ActiveJob instance.
     def self.enqueue_args(active_job, overrides = {})
       if active_job.priority && GoodJob.configuration.smaller_number_is_higher_priority.nil?
-        ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+        GoodJob.deprecator.warn(<<~DEPRECATION)
           The next major version of GoodJob (v4.0) will change job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority.
             To opt-in to this behavior now, set `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or application.rb.
             To not opt-in yet, but silence this deprecation warning, set `config.good_job.smaller_number_is_higher_priority = false`.

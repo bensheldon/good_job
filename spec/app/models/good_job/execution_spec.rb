@@ -92,7 +92,7 @@ RSpec.describe GoodJob::Execution do
     end
 
     describe 'deprecation of higher is higher priority order, change to smaller is higher priority' do
-      before { allow(ActiveSupport::Deprecation).to receive(:warn) }
+      before { allow(GoodJob.deprecator).to receive(:warn) }
 
       context 'when smaller_number_higher_priority is not set' do
         before { allow(Rails.application.config).to receive(:good_job).and_return({}) }
@@ -100,13 +100,13 @@ RSpec.describe GoodJob::Execution do
         it 'does not warn when priority is not set' do
           active_job.priority = nil
           described_class.enqueue(active_job)
-          expect(ActiveSupport::Deprecation).not_to have_received(:warn)
+          expect(GoodJob.deprecator).not_to have_received(:warn)
         end
 
         it 'does warn when priority is set' do
           active_job.priority = 50
           described_class.enqueue(active_job)
-          expect(ActiveSupport::Deprecation).to have_received(:warn)
+          expect(GoodJob.deprecator).to have_received(:warn)
         end
       end
 
@@ -116,7 +116,7 @@ RSpec.describe GoodJob::Execution do
         it 'does not warn' do
           active_job.priority = 50
           described_class.enqueue(active_job)
-          expect(ActiveSupport::Deprecation).not_to have_received(:warn)
+          expect(GoodJob.deprecator).not_to have_received(:warn)
         end
       end
 
@@ -126,7 +126,7 @@ RSpec.describe GoodJob::Execution do
         it 'does not warn' do
           active_job.priority = 50
           described_class.enqueue(active_job)
-          expect(ActiveSupport::Deprecation).not_to have_received(:warn)
+          expect(GoodJob.deprecator).not_to have_received(:warn)
         end
       end
     end
