@@ -324,6 +324,7 @@ module GoodJob
           AND pg_locks.objsubid = 1
           AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
           AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
+        LIMIT 1
       SQL
       binds = [
         ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
@@ -351,6 +352,7 @@ module GoodJob
           AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
           AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
           AND pg_locks.pid = pg_backend_pid()
+        LIMIT 1
       SQL
       binds = [
         ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),

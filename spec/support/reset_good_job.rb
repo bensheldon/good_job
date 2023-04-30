@@ -118,7 +118,12 @@ class PgLock < ActiveRecord::Base
     query = <<~SQL.squish
       SELECT pg_advisory_unlock(($1::bigint << 32) + $2::bigint) AS unlocked
     SQL
-    self.class.connection.exec_query(GoodJob::Execution.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', [[nil, classid], [nil, objid]]).first['unlocked']
+
+    binds = [
+      ActiveRecord::Relation::QueryAttribute.new('classid', classid, ActiveRecord::Type::String.new),
+      ActiveRecord::Relation::QueryAttribute.new('objid', objid, ActiveRecord::Type::String.new),
+    ]
+    self.class.connection.exec_query(GoodJob::Execution.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', binds).first['unlocked']
   end
 
   def unlock!
