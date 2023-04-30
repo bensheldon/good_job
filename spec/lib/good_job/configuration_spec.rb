@@ -135,20 +135,20 @@ RSpec.describe GoodJob::Configuration do
 
       it 'accepts 0, with deprecation' do
         allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_interval_jobs: 0 })
-        allow(ActiveSupport::Deprecation).to receive(:warn)
+        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
         expect(configuration.cleanup_interval_jobs).to eq(-1)
-        expect(ActiveSupport::Deprecation).to have_received(:warn)
+        expect(GoodJob.deprecator).to have_received(:warn)
       end
 
       it 'accepts nil, with deprecation' do
         allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_interval_jobs: nil })
-        allow(ActiveSupport::Deprecation).to receive(:warn)
+        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
         expect(configuration.cleanup_interval_jobs).to be false
-        expect(ActiveSupport::Deprecation).to have_received(:warn)
+        expect(GoodJob.deprecator).to have_received(:warn)
       end
     end
 
@@ -176,11 +176,11 @@ RSpec.describe GoodJob::Configuration do
 
       it 'accepts an empty value, with deprecation' do
         stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_INTERVAL_JOBS' => '' })
-        allow(ActiveSupport::Deprecation).to receive(:warn)
+        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
         expect(configuration.cleanup_interval_jobs).to be false
-        expect(ActiveSupport::Deprecation).to have_received(:warn)
+        expect(GoodJob.deprecator).to have_received(:warn)
       end
     end
   end
@@ -208,20 +208,20 @@ RSpec.describe GoodJob::Configuration do
 
       it 'accepts 0, with deprecation' do
         allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_interval_seconds: 0 })
-        allow(ActiveSupport::Deprecation).to receive(:warn)
+        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
         expect(configuration.cleanup_interval_seconds).to be(-1)
-        expect(ActiveSupport::Deprecation).to have_received(:warn)
+        expect(GoodJob.deprecator).to have_received(:warn)
       end
 
       it 'accepts nil, with deprecation' do
         allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_interval_seconds: nil })
-        allow(ActiveSupport::Deprecation).to receive(:warn)
+        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
         expect(configuration.cleanup_interval_seconds).to be false
-        expect(ActiveSupport::Deprecation).to have_received(:warn)
+        expect(GoodJob.deprecator).to have_received(:warn)
       end
     end
 
@@ -249,11 +249,11 @@ RSpec.describe GoodJob::Configuration do
 
       it 'accepts an empty value, with deprecation' do
         stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_INTERVAL_SECONDS' => '' })
-        allow(ActiveSupport::Deprecation).to receive(:warn)
+        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
         expect(configuration.cleanup_interval_seconds).to be false
-        expect(ActiveSupport::Deprecation).to have_received(:warn)
+        expect(GoodJob.deprecator).to have_received(:warn)
       end
     end
   end

@@ -223,5 +223,14 @@ module GoodJob
     end
   end
 
+  # Deprecator for providing deprecation warnings.
+  # @return [ActiveSupport::Deprecation]
+  def self.deprecator
+    @_deprecator ||= begin
+      next_major_version = GEM_VERSION.segments[0] + 1
+      ActiveSupport::Deprecation.new("#{next_major_version}.0", "GoodJob")
+    end
+  end
+
   ActiveSupport.run_load_hooks(:good_job, self)
 end

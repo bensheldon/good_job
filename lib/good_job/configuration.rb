@@ -250,12 +250,12 @@ module GoodJob
       if rails_config.key?(:cleanup_interval_jobs)
         value = rails_config[:cleanup_interval_jobs]
         if value.nil?
-          ActiveSupport::Deprecation.warn(
+          GoodJob.deprecator.warn(
             %(Setting `config.good_job.cleanup_interval_jobs` to `nil` will no longer disable count-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
           )
           value = false
         elsif value == 0 # rubocop:disable Style/NumericPredicate
-          ActiveSupport::Deprecation.warn(
+          GoodJob.deprecator.warn(
             %(Setting `config.good_job.cleanup_interval_jobs` to `0` will disable count-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
           )
           value = -1
@@ -263,7 +263,7 @@ module GoodJob
       elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_JOBS')
         value = env['GOOD_JOB_CLEANUP_INTERVAL_JOBS']
         if value.blank?
-          ActiveSupport::Deprecation.warn(
+          GoodJob.deprecator.warn(
             %(Setting `GOOD_JOB_CLEANUP_INTERVAL_JOBS` to `""` will no longer disable count-based cleanups in GoodJob v4. Set to `0` to disable, or `-1` to run every time.)
           )
           value = false
@@ -285,12 +285,12 @@ module GoodJob
         value = rails_config[:cleanup_interval_seconds]
 
         if value.nil?
-          ActiveSupport::Deprecation.warn(
+          GoodJob.deprecator.warn(
             %(Setting `config.good_job.cleanup_interval_seconds` to `nil` will no longer disable time-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
           )
           value = false
         elsif value == 0 # rubocop:disable Style/NumericPredicate
-          ActiveSupport::Deprecation.warn(
+          GoodJob.deprecator.warn(
             %(Setting `config.good_job.cleanup_interval_seconds` to `0` will disable time-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
           )
           value = -1
@@ -298,7 +298,7 @@ module GoodJob
       elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_SECONDS')
         value = env['GOOD_JOB_CLEANUP_INTERVAL_SECONDS']
         if value.blank?
-          ActiveSupport::Deprecation.warn(
+          GoodJob.deprecator.warn(
             %(Setting `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` to `""` will no longer disable time-based cleanups in GoodJob v4. Set to `0` to disable, or `-1` to run every time.)
           )
           value = false

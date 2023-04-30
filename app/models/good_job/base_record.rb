@@ -8,7 +8,7 @@ module GoodJob
     self.abstract_class = true
 
     def self.migration_pending_warning!
-      ActiveSupport::Deprecation.warn(<<~DEPRECATION)
+      GoodJob.deprecator.warn(<<~DEPRECATION)
         GoodJob has pending database migrations. To create the migration files, run:
             rails generate good_job:update
         To apply the migration files, run:

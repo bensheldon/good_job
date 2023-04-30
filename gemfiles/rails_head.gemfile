@@ -3,16 +3,23 @@
 source "https://rubygems.org"
 
 gem "activerecord-jdbcpostgresql-adapter", platforms: [:jruby]
-gem "appraisal", branch: "fix-bundle-env", git: "https://github.com/bensheldon/appraisal.git"
+gem "appraisal", branch: "main", git: "https://github.com/thoughtbot/appraisal.git"
 gem "matrix"
 gem "nokogiri"
 gem "pg", platforms: [:mri, :mingw, :x64_mingw]
 gem "rails", branch: "main", git: "https://github.com/rails/rails.git"
+gem "capybara", "~> 3.36"
 gem "selenium-webdriver", "~> 4.0"
 
 platforms :ruby do
-  gem "activerecord-explain-analyze"
+  gem "activerecord-explain-analyze", require: false
   gem "pry-byebug"
+  gem "rack-mini-profiler"
+  gem "rbtrace"
+  gem "stackprof"
+  gem "net-imap", require: false
+  gem "net-pop", require: false
+  gem "net-smtp", require: false
 
   group :lint do
     gem "easy_translate"
