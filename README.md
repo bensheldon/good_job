@@ -472,7 +472,7 @@ config.good_job.enable_cron = ENV['DYNO'] == 'worker.1' # or `true` or via $GOOD
 
 # Configure cron with a hash that has a unique key for each recurring job
 config.good_job.cron = {
-  # Every 15 minutes, enqueue `ExampleJob.set(priority: -10).perform_later(42, name: "Alice")`
+  # Every 15 minutes, enqueue `ExampleJob.set(priority: -10).perform_later(42, "life", name: "Alice")`
   frequent_task: { # each recurring job must have a unique key
     cron: "*/15 * * * *", # cron-style scheduling format by fugit gem
     class: "ExampleJob", # reference the Job class with a string
