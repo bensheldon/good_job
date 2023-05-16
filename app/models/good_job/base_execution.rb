@@ -35,12 +35,7 @@ module GoodJob
       end
 
       def discrete_support?
-        if connection.table_exists?(GoodJob::DiscreteExecution.table_name)
-          true
-        else
-          migration_pending_warning!
-          false
-        end
+        DiscreteExecution.migrated?
       end
     end
 
