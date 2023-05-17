@@ -1108,7 +1108,9 @@ If your application is already using an ActiveJob backend, you will need to inst
     ```ruby
     # jobs/specific_job.rb
     class SpecificJob < ApplicationJob
-      self.queue_adapter = :good_job
+      # Don't set queue_adapter when testing, otherwise assertions such as
+      # assert_enqueued_jobs won't work.
+      self.queue_adapter = :good_job unless Rails.env.test?
       # ...
     end
     ```
