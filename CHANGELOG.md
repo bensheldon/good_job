@@ -1,5 +1,19 @@
 # Changelog
 
+## [v3.15.8](https://github.com/bensheldon/good_job/tree/v3.15.8) (2023-05-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.7...v3.15.8)
+
+**Closed issues:**
+
+- `active_job.enqueue` Performance Issue [\#939](https://github.com/bensheldon/good_job/issues/939)
+
+**Merged pull requests:**
+
+- Fix hard-coded and duplicated table\_name [\#958](https://github.com/bensheldon/good_job/pull/958) ([gap777](https://github.com/gap777))
+- Bump rubocop from 1.46.0 to 1.50.2 [\#949](https://github.com/bensheldon/good_job/pull/949) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rubocop-rails from 2.18.0 to 2.19.1 [\#947](https://github.com/bensheldon/good_job/pull/947) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.15.7](https://github.com/bensheldon/good_job/tree/v3.15.7) (2023-04-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.6...v3.15.7)
