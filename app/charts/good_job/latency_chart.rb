@@ -9,13 +9,24 @@ module GoodJob
       day: 120.days,
     }.freeze
 
-    def initialize(filter)
+    CALCULATIONS = {
+      min: 'min',
+      avg: 'avg',
+      p95: 'percentile_95',
+      max: 'max',
+    }
+
+    attr_reader :interval
+
+    def initialize(filter, interval: :second)
+      raise ArgumentError, "interval must be one of #{INTERVALS.keys.join(', ')}" unless interval.in?(INTERVALS.keys)
+
       @filter = filter
+      @interval = interval
     end
 
     def data
-      interval = 'day'
-      interval_duration = INTERVALS[interval.to_sym]
+      interval_duration = INTERVALS[interval]
 
       base_query = GoodJob::Execution.only_scheduled
       # Filter out jobs that have been discarded because they will have been finished but not performed

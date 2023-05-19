@@ -14,6 +14,10 @@ function renderCharts(animate) {
       },
       options: {
         animation: animate,
+        interaction: {
+          mode: 'index',
+          axis: 'x'
+        },
         responsive: true,
         maintainAspectRatio: false,
         scales: {
