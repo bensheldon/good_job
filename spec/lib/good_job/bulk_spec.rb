@@ -114,5 +114,17 @@ describe GoodJob::Bulk do
       expect(job_1.provider_job_id).to be_present
       expect(job_2.provider_job_id).to be_nil
     end
+
+    it 'sets queue, scheduled_at, and priority' do
+      described_class.enqueue do
+        TestJob.set(queue: 'elephant', wait: 10.minutes, priority: 50).perform_later
+      end
+
+      expect(GoodJob::Job.last).to have_attributes(
+        queue_name: 'elephant',
+        scheduled_at: be_within(1.second).of(10.minutes.from_now),
+        priority: 50
+      )
+    end
   end
 end

@@ -117,6 +117,21 @@ RSpec.describe GoodJob::Adapter do
       expect(provider_job_ids).to all be_present
     end
 
+    it 'enqueues queue_name, scheduled_at, priority' do
+      active_job = ExampleJob.new
+      active_job.queue_name = 'elephant'
+      active_job.priority = -55
+      active_job.scheduled_at = 10.minutes.from_now
+
+      adapter.enqueue_all([active_job])
+
+      expect(GoodJob::Job.last).to have_attributes(
+        queue_name: 'elephant',
+        priority: -55,
+        scheduled_at: be_within(0.1).of(10.minutes.from_now)
+      )
+    end
+
     context 'when a job fails to enqueue' do
       it 'does not set a provider_job_id' do
         allow(GoodJob::Execution).to receive(:insert_all).and_wrap_original do |original_method, *args|

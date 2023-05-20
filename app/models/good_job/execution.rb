@@ -224,9 +224,8 @@ module GoodJob
         queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
         priority: active_job.priority || DEFAULT_PRIORITY,
         serialized_params: active_job.serialize,
-        scheduled_at: active_job.scheduled_at,
       }
-
+      execution_args[:scheduled_at] = Time.zone.at(active_job.scheduled_at) if active_job.scheduled_at
       execution_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
 
       reenqueued_current_execution = CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
