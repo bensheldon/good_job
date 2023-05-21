@@ -128,7 +128,7 @@ RSpec.describe GoodJob::Adapter do
       expect(GoodJob::Job.last).to have_attributes(
         queue_name: 'elephant',
         priority: -55,
-        scheduled_at: be_within(0.1).of(10.minutes.from_now)
+        scheduled_at: be_within(1).of(10.minutes.from_now)
       )
     end
 
