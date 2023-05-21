@@ -1,8 +1,30 @@
 # Changelog
 
+## [v3.15.9](https://github.com/bensheldon/good_job/tree/v3.15.9) (2023-05-21)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.8...v3.15.9)
+
+**Fixed bugs:**
+
+- Fix wait and wait\_until ignored in bulk enqueue [\#960](https://github.com/bensheldon/good_job/pull/960) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Does Bulk enqueue respect wait? [\#959](https://github.com/bensheldon/good_job/issues/959)
+- BaseExecution::discrete\_support?  hardcodes the DiscreteExecution table\_name [\#957](https://github.com/bensheldon/good_job/issues/957)
+
+**Merged pull requests:**
+
+- Fix flaky jruby test to widen time-based range [\#961](https://github.com/bensheldon/good_job/pull/961) ([bensheldon](https://github.com/bensheldon))
+- Update README.md [\#953](https://github.com/bensheldon/good_job/pull/953) ([namiwang](https://github.com/namiwang))
+
 ## [v3.15.8](https://github.com/bensheldon/good_job/tree/v3.15.8) (2023-05-19)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.7...v3.15.8)
+
+**Fixed bugs:**
+
+- Fix hard-coded and duplicated table\_name [\#958](https://github.com/bensheldon/good_job/pull/958) ([gap777](https://github.com/gap777))
 
 **Closed issues:**
 
@@ -10,7 +32,6 @@
 
 **Merged pull requests:**
 
-- Fix hard-coded and duplicated table\_name [\#958](https://github.com/bensheldon/good_job/pull/958) ([gap777](https://github.com/gap777))
 - Bump rubocop from 1.46.0 to 1.50.2 [\#949](https://github.com/bensheldon/good_job/pull/949) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump rubocop-rails from 2.18.0 to 2.19.1 [\#947](https://github.com/bensheldon/good_job/pull/947) ([dependabot[bot]](https://github.com/apps/dependabot))
 
