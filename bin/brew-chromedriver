@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+brew upgrade chromedriver
+xattr -d com.apple.quarantine $(which chromedriver)
