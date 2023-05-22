@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.15.10](https://github.com/bensheldon/good_job/tree/v3.15.10) (2023-05-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.9...v3.15.10)
+
+**Fixed bugs:**
+
+- Ensure migration warning for `DiscreteExecution` constant is in explicit `GoodJob::` namespace [\#963](https://github.com/bensheldon/good_job/pull/963) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- uninitialized constant DiscreteExecution [\#962](https://github.com/bensheldon/good_job/issues/962)
+
 ## [v3.15.9](https://github.com/bensheldon/good_job/tree/v3.15.9) (2023-05-21)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.8...v3.15.9)
