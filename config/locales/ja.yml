@@ -190,6 +190,7 @@ ja:
         schedulers: スケジューラー
         started: 開始日時
         title: プロセス
+        updated: 更新された
     shared:
       filter:
         all: 全て

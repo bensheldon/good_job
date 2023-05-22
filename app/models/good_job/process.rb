@@ -7,7 +7,9 @@ module GoodJob # :nodoc:
     include AssignableConnection
     include Lockable
 
+    # Interval until the process record being updated
     STALE_INTERVAL = 30.seconds
+    # Interval until the process record is treated as expired
     EXPIRED_INTERVAL = 5.minutes
 
     self.table_name = 'good_job_processes'
@@ -31,20 +33,26 @@ module GoodJob # :nodoc:
     # UUID that is unique to the current process and changes when forked.
     # @return [String]
     def self.current_id
-      mutex.synchronize do
-        if _current_id.nil? || _pid != ::Process.pid
-          self._current_id = SecureRandom.uuid
-          self._pid = ::Process.pid
-        end
-        _current_id
+      mutex.synchronize { ns_current_id }
+    end
+
+    def self.ns_current_id
+      if _current_id.nil? || _pid != ::Process.pid
+        self._current_id = SecureRandom.uuid
+        self._pid = ::Process.pid
       end
+      _current_id
     end
 
     # Hash representing metadata about the current process.
     # @return [Hash]
     def self.current_state
+      mutex.synchronize { ns_current_state }
+    end
+
+    def self.ns_current_state
       {
-        id: current_id,
+        id: ns_current_id,
         hostname: Socket.gethostname,
         pid: ::Process.pid,
         proctitle: $PROGRAM_NAME,
@@ -63,29 +71,43 @@ module GoodJob # :nodoc:
     # Registers the current process in the database
     # @return [GoodJob::Process]
     def self.register
-      create(id: current_id, state: current_state, create_with_advisory_lock: true)
-    rescue ActiveRecord::RecordNotUnique
-      nil
+      mutex.synchronize do
+        process_state = ns_current_state
+        create(id: process_state[:id], state: process_state, create_with_advisory_lock: true)
+      rescue ActiveRecord::RecordNotUnique
+        find(ns_current_state[:id])
+      end
+    end
+
+    def refresh
+      mutex.synchronize do
+        reload
+        update(state: self.class.ns_current_state, updated_at: Time.current)
+      rescue ActiveRecord::RecordNotFound
+        false
+      end
     end
 
     # Unregisters the instance.
     def deregister
       return unless owns_advisory_lock?
 
-      destroy!
-      advisory_unlock
+      mutex.synchronize do
+        destroy!
+        advisory_unlock
+      end
     end
 
     def basename
       File.basename(state["proctitle"])
     end
 
-    def refresh
-      touch(:updated_at) # rubocop:disable Rails/SkipsModelValidations
-    end
+    def refresh_if_stale(cleanup: false)
+      return unless stale?
 
-    def refresh_if_stale
-      refresh if stale?
+      result = refresh
+      self.class.cleanup if cleanup
+      result
     end
 
     def stale?

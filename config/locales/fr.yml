@@ -190,6 +190,7 @@ fr:
         schedulers: Schedulers
         started: Lancé
         title: Processus
+        updated: Mis à jour
     shared:
       filter:
         all: Tous

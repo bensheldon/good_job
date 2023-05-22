@@ -190,6 +190,7 @@ tr:
         schedulers: Planlayıcılar
         started: Başlangıç zamanı
         title: Süreçler
+        updated: Güncellenmiş
     shared:
       filter:
         all: Tümü

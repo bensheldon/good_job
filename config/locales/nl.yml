@@ -190,6 +190,7 @@ nl:
         schedulers: Planners
         started: Begonnen
         title: Processen
+        updated: Bijgewerkt
     shared:
       filter:
         all: Alle

@@ -216,6 +216,7 @@ ru:
         schedulers: Планировщики
         started: Начал
         title: Процессы
+        updated: Обновлено
     shared:
       filter:
         all: Все

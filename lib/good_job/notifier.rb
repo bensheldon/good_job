@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'active_support/core_ext/module/attribute_accessors_per_thread'
 require 'concurrent/atomic/atomic_boolean'
-require "good_job/notifier/process_registration"
+require "good_job/notifier/process_heartbeat"
 
 module GoodJob # :nodoc:
   #
@@ -13,9 +13,9 @@ module GoodJob # :nodoc:
   #
   class Notifier
     include ActiveSupport::Callbacks
-    define_callbacks :listen, :unlisten
+    define_callbacks :listen, :tick, :unlisten
 
-    include Notifier::ProcessRegistration
+    include ProcessHeartbeat
 
     # Default Postgres channel for LISTEN/NOTIFY
     CHANNEL = 'good_job'
@@ -189,18 +189,20 @@ module GoodJob # :nodoc:
             end
 
             while thr_executor.running?
-              wait_for_notify do |channel, payload|
-                next unless channel == CHANNEL
+              run_callbacks :tick do
+                wait_for_notify do |channel, payload|
+                  next unless channel == CHANNEL
 
-                ActiveSupport::Notifications.instrument("notifier_notified.good_job", { payload: payload })
-                parsed_payload = JSON.parse(payload, symbolize_names: true)
-                thr_recipients.each do |recipient|
-                  target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
-                  target.send(method_name, parsed_payload)
+                  ActiveSupport::Notifications.instrument("notifier_notified.good_job", { payload: payload })
+                  parsed_payload = JSON.parse(payload, symbolize_names: true)
+                  thr_recipients.each do |recipient|
+                    target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
+                    target.send(method_name, parsed_payload)
+                  end
                 end
-              end
 
-              reset_connection_errors
+                reset_connection_errors
+              end
             end
           end
         ensure

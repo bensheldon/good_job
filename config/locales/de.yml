@@ -190,6 +190,7 @@ de:
         schedulers: Planer
         started: Gestartet
         title: Prozesse
+        updated: Aktualisiert
     shared:
       filter:
         all: Alle

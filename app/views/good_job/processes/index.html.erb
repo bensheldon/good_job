@@ -11,6 +11,9 @@
         <div class="col-2 d-flex gap-2">
           <span><%= t ".started" %></span>
         </div>
+        <div class="col-2 d-flex gap-2">
+          <span><%= t ".updated" %></span>
+        </div>
         <div class="col-auto">
           <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
                          data: { bs_toggle: "collapse", bs_target: ".process-state" },
@@ -42,6 +45,7 @@
             <% end %>
           </div>
           <div class="col-2 small"><%= relative_time(process.created_at) %></div>
+          <div class="col-2 small"><%= relative_time(process.updated_at) %></div>
           <div class="col-auto">
             <%= tag.button type: "button", class: "btn btn-sm text-muted ms-auto", role: "button",
                            title: t("good_job.actions.inspect"),
