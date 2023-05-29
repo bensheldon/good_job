@@ -135,7 +135,7 @@ describe GoodJob do
   end
 
   describe '.system_info' do
-    it 'returns expecrted systen information' do
+    it 'returns expected systen information' do
       system_info = described_class.system_info
       expect(system_info.keys).to eq %w[
         VERSION
