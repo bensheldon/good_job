@@ -314,6 +314,8 @@ module GoodJob
             execution = current_execution
             execution.assign_attributes(enqueue_args(active_job, { scheduled_at: scheduled_at }))
             execution.scheduled_at ||= Time.current
+            # TODO: these values ideally shouldn't be persisted until the current_execution is finished
+            #   which will require handling `retry_job` being called from outside the execution context.
             execution.performed_at = nil
             execution.finished_at = nil
           else
@@ -335,7 +337,11 @@ module GoodJob
         instrument_payload[:execution] = execution
         execution.save!
 
-        CurrentThread.execution.retried_good_job_id = execution.id if retried && !CurrentThread.execution.discrete?
+        if retried
+          CurrentThread.execution_retried = true
+          CurrentThread.execution.retried_good_job_id = execution.id unless current_execution.discrete?
+        end
+
         active_job.provider_job_id = execution.id
         execution
       end
@@ -402,9 +408,9 @@ module GoodJob
             instrument_payload.merge!(
               value: value,
               handled_error: handled_error,
-              retried: current_thread.error_on_retry.present?
+              retried: current_thread.execution_retried
             )
-            ExecutionResult.new(value: value, handled_error: handled_error, retried: current_thread.error_on_retry.present?)
+            ExecutionResult.new(value: value, handled_error: handled_error, retried: current_thread.execution_retried)
           rescue StandardError => e
             instrument_payload[:unhandled_error] = e
             ExecutionResult.new(value: nil, unhandled_error: e)
