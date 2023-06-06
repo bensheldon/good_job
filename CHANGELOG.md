@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.15.11](https://github.com/bensheldon/good_job/tree/v3.15.11) (2023-06-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.10...v3.15.11)
+
+**Fixed bugs:**
+
+- Fix `discrete_executions` job re-enqueueing when `retry_job` is called directly [\#973](https://github.com/bensheldon/good_job/pull/973) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Unclear how discrete executions should work with reenqueued  jobs \(leads to broken job-iteration\) [\#972](https://github.com/bensheldon/good_job/issues/972)
+- `build_for_enqueue` discards `scheduled_at` values for bulk-enqueued jobs [\#966](https://github.com/bensheldon/good_job/issues/966)
+
 ## [v3.15.10](https://github.com/bensheldon/good_job/tree/v3.15.10) (2023-05-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.9...v3.15.10)
