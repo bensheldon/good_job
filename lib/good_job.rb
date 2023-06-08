@@ -7,9 +7,15 @@ require "good_job/engine"
 
 require "good_job/adapter"
 require "active_job/queue_adapters/good_job_adapter"
+require "good_job/active_job_extensions/batches"
 require "good_job/active_job_extensions/concurrency"
+require "good_job/interrupt_error"
+require "good_job/active_job_extensions/interrupt_errors"
+require "good_job/active_job_extensions/notify_options"
 
 require "good_job/assignable_connection"
+require "good_job/bulk"
+require "good_job/capsule"
 require "good_job/cleanup_tracker"
 require "good_job/cli"
 require "good_job/configuration"
@@ -54,9 +60,10 @@ module GoodJob
   # @!attribute [rw] preserve_job_records
   #   @!scope class
   #   Whether to preserve job records in the database after they have finished (default: +true+).
-  #   By default, GoodJob deletes job records after the job is completed successfully.
   #   If you want to preserve jobs for latter inspection, set this to +true+.
   #   If you want to preserve only jobs that finished with error for latter inspection, set this to +:on_unhandled_error+.
+  #   If you do not want to preserve jobs, set this to +false+.
+  #   When using GoodJob's cron functionality, job records will be preserved for a brief time to prevent duplicate jobs.
   #   @return [Boolean, Symbol, nil]
   mattr_accessor :preserve_job_records, default: true
 
@@ -85,6 +92,12 @@ module GoodJob
   #   @return [GoodJob::Configuration, nil]
   mattr_accessor :configuration, default: GoodJob::Configuration.new({})
 
+  # @!attribute [rw] capsule
+  #   @!scope class
+  #   Global/default execution capsule for GoodJob.
+  #   @return [GoodJob::Capsule, nil]
+  mattr_accessor :capsule, default: GoodJob::Capsule.new(configuration: configuration)
+
   # Called with exception when a GoodJob thread raises an exception
   # @param exception [Exception] Exception that was raised
   # @return [void]
@@ -102,16 +115,15 @@ module GoodJob
   #   * +-1+, the scheduler will wait until the shutdown is complete.
   #   * +0+, the scheduler will immediately shutdown and stop any active tasks.
   #   * +1..+, the scheduler will wait that many seconds before stopping any remaining active tasks.
-  # @param wait [Boolean] whether to wait for shutdown
   # @return [void]
   def self.shutdown(timeout: -1)
-    _shutdown_all(_executables, timeout: timeout)
+    _shutdown_all(Capsule.instances, timeout: timeout)
   end
 
   # Tests whether jobs have stopped executing.
   # @return [Boolean] whether background threads are shut down
   def self.shutdown?
-    _executables.all?(&:shutdown?)
+    Capsule.instances.all?(&:shutdown?)
   end
 
   # Stops and restarts executing jobs.
@@ -119,10 +131,10 @@ module GoodJob
   # When forking processes you should shut down these background threads before forking, and restart them after forking.
   # For example, you should use +shutdown+ and +restart+ when using async execution mode with Puma.
   # See the {file:README.md#executing-jobs-async--in-process} for more explanation and examples.
-  # @param timeout [Numeric, nil] Seconds to wait for active threads to finish.
+  # @param timeout [Numeric] Seconds to wait for active threads to finish.
   # @return [void]
   def self.restart(timeout: -1)
-    _shutdown_all(_executables, :restart, timeout: timeout)
+    _shutdown_all(Capsule.instances, :restart, timeout: timeout)
   end
 
   # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager})
@@ -141,27 +153,59 @@ module GoodJob
     end
   end
 
-  # Destroys preserved job records.
+  # Destroys preserved job and batch records.
   # By default, GoodJob destroys job records when the job is performed and this
   # method is not necessary. However, when `GoodJob.preserve_job_records = true`,
   # the jobs will be preserved in the database. This is useful when wanting to
   # analyze or inspect job performance.
   # If you are preserving job records this way, use this method regularly to
   # destroy old records and preserve space in your database.
-  # @params older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
-  # @return [Integer] Number of jobs that were destroyed.
-  def self.cleanup_preserved_jobs(older_than: nil)
+  # @param older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
+  # @return [Integer] Number of job execution records and batches that were destroyed.
+  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000)
     older_than ||= GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
     include_discarded = GoodJob.configuration.cleanup_discarded_jobs?
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
-      old_jobs = GoodJob::Job.where('finished_at <= ?', timestamp)
-      old_jobs = old_jobs.succeeded unless include_discarded
-      old_jobs_count = old_jobs.count
+      deleted_executions_count = 0
+      deleted_batches_count = 0
+      deleted_discrete_executions_count = 0
 
-      GoodJob::Execution.where(job: old_jobs).delete_all
-      payload[:destroyed_records_count] = old_jobs_count
+      jobs_query = GoodJob::Job.where('finished_at <= ?', timestamp).order(finished_at: :asc).limit(in_batches_of)
+      jobs_query = jobs_query.succeeded unless include_discarded
+      loop do
+        active_job_ids = jobs_query.pluck(:active_job_id)
+        break if active_job_ids.empty?
+
+        if GoodJob::Execution.discrete_support?
+          deleted_discrete_executions = GoodJob::DiscreteExecution.where(active_job_id: active_job_ids).delete_all
+          deleted_discrete_executions_count += deleted_discrete_executions
+        end
+
+        deleted_executions = GoodJob::Execution.where(active_job_id: active_job_ids).delete_all
+        deleted_executions_count += deleted_executions
+      end
+
+      if GoodJob::BatchRecord.migrated?
+        batches_query = GoodJob::BatchRecord.where('finished_at <= ?', timestamp).limit(in_batches_of)
+        batches_query = batches_query.succeeded unless include_discarded
+        loop do
+          deleted = batches_query.delete_all
+          break if deleted.zero?
+
+          deleted_batches_count += deleted
+        end
+      end
+
+      payload[:destroyed_batches_count] = deleted_batches_count
+      payload[:destroyed_discrete_executions_count] = deleted_discrete_executions_count
+      payload[:destroyed_executions_count] = deleted_executions_count
+
+      destroyed_records_count = deleted_batches_count + deleted_discrete_executions_count + deleted_executions_count
+      payload[:destroyed_records_count] = destroyed_records_count
+
+      destroyed_records_count
     end
   end
 
@@ -179,13 +223,13 @@ module GoodJob
     end
   end
 
-  def self._executables
-    [].concat(
-      CronManager.instances,
-      Notifier.instances,
-      Poller.instances,
-      Scheduler.instances
-    )
+  # Deprecator for providing deprecation warnings.
+  # @return [ActiveSupport::Deprecation]
+  def self.deprecator
+    @_deprecator ||= begin
+      next_major_version = GEM_VERSION.segments[0] + 1
+      ActiveSupport::Deprecation.new("#{next_major_version}.0", "GoodJob")
+    end
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)

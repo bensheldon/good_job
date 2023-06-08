@@ -1,6 +1,7 @@
 inherit_from: .rubocop_todo.yml
 
 require:
+  - rubocop-capybara
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
@@ -11,7 +12,7 @@ inherit_mode:
     - Include
 
 AllCops:
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.6
   TargetRailsVersion: 6.0
   DisplayCopNames: true
   DisplayStyleGuide: true
@@ -20,11 +21,15 @@ AllCops:
   Exclude:
     - pkg/**/*
     - spec/test_app/**/*
+    - tmp/**/*
     - vendor/**/*
     - scripts/**/*
     - gemfiles/**/*
     - Brewfile
   NewCops: enable
+
+Gemspec/DevelopmentDependencies:
+  Enabled: false
 
 Layout/EmptyLineAfterMagicComment:
   Enabled: false
@@ -47,8 +52,8 @@ Metrics:
 Naming/MemoizedInstanceVariableName:
   EnforcedStyleForLeadingUnderscores: required
 
-Rails/RakeEnvironment:
-  Enabled: false
+Naming/VariableNumber:
+  EnforcedStyle: snake_case
 
 Rails/ApplicationJob:
   Enabled: false
@@ -56,9 +61,15 @@ Rails/ApplicationJob:
 Rails/ApplicationRecord:
   Enabled: false
 
+Rails/I18nLocaleTexts:
+  Enabled: false
+
 Rails/Inquiry:
   Exclude:
     - spec/**/*
+
+Rails/RakeEnvironment:
+  Enabled: false
 
 Rails/SkipsModelValidations:
   Exclude:
@@ -74,6 +85,9 @@ RSpec/DescribeClass:
 RSpec/ExampleLength:
   Enabled: false
 
+RSpec/IndexedLet:
+  Enabled: false
+
 RSpec/LetSetup:
   Enabled: false
 
@@ -87,10 +101,10 @@ RSpec/MultipleDescribes:
   Exclude:
     - spec/lib/tasks/*
 
-RSpec/NestedGroups:
+RSpec/MultipleMemoizedHelpers:
   Enabled: false
 
-RSpec/MultipleMemoizedHelpers:
+RSpec/NestedGroups:
   Enabled: false
 
 Style/Documentation:
@@ -132,6 +146,3 @@ Style/TrailingCommaInArrayLiteral:
 
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
-
-Naming/VariableNumber:
-  EnforcedStyle: snake_case

@@ -5,7 +5,7 @@ module GoodJob
   # The +good_jobs+ table is a table of individual {GoodJob::Execution}s that share the same +active_job_id+.
   # A single row from the +good_jobs+ table of executions is fetched to represent a Job.
   #
-  class Job < BaseRecord
+  class Job < BaseExecution
     include Filterable
     include Lockable
     include Reportable
@@ -28,17 +28,16 @@ module GoodJob
     self.primary_key = 'active_job_id'
     self.advisory_lockable_column = 'active_job_id'
 
+    belongs_to :batch, class_name: 'GoodJob::BatchRecord', inverse_of: :jobs, optional: true
     has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
+    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
+
+    after_destroy lambda {
+      GoodJob::DiscreteExecution.where(active_job_id: active_job_id).delete_all if discrete? # TODO: move into association `dependent: :delete_all` after v4
+    }
 
     # Only the most-recent unretried execution represents a "Job"
     default_scope { where(retried_good_job_id: nil) }
-
-    # Get Jobs with given class name
-    # @!method job_class
-    # @!scope class
-    # @param string [String] Execution class name
-    # @return [ActiveRecord::Relation]
-    scope :job_class, ->(job_class) { where("serialized_params->>'job_class' = ?", job_class) }
 
     # Get Jobs finished before the given timestamp.
     # @!method finished_before(timestamp)
@@ -48,11 +47,11 @@ module GoodJob
     scope :finished_before, ->(timestamp) { where(arel_table['finished_at'].lteq(timestamp)) }
 
     # First execution will run in the future
-    scope :scheduled, -> { where(finished_at: nil).where('COALESCE(scheduled_at, created_at) > ?', DateTime.current).where("(serialized_params->>'executions')::integer < 2") }
+    scope :scheduled, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(DateTime.current)).where(params_execution_count.lt(2)) }
     # Execution errored, will run in the future
-    scope :retried, -> { where(finished_at: nil).where('COALESCE(scheduled_at, created_at) > ?', DateTime.current).where("(serialized_params->>'executions')::integer > 1") }
+    scope :retried, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(DateTime.current)).where(params_execution_count.gt(1)) }
     # Immediate/Scheduled time to run has passed, waiting for an available thread run
-    scope :queued, -> { where(finished_at: nil).where('COALESCE(scheduled_at, created_at) <= ?', DateTime.current).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
+    scope :queued, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.lteq(DateTime.current)).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
     # Advisory locked and executing
     scope :running, -> { where(finished_at: nil).joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
     # Finished executing (succeeded or discarded)
@@ -62,16 +61,12 @@ module GoodJob
     # Errored but will not be retried
     scope :discarded, -> { finished.where.not(error: nil) }
 
+    scope :unfinished_undiscrete, -> { where(finished_at: nil, retried_good_job_id: nil, is_discrete: [nil, false]) }
+
     # The job's ActiveJob UUID
     # @return [String]
     def id
       active_job_id
-    end
-
-    # The ActiveJob job class, as a string
-    # @return [String]
-    def job_class
-      serialized_params['job_class']
     end
 
     # Override #reload to add a custom scope to ensure the reloaded record is the head execution
@@ -135,6 +130,16 @@ module GoodJob
       error || executions[-2]&.error
     end
 
+    # Errors for the job to be displayed in the Dashboard.
+    # @return [String]
+    def display_error
+      return error if error.present?
+
+      serialized_params.fetch('exception_executions', {}).map do |exception, count|
+        "#{exception}: #{count}"
+      end.join(', ')
+    end
+
     # Return formatted serialized_params for display in the dashboard
     # @return [Hash]
     def display_serialized_params
@@ -193,9 +198,10 @@ module GoodJob
 
           execution.class.transaction(joinable: false, requires_new: true) do
             new_active_job = active_job.retry_job(wait: 0, error: execution.error)
-            execution.save
+            execution.save!
           end
         end
+
         new_active_job
       end
     end
@@ -206,7 +212,7 @@ module GoodJob
     def discard_job(message)
       with_advisory_lock do
         execution = head_execution(reload: true)
-        active_job = execution.active_job
+        active_job = execution.active_job(ignore_deserialization_errors: true)
 
         raise ActionForStateMismatchError if execution.finished_at.present?
 
@@ -215,7 +221,7 @@ module GoodJob
         update_execution = proc do
           execution.update(
             finished_at: Time.current,
-            error: [job_error.class, GoodJob::Execution::ERROR_MESSAGE_SEPARATOR, job_error.message].join
+            error: GoodJob::Execution.format_error(job_error)
           )
         end
 

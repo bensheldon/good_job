@@ -7,6 +7,9 @@ module GoodJob # :nodoc:
     include AssignableConnection
     include Lockable
 
+    STALE_INTERVAL = 30.seconds
+    EXPIRED_INTERVAL = 5.minutes
+
     self.table_name = 'good_job_processes'
 
     cattr_reader :mutex, default: Mutex.new
@@ -75,6 +78,22 @@ module GoodJob # :nodoc:
 
     def basename
       File.basename(state["proctitle"])
+    end
+
+    def refresh
+      touch(:updated_at)
+    end
+
+    def refresh_if_stale
+      refresh if stale?
+    end
+
+    def stale?
+      updated_at < STALE_INTERVAL.ago
+    end
+
+    def expired?
+      updated_at < EXPIRED_INTERVAL.ago
     end
   end
 end

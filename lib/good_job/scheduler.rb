@@ -121,18 +121,24 @@ module GoodJob # :nodoc:
 
         if executor.shuttingdown? && timeout
           executor_wait = timeout.negative? ? nil : timeout
-          executor.kill unless executor.wait_for_termination(executor_wait)
+
+          unless executor.wait_for_termination(executor_wait)
+            instrument("scheduler_shutdown_kill", { active_job_ids: @performer.performing_active_job_ids.to_a })
+            executor.kill
+          end
         end
       end
     end
 
     # Restart the Scheduler.
     # When shutdown, start; or shutdown and start.
-    # @param timeout [nil, Numeric] Seconds to wait for actively executing jobs to finish; shares same values as {#shutdown}.
+    # @param timeout [Numeric] Seconds to wait for actively executing jobs to finish; shares same values as {#shutdown}.
     # @return [void]
     def restart(timeout: -1)
+      raise ArgumentError, "Scheduler#restart cannot be called with a timeout of nil" if timeout.nil?
+
       instrument("scheduler_restart_pools") do
-        shutdown(timeout: timeout) if running?
+        shutdown(timeout: timeout)
         create_executor
         warm_cache
       end
@@ -150,6 +156,19 @@ module GoodJob # :nodoc:
 
       if state
         return false unless performer.next?(state)
+
+        if state[:count]
+          # When given state for multiple jobs, try to create a thread for each one.
+          # Return true if a thread can be created for all of them, nil if partial or none.
+
+          state_without_count = state.without(:count)
+          result = state[:count].times do
+            value = create_thread(state_without_count)
+            break(value) unless value
+          end
+
+          return result.nil? ? nil : true
+        end
 
         if state[:scheduled_at]
           scheduled_at = if state[:scheduled_at].is_a? String

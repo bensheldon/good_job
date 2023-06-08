@@ -1,80 +1,236 @@
 ---
 ru:
-  datetime:
-    distance_in_words:
-      about_x_hours:
-        few: около %{count} часов
-        many: около %{count} часов
-        one: около 1 часа
-        other: около %{count} часа
-      about_x_months:
-        few: около %{count} месяцев
-        many: около %{count} месяцев
-        one: около 1 месяца
-        other: около %{count} месяца
-      about_x_years:
-        few: около %{count} лет
-        many: около %{count} лет
-        one: около 1 года
-        other: около %{count} лет
-      almost_x_years:
-        few: почти %{count} года
-        many: почти %{count} лет
-        one: почти 1 год
-        other: почти %{count} лет
-      half_a_minute: полминуты
-      less_than_x_minutes:
-        few: меньше %{count} минут
-        many: меньше %{count} минут
-        one: меньше 1 минуты
-        other: меньше %{count} минуты
-      less_than_x_seconds:
-        few: меньше %{count} секунд
-        many: меньше %{count} секунд
-        one: меньше 1 секунды
-        other: меньше %{count} секунды
-      over_x_years:
-        few: больше %{count} лет
-        many: больше %{count} лет
-        one: больше 1 года
-        other: больше %{count} лет
-      x_days:
-        few: "%{count} дня"
-        many: "%{count} дней"
-        one: 1 день
-        other: "%{count} дня"
-      x_minutes:
-        few: "%{count} минуты"
-        many: "%{count} минут"
-        one: 1 минуту
-        other: "%{count} минуты"
-      x_months:
-        few: "%{count} месяца"
-        many: "%{count} месяцев"
-        one: 1 месяц
-        other: "%{count} месяца"
-      x_seconds:
-        few: "%{count} секунды"
-        many: "%{count} секунд"
-        one: 1 секунду
-        other: "%{count} секунды"
-      x_years:
-        few: "%{count} года"
-        many: "%{count} лет"
-        one: 1 год
-        other: "%{count} года"
-  duration:
-    hours: "%{hour}h %{min}m"
-    less_than_10_seconds: "%{sec}s"
-    milliseconds: "%{ms}мс"
-    minutes: "%{min}м %{sec}с"
-    seconds: "%{sec}s"
   good_job:
+    actions:
+      destroy: Разрушать
+      discard: Отказаться
+      inspect: Осмотреть
+      reschedule: Перенести
+      retry: Повторить попытку
+    batches:
+      index:
+        older_batches: Старые партии
+        pending_migrations: У GoodJob есть ожидающие миграции базы данных.
+        title: Пакеты
+      jobs:
+        actions:
+          confirm_destroy: Вы уверены, что хотите уничтожить эту работу?
+          confirm_discard: Вы уверены, что хотите отказаться от этого задания?
+          confirm_reschedule: Вы уверены, что хотите перенести это задание?
+          confirm_retry: Вы уверены, что хотите повторить это задание?
+          destroy: Уничтожить работу
+          discard: Отменить задание
+          reschedule: Перенести задание
+          retry: Повторить задание
+          title: Действия
+        no_jobs_found: Вакансий не найдено.
+      show:
+        attributes: Атрибуты
+        batched_jobs: Пакетные задания
+        callback_jobs: Задания обратного вызова
+      table:
+        no_batches_found: Партии не найдены.
+    cron_entries:
+      actions:
+        confirm_disable: Вы уверены, что хотите отключить эту запись cron?
+        confirm_enable: Вы уверены, что хотите подтвердить эту запись cron?
+        confirm_enqueue: Вы уверены, что хотите поставить эту запись cron в очередь?
+        disable: Отключить запись cron
+        enable: Включить запись cron
+        enqueue: Поставить в очередь запись cron сейчас
+      disable:
+        notice: Запись Cron отключена.
+      enable:
+        notice: Запись Cron включена.
+      enqueue:
+        notice: Запись Cron поставлена в очередь.
+      index:
+        no_cron_schedules_found: Расписания cron не найдены.
+        title: Расписания Cron
+      pending_migrations: Требуется отложенная миграция базы данных GoodJob.
+      show:
+        cron_entry_key: Ключ входа в Крон
+    datetime:
+      distance_in_words:
+        about_x_hours:
+          few: около %{count} часов
+          many: около %{count} часов
+          one: около 1 часа
+          other: около %{count} часа
+        about_x_months:
+          few: около %{count} месяцев
+          many: около %{count} месяцев
+          one: около 1 месяца
+          other: около %{count} месяца
+        about_x_years:
+          few: около %{count} лет
+          many: около %{count} лет
+          one: около 1 года
+          other: около %{count} лет
+        almost_x_years:
+          few: почти %{count} года
+          many: почти %{count} лет
+          one: почти 1 год
+          other: почти %{count} лет
+        half_a_minute: полминуты
+        less_than_x_minutes:
+          few: меньше %{count} минут
+          many: меньше %{count} минут
+          one: меньше 1 минуты
+          other: меньше %{count} минуты
+        less_than_x_seconds:
+          few: меньше %{count} секунд
+          many: меньше %{count} секунд
+          one: меньше 1 секунды
+          other: меньше %{count} секунды
+        over_x_years:
+          few: больше %{count} лет
+          many: больше %{count} лет
+          one: больше 1 года
+          other: больше %{count} лет
+        x_days:
+          few: "%{count} дня"
+          many: "%{count} дней"
+          one: 1 день
+          other: "%{count} дня"
+        x_minutes:
+          few: "%{count} минуты"
+          many: "%{count} минут"
+          one: 1 минуту
+          other: "%{count} минуты"
+        x_months:
+          few: "%{count} месяца"
+          many: "%{count} месяцев"
+          one: 1 месяц
+          other: "%{count} месяца"
+        x_seconds:
+          few: "%{count} секунды"
+          many: "%{count} секунд"
+          one: 1 секунду
+          other: "%{count} секунды"
+        x_years:
+          few: "%{count} года"
+          many: "%{count} лет"
+          one: 1 год
+          other: "%{count} года"
+    duration:
+      hours: "%{hour}ч %{min}м"
+      less_than_10_seconds: "%{sec}s"
+      milliseconds: "%{ms}мс"
+      minutes: "%{min}м %{sec}с"
+      seconds: "%{sec}s"
+    helpers:
+      relative_time:
+        future: в %{time}
+        past: "%{time} назад"
+    jobs:
+      actions:
+        confirm_destroy: Вы уверены, что хотите уничтожить задание?
+        confirm_discard: Вы уверены, что хотите отказаться от задания?
+        confirm_reschedule: Вы уверены, что хотите перенести задание?
+        confirm_retry: Вы уверены, что хотите повторить задание?
+        destroy: Уничтожить работу
+        discard: Отменить задание
+        reschedule: Перенести задание
+        retry: Повторить задание
+      destroy:
+        notice: Работа была уничтожена
+      discard:
+        notice: Работа удалена
+      executions:
+        error: Ошибка
+        in_queue: в очереди
+        runtime: время выполнения
+        title: Казни
+      index:
+        job_pagination: Пагинация вакансий
+        older_jobs: Старые рабочие места
+      reschedule:
+        notice: Работа была перенесена
+      retry:
+        notice: Задание было повторено
+      show:
+        jobs: Работа
+      table:
+        actions:
+          apply_to_all:
+            few: около %{count} часов
+            many: около %{count} часов
+            one: около 1 часа
+            other: около %{count} часа
+          confirm_destroy_all: Вы уверены, что хотите уничтожить выбранные задания?
+          confirm_discard_all: Вы действительно хотите отказаться от выбранных заданий?
+          confirm_reschedule_all: Вы уверены, что хотите изменить расписание выбранных заданий?
+          confirm_retry_all: Вы уверены, что хотите повторить выбранные задания?
+          destroy_all: Уничтожить все
+          discard_all: Отменить все
+          reschedule_all: Перенести все
+          retry_all: Повторить все
+          title: Действия
+        no_jobs_found: Вакансий не найдено.
+        toggle_actions: Переключить действия
+        toggle_all_jobs: Переключить все задания
+    models:
+      batch:
+        created: Созданный
+        created_at: Создан в
+        discarded: Отброшено
+        discarded_at: Отброшено в
+        enqueued: В очереди
+        enqueued_at: В очереди в
+        finished: Законченный
+        finished_at: Закончено в
+        jobs: Работа
+        name: Имя
+      cron:
+        class: Сорт
+        last_run: Последний запуск
+        next_scheduled: Следующий по расписанию
+        schedule: Расписание
+      job:
+        arguments: Аргументы
+        attempts: Попытки
+        priority: приоритет
+        queue: Очередь
+    number:
+      format:
+        delimiter: " "
+        separator: ","
+      human:
+        decimal_units:
+          delimiter: " "
+          format: "%n%u"
+          precision: 3
+          separator: ","
+          units:
+            billion: Б
+            million: М
+            quadrillion: Q
+            thousand: К
+            trillion: Т
+            unit: ''
+    processes:
+      index:
+        no_good_job_processes_found: Процессы GoodJob не найдены.
+        process: Процесс
+        schedulers: Планировщики
+        started: Начал
+        title: Процессы
     shared:
+      filter:
+        all: Все
+        all_jobs: Все вакансии
+        all_queues: Все очереди
+        clear: Прозрачный
+        job_name: Название работы
+        placeholder: Поиск по классу, идентификатору задания, параметрам задания и тексту ошибки.
+        queue_name: Имя очереди
+        search: Поиск
       footer:
         last_update_html: Последнее обновление <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: Запомни, ты делаешь Good Job тоже!
       navbar:
+        batches: Batches
         cron_schedules: Cron
         jobs: Задачи
         live_poll: Живой Опрос
@@ -87,21 +243,3 @@ ru:
       running: Бег
       scheduled: по расписанию
       succeeded: удалось
-  number:
-    format:
-      delimiter: " "
-      separator: ","
-    human:
-      decimal_units:
-        format: "%n%u"
-        units:
-          billion: Б
-          million: М
-          quadrillion: Q
-          thousand: К
-          trillion: Т
-          unit: ''
-      format:
-        delimiter: " "
-        precision: 3
-        separator: ","

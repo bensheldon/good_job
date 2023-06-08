@@ -1,0 +1,32 @@
+<div class="border-bottom py-2 mb-3">
+  <div class="pt-2">
+    <div class="row align-items-center">
+      <div class="col">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><%= link_to t("good_job.batches.index.title"), batches_path %></li>
+            <li class="breadcrumb-item active" aria-current="page"><%= tag.code @batch.id, class: "text-muted" %></li>
+          </ol>
+          <h2 class="h5 mt-2"><%= @batch.description %></h2>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="my-4">
+  <h5><%= t ".attributes" %></h5>
+  <div class="bg-dark text-light p-3 rounded">
+    <%= tag.pre JSON.pretty_generate @batch.display_attributes, class: 'text-wrap text-break' %>
+  </div>
+</div>
+
+<div class="my-4">
+  <h5><%= t ".callback_jobs" %></h5>
+  <%= render 'jobs', jobs: @batch.callback_jobs.reverse %>
+</div>
+
+<div class="my-4">
+  <h5><%= t ".batched_jobs" %></h5>
+  <%= render 'jobs', jobs: @batch.jobs.reverse %>
+</div>

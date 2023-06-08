@@ -62,9 +62,9 @@ RSpec.describe GoodJob::JobsFilter do
       expect(filter.states).to eq({
                                     "scheduled" => 1,
                                     "retried" => 0,
-                                    "queued" => 0,
+                                    "queued" => 1,
                                     "running" => 1,
-                                    "succeeded" => 2,
+                                    "succeeded" => 1,
                                     "discarded" => 1,
                                   })
     end

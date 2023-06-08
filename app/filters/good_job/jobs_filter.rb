@@ -2,19 +2,21 @@
 module GoodJob
   class JobsFilter < BaseFilter
     def states
-      query = filtered_query(params.except(:state)).unscope(:select)
-      {
-        'scheduled' =>  query.scheduled.count,
-        'retried' => query.retried.count,
-        'queued' => query.queued.count,
-        'running' => query.running.count,
-        'succeeded' => query.succeeded.count,
-        'discarded' => query.discarded.count,
-      }
+      @_states ||= begin
+        query = filtered_query(params.except(:state))
+        {
+          'scheduled' =>  query.scheduled.count,
+          'retried' => query.retried.count,
+          'queued' => query.queued.count,
+          'running' => query.running.count,
+          'succeeded' => query.succeeded.count,
+          'discarded' => query.discarded.count,
+        }
+      end
     end
 
     def filtered_query(filter_params = params)
-      query = base_query.includes(:executions).includes_advisory_locks
+      query = base_query
 
       query = query.job_class(filter_params[:job_class]) if filter_params[:job_class].present?
       query = query.where(queue_name: filter_params[:queue_name]) if filter_params[:queue_name].present?
@@ -42,10 +44,14 @@ module GoodJob
     end
 
     def filtered_count
-      filtered_query.unscope(:select).count
+      @_filtered_count ||= filtered_query.unscope(:select).count
     end
 
     private
+
+    def query_for_records
+      filtered_query.includes_advisory_locks
+    end
 
     def default_base_query
       GoodJob::Job.all

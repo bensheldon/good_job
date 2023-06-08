@@ -24,9 +24,10 @@ module GoodJob
     #   -+test+: +:inline+
     #  - +production+ and all other environments: +:external+
     #
-    def initialize(execution_mode: nil)
+    def initialize(execution_mode: nil, _capsule: GoodJob.capsule) # rubocop:disable Lint/UnderscorePrefixedVariableName
       @_execution_mode_override = execution_mode
       GoodJob::Configuration.validate_execution_mode(@_execution_mode_override) if @_execution_mode_override
+      @capsule = _capsule
 
       self.class.instances << self
       start_async if GoodJob.async_ready?
@@ -40,6 +41,81 @@ module GoodJob
       enqueue_at(active_job, nil)
     end
 
+    # Enqueues multiple ActiveJob instances at once
+    # @param active_jobs [Array<ActiveJob::Base>] jobs to be enqueued
+    # @return [Integer] number of jobs that were successfully enqueued
+    def enqueue_all(active_jobs)
+      active_jobs = Array(active_jobs)
+      return 0 if active_jobs.empty?
+
+      current_time = Time.current
+      executions = active_jobs.map do |active_job|
+        GoodJob::Execution.build_for_enqueue(active_job).tap do |execution|
+          if GoodJob::Execution.discrete_support?
+            execution.make_discrete
+            execution.scheduled_at = current_time if execution.scheduled_at == execution.created_at
+          end
+
+          execution.created_at = current_time
+          execution.updated_at = current_time
+        end
+      end
+
+      inline_executions = []
+      GoodJob::Execution.transaction(requires_new: true, joinable: false) do
+        results = GoodJob::Execution.insert_all(executions.map(&:attributes), returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
+
+        job_id_to_provider_job_id = results.each_with_object({}) { |result, hash| hash[result['active_job_id']] = result['id'] }
+        active_jobs.each do |active_job|
+          active_job.provider_job_id = job_id_to_provider_job_id[active_job.job_id]
+          active_job.successfully_enqueued = active_job.provider_job_id.present? if active_job.respond_to?(:successfully_enqueued=)
+        end
+        executions.each do |execution|
+          execution.instance_variable_set(:@new_record, false) if job_id_to_provider_job_id[execution.active_job_id]
+        end
+        executions = executions.select(&:persisted?) # prune unpersisted executions
+
+        if execute_inline?
+          inline_executions = executions.select { |execution| (execution.scheduled_at.nil? || execution.scheduled_at <= Time.current) }
+          inline_executions.each(&:advisory_lock!)
+        end
+      end
+
+      begin
+        until inline_executions.empty?
+          begin
+            inline_execution = inline_executions.shift
+            inline_result = inline_execution.perform
+          ensure
+            inline_execution.advisory_unlock
+            inline_execution.run_callbacks(:perform_unlocked)
+          end
+          raise inline_result.unhandled_error if inline_result.unhandled_error
+        end
+      ensure
+        inline_executions.each(&:advisory_unlock)
+      end
+
+      non_inline_executions = executions.reject(&:finished_at)
+      if non_inline_executions.any?
+        job_id_to_active_jobs = active_jobs.index_by(&:job_id)
+        non_inline_executions.group_by(&:queue_name).each do |queue_name, executions_by_queue|
+          executions_by_queue.group_by(&:scheduled_at).each do |scheduled_at, executions_by_queue_and_scheduled_at|
+            state = { queue_name: queue_name, count: executions_by_queue_and_scheduled_at.size }
+            state[:scheduled_at] = scheduled_at if scheduled_at
+
+            executed_locally = execute_async? && @capsule&.create_thread(state)
+            unless executed_locally
+              state[:count] = job_id_to_active_jobs.values_at(*executions_by_queue_and_scheduled_at.map(&:active_job_id)).count { |active_job| send_notify?(active_job) }
+              Notifier.notify(state) unless state[:count].zero?
+            end
+          end
+        end
+      end
+
+      active_jobs.count(&:provider_job_id)
+    end
+
     # Enqueues an ActiveJob job to be run at a specific time.
     # For use by Rails; you should generally not call this directly.
     # @param active_job [ActiveJob::Base] the job to be enqueued from +#perform_later+
@@ -47,8 +123,12 @@ module GoodJob
     # @return [GoodJob::Execution]
     def enqueue_at(active_job, timestamp)
       scheduled_at = timestamp ? Time.zone.at(timestamp) : nil
-      will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
 
+      # If there is a currently open Bulk in the current thread, direct the
+      # job there to be enqueued using enqueue_all
+      return if GoodJob::Bulk.capture(active_job, queue_adapter: self)
+
+      will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
       execution = GoodJob::Execution.enqueue(
         active_job,
         scheduled_at: scheduled_at,
@@ -67,8 +147,8 @@ module GoodJob
         job_state = { queue_name: execution.queue_name }
         job_state[:scheduled_at] = execution.scheduled_at if execution.scheduled_at
 
-        executed_locally = execute_async? && @scheduler&.create_thread(job_state)
-        Notifier.notify(job_state) unless executed_locally
+        executed_locally = execute_async? && @capsule&.create_thread(job_state)
+        Notifier.notify(job_state) if !executed_locally && send_notify?(active_job)
       end
 
       execution
@@ -76,20 +156,13 @@ module GoodJob
 
     # Shut down the thread pool executors.
     # @param timeout [nil, Numeric, Symbol] Seconds to wait for active threads.
-    #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
-    #   * +-1+, the scheduler will wait until the shutdown is complete.
-    #   * +0+, the scheduler will immediately shutdown and stop any threads.
+    #   * +nil+ trigger a shutdown but not wait for it to complete.
+    #   * +-1+ wait until the shutdown is complete.
+    #   * +0+ immediately shutdown and stop any threads.
     #   * A positive number will wait that many seconds before stopping any remaining active threads.
     # @return [void]
     def shutdown(timeout: :default)
-      timeout = if timeout == :default
-                  GoodJob.configuration.shutdown_timeout
-                else
-                  timeout
-                end
-
-      executables = [@notifier, @poller, @scheduler].compact
-      GoodJob._shutdown_all(executables, timeout: timeout)
+      @capsule&.shutdown(timeout: timeout)
       @_async_started = false
     end
 
@@ -125,14 +198,7 @@ module GoodJob
     def start_async
       return unless execute_async?
 
-      @notifier = GoodJob::Notifier.new
-      @poller = GoodJob::Poller.new(poll_interval: GoodJob.configuration.poll_interval)
-      @scheduler = GoodJob::Scheduler.from_configuration(GoodJob.configuration, warm_cache_on_initialize: true)
-      @notifier.recipients << [@scheduler, :create_thread]
-      @poller.recipients << [@scheduler, :create_thread]
-
-      @cron_manager = GoodJob::CronManager.new(GoodJob.configuration.cron_entries, start_on_initialize: true) if GoodJob.configuration.enable_cron?
-
+      @capsule.start
       @_async_started = true
     end
 
@@ -157,6 +223,13 @@ module GoodJob
           self_caller.grep(%{/rack/handler/}).any? || # EXAMPLE: iodine-0.7.44/lib/rack/handler/iodine.rb:13:in `start'
           (Concurrent.on_jruby? && self_caller.grep(%r{jruby/rack/rails_booter}).any?) # EXAMPLE: uri:classloader:/jruby/rack/rails_booter.rb:83:in `load_environment'
       end
+    end
+
+    def send_notify?(active_job)
+      return false unless GoodJob.configuration.enable_listen_notify
+      return true unless active_job.respond_to?(:good_job_notify)
+
+      !(active_job.good_job_notify == false || (active_job.class.good_job_notify == false && active_job.good_job_notify.nil?))
     end
   end
 end

@@ -53,7 +53,7 @@ module GoodJob
       process_id = event.payload[:process_id]
 
       info(tags: [process_id]) do
-        "GoodJob started scheduler with queues=#{performer_name} max_threads=#{max_threads}."
+        "GoodJob #{GoodJob::VERSION} started scheduler with queues=#{performer_name} max_threads=#{max_threads}."
       end
     end
 
@@ -82,6 +82,19 @@ module GoodJob
 
       info(tags: [process_id]) do
         "GoodJob scheduler is shut down."
+      end
+    end
+
+    def scheduler_shutdown_kill(event)
+      process_id = event.payload[:process_id]
+
+      warn(tags: [process_id]) do
+        active_job_ids = event.payload.fetch(:active_job_ids, [])
+        if active_job_ids.any?
+          "GoodJob scheduler has been killed. The following Active Jobs were interrupted: #{active_job_ids.join(' ')}"
+        else
+          "GoodJob scheduler has been killed."
+        end
       end
     end
 
@@ -143,7 +156,7 @@ module GoodJob
       destroyed_records_count = event.payload[:destroyed_records_count]
 
       info do
-        "GoodJob destroyed #{destroyed_records_count} preserved #{'job'.pluralize(destroyed_records_count)} finished before #{timestamp}."
+        "GoodJob destroyed #{destroyed_records_count} preserved job execution #{'records'.pluralize(destroyed_records_count)} finished before #{timestamp}."
       end
     end
 

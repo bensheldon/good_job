@@ -13,7 +13,7 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
-gem 'appraisal', github: "bensheldon/appraisal", branch: "fix-bundle-env" # https://github.com/thoughtbot/appraisal/pull/174
+gem 'appraisal', github: 'thoughtbot/appraisal', branch: 'main'
 gem 'matrix'
 gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
@@ -24,8 +24,15 @@ gem "spoom", require: false, group: :development
 gem "tapioca", require: false, group: :development
 
 platforms :ruby do
-  gem "activerecord-explain-analyze"
+  gem "activerecord-explain-analyze", require: false
   gem "pry-byebug"
+  gem 'rack-mini-profiler'
+  gem "rbtrace"
+  gem 'stackprof'
+
+  gem 'net-imap', require: false
+  gem 'net-pop', require: false
+  gem 'net-smtp', require: false
 
   group :lint do
     gem 'easy_translate'

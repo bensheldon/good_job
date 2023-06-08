@@ -48,7 +48,7 @@ Gem::Specification.new do |spec|
     "--quiet"
   ]
 
-  spec.required_ruby_version = ">= 2.5.0"
+  spec.required_ruby_version = ">= 2.6.0"
 
   spec.add_dependency "activejob", ">= 6.0.0"
   spec.add_dependency "activerecord", ">= 6.0.0"
@@ -60,7 +60,6 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "capybara"
-  spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "dotenv", "~> 2.7.6" # required for Ruby 2.5 support
   spec.add_development_dependency "foreman"
   spec.add_development_dependency "gem-release"

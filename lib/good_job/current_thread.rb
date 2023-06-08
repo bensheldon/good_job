@@ -12,6 +12,8 @@ module GoodJob
       error_on_discard
       error_on_retry
       execution
+      execution_interrupted
+      execution_retried
     ].freeze
 
     # @!attribute [rw] cron_at
@@ -43,6 +45,18 @@ module GoodJob
     #   Execution
     #   @return [GoodJob::Execution, nil]
     thread_mattr_accessor :execution
+
+    # @!attribute [rw] execution_interrupted
+    #   @!scope class
+    #   Execution Interrupted
+    #   @return [Boolean, nil]
+    thread_mattr_accessor :execution_interrupted
+
+    # @!attribute [rw] execution_retried
+    #   @!scope class
+    #   Execution Retried
+    #   @return [Boolean, nil]
+    thread_mattr_accessor :execution_retried
 
     # Resets attributes
     # @param [Hash] values to assign

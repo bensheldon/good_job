@@ -92,16 +92,11 @@ module GoodJob
       set_up_application!
       GoodJob.configuration.options.merge!(options.symbolize_keys)
       configuration = GoodJob.configuration
+      capsule = GoodJob.capsule
 
       Daemon.new(pidfile: configuration.pidfile).daemonize if configuration.daemonize?
 
-      notifier = GoodJob::Notifier.new
-      poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
-      scheduler = GoodJob::Scheduler.from_configuration(configuration, warm_cache_on_initialize: true)
-      notifier.recipients << [scheduler, :create_thread]
-      poller.recipients << [scheduler, :create_thread]
-
-      cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true) if configuration.enable_cron?
+      capsule.start
 
       if configuration.probe_port
         probe_server = GoodJob::ProbeServer.new(port: configuration.probe_port)
@@ -115,11 +110,10 @@ module GoodJob
 
       Kernel.loop do
         sleep 0.1
-        break if @stop_good_job_executable || scheduler.shutdown? || notifier.shutdown?
+        break if @stop_good_job_executable || capsule.shutdown?
       end
 
-      executors = [notifier, poller, cron_manager, scheduler].compact
-      GoodJob._shutdown_all(executors, timeout: configuration.shutdown_timeout)
+      capsule.shutdown(timeout: configuration.shutdown_timeout)
       probe_server&.stop
     end
 
@@ -128,23 +122,16 @@ module GoodJob
     # @!macro thor.desc
     desc :cleanup_preserved_jobs, "Destroys preserved job records."
     long_desc <<~DESCRIPTION
-      Destroys preserved job records.
+      Manually destroys preserved job records.
 
-      By default, GoodJob destroys job records when the job is performed and this
-      command is not necessary.
-
-      However, when `GoodJob.preserve_job_records = true`, the jobs will be
-      preserved in the database. This is useful when wanting to analyze or
-      inspect job performance.
-
-      If you are preserving job records this way, use this command regularly
-      to destroy old records and preserve space in your database.
+      By default, GoodJob automatically destroys job records when the job is performed
+      and this command is not required to be used.
 
     DESCRIPTION
     method_option :before_seconds_ago,
                   type: :numeric,
                   banner: 'SECONDS',
-                  desc: "Destroy records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 86400)"
+                  desc: "Destroy records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 1209600 (14 days))"
 
     def cleanup_preserved_jobs
       set_up_application!
@@ -161,7 +148,10 @@ module GoodJob
       # Rails or from the application can be set up here.
       def set_up_application!
         require RAILS_ENVIRONMENT_RB
-        return if !GoodJob::CLI.log_to_stdout? || ActiveSupport::Logger.logger_outputs_to?(GoodJob.logger, $stdout)
+        return unless GoodJob::CLI.log_to_stdout?
+
+        $stdout.sync = true
+        return if ActiveSupport::Logger.logger_outputs_to?(GoodJob.logger, $stdout)
 
         GoodJob::LogSubscriber.loggers << ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
         GoodJob::LogSubscriber.reset_logger

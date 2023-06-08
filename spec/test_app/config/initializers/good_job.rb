@@ -1,6 +1,6 @@
 Rails.application.configure do
-  # TODO: Remove on GoodJob 3.0 release
-  config.good_job.inline_execution_respects_schedule = true
+  # TODO: Remove on GoodJob 4.0 release
+  config.good_job.smaller_number_is_higher_priority = true
 
   config.good_job.cron = {
     example: {
@@ -13,12 +13,16 @@ end
 
 case Rails.env
 when 'development'
-  ActiveJob::Base.queue_adapter = :good_job
   GoodJob.on_thread_error = -> (error) { Rails.logger.warn("#{error}\n#{error.backtrace}") }
 
   Rails.application.configure do
     config.good_job.enable_cron = ActiveModel::Type::Boolean.new.cast(ENV.fetch('GOOD_JOB_ENABLE_CRON', true))
     config.good_job.cron = {
+      batch_example: {
+        description: "Enqueue a Batch",
+        cron: "*/15 * * * * *",
+        class: "ExampleJob::BatchJob",
+      },
       frequent_example: {
         description: "Enqueue an ExampleJob",
         cron: "*/5 * * * * *",
@@ -39,8 +43,6 @@ when 'development'
 when 'test'
   # test
 when 'demo'
-  ActiveJob::Base.queue_adapter = :good_job
-
   Rails.application.configure do
     config.good_job.execution_mode = :async
     config.good_job.poll_interval = 30
@@ -68,8 +70,15 @@ when 'demo'
         class: "OtherJob",
         set: { queue: :default },
       },
+      batch_example: {
+        description: "Enqueue a Batch",
+        cron: "*/30 * * * * *",
+        class: "ExampleJob::BatchJob",
+      },
     }
   end
 when 'production'
-  ActiveJob::Base.queue_adapter = :good_job
+  # production
+else
+  raise "Unconfigured environment for GoodJob"
 end

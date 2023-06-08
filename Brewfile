@@ -1,1 +1,1 @@
-brew "chromedriver"
+cask "chromedriver"

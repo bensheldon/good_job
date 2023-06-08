@@ -1,0 +1,219 @@
+---
+de:
+  good_job:
+    actions:
+      destroy: Zerstören
+      discard: Verwerfen
+      inspect: Prüfen
+      reschedule: Umplanen
+      retry: Wiederholen
+    batches:
+      index:
+        older_batches: Ältere Chargen
+        pending_migrations: GoodJob hat ausstehende Datenbankmigrationen.
+        title: Chargen
+      jobs:
+        actions:
+          confirm_destroy: Sind Sie sicher, dass Sie diesen Job zerstören wollen?
+          confirm_discard: Möchten Sie diesen Job wirklich verwerfen?
+          confirm_reschedule: Möchten Sie diesen Auftrag wirklich verschieben?
+          confirm_retry: Möchten Sie diesen Job wirklich wiederholen?
+          destroy: Zerstöre Job
+          discard: Auftrag verwerfen
+          reschedule: Auftrag neu planen
+          retry: Job wiederholen
+          title: Aktionen
+        no_jobs_found: Keine Jobs gefunden.
+      show:
+        attributes: Attribute
+        batched_jobs: Batch-Jobs
+        callback_jobs: Callback-Jobs
+      table:
+        no_batches_found: Keine Chargen gefunden.
+    cron_entries:
+      actions:
+        confirm_disable: Möchten Sie diesen Cron-Eintrag wirklich deaktivieren?
+        confirm_enable: Möchten Sie diesen Cron-Eintrag wirklich bestätigen?
+        confirm_enqueue: Möchten Sie diesen Cron-Eintrag wirklich in die Warteschlange stellen?
+        disable: Cron-Eintrag deaktivieren
+        enable: Cron-Eintrag aktivieren
+        enqueue: Cron-Eintrag jetzt einreihen
+      disable:
+        notice: Der Cron-Eintrag wurde deaktiviert.
+      enable:
+        notice: Cron-Eintrag wurde aktiviert.
+      enqueue:
+        notice: Cron-Eintrag wurde in die Warteschlange eingereiht.
+      index:
+        no_cron_schedules_found: Keine Cron-Zeitpläne gefunden.
+        title: Cron-Zeitpläne
+      pending_migrations: Erfordert ausstehende GoodJob-Datenbankmigration.
+      show:
+        cron_entry_key: Cron-Eingabetaste
+    datetime:
+      distance_in_words:
+        about_x_hours:
+          one: ca. 1 Stunde
+          other: ca. %{count} Stunden
+        about_x_months:
+          one: ca. 1 Monat
+          other: ca. %{count} Monate
+        about_x_years:
+          one: ca. 1 Jahr
+          other: ca. %{count} Jahre
+        almost_x_years:
+          one: fast 1 Jahr
+          other: fast %{count} Jahre
+        half_a_minute: eine halbe Minute
+        less_than_x_minutes:
+          one: weniger als eine Minute
+          other: weniger als %{count} Minuten
+        less_than_x_seconds:
+          one: weniger als eine Sekunde
+          other: weniger als %{count} Sekunden
+        over_x_years:
+          one: über 1 Jahr
+          other: über %{count} Jahre
+        x_days:
+          one: 1 Tag
+          other: "%{count} Tage"
+        x_minutes:
+          one: 1 Minute
+          other: "%{count} Minuten"
+        x_months:
+          one: 1 Monat
+          other: "%{count} Monate"
+        x_seconds:
+          one: 1 Sekunde
+          other: "%{count} Sekunden"
+        x_years:
+          one: 1 Jahr
+          other: "%{count} Jahre"
+    duration:
+      hours: "%{hour}h %{min}m"
+      less_than_10_seconds: "%{sec}s"
+      milliseconds: "%{ms}ms"
+      minutes: "%{min}m %{sec}s"
+      seconds: "%{sec}s"
+    helpers:
+      relative_time:
+        future: in %{time}
+        past: Vor %{time}
+    jobs:
+      actions:
+        confirm_destroy: Sind Sie sicher, dass Sie den Job zerstören wollen?
+        confirm_discard: Sind Sie sicher, dass Sie den Job verwerfen wollen?
+        confirm_reschedule: Möchten Sie den Auftrag wirklich verschieben?
+        confirm_retry: Möchten Sie den Job wirklich wiederholen?
+        destroy: Arbeit vernichten
+        discard: Auftrag verwerfen
+        reschedule: Auftrag neu planen
+        retry: Job wiederholen
+      destroy:
+        notice: Hiob wurde zerstört
+      discard:
+        notice: Auftrag wurde verworfen
+      executions:
+        error: Fehler
+        in_queue: in der Warteschlange
+        runtime: Laufzeit
+        title: Hinrichtungen
+      index:
+        job_pagination: Job-Paginierung
+        older_jobs: Ältere Berufe
+      reschedule:
+        notice: Auftrag wurde verschoben
+      retry:
+        notice: Auftrag wurde wiederholt
+      show:
+        jobs: Arbeitsplätze
+      table:
+        actions:
+          apply_to_all:
+            one: Bewerben Sie sich auf alle 1 Stelle.
+            other: Bewerben Sie sich auf alle %{count} Stellen.
+          confirm_destroy_all: Möchten Sie die ausgewählten Jobs wirklich löschen?
+          confirm_discard_all: Möchten Sie die ausgewählten Jobs wirklich verwerfen?
+          confirm_reschedule_all: Möchten Sie die ausgewählten Jobs wirklich neu planen?
+          confirm_retry_all: Möchten Sie die ausgewählten Jobs wirklich wiederholen?
+          destroy_all: Zerstöre alle
+          discard_all: Alle verwerfen
+          reschedule_all: Alles neu planen
+          retry_all: Alle wiederholen
+          title: Aktionen
+        no_jobs_found: Keine Jobs gefunden.
+        toggle_actions: Aktionen umschalten
+        toggle_all_jobs: Alle Jobs umschalten
+    models:
+      batch:
+        created: Erstellt
+        created_at: Hergestellt in
+        discarded: Verworfen
+        discarded_at: Abgelegt bei
+        enqueued: Eingereiht
+        enqueued_at: Eingereiht bei
+        finished: Fertig
+        finished_at: Fertig um
+        jobs: Arbeitsplätze
+        name: Name
+      cron:
+        class: Klasse
+        last_run: Letzter Lauf
+        next_scheduled: Als nächstes geplant
+        schedule: Zeitplan
+      job:
+        arguments: Argumente
+        attempts: Versuche
+        priority: Priorität
+        queue: Warteschlange
+    number:
+      format:
+        delimiter: "."
+        separator: ","
+      human:
+        decimal_units:
+          delimiter: "."
+          format: "%n%u"
+          precision: 3
+          separator: ","
+          units:
+            billion: B
+            million: M
+            quadrillion: Q
+            thousand: K
+            trillion: T
+            unit: ''
+    processes:
+      index:
+        no_good_job_processes_found: Keine GoodJob-Prozesse gefunden.
+        process: Verfahren
+        schedulers: Planer
+        started: Gestartet
+        title: Prozesse
+    shared:
+      filter:
+        all: Alle
+        all_jobs: Alle Jobs
+        all_queues: Alle Warteschlangen
+        clear: Klar
+        job_name: Berufsbezeichnung
+        placeholder: Suchen Sie nach Klasse, Job-ID, Jobparametern und Fehlertext.
+        queue_name: Warteschlangenname
+        search: Suchen
+      footer:
+        last_update_html: Zuletzt aktualisiert <time id="page-updated-at" datetime="%{time}">%{time}</time>
+        wording: Denk daran, auch du machst einen guten Job!
+      navbar:
+        batches: Batches
+        cron_schedules: Cron
+        jobs: Jobs
+        live_poll: Live Poll
+        name: "GoodJob 👍"
+        processes: Prozesse
+    status:
+      discarded: Ausrangiert
+      queued: In der Warteschlange
+      retried: Wiederholt
+      running: Laufend
+      scheduled: Geplant
+      succeeded: Erfolgreich

@@ -25,9 +25,9 @@ describe ExampleJob do
         end
         travel_back
 
-        executions = GoodJob::Execution.where(active_job_id: active_job.job_id).order(created_at: :asc)
-        expect(executions.size).to eq 2
-        expect(executions.last.error).to be_nil
+        good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
+        expect(good_job.discrete_executions.count).to eq 2
+        expect(good_job.discrete_executions.last.error).to be_nil
       end
     end
 
@@ -40,26 +40,25 @@ describe ExampleJob do
         end
         travel_back
 
-        executions = GoodJob::Execution.where(active_job_id: active_job.job_id).order(created_at: :asc)
-        expect(executions.size).to eq 6
-        expect(executions.last.error).to be_nil
+        good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
+
+        expect(good_job.discrete_executions.count).to eq 6
+        expect(good_job.discrete_executions.last.error).to be_nil
       end
     end
 
     describe "DEAD_TYPE" do
       it 'errors but does not retry' do
-        described_class.perform_later(described_class::DEAD_TYPE)
+        active_job = described_class.perform_later(described_class::DEAD_TYPE)
         10.times do
           GoodJob.perform_inline
           travel(5.minutes)
         end
         travel_back
 
-        active_job_id = GoodJob::Execution.last.active_job_id
-
-        executions = GoodJob::Execution.where(active_job_id: active_job_id).order(created_at: :asc)
-        expect(executions.size).to eq 3
-        expect(executions.last.error).to be_present
+        good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
+        expect(good_job.discrete_executions.count).to eq 3
+        expect(good_job.discrete_executions.last.error).to be_present
       end
     end
 

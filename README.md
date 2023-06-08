@@ -41,9 +41,11 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Dashboard](#dashboard)
         - [API-only Rails applications](#api-only-rails-applications)
         - [Live Polling](#live-polling)
-    - [ActiveJob concurrency](#activejob-concurrency)
+    - [Concurrency controls](#concurrency-controls)
         - [How concurrency controls work](#how-concurrency-controls-work)
     - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
+    - [Bulk enqueue](#bulk-enqueue)
+    - [Batches](#batches)
     - [Updating](#updating)
         - [Upgrading minor versions](#upgrading-minor-versions)
         - [Upgrading v2 to v3](#upgrading-v2-to-v3)
@@ -53,6 +55,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         - [Exceptions](#exceptions)
         - [Retries](#retries)
         - [ActionMailer retries](#actionmailer-retries)
+        - [Interrupts](#interrupts)
     - [Timeouts](#timeouts)
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
     - [Database connections](#database-connections)
@@ -146,7 +149,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 ## Compatibility
 
 - **Ruby on Rails:** 6.0+
-- **Ruby:** Ruby 2.5+. JRuby 9.2.13+
+- **Ruby:** Ruby 2.6+. JRuby 9.3+
 - **Postgres:** 10.0+
 
 ## Configuration
@@ -174,6 +177,7 @@ Options:
   [--max-cache=COUNT]          # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
   [--shutdown-timeout=SECONDS] # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
   [--enable-cron]              # Whether to run cron process (default: false)
+  [--enable-listen-notify]     # Whether to enqueue and read jobs with Postgres LISTEN/NOTIFY (default: true)
   [--daemonize]                # Run as a background daemon (default: false)
   [--pidfile=PIDFILE]          # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
   [--probe-port=PORT]          # Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)
@@ -203,17 +207,10 @@ Usage:
 Options:
   [--before-seconds-ago=SECONDS] # Destroy records finished more than this many seconds ago (env var:  GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 1209600 (14 days))
 
-Destroys preserved job records.
+Manually destroys preserved job records.
 
-By default, GoodJob destroys job records when the job is performed and this
-command is not necessary.
-
-However, when `GoodJob.preserve_job_records = true`, the jobs will be
-preserved in the database. This is useful when wanting to analyze or
-inspect job performance.
-
-If you are preserving job records this way, use this command regularly
-to destroy old records and preserve space in your database.
+By default, GoodJob automatically destroys job records when the job is performed
+and this command is not required to be used.
 ```
 
 ### Configuration options
@@ -277,11 +274,12 @@ Available configuration options are:
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
 - `shutdown_timeout` (integer) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 - `enable_cron` (boolean) whether to run cron process. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_CRON`.
+- `enable_listen_notify` (boolean) whether to enqueue and read jobs with Postgres LISTEN/NOTIFY. Defaults to `true`. You can also set this with the environment variable `GOOD_JOB_ENABLE_LISTEN_NOTIFY`.
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
 - `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`. _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
 - `cleanup_preserved_jobs_before_seconds_ago` (integer) number of seconds to preserve jobs when using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `1209600` (14 days). Can also be set with  the environment variable `GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO`.  _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
-- `cleanup_interval_jobs` (integer) Number of jobs a Scheduler will execute before cleaning up preserved jobs. Defaults to `1000`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_JOBS`.
-- `cleanup_interval_seconds` (integer) Number of seconds a Scheduler will wait before cleaning up preserved jobs. Defaults to `600` (10 minutes). Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_SECONDS`.
+- `cleanup_interval_jobs` (integer) Number of jobs a Scheduler will execute before cleaning up preserved jobs. Defaults to `1000`. Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_JOBS` and disabled with `0`).
+- `cleanup_interval_seconds` (integer) Number of seconds a Scheduler will wait before cleaning up preserved jobs. Defaults to `600` (10 minutes). Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` and disabled with `0`).
 - `inline_execution_respects_schedule` (boolean) Opt-in to future behavior of inline execution respecting scheduled jobs. Defaults to `false`.
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
 - `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
@@ -398,7 +396,7 @@ end
 
 The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
 
-### ActiveJob concurrency
+### Concurrency controls
 
 GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unnecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.
 
@@ -454,13 +452,15 @@ GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry 
 - "Optimistic" meaning that the implementation's performance trade-off assumes that collisions are atypical (e.g. two users enqueue the same job at the same time) rather than regular (e.g. the system enqueues thousands of colliding jobs at the same time). Depending on your concurrency requirements, you may also want to manage concurrency through the number of GoodJob threads and processes that are performing a given queue.
 - "Retry with an incremental backoff" means that when `perform_limit` is exceeded, the job will raise a `GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError` which is caught by a `retry_on` handler which re-schedules the job to execute in the near future with an incremental backoff.
 - First-in-first-out job execution order is not preserved when a job is retried with incremental back-off.
-- For pessimistic usecases that collisions are expected, use number of threads/processes (e.g., `good_job --queue "serial:1;-serial:5"`) to control concurrency. It is also a good idea to use `perform_limit` as backstop.
+- For pessimistic usecases that collisions are expected, use number of threads/processes (e.g., `good_job --queues "serial:1;-serial:5"`) to control concurrency. It is also a good idea to use `perform_limit` as backstop.
 
 ### Cron-style repeating/recurring jobs
 
 GoodJob can enqueue jobs on a recurring basis that can be used as a replacement for cron.
 
-Cron-style jobs are run on every GoodJob process (e.g. CLI or `async` execution mode) when `config.good_job.enable_cron = true`, but GoodJob's cron uses unique indexes to ensure that only a single job is enqueued at the given time interval.
+Cron-style jobs are run on every GoodJob process (e.g. CLI or `async` execution mode) when `config.good_job.enable_cron = true`.
+
+GoodJob's cron uses unique indexes to ensure that only a single job is enqueued at the given time interval. In order for this to work, GoodJob must preserve cron-created job records; these records will be automatically deleted like any other preserved record.
 
 Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`) and natural language parsing (e.g. `every second`).
 
@@ -472,7 +472,7 @@ config.good_job.enable_cron = ENV['DYNO'] == 'worker.1' # or `true` or via $GOOD
 
 # Configure cron with a hash that has a unique key for each recurring job
 config.good_job.cron = {
-  # Every 15 minutes, enqueue `ExampleJob.set(priority: -10).perform_later(42, name: "Alice")`
+  # Every 15 minutes, enqueue `ExampleJob.set(priority: -10).perform_later(42, "life", name: "Alice")`
   frequent_task: { # each recurring job must have a unique key
     cron: "*/15 * * * *", # cron-style scheduling format by fugit gem
     class: "ExampleJob", # reference the Job class with a string
@@ -488,6 +488,197 @@ config.good_job.cron = {
   # etc.
 }
 ```
+
+### Bulk enqueue
+
+GoodJob's Bulk-enqueue functionality can buffer and enqueue multiple jobs at once, using a single INSERT statement. This can more performant when enqueuing a large number of jobs.
+
+```ruby
+# Capture jobs using `.perform_later`:
+active_jobs = GoodJob::Bulk.enqueue do
+  MyJob.perform_later
+  AnotherJob.perform_later
+  # If an exception is raised within this block, no jobs will be inserted.
+end
+
+# All ActiveJob instances are returned from GoodJob::Bulk.enqueue.
+# Jobs that have been successfully enqueued have a `provider_job_id` set.
+active_jobs.all?(&:provider_job_id)
+
+# Bulk enqueue ActiveJob instances directly without using `.perform_later`:
+GoodJob::Bulk.enqueue(MyJob.new, AnotherJob.new)
+```
+
+### Batches
+
+Batches track a set of jobs, and enqueue an optional callback job when all of the jobs have finished (succeeded or discarded).
+
+- A simple example that enqueues your `MyBatchCallbackJob` after the two jobs have finished, and passes along the current user as a batch property:
+
+    ```ruby
+    GoodJob::Batch.enqueue(on_finish: MyBatchCallbackJob, user: current_user) do
+      MyJob.perform_later
+      OtherJob.perform_later
+    end
+
+    # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, options)`
+    class MyBatchCallbackJob < ApplicationJob
+      # Callback jobs must accept a `batch` and `options` argument
+      def perform(batch, params)
+        # The batch object will contain the Batch's properties, which are mutable
+        batch.properties[:user] # => <User id: 1, ...>
+
+        # Params is a hash containing additional context (more may be added in the future)
+        params[:event] # => :finish, :success, :discard
+      end
+    end
+    ```
+
+- Jobs can be added to an existing batch. Jobs in a batch are enqueued and performed immediately/asynchronously. The final callback job will not be enqueued until `GoodJob::Batch#enqueue` is called.
+
+    ```ruby
+    batch = GoodJob::Batch.new
+    batch = GoodJob::Batch.add do
+      10.times { MyJob.perform_later }
+    end
+    batch.add do
+      10.times { OtherJob.perform_later }
+    end
+    batch.enqueue(on_finish: MyBatchCallbackJob, age: 42)
+    ```
+
+- If you need to access the batch within a job that is part of the batch, include [`GoodJob::ActiveJobExtensions::Batches`](lib/good_job/active_job_extensions/batches.rb) in your job class:
+
+  ```ruby
+    class MyJob < ApplicationJob
+      include GoodJob::ActiveJobExtensions::Batches
+
+      def perform
+        self.batch # => <GoodJob::Batch id: 1, ...>
+      end
+    end
+    ```
+
+- [`GoodJob::Batch`](app/models/good_job/batch.rb) has a number of assignable attributes and methods:
+
+```ruby
+batch = GoodJob::Batch.new
+batch.description = "My batch"
+batch.on_finish = "MyBatchCallbackJob" # Callback job when all jobs have finished
+batch.on_success = "MyBatchCallbackJob" # Callback job when/if all jobs have succeeded
+batch.on_discard = "MyBatchCallbackJob" # Callback job when the first job in the batch is discarded
+batch.callback_queue_name = "special_queue" # Optional queue for callback jobs, otherwise will defer to job class
+batch.callback_priority = 10 # Optional priority name for callback jobs, otherwise will defer to job class
+batch.properties = { age: 42 } # Custom data and state to attach to the batch
+batch.add do
+  MyJob.perform_later
+end
+batch.enqueue
+
+batch.discarded? # => Boolean
+batch.discarded_at # => <DateTime>
+batch.finished? # => Boolean
+batch.finished_at # => <DateTime>
+batch.succeeded? # => Boolean
+batch.active_jobs # => Array of ActiveJob::Base-inherited jobs that are part of the batch
+
+batch = GoodJob::Batch.find(batch.id)
+batch.description = "Updated batch description"
+batch.save
+batch.reload
+```
+
+### Batch callback jobs
+
+Batch callbacks are Active Job jobs that are enqueued at certain events during the execution of jobs within the batch:
+
+- `:finish` - Enqueued when all jobs in the batch have finished, after all retries. Jobs will either be discarded or succeeded.
+- `:success` - Enqueued only when all jobs in the batch have finished and succeeded.
+- `:discard` - Enqueued immediately the first time a job in the batch is discarded.
+
+Callback jobs must accept a `batch` and `params` argument in their `perform` method:
+
+```ruby
+class MyBatchCallbackJob < ApplicationJob
+  def perform(batch, params)
+    # The batch object will contain the Batch's properties
+    batch.properties[:user] # => <User id: 1, ...>
+    # Batches are mutable
+    batch.properties[:user] = User.find(2)
+    batch.save
+
+    # Params is a hash containing additional context (more may be added in the future)
+    params[:event] # => :finish, :success, :discard
+  end
+end
+```
+
+#### Complex batches
+
+Consider a multi-stage batch with both parallel and serial job steps:
+
+```mermaid
+graph TD
+    0{"BatchJob\n{ stage: nil }"}
+    0 --> a["WorkJob]\n{ step: a }"]
+    0 --> b["WorkJob]\n{ step: b }"]
+    0 --> c["WorkJob]\n{ step: c }"]
+    a --> 1
+    b --> 1
+    c --> 1
+    1{"BatchJob\n{ stage: 1 }"}
+    1 --> d["WorkJob]\n{ step: d }"]
+    1 --> e["WorkJob]\n{ step: e }"]
+    e --> f["WorkJob]\n{ step: f }"]
+    d --> 2
+    f --> 2
+    2{"BatchJob\n{ stage: 2 }"}
+```
+
+This can be implemented with a single, mutable batch job:
+
+```ruby
+class WorkJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Batches
+
+  def perform(step)
+    # ...
+    if step == 'e'
+      batch.add { WorkJob.perform_later('f') }
+    end
+  end
+end
+
+class BatchJob < ApplicationJob
+  def perform(batch, options)
+    if batch.properties[:stage].nil?
+      batch.enqueue(stage: 1) do
+        WorkJob.perform_later('a')
+        WorkJob.perform_later('b')
+        WorkJob.perform_later('c')
+      end
+    elsif batch.properties[:stage] == 1
+      batch.enqueue(stage: 2) do
+        WorkJob.perform_later('d')
+        WorkJob.perform_later('e')
+      end
+    elsif batch.properties[:stage] == 2
+      # ...
+    end
+  end
+end
+
+GoodJob::Batch.enqueue(on_finish: BatchJob)
+```
+
+#### Other batch details
+
+- Whether to enqueue a callback job is evaluated once the batch is in an `enqueued?`-state by using `GoodJob::Batch.enqueue` or `batch.enqueue`.
+- Callback job enqueueing will be re-triggered if additional jobs are `enqueue`'d to the batch; use `add` to add jobs to the batch without retriggering callback jobs.
+- Callback jobs will be enqueued even if the batch contains no jobs.
+- Callback jobs perform asynchronously. It's possible that `:finish` and `:success` or `:discard` callback jobs perform at the same time. Keep this in mind when updating batch properties.
+- Batch properties are serialized using Active Job serialization. This is flexible, but can lead to deserialization errors if a GlobalID record is directly referenced but is subsequently deleted and thus unloadable.
+- 🚧Batches are a work in progress. Please let us know what would be helpful to improve their functionality and usefulness.
 
 ### Updating
 
@@ -639,6 +830,23 @@ end
 
 Note, that `ActionMailer::MailDeliveryJob` is a default since Rails 6.0. Be sure that your app is using that class, as it
 might also be configured to use (deprecated now) `ActionMailer::DeliveryJob`.
+
+### Interrupts
+
+Jobs will be automatically retried if the process is interrupted while performing a job, for example as the result of a `SIGKILL` or power failure.
+
+If you need more control over interrupt-caused retries, include the `GoodJob::ActiveJobExtensions::InterruptErrors` extension in your job class. When an interrupted job is retried, the extension will raise a `GoodJob::InterruptError` exception within the job, which allows you to use ActiveJob's `retry_on` and `discard_on` to control the behavior of the job.
+
+```ruby
+class MyJob < ApplicationJob
+  # The extension must be included before other extensions
+  include GoodJob::ActiveJobExtensions::InterruptErrors
+  # Discard the job if it is interrupted
+  discard_on InterruptError
+  # Retry the job if it is interrupted
+  retry_on InterruptError, wait: 0, attempts: Float::INFINITY
+end
+```
 
 ### Timeouts
 
@@ -931,9 +1139,9 @@ config.good_job.preserve_job_records = false # defaults to true; can also be `fa
 GoodJob will automatically delete preserved job records after 14 days. The retention period, as well as the frequency GoodJob checks for deletable records can be configured:
 
 ```ruby
-config.good_job.cleanup_preserved_jobs_before_seconds_ago = 14.days.to_i
+config.good_job.cleanup_preserved_jobs_before_seconds_ago = 14.days
 config.good_job.cleanup_interval_jobs = 1_000 # Number of executed jobs between deletion sweeps.
-config.good_job.cleanup_interval_seconds = 10.minutes.to_i # Number of seconds between deletion sweeps.
+config.good_job.cleanup_interval_seconds = 10.minutes # Number of seconds between deletion sweeps.
 ```
 
 It is also possible to manually trigger a cleanup of preserved job records:

@@ -1,0 +1,20 @@
+<div class="border-bottom">
+  <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
+</div>
+
+<% if GoodJob::BatchRecord.migrated? %>
+  <%= render 'good_job/batches/table', batches: @filter.records, filter: @filter %>
+  <% if @filter.records.present? %>
+    <nav aria-label="Batch pagination" class="mt-3">
+      <ul class="pagination">
+        <li class="page-item">
+          <%= link_to(@filter.to_params(after_created_at: @filter.last.created_at, after_id: @filter.last.id), class: "page-link") do %>
+            <%= t ".older_batches" %> <span aria-hidden="true">&raquo;</span>
+          <% end %>
+        </li>
+      </ul>
+    </nav>
+  <% end %>
+<% else %>
+  <h3 class="text-center my-5"><%= t ".pending_migrations" %></h3>
+<% end %>

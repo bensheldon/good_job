@@ -16,7 +16,9 @@ ActiveSupport.on_load :active_record do
 end
 
 RSpec.configure do |config|
-  config.after do
+  config.around do |example|
+    POSTGRES_NOTICES.clear
+    example.run
     expect(POSTGRES_NOTICES).to be_empty
   end
 end

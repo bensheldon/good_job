@@ -5,20 +5,21 @@ module GoodJob
       return unless sec
 
       if sec < 1
-        t 'duration.milliseconds', ms: (sec * 1000).floor
+        t 'good_job.duration.milliseconds', ms: (sec * 1000).floor
       elsif sec < 10
-        t 'duration.less_than_10_seconds', sec: sec.floor
+        t 'good_job.duration.less_than_10_seconds', sec: sec.floor
       elsif sec < 60
-        t 'duration.seconds', sec: sec.floor
+        t 'good_job.duration.seconds', sec: sec.floor
       elsif sec < 3600
-        t 'duration.minutes', min: (sec / 60).floor, sec: (sec % 60).floor
+        t 'good_job.duration.minutes', min: (sec / 60).floor, sec: (sec % 60).floor
       else
-        t 'duration.hours', hour: (sec / 3600).floor, min: ((sec % 3600) / 60).floor
+        t 'good_job.duration.hours', hour: (sec / 3600).floor, min: ((sec % 3600) / 60).floor
       end
     end
 
-    def relative_time(timestamp, **args)
-      text = timestamp.future? ? "in #{time_ago_in_words(timestamp, **args)}" : "#{time_ago_in_words(timestamp, **args)} ago"
+    def relative_time(timestamp, **options)
+      options = options.reverse_merge({ scope: "good_job.datetime.distance_in_words" })
+      text = t("good_job.helpers.relative_time.#{timestamp.future? ? 'future' : 'past'}", time: time_ago_in_words(timestamp, **options))
       tag.time(text, datetime: timestamp, title: timestamp)
     end
 
@@ -41,7 +42,7 @@ module GoodJob
     }.freeze
 
     def status_badge(status)
-      content_tag :span, status_icon(status, class: "text-white") + t(status, scope: 'good_job.status'),
+      content_tag :span, status_icon(status, class: "text-white") + t(status, scope: 'good_job.status', count: 1),
                   class: "badge rounded-pill bg-#{STATUS_COLOR.fetch(status)} d-inline-flex gap-2 ps-1 pe-3 align-items-center"
     end
 
@@ -55,6 +56,15 @@ module GoodJob
       # workaround to render svg icons without all of the log messages
       partial = lookup_context.find_template("good_job/shared/icons/#{name}", [], true)
       partial.render(self, {})
+    end
+
+    def translate_hash(key, **options)
+      translation_exists?(key, **options) ? translate(key, **options) : {}
+    end
+
+    def translation_exists?(key, **options)
+      true if good_job_available_locales.include?(I18n.locale)
+      I18n.exists?(scope_key_by_partial(key), **options)
     end
   end
 end

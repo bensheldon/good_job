@@ -36,6 +36,18 @@ RSpec.describe 'Adapter Integration' do
         expect(enqueued_job.provider_job_id).to eq execution.id
       end
 
+      it 'assigns successfully_enqueued' do
+        ok_job = TestJob.new
+        expect { ok_job.enqueue }.not_to raise_error
+        expect(ok_job.successfully_enqueued?).to be true if ok_job.respond_to?(:successfully_enqueued?)
+
+        allow(TestJob.queue_adapter).to receive(:enqueue).and_raise(StandardError)
+
+        bad_job = TestJob.new
+        expect { bad_job.enqueue }.to raise_error(StandardError)
+        expect(bad_job.successfully_enqueued?).to be false if bad_job.respond_to?(:successfully_enqueued?)
+      end
+
       it 'without a scheduled time' do
         expect do
           TestJob.perform_later('first', 'second', keyword_arg: 'keyword_arg')
@@ -46,7 +58,7 @@ RSpec.describe 'Adapter Integration' do
         expect(execution).to have_attributes(
           queue_name: 'test',
           priority: 50,
-          scheduled_at: nil
+          scheduled_at: within(1).of(Time.current)
         )
       end
 
@@ -66,7 +78,8 @@ RSpec.describe 'Adapter Integration' do
   end
 
   describe 'Async execution mode' do
-    let(:adapter) { GoodJob::Adapter.new execution_mode: :async_all }
+    let(:capsule) { GoodJob::Capsule.new(configuration: GoodJob::Configuration.new({ max_threads: 5, queue_string: '*' })) }
+    let(:adapter) { GoodJob::Adapter.new(execution_mode: :async_all, _capsule: capsule) }
 
     it 'executes the job', skip_if_java: true do
       elephant_adapter = GoodJob::Adapter.new execution_mode: :async_all

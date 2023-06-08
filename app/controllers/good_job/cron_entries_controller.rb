@@ -15,25 +15,25 @@ module GoodJob
     def enqueue
       @cron_entry = CronEntry.find(params[:cron_key])
       @cron_entry.enqueue(Time.current)
-      redirect_back(fallback_location: cron_entries_path, notice: "Cron entry has been enqueued.")
+      redirect_back(fallback_location: cron_entries_path, notice: t(".notice"))
     end
 
     def enable
       @cron_entry = CronEntry.find(params[:cron_key])
       @cron_entry.enable
-      redirect_back(fallback_location: cron_entries_path, notice: "Cron entry has been enabled.")
+      redirect_back(fallback_location: cron_entries_path, notice: t(".notice"))
     end
 
     def disable
       @cron_entry = CronEntry.find(params[:cron_key])
       @cron_entry.disable
-      redirect_back(fallback_location: cron_entries_path, notice: "Cron entry has been disabled.")
+      redirect_back(fallback_location: cron_entries_path, notice: t(".notice"))
     end
 
     private
 
     def check_settings_migration!
-      redirect_back(fallback_location: cron_entries_path, alert: "Requires pending GoodJob database migration.") unless GoodJob::Setting.migrated?
+      redirect_back(fallback_location: cron_entries_path, alert: t("good_job.cron_entries.pending_migrations")) unless GoodJob::Setting.migrated?
     end
   end
 end

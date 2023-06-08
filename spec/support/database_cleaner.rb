@@ -5,13 +5,16 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = false
 
   config.before(:suite) do
-    DatabaseCleaner.strategy = :truncation
-    DatabaseCleaner.clean_with :truncation
+    ApplicationRecord.connection_pool.with_connection do |connection|
+      connection.truncate_tables(*connection.tables)
+    end
   end
 
   config.around do |example|
-    DatabaseCleaner.cleaning do
-      example.run
+    example.run
+
+    ApplicationRecord.connection_pool.with_connection do |connection|
+      connection.truncate_tables(*connection.tables)
     end
   end
 end

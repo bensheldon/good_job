@@ -26,6 +26,8 @@ module GoodJob
     DEFAULT_SHUTDOWN_TIMEOUT = -1
     # Default to not running cron
     DEFAULT_ENABLE_CRON = false
+    # Default to enabling LISTEN/NOTIFY
+    DEFAULT_ENABLE_LISTEN_NOTIFY = true
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
@@ -221,8 +223,7 @@ module GoodJob
       )&.to_i
     end
 
-    # Whether to destroy discarded jobs when cleaning up preserved jobs.
-    # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
+    # Whether to automatically destroy discarded jobs that have been preserved.
     # @return [Boolean]
     def cleanup_discarded_jobs?
       return rails_config[:cleanup_discarded_jobs] unless rails_config[:cleanup_discarded_jobs].nil?
@@ -231,8 +232,7 @@ module GoodJob
       true
     end
 
-    # Number of seconds to preserve jobs when using the +good_job cleanup_preserved_jobs+ CLI command.
-    # This configuration is only used when {GoodJob.preserve_job_records} is +true+.
+    # Number of seconds to preserve jobs before automatic destruction.
     # @return [Integer]
     def cleanup_preserved_jobs_before_seconds_ago
       (
@@ -243,26 +243,73 @@ module GoodJob
       ).to_i
     end
 
-    # Number of jobs a {Scheduler} will execute before cleaning up preserved jobs.
+    # Number of jobs a {Scheduler} will execute before automatically cleaning up preserved jobs.
+    # Positive values will clean up after that many jobs have run, false or 0 will disable, and -1 will clean up after every job.
     # @return [Integer, nil]
     def cleanup_interval_jobs
-      value = (
-        rails_config[:cleanup_interval_jobs] ||
-          env['GOOD_JOB_CLEANUP_INTERVAL_JOBS'] ||
-          DEFAULT_CLEANUP_INTERVAL_JOBS
-      )
-      value.present? ? value.to_i : nil
+      if rails_config.key?(:cleanup_interval_jobs)
+        value = rails_config[:cleanup_interval_jobs]
+        if value.nil?
+          GoodJob.deprecator.warn(
+            %(Setting `config.good_job.cleanup_interval_jobs` to `nil` will no longer disable count-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
+          )
+          value = false
+        elsif value == 0 # rubocop:disable Style/NumericPredicate
+          GoodJob.deprecator.warn(
+            %(Setting `config.good_job.cleanup_interval_jobs` to `0` will disable count-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
+          )
+          value = -1
+        end
+      elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_JOBS')
+        value = env['GOOD_JOB_CLEANUP_INTERVAL_JOBS']
+        if value.blank?
+          GoodJob.deprecator.warn(
+            %(Setting `GOOD_JOB_CLEANUP_INTERVAL_JOBS` to `""` will no longer disable count-based cleanups in GoodJob v4. Set to `0` to disable, or `-1` to run every time.)
+          )
+          value = false
+        elsif value == '0'
+          value = false
+        end
+      else
+        value = DEFAULT_CLEANUP_INTERVAL_JOBS
+      end
+
+      value ? value.to_i : false
     end
 
-    # Number of seconds a {Scheduler} will wait before cleaning up preserved jobs.
+    # Number of seconds a {Scheduler} will wait before automatically cleaning up preserved jobs.
+    # Positive values will clean up after that many jobs have run, false or 0 will disable, and -1 will clean up after every job.
     # @return [Integer, nil]
     def cleanup_interval_seconds
-      value = (
-        rails_config[:cleanup_interval_seconds] ||
-          env['GOOD_JOB_CLEANUP_INTERVAL_SECONDS'] ||
-          DEFAULT_CLEANUP_INTERVAL_SECONDS
-      )
-      value.present? ? value.to_i : nil
+      if rails_config.key?(:cleanup_interval_seconds)
+        value = rails_config[:cleanup_interval_seconds]
+
+        if value.nil?
+          GoodJob.deprecator.warn(
+            %(Setting `config.good_job.cleanup_interval_seconds` to `nil` will no longer disable time-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
+          )
+          value = false
+        elsif value == 0 # rubocop:disable Style/NumericPredicate
+          GoodJob.deprecator.warn(
+            %(Setting `config.good_job.cleanup_interval_seconds` to `0` will disable time-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
+          )
+          value = -1
+        end
+      elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_SECONDS')
+        value = env['GOOD_JOB_CLEANUP_INTERVAL_SECONDS']
+        if value.blank?
+          GoodJob.deprecator.warn(
+            %(Setting `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` to `""` will no longer disable time-based cleanups in GoodJob v4. Set to `0` to disable, or `-1` to run every time.)
+          )
+          value = false
+        elsif value == '0'
+          value = false
+        end
+      else
+        value = DEFAULT_CLEANUP_INTERVAL_SECONDS
+      end
+
+      value ? value.to_i : false
     end
 
     # Tests whether to daemonize the process.
@@ -284,6 +331,18 @@ module GoodJob
     def probe_port
       options[:probe_port] ||
         env['GOOD_JOB_PROBE_PORT']
+    end
+
+    def enable_listen_notify
+      return options[:enable_listen_notify] unless options[:enable_listen_notify].nil?
+      return rails_config[:enable_listen_notify] unless rails_config[:enable_listen_notify].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_LISTEN_NOTIFY']) unless env['GOOD_JOB_ENABLE_LISTEN_NOTIFY'].nil?
+
+      DEFAULT_ENABLE_LISTEN_NOTIFY
+    end
+
+    def smaller_number_is_higher_priority
+      rails_config[:smaller_number_is_higher_priority]
     end
 
     private

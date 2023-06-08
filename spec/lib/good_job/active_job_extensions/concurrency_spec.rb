@@ -16,6 +16,27 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end)
   end
 
+  describe 'when extension is only included but not configured' do
+    it 'does not limit concurrency' do
+      expect do
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+      end.not_to raise_error
+    end
+  end
+
+  describe 'when concurrency key is nil' do
+    it 'does not limit concurrency' do
+      TestJob.good_job_control_concurrency_with(
+        total_limit: -> { 1 },
+        key: -> {}
+      )
+
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+    end
+  end
+
   describe '.good_job_control_concurrency_with' do
     describe 'total_limit:', skip_rails_5: true do
       before do
@@ -48,6 +69,8 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
 
       it "does not enqueue if enqueue concurrency limit is exceeded for a particular key" do
+        allow(Rails.logger.formatter).to receive(:call).and_call_original
+
         expect(TestJob.perform_later(name: "Alice")).to be_present
         expect(TestJob.perform_later(name: "Alice")).to be_present
 
@@ -59,6 +82,12 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
 
         expect(GoodJob::Execution.where(concurrency_key: "Alice").count).to eq 2
         expect(GoodJob::Execution.where(concurrency_key: "Bob").count).to eq 1
+
+        expect(Rails.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its limit of 2 jobs/)).exactly(:once)
+        if ActiveJob.gem_version >= Gem::Version.new("6.1.0")
+          expect(Rails.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
+          expect(Rails.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
+        end
       end
 
       it 'excludes jobs that are already executing/locked' do
@@ -84,19 +113,21 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
 
       it "will error and retry jobs if concurrency is exceeded" do
-        TestJob.perform_later(name: "Alice")
+        active_job = TestJob.perform_later(name: "Alice")
 
         performer = GoodJob::JobPerformer.new('*')
         scheduler = GoodJob::Scheduler.new(performer, max_threads: 5)
         5.times { scheduler.create_thread }
 
         sleep_until(max: 10, increments_of: 0.5) do
-          GoodJob::Execution.where(concurrency_key: "Alice").finished.count >= 1
+          GoodJob::DiscreteExecution.where(active_job_id: active_job.job_id).finished.count >= 1
         end
         scheduler.shutdown
 
-        expect(GoodJob::Execution.count).to be >= 1
-        expect(GoodJob::Execution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
+        expect(GoodJob::Job.find_by(active_job_id: active_job.job_id).concurrency_key).to eq "Alice"
+
+        expect(GoodJob::DiscreteExecution.count).to be >= 1
+        expect(GoodJob::DiscreteExecution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
       end
 
       it 'is ignored with the job is executed via perform_now' do
@@ -124,17 +155,60 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         end)
       end
 
-      it 'preserves the key value across retries' do
-        TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
-        begin
-          GoodJob.perform_inline
-        rescue StandardError
-          nil
+      describe 'retries' do
+        it 'preserves the value' do
+          TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
+
+          begin
+            GoodJob.perform_inline
+          rescue StandardError
+            nil
+          end
+
+          expect(GoodJob::Execution.count).to eq 1
+          expect(GoodJob::Execution.first.concurrency_key).to be_present
+          expect(GoodJob::Job.first).not_to be_finished
         end
 
-        expect(GoodJob::Execution.count).to eq 2
-        first_execution, retried_execution = GoodJob::Execution.order(created_at: :asc).to_a
-        expect(retried_execution.concurrency_key).to eq first_execution.concurrency_key
+        context 'when not discrete' do
+          it 'preserves the key value across retries' do
+            TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
+            GoodJob::Job.first.update!(is_discrete: false)
+
+            begin
+              GoodJob.perform_inline
+            rescue StandardError
+              nil
+            end
+
+            expect(GoodJob::Execution.count).to eq 2
+            first_execution, retried_execution = GoodJob::Execution.order(created_at: :asc).to_a
+            expect(retried_execution.concurrency_key).to eq first_execution.concurrency_key
+          end
+        end
+      end
+    end
+
+    describe '#perform_later' do
+      before do
+        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+          include GoodJob::ActiveJobExtensions::Concurrency
+
+          good_job_control_concurrency_with(
+            total_limit: 1,
+            key: -> { arguments.first }
+          )
+
+          def perform(arg)
+          end
+        end)
+      end
+
+      it 'raises an error for non-serializable types' do
+        expect { TestJob.perform_later({ key: "value" }) }.to raise_error(TypeError, "Concurrency key must be a String; was a Hash")
+        expect { TestJob.perform_later({ key: "value" }.with_indifferent_access) }.to raise_error(TypeError)
+        expect { TestJob.perform_later(["key"]) }.to raise_error(TypeError)
+        expect { TestJob.perform_later(TestJob) }.to raise_error(TypeError)
       end
     end
   end

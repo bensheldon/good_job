@@ -15,6 +15,8 @@ GoodJob::Engine.routes.draw do
     end
   end
 
+  resources :batches, only: %i[index show]
+
   resources :cron_entries, only: %i[index show], param: :cron_key do
     member do
       post :enqueue
@@ -25,19 +27,8 @@ GoodJob::Engine.routes.draw do
 
   resources :processes, only: %i[index]
 
-  scope :assets, controller: :assets do
-    constraints(format: :css) do
-      get :bootstrap, action: :bootstrap_css
-      get :style, action: :style_css
-    end
-
-    constraints(format: :js) do
-      get :bootstrap, action: :bootstrap_js
-      get :chartjs, action: :chartjs_js
-      get :rails_ujs, action: :rails_ujs_js
-      get :es_module_shims, action: :es_module_shims_js
-      get "modules/:module", action: :modules_js, as: :modules
-      get :scripts, action: :scripts_js
-    end
+  scope :frontend, controller: :frontends do
+    get "modules/:name", action: :module, as: :frontend_module, constraints: { format: 'js' }
+    get "static/:name", action: :static, as: :frontend_static, constraints: { format: %w[css js] }
   end
 end

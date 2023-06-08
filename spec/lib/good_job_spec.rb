@@ -3,20 +3,22 @@ require 'rails_helper'
 
 describe GoodJob do
   let(:configuration) { GoodJob::Configuration.new({ queues: 'mice:1', poll_interval: -1 }) }
-  let!(:scheduler) { GoodJob::Scheduler.from_configuration(configuration) }
-  let!(:notifier) { GoodJob::Notifier.new([scheduler, :create_thread]) }
 
   describe '.shutdown' do
-    it 'shuts down all scheduler and notifier instances' do
-      described_class.shutdown
-
-      expect(scheduler.shutdown?).to be true
-      expect(notifier.shutdown?).to be true
+    it 'shuts down all capsules' do
+      capsule = GoodJob::Capsule.new(configuration: configuration)
+      capsule.start
+      expect { described_class.shutdown }.to change(capsule, :shutdown?).from(false).to(true)
     end
   end
 
   describe '.shutdown?' do
-    it 'shuts down all scheduler and notifier instances' do
+    it 'returns whether any capsules are running' do
+      expect do
+        capsule = GoodJob::Capsule.new(configuration: configuration)
+        capsule.start
+      end.to change(described_class, :shutdown?).from(true).to(false)
+
       expect do
         described_class.shutdown
       end.to change(described_class, :shutdown?).from(false).to(true)
@@ -24,12 +26,14 @@ describe GoodJob do
   end
 
   describe '.restart' do
-    it 'restarts down all scheduler and notifier instances' do
-      described_class.shutdown
+    it 'does nothing when there are no capsule instances' do
+      GoodJob::Capsule.instances.clear
+      expect { described_class.restart }.not_to change(described_class, :shutdown?).from(true)
+    end
 
-      expect do
-        described_class.restart
-      end.to change(described_class, :shutdown?).from(true).to(false)
+    it 'restarts down all capsule instances' do
+      GoodJob::Capsule.new(configuration: configuration)
+      expect { described_class.restart }.to change(described_class, :shutdown?).from(true).to(false)
     end
   end
 
@@ -37,28 +41,37 @@ describe GoodJob do
     let!(:recent_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 12.hours.ago) }
     let!(:old_unfinished_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, scheduled_at: 15.days.ago, finished_at: nil) }
     let!(:old_finished_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago) }
+    let!(:old_finished_job_execution) { GoodJob::Execution.create!(active_job_id: old_finished_job.active_job_id, retried_good_job_id: old_finished_job.id, finished_at: 16.days.ago) }
+    let!(:old_finished_job_discrete_execution) { GoodJob::DiscreteExecution.create!(active_job_id: old_finished_job.active_job_id, finished_at: 16.days.ago) }
     let!(:old_discarded_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago, error: "Error") }
+    let!(:old_batch) { GoodJob::BatchRecord.create!(finished_at: 15.days.ago) }
 
     it 'deletes finished jobs' do
-      destroyed_jobs_count = described_class.cleanup_preserved_jobs
+      destroyed_records_count = described_class.cleanup_preserved_jobs(in_batches_of: 1)
 
-      expect(destroyed_jobs_count).to eq 2
+      expect(destroyed_records_count).to eq 5
 
       expect { recent_job.reload }.not_to raise_error
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
     it 'takes arguments' do
-      destroyed_jobs_count = described_class.cleanup_preserved_jobs(older_than: 10.seconds)
+      destroyed_records_count = described_class.cleanup_preserved_jobs(older_than: 10.seconds)
 
-      expect(destroyed_jobs_count).to eq 3
+      expect(destroyed_records_count).to eq 6
 
       expect { recent_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
     it 'is instrumented' do
@@ -74,14 +87,17 @@ describe GoodJob do
 
     it "respects the cleanup_discarded_jobs? configuration" do
       allow(described_class.configuration).to receive(:env).and_return ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_DISCARDED_JOBS' => 'false' })
-      destroyed_jobs_count = described_class.cleanup_preserved_jobs
+      destroyed_records_count = described_class.cleanup_preserved_jobs
 
-      expect(destroyed_jobs_count).to eq 1
+      expect(destroyed_records_count).to eq 4
 
       expect { recent_job.reload }.not_to raise_error
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.not_to raise_error
+      expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
   end
 

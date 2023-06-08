@@ -28,8 +28,8 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        create_with_advisory_lock: false,
-        scheduled_at: nil
+        scheduled_at: nil,
+        create_with_advisory_lock: false
       )
     end
 
@@ -69,21 +69,20 @@ RSpec.describe GoodJob::Adapter do
     end
 
     context 'when async' do
-      it 'triggers an execution thread and the notifier' do
+      it 'triggers the capsule and the notifier' do
         allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
         allow(GoodJob::Notifier).to receive(:notify)
 
-        scheduler = instance_double(GoodJob::Scheduler, shutdown: nil, create_thread: nil)
-        allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
-
-        poller = instance_double(GoodJob::Poller, recipients: [], shutdown: nil)
-        allow(GoodJob::Poller).to receive(:new).and_return(poller)
+        capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil)
+        allow(GoodJob).to receive(:capsule).and_return(capsule)
+        allow(capsule).to receive(:start)
 
         adapter = described_class.new(execution_mode: :async_all)
         adapter.enqueue(active_job)
 
-        expect(scheduler).to have_received(:create_thread)
-        expect(GoodJob::Notifier).to have_received(:notify)
+        expect(capsule).to have_received(:start)
+        expect(capsule).to have_received(:create_thread)
+        expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default' })
       end
     end
   end
@@ -98,9 +97,88 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        create_with_advisory_lock: false,
-        scheduled_at: scheduled_at.change(usec: 0)
+        scheduled_at: scheduled_at.change(usec: 0),
+        create_with_advisory_lock: false
       )
+    end
+  end
+
+  describe '#enqueue_all' do
+    before do
+      allow(GoodJob::Notifier).to receive(:notify)
+    end
+
+    it 'enqueues multiple active jobs, returns the number of jobs enqueued, and sets provider_job_id' do
+      active_jobs = [ExampleJob.new, ExampleJob.new]
+      result = adapter.enqueue_all(active_jobs)
+      expect(result).to eq 2
+
+      provider_job_ids = active_jobs.map(&:provider_job_id)
+      expect(provider_job_ids).to all be_present
+    end
+
+    it 'enqueues queue_name, scheduled_at, priority' do
+      active_job = ExampleJob.new
+      active_job.queue_name = 'elephant'
+      active_job.priority = -55
+      active_job.scheduled_at = 10.minutes.from_now
+
+      adapter.enqueue_all([active_job])
+
+      expect(GoodJob::Job.last).to have_attributes(
+        queue_name: 'elephant',
+        priority: -55,
+        scheduled_at: be_within(1).of(10.minutes.from_now)
+      )
+    end
+
+    context 'when a job fails to enqueue' do
+      it 'does not set a provider_job_id' do
+        allow(GoodJob::Execution).to receive(:insert_all).and_wrap_original do |original_method, *args|
+          attributes, kwargs = *args
+          original_method.call(attributes[0, 1], **kwargs) #  pretend only the first item is successfully inserted
+        end
+
+        active_jobs = [ExampleJob.new, ExampleJob.new]
+        result = adapter.enqueue_all(active_jobs)
+        expect(result).to eq 1
+
+        expect(active_jobs.map(&:provider_job_id)).to eq [active_jobs.first.provider_job_id, nil]
+        expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default', count: 1, scheduled_at: within(0.1).of(Time.current) })
+      end
+
+      it 'sets successfully_enqueued, if Rails supports it' do
+        allow(GoodJob::Execution).to receive(:insert_all).and_wrap_original do |original_method, *args|
+          attributes, kwargs = *args
+          original_method.call(attributes[0, 1], **kwargs) #  pretend only the first item is successfully inserted
+        end
+
+        active_jobs = [ExampleJob.new, ExampleJob.new]
+        result = adapter.enqueue_all(active_jobs)
+        expect(result).to eq 1
+
+        expect(active_jobs.map(&:successfully_enqueued?)).to eq [true, false] if ActiveJob::Base.method_defined?(:successfully_enqueued?)
+      end
+    end
+
+    context 'when the adapter is inline' do
+      let(:adapter) { described_class.new(execution_mode: :inline) }
+
+      it 'executes the jobs immediately' do
+        stub_const 'PERFORMED', []
+        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+          def perform
+            raise "Not advisory locked" unless GoodJob::Execution.find(provider_job_id).advisory_locked?
+
+            PERFORMED << Time.current
+          end
+        end)
+
+        active_jobs = [TestJob.new, TestJob.new]
+        result = adapter.enqueue_all(active_jobs)
+        expect(result).to eq 2
+        expect(PERFORMED.size).to eq 2
+      end
     end
   end
 
@@ -147,6 +225,11 @@ RSpec.describe GoodJob::Adapter do
 
     context 'when execution mode async_server' do
       let(:adapter) { described_class.new(execution_mode: :async_server) }
+
+      before do
+        capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil)
+        allow(GoodJob::Capsule).to receive(:new).and_return(capsule)
+      end
 
       context 'when Rails::Server is defined' do
         before do
