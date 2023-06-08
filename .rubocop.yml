@@ -85,6 +85,9 @@ RSpec/DescribeClass:
 RSpec/ExampleLength:
   Enabled: false
 
+RSpec/IndexedLet:
+  Enabled: false
+
 RSpec/LetSetup:
   Enabled: false
 
