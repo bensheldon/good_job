@@ -81,7 +81,7 @@ module GoodJob # :nodoc:
     end
 
     def refresh
-      touch(:updated_at)
+      touch(:updated_at) # rubocop:disable Rails/SkipsModelValidations
     end
 
     def refresh_if_stale
