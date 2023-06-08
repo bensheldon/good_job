@@ -13,6 +13,9 @@ module ActiveRecord::AttributeMethods::TimeZoneConversion
     def skip_time_zone_conversion_for_attributes; end
     def skip_time_zone_conversion_for_attributes=(value); end
     def skip_time_zone_conversion_for_attributes?; end
+    def time_zone_aware_attributes; end
+    def time_zone_aware_attributes=(value); end
+    def time_zone_aware_attributes?; end
     def time_zone_aware_types; end
     def time_zone_aware_types=(value); end
     def time_zone_aware_types?; end
@@ -21,6 +24,8 @@ module ActiveRecord::AttributeMethods::TimeZoneConversion
   module GeneratedInstanceMethods
     def skip_time_zone_conversion_for_attributes; end
     def skip_time_zone_conversion_for_attributes?; end
+    def time_zone_aware_attributes; end
+    def time_zone_aware_attributes?; end
     def time_zone_aware_types; end
     def time_zone_aware_types?; end
   end

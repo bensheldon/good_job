@@ -16,6 +16,9 @@ module ActiveRecord::Reflection
     def aggregate_reflections; end
     def aggregate_reflections=(value); end
     def aggregate_reflections?; end
+    def automatic_scope_inversing; end
+    def automatic_scope_inversing=(value); end
+    def automatic_scope_inversing?; end
   end
 
   module GeneratedInstanceMethods
@@ -23,5 +26,7 @@ module ActiveRecord::Reflection
     def _reflections?; end
     def aggregate_reflections; end
     def aggregate_reflections?; end
+    def automatic_scope_inversing; end
+    def automatic_scope_inversing?; end
   end
 end

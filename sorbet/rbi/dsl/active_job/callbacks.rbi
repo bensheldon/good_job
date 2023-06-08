@@ -14,8 +14,6 @@ module ActiveJob::Callbacks
     def __callbacks; end
     def __callbacks=(value); end
     def __callbacks?; end
-    def return_false_on_aborted_enqueue; end
-    def return_false_on_aborted_enqueue=(value); end
   end
 
   module GeneratedInstanceMethods

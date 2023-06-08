@@ -24,6 +24,18 @@ module ActiveRecord::Core
     def default_shard?; end
     def destroy_association_async_job; end
     def destroy_association_async_job=(value); end
+    def enumerate_columns_in_select_statements; end
+    def enumerate_columns_in_select_statements=(value); end
+    def enumerate_columns_in_select_statements?; end
+    def has_many_inversing; end
+    def has_many_inversing=(value); end
+    def has_many_inversing?; end
+    def logger; end
+    def logger=(value); end
+    def logger?; end
+    def shard_selector; end
+    def shard_selector=(value); end
+    def shard_selector?; end
     def strict_loading_by_default; end
     def strict_loading_by_default=(value); end
     def strict_loading_by_default?; end
@@ -37,5 +49,7 @@ module ActiveRecord::Core
     def default_shard; end
     def default_shard?; end
     def destroy_association_async_job; end
+    def logger; end
+    def logger?; end
   end
 end
