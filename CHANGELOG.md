@@ -1,5 +1,19 @@
 # Changelog
 
+## [v3.15.12](https://github.com/bensheldon/good_job/tree/v3.15.12) (2023-06-11)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.11...v3.15.12)
+
+**Fixed bugs:**
+
+- Do not allow GoodJob to automatically start after Rails initialization if previously shutdown [\#976](https://github.com/bensheldon/good_job/pull/976) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Fix Rubocop linting [\#975](https://github.com/bensheldon/good_job/pull/975) ([bensheldon](https://github.com/bensheldon))
+- Bump capybara from 3.38.0 to 3.39.1 [\#970](https://github.com/bensheldon/good_job/pull/970) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump thor from 1.2.1 to 1.2.2 [\#967](https://github.com/bensheldon/good_job/pull/967) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.15.11](https://github.com/bensheldon/good_job/tree/v3.15.11) (2023-06-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.10...v3.15.11)
