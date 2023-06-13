@@ -3,6 +3,7 @@ require "concurrent/executor/thread_pool_executor"
 require "concurrent/executor/timer_set"
 require "concurrent/scheduled_task"
 require "concurrent/utility/processor_counter"
+require 'good_job/metrics'
 
 module GoodJob # :nodoc:
   #
@@ -88,6 +89,7 @@ module GoodJob # :nodoc:
       @executor_options[:name] = name
 
       @cleanup_tracker = CleanupTracker.new(cleanup_interval_seconds: cleanup_interval_seconds, cleanup_interval_jobs: cleanup_interval_jobs)
+      @metrics = ::GoodJob::Metrics.new
       create_executor
       warm_cache if warm_cache_on_initialize
     end
@@ -203,6 +205,12 @@ module GoodJob # :nodoc:
       instrument("finished_job_task", { result: output, error: thread_error, time: time })
       return unless output
 
+      if error
+        @metrics.increment_failed
+      else
+        @metrics.increment_succeeded
+      end
+
       @cleanup_tracker.increment
       if @cleanup_tracker.cleanup?
         cleanup
@@ -222,6 +230,9 @@ module GoodJob # :nodoc:
         max_cache: @max_cache,
         active_cache: cache_count,
         available_cache: remaining_cache_count,
+        succeeded_count: @metrics.succeeded_count,
+        failed_count: @metrics.failed_count,
+        total_count: @metrics.succeeded_count + @metrics.failed_count,
       }
     end
 

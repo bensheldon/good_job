@@ -62,6 +62,25 @@ RSpec.describe GoodJob::Scheduler do
 
         expect(error_proc).to have_received(:call).with(an_instance_of(StandardError).and(having_attributes(message: 'oopsy'))).at_least(:once)
       end
+
+      it 'increases failed job count' do
+        expect(performer).to receive(:next) do
+          THREAD_HAS_RUN.make_true
+          GoodJob::ExecutionResult.new(value: nil, unhandled_error: StandardError.new("oopsy"))
+        end
+
+        allow(error_proc).to receive(:call) do
+          ERROR_TRIGGERED.make_true
+        end
+
+        scheduler = described_class.new(performer)
+        scheduler.create_thread
+        sleep_until { THREAD_HAS_RUN.true? }
+        sleep_until { ERROR_TRIGGERED.true? }
+
+        expect(scheduler.stats.fetch(:failed_count)).to eq 1
+        expect(scheduler.stats.fetch(:succeeded_count)).to eq 0
+      end
     end
   end
 
@@ -177,6 +196,9 @@ RSpec.describe GoodJob::Scheduler do
                                       max_cache: max_cache,
                                       active_cache: 0,
                                       available_cache: max_cache,
+                                      failed_count: 0,
+                                      succeeded_count: 0,
+                                      total_count: 0,
                                     })
     end
   end
