@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.15.13](https://github.com/bensheldon/good_job/tree/v3.15.13) (2023-06-14)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.12...v3.15.13)
+
+**Fixed bugs:**
+
+- Replace uncached table\_exists? with cached table\_exists? [\#979](https://github.com/bensheldon/good_job/pull/979) ([cmcinnes-mdsol](https://github.com/cmcinnes-mdsol))
+
 ## [v3.15.12](https://github.com/bensheldon/good_job/tree/v3.15.12) (2023-06-11)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.11...v3.15.12)
