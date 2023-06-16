@@ -5,6 +5,7 @@ require:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
+  - ./spec/rubocop/cop/good_job/explicit_namespace_cop.rb
 
 inherit_mode:
   merge:
