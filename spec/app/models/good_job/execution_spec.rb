@@ -724,6 +724,30 @@ RSpec.describe GoodJob::Execution do
           )
         end
       end
+
+      context 'when retry_job is invoked directly during execution' do
+        before do
+          TestJob.after_perform do |job|
+            job.retry_job wait: 1.second
+          end
+        end
+
+        it 'finishes the execution but does not finish the job' do
+          good_job.perform
+
+          expect(good_job.reload).to have_attributes(
+            performed_at: nil,
+            finished_at: nil,
+            scheduled_at: within(0.5).of(1.second.from_now)
+          )
+
+          expect(good_job.discrete_executions.size).to eq(1)
+          expect(good_job.discrete_executions.first).to have_attributes(
+            performed_at: within(1.second).of(Time.current),
+            finished_at: within(1.second).of(Time.current)
+          )
+        end
+      end
     end
   end
 

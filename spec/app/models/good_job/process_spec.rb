@@ -60,4 +60,40 @@ RSpec.describe GoodJob::Process do
       expect(process.basename).to eq('bundle exec rails start')
     end
   end
+
+  describe '#refresh' do
+    it 'updates the record' do
+      process = described_class.create! state: {}, updated_at: 1.day.ago
+      expect do
+        expect(process.refresh).to eq true
+      end.to change(process, :updated_at).to within(1.second).of(Time.current)
+    end
+
+    context 'when the record has been deleted elsewhere' do
+      it 'returns false' do
+        process = described_class.create! state: {}, updated_at: 1.day.ago
+        described_class.where(id: process.id).delete_all
+
+        expect(process.refresh).to eq false
+      end
+    end
+  end
+
+  describe '#stale?' do
+    it 'returns true when the record is stale' do
+      process = described_class.create! state: {}, updated_at: 1.day.ago
+      expect(process.stale?).to eq true
+      process.refresh
+      expect(process.stale?).to eq false
+    end
+  end
+
+  describe '#expired?' do
+    it 'returns true when the record is stale' do
+      process = described_class.create! state: {}, updated_at: 1.day.ago
+      expect(process.expired?).to eq true
+      process.refresh
+      expect(process.expired?).to eq false
+    end
+  end
 end
