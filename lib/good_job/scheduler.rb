@@ -232,7 +232,7 @@ module GoodJob # :nodoc:
         available_cache: remaining_cache_count,
         succeeded_count: @metrics.succeeded_count,
         failed_count: @metrics.failed_count,
-        total_count: @metrics.succeeded_count + @metrics.failed_count,
+        total_count: @metrics.total_count,
       }
     end
 
