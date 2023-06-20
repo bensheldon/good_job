@@ -8,10 +8,10 @@ RSpec.describe GoodJob::Scheduler do
     described_class.instances.each(&:shutdown)
   end
 
-  describe 'name' do
+  describe '#name' do
     it 'is human readable and contains configuration values' do
       scheduler = described_class.new(performer)
-      expect(scheduler.name).to eq('GoodJob::Scheduler(queues= max_threads=5)')
+      expect(scheduler.name).to eq('GoodJob::Scheduler(queues= max_threads=5 failed_count=0 succeeded_count=0 total_count=0)')
     end
   end
 
