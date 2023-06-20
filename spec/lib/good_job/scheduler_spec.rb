@@ -62,25 +62,6 @@ RSpec.describe GoodJob::Scheduler do
 
         expect(error_proc).to have_received(:call).with(an_instance_of(StandardError).and(having_attributes(message: 'oopsy'))).at_least(:once)
       end
-
-      it 'increases failed job count' do
-        expect(performer).to receive(:next) do
-          THREAD_HAS_RUN.make_true
-          GoodJob::ExecutionResult.new(value: nil, unhandled_error: StandardError.new("oopsy"))
-        end
-
-        allow(error_proc).to receive(:call) do
-          ERROR_TRIGGERED.make_true
-        end
-
-        scheduler = described_class.new(performer)
-        scheduler.create_thread
-        sleep_until { THREAD_HAS_RUN.true? }
-        sleep_until { ERROR_TRIGGERED.true? }
-
-        expect(scheduler.stats.fetch(:failed_count)).to eq 1
-        expect(scheduler.stats.fetch(:succeeded_count)).to eq 0
-      end
     end
   end
 
@@ -92,6 +73,34 @@ RSpec.describe GoodJob::Scheduler do
       end.to change { described_class.instances.size }.by(1)
 
       expect(described_class.instances).to include scheduler
+    end
+  end
+
+  describe '#task_observer' do
+    it 'increases metric counters' do
+      allow(GoodJob).to receive(:on_thread_error)
+
+      failed_job_count = 0
+      succeeded_job_count = 0
+
+      allow(performer).to receive(:next) do
+        if failed_job_count < 7
+          failed_job_count += 1
+          GoodJob::ExecutionResult.new(value: nil, unhandled_error: StandardError.new("oopsy"))
+        elsif succeeded_job_count < 9
+          succeeded_job_count += 1
+          GoodJob::ExecutionResult.new(value: 'success')
+        end
+      end
+
+      scheduler = described_class.new(performer)
+      scheduler.create_thread
+
+      sleep_until { succeeded_job_count == 9 }
+
+      expect(scheduler.stats.fetch(:failed_count)).to eq 7
+      expect(scheduler.stats.fetch(:succeeded_count)).to eq 9
+      expect(scheduler.stats.fetch(:total_count)).to eq 16
     end
   end
 
