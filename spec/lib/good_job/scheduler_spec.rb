@@ -134,6 +134,25 @@ RSpec.describe GoodJob::Scheduler do
         .to change(scheduler, :running?).from(false).to(true)
     end
 
+    it 'resets metrics' do
+      allow(performer).to receive(:next).and_return GoodJob::ExecutionResult.new(value: 'hello'), nil
+
+      scheduler = described_class.new(performer)
+      scheduler.create_thread
+
+      sleep_until do
+        scheduler.stats.fetch(:succeeded_count) == 1
+      end
+
+      scheduler.shutdown
+      expect(scheduler.stats.fetch(:succeeded_count)).to eq 1
+
+      expect { scheduler.restart }
+        .to change(scheduler, :running?).from(false).to(true)
+
+      expect(scheduler.stats.fetch(:succeeded_count)).to eq 0
+    end
+
     it 'can be called multiple times' do
       scheduler = described_class.new(performer)
       scheduler.shutdown

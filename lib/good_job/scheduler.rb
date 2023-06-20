@@ -141,6 +141,7 @@ module GoodJob # :nodoc:
 
       instrument("scheduler_restart_pools") do
         shutdown(timeout: timeout)
+        @metrics.reset
         create_executor
         warm_cache
       end
