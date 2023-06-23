@@ -49,7 +49,7 @@ module GoodJob
     #   * +nil+ will trigger a shutdown but not wait for it to complete.
     # @return [void]
     def shutdown(timeout: :default)
-      timeout = timeout == :default ? @configuration.shutdown_timeout : timeout
+      timeout = @configuration.shutdown_timeout if timeout == :default
       GoodJob._shutdown_all([@notifier, @poller, @scheduler, @cron_manager].compact, timeout: timeout)
       @startable = false
       @running = false

@@ -20,6 +20,7 @@ gem 'appraisal', github: 'thoughtbot/appraisal', branch: 'main'
 gem 'matrix'
 gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
+gem 'rack', '~> 2.0'
 gem 'rails'
 
 platforms :ruby do
