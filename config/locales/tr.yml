@@ -1,3 +1,4 @@
+---
 tr:
   good_job:
     actions:
@@ -65,7 +66,7 @@ tr:
           other: neredeyse %{count} yıl
         half_a_minute: yarım dakika
         less_than_x_minutes:
-          one: "%{count} dakikadan az"
+          one: 1 dakikadan az
           other: "%{count} dakikadan az"
         less_than_x_seconds:
           one: 1 saniyeden az
