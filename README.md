@@ -231,7 +231,7 @@ Rails.application.configure do
   # Configure options individually...
   config.good_job.preserve_job_records = true
   config.good_job.retry_on_unhandled_error = false
-  config.good_job.on_thread_error = -> (exception) { Sentry.capture_exception(exception) }
+  config.good_job.on_thread_error = -> (exception) { Rails.error.report(exception) }
   config.good_job.execution_mode = :async
   config.good_job.queues = '*'
   config.good_job.max_threads = 5
@@ -244,7 +244,7 @@ Rails.application.configure do
   config.good_job = {
     preserve_job_records: true,
     retry_on_unhandled_error: false,
-    on_thread_error: -> (exception) { Sentry.capture_exception(exception) },
+    on_thread_error: -> (exception) { Rails.error.report(exception) },
     execution_mode: :async,
     queues: '*',
     max_threads: 5,
@@ -287,7 +287,7 @@ Available configuration options are:
 - `on_thread_error` (proc, lambda, or callable) will be called when there is an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake. Example:
 
     ```ruby
-    config.good_job.on_thread_error = -> (exception) { Sentry.capture_exception(exception) }
+    config.good_job.on_thread_error = -> (exception) { Rails.error.report(exception) }
     ```
 
 By default, GoodJob configures the following execution modes per environment:
@@ -760,7 +760,7 @@ If errors do reach GoodJob, you can assign a callable to `GoodJob.on_thread_erro
 
 ```ruby
 # config/initializers/good_job.rb
-GoodJob.on_thread_error = -> (exception) { Sentry.capture_exception(exception) }
+GoodJob.on_thread_error = -> (exception) { Rails.error.report(exception) }
 ```
 
 #### Retries
@@ -794,13 +794,13 @@ class ApplicationJob < ActiveJob::Base
   retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
 
   retry_on SpecialError, attempts: 5 do |_job, exception|
-    Sentry.capture_exception(exception)
+    Rails.error.report(exception)
   end
 
   around_perform do |_job, block|
     block.call
   rescue StandardError => e
-    Sentry.capture_exception(e)
+    Rails.error.report(e)
     raise
   end
   # ...
@@ -823,7 +823,7 @@ ActionMailer::MailDeliveryJob.retry_on StandardError, wait: :exponentially_longe
 ActionMailer::MailDeliveryJob.around_perform do |_job, block|
   block.call
 rescue StandardError => e
-  Sentry.capture_exception(e)
+  Rails.error.report(e)
   raise
 end
 ```
