@@ -35,7 +35,7 @@ module GoodJob
       end
 
       def discrete_support?
-        DiscreteExecution.migrated?
+        GoodJob::DiscreteExecution.migrated?
       end
     end
 

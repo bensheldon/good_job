@@ -7,6 +7,7 @@ gem "appraisal", branch: "main", git: "https://github.com/thoughtbot/appraisal.g
 gem "matrix"
 gem "nokogiri"
 gem "pg", platforms: [:mri, :mingw, :x64_mingw]
+gem "rack", "~> 2.0"
 gem "rails", branch: "main", git: "https://github.com/rails/rails.git"
 gem "capybara", "~> 3.36"
 gem "selenium-webdriver", "~> 4.0"

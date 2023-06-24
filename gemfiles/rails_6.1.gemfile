@@ -7,7 +7,9 @@ gem "appraisal", branch: "fix-bundle-env", git: "https://github.com/bensheldon/a
 gem "matrix"
 gem "nokogiri"
 gem "pg", platforms: [:mri, :mingw, :x64_mingw]
+gem "rack", "~> 2.0"
 gem "rails", "~> 6.1.0"
+gem "traces", "~> 0.9.1"
 
 platforms :ruby do
   gem "activerecord-explain-analyze"
