@@ -208,9 +208,9 @@ module GoodJob # :nodoc:
       return unless output
 
       if error
-        @metrics.increment_failed
+        @metrics.increment_failed_executions
       else
-        @metrics.increment_succeeded
+        @metrics.increment_succeeded_executions
       end
 
       @cleanup_tracker.increment
@@ -232,9 +232,9 @@ module GoodJob # :nodoc:
         max_cache: @max_cache,
         active_cache: cache_count,
         available_cache: remaining_cache_count,
-        succeeded_executions_count: @metrics.succeeded_count,
-        failed_executions_count: @metrics.failed_count,
-        total_executions_count: @metrics.total_count,
+        succeeded_executions_count: @metrics.succeeded_executions_count,
+        failed_executions_count: @metrics.failed_executions_count,
+        total_executions_count: @metrics.total_executions_count,
       }
     end
 
