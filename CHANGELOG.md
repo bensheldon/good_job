@@ -1,5 +1,40 @@
 # Changelog
 
+## [v3.15.13](https://github.com/bensheldon/good_job/tree/v3.15.13) (2023-06-14)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.12...v3.15.13)
+
+**Fixed bugs:**
+
+- Replace uncached table\_exists? with cached table\_exists? [\#979](https://github.com/bensheldon/good_job/pull/979) ([cmcinnes-mdsol](https://github.com/cmcinnes-mdsol))
+
+## [v3.15.12](https://github.com/bensheldon/good_job/tree/v3.15.12) (2023-06-11)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.11...v3.15.12)
+
+**Fixed bugs:**
+
+- Do not allow GoodJob to automatically start after Rails initialization if previously shutdown [\#976](https://github.com/bensheldon/good_job/pull/976) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Fix Rubocop linting [\#975](https://github.com/bensheldon/good_job/pull/975) ([bensheldon](https://github.com/bensheldon))
+- Bump capybara from 3.38.0 to 3.39.1 [\#970](https://github.com/bensheldon/good_job/pull/970) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump thor from 1.2.1 to 1.2.2 [\#967](https://github.com/bensheldon/good_job/pull/967) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v3.15.11](https://github.com/bensheldon/good_job/tree/v3.15.11) (2023-06-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.10...v3.15.11)
+
+**Fixed bugs:**
+
+- Fix `discrete_executions` job re-enqueueing when `retry_job` is called directly [\#973](https://github.com/bensheldon/good_job/pull/973) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Unclear how discrete executions should work with reenqueued  jobs \(leads to broken job-iteration\) [\#972](https://github.com/bensheldon/good_job/issues/972)
+- `build_for_enqueue` discards `scheduled_at` values for bulk-enqueued jobs [\#966](https://github.com/bensheldon/good_job/issues/966)
+
 ## [v3.15.10](https://github.com/bensheldon/good_job/tree/v3.15.10) (2023-05-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.9...v3.15.10)

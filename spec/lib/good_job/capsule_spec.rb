@@ -26,9 +26,35 @@ describe GoodJob::Capsule do
       capsule.shutdown
       expect(GoodJob::Scheduler.instances.size).to eq 1
     end
+
+    it 'will not start if previously shutdown' do
+      capsule = described_class.new
+      capsule.shutdown
+
+      expect { capsule.start }.not_to change(capsule, :running?).from(false)
+    end
+  end
+
+  describe '#restart' do
+    it 'can start a previously shutdown capsule' do
+      capsule = described_class.new
+      capsule.shutdown
+
+      expect { capsule.restart }.to change(capsule, :running?).from(false).to(true)
+      expect { capsule.restart }.not_to change(capsule, :running?).from(true)
+      expect { capsule.shutdown }.to change(capsule, :running?).from(true).to(false)
+    end
   end
 
   describe '#shutdown' do
+    it 'shuts down the capsule' do
+      capsule = described_class.new
+      capsule.start
+
+      expect { capsule.shutdown }.to change(capsule, :running?).from(true).to(false)
+      expect(GoodJob::Notifier.instances).to all be_shutdown
+    end
+
     it 'operates if the capsule has not been started' do
       capsule = described_class.new
       expect { capsule.shutdown }.not_to raise_error
