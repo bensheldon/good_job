@@ -11,7 +11,7 @@ RSpec.describe GoodJob::Scheduler do
   describe '#name' do
     it 'is human readable and contains configuration values' do
       scheduler = described_class.new(performer)
-      expect(scheduler.name).to eq('GoodJob::Scheduler(queues= max_threads=5 failed_count=0 succeeded_count=0 total_count=0)')
+      expect(scheduler.name).to eq('GoodJob::Scheduler(queues= max_threads=5)')
     end
   end
 
@@ -98,9 +98,9 @@ RSpec.describe GoodJob::Scheduler do
 
       sleep_until { succeeded_job_count == 9 }
 
-      expect(scheduler.stats.fetch(:failed_count)).to eq 7
-      expect(scheduler.stats.fetch(:succeeded_count)).to eq 9
-      expect(scheduler.stats.fetch(:total_count)).to eq 16
+      expect(scheduler.stats.fetch(:failed_executions_count)).to eq 7
+      expect(scheduler.stats.fetch(:succeeded_executions_count)).to eq 9
+      expect(scheduler.stats.fetch(:total_executions_count)).to eq 16
     end
   end
 
@@ -150,16 +150,16 @@ RSpec.describe GoodJob::Scheduler do
       scheduler.create_thread
 
       sleep_until do
-        scheduler.stats.fetch(:succeeded_count) == 1
+        scheduler.stats.fetch(:succeeded_executions_count) == 1
       end
 
       scheduler.shutdown
-      expect(scheduler.stats.fetch(:succeeded_count)).to eq 1
+      expect(scheduler.stats.fetch(:succeeded_executions_count)).to eq 1
 
       expect { scheduler.restart }
         .to change(scheduler, :running?).from(false).to(true)
 
-      expect(scheduler.stats.fetch(:succeeded_count)).to eq 0
+      expect(scheduler.stats.fetch(:succeeded_executions_count)).to eq 0
     end
 
     it 'can be called multiple times' do
@@ -224,9 +224,9 @@ RSpec.describe GoodJob::Scheduler do
                                       max_cache: max_cache,
                                       active_cache: 0,
                                       available_cache: max_cache,
-                                      failed_count: 0,
-                                      succeeded_count: 0,
-                                      total_count: 0,
+                                      failed_executions_count: 0,
+                                      succeeded_executions_count: 0,
+                                      total_executions_count: 0,
                                     })
     end
   end

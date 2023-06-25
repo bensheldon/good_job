@@ -47,8 +47,10 @@ module GoodJob # :nodoc:
         proctitle: $PROGRAM_NAME,
         preserve_job_records: GoodJob.preserve_job_records,
         retry_on_unhandled_error: GoodJob.retry_on_unhandled_error,
-        schedulers: GoodJob::Scheduler.instances.map(&:name),
+        schedulers: GoodJob::Scheduler.instances.map(&:stats),
         cron_enabled: GoodJob.configuration.enable_cron?,
+        total_succeeded_executions_count: GoodJob::Scheduler.instances.sum(&:succeeded_executions_count),
+        total_failed_executions_count: GoodJob::Scheduler.instances.sum(&:failed_executions_count),
       }
     end
 

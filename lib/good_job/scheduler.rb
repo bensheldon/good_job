@@ -62,6 +62,10 @@ module GoodJob # :nodoc:
       end
     end
 
+    # Human readable name of the scheduler that includes configuration values.
+    # @return [String]
+    attr_reader :name
+
     # @param performer [GoodJob::JobPerformer]
     # @param max_threads [Numeric, nil] number of seconds between polls for jobs
     # @param max_cache [Numeric, nil] maximum number of scheduled jobs to cache in memory
@@ -81,18 +85,14 @@ module GoodJob # :nodoc:
         @executor_options[:max_threads] = max_threads
         @executor_options[:max_queue] = max_threads
       end
+      @name = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@executor_options[:max_threads]})"
+      @executor_options[:name] = name
 
       @cleanup_tracker = CleanupTracker.new(cleanup_interval_seconds: cleanup_interval_seconds, cleanup_interval_jobs: cleanup_interval_jobs)
       @metrics = ::GoodJob::Metrics.new
       @executor_options[:name] = name
       create_executor
       warm_cache if warm_cache_on_initialize
-    end
-
-    # Human readable name of the scheduler that includes configuration values.
-    # @return [String]
-    def name
-      "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@executor_options[:max_threads]} failed_count=#{@metrics.failed_count} succeeded_count=#{@metrics.succeeded_count} total_count=#{@metrics.total_count})"
     end
 
     # Tests whether the scheduler is running.
@@ -232,9 +232,9 @@ module GoodJob # :nodoc:
         max_cache: @max_cache,
         active_cache: cache_count,
         available_cache: remaining_cache_count,
-        succeeded_count: @metrics.succeeded_count,
-        failed_count: @metrics.failed_count,
-        total_count: @metrics.total_count,
+        succeeded_executions_count: @metrics.succeeded_count,
+        failed_executions_count: @metrics.failed_count,
+        total_executions_count: @metrics.total_count,
       }
     end
 
