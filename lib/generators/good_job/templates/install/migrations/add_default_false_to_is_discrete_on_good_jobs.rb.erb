@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+class AddDefaultFalseToIsDiscreteOnGoodJobs < ActiveRecord::Migration<%= migration_version %>
+  def change
+    change_column_default :good_jobs, :is_discrete, from: nil, to: false
+  end
+end
