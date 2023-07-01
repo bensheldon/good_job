@@ -95,14 +95,16 @@ RSpec.describe GoodJob::Scheduler do
 
       scheduler = described_class.new(performer)
       scheduler.create_thread
+      sleep_until { scheduler.stats[:total_executions_count] == 17 }
+      scheduler.shutdown
 
-      sleep_until { succeeded_job_count == 9 }
-
-      expect(scheduler.stats.fetch(:empty_executions_count)).to eq 1
-      expect(scheduler.stats.fetch(:errored_executions_count)).to eq 7
-      expect(scheduler.stats.fetch(:succeeded_executions_count)).to eq 9
-      expect(scheduler.stats.fetch(:unlocked_executions_count)).to eq 0
-      expect(scheduler.stats.fetch(:total_executions_count)).to eq 17
+      expect(scheduler.stats).to include(
+        empty_executions_count: 1,
+        errored_executions_count: 7,
+        succeeded_executions_count: 9,
+        unlocked_executions_count: 0,
+        total_executions_count: 17
+      )
     end
   end
 
