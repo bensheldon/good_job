@@ -230,7 +230,7 @@ module GoodJob # :nodoc:
     # Information about the Scheduler
     # @return [Hash]
     def stats
-      available_threads = executor.ready_worker_count
+      available_threads = executor&.ready_worker_count || 0
 
       {
         name: name,
