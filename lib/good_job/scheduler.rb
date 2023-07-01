@@ -230,21 +230,18 @@ module GoodJob # :nodoc:
     # Information about the Scheduler
     # @return [Hash]
     def stats
+      available_threads = executor.ready_worker_count
+
       {
         name: name,
         queues: performer.name,
         max_threads: @executor_options[:max_threads],
-        active_threads: @executor_options[:max_threads] - executor.ready_worker_count,
-        available_threads: executor.ready_worker_count,
+        active_threads: @executor_options[:max_threads] - available_threads,
+        available_threads: available_threads,
         max_cache: @max_cache,
         active_cache: cache_count,
         available_cache: remaining_cache_count,
-        succeeded_executions_count: @metrics.succeeded_executions_count,
-        errored_executions_count: @metrics.errored_executions_count,
-        unlocked_executions_count: @metrics.unlocked_executions_count,
-        empty_executions_count: @metrics.empty_executions_count,
-        total_executions_count: @metrics.total_executions_count,
-      }
+      }.merge!(@metrics.to_h)
     end
 
     # Preload existing runnable and future-scheduled jobs
