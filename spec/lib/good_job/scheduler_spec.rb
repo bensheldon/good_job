@@ -217,7 +217,8 @@ RSpec.describe GoodJob::Scheduler do
       scheduler = described_class.new(performer, max_threads: max_threads, max_cache: max_cache)
 
       expect(scheduler.stats).to eq({
-                                      name: performer.name,
+                                      name: scheduler.name,
+                                      queues: performer.name,
                                       max_threads: max_threads,
                                       active_threads: 0,
                                       available_threads: max_threads,
@@ -272,17 +273,17 @@ RSpec.describe GoodJob::Scheduler do
         all_scheduler, rodents_scheduler, elephants_scheduler = multi_scheduler.schedulers
 
         expect(all_scheduler.stats).to include(
-          name: '*',
+          queues: '*',
           max_threads: 1
         )
 
         expect(rodents_scheduler.stats).to include(
-          name: 'mice,ferrets',
+          queues: 'mice,ferrets',
           max_threads: 2
         )
 
         expect(elephants_scheduler.stats).to include(
-          name: 'elephant',
+          queues: 'elephant',
           max_threads: 4
         )
       end
