@@ -98,7 +98,7 @@ RSpec.describe GoodJob::Scheduler do
 
       sleep_until { succeeded_job_count == 9 }
 
-      expect(scheduler.stats.fetch(:failed_executions_count)).to eq 7
+      expect(scheduler.stats.fetch(:errored_executions_count)).to eq 7
       expect(scheduler.stats.fetch(:succeeded_executions_count)).to eq 9
       expect(scheduler.stats.fetch(:total_executions_count)).to eq 16
     end
@@ -225,7 +225,7 @@ RSpec.describe GoodJob::Scheduler do
                                       max_cache: max_cache,
                                       active_cache: 0,
                                       available_cache: max_cache,
-                                      failed_executions_count: 0,
+                                      errored_executions_count: 0,
                                       succeeded_executions_count: 0,
                                       total_executions_count: 0,
                                     })

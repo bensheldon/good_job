@@ -61,7 +61,7 @@ module GoodJob # :nodoc:
         schedulers: GoodJob::Scheduler.instances.map(&:stats),
         cron_enabled: GoodJob.configuration.enable_cron?,
         total_succeeded_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:succeeded_executions_count) },
-        total_failed_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:failed_executions_count) },
+        total_errored_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:errored_executions_count) },
       }
     end
 

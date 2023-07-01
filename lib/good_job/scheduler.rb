@@ -201,13 +201,15 @@ module GoodJob # :nodoc:
     # @!visibility private
     # @return [void]
     def task_observer(time, output, thread_error)
-      error = thread_error || (output.is_a?(GoodJob::ExecutionResult) ? output.unhandled_error : nil)
-      GoodJob._on_thread_error(error) if error
+      result = output.is_a?(GoodJob::ExecutionResult) ? output : nil
+
+      unhandled_error = thread_error || result&.unhandled_error
+      GoodJob._on_thread_error(unhandled_error) if unhandled_error
 
       instrument("finished_job_task", { result: output, error: thread_error, time: time })
       return unless output
 
-      if error
+      if unhandled_error || result&.handled_error
         @metrics.increment_failed_executions
       else
         @metrics.increment_succeeded_executions
@@ -234,7 +236,7 @@ module GoodJob # :nodoc:
         active_cache: cache_count,
         available_cache: remaining_cache_count,
         succeeded_executions_count: @metrics.succeeded_executions_count,
-        failed_executions_count: @metrics.failed_executions_count,
+        errored_executions_count: @metrics.errored_executions_count,
         total_executions_count: @metrics.total_executions_count,
       }
     end
