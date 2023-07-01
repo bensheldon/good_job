@@ -75,8 +75,6 @@ module GoodJob # :nodoc:
     def initialize(performer, max_threads: nil, max_cache: nil, warm_cache_on_initialize: false, cleanup_interval_seconds: nil, cleanup_interval_jobs: nil)
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
 
-      self.class.instances << self
-
       @performer = performer
 
       @max_cache = max_cache || 0
@@ -91,8 +89,10 @@ module GoodJob # :nodoc:
       @cleanup_tracker = CleanupTracker.new(cleanup_interval_seconds: cleanup_interval_seconds, cleanup_interval_jobs: cleanup_interval_jobs)
       @metrics = ::GoodJob::Metrics.new
       @executor_options[:name] = name
+
       create_executor
       warm_cache if warm_cache_on_initialize
+      self.class.instances << self
     end
 
     # Tests whether the scheduler is running.
@@ -230,8 +230,7 @@ module GoodJob # :nodoc:
     # Information about the Scheduler
     # @return [Hash]
     def stats
-      available_threads = executor&.ready_worker_count || 0
-
+      available_threads = executor.ready_worker_count
       {
         name: name,
         queues: performer.name,

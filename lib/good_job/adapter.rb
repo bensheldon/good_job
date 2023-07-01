@@ -29,8 +29,8 @@ module GoodJob
       GoodJob::Configuration.validate_execution_mode(@_execution_mode_override) if @_execution_mode_override
       @capsule = _capsule
 
-      self.class.instances << self
       start_async if GoodJob.async_ready?
+      self.class.instances << self
     end
 
     # Enqueues the ActiveJob job to be performed.

@@ -12,12 +12,12 @@ module GoodJob
 
     # @param configuration [GoodJob::Configuration] Configuration to use for this capsule.
     def initialize(configuration: GoodJob.configuration)
-      self.class.instances << self
       @configuration = configuration
-
       @startable = true
       @running = false
       @mutex = Mutex.new
+
+      self.class.instances << self
     end
 
     # Start the capsule once. After a shutdown, {#restart} must be used to start again.

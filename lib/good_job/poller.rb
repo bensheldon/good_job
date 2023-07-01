@@ -38,9 +38,8 @@ module GoodJob # :nodoc:
       @timer_options = DEFAULT_TIMER_OPTIONS.dup
       @timer_options[:execution_interval] = poll_interval if poll_interval.present?
 
-      self.class.instances << self
-
       create_timer
+      self.class.instances << self
     end
 
     # Tests whether the timer is running.
