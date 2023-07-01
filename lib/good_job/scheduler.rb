@@ -206,14 +206,18 @@ module GoodJob # :nodoc:
       unhandled_error = thread_error || result&.unhandled_error
       GoodJob._on_thread_error(unhandled_error) if unhandled_error
 
+      if unhandled_error || result&.handled_error
+        @metrics.increment_errored_executions
+      elsif result&.unlocked_error
+        @metrics.increment_unlocked_executions
+      elsif result
+        @metrics.increment_succeeded_executions
+      else
+        @metrics.increment_empty_executions
+      end
+
       instrument("finished_job_task", { result: output, error: thread_error, time: time })
       return unless output
-
-      if unhandled_error || result&.handled_error
-        @metrics.increment_failed_executions
-      else
-        @metrics.increment_succeeded_executions
-      end
 
       @cleanup_tracker.increment
       if @cleanup_tracker.cleanup?
@@ -237,6 +241,8 @@ module GoodJob # :nodoc:
         available_cache: remaining_cache_count,
         succeeded_executions_count: @metrics.succeeded_executions_count,
         errored_executions_count: @metrics.errored_executions_count,
+        unlocked_executions_count: @metrics.unlocked_executions_count,
+        empty_executions_count: @metrics.empty_executions_count,
         total_executions_count: @metrics.total_executions_count,
       }
     end
