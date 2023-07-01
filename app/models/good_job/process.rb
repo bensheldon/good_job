@@ -30,6 +30,8 @@ module GoodJob # :nodoc:
     # @return [ActiveRecord::Relation]
     scope :inactive, -> { advisory_unlocked }
 
+    attribute :state, default: -> { {} }
+
     # UUID that is unique to the current process and changes when forked.
     # @return [String]
     def self.current_id
@@ -101,7 +103,11 @@ module GoodJob # :nodoc:
     end
 
     def basename
-      File.basename(state["proctitle"])
+      File.basename(state.fetch("proctitle", ""))
+    end
+
+    def schedulers
+      state.fetch("schedulers", [])
     end
 
     def refresh_if_stale(cleanup: false)

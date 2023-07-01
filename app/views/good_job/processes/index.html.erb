@@ -40,8 +40,8 @@
             </div>
           </div>
           <div class="col">
-            <% process.state["schedulers"].each do |scheduler| %>
-              <pre class="mb-0"><%= scheduler %></pre>
+            <% process.schedulers.each do |scheduler| %>
+              <pre class="mb-0"><%= scheduler.is_a?(Hash) ? scheduler['name'] : scheduler %></pre>
             <% end %>
           </div>
           <div class="col-2 small"><%= relative_time(process.created_at) %></div>

@@ -225,7 +225,8 @@ module GoodJob # :nodoc:
     # @return [Hash]
     def stats
       {
-        name: performer.name,
+        name: name,
+        queues: performer.name,
         max_threads: @executor_options[:max_threads],
         active_threads: @executor_options[:max_threads] - executor.ready_worker_count,
         available_threads: executor.ready_worker_count,
