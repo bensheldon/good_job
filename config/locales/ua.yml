@@ -192,6 +192,7 @@ ua:
         schedulers: Планувальники
         started: Розпочато
         title: Процеси
+        updated: Оновлено
     shared:
       filter:
         all: Всі

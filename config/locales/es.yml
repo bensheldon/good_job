@@ -190,6 +190,7 @@ es:
         schedulers: Schedulers
         started: Iniciado
         title: Procesos
+        updated: Actualizado
     shared:
       filter:
         all: Todas
