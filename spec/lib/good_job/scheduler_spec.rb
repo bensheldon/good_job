@@ -102,7 +102,7 @@ RSpec.describe GoodJob::Scheduler do
         empty_executions_count: 1,
         errored_executions_count: 7,
         succeeded_executions_count: 9,
-        unlocked_executions_count: 0,
+        unexecutable_executions_count: 0,
         total_executions_count: 17
       )
     end
@@ -232,7 +232,7 @@ RSpec.describe GoodJob::Scheduler do
                                       empty_executions_count: 0,
                                       errored_executions_count: 0,
                                       succeeded_executions_count: 0,
-                                      unlocked_executions_count: 0,
+                                      unexecutable_executions_count: 0,
                                       total_executions_count: 0,
                                     })
     end

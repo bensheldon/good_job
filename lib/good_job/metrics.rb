@@ -6,7 +6,7 @@ module GoodJob # :nodoc:
       @empty_executions = Concurrent::AtomicFixnum.new
       @errored_executions = Concurrent::AtomicFixnum.new
       @succeeded_executions = Concurrent::AtomicFixnum.new
-      @unlocked_executions = Concurrent::AtomicFixnum.new
+      @unexecutable_executions = Concurrent::AtomicFixnum.new
     end
 
     # Increments number of empty queried executions.
@@ -29,8 +29,8 @@ module GoodJob # :nodoc:
 
     # Increments number of unlocked executions.
     # @return [Integer]
-    def increment_unlocked_executions
-      @unlocked_executions.increment
+    def increment_unexecutable_executions
+      @unexecutable_executions.increment
     end
 
     def to_h
@@ -38,7 +38,7 @@ module GoodJob # :nodoc:
         empty_executions_count: @empty_executions.value,
         errored_executions_count: @errored_executions.value,
         succeeded_executions_count: @succeeded_executions.value,
-        unlocked_executions_count: @unlocked_executions.value,
+        unexecutable_executions_count: @unexecutable_executions.value,
       }.tap do |values|
         values[:total_executions_count] = values.values.sum
       end
@@ -50,7 +50,7 @@ module GoodJob # :nodoc:
       @empty_executions.value = 0
       @errored_executions.value = 0
       @succeeded_executions.value = 0
-      @unlocked_executions.value = 0
+      @unexecutable_executions.value = 0
     end
   end
 end

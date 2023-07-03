@@ -208,8 +208,8 @@ module GoodJob # :nodoc:
 
       if unhandled_error || result&.handled_error
         @metrics.increment_errored_executions
-      elsif result&.unlocked_error
-        @metrics.increment_unlocked_executions
+      elsif result&.unexecutable
+        @metrics.increment_unexecutable_executions
       elsif result
         @metrics.increment_succeeded_executions
       else
