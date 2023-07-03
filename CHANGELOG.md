@@ -1,5 +1,29 @@
 # Changelog
 
+## [v3.15.14](https://github.com/bensheldon/good_job/tree/v3.15.14) (2023-07-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.13...v3.15.14)
+
+**Fixed bugs:**
+
+- Dashboard error when trying to display 0 running/queued/retried jobs due to missing 'zero' translation [\#990](https://github.com/bensheldon/good_job/issues/990)
+
+**Closed issues:**
+
+- Persisting ActiveSupport::CurrentAttributes  [\#981](https://github.com/bensheldon/good_job/issues/981)
+- uninitialized constant DiscreteExecution [\#962](https://github.com/bensheldon/good_job/issues/962)
+- Hard kill resilience with execution counts [\#922](https://github.com/bensheldon/good_job/issues/922)
+
+**Merged pull requests:**
+
+- Bump rubocop from 1.53.0 to 1.54.0 [\#994](https://github.com/bensheldon/good_job/pull/994) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rails from 7.0.5 to 7.0.6 [\#993](https://github.com/bensheldon/good_job/pull/993) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Fix CI: Lock traces version for Ruby 2.6 compatible version [\#987](https://github.com/bensheldon/good_job/pull/987) ([bensheldon](https://github.com/bensheldon))
+- Turkish Language support [\#986](https://github.com/bensheldon/good_job/pull/986) ([SemihCag](https://github.com/SemihCag))
+- Add explicit namespace back to `GoodJob::DiscreteExecution` [\#983](https://github.com/bensheldon/good_job/pull/983) ([bensheldon](https://github.com/bensheldon))
+- Add Process heartbeat that is updated inside of Notifier [\#977](https://github.com/bensheldon/good_job/pull/977) ([bensheldon](https://github.com/bensheldon))
+- Use generic error reporter in Readme examples [\#964](https://github.com/bensheldon/good_job/pull/964) ([shouichi](https://github.com/shouichi))
+
 ## [v3.15.13](https://github.com/bensheldon/good_job/tree/v3.15.13) (2023-06-14)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.12...v3.15.13)
@@ -42,10 +66,6 @@
 **Fixed bugs:**
 
 - Ensure migration warning for `DiscreteExecution` constant is in explicit `GoodJob::` namespace [\#963](https://github.com/bensheldon/good_job/pull/963) ([bensheldon](https://github.com/bensheldon))
-
-**Closed issues:**
-
-- uninitialized constant DiscreteExecution [\#962](https://github.com/bensheldon/good_job/issues/962)
 
 ## [v3.15.9](https://github.com/bensheldon/good_job/tree/v3.15.9) (2023-05-21)
 
