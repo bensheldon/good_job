@@ -95,6 +95,13 @@ ja:
       milliseconds: "%{ms}ミリ秒"
       minutes: "%{min}分 %{sec}秒"
       seconds: "%{sec}秒"
+    error_event:
+      discarded: 廃棄されました
+      handled: 取り扱い済み
+      interrupted: 中断されました
+      retried: 再試行しました
+      retry_stopped: 再試行が停止されました
+      unhandled: 未処理
     helpers:
       relative_time:
         future: "%{time}後"
@@ -114,7 +121,6 @@ ja:
       discard:
         notice: ジョブが破棄されました
       executions:
-        error: エラー
         in_queue: 待機中
         runtime: 実行時間
         title: 実行
@@ -192,6 +198,7 @@ ja:
         title: プロセス
         updated: 更新された
     shared:
+      error: エラー
       filter:
         all: 全て
         all_jobs: 全てのジョブ

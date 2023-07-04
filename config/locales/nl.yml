@@ -95,6 +95,13 @@ nl:
       milliseconds: "%{ms}ms"
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
+    error_event:
+      discarded: weggegooid
+      handled: Afgehandeld
+      interrupted: onderbroken
+      retried: Opnieuw geprobeerd
+      retry_stopped: Opnieuw proberen gestopt
+      unhandled: Onbehandeld
     helpers:
       relative_time:
         future: op %{time}
@@ -114,7 +121,6 @@ nl:
       discard:
         notice: Job is weggegooid
       executions:
-        error: Fout
         in_queue: in de wachtrij
         runtime: looptijd
         title: Executies
@@ -192,6 +198,7 @@ nl:
         title: Processen
         updated: Bijgewerkt
     shared:
+      error: Fout
       filter:
         all: Alle
         all_jobs: Alle banen
