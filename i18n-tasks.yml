@@ -108,8 +108,8 @@ ignore_unused:
 #     - common.brand
 
 ## Exclude these keys from the `i18n-tasks check-consistent-interpolations` report:
-# ignore_inconsistent_interpolations:
-# - 'activerecord.attributes.*'
+ignore_inconsistent_interpolations:
+ - '*.one'
 
 ## Ignore these keys completely:
 # ignore:
