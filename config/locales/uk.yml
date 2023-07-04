@@ -119,6 +119,13 @@ uk:
       milliseconds: "%{ms}мс"
       minutes: "%{min}хв %{sec}с"
       seconds: "%{sec}с"
+    error_event:
+      discarded: Відкинуто
+      handled: Обробляється
+      interrupted: Перерваний
+      retried: Повторна спроба
+      retry_stopped: Повторну спробу зупинено
+      unhandled: Необроблений
     helpers:
       relative_time:
         future: за %{time}
@@ -138,7 +145,6 @@ uk:
       discard:
         notice: Завдання було відхилено
       executions:
-        error: Помилка
         in_queue: у черзі
         runtime: час виконання
         title: Виконання
@@ -218,6 +224,7 @@ uk:
         title: Процеси
         updated: Оновлено
     shared:
+      error: Помилка
       filter:
         all: Всі
         all_jobs: Усі роботи

@@ -377,10 +377,14 @@ module GoodJob
             if discrete?
               interrupt_error_string = self.class.format_error(GoodJob::InterruptError.new("Interrupted after starting perform at '#{performed_at}'"))
               self.error = interrupt_error_string
-              discrete_executions.where(finished_at: nil).where.not(performed_at: nil).update_all( # rubocop:disable Rails/SkipsModelValidations
+              self.error_event = ERROR_EVENT_INTERRUPTED if self.class.error_event_migrated?
+
+              discrete_execution_attrs = {
                 error: interrupt_error_string,
-                finished_at: Time.current
-              )
+                finished_at: Time.current,
+              }
+              discrete_execution_attrs[:error_event] = GoodJob::DiscreteExecution.error_events[GoodJob::DiscreteExecution::ERROR_EVENT_INTERRUPTED] if self.class.error_event_migrated?
+              discrete_executions.where(finished_at: nil).where.not(performed_at: nil).update_all(discrete_execution_attrs) # rubocop:disable Rails/SkipsModelValidations
             end
           end
 
@@ -409,15 +413,34 @@ module GoodJob
             end
             handled_error ||= current_thread.error_on_retry || current_thread.error_on_discard
 
+            error_event = if handled_error == current_thread.error_on_discard
+                            ERROR_EVENT_DISCARDED
+                          elsif handled_error == current_thread.error_on_retry
+                            ERROR_EVENT_RETRIED
+                          elsif handled_error == current_thread.error_on_retry_stopped
+                            ERROR_EVENT_RETRY_STOPPED
+                          elsif handled_error
+                            ERROR_EVENT_HANDLED
+                          end
+
             instrument_payload.merge!(
               value: value,
               handled_error: handled_error,
-              retried: current_thread.execution_retried
+              retried: current_thread.execution_retried,
+              error_event: error_event
             )
-            ExecutionResult.new(value: value, handled_error: handled_error, retried: current_thread.execution_retried)
+            ExecutionResult.new(value: value, handled_error: handled_error, error_event: error_event, retried: current_thread.execution_retried)
           rescue StandardError => e
+            error_event = if e.is_a?(GoodJob::InterruptError)
+                            ERROR_EVENT_INTERRUPTED
+                          elsif e == current_thread.error_on_retry_stopped
+                            ERROR_EVENT_RETRY_STOPPED
+                          else
+                            ERROR_EVENT_UNHANDLED
+                          end
+
             instrument_payload[:unhandled_error] = e
-            ExecutionResult.new(value: nil, unhandled_error: e)
+            ExecutionResult.new(value: nil, unhandled_error: e, error_event: error_event)
           end
         end
 
@@ -426,9 +449,14 @@ module GoodJob
         if job_error
           error_string = self.class.format_error(job_error)
           self.error = error_string
-          discrete_execution.error = error_string if discrete_execution
+          self.error_event = result.error_event if self.class.error_event_migrated?
+          if discrete_execution
+            discrete_execution.error = error_string
+            discrete_execution.error_event = result.error_event if discrete_execution.class.error_event_migrated?
+          end
         else
           self.error = nil
+          self.error_event = nil if self.class.error_event_migrated?
         end
 
         reenqueued = result.retried? || retried_good_job_id.present?

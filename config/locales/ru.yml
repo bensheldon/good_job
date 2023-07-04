@@ -119,6 +119,13 @@ ru:
       milliseconds: "%{ms}мс"
       minutes: "%{min}м %{sec}с"
       seconds: "%{sec}s"
+    error_event:
+      discarded: Отброшено
+      handled: Обработано
+      interrupted: Прервано
+      retried: Повторная попытка
+      retry_stopped: Повторить остановлено
+      unhandled: необработанный
     helpers:
       relative_time:
         future: в %{time}
@@ -138,7 +145,6 @@ ru:
       discard:
         notice: Работа удалена
       executions:
-        error: Ошибка
         in_queue: в очереди
         runtime: время выполнения
         title: Казни
@@ -218,6 +224,7 @@ ru:
         title: Процессы
         updated: Обновлено
     shared:
+      error: Ошибка
       filter:
         all: Все
         all_jobs: Все вакансии

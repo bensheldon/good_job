@@ -2,6 +2,8 @@
 
 module GoodJob # :nodoc:
   class DiscreteExecution < BaseRecord
+    include ErrorEvents
+
     self.table_name = 'good_job_executions'
 
     belongs_to :execution, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', primary_key: 'active_job_id', inverse_of: :discrete_executions, optional: true
@@ -10,6 +12,13 @@ module GoodJob # :nodoc:
     scope :finished, -> { where.not(finished_at: nil) }
 
     alias_attribute :performed_at, :created_at
+
+    def self.error_event_migrated?
+      return true if columns_hash["error_event"].present?
+
+      migration_pending_warning!
+      false
+    end
 
     def number
       serialized_params.fetch('executions', 0) + 1

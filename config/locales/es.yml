@@ -95,6 +95,13 @@ es:
       milliseconds: "%{ms}ms"
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
+    error_event:
+      discarded: Descartado
+      handled: Manejado
+      interrupted: interrumpido
+      retried: reintentado
+      retry_stopped: Reintentar detenido
+      unhandled: sin manejar
     helpers:
       relative_time:
         future: en %{time}
@@ -114,7 +121,6 @@ es:
       discard:
         notice: La tarea ha sido descartada
       executions:
-        error: Error
         in_queue: en cola
         runtime: en ejecución
         title: Ejecuciones
@@ -192,6 +198,7 @@ es:
         title: Procesos
         updated: Actualizado
     shared:
+      error: Error
       filter:
         all: Todas
         all_jobs: Todas las tareas

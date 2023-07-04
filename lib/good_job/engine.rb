@@ -19,6 +19,10 @@ module GoodJob
         GoodJob::CurrentThread.error_on_retry = event.payload[:error]
       end
 
+      ActiveSupport::Notifications.subscribe "retry_stopped.active_job" do |event|
+        GoodJob::CurrentThread.error_on_retry_stopped = event.payload[:error]
+      end
+
       ActiveSupport::Notifications.subscribe "discard.active_job" do |event|
         GoodJob::CurrentThread.error_on_discard = event.payload[:error]
       end

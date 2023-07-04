@@ -95,6 +95,13 @@ de:
       milliseconds: "%{ms}ms"
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
+    error_event:
+      discarded: Weggeworfen
+      handled: Abgewickelt
+      interrupted: Unterbrochen
+      retried: Wiederholt
+      retry_stopped: Der Wiederholungsversuch wurde gestoppt
+      unhandled: Unbehandelt
     helpers:
       relative_time:
         future: in %{time}
@@ -114,7 +121,6 @@ de:
       discard:
         notice: Auftrag wurde verworfen
       executions:
-        error: Fehler
         in_queue: in der Warteschlange
         runtime: Laufzeit
         title: Hinrichtungen
@@ -192,6 +198,7 @@ de:
         title: Prozesse
         updated: Aktualisiert
     shared:
+      error: Fehler
       filter:
         all: Alle
         all_jobs: Alle Jobs

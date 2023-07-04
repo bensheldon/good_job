@@ -202,6 +202,11 @@ RSpec.describe GoodJob::Job do
           job.retry_job
         end.to change { job.reload.finished? }.from(true).to(false)
         expect(job.executions.count).to eq 1
+
+        expect(job).to have_attributes(
+          error: "TestJob::Error: TestJob::Error",
+          error_event: "retried"
+        )
       end
 
       context 'when job is not discrete' do
@@ -264,6 +269,7 @@ RSpec.describe GoodJob::Job do
 
         expect(job.head_execution(reload: true)).to have_attributes(
           error: "GoodJob::Job::DiscardJobError: Discarded in test",
+          error_event: "discarded",
           finished_at: within(1.second).of(Time.current)
         )
       end

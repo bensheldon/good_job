@@ -98,6 +98,7 @@ ignore_unused:
  - "activerecord.attributes.*"
  - "good_job.datetime.*"
  - "good_job.status.*"
+ - "good_job.error_event.*"
  - "good_job.number.*"
 
 ## Exclude these keys from the `i18n-tasks eq-base' report:

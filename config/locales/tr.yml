@@ -95,6 +95,13 @@ tr:
       milliseconds: "%{ms} ms"
       minutes: "%{min}d %{sec}s"
       seconds: "%{sec}s"
+    error_event:
+      discarded: Atılan
+      handled: işlenmiş
+      interrupted: kesintiye uğradı
+      retried: yeniden denendi
+      retry_stopped: Yeniden deneme durduruldu
+      unhandled: işlenmemiş
     helpers:
       relative_time:
         future: "%{time} içinde"
@@ -114,7 +121,6 @@ tr:
       discard:
         notice: İş İptal Edildi
       executions:
-        error: Hata
         in_queue: sırada
         runtime: çalışma süresi
         title: İşlemler
@@ -192,6 +198,7 @@ tr:
         title: Süreçler
         updated: Güncellenmiş
     shared:
+      error: Hata
       filter:
         all: Tümü
         all_jobs: Tüm işler

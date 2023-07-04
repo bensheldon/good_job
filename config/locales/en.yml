@@ -95,6 +95,13 @@ en:
       milliseconds: "%{ms}ms"
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
+    error_event:
+      discarded: Discarded
+      handled: Handled
+      interrupted: Interrupted
+      retried: Retried
+      retry_stopped: Retry stopped
+      unhandled: Unhandled
     helpers:
       relative_time:
         future: in %{time}
@@ -114,7 +121,6 @@ en:
       discard:
         notice: Job has been discarded
       executions:
-        error: Error
         in_queue: in queue
         runtime: runtime
         title: Executions
@@ -192,6 +198,7 @@ en:
         title: Processes
         updated: Updated
     shared:
+      error: Error
       filter:
         all: All
         all_jobs: All jobs
