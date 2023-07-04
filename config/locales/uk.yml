@@ -1,5 +1,5 @@
 ---
-ua:
+uk:
   good_job:
     actions:
       destroy: Видалити
@@ -53,40 +53,64 @@ ua:
     datetime:
       distance_in_words:
         about_x_hours:
+          few: близько %{count} годин
+          many: близько %{count} годин
           one: близько 1 години
           other: близько %{count} годин
         about_x_months:
+          few: близько %{count} місяців
+          many: близько %{count} місяців
           one: близько 1 місяця
           other: близько %{count} місяців
         about_x_years:
+          few: близько %{count} років
+          many: близько %{count} років
           one: близько 1 року
           other: близько %{count} років
         almost_x_years:
+          few: майже %{count} роки
+          many: майже %{count} років
           one: майже 1 рік
           other: майже %{count} років
         half_a_minute: півхвилини
         less_than_x_minutes:
+          few: менше %{count} хвилин
+          many: менше %{count} хвилин
           one: менше 1 хвилини
           other: менше %{count} хвилин
         less_than_x_seconds:
+          few: менше %{count} секунд
+          many: менше %{count} секунд
           one: менше 1 секунди
           other: менше %{count} секунд
         over_x_years:
+          few: більше %{count} років
+          many: більше %{count} років
           one: понад 1 рік
           other: понад %{count} років
         x_days:
+          few: "%{count} дні"
+          many: "%{count} днів"
           one: 1 день
           other: "%{count} днів"
         x_minutes:
+          few: 1 хвилини
+          many: "%{count} хвилин"
           one: 1 хвилина
           other: "%{count} хвилин"
         x_months:
+          few: "%{count} місяці"
+          many: "%{count} місяців"
           one: 1 місяць
           other: "%{count} місяців"
         x_seconds:
+          few: "%{count} секунди"
+          many: "%{count} секунд"
           one: 1 секунда
           other: "%{count} секунд"
         x_years:
+          few: "%{count} роки"
+          many: "%{count} років"
           one: 1 рік
           other: "%{count} років"
     duration:
