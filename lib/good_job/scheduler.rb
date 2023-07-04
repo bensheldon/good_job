@@ -3,6 +3,7 @@ require "concurrent/executor/thread_pool_executor"
 require "concurrent/executor/timer_set"
 require "concurrent/scheduled_task"
 require "concurrent/utility/processor_counter"
+require 'good_job/metrics'
 
 module GoodJob # :nodoc:
   #
@@ -74,8 +75,6 @@ module GoodJob # :nodoc:
     def initialize(performer, max_threads: nil, max_cache: nil, warm_cache_on_initialize: false, cleanup_interval_seconds: nil, cleanup_interval_jobs: nil)
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
 
-      self.class.instances << self
-
       @performer = performer
 
       @max_cache = max_cache || 0
@@ -88,8 +87,12 @@ module GoodJob # :nodoc:
       @executor_options[:name] = name
 
       @cleanup_tracker = CleanupTracker.new(cleanup_interval_seconds: cleanup_interval_seconds, cleanup_interval_jobs: cleanup_interval_jobs)
+      @metrics = ::GoodJob::Metrics.new
+      @executor_options[:name] = name
+
       create_executor
       warm_cache if warm_cache_on_initialize
+      self.class.instances << self
     end
 
     # Tests whether the scheduler is running.
@@ -139,6 +142,7 @@ module GoodJob # :nodoc:
 
       instrument("scheduler_restart_pools") do
         shutdown(timeout: timeout)
+        @metrics.reset
         create_executor
         warm_cache
       end
@@ -197,8 +201,20 @@ module GoodJob # :nodoc:
     # @!visibility private
     # @return [void]
     def task_observer(time, output, thread_error)
-      error = thread_error || (output.is_a?(GoodJob::ExecutionResult) ? output.unhandled_error : nil)
-      GoodJob._on_thread_error(error) if error
+      result = output.is_a?(GoodJob::ExecutionResult) ? output : nil
+
+      unhandled_error = thread_error || result&.unhandled_error
+      GoodJob._on_thread_error(unhandled_error) if unhandled_error
+
+      if unhandled_error || result&.handled_error
+        @metrics.increment_errored_executions
+      elsif result&.unexecutable
+        @metrics.increment_unexecutable_executions
+      elsif result
+        @metrics.increment_succeeded_executions
+      else
+        @metrics.increment_empty_executions
+      end
 
       instrument("finished_job_task", { result: output, error: thread_error, time: time })
       return unless output
@@ -214,15 +230,17 @@ module GoodJob # :nodoc:
     # Information about the Scheduler
     # @return [Hash]
     def stats
+      available_threads = executor.ready_worker_count
       {
-        name: performer.name,
+        name: name,
+        queues: performer.name,
         max_threads: @executor_options[:max_threads],
-        active_threads: @executor_options[:max_threads] - executor.ready_worker_count,
-        available_threads: executor.ready_worker_count,
+        active_threads: @executor_options[:max_threads] - available_threads,
+        available_threads: available_threads,
         max_cache: @max_cache,
         active_cache: cache_count,
         available_cache: remaining_cache_count,
-      }
+      }.merge!(@metrics.to_h)
     end
 
     # Preload existing runnable and future-scheduled jobs

@@ -8,7 +8,7 @@ RSpec.describe GoodJob::Scheduler do
     described_class.instances.each(&:shutdown)
   end
 
-  describe 'name' do
+  describe '#name' do
     it 'is human readable and contains configuration values' do
       scheduler = described_class.new(performer)
       expect(scheduler.name).to eq('GoodJob::Scheduler(queues= max_threads=5)')
@@ -76,6 +76,38 @@ RSpec.describe GoodJob::Scheduler do
     end
   end
 
+  describe '#task_observer' do
+    it 'increases metric counters' do
+      allow(GoodJob).to receive(:on_thread_error)
+
+      failed_job_count = 0
+      succeeded_job_count = 0
+
+      allow(performer).to receive(:next) do
+        if failed_job_count < 7
+          failed_job_count += 1
+          GoodJob::ExecutionResult.new(value: nil, unhandled_error: StandardError.new("oopsy"))
+        elsif succeeded_job_count < 9
+          succeeded_job_count += 1
+          GoodJob::ExecutionResult.new(value: 'success')
+        end
+      end
+
+      scheduler = described_class.new(performer)
+      scheduler.create_thread
+      sleep_until { scheduler.stats[:total_executions_count] == 17 }
+      scheduler.shutdown
+
+      expect(scheduler.stats).to include(
+        empty_executions_count: 1,
+        errored_executions_count: 7,
+        succeeded_executions_count: 9,
+        unexecutable_executions_count: 0,
+        total_executions_count: 17
+      )
+    end
+  end
+
   describe '#shutdown' do
     it 'shuts down the theadpools' do
       scheduler = described_class.new(performer)
@@ -113,6 +145,25 @@ RSpec.describe GoodJob::Scheduler do
 
       expect { scheduler.restart }
         .to change(scheduler, :running?).from(false).to(true)
+    end
+
+    it 'resets metrics' do
+      allow(performer).to receive(:next).and_return GoodJob::ExecutionResult.new(value: 'hello'), nil
+
+      scheduler = described_class.new(performer)
+      scheduler.create_thread
+
+      sleep_until do
+        scheduler.stats.fetch(:succeeded_executions_count) == 1
+      end
+
+      scheduler.shutdown
+      expect(scheduler.stats.fetch(:succeeded_executions_count)).to eq 1
+
+      expect { scheduler.restart }
+        .to change(scheduler, :running?).from(false).to(true)
+
+      expect(scheduler.stats.fetch(:succeeded_executions_count)).to eq 0
     end
 
     it 'can be called multiple times' do
@@ -170,13 +221,19 @@ RSpec.describe GoodJob::Scheduler do
       scheduler = described_class.new(performer, max_threads: max_threads, max_cache: max_cache)
 
       expect(scheduler.stats).to eq({
-                                      name: performer.name,
+                                      name: scheduler.name,
+                                      queues: performer.name,
                                       max_threads: max_threads,
                                       active_threads: 0,
                                       available_threads: max_threads,
                                       max_cache: max_cache,
                                       active_cache: 0,
                                       available_cache: max_cache,
+                                      empty_executions_count: 0,
+                                      errored_executions_count: 0,
+                                      succeeded_executions_count: 0,
+                                      unexecutable_executions_count: 0,
+                                      total_executions_count: 0,
                                     })
     end
   end
@@ -222,17 +279,17 @@ RSpec.describe GoodJob::Scheduler do
         all_scheduler, rodents_scheduler, elephants_scheduler = multi_scheduler.schedulers
 
         expect(all_scheduler.stats).to include(
-          name: '*',
+          queues: '*',
           max_threads: 1
         )
 
         expect(rodents_scheduler.stats).to include(
-          name: 'mice,ferrets',
+          queues: 'mice,ferrets',
           max_threads: 2
         )
 
         expect(elephants_scheduler.stats).to include(
-          name: 'elephant',
+          queues: 'elephant',
           max_threads: 4
         )
       end

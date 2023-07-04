@@ -262,7 +262,11 @@ module GoodJob
       unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true, select_limit: queue_select_limit) do |executions|
         execution = executions.first
         break if execution.blank?
-        break :unlocked unless execution&.executable?
+
+        unless execution.executable?
+          result = ExecutionResult.new(value: nil, unexecutable: true)
+          break
+        end
 
         yield(execution) if block_given?
         result = execution.perform

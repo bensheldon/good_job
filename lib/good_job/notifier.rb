@@ -77,10 +77,9 @@ module GoodJob # :nodoc:
       @connection_errors_reported = Concurrent::AtomicBoolean.new(false)
       @enable_listening = enable_listening
 
-      self.class.instances << self
-
       create_executor
       listen
+      self.class.instances << self
     end
 
     # Tests whether the notifier is active and has acquired a dedicated database connection.
