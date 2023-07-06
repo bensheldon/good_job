@@ -253,7 +253,7 @@ module GoodJob
     #   return value for the job's +#perform+ method, and the exception the job
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
-    def self.perform_with_advisory_lock(parsed_queues: nil, queue_select_limit: nil)
+    def self.perform_with_advisory_lock(parsed_queues: nil, queue_select_limit: nil, capsule: GoodJob.capsule)
       execution = nil
       result = nil
       unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true, select_limit: queue_select_limit) do |executions|
@@ -266,7 +266,9 @@ module GoodJob
         end
 
         yield(execution) if block_given?
-        result = execution.perform
+        capsule.tracker.register do
+          result = execution.perform(id_for_lock: capsule.tracker.id_for_lock)
+        end
       end
       execution&.run_callbacks(:perform_unlocked)
 
@@ -356,7 +358,7 @@ module GoodJob
     #   An array of the return value of the job's +#perform+ method and the
     #   exception raised by the job, if any. If the job completed successfully,
     #   the second array entry (the exception) will be +nil+ and vice versa.
-    def perform
+    def perform(id_for_lock: nil)
       run_callbacks(:perform) do
         raise PreviouslyPerformedError, 'Cannot perform a job that has already been performed' if finished_at
 
@@ -385,17 +387,23 @@ module GoodJob
           if discrete?
             transaction do
               now = Time.current
-              discrete_execution = discrete_executions.create!(
+              discrete_execution = discrete_executions.create!({
                 job_class: job_class,
                 queue_name: queue_name,
                 serialized_params: serialized_params,
                 scheduled_at: (scheduled_at || created_at),
-                created_at: now
-              )
+                created_at: now,
+              }.tap do |args|
+                args[:process_id] = id_for_lock if id_for_lock && self.class.process_lock_migrated?
+              end)
+
+              assign_attributes(locked_by_id: id_for_lock, locked_at: now) if id_for_lock && self.class.process_lock_migrated?
               update!(performed_at: now, executions_count: ((executions_count || 0) + 1))
             end
           else
-            update!(performed_at: Time.current)
+            now = Time.current
+            assign_attributes(locked_by_id: id_for_lock, locked_at: now) if id_for_lock && self.class.process_lock_migrated?
+            update!(performed_at: now)
           end
 
           ActiveSupport::Notifications.instrument("perform_job.good_job", { execution: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do |instrument_payload|
@@ -439,7 +447,6 @@ module GoodJob
         end
 
         job_error = result.handled_error || result.unhandled_error
-
         if job_error
           error_string = self.class.format_error(job_error)
           self.error = error_string
@@ -452,8 +459,13 @@ module GoodJob
           self.error = nil
           self.error_event = nil if self.class.error_event_migrated?
         end
-
         reenqueued = result.retried? || retried_good_job_id.present?
+
+        if self.class.process_lock_migrated?
+          self.locked_by_id = nil
+          self.locked_at = nil
+        end
+
         if result.unhandled_error && GoodJob.retry_on_unhandled_error
           if discrete_execution
             transaction do

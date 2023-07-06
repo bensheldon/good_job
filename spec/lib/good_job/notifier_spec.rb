@@ -65,7 +65,7 @@ RSpec.describe GoodJob::Notifier do
       specify do
         stub_const 'REFRESH_IF_STALE_CALLED', Concurrent::AtomicFixnum.new(0)
 
-        allow_any_instance_of(GoodJob::Process).to receive(:refresh_if_stale) { REFRESH_IF_STALE_CALLED.increment }
+        allow_any_instance_of(GoodJob::CapsuleRecord).to receive(:refresh_if_stale) { REFRESH_IF_STALE_CALLED.increment }
 
         recipient = proc {}
         notifier = described_class.new(recipient, enable_listening: true)
@@ -160,28 +160,14 @@ RSpec.describe GoodJob::Notifier do
     it 'creates and destroys a new Process record' do
       notifier = described_class.new(enable_listening: true)
 
-      wait_until { expect(GoodJob::Process.count).to eq 1 }
+      wait_until { expect(GoodJob::CapsuleRecord.count).to eq 1 }
 
-      process = GoodJob::Process.first
-      expect(process.id).to eq GoodJob::Process.current_id
+      process = GoodJob::CapsuleRecord.first
+      expect(process.id).to eq GoodJob.capsule.tracker.id_for_lock
       expect(process).to be_advisory_locked
 
       notifier.shutdown
       expect { process.reload }.to raise_error ActiveRecord::RecordNotFound
-    end
-
-    context 'when, for some reason, the process already exists' do
-      it 'does not create a new process' do
-        process = GoodJob::Process.register
-        notifier = described_class.new(enable_listening: true)
-
-        wait_until { expect(notifier).to be_listening }
-        expect(GoodJob::Process.count).to eq 1
-
-        notifier.shutdown
-        expect(process.reload).to eq process
-        process.advisory_unlock
-      end
     end
   end
 end

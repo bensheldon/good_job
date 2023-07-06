@@ -18,6 +18,8 @@ RSpec.configure do |config|
     end
 
     example.run
+
+    expect(THREAD_ERRORS).to be_empty
   end
 
   config.after do
@@ -34,7 +36,12 @@ RSpec.configure do |config|
     )
     GoodJob._shutdown_all(executables, timeout: -1)
 
-    expect(THREAD_ERRORS).to be_empty
+    GoodJob::CapsuleTracker.instances.each do |process_tracker|
+      expect(process_tracker.locks).to eq 0
+      expect(process_tracker).not_to be_advisory_locked
+      expect(process_tracker.record).to be_nil
+    end
+    GoodJob::CapsuleTracker.instances.clear
 
     expect(GoodJob::Notifier.instances).to all be_shutdown
     GoodJob::Notifier.instances.clear
@@ -61,12 +68,12 @@ RSpec.configure do |config|
     if other_locks.any?
       puts "There are #{other_locks.count} advisory locks still open."
       puts "\n\nAdvisory Locks:"
-      other_locks.includes(:pg_stat_activity).find_each do |pg_lock|
+      other_locks.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
         puts "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity.application_name}"
       end
 
       puts "\n\nCurrent connections:"
-      PgStatActivity.find_each do |pg_stat_activity|
+      PgStatActivity.all.each do |pg_stat_activity| # rubocop:disable Rails/FindEach
         puts "  - #{pg_stat_activity.pid}: #{pg_stat_activity.application_name}"
       end
     end

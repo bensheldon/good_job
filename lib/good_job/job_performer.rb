@@ -14,8 +14,9 @@ module GoodJob
     cattr_accessor :performing_active_job_ids, default: Concurrent::Set.new
 
     # @param queue_string [String] Queues to execute jobs from
-    def initialize(queue_string)
+    def initialize(queue_string, capsule: GoodJob.capsule)
       @queue_string = queue_string
+      @capsule = capsule
     end
 
     # A meaningful name to identify the performer in logs and for debugging.
@@ -28,7 +29,7 @@ module GoodJob
     # @return [Object, nil] Returns job result or +nil+ if no job was found
     def next
       active_job_id = nil
-      job_query.perform_with_advisory_lock(parsed_queues: parsed_queues, queue_select_limit: GoodJob.configuration.queue_select_limit) do |execution|
+      job_query.perform_with_advisory_lock(parsed_queues: parsed_queues, queue_select_limit: GoodJob.configuration.queue_select_limit, capsule: @capsule) do |execution|
         active_job_id = execution.active_job_id
         performing_active_job_ids << active_job_id
       end

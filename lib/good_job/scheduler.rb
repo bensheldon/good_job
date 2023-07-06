@@ -40,12 +40,12 @@ module GoodJob # :nodoc:
     # @param configuration [GoodJob::Configuration]
     # @param warm_cache_on_initialize [Boolean]
     # @return [GoodJob::Scheduler, GoodJob::MultiScheduler]
-    def self.from_configuration(configuration, warm_cache_on_initialize: false)
+    def self.from_configuration(configuration, capsule: GoodJob.capsule, warm_cache_on_initialize: false)
       schedulers = configuration.queue_string.split(';').map do |queue_string_and_max_threads|
         queue_string, max_threads = queue_string_and_max_threads.split(':')
         max_threads = (max_threads || configuration.max_threads).to_i
 
-        job_performer = GoodJob::JobPerformer.new(queue_string)
+        job_performer = GoodJob::JobPerformer.new(queue_string, capsule: capsule)
         GoodJob::Scheduler.new(
           job_performer,
           max_threads: max_threads,

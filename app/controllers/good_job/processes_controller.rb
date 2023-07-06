@@ -3,7 +3,7 @@
 module GoodJob
   class ProcessesController < GoodJob::ApplicationController
     def index
-      @processes = GoodJob::Process.active.order(created_at: :desc)
+      @processes = GoodJob::CapsuleRecord.active.order(created_at: :desc)
     end
   end
 end
