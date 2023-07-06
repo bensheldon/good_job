@@ -4,6 +4,8 @@ module GoodJob
   # ActiveRecord model to share behavior between {Job} and {Execution} models
   # which both read out of the same table.
   class BaseExecution < BaseRecord
+    include ErrorEvents
+
     self.table_name = 'good_jobs'
 
     # With a given class name
@@ -35,12 +37,14 @@ module GoodJob
       end
 
       def discrete_support?
-        if connection.table_exists?(GoodJob::DiscreteExecution.table_name)
-          true
-        else
-          migration_pending_warning!
-          false
-        end
+        GoodJob::DiscreteExecution.migrated?
+      end
+
+      def error_event_migrated?
+        return true if columns_hash["error_event"].present?
+
+        migration_pending_warning!
+        false
       end
     end
 

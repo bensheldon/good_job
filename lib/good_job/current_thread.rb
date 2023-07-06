@@ -11,6 +11,7 @@ module GoodJob
       cron_key
       error_on_discard
       error_on_retry
+      error_on_retry_stopped
       execution
       execution_interrupted
       execution_retried
@@ -39,6 +40,12 @@ module GoodJob
     #   Error captured by retry_on
     #   @return [Exception, nil]
     thread_mattr_accessor :error_on_retry
+
+    # @!attribute [rw] error_on_retry_stopped
+    #   @!scope class
+    #   Error captured by retry_stopped
+    #   @return [Exception, nil]
+    thread_mattr_accessor :error_on_retry_stopped
 
     # @!attribute [rw] executions
     #   @!scope class

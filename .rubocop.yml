@@ -78,6 +78,9 @@ Rails/SkipsModelValidations:
 RSpec/AnyInstance:
   Enabled: false
 
+RSpec/BeEq:
+  Enabled: false
+
 RSpec/DescribeClass:
   Exclude:
     - spec/integration/*

@@ -6,10 +6,12 @@ jruby = RUBY_PLATFORM.include?('java')
 unless ruby_31_or_higher # https://github.com/rails/rails/issues/44090#issuecomment-1007686519
   appraise "rails-6.0" do
     gem "rails", "~> 6.0.0"
+    gem "traces", "~> 0.9.1"
   end
 
   appraise "rails-6.1" do
     gem "rails", "~> 6.1.0"
+    gem "traces", "~> 0.9.1"
   end
 end
 

@@ -198,6 +198,7 @@ module GoodJob
 
           execution.class.transaction(joinable: false, requires_new: true) do
             new_active_job = active_job.retry_job(wait: 0, error: execution.error)
+            execution.error_event = ERROR_EVENT_RETRIED if execution.error && execution.class.error_event_migrated?
             execution.save!
           end
         end
@@ -221,7 +222,8 @@ module GoodJob
         update_execution = proc do
           execution.update(
             finished_at: Time.current,
-            error: GoodJob::Execution.format_error(job_error)
+            error: GoodJob::Execution.format_error(job_error),
+            error_event: :discarded
           )
         end
 

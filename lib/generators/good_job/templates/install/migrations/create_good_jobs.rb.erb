@@ -26,6 +26,7 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       t.boolean :is_discrete
       t.integer :executions_count
       t.text :job_class
+      t.integer :error_event, limit: 2
     end
 
     create_table :good_job_batches, id: :uuid do |t|
@@ -52,6 +53,7 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       t.datetime :scheduled_at
       t.datetime :finished_at
       t.text :error
+      t.integer :error_event, limit: 2
     end
 
     create_table :good_job_processes, id: :uuid do |t|

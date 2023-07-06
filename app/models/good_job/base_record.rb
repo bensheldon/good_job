@@ -21,7 +21,7 @@ module GoodJob
     # Can be overriden by child class.
     # @return [Boolean]
     def self.migrated?
-      return true if connection.table_exists?(table_name)
+      return true if table_exists?
 
       migration_pending_warning!
       false

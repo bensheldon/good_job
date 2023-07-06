@@ -35,9 +35,8 @@ module GoodJob # :nodoc:
       @cron_entries = cron_entries
       @tasks = Concurrent::Hash.new
 
-      self.class.instances << self
-
       start if start_on_initialize
+      self.class.instances << self
     end
 
     # Schedule tasks that will enqueue jobs based on their schedule

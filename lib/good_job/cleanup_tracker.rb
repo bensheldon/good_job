@@ -17,7 +17,7 @@ module GoodJob # :nodoc:
     end
 
     # Increments job count.
-    # @return [void]
+    # @return [Integer]
     def increment
       self.job_count += 1
     end

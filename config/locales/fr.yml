@@ -95,6 +95,13 @@ fr:
       milliseconds: "%{ms}ms"
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
+    error_event:
+      discarded: Mis au rebut
+      handled: manipulé
+      interrupted: Interrompu
+      retried: Réessayé
+      retry_stopped: Nouvelle tentative arrêtée
+      unhandled: Non géré
     helpers:
       relative_time:
         future: dans %{time}
@@ -114,7 +121,6 @@ fr:
       discard:
         notice: Le job a été mis au rebut
       executions:
-        error: Erreur
         in_queue: Dans la file d'attente
         runtime: Durée
         title: Exécutions
@@ -190,7 +196,9 @@ fr:
         schedulers: Schedulers
         started: Lancé
         title: Processus
+        updated: Mis à jour
     shared:
+      error: Erreur
       filter:
         all: Tous
         all_jobs: Tous les jobs
