@@ -42,6 +42,7 @@ module ::RetryableError; end
 module ::SimpleJob; end
 module ::THREAD_HAS_RUN; end
 module ::THREAD_JOBS; end
+module ::TestError; end
 module ::TestJob; end
 module ::TestJob::ExpectedError; end
 module ::YARD::Templates::Helpers::MarkupHelper::MARKUP_PROVIDERS; end
@@ -139,13 +140,17 @@ module GoodJob::CronEntry::I18n; end
 module GoodJob::CronManager::Concurrent::CancelledOperationError; end
 module GoodJob::CronManager::Concurrent::Hash; end
 module GoodJob::CronManager::Concurrent::ScheduledTask; end
+module GoodJob::DiscreteExecution::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Execution::Arel; end
 module GoodJob::Filterable::Arel; end
+module GoodJob::Job::ERROR_EVENT_INTERRUPTED; end
+module GoodJob::Job::ERROR_EVENT_RETRIED; end
 module GoodJob::Lockable::Arel; end
 module GoodJob::Lockable::Arel::Nodes::As; end
 module GoodJob::Lockable::Arel::Nodes::SqlLiteral; end
 module GoodJob::Lockable::Arel::Table; end
 module GoodJob::Lockable::ClassMethods::Concurrent; end
+module GoodJob::Metrics::Concurrent::AtomicFixnum; end
 module GoodJob::Notifier::Concurrent::Array; end
 module GoodJob::Notifier::Concurrent::AtomicBoolean; end
 module GoodJob::Notifier::Concurrent::AtomicFixnum; end
