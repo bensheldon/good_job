@@ -30,10 +30,10 @@ module GoodJob
 
     # Runs the block with self.logger silenced.
     # If self.logger is nil, simply runs the block.
-    def self.with_logger_silenced(&block)
+    def self.with_logger_silenced(silent: true, &block)
       # Assign to a local variable, just in case it's modified in another thread concurrently
       logger = self.logger
-      if logger.respond_to? :silence
+      if silent && logger.respond_to?(:silence)
         logger.silence(&block)
       else
         yield

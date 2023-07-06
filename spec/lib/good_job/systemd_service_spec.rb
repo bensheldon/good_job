@@ -70,8 +70,7 @@ RSpec.describe GoodJob::SystemdService, :skip_if_java do
     systemd_socket.read
     expect(systemd.notifying?).to be(true)
 
-    sleep 0.3
-    expect(systemd_socket.read).to eq('WATCHDOG=1')
+    wait_until(max: 1) { expect(systemd_socket.read).to eq('WATCHDOG=1') }
 
     systemd.stop
   end

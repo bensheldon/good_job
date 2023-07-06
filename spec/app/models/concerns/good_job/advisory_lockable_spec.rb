@@ -128,7 +128,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
 
       it 'does not invoke the block if the key is already locked' do
         model_class.advisory_lock_key(execution.lockable_key) do
-          promise = Concurrent::Promises.future do
+          promise = rails_promise do
             result = model_class.advisory_lock_key(execution.lockable_key) { raise }
             expect(result).to be_nil
           end
@@ -189,7 +189,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
       expect(execution.advisory_locked?).to be true
       expect(execution.owns_advisory_lock?).to be true
 
-      other_thread_owns_advisory_lock = Concurrent::Promises.future(execution, &:owns_advisory_lock?).value!
+      other_thread_owns_advisory_lock = rails_promise(execution, &:owns_advisory_lock?).value!
       expect(other_thread_owns_advisory_lock).to be false
 
       execution.advisory_unlock
@@ -198,7 +198,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
     it 'returns true or false if the lock is acquired' do
       expect(execution.advisory_lock).to be true
 
-      expect(Concurrent::Promises.future(execution, &:advisory_lock).value!).to be false
+      expect(rails_promise(execution, &:advisory_lock).value!).to be false
 
       execution.advisory_unlock
     end
@@ -250,7 +250,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
     it 'returns true or false if the unlock operation is successful' do
       execution.advisory_lock
 
-      expect(Concurrent::Promises.future(execution, &:advisory_unlock).value!).to be false
+      expect(rails_promise(execution, &:advisory_unlock).value!).to be false
       expect(execution.advisory_unlock).to be true
 
       unless RUBY_PLATFORM.include?('java')
@@ -317,7 +317,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
     execution.advisory_lock!
 
     expect do
-      Concurrent::Promises.future(execution, &:advisory_lock!).value!
+      rails_promise(execution, &:advisory_lock!).value!
     end.to raise_error GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
 
     execution.advisory_unlock

@@ -2,22 +2,30 @@
 
 THREAD_ERRORS = Concurrent::Array.new
 
+ActiveSupport.on_load :active_record do
+  ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkout, :before, lambda { |conn|
+    thread_name = Thread.current.name || Thread.current.object_id
+    conn.exec_query("SET application_name = '#{thread_name}'", "Set application name")
+  }
+end
+
 RSpec.configure do |config|
   config.around do |example|
     GoodJob.preserve_job_records = true
-    GoodJob::CurrentThread.reset
 
     PgLock.current_database.advisory_lock.owns.all?(&:unlock) if PgLock.advisory_lock.owns.count > 0
     PgLock.current_database.advisory_lock.others.each(&:unlock!) if PgLock.advisory_lock.others.count > 0
     expect(PgLock.current_database.advisory_lock.count).to eq(0), "Existing advisory locks BEFORE test run"
 
+    GoodJob::CurrentThread.reset
     THREAD_ERRORS.clear
-    Thread.current.name = "RSpec: #{example.description}"
     GoodJob.on_thread_error = lambda do |exception|
       THREAD_ERRORS << [Thread.current.name, exception, exception.backtrace]
     end
 
     example.run
+
+    expect(THREAD_ERRORS).to be_empty
   end
 
   config.after do
@@ -33,8 +41,6 @@ RSpec.configure do |config|
       GoodJob::CronManager.instances
     )
     GoodJob._shutdown_all(executables, timeout: -1)
-
-    expect(THREAD_ERRORS).to be_empty
 
     expect(GoodJob::Notifier.instances).to all be_shutdown
     GoodJob::Notifier.instances.clear
@@ -59,14 +65,14 @@ RSpec.configure do |config|
 
     other_locks = PgLock.current_database.advisory_lock.others
     if other_locks.any?
-      puts "There are #{other_locks.count} advisory locks still open."
+      puts "There are #{other_locks.count} advisory locks still open AFTER test run."
       puts "\n\nAdvisory Locks:"
-      other_locks.includes(:pg_stat_activity).find_each do |pg_lock|
+      other_locks.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
         puts "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity.application_name}"
       end
 
       puts "\n\nCurrent connections:"
-      PgStatActivity.find_each do |pg_stat_activity|
+      PgStatActivity.all.each do |pg_stat_activity| # rubocop:disable Rails/FindEach
         puts "  - #{pg_stat_activity.pid}: #{pg_stat_activity.application_name}"
       end
     end
@@ -75,13 +81,6 @@ RSpec.configure do |config|
 
     GoodJob.configuration.instance_variable_set(:@_in_webserver, nil)
   end
-end
-
-ActiveSupport.on_load :active_record do
-  ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkout, :before, lambda { |conn|
-    thread_name = Thread.current.name || Thread.current.object_id
-    conn.exec_query("SET application_name = '#{thread_name}'", "Set application name")
-  }
 end
 
 module PostgresXidExtension

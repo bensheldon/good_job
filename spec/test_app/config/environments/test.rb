@@ -5,7 +5,7 @@
 
 Rails.application.configure do
   config.cache_classes = true
-  config.eager_load = true
+  config.eager_load = ENV["CI"].present?
 
   config.active_job.queue_adapter = :test
 
@@ -16,6 +16,7 @@ Rails.application.configure do
     config.i18n.raise_on_missing_translations = true
   end
 
+  config.colorize_logging = false if ENV["CI"]
   if ActiveModel::Type::Boolean.new.cast(ENV['RAILS_LOG_TO_STDOUT'])
     logger = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = config.log_formatter

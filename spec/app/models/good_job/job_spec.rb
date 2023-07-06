@@ -261,10 +261,9 @@ RSpec.describe GoodJob::Job do
 
     context 'when job is already locked' do
       it 'raises an Error' do
-        ActiveRecord::Base.clear_active_connections!
         job.with_advisory_lock do
           expect do
-            Concurrent::Promises.future(job, &:retry_job).value!
+            rails_promise(job, &:retry_job).value!
           end.to raise_error GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
         end
       end
