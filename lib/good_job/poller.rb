@@ -17,7 +17,7 @@ module GoodJob # :nodoc:
     #   @!scope class
     #   List of all instantiated Pollers in the current process.
     #   @return [Array<GoodJob::Poller>, nil]
-    cattr_reader :instances, default: [], instance_reader: false
+    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
 
     # Creates GoodJob::Poller from a GoodJob::Configuration instance.
     # @param configuration [GoodJob::Configuration]

@@ -8,7 +8,7 @@ module GoodJob
     #   @!scope class
     #   List of all instantiated Adapters in the current process.
     #   @return [Array<GoodJob::Adapter>, nil]
-    cattr_reader :instances, default: [], instance_reader: false
+    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
 
     # @param execution_mode [Symbol, nil] specifies how and where jobs should be executed. You can also set this with the environment variable +GOOD_JOB_EXECUTION_MODE+.
     #
