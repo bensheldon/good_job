@@ -30,4 +30,27 @@ describe GoodJob::CronEntriesController do
       expect(response).to have_http_status(:found)
     end
   end
+
+  describe 'POST #enqueue' do
+    before do
+      allow(ExampleJob).to receive(:queue_adapter).and_return(GoodJob::Adapter.new(execution_mode: :external))
+    end
+
+    it 'enqueues a job' do
+      expect do
+        post good_job.enqueue_cron_entry_path(cron_key: 'example')
+      end.to change(GoodJob::Job, :count).by(1)
+      expect(response).to have_http_status(:found)
+    end
+
+    it 'uses the application I18n.default_locale' do
+      original_locale = I18n.default_locale
+      I18n.default_locale = :de
+
+      post good_job.enqueue_cron_entry_path(cron_key: 'example')
+      expect(GoodJob::Job.last.serialized_params).to include("locale" => "de")
+    ensure
+      I18n.default_locale = original_locale
+    end
+  end
 end
