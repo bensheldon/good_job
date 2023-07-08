@@ -5,6 +5,7 @@ gem:
   # - gem_name
   # doc: true
   # workers: 5
+  prerequire: sorbet/tapioca/prerequire.rb
 dsl:
   # Add your `dsl` command parameters here:
   #

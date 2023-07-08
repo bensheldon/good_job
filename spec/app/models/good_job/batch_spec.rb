@@ -27,7 +27,7 @@ describe GoodJob::Batch do
     end
 
     it 'resets callbacks' do
-      batch = described_class.new(on_finish: CallbackJob)
+      batch = described_class.new(on_finish: "CallbackJob")
       batch.enqueue { TestJob.perform_later }  # 1st time triggers callback
       GoodJob.perform_inline
       batch.enqueue { TestJob.perform_later }  # 2nd time does not trigger callback (finished_at didn't update to nil on the stale reference to batch_record)

@@ -334,7 +334,7 @@ module GoodJob # :nodoc:
 
     # Custom sub-class of +Concurrent::ThreadPoolExecutor+ to add additional worker status.
     # @private
-    class ThreadPoolExecutor < Concurrent::ThreadPoolExecutor
+    class ThreadPoolExecutor < ::Concurrent::ThreadPoolExecutor
       # Number of inactive threads available to execute tasks.
       # https://github.com/ruby-concurrency/concurrent-ruby/issues/684#issuecomment-427594437
       # @return [Integer]
@@ -353,7 +353,7 @@ module GoodJob # :nodoc:
 
     # Custom sub-class of +Concurrent::TimerSet+ for additional behavior.
     # @private
-    class TimerSet < Concurrent::TimerSet
+    class TimerSet < ::Concurrent::TimerSet
       # Number of scheduled jobs in the queue
       # @return [Integer]
       def length
