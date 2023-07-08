@@ -4,6 +4,7 @@
 
 # typed: false
 
+module ::CustomError; end
 module ::DONE; end
 module ::DiscardableError; end
 module ::DiscardedJob; end
