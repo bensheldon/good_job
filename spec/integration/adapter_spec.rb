@@ -75,6 +75,31 @@ RSpec.describe 'Adapter Integration' do
         )
       end
     end
+
+    describe 'transactional integrity' do
+      it 'does not enqueue the job when the transaction is rolled back' do
+        stub_const "CustomError", Class.new(StandardError)
+        TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+
+        subscriber = instance_double(Proc, call: nil)
+        notifier = GoodJob::Notifier.new(subscriber)
+        wait_until { notifier.listening? }
+
+        expect do
+          ApplicationRecord.transaction do
+            TestJob.perform_later
+            raise CustomError
+          end
+        rescue CustomError
+          nil
+        end.not_to change(GoodJob::Job, :count)
+
+        sleep 0.5
+        expect(subscriber).not_to have_received(:call)
+
+        notifier.shutdown
+      end
+    end
   end
 
   describe 'Async execution mode' do

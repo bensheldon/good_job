@@ -121,8 +121,13 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     YourJob.set(queue: :some_queue, wait: 5.minutes, priority: 10).perform_later
     ```
 
-1. In development, GoodJob executes jobs immediately in a separate thread ("async" mode). In production, GoodJob provides different options:
-
+1. **In Rails' development environment**, by default, GoodJob's Adapter executes jobs `async` in a background thread pool in `rails server`.
+    - Because of Rails deferred autoloading, jobs enqueued via the `rails console` may not begin executing on a separate server process until the Rails application is fully initialized by loading a web page once.
+    - Remember, only Active Job's `perform_later` sends jobs to the queue adapter; Active Job's `perform_now` executes the job immediately and does not invoke the queue adapter. GoodJob is not involved in `perform_now` jobs.
+1. **In Rails' test environment**, by default, GoodJob's Adapter executes jobs `inline` immediately in the current thread.
+    - Future-scheduled jobs can be executed with `GoodJob.perform_inline` using using a tool like Timecop or `ActiveSupport::Testing::TimeHelpers`.
+    - Note that Active Job's TestAdapter, which powers test helpers (e.g. `assert_enqueued_with`), may override GoodJob's Adapter in [some configurations](https://github.com/rails/rails/issues/37270).
+1. **In Rails' production environment**, by default, GoodJob's Adapter enqueues jobs in `external` mode to be executed by a separate execution process:
     - By default, GoodJob separates job enqueuing from job execution so that jobs can be scaled independently of the web server.  Use the GoodJob command-line tool to execute jobs:
 
         ```bash
