@@ -46,7 +46,7 @@ module GoodJob # :nodoc:
     #   @!scope class
     #   List of all instantiated Notifiers in the current process.
     #   @return [Array<GoodJob::Notifier>, nil]
-    cattr_reader :instances, default: [], instance_reader: false
+    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
 
     # @!attribute [rw] connection
     #   @!scope class

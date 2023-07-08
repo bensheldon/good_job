@@ -12,7 +12,7 @@ module GoodJob # :nodoc:
     #   @!scope class
     #   List of all instantiated CronManagers in the current process.
     #   @return [Array<GoodJob::CronManager>, nil]
-    cattr_reader :instances, default: [], instance_reader: false
+    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
 
     # Task observer for cron task
     # @param time [Time]
