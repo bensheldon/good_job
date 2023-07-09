@@ -32,7 +32,7 @@ Gemspec/DevelopmentDependencies:
   Enabled: false
 
 Layout/EmptyLineAfterMagicComment:
-  Enabled: false
+  Enabled: true
 
 Layout/HashAlignment:
   Enabled: false
