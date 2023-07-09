@@ -16,6 +16,10 @@ def system!(*args)
 end
 
 FileUtils.chdir GEM_ROOT do
+  puts "\n== Sorbet =="
+
+  system! "bundle exec srb tc"
+
   puts "\n== Rubocop =="
 
   flags = []

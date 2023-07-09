@@ -1,0 +1,14 @@
+gem:
+  # Add your `gem` command parameters here:
+  #
+  # exclude:
+  # - gem_name
+  # doc: true
+  # workers: 5
+  prerequire: sorbet/tapioca/prerequire.rb
+dsl:
+  # Add your `dsl` command parameters here:
+  #
+  # exclude:
+  # - SomeGeneratorName
+  # workers: 5
