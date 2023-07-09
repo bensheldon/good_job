@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   module ActiveJobExtensions
     # Allows configuring whether GoodJob should emit a NOTIFY event when a job is enqueued.

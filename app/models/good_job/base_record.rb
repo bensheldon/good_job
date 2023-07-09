@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   # Base ActiveRecord class that all GoodJob models inherit from.
   # Parent class can be configured with +GoodJob.active_record_parent_class+.

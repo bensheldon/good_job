@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   #
   # Manages daemonization of the current process.

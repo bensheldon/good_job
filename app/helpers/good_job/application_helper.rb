@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   module ApplicationHelper
     def format_duration(sec)

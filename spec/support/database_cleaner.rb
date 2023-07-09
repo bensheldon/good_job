@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.configure do |config|
   # Disabled because this causes the same database connection to be reused across threads
   # which causes Advisory Locks to not be effective because they are locked per-connection/per-thread.

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob # :nodoc:
   # Metrics for the scheduler.
   class Metrics

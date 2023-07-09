@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 THREAD_ERRORS = Concurrent::Array.new
 
 RSpec.configure do |config|

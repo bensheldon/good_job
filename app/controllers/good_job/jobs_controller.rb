@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   class JobsController < GoodJob::ApplicationController
     DISCARD_MESSAGE = "Discarded through dashboard"

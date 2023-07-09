@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   # A GoodJob::Capsule contains the resources necessary to execute jobs, including
   # a {GoodJob::Scheduler}, {GoodJob::Poller}, {GoodJob::Notifier}, and {GoodJob::CronManager}.

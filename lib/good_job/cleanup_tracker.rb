@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob # :nodoc:
   # Tracks thresholds for cleaning up old jobs.
   class CleanupTracker
