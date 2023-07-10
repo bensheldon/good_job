@@ -1,12 +1,46 @@
 # Changelog
 
+## [v3.16.0](https://github.com/bensheldon/good_job/tree/v3.16.0) (2023-07-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.14...v3.16.0)
+
+**Implemented enhancements:**
+
+- Add `GoodJob.configure_active_record` as alternative to `GoodJob.active_record_parent_class` [\#1004](https://github.com/bensheldon/good_job/pull/1004) ([bensheldon](https://github.com/bensheldon))
+- Configure `dashboard_default_locale` using custom subclass of `I18n::Config` to isolate I18n configuration from parent application [\#1001](https://github.com/bensheldon/good_job/pull/1001) ([bensheldon](https://github.com/bensheldon))
+- Create `error_event` column to track the context of an error \(discarded, retried, retry\_stopped, etc\) [\#995](https://github.com/bensheldon/good_job/pull/995) ([bensheldon](https://github.com/bensheldon))
+- Added metrics to Scheduler and track in Process state [\#984](https://github.com/bensheldon/good_job/pull/984) ([AndersGM](https://github.com/AndersGM))
+
+**Fixed bugs:**
+
+- Use Concurrent::Array for class `instances` to avoid JRuby synchronization errors [\#1002](https://github.com/bensheldon/good_job/pull/1002) ([bensheldon](https://github.com/bensheldon))
+- Add test to assert enqueuing behavior within transactions [\#998](https://github.com/bensheldon/good_job/pull/998) ([bensheldon](https://github.com/bensheldon))
+- Fix Ukrainian language code [\#996](https://github.com/bensheldon/good_job/pull/996) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Is `pgcrypto` necessary? [\#805](https://github.com/bensheldon/good_job/issues/805)
+- Integrate Sorbet type checking [\#404](https://github.com/bensheldon/good_job/issues/404)
+
+**Merged pull requests:**
+
+- Unify `frozen_string_literal` comment style [\#1003](https://github.com/bensheldon/good_job/pull/1003) ([dixpac](https://github.com/dixpac))
+- Add more execution mode details and caveats to Readme Set Up section [\#997](https://github.com/bensheldon/good_job/pull/997) ([bensheldon](https://github.com/bensheldon))
+- Add note in migrations that `pgcrypto` extension isn't necessary in PG 13+ [\#837](https://github.com/bensheldon/good_job/pull/837) ([bensheldon](https://github.com/bensheldon))
+- Add Sorbet to linter [\#760](https://github.com/bensheldon/good_job/pull/760) ([sam1el](https://github.com/sam1el))
+
 ## [v3.15.14](https://github.com/bensheldon/good_job/tree/v3.15.14) (2023-07-03)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.13...v3.15.14)
 
+**Implemented enhancements:**
+
+- Add Process heartbeat that is updated inside of Notifier [\#977](https://github.com/bensheldon/good_job/pull/977) ([bensheldon](https://github.com/bensheldon))
+
 **Fixed bugs:**
 
 - Dashboard error when trying to display 0 running/queued/retried jobs due to missing 'zero' translation [\#990](https://github.com/bensheldon/good_job/issues/990)
+- Add explicit namespace back to `GoodJob::DiscreteExecution` [\#983](https://github.com/bensheldon/good_job/pull/983) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
@@ -20,8 +54,6 @@
 - Bump rails from 7.0.5 to 7.0.6 [\#993](https://github.com/bensheldon/good_job/pull/993) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Fix CI: Lock traces version for Ruby 2.6 compatible version [\#987](https://github.com/bensheldon/good_job/pull/987) ([bensheldon](https://github.com/bensheldon))
 - Turkish Language support [\#986](https://github.com/bensheldon/good_job/pull/986) ([SemihCag](https://github.com/SemihCag))
-- Add explicit namespace back to `GoodJob::DiscreteExecution` [\#983](https://github.com/bensheldon/good_job/pull/983) ([bensheldon](https://github.com/bensheldon))
-- Add Process heartbeat that is updated inside of Notifier [\#977](https://github.com/bensheldon/good_job/pull/977) ([bensheldon](https://github.com/bensheldon))
 - Use generic error reporter in Readme examples [\#964](https://github.com/bensheldon/good_job/pull/964) ([shouichi](https://github.com/shouichi))
 
 ## [v3.15.13](https://github.com/bensheldon/good_job/tree/v3.15.13) (2023-06-14)

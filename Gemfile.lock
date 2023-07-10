@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    good_job (3.15.14)
+    good_job (3.16.0)
       activejob (>= 6.0.0)
       activerecord (>= 6.0.0)
       concurrent-ruby (>= 1.0.2)
@@ -230,7 +230,6 @@ GEM
       mixlib-shellout
     method_source (1.0.0)
     mini_mime (1.1.2)
-    mini_portile2 (2.8.2)
     minitest (5.18.1)
     mixlib-cli (2.1.8)
     mixlib-config (3.0.27)
@@ -252,9 +251,6 @@ GEM
     netrc (0.11.0)
     nio4r (2.5.9)
     nio4r (2.5.9-java)
-    nokogiri (1.15.2)
-      mini_portile2 (~> 2.8.2)
-      racc (~> 1.4)
     nokogiri (1.15.2-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.15.2-java)
@@ -478,7 +474,6 @@ GEM
 PLATFORMS
   arm64-darwin
   java
-  ruby
   universal-java-11
   universal-java-17
   x86_64-darwin
