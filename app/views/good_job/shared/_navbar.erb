@@ -49,7 +49,7 @@
           </a>
 
           <ul class="dropdown-menu" aria-labelledby="localeOptions">
-            <% possible_locales = I18n.enforce_available_locales ? (good_job_available_locales & I18n.available_locales) : good_job_available_locales %>
+            <% possible_locales = I18n.available_locales %>
             <% possible_locales.reject { |locale| locale == I18n.locale }.each do |locale| %>
               <li><%= link_to locale, url_for(locale: locale), class: "dropdown-item" %></li>
             <% end %>

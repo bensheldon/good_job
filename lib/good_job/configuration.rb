@@ -29,6 +29,8 @@ module GoodJob
     DEFAULT_ENABLE_CRON = false
     # Default to enabling LISTEN/NOTIFY
     DEFAULT_ENABLE_LISTEN_NOTIFY = true
+    # Default Dashboard I18n locale
+    DEFAULT_DASHBOARD_DEFAULT_LOCALE = :en
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
@@ -344,6 +346,10 @@ module GoodJob
 
     def smaller_number_is_higher_priority
       rails_config[:smaller_number_is_higher_priority]
+    end
+
+    def dashboard_default_locale
+      rails_config[:dashboard_default_locale] || DEFAULT_DASHBOARD_DEFAULT_LOCALE
     end
 
     private

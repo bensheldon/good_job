@@ -15,7 +15,7 @@ module GoodJob
 
     def enqueue
       @cron_entry = CronEntry.find(params[:cron_key])
-      @cron_entry.enqueue(Time.current)
+      use_original_locale { @cron_entry.enqueue(Time.current) }
       redirect_back(fallback_location: cron_entries_path, notice: t(".notice"))
     end
 

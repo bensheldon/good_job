@@ -280,4 +280,12 @@ RSpec.describe GoodJob::Configuration do
       expect(configuration.smaller_number_is_higher_priority).to be true
     end
   end
+
+  describe '#dashboard_default_locale' do
+    it 'delegates to rails configuration' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ dashboard_default_locale: :de })
+      configuration = described_class.new({})
+      expect(configuration.dashboard_default_locale).to eq :de
+    end
+  end
 end

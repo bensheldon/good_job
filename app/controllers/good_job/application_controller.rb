@@ -4,7 +4,7 @@ module GoodJob
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
 
-    around_action :switch_locale
+    around_action :use_good_job_locale
 
     content_security_policy do |policy|
       policy.default_src(:none) if policy.default_src(*policy.default_src).blank?
@@ -31,8 +31,21 @@ module GoodJob
       { locale: I18n.locale }.merge(options)
     end
 
-    def switch_locale(&action)
+    def use_good_job_locale(&action)
+      @original_i18n_config = I18n.config
+      I18n.config = ::GoodJob::I18nConfig.new
       I18n.with_locale(current_locale, &action)
+    ensure
+      I18n.config = @original_i18n_config
+      @original_i18n_config = nil
+    end
+
+    def use_original_locale
+      prev_config = I18n.config
+      I18n.config = @original_i18n_config if @original_i18n_config
+      yield
+    ensure
+      I18n.config = prev_config
     end
 
     def current_locale
@@ -40,16 +53,9 @@ module GoodJob
         request.GET['locale']
       elsif params[:locale]
         params[:locale]
-      elsif good_job_available_locales.exclude?(I18n.default_locale) && I18n.available_locales.include?(:en)
-        :en
       else
         I18n.default_locale
       end
     end
-
-    def good_job_available_locales
-      @_good_job_available_locales ||= GoodJob::Engine.root.join("config/locales").glob("*.yml").map { |path| File.basename(path, ".yml").to_sym }.uniq
-    end
-    helper_method :good_job_available_locales
   end
 end

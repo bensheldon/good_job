@@ -244,6 +244,7 @@ Rails.application.configure do
   config.good_job.shutdown_timeout = 25 # seconds
   config.good_job.enable_cron = true
   config.good_job.cron = { example: { cron: '0 * * * *', class: 'ExampleJob'  } }
+  config.good_job.dashboard_default_locale = :en
 
   # ...or all at once.
   config.good_job = {
@@ -262,6 +263,7 @@ Rails.application.configure do
         class: 'ExampleJob'
       },
     },
+    dashboard_default_locale: :en,
   }
 end
 ```
