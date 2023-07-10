@@ -47,7 +47,7 @@ module GoodJob
   #   @return [ActiveRecord::Base]
   #   @example Change the base class:
   #     GoodJob.active_record_parent_class = "CustomApplicationRecord"
-  mattr_accessor :active_record_parent_class, default: "ActiveRecord::Base"
+  mattr_accessor :active_record_parent_class, default: nil
 
   # @!attribute [rw] logger
   #   @!scope class
@@ -105,6 +105,19 @@ module GoodJob
   def self._on_thread_error(exception)
     on_thread_error.call(exception) if on_thread_error.respond_to?(:call)
   end
+
+  # Custom Active Record configuration that is class_eval'ed into +GoodJob::BaseRecord+
+  # @param block Custom Active Record configuration
+  # @retyrn [void]
+  #
+  # @example
+  #   GoodJob.configure_active_record do
+  #     connects_to database: :special_database
+  #   end
+  def self.configure_active_record(&block)
+    self._active_record_configuration = block
+  end
+  mattr_accessor :_active_record_configuration, default: nil
 
   # Stop executing jobs.
   # GoodJob does its work in pools of background threads.

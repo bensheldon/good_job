@@ -318,7 +318,17 @@ config.good_job.execution_mode = :external
 
 Good Job’s general behavior can also be configured via attributes directly on the `GoodJob` module:
 
-- **`GoodJob.active_record_parent_class`** (string) The ActiveRecord parent class inherited by GoodJob's ActiveRecord model `GoodJob::Job` (defaults to `"ActiveRecord::Base"`). Configure this when using [multiple databases with ActiveRecord](https://guides.rubyonrails.org/active_record_multiple_databases.html) or when other custom configuration is necessary for the ActiveRecord model to connect to the Postgres database. _The value must be a String to avoid premature initialization of ActiveRecord._
+- **`GoodJob.configure_active_record { ... }`** Inject Active Record configuration into GoodJob's base model, for example, when using [multiple databases with ActiveRecord](https://guides.rubyonrails.org/active_record_multiple_databases.html) or when other custom configuration is necessary for the ActiveRecord model to connect to the Postgres database. Example:
+
+    ```ruby
+    # config/initializers/good_job.rb
+    GoodJob.configure_active_record do
+      connects_to database: :special_database
+      self.table_name_prefix = "special_application_"
+    end
+    ```
+
+- **`GoodJob.active_record_parent_class`** (string) Alternatively, modify the ActiveRecord parent class inherited by GoodJob's Active Record model `GoodJob::Job` (defaults to `"ActiveRecord::Base"`). Configure this _The value must be a String to avoid premature initialization of ActiveRecord._
 
 You’ll generally want to configure these in `config/initializers/good_job.rb`, like so:
 
