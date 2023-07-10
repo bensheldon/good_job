@@ -41,6 +41,8 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Dashboard](#dashboard)
         - [API-only Rails applications](#api-only-rails-applications)
         - [Live Polling](#live-polling)
+    - [Priority Level](#priority-level)
+        - [Setting priority levels for named queues](#setting-priority-levels-for-named-queues)
     - [Concurrency controls](#concurrency-controls)
         - [How concurrency controls work](#how-concurrency-controls-work)
     - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
@@ -290,6 +292,7 @@ Available configuration options are:
 - `inline_execution_respects_schedule` (boolean) Opt-in to future behavior of inline execution respecting scheduled jobs. Defaults to `false`.
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
 - `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
+- `smaller_number_is_higher_priority` (boolean) allows you to specifiy that jobs should be run in ascending order of priority (smallest priority numbers first). This will be enabled by default in the next major version of GoodJob (v4.0), but jobs with the highest priority number are run first by default in all earlier versions of GoodJob.
 - `retry_on_unhandled_error` (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Be advised this may lead to jobs being repeated infinitely ([see below for more on retries](#retries)). Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `false`)
 - `on_thread_error` (proc, lambda, or callable) will be called when there is an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake. Example:
 
@@ -402,6 +405,44 @@ end
 #### Live Polling
 
 The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
+
+### Priority level
+
+**`priority:`**: higher numbers run first in all versions of GoodJob before v4.0. The next major version of GoodJob (v4.0) will change job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority (see #524). To opt-in to this behavior now, set `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or `application.rb`.
+
+#### Setting priority levels for named queues
+
+You can do this by configuring specific priority levels for named queues then setting those priority levels to be applied by default within `ApplicationJob`. The following 2 steps provide an example of applying this pattern:
+
+1. In `application.rb`, you can configure priority levels for your named queues:
+    ```ruby
+    # Assuming `config.good_job.smaller_number_is_higher_priority = true` (so lowest priority level runs first)
+    config.queue_attributes = {
+        fast_queue: { priority: -10 },
+        default: { priority: 0 },
+        slow_queue: { priority: 10 }
+    }.with_indifferent_access
+    ```
+
+2. In `application.rb`, you can ensure the job's priority is determined by the priority level of the named queue:
+    ```ruby
+    queue_with_priority do
+        queue_attributes = Rails.configuration.queue_attributes[self.queue_name] || Rails.configuration.queue_attributes[:default]
+        queue_attributes[:priority]
+    end
+    ```
+
+This approach enables you to then set a named queue for your jobs and ensure the desired priority level is taken from that queue. For example:
+
+```ruby
+class SomeReallyUrgentJob < ApplicationJob
+    queue_as :fast_queue
+
+    def perform
+        # Do work
+    end
+end
+```
 
 ### Concurrency controls
 
