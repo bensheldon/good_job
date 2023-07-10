@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   class CronEntriesController < GoodJob::ApplicationController
     before_action :check_settings_migration!, only: [:enable, :disable]

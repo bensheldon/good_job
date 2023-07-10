@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
   class Execution < BaseExecution

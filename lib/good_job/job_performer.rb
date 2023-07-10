@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'concurrent/delay'
 
 module GoodJob

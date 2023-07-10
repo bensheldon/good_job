@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   # Delegates the interface of a single {Scheduler} to multiple Schedulers.
   class MultiScheduler

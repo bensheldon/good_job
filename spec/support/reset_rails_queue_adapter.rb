@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 RSpec.configure do |config|
   config.prepend_before do
     # https://github.com/rails/rails/issues/37270

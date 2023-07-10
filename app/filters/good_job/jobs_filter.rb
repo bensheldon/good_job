@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   class JobsFilter < BaseFilter
     def states

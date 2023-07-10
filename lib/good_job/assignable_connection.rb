@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob # :nodoc:
   # Extends an ActiveRecord odel to override the connection and use
   # an explicit connection that has been removed from the pool.

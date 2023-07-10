@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   module Reportable
     # There are 3 buckets of non-overlapping statuses:

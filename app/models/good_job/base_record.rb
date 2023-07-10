@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module GoodJob
   ACTIVE_RECORD_PARENT_CLASS = Object.const_get(GoodJob.active_record_parent_class)
 

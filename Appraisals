@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 ruby_27_or_higher = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.7')
 ruby_31_or_higher = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1')
 jruby = RUBY_PLATFORM.include?('java')
