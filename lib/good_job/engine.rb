@@ -40,6 +40,14 @@ module GoodJob
       end
     end
 
+    initializer 'good_job.active_record' do
+      config.to_prepare do
+        ActiveSupport.on_load :good_job_base_record, run_once: true do
+          GoodJob::BaseRecord.class_eval(&GoodJob._active_record_configuration) if GoodJob._active_record_configuration
+        end
+      end
+    end
+
     initializer "good_job.start_async" do
       # This hooks into the hookable places during Rails boot, which is unfortunately not Rails.application.initialized?
       # If an Adapter is initialized during boot, we want to want to start async executors once the framework dependencies have loaded.
