@@ -21,9 +21,11 @@ module GoodJob # :nodoc:
       end
 
       def refresh_process
-        GoodJob::Process.with_connection(connection) do
-          Process.logger.silence do
-            @process&.refresh_if_stale(cleanup: true)
+        Rails.application.executor.wrap do
+          GoodJob::Process.with_connection(connection) do
+            GoodJob::Process.logger.silence do
+              @process&.refresh_if_stale(cleanup: true)
+            end
           end
         end
       end
