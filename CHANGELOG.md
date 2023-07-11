@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.16.1](https://github.com/bensheldon/good_job/tree/v3.16.1) (2023-07-11)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.0...v3.16.1)
+
+**Fixed bugs:**
+
+- Wrap Notifier's `refresh_process` with Rails executor [\#1007](https://github.com/bensheldon/good_job/pull/1007) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- uninitialized constant GoodJob::Process [\#1006](https://github.com/bensheldon/good_job/issues/1006)
+
 ## [v3.16.0](https://github.com/bensheldon/good_job/tree/v3.16.0) (2023-07-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.14...v3.16.0)
