@@ -413,6 +413,26 @@ end
 
 The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
 
+#### Customizing Job Display Name
+
+The Dashboard displays jobs by default using the name of the Job class. If you want to customize this name, for example you have a generic job and want to include some part of the job arguments within the name, you can override `GoodJob::BaseExecution#job_display_name`:
+
+```ruby
+module GoodJobCustomDisplayName
+  def job_display_name
+    super + serialized_params.dig("arguments", 0, "my_specific_name")
+  end
+end
+
+# In a Rails initializer:
+Rails.application.configure do
+  # :after_initialize, so GoodJob has had a chance to load its models
+  ActiveSupport.on_load(:after_initialize) do
+    GoodJob::BaseExecution.prepend(GoodJobCustomDisplayName)
+  end
+end
+```
+
 ### Concurrency controls
 
 GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unnecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.

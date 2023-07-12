@@ -54,6 +54,14 @@ module GoodJob
       discrete? ? attributes['job_class'] : serialized_params['job_class']
     end
 
+    # Used when displaying this job in the GoodJob dashboard. This will only ever
+    # be used when displaying jobs, so is available to monkeypatch if needed
+    # without interfering with the operation of GoodJob itself.
+    # @return [String]
+    def job_display_name
+      job_class
+    end
+
     def discrete?
       self.class.discrete_support? && is_discrete?
     end
