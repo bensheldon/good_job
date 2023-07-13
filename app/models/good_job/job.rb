@@ -149,6 +149,12 @@ module GoodJob
                               })
     end
 
+    # Used when displaying this job in the GoodJob dashboard.
+    # @return [String]
+    def display_name
+      job_class
+    end
+
     # Tests whether the job is being executed right now.
     # @return [Boolean]
     def running?
