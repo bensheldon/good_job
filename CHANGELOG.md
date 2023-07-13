@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.16.2](https://github.com/bensheldon/good_job/tree/v3.16.2) (2023-07-13)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.1...v3.16.2)
+
+**Closed issues:**
+
+- Support for customized job display name [\#956](https://github.com/bensheldon/good_job/issues/956)
+
+**Merged pull requests:**
+
+- Add `GoodJob::Job#display_name` to allow customizing dashboard job display [\#1008](https://github.com/bensheldon/good_job/pull/1008) ([paul](https://github.com/paul))
+
 ## [v3.16.1](https://github.com/bensheldon/good_job/tree/v3.16.1) (2023-07-11)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.0...v3.16.1)
