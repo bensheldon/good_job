@@ -7,10 +7,6 @@ module GoodJob
   # A single row from the +good_jobs+ table of executions is fetched to represent a Job.
   #
   class Job < BaseExecution
-    include Filterable
-    include Lockable
-    include Reportable
-
     # Raised when an inappropriate action is applied to a Job based on its state.
     ActionForStateMismatchError = Class.new(StandardError)
     # Raised when an action requires GoodJob to be the ActiveJob Queue Adapter but GoodJob is not.

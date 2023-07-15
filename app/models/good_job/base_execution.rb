@@ -5,6 +5,9 @@ module GoodJob
   # which both read out of the same table.
   class BaseExecution < BaseRecord
     include ErrorEvents
+    include Filterable
+    include Lockable
+    include Reportable
 
     self.table_name = 'good_jobs'
 
