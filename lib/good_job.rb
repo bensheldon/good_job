@@ -246,5 +246,14 @@ module GoodJob
     end
   end
 
+  # Whether all GoodJob migrations have been applied.
+  # For use in tests/CI to validate GoodJob is up-to-date.
+  # @return [Boolean]
+  def self.migrated?
+    # Always update with the most recent migration check
+    GoodJob::Execution.reset_column_information
+    GoodJob::Execution.error_event_migrated?
+  end
+
   ActiveSupport.run_load_hooks(:good_job, self)
 end

@@ -384,7 +384,7 @@ module GoodJob
                 error: interrupt_error_string,
                 finished_at: Time.current,
               }
-              discrete_execution_attrs[:error_event] = GoodJob::DiscreteExecution.error_events[GoodJob::DiscreteExecution::ERROR_EVENT_INTERRUPTED] if self.class.error_event_migrated?
+              discrete_execution_attrs[:error_event] = GoodJob::ErrorEvents::ERROR_EVENT_ENUMS[GoodJob::ErrorEvents::ERROR_EVENT_INTERRUPTED] if self.class.error_event_migrated?
               discrete_executions.where(finished_at: nil).where.not(performed_at: nil).update_all(discrete_execution_attrs) # rubocop:disable Rails/SkipsModelValidations
             end
           end
