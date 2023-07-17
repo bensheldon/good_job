@@ -64,7 +64,15 @@ module GoodJob
 
       inline_executions = []
       GoodJob::Execution.transaction(requires_new: true, joinable: false) do
-        results = GoodJob::Execution.insert_all(executions.map(&:attributes), returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
+        execution_attributes = executions.map do |execution|
+          if GoodJob::Execution.error_event_migrated?
+            execution.attributes
+          else
+            execution.attributes.except('error_event')
+          end
+        end
+
+        results = GoodJob::Execution.insert_all(execution_attributes, returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
 
         job_id_to_provider_job_id = results.each_with_object({}) { |result, hash| hash[result['active_job_id']] = result['id'] }
         active_jobs.each do |active_job|

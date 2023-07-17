@@ -53,6 +53,14 @@ module ExampleAppHelper
       good_job_processes
       good_job_settings
     ]
+    models = [
+      GoodJob::Job,
+      GoodJob::BatchRecord,
+      GoodJob::Execution,
+      GoodJob::DiscreteExecution,
+      GoodJob::Process,
+      GoodJob::Setting,
+    ]
     quiet do
       tables.each do |table_name|
         ActiveRecord::Migration.drop_table(table_name) if ActiveRecord::Base.connection.table_exists?(table_name)
@@ -61,6 +69,7 @@ module ExampleAppHelper
 
       setup_example_app
       run_in_test_app("bin/rails db:environment:set RAILS_ENV=test")
+      models.each(&:reset_column_information)
     end
 
     yield
@@ -74,6 +83,7 @@ module ExampleAppHelper
       ActiveRecord::Base.connection.execute("TRUNCATE schema_migrations")
 
       run_in_test_app("bin/rails db:schema:load db:environment:set RAILS_ENV=test")
+      models.each(&:reset_column_information)
     end
   end
 

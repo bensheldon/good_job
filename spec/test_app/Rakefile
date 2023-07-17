@@ -22,3 +22,18 @@ namespace :heroku do
     Rake::Task['db:seed'].invoke
   end
 end
+
+def remove_version_from_schema_rb
+  puts "GoodJob: Sanitizing Rails version from schema.rb...\n"
+  schema_rb = Rails.root.join("db/schema.rb").to_s
+  contents = File.read(schema_rb)
+  contents.sub!(/ActiveRecord::Schema\[\d\.\d\]/, "ActiveRecord::Schema")
+  File.write(schema_rb, contents)
+end
+
+Rake::Task['db:migrate'].enhance do
+  remove_version_from_schema_rb
+end
+Rake::Task['db:rollback'].enhance do
+  remove_version_from_schema_rb
+end

@@ -228,9 +228,12 @@ module GoodJob
 
         update_execution = proc do
           execution.update(
-            finished_at: Time.current,
-            error: GoodJob::Execution.format_error(job_error),
-            error_event: :discarded
+            {
+              finished_at: Time.current,
+              error: GoodJob::Execution.format_error(job_error),
+            }.tap do |attrs|
+              attrs[:error_event] = ERROR_EVENT_DISCARDED if self.class.error_event_migrated?
+            end
           )
         end
 
