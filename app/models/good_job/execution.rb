@@ -3,10 +3,6 @@
 module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
   class Execution < BaseExecution
-    include Lockable
-    include Filterable
-    include Reportable
-
     # Raised if something attempts to execute a previously completed Execution again.
     PreviouslyPerformedError = Class.new(StandardError)
 
