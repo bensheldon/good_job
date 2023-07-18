@@ -1,5 +1,21 @@
 # Changelog
 
+## [v3.16.3](https://github.com/bensheldon/good_job/tree/v3.16.3) (2023-07-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.2...v3.16.3)
+
+**Fixed bugs:**
+
+- Fix bulk enqueue for unmigrated 'error\_event'; add `GoodJob.migrated?` check method; use custom enum implementation [\#1011](https://github.com/bensheldon/good_job/pull/1011) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- GoodJob::Bulk.enqueue not handling missing migrations [\#1010](https://github.com/bensheldon/good_job/issues/1010)
+
+**Merged pull requests:**
+
+- Move shared `BaseExecution` concerns into the base class. [\#1009](https://github.com/bensheldon/good_job/pull/1009) ([dixpac](https://github.com/dixpac))
+
 ## [v3.16.2](https://github.com/bensheldon/good_job/tree/v3.16.2) (2023-07-13)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.1...v3.16.2)
