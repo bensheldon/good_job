@@ -5,8 +5,8 @@ require 'socket'
 module GoodJob # :nodoc:
   # ActiveRecord model that represents an GoodJob process (either async or CLI).
   class Process < BaseRecord
+    include AdvisoryLockable
     include AssignableConnection
-    include Lockable
 
     # Interval until the process record being updated
     STALE_INTERVAL = 30.seconds

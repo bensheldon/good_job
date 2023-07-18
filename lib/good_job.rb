@@ -246,6 +246,9 @@ module GoodJob
     end
   end
 
+  include ActiveSupport::Deprecation::DeprecatedConstantAccessor
+  deprecate_constant :Lockable, 'GoodJob::AdvisoryLockable', deprecator: deprecator
+
   # Whether all GoodJob migrations have been applied.
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]

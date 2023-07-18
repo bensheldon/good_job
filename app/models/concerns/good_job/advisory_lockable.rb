@@ -16,7 +16,7 @@ module GoodJob
   #     end
   #   end
   #
-  module Lockable
+  module AdvisoryLockable
     extend ActiveSupport::Concern
 
     # Indicates an advisory lock is already held on a record by another

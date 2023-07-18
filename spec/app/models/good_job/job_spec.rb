@@ -248,7 +248,7 @@ RSpec.describe GoodJob::Job do
         job.with_advisory_lock do
           expect do
             Concurrent::Promises.future(job, &:retry_job).value!
-          end.to raise_error GoodJob::Lockable::RecordAlreadyAdvisoryLockedError
+          end.to raise_error GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
         end
       end
     end

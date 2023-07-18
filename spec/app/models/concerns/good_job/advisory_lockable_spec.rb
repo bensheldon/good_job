@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe GoodJob::Lockable do
+RSpec.describe GoodJob::AdvisoryLockable do
   let(:model_class) { GoodJob::Execution }
   let!(:execution) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default") }
 
@@ -318,7 +318,7 @@ RSpec.describe GoodJob::Lockable do
 
     expect do
       Concurrent::Promises.future(execution, &:advisory_lock!).value!
-    end.to raise_error GoodJob::Lockable::RecordAlreadyAdvisoryLockedError
+    end.to raise_error GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
 
     execution.advisory_unlock
   end
