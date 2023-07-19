@@ -958,7 +958,7 @@ GoodJob job executor processes require the following database connections:
 
 - 1 connection for the job listener, a.k.a. `LISTEN/NOTIFY`.
 - 1 connection per execution pool thread. E.g., `--queues=mice:2;elephants:1` is 3 threads. Pool size defaults to `--max-threads`.
-- 2 connections for the cron scheduler, if it's enabled.
+- 2 connections for the cron scheduler and executor, if cron is enabled.
 - 1 connection per subthread, if your application makes multithreaded database queries within a job.
 
 The executor process will not crash if the connections pool is exhausted, instead it will report an exception (eg. `ActiveRecord::ConnectionTimeoutError`).
@@ -974,8 +974,8 @@ pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 When GoodJob runs in `:async` mode (in Rails's development environment, by default), the following database pool configuration works, where:
 
 - `ENV.fetch("RAILS_MAX_THREADS", 5)` is the number of threads used by the web server
-- `1` is the job enqueuer
-- `2` is the cron scheduler
+- `1` is the job listener
+- `2` is the cron scheduler and executor
 - `ENV.fetch("GOOD_JOB_MAX_THREADS", 5)` is the number of threads used to perform jobs
 
 ```yaml
@@ -984,7 +984,7 @@ When GoodJob runs in `:async` mode (in Rails's development environment, by defau
 pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + 1 + 2 + ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
 ```
 
-When GoodJob runs in `:external` mode (in Rails' production environment, by default), the following databsae pool configurations work for the web server and worker process, respectively.
+When GoodJob runs in `:external` mode (in Rails' production environment, by default), the following database pool configurations work for the web server and worker process, respectively.
 
 ```yaml
 # config/database.yml
@@ -995,7 +995,7 @@ pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
 ```yaml
 # config/database.yml
 
-pool: <%= 1 + 2+ ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
+pool: <%= 1 + 2 + ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
 ```
 
 ### Production setup
