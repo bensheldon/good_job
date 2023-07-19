@@ -974,8 +974,8 @@ pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 When GoodJob runs in `:async` mode (in Rails's development environment, by default), the following database pool configuration works, where:
 
 - `ENV.fetch("RAILS_MAX_THREADS", 5)` is the number of threads used by the web server
-- `1` is the job listener
-- `2` is the cron scheduler and executor
+- `1` is the number of connections used by the job listener
+- `2` is the number of connections used by the cron scheduler and executor
 - `ENV.fetch("GOOD_JOB_MAX_THREADS", 5)` is the number of threads used to perform jobs
 
 ```yaml
@@ -984,7 +984,7 @@ When GoodJob runs in `:async` mode (in Rails's development environment, by defau
 pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + 1 + 2 + ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
 ```
 
-When GoodJob runs in `:external` mode (in Rails' production environment, by default), the following database pool configurations work for the web server and worker process, respectively.
+When GoodJob runs in `:external` mode (in Rails' production environment, by default), the following database pool configurations work for web servers and worker processes, respectively.
 
 ```yaml
 # config/database.yml
