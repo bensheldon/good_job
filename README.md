@@ -956,7 +956,7 @@ Keep in mind, queue operations and management is an advanced discipline. This st
 
 GoodJob job executor processes require the following database connections:
 
-- 1 connection for the job listener, a.k.a. `LISTEN/NOTIFY`.
+- 1 connection for the job reader.
 - 1 connection per execution pool thread. E.g., `--queues=mice:2;elephants:1` is 3 threads. Pool size defaults to `--max-threads`.
 - 2 connections for the cron scheduler and executor, if cron is enabled.
 - 1 connection per subthread, if your application makes multithreaded database queries within a job.
