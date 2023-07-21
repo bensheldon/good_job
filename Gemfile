@@ -33,9 +33,9 @@ platforms :ruby do
   gem "pry-byebug"
   gem "rack-mini-profiler"
   gem "rbtrace"
-
   gem "stackprof"
   gem "tapioca", require: false, group: :development
+  gem "vernier", github: "jhawthorn/vernier", branch: "main"
 
   group :lint do
     gem "easy_translate"

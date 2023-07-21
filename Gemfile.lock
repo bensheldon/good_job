@@ -1,4 +1,11 @@
 GIT
+  remote: https://github.com/jhawthorn/vernier.git
+  revision: cf51de1b570ac0a2f32e1fbd0b25d7e5f085e006
+  branch: main
+  specs:
+    vernier (0.3.0)
+
+GIT
   remote: https://github.com/thoughtbot/appraisal.git
   revision: feb78bcc6177038399bff098cb6c2bd4bca4972a
   branch: main
@@ -520,6 +527,7 @@ DEPENDENCIES
   spoom
   stackprof
   tapioca
+  vernier!
   yard
   yard-activesupport-concern
 
