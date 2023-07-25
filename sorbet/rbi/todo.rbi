@@ -13,6 +13,7 @@ module ::ErrorJob; end
 module ::ExpectedError; end
 module ::JOB_PERFORMED; end
 module ::JobError; end
+module ::LATCH; end
 module ::MemoryProfiler; end
 module ::PERFORMED; end
 module ::POLL_COUNT; end
@@ -27,7 +28,6 @@ module ::THREAD_JOBS; end
 module ::TestError; end
 module ::TestJob; end
 module ::TestJob::ExpectedError; end
-module GoodJob::DiscreteExecution::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Job::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Job::ERROR_EVENT_RETRIED; end
 module RSpec::Core::Example; end

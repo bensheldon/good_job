@@ -31,6 +31,7 @@ require "good_job/notifier"
 require "good_job/poller"
 require "good_job/probe_server"
 require "good_job/scheduler"
+require "good_job/shared_executor"
 
 # GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 #
