@@ -63,6 +63,10 @@ module GoodJob # :nodoc:
         cron_enabled: GoodJob.configuration.enable_cron?,
         total_succeeded_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:succeeded_executions_count) },
         total_errored_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:errored_executions_count) },
+        database_connection_pool: {
+          size: connection_pool.size,
+          active: connection_pool.connections.count(&:in_use?),
+        },
       }
     end
 

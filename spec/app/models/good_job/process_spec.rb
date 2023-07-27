@@ -23,6 +23,17 @@ RSpec.describe GoodJob::Process do
     end
   end
 
+  describe '.ns_current_state' do
+    it 'contains information about the process' do
+      expect(described_class.ns_current_state).to include(
+        database_connection_pool: include(
+          size: be_an(Integer),
+          active: be_an(Integer)
+        )
+      )
+    end
+  end
+
   describe '.register' do
     it 'registers the process' do
       process = nil
