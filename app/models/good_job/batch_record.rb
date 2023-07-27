@@ -2,7 +2,7 @@
 
 module GoodJob
   class BatchRecord < BaseRecord
-    include Lockable
+    include AdvisoryLockable
 
     self.table_name = 'good_job_batches'
 
