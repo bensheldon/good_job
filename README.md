@@ -956,10 +956,9 @@ Keep in mind, queue operations and management is an advanced discipline. This st
 
 GoodJob job executor processes require the following database connections:
 
-- 1 connection for the job reader.
-- 1 connection per execution pool thread. E.g., `--queues=mice:2;elephants:1` is 3 threads. Pool size defaults to `--max-threads`.
-- 2 connections for the cron scheduler and executor, if cron is enabled.
-- 1 connection per subthread, if your application makes multithreaded database queries within a job.
+- 1 connection per execution pool thread. E.g., `--queues=mice:2;elephants:1` is 3 threads and thus 3 connections. Pool size defaults to `--max-threads`.
+- 2 additional connections that GoodJob uses for utility functionality (e.g. LISTEN/NOTIFY, cron, etc.)
+- 1 connection per subthread, if your application makes multithreaded database queries (e.g. `load_async`) within a job.
 
 The executor process will not crash if the connections pool is exhausted, instead it will report an exception (eg. `ActiveRecord::ConnectionTimeoutError`).
 

@@ -31,7 +31,8 @@ module GoodJob # :nodoc:
 
     # @param cron_entries [Array<CronEntry>]
     # @param start_on_initialize [Boolean]
-    def initialize(cron_entries = [], start_on_initialize: false)
+    def initialize(cron_entries = [], start_on_initialize: false, executor: Concurrent.global_io_executor)
+      @executor = executor
       @running = false
       @cron_entries = cron_entries
       @tasks = Concurrent::Hash.new
@@ -84,7 +85,7 @@ module GoodJob # :nodoc:
     def create_task(cron_entry)
       cron_at = cron_entry.next_at
       delay = [(cron_at - Time.current).to_f, 0].max
-      future = Concurrent::ScheduledTask.new(delay, args: [self, cron_entry, cron_at]) do |thr_scheduler, thr_cron_entry, thr_cron_at|
+      future = Concurrent::ScheduledTask.new(delay, args: [self, cron_entry, cron_at], executor: @executor) do |thr_scheduler, thr_cron_entry, thr_cron_at|
         # Re-schedule the next cron task before executing the current task
         thr_scheduler.create_task(thr_cron_entry)
 

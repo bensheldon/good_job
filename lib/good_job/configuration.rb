@@ -51,13 +51,10 @@ module GoodJob
     # @param warn [Boolean] whether to print a warning when over the limit
     # @return [Integer]
     def self.total_estimated_threads(warn: false)
-      configuration = new({})
-
-      cron_threads = configuration.enable_cron? ? 2 : 0
-      notifier_threads = 1
+      utility_threads = GoodJob::SharedExecutor::MAX_THREADS
       scheduler_threads = GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats[:max_threads] }
 
-      good_job_threads = cron_threads + notifier_threads + scheduler_threads
+      good_job_threads = utility_threads + scheduler_threads
       puma_threads = (Puma::Server.current&.max_threads if defined?(Puma::Server)) || 0
 
       total_threads = good_job_threads + puma_threads

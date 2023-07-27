@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'concurrent/executor/fixed_thread_pool'
 
 RSpec.describe GoodJob::Notifier do
   describe '.instances' do
@@ -88,6 +89,38 @@ RSpec.describe GoodJob::Notifier do
       wait_until(max: 5, increments_of: 0.5) { expect(on_thread_error).to have_received(:call).at_least(:once).with instance_of(ExpectedError) }
 
       notifier.shutdown
+    end
+  end
+
+  describe '#shutdown' do
+    let(:executor) { Concurrent::FixedThreadPool.new(1) }
+
+    it 'shuts down when the thread is killed' do
+      notifier = described_class.new(executor: executor, enable_listening: true)
+      wait_until { expect(notifier).to be_listening }
+      executor.kill
+      wait_until { expect(notifier).not_to be_listening }
+      notifier.shutdown
+      expect(notifier).to be_shutdown
+    end
+  end
+
+  describe '#restart' do
+    let(:executor) { Concurrent::FixedThreadPool.new(1) }
+
+    it 'shuts down and restarts when already running' do
+      notifier = described_class.new(executor: executor, enable_listening: true)
+      wait_until { expect(notifier).to be_listening }
+      notifier.restart
+      expect(notifier).to be_running
+    end
+
+    it 'restarts when shutdown' do
+      notifier = described_class.new(executor: executor, enable_listening: true)
+      notifier.shutdown
+      expect(notifier).to be_shutdown
+      notifier.restart
+      wait_until { expect(notifier).to be_listening }
     end
   end
 
