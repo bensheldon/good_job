@@ -152,4 +152,15 @@ describe GoodJob::Batch do
       end
     end
   end
+
+  describe '#active_jobs' do
+    it 'returns associated Active Jobs' do
+      batch = described_class.enqueue do
+        TestJob.perform_later
+        TestJob.perform_later
+      end
+      expect(batch.active_jobs.count).to eq 2
+      expect(batch.active_jobs).to all be_a(TestJob)
+    end
+  end
 end

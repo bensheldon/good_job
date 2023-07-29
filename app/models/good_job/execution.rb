@@ -508,19 +508,6 @@ module GoodJob
       self.scheduled_at ||= current_time
     end
 
-    # Build an ActiveJob instance and deserialize the arguments, using `#active_job_data`.
-    #
-    # @param ignore_deserialization_errors [Boolean]
-    #   Whether to ignore ActiveJob::DeserializationError when deserializing the arguments.
-    #   This is most useful if you aren't planning to use the arguments directly.
-    def active_job(ignore_deserialization_errors: false)
-      ActiveJob::Base.deserialize(active_job_data).tap do |aj|
-        aj.send(:deserialize_arguments_if_needed)
-      rescue ActiveJob::DeserializationError
-        raise unless ignore_deserialization_errors
-      end
-    end
-
     # Return formatted serialized_params for display in the dashboard
     # @return [Hash]
     def display_serialized_params
@@ -564,14 +551,6 @@ module GoodJob
     end
 
     private
-
-    def active_job_data
-      serialized_params.deep_dup
-                       .tap do |job_data|
-        job_data["provider_job_id"] = id
-        job_data["good_job_concurrency_key"] = concurrency_key if concurrency_key
-      end
-    end
 
     def reset_batch_values(&block)
       GoodJob::Batch.within_thread(batch_id: nil, batch_callback_id: nil, &block)

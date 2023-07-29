@@ -124,11 +124,11 @@ module GoodJob
     end
 
     def active_jobs
-      record.jobs.map(&:head_execution).map(&:active_job)
+      record.jobs.map(&:active_job)
     end
 
     def callback_active_jobs
-      record.callback_jobs.map(&:head_execution).map(&:active_job)
+      record.callback_jobs.map(&:active_job)
     end
 
     def assign_properties(properties)
