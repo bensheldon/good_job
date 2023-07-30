@@ -1,5 +1,30 @@
 # Changelog
 
+## [v3.16.4](https://github.com/bensheldon/good_job/tree/v3.16.4) (2023-07-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.3...v3.16.4)
+
+**Implemented enhancements:**
+
+- Add database\_connection\_pool stats to `GoodJob::Process.current_state` [\#1019](https://github.com/bensheldon/good_job/pull/1019) ([dixpac](https://github.com/dixpac))
+
+**Fixed bugs:**
+
+- Move `Execution#active_job` to BaseExecution to share with Job; refactor `Batch#active_jobs` to use job directly [\#1022](https://github.com/bensheldon/good_job/pull/1022) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Notifier errored: ArgumentError: wrong number of arguments \(given 1, expected 0\) [\#1016](https://github.com/bensheldon/good_job/issues/1016)
+- Understanding Database Connections and Cron [\#1013](https://github.com/bensheldon/good_job/issues/1013)
+- Experiencing various database exceptions with Rails 7.1  [\#796](https://github.com/bensheldon/good_job/issues/796)
+
+**Merged pull requests:**
+
+- Refactor Notifier to ensure \#restart is threadsafe [\#1021](https://github.com/bensheldon/good_job/pull/1021) ([bensheldon](https://github.com/bensheldon))
+- Notifier and CronManager share a 2-thread executor within the capsule [\#1018](https://github.com/bensheldon/good_job/pull/1018) ([bensheldon](https://github.com/bensheldon))
+- Clarify database connections and recurring processes in README.md [\#1015](https://github.com/bensheldon/good_job/pull/1015) ([blumhardts](https://github.com/blumhardts))
+- Deprecate `GoodJob::Lockable` and rename to `GoodJob::AdvisoryLockable` [\#1012](https://github.com/bensheldon/good_job/pull/1012) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.16.3](https://github.com/bensheldon/good_job/tree/v3.16.3) (2023-07-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.2...v3.16.3)

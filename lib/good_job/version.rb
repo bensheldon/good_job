@@ -2,7 +2,7 @@
 
 module GoodJob
   # GoodJob gem version.
-  VERSION = '3.16.3'
+  VERSION = '3.16.4'
 
   # GoodJob version as Gem::Version object
   GEM_VERSION = Gem::Version.new(VERSION)
