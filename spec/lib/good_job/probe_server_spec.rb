@@ -12,7 +12,7 @@ RSpec.describe GoodJob::ProbeServer do
   end
 
   describe '#start' do
-    it 'starts a webrick server that binds to all interfaces' do
+    it 'starts a http server that binds to all interfaces' do
       probe_server.start
       wait_until(max: 1) { expect(probe_server).to be_running }
 
