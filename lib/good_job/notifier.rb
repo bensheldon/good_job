@@ -66,6 +66,7 @@ module GoodJob # :nodoc:
       @enable_listening = enable_listening
       @executor = executor
 
+      @mutex = Mutex.new
       @shutdown_event = Concurrent::Event.new.tap(&:set)
       @running = Concurrent::AtomicBoolean.new(false)
       @connected = Concurrent::AtomicBoolean.new(false)
@@ -73,8 +74,9 @@ module GoodJob # :nodoc:
       @connection_errors_count = Concurrent::AtomicFixnum.new(0)
       @connection_errors_reported = Concurrent::AtomicBoolean.new(false)
       @enable_listening = enable_listening
+      @task = nil
 
-      listen
+      start
       self.class.instances << self
     end
 
@@ -107,18 +109,19 @@ module GoodJob # :nodoc:
     #   * A positive number will wait that many seconds before stopping any remaining active threads.
     # @return [void]
     def shutdown(timeout: -1)
-      return if @running.false?
+      synchronize do
+        @running.make_false
 
-      @running.make_false
-      if @executor.shutdown?
-        # clean up in the even the executor is killed
-        @connected.make_false
-        @listening.make_false
-        @shutdown_event.set
-      else
-        @shutdown_event.wait(timeout == -1 ? nil : timeout) unless timeout.nil?
+        if @executor.shutdown? || @task&.complete?
+          # clean up in the even the executor is killed
+          @connected.make_false
+          @listening.make_false
+          @shutdown_event.set
+        else
+          @shutdown_event.wait(timeout == -1 ? nil : timeout) unless timeout.nil?
+        end
+        @shutdown_event.set?
       end
-      @shutdown_event.set?
     end
 
     # Restart the notifier.
@@ -126,8 +129,10 @@ module GoodJob # :nodoc:
     # @param timeout [nil, Numeric] Seconds to wait; shares same values as {#shutdown}.
     # @return [void]
     def restart(timeout: -1)
-      shutdown(timeout: timeout) unless @shutdown_event.set?
-      listen
+      synchronize do
+        shutdown(timeout: timeout) unless @shutdown_event.set?
+        start
+      end
     end
 
     # Invoked on completion of ThreadPoolExecutor task
@@ -156,7 +161,7 @@ module GoodJob # :nodoc:
       end
 
       if @running.true?
-        listen(delay: connection_error ? RECONNECT_INTERVAL : 0)
+        create_listen_task(delay: connection_error ? RECONNECT_INTERVAL : 0)
       else
         @shutdown_event.set
       end
@@ -164,11 +169,18 @@ module GoodJob # :nodoc:
 
     private
 
-    def listen(delay: 0)
-      @running.make_true
-      @shutdown_event.reset
+    def start
+      synchronize do
+        return if @running.true?
 
-      future = Concurrent::ScheduledTask.new(delay, args: [@recipients, @running, @executor, @enable_listening, @listening], executor: @executor) do |thr_recipients, thr_running, thr_executor, thr_enable_listening, thr_listening|
+        @running.make_true
+        @shutdown_event.reset
+        create_listen_task(delay: 0)
+      end
+    end
+
+    def create_listen_task(delay: 0)
+      @task = Concurrent::ScheduledTask.new(delay, args: [@recipients, @running, @executor, @enable_listening, @listening], executor: @executor) do |thr_recipients, thr_running, thr_executor, thr_enable_listening, thr_listening|
         with_connection do
           begin
             Rails.application.executor.wrap do
@@ -213,8 +225,9 @@ module GoodJob # :nodoc:
         end
       end
 
-      future.add_observer(self, :listen_observer)
-      future.execute
+      @task.add_observer(self, :listen_observer)
+      @task.execute
+      @task
     end
 
     def with_connection
@@ -256,6 +269,14 @@ module GoodJob # :nodoc:
     def reset_connection_errors
       @connection_errors_count.value = 0
       @connection_errors_reported.make_false
+    end
+
+    def synchronize(&block)
+      if @mutex.owned?
+        yield
+      else
+        @mutex.synchronize(&block)
+      end
     end
   end
 end
