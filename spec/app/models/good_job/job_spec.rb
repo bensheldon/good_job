@@ -104,6 +104,23 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  describe '#reload' do
+    it 'reloads the job execution' do
+      job = undiscrete_job
+      original_head_execution = job.head_execution
+
+      new_execution = GoodJob::Execution.create!(
+        active_job_id: job.active_job_id,
+        queue_name: 'newnewnew'
+      )
+      original_head_execution.update!(retried_good_job_id: new_execution.id)
+
+      expect do
+        job.reload
+      end.to change { job.queue_name }.from('mice').to('newnewnew')
+    end
+  end
+
   describe '#head_execution' do
     it 'is the head execution (which should be the same record)' do
       job = undiscrete_job
