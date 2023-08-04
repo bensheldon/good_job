@@ -94,10 +94,12 @@ module GoodJob
       GoodJob.configuration.options.merge!(options.symbolize_keys)
       configuration = GoodJob.configuration
       capsule = GoodJob.capsule
+      systemd = GoodJob::SystemdService.new
 
       Daemon.new(pidfile: configuration.pidfile).daemonize if configuration.daemonize?
 
       capsule.start
+      systemd.start
 
       if configuration.probe_port
         probe_server = GoodJob::ProbeServer.new(port: configuration.probe_port)
@@ -116,6 +118,7 @@ module GoodJob
 
       capsule.shutdown(timeout: configuration.shutdown_timeout)
       probe_server&.stop
+      systemd&.stop
     end
 
     default_task :start
