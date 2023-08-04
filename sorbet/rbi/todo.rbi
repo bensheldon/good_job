@@ -30,6 +30,7 @@ module ::TestJob; end
 module ::TestJob::ExpectedError; end
 module GoodJob::Job::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Job::ERROR_EVENT_RETRIED; end
+module GoodJob::SdNotify; end
 module RSpec::Core::Example; end
 module RSpec::Core::Formatters::ConsoleCodes; end
 module RSpec::Expectations::ExpectationNotMetError; end
