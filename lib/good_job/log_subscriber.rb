@@ -170,6 +170,15 @@ module GoodJob
       end
     end
 
+    # @!macro notification_responder
+    def systemd_watchdog_error(event)
+      exception = event.payload[:error]
+
+      error do
+        "Error pinging systemd: #{exception.class}: #{exception}\n #{exception.backtrace}"
+      end
+    end
+
     # @!endgroup
 
     # Get the logger associated with this {LogSubscriber} instance.
