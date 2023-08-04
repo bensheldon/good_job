@@ -29,9 +29,14 @@ module GoodJob # :nodoc:
     end
 
     # Notify systemd that the process is stopping and stop pinging the watchdog
-    # if currently doing so.
+    # if currently doing so. If given a block, it will wait for the block to
+    # complete before stopping watchdog notifications, so systemd has a clear
+    # indication when graceful shutdown started and finished.
     def stop
       GoodJob::SdNotify.stopping
+
+      yield if block_given?
+
       @watchdog&.kill
       @watchdog&.wait_for_termination
     end

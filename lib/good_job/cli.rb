@@ -116,9 +116,10 @@ module GoodJob
         break if @stop_good_job_executable || capsule.shutdown?
       end
 
-      capsule.shutdown(timeout: configuration.shutdown_timeout)
-      probe_server&.stop
-      systemd&.stop
+      systemd.stop do
+        capsule.shutdown(timeout: configuration.shutdown_timeout)
+        probe_server&.stop
+      end
     end
 
     default_task :start
