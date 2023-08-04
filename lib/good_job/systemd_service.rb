@@ -35,7 +35,7 @@ module GoodJob
       # https://www.freedesktop.org/software/systemd/man/sd_watchdog_enabled.html
       interval = watchdog_interval / 2
 
-      GoodJob.logger.info("Pinging systemd watchdog every #{interval.round(1)} seconds")
+      ActiveSupport::Notifications.instrument("systemd_watchdog_start.good_job", { interval: interval })
       @watchdog = Concurrent::TimerTask.execute(execution_interval: interval) do
         GoodJob::SdNotify.watchdog
       end
