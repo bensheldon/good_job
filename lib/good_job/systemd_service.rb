@@ -3,27 +3,37 @@
 require 'concurrent/timer_task'
 require_relative '../../vendor/sd_notify'
 
-module GoodJob
+module GoodJob # :nodoc:
+  #
+  # Manages communication with systemd to notify it about the status of the
+  # GoodJob CLI. If it doesn't look like systemd is controlling the process,
+  # SystemdService doesn't do anything.
+  #
   class SystemdService
-    def self.task_observer(time, output, thread_error) # rubocop:disable Lint/UnusedMethodArgument
+    def self.task_observer(_time, _output, thread_error) # :nodoc:
       return if thread_error.is_a? Concurrent::CancelledOperationError
 
       GoodJob._on_thread_error(thread_error) if thread_error
     end
 
+    # Indicates whether the service is actively notifying systemd's watchdog.
     def notifying?
       @watchdog&.running? || false
     end
 
+    # Notify systemd that the process is ready. If the service is configured in
+    # systemd to use the watchdog, this will also start pinging the watchdog.
     def start
       GoodJob::SdNotify.ready
       run_watchdog
     end
 
+    # Notify systemd that the process is stopping and stop pinging the watchdog
+    # if currently doing so.
     def stop
+      GoodJob::SdNotify.stopping
       @watchdog&.kill
       @watchdog&.wait_for_termination
-      GoodJob::SdNotify.stopping
     end
 
     private
