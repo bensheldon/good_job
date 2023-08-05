@@ -26,7 +26,7 @@ class TestSocket
   end
 end
 
-RSpec.describe GoodJob::SystemdService do
+RSpec.describe GoodJob::SystemdService, skip_if_java: true do
   let(:systemd_socket) { TestSocket.new }
 
   before do
