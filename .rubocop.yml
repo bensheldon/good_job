@@ -22,10 +22,11 @@ AllCops:
     - pkg/**/*
     - spec/test_app/**/*
     - tmp/**/*
-    - vendor/**/*
     - scripts/**/*
     - gemfiles/**/*
     - Brewfile
+    # Vendored dependencies
+    - lib/good_job/sd_notify.rb
   NewCops: enable
 
 Gemspec/DevelopmentDependencies:

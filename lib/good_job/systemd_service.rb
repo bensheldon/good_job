@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'concurrent/timer_task'
-require_relative '../../vendor/sd_notify'
+require 'good_job/sd_notify'
 
 module GoodJob # :nodoc:
   #

@@ -42,10 +42,7 @@ require "socket"
 # therefore be sure to check the official man pages prior to using SdNotify.
 #
 # @see https://www.freedesktop.org/software/systemd/man/sd_notify.html
-#
-# FORK: nest this inside the GoodJob module to prevent name collisions in case a
-# GoodJob user also uses the actual sd_notify gem.
-module GoodJob::SdNotify
+module SdNotify
   # Exception raised when there's an error writing to the notification socket
   class NotifyError < RuntimeError; end
 
