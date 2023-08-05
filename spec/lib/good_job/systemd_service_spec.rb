@@ -26,6 +26,8 @@ class TestSocket
   end
 end
 
+# These are skipped on JRuby because it appears to have some issues with binding
+# to UNIX domain sockets, which all these tests rely on.
 RSpec.describe GoodJob::SystemdService, skip_if_java: true do
   let(:systemd_socket) { TestSocket.new }
 
