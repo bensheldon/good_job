@@ -27,24 +27,25 @@ class TestSocket
 end
 
 RSpec.describe GoodJob::SystemdService do
+  let(:systemd_socket) { TestSocket.new }
+
   before do
-    stub_const('SYSTEMD_SOCKET', TestSocket.new)
-    stub_const('ENV', ENV.to_hash.merge({ 'NOTIFY_SOCKET' => SYSTEMD_SOCKET.path }))
+    stub_const('ENV', ENV.to_hash.merge({ 'NOTIFY_SOCKET' => systemd_socket.path }))
   end
 
   after do
-    SYSTEMD_SOCKET.close
+    systemd_socket.close
   end
 
   it 'notifies systemd about starting and stopping' do
     systemd = described_class.new
     systemd.start
-    expect(SYSTEMD_SOCKET.read).to eq('READY=1')
+    expect(systemd_socket.read).to eq('READY=1')
 
     expect(systemd.notifying?).to be(false)
 
     systemd.stop
-    expect(SYSTEMD_SOCKET.read).to eq('STOPPING=1')
+    expect(systemd_socket.read).to eq('STOPPING=1')
   end
 
   it 'sends stopping notification before running #stop block' do
@@ -52,7 +53,7 @@ RSpec.describe GoodJob::SystemdService do
 
     block_ran = false
     systemd.stop do
-      expect(SYSTEMD_SOCKET.read).to eq('STOPPING=1')
+      expect(systemd_socket.read).to eq('STOPPING=1')
       block_ran = true
     end
 
@@ -64,11 +65,11 @@ RSpec.describe GoodJob::SystemdService do
 
     systemd = described_class.new
     systemd.start
-    SYSTEMD_SOCKET.read
+    systemd_socket.read
     expect(systemd.notifying?).to be(true)
 
     sleep 0.3
-    expect(SYSTEMD_SOCKET.read).to eq('WATCHDOG=1')
+    expect(systemd_socket.read).to eq('WATCHDOG=1')
 
     systemd.stop
   end
