@@ -65,6 +65,29 @@ RSpec.describe GoodJob::CLI do
         expect(probe_server).to have_received(:stop)
       end
     end
+
+    describe 'systemd support' do
+      let(:systemd) { instance_double GoodJob::SystemdService, start: nil, stop: nil }
+
+      before do
+        allow(GoodJob::SystemdService).to receive(:new).and_return systemd
+      end
+
+      it 'notifies systemd about starting and stopping' do
+        cli = described_class.new([], {}, {})
+
+        cli_thread = Concurrent::Promises.future { cli.start }
+        sleep_until { cli.instance_variable_get(:@stop_good_job_executable) == false }
+        expect(GoodJob::SystemdService).to have_received(:new)
+        expect(systemd).to have_received(:start)
+        expect(systemd).not_to have_received(:stop)
+
+        Process.kill 'INT', Process.pid # Send the signal to ourselves
+
+        sleep_until { cli_thread.fulfilled? }
+        expect(systemd).to have_received(:stop)
+      end
+    end
   end
 
   describe '#cleanup_preserved_jobs' do
