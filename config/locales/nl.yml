@@ -218,6 +218,11 @@ nl:
         live_poll: Live Poll
         name: "GoodJob 👍"
         processes: Processen
+        theme:
+          auto: Auto
+          dark: Donker
+          light: Licht
+          theme: Thema
     status:
       discarded: weggegooid
       queued: In de wachtrij

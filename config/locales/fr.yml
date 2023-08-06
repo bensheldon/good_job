@@ -218,6 +218,11 @@ fr:
         live_poll: En direct
         name: "GoodJob 👍"
         processes: Processus
+        theme:
+          auto: Auto
+          dark: Sombre
+          light: Lumière
+          theme: Thème
     status:
       discarded: Mis au rebut
       queued: À la file

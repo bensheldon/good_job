@@ -218,6 +218,11 @@ en:
         live_poll: Live Poll
         name: "GoodJob 👍"
         processes: Processes
+        theme:
+          auto: Auto
+          dark: Dark
+          light: Light
+          theme: Theme
     status:
       discarded: Discarded
       queued: Queued

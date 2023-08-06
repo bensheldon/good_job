@@ -1,12 +1,13 @@
 <%= form_with(url: mass_update_jobs_path(filter.to_params), method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
 <div class="my-3 card" data-gj-poll-replace id="jobs-table">
   <div class="list-group list-group-flush text-nowrap table-jobs" role="table">
-    <header class="list-group-item bg-light">
+    <header class="list-group-item bg-body-tertiary">
       <div class="row small text-muted text-uppercase align-items-center">
         <div class="col-lg-4 d-flex gap-2 flex-wrap">
-          <%= label_tag('toggle_job_ids', t(".toggle_all_jobs"), class: "visually-hidden") %>
-          <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %>
-
+          <div class="form-check d-flex flex-row px-0 mb-0">
+            <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %>
+            <%= label_tag('toggle_job_ids', t(".toggle_all_jobs"), class: "visually-hidden") %>
+          </div>
           <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'ms-1 btn btn-sm btn-outline-secondary', title: t(".actions.reschedule_all"), data: { confirm: t(".actions.confirm_reschedule_all"), disable: true } do %>
             <span class="me-1"><%= render_icon "skip_forward" %></span> <%=t "good_job.actions.reschedule" %>
           <% end %>
@@ -22,13 +23,13 @@
             <button id="destroy-dropdown-toggle" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
               <span class="visually-hidden"><%=t ".toggle_actions" %></span>
             </button>
-            <div class="dropdown-menu" aria-labelledby="destroy-dropdown-toggle">
+            <ul class="dropdown-menu" aria-labelledby="destroy-dropdown-toggle">
               <li>
                 <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn', title: t(".actions.destroy_all"), data: { confirm: t(".actions.confirm_destroy_all"), disable: true } do %>
                   <span class="me-1"><%= render_icon "trash" %></span> <%=t "good_job.actions.destroy" %>
                 <% end %>
               </li>
-            </div>
+            </ul>
           </div>
 
         </div>
@@ -68,14 +69,14 @@
                 <% if job.error %>
                   <div class="mt-1 small">
                     <strong class="small"><%=t "good_job.shared.error" %>:</strong>
-                    <code class="text-wrap text-break m-0 text-black"><%= job.error %></code>
+                    <code class="text-wrap text-break m-0 text-secondary-emphasis"><%= job.error %></code>
                   </div>
                 <% end %>
               </div>
             </div>
             <div class="col-4 col-lg-1 text-lg-center">
               <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.job.queue" %></div>
-              <span class="badge bg-primary bg-opacity-25 text-dark font-monospace"><%= job.queue_name %></span>
+              <span class="badge bg-primary font-monospace"><%= job.queue_name %></span>
             </div>
             <div class="col-4 col-lg-1 text-lg-end">
               <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.job.priority" %></div>
@@ -91,7 +92,7 @@
                       bs_content: job.display_error,
                 } %>
               <% else %>
-                <span class="badge bg-secondary bg-opacity-50 rounded-pill"><%= job.executions_count %></span>
+                <span class="badge bg-secondary rounded-pill"><%= job.executions_count %></span>
               <% end %>
             </div>
             <div class="mt-3 mt-lg-0 col">
