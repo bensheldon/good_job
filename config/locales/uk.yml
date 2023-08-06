@@ -244,6 +244,11 @@ uk:
         live_poll: Живе Опитування
         name: "GoodJob 👍"
         processes: Процеси
+        theme:
+          auto: Авто
+          dark: Темний
+          light: світло
+          theme: Тема
     status:
       discarded: Відхилено
       queued: У черзі

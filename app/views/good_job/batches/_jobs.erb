@@ -1,6 +1,6 @@
   <div class="my-3 card" data-gj-poll-replace id="jobs-table">
     <div class="list-group list-group-flush text-nowrap table-jobs" role="table">
-      <header class="list-group-item bg-light">
+      <header class="list-group-item bg-body-tertiary">
         <div class="row small text-muted text-uppercase align-items-center">
         <div class="col-4"><%=t "good_job.models.batch.jobs" %></div>
           <div class="d-none d-lg-block col-lg-1 text-lg-center"><%=t "good_job.models.job.queue" %></div>
@@ -27,7 +27,7 @@
               </div>
               <div class="col-4 col-lg-1 text-lg-center">
                 <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.job.queue" %></div>
-                <span class="badge bg-primary bg-opacity-25 text-dark font-monospace"><%= job.queue_name %></span>
+                <span class="badge bg-primary text-dark font-monospace"><%= job.queue_name %></span>
               </div>
               <div class="col-4 col-lg-1 text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%=t "good_job.models.job.priority" %>Priority</div>
@@ -43,7 +43,7 @@
                     bs_content: job.recent_error
                   } %>
                 <% else %>
-                  <span class="badge bg-secondary bg-opacity-50 rounded-pill"><%= job.executions_count %></span>
+                  <span class="badge bg-secondary rounded-pill"><%= job.executions_count %></span>
                 <% end %>
               </div>
               <div class="mt-3 mt-lg-0 col d-flex gap-3 align-items-center justify-content-end">

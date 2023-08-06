@@ -218,6 +218,11 @@ tr:
         live_poll: Anlık Güncelleme
         name: "GoodJob 👍"
         processes: Süreçler
+        theme:
+          auto: Oto
+          dark: Karanlık
+          light: Işık
+          theme: Tema
     status:
       discarded: İptal Edildi
       queued: Sırada

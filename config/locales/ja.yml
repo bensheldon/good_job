@@ -218,6 +218,11 @@ ja:
         live_poll: リアルタイム更新
         name: "GoodJob 👍"
         processes: プロセス
+        theme:
+          auto: 自動
+          dark: 暗い
+          light: ライト
+          theme: テーマ
     status:
       discarded: 破棄済み
       queued: 処理待ち

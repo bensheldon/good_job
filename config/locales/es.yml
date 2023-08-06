@@ -218,6 +218,11 @@ es:
         live_poll: En vivo
         name: "GoodJob 👍"
         processes: Procesos
+        theme:
+          auto: Auto
+          dark: Oscuro
+          light: Luz
+          theme: Tema
     status:
       discarded:
         one: Descartada

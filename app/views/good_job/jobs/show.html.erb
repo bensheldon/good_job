@@ -6,7 +6,7 @@
         <li class="breadcrumb-item active" aria-current="page">
           <%= tag.code @job.id, class: "text-muted" %>
           <% if @job.discrete? %>
-            <span class="badge bg-info text-dark">Discrete</span>
+            <span class="badge bg-info">Discrete</span>
           <% end %>
         </li>
       </ol>
@@ -17,7 +17,7 @@
       </div>
       <div class="col-6 col-md-2">
         <div class="small text-muted text-uppercase"><%= t "good_job.models.job.queue" %></div>
-        <div class="badge bg-primary bg-opacity-25 text-dark font-monospace my-2">
+        <div class="badge bg-primary font-monospace my-2">
           <%= tag.strong @job.queue_name %>
         </div>
       </div>
