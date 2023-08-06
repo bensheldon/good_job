@@ -47,6 +47,9 @@ Layout/ParameterAlignment:
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
+Lint/IncompatibleIoSelectWithFiberScheduler:
+  Enabled: false
+
 Metrics:
   Enabled: false
 
