@@ -1,5 +1,28 @@
 # Changelog
 
+## [v3.17.0](https://github.com/bensheldon/good_job/tree/v3.17.0) (2023-08-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.4...v3.17.0)
+
+**Implemented enhancements:**
+
+- Add Dark Mode color theme for Dashboard [\#1031](https://github.com/bensheldon/good_job/pull/1031) ([bensheldon](https://github.com/bensheldon))
+- Automatically send status notifications to systemd [\#1029](https://github.com/bensheldon/good_job/pull/1029) ([Mr0grog](https://github.com/Mr0grog))
+
+**Closed issues:**
+
+- Add systemd/sd\_notify support to CLI [\#1027](https://github.com/bensheldon/good_job/issues/1027)
+- Cron job by default runs on the web server even when "async" execution mode is not specified [\#1026](https://github.com/bensheldon/good_job/issues/1026)
+- Replace webrick with a small/simple custom rack-compatible http server [\#1017](https://github.com/bensheldon/good_job/issues/1017)
+- Dark mode for the dashboard ? [\#974](https://github.com/bensheldon/good_job/issues/974)
+
+**Merged pull requests:**
+
+-  Replace Webrick with custom simple http server [\#1030](https://github.com/bensheldon/good_job/pull/1030) ([dixpac](https://github.com/dixpac))
+- Bump appraisal from `b200e63` to `feb78bc` [\#1025](https://github.com/bensheldon/good_job/pull/1025) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump net-imap from 0.3.6 to 0.3.7 [\#1024](https://github.com/bensheldon/good_job/pull/1024) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rack from 2.2.7 to 2.2.8 [\#1023](https://github.com/bensheldon/good_job/pull/1023) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.16.4](https://github.com/bensheldon/good_job/tree/v3.16.4) (2023-07-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.3...v3.16.4)
