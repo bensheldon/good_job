@@ -33,6 +33,9 @@ FileUtils.chdir GEM_ROOT do
 
   system! "bundle exec rubocop #{flags.join(' ')}"
 
+  puts "\n== YARD =="
+  system! "bundle exec yard stats --no-cache --fail-on-warning"
+
   puts "\n== ERB Lint =="
   if options[:nofix]
     system!("bundle exec erblint app/views")

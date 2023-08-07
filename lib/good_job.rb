@@ -111,7 +111,7 @@ module GoodJob
 
   # Custom Active Record configuration that is class_eval'ed into +GoodJob::BaseRecord+
   # @param block Custom Active Record configuration
-  # @retyrn [void]
+  # @return [void]
   #
   # @example
   #   GoodJob.configure_active_record do

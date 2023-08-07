@@ -76,7 +76,7 @@ module GoodJob
     }, if: -> { @_destroy_job }
 
     # Get executions with given ActiveJob ID
-    # @!method active_job_id
+    # @!method active_job_id(active_job_id)
     # @!scope class
     # @param active_job_id [String]
     #   ActiveJob ID
@@ -115,7 +115,7 @@ module GoodJob
     scope :creation_ordered, -> { order(created_at: :asc) }
 
     # Order executions for de-queueing
-    # @!method dequeueing_ordered
+    # @!method dequeueing_ordered(parsed_queues)
     # @!scope class
     # @param parsed_queues [Hash]
     #   optional output of .queue_parser, parsed queues, will be used for
@@ -130,7 +130,7 @@ module GoodJob
     end)
 
     # Order executions in order of queues in array param
-    # @!method queue_ordered
+    # @!method queue_ordered(queues)
     # @!scope class
     # @param queues [Array<string] ordered names of queues
     # @return [ActiveRecord::Relation]
@@ -300,9 +300,6 @@ module GoodJob
     #   Epoch timestamp when the job should be executed, if blank will delegate to the ActiveJob instance
     # @param create_with_advisory_lock [Boolean]
     #   Whether to establish a lock on the {Execution} record after it is created.
-    # @param persist_immediately [Boolean]
-    #   Whether to save the record immediately or just initialize it with values. When bulk-inserting
-    #   jobs the caller takes care of the persistence and sets this parameter to `false`
     # @return [Execution]
     #   The new {Execution} instance representing the queued ActiveJob job.
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
