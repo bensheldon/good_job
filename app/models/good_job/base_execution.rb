@@ -12,9 +12,9 @@ module GoodJob
     self.table_name = 'good_jobs'
 
     # With a given class name
-    # @!method job_class
+    # @!method job_class(name)
     # @!scope class
-    # @param string [String] Execution class name
+    # @param name [String] Execution class name
     # @return [ActiveRecord::Relation]
     scope :job_class, ->(name) { where(params_job_class.eq(name)) }
 

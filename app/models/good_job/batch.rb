@@ -50,7 +50,6 @@ module GoodJob
     )
 
     # Create a new batch and enqueue it
-    # @param on_finish [String, Object] The class name of the callback job to be enqueued after the batch is finished
     # @param properties [Hash] Additional properties to be stored on the batch
     # @param block [Proc] Enqueue jobs within the block to add them to the batch
     # @return [GoodJob::BatchRecord]
