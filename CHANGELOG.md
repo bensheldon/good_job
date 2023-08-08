@@ -1,5 +1,22 @@
 # Changelog
 
+## [v3.17.1](https://github.com/bensheldon/good_job/tree/v3.17.1) (2023-08-08)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.0...v3.17.1)
+
+**Fixed bugs:**
+
+- 3.17.0 breaks health check endpoints [\#1033](https://github.com/bensheldon/good_job/issues/1033)
+- Fix Probe Server by retrying IO.select instead of returning early [\#1034](https://github.com/bensheldon/good_job/pull/1034) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Add database connection pool details to Process state [\#1014](https://github.com/bensheldon/good_job/issues/1014)
+
+**Merged pull requests:**
+
+- Add YARD warnings to lint script; fix YARD warnings [\#1032](https://github.com/bensheldon/good_job/pull/1032) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.17.0](https://github.com/bensheldon/good_job/tree/v3.17.0) (2023-08-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.4...v3.17.0)
