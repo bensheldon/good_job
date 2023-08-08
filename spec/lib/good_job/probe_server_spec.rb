@@ -24,6 +24,15 @@ RSpec.describe GoodJob::ProbeServer do
         ip_addresses.each do |ip_address|
           response = Net::HTTP.get(ip_address, "/", port)
           expect(response).to eq("OK")
+
+          response = Net::HTTP.get(ip_address, "/status", port)
+          expect(response).to eq("OK")
+
+          response = Net::HTTP.get(ip_address, "/status/started", port)
+          expect(response).to eq("Not started")
+
+          response = Net::HTTP.get(ip_address, "/status/connected", port)
+          expect(response).to eq("Not connected")
         end
       end
     end
