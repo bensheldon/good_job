@@ -44,7 +44,7 @@ module GoodJob
       while @running.true?
         begin
           ready_sockets, = IO.select([@server], nil, nil, SOCKET_READ_TIMEOUT)
-          return unless ready_sockets
+          next unless ready_sockets
 
           client = @server.accept_nonblock(exception: false)
           request = client.gets
