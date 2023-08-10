@@ -66,7 +66,7 @@ RSpec.describe GoodJob::Notifier do
 
         allow_any_instance_of(GoodJob::Process).to receive(:refresh_if_stale) { REFRESH_IF_STALE_CALLED.increment }
 
-        recipient = proc { }
+        recipient = proc {}
         notifier = described_class.new(recipient, enable_listening: true)
         sleep_until(max: 5) { notifier.listening? }
         described_class.notify(true)

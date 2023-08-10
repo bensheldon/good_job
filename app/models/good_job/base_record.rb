@@ -36,7 +36,7 @@ module GoodJob
       if logger
         logger.silence(&block)
       else
-        block.call
+        yield
       end
     end
 
