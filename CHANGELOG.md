@@ -1,12 +1,29 @@
 # Changelog
 
+## [v3.17.2](https://github.com/bensheldon/good_job/tree/v3.17.2) (2023-08-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.1...v3.17.2)
+
+**Fixed bugs:**
+
+- 3.17.0 breaks health check endpoints [\#1033](https://github.com/bensheldon/good_job/issues/1033)
+- Fix NoMethodError: undefined method `silence' for nil:NilClass [\#1037](https://github.com/bensheldon/good_job/pull/1037) ([afn](https://github.com/afn))
+
+**Closed issues:**
+
+- NoMethodError in ProcessHeartbeat if ActiveRecord logger is nil [\#1036](https://github.com/bensheldon/good_job/issues/1036)
+- JRuby deprecation policy [\#1035](https://github.com/bensheldon/good_job/issues/1035)
+
+**Merged pull requests:**
+
+- Add helpful failure output for Sorbet linter [\#1038](https://github.com/bensheldon/good_job/pull/1038) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.17.1](https://github.com/bensheldon/good_job/tree/v3.17.1) (2023-08-08)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.0...v3.17.1)
 
 **Fixed bugs:**
 
-- 3.17.0 breaks health check endpoints [\#1033](https://github.com/bensheldon/good_job/issues/1033)
 - Fix Probe Server by retrying IO.select instead of returning early [\#1034](https://github.com/bensheldon/good_job/pull/1034) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
