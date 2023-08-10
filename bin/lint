@@ -11,14 +11,20 @@ end.parse!
 
 GEM_ROOT = File.expand_path('..', __dir__)
 
-def system!(*args)
-  system(*args) || abort("\n== Command #{args} failed ==")
+def system!(*args, failure: nil)
+  system(*args) || abort("\n== Command #{args} failed ==#{failure ? "\n\n#{failure}" : ''}}")
 end
 
 FileUtils.chdir GEM_ROOT do
   puts "\n== Sorbet =="
 
-  system! "bundle exec srb tc"
+  system! "bundle exec srb tc", failure: <<~MESSAGE
+    You may need to run one of the following commands
+    - bin/tapioca todo         # generate RBI files for unresolved constants (e.g. RSpec `stub_const`)
+    - bin/tapioca dsl          # generate RBIs for dynamic methods
+    - bin/tapioca gem          # generate RBIs for gems
+    - bin/tapioca check-shims  # check duplicated definitions in shim RBIs
+  MESSAGE
 
   puts "\n== Rubocop =="
 
