@@ -60,6 +60,36 @@ RSpec.describe GoodJob::Notifier do
       expect(RECEIVED_MESSAGE.false?).to be true
     end
 
+    shared_examples 'calls refresh_if_stale on every tick' do
+      specify do
+        stub_const 'REFRESH_IF_STALE_CALLED', Concurrent::AtomicFixnum.new(0)
+
+        allow_any_instance_of(GoodJob::Process).to receive(:refresh_if_stale) { REFRESH_IF_STALE_CALLED.increment }
+
+        recipient = proc {}
+        notifier = described_class.new(recipient, enable_listening: true)
+        sleep_until(max: 5) { notifier.listening? }
+        described_class.notify(true)
+        sleep_until(max: 5) { REFRESH_IF_STALE_CALLED.value > 0 }
+        notifier.shutdown
+
+        expect(REFRESH_IF_STALE_CALLED.value).to be > 0
+      end
+    end
+
+    it_behaves_like 'calls refresh_if_stale on every tick'
+
+    context 'with ActiveRecord::Base.logger equal to nil' do
+      around do |example|
+        logger = ActiveRecord::Base.logger
+        ActiveRecord::Base.logger = nil
+        example.run
+        ActiveRecord::Base.logger = logger
+      end
+
+      it_behaves_like 'calls refresh_if_stale on every tick'
+    end
+
     it 'raises exception to GoodJob.on_thread_error' do
       stub_const('ExpectedError', Class.new(StandardError))
       on_thread_error = instance_double(Proc, call: nil)

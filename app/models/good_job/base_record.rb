@@ -28,6 +28,18 @@ module GoodJob
       false
     end
 
+    # Runs the block with self.logger silenced.
+    # If self.logger is nil, simply runs the block.
+    def self.with_logger_silenced(&block)
+      # Assign to a local variable, just in case it's modified in another thread concurrently
+      logger = self.logger
+      if logger
+        logger.silence(&block)
+      else
+        yield
+      end
+    end
+
     ActiveSupport.run_load_hooks(:good_job_base_record, self)
   end
 end
