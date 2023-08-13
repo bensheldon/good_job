@@ -473,15 +473,13 @@ GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry 
 
 ### Cron-style repeating/recurring jobs
 
-GoodJob can enqueue jobs on a recurring basis that can be used as a replacement for cron.
+GoodJob can enqueue Active Job jobs on a recurring basis that can be used as a replacement for cron.
 
 Cron-style jobs can be performed by any GoodJob process (e.g., CLI or `:async` execution mode) that has `config.good_job.enable_cron` set to `true`. That is, one or more job executor processes can be configured to perform recurring jobs.
 
 GoodJob's cron uses unique indexes to ensure that only a single job is enqueued at the given time interval. In order for this to work, GoodJob must preserve cron-created job records; these records will be automatically deleted like any other preserved record.
 
 Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`) and natural language parsing (e.g. `every second`).
-
-`class:` is an [ActiveJob](https://guides.rubyonrails.org/active_job_basics.html) Job 
 
 ```ruby
 # config/environments/application.rb or a specific environment e.g. production.rb
@@ -494,10 +492,10 @@ config.good_job.cron = {
   # Every 15 minutes, enqueue `ExampleJob.set(priority: -10).perform_later(42, "life", name: "Alice")`
   frequent_task: { # each recurring job must have a unique key
     cron: "*/15 * * * *", # cron-style scheduling format by fugit gem
-    class: "ExampleJob", # reference the Job class with a string
-    args: [42, "life"], # positional arguments to pass; can also be a proc e.g. `-> { [Time.now] }`
-    kwargs: { name: "Alice" }, # keyword arguments to pass; can also be a proc e.g. `-> { { name: NAMES.sample } }`
-    set: { priority: -10 }, # additional ActiveJob properties; can also be a lambda/proc e.g. `-> { { priority: [1,2].sample } }`
+    class: "ExampleJob", # name of the job class as a String; must reference an Active Job job class
+    args: [42, "life"], # positional arguments to pass to the job; can also be a proc e.g. `-> { [Time.now] }`
+    kwargs: { name: "Alice" }, # keyword arguments to pass to the job; can also be a proc e.g. `-> { { name: NAMES.sample } }`
+    set: { priority: -10 }, # additional Active Job properties; can also be a lambda/proc e.g. `-> { { priority: [1,2].sample } }`
     description: "Something helpful", # optional description that appears in Dashboard
   },
   another_task: {
