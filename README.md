@@ -481,6 +481,8 @@ GoodJob's cron uses unique indexes to ensure that only a single job is enqueued 
 
 Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`) and natural language parsing (e.g. `every second`).
 
+`class:` is an [ActiveJob](https://guides.rubyonrails.org/active_job_basics.html) Job 
+
 ```ruby
 # config/environments/application.rb or a specific environment e.g. production.rb
 
