@@ -481,6 +481,8 @@ GoodJob's cron uses unique indexes to ensure that only a single job is enqueued 
 
 Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`) and natural language parsing (e.g. `every second`).
 
+If you use the [Dashboard](#dashboard) the scheduled tasks can be viewed in the 'cron' menu. In this view you can also disable a task or run/enqueue a task immediately.
+
 ```ruby
 # config/environments/application.rb or a specific environment e.g. production.rb
 
