@@ -46,7 +46,7 @@ module GoodJob
           ready_sockets, = IO.select([@server], nil, nil, SOCKET_READ_TIMEOUT)
           next unless ready_sockets
 
-          client = @server.accept_nonblock(exception: false)
+          client = @server.accept_nonblock
           request = client.gets
 
           status, headers, body = @app.call(parse_request(request))
