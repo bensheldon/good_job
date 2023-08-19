@@ -14,3 +14,5 @@ tmp/rspec_examples.txt
 .DS_Store
 tmp/example_app
 Brewfile.lock.json
+tmp/*
+!tmp/.keep

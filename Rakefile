@@ -42,7 +42,7 @@ task :release_good_job, [:version_bump] do |_t, args|
   puts GoodJob::VERSION
 
   puts "\n== Updating Changelog =="
-  system! ENV, "bundle exec github_changelog_generator --user bensheldon --project good_job --future-release v#{GoodJob::VERSION}"
+  system! ENV, "bundle exec github_changelog_generator --user bensheldon --project good_job --future-release v#{GoodJob::VERSION} --cache-file=tmp/github-changelog-http-cache"
 
   puts "\n== Updating Gemfile.lock version =="
   system! "bundle update --conservative good_job"
