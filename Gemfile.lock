@@ -95,10 +95,10 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-    addressable (2.8.4)
+    addressable (2.8.5)
       public_suffix (>= 2.0.2, < 6.0)
     ast (2.4.2)
-    async (2.6.2)
+    async (2.6.3)
       console (~> 1.10)
       fiber-annotation
       io-event (~> 1.1)
@@ -141,7 +141,7 @@ GEM
       concurrent-ruby
     coderay (1.1.3)
     concurrent-ruby (1.2.2)
-    console (1.17.2)
+    console (1.23.2)
       fiber-annotation
       fiber-local
     crass (1.0.6)
@@ -162,7 +162,7 @@ GEM
     erubi (1.12.0)
     et-orbi (1.2.7)
       tzinfo
-    faraday (2.7.7)
+    faraday (2.7.10)
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-http-cache (2.5.0)
@@ -202,7 +202,7 @@ GEM
       rails-i18n
       rainbow (>= 2.2.2, < 4.0)
       terminal-table (>= 1.5.1)
-    io-event (1.2.2)
+    io-event (1.2.3)
     jdbc-postgres (42.6.0)
     json (2.6.3)
     json (2.6.3-java)
@@ -229,7 +229,7 @@ GEM
       mixlib-shellout
     method_source (1.0.0)
     mini_mime (1.1.2)
-    minitest (5.18.1)
+    minitest (5.19.0)
     mixlib-cli (2.1.8)
     mixlib-config (3.0.27)
       tomlrb
@@ -269,8 +269,8 @@ GEM
     pg (1.5.3)
     prettier_print (1.2.1)
     protocol-hpack (1.4.2)
-    protocol-http (0.24.3)
-    protocol-http1 (0.15.0)
+    protocol-http (0.24.7)
+    protocol-http1 (0.15.1)
       protocol-http (~> 0.22)
     protocol-http2 (0.15.1)
       protocol-hpack (~> 1.4)
@@ -287,7 +287,7 @@ GEM
       pry (>= 0.13, < 0.15)
     pry-rails (0.3.9)
       pry (>= 0.10.4)
-    public_suffix (5.0.1)
+    public_suffix (5.0.3)
     puma (5.6.6)
       nio4r (~> 2.0)
     puma (5.6.6-java)
@@ -446,7 +446,7 @@ GEM
     timeout (0.4.0)
     timers (4.3.5)
     tomlrb (2.0.3)
-    traces (0.10.0)
+    traces (0.11.1)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.4.2)
