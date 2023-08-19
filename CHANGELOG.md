@@ -1,5 +1,25 @@
 # Changelog
 
+## [v3.17.3](https://github.com/bensheldon/good_job/tree/v3.17.3) (2023-08-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.2...v3.17.3)
+
+**Fixed bugs:**
+
+- New probe server fixes: allow accept\_nonblock to raise and IO.gets return nil [\#1043](https://github.com/bensheldon/good_job/pull/1043) ([stas](https://github.com/stas))
+
+**Closed issues:**
+
+- Dashboard as separate package? [\#965](https://github.com/bensheldon/good_job/issues/965)
+- Managing jobs with errors [\#929](https://github.com/bensheldon/good_job/issues/929)
+- Feature: dynamic options for good\_job\_control\_concurrency\_with [\#684](https://github.com/bensheldon/good_job/issues/684)
+
+**Merged pull requests:**
+
+- Attempt to overcome github\_changelog\_generator's rate limit problem [\#1045](https://github.com/bensheldon/good_job/pull/1045) ([bensheldon](https://github.com/bensheldon))
+- \[Doc\] for cron schedule add info about Dashboard view [\#1042](https://github.com/bensheldon/good_job/pull/1042) ([steveroot](https://github.com/steveroot))
+- Add description of  :class to readme for cron style repeating jobs section [\#1040](https://github.com/bensheldon/good_job/pull/1040) ([steveroot](https://github.com/steveroot))
+
 ## [v3.17.2](https://github.com/bensheldon/good_job/tree/v3.17.2) (2023-08-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.1...v3.17.2)
