@@ -33,7 +33,7 @@ module GoodJob
     def self.with_logger_silenced(&block)
       # Assign to a local variable, just in case it's modified in another thread concurrently
       logger = self.logger
-      if logger
+      if logger.respond_to? :silence
         logger.silence(&block)
       else
         yield
