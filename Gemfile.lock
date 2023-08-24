@@ -446,6 +446,7 @@ GEM
     timeout (0.4.0)
     timers (4.3.5)
     tomlrb (2.0.3)
+    toxiproxy (2.0.2)
     traces (0.11.1)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -518,6 +519,7 @@ DEPENDENCIES
   spoom
   stackprof
   tapioca
+  toxiproxy (~> 2.0)
   yard
   yard-activesupport-concern
 

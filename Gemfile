@@ -47,3 +47,5 @@ platforms :ruby do
     gem "rubocop-rspec"
   end
 end
+
+gem "toxiproxy", "~> 2.0"
