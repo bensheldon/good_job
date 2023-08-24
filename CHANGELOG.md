@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.17.4](https://github.com/bensheldon/good_job/tree/v3.17.4) (2023-08-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.3...v3.17.4)
+
+**Fixed bugs:**
+
+- Handle edge case of logger not responding to silence [\#1049](https://github.com/bensheldon/good_job/pull/1049) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- An idea for better .silence handling [\#1046](https://github.com/bensheldon/good_job/issues/1046)
+
 ## [v3.17.3](https://github.com/bensheldon/good_job/tree/v3.17.3) (2023-08-19)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.2...v3.17.3)
