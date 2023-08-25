@@ -57,6 +57,17 @@ describe GoodJob::CronEntry do
     it 'returns a timestamp of the next time to run' do
       expect(entry.next_at).to eq(Time.current.at_beginning_of_minute + 1.minute)
     end
+
+    context 'when the cron is a proc' do
+      let(:time_at) { 1.minute.from_now }
+      let(:my_proc) { instance_double(Proc, call: time_at, arity: 1) }
+      let(:params) { super().merge(cron: my_proc) }
+
+      it 'is executed' do
+        expect(entry.next_at).to eq time_at
+        expect(my_proc).to have_received(:call).with(nil)
+      end
+    end
   end
 
   describe 'schedule' do

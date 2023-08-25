@@ -27,11 +27,8 @@ module GoodJob # :nodoc:
     def initialize(params = {})
       @params = params
 
-      if cron_proc?
-        raise ArgumentError, "Cron proc must accept a timestamp of the last run as its sole argument" if cron.arity != 1
-      else
-        raise ArgumentError, "Invalid cron format: '#{cron}'" unless fugit.instance_of?(Fugit::Cron)
-      end
+      return if cron_proc?
+      raise ArgumentError, "Invalid cron format: '#{cron}'" unless fugit.instance_of?(Fugit::Cron)
     end
 
     def key
@@ -61,9 +58,9 @@ module GoodJob # :nodoc:
       params[:description]
     end
 
-    def next_at
+    def next_at(previously_at = nil)
       if cron_proc?
-        result = cron.call(last_at)
+        result = cron.call(previously_at)
         return Fugit.parse(result).next_time.to_t if result.is_a? String
 
         return result
@@ -84,11 +81,7 @@ module GoodJob # :nodoc:
     def last_at
       return if last_job.blank?
 
-      if GoodJob::Job.column_names.include?('cron_at')
-        (last_job.cron_at || last_job.created_at).localtime
-      else
-        last_job.created_at
-      end
+      (last_job.cron_at || last_job.created_at).localtime
     end
 
     def enabled?
@@ -120,11 +113,7 @@ module GoodJob # :nodoc:
     end
 
     def last_job
-      if GoodJob::Job.column_names.include?('cron_at')
-        jobs.order("cron_at DESC NULLS LAST").first
-      else
-        jobs.order(created_at: :asc).last
-      end
+      jobs.order("cron_at DESC NULLS LAST").first
     end
 
     def display_properties
@@ -147,7 +136,7 @@ module GoodJob # :nodoc:
     end
 
     def cron_proc?
-      cron.is_a?(Proc)
+      cron.respond_to?(:call)
     end
 
     def fugit

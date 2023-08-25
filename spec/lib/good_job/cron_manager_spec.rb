@@ -81,5 +81,37 @@ RSpec.describe GoodJob::CronManager do
 
       expect(GoodJob::Execution.count).to eq 0
     end
+
+    context 'when schedule is a proc' do
+      let(:my_proc) do
+        lambda { |previously_at|
+          puts previously_at
+          previously_at ? previously_at + 1.second : Time.current
+        }
+      end
+      let(:cron_entries) do
+        [
+          GoodJob::CronEntry.new(
+            key: 'example',
+            cron: my_proc,
+            class: "TestJob", # reference the Job class with a string
+            description: "Something helpful" # optional description that appears in Dashboard
+          ),
+        ]
+      end
+
+      it 'executes the defined tasks' do
+        allow(my_proc).to receive(:call).and_call_original
+        cron_manager = described_class.new(cron_entries, start_on_initialize: true)
+
+        wait_until(max: 5) do
+          expect(GoodJob::Job.count).to be > 2
+        end
+        cron_manager.shutdown
+
+        expect(my_proc).to have_received(:call).with(nil).once
+        expect(my_proc).to have_received(:call).with(an_instance_of(ActiveSupport::TimeWithZone)).at_least(2).times
+      end
+    end
   end
 end
