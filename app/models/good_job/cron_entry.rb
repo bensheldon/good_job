@@ -58,12 +58,13 @@ module GoodJob # :nodoc:
       params[:description]
     end
 
-    def next_at(previously_at = nil)
+    def next_at(previously_at: nil)
       if cron_proc?
-        result = cron.call(previously_at)
-        return Fugit.parse(result).next_time.to_t if result.is_a? String
+        result = Rails.application.executor.wrap { cron.call(previously_at || last_at) }
+        return Fugit.parse(result).next_time.to_t if result.is_a?(String)
 
         return result
+
       end
       fugit.next_time.to_t
     end

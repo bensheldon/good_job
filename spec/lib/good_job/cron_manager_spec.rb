@@ -83,19 +83,13 @@ RSpec.describe GoodJob::CronManager do
     end
 
     context 'when schedule is a proc' do
-      let(:my_proc) do
-        lambda { |previously_at|
-          puts previously_at
-          previously_at ? previously_at + 1.second : Time.current
-        }
-      end
+      let(:my_proc) { ->(last_at) { last_at ? last_at + 1.second : Time.current } }
       let(:cron_entries) do
         [
           GoodJob::CronEntry.new(
             key: 'example',
             cron: my_proc,
-            class: "TestJob", # reference the Job class with a string
-            description: "Something helpful" # optional description that appears in Dashboard
+            class: "TestJob"
           ),
         ]
       end
