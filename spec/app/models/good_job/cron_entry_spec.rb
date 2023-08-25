@@ -68,19 +68,24 @@ describe GoodJob::CronEntry do
       entry = described_class.new(cron: 'every weekday at five')
       expect(entry.schedule).to eq('0 5 * * 1-5')
     end
+
+    it 'generates a schedule provided via a block' do
+      entry = described_class.new(cron: ->(last_run) {})
+      expect(entry.schedule).to eq('Custom schedule')
+    end
   end
 
   describe '#fugit' do
     it 'parses the cron configuration using fugit' do
       allow(Fugit).to receive(:parse).and_call_original
 
-      entry.fugit
+      entry.send(:fugit)
 
       expect(Fugit).to have_received(:parse).with('* * * * *')
     end
 
     it 'returns an instance of Fugit::Cron' do
-      expect(entry.fugit).to be_instance_of(Fugit::Cron)
+      expect(entry.send(:fugit)).to be_instance_of(Fugit::Cron)
     end
   end
 

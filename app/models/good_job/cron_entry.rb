@@ -27,7 +27,11 @@ module GoodJob # :nodoc:
     def initialize(params = {})
       @params = params
 
-      raise ArgumentError, "Invalid cron format: '#{cron}'" unless fugit.instance_of?(Fugit::Cron)
+      if cron_proc?
+        raise ArgumentError, "Cron proc must accept a timestamp of the last run as its sole argument" if cron.arity != 1
+      else
+        raise ArgumentError, "Invalid cron format: '#{cron}'" unless fugit.instance_of?(Fugit::Cron)
+      end
     end
 
     def key
@@ -39,10 +43,6 @@ module GoodJob # :nodoc:
 
     def job_class
       params.fetch(:class)
-    end
-
-    def cron
-      params.fetch(:cron)
     end
 
     def set
@@ -62,15 +62,19 @@ module GoodJob # :nodoc:
     end
 
     def next_at
+      if cron_proc?
+        result = cron.call(last_at)
+        return Fugit.parse(result).next_time.to_t if result.is_a? String
+
+        return result
+      end
       fugit.next_time.to_t
     end
 
     def schedule
-      fugit.original
-    end
+      return "Custom schedule" if cron_proc?
 
-    def fugit
-      @_fugit ||= Fugit.parse(cron)
+      fugit.original
     end
 
     def jobs
@@ -137,6 +141,18 @@ module GoodJob # :nodoc:
     end
 
     private
+
+    def cron
+      params.fetch(:cron)
+    end
+
+    def cron_proc?
+      cron.is_a?(Proc)
+    end
+
+    def fugit
+      @_fugit ||= Fugit.parse(cron)
+    end
 
     def set_value
       value = set || {}
