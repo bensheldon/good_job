@@ -27,6 +27,7 @@ module GoodJob # :nodoc:
     def initialize(params = {})
       @params = params
 
+      return if cron_proc?
       raise ArgumentError, "Invalid cron format: '#{cron}'" unless fugit.instance_of?(Fugit::Cron)
     end
 
@@ -39,10 +40,6 @@ module GoodJob # :nodoc:
 
     def job_class
       params.fetch(:class)
-    end
-
-    def cron
-      params.fetch(:cron)
     end
 
     def set
@@ -61,16 +58,21 @@ module GoodJob # :nodoc:
       params[:description]
     end
 
-    def next_at
+    def next_at(previously_at: nil)
+      if cron_proc?
+        result = Rails.application.executor.wrap { cron.call(previously_at || last_at) }
+        return Fugit.parse(result).next_time.to_t if result.is_a?(String)
+
+        return result
+
+      end
       fugit.next_time.to_t
     end
 
     def schedule
-      fugit.original
-    end
+      return "Custom schedule" if cron_proc?
 
-    def fugit
-      @_fugit ||= Fugit.parse(cron)
+      fugit.original
     end
 
     def jobs
@@ -80,11 +82,7 @@ module GoodJob # :nodoc:
     def last_at
       return if last_job.blank?
 
-      if GoodJob::Job.column_names.include?('cron_at')
-        (last_job.cron_at || last_job.created_at).localtime
-      else
-        last_job.created_at
-      end
+      (last_job.cron_at || last_job.created_at).localtime
     end
 
     def enabled?
@@ -116,11 +114,7 @@ module GoodJob # :nodoc:
     end
 
     def last_job
-      if GoodJob::Job.column_names.include?('cron_at')
-        jobs.order("cron_at DESC NULLS LAST").first
-      else
-        jobs.order(created_at: :asc).last
-      end
+      jobs.order("cron_at DESC NULLS LAST").first
     end
 
     def display_properties
@@ -137,6 +131,18 @@ module GoodJob # :nodoc:
     end
 
     private
+
+    def cron
+      params.fetch(:cron)
+    end
+
+    def cron_proc?
+      cron.respond_to?(:call)
+    end
+
+    def fugit
+      @_fugit ||= Fugit.parse(cron)
+    end
 
     def set_value
       value = set || {}

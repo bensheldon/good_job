@@ -504,6 +504,10 @@ config.good_job.cron = {
     cron: "0 0,12 * * *",
     class: "AnotherJob",
   },
+  complex_schedule: {
+    class: "ComplexScheduleJob",
+    cron: -> (last_ran) { (last_ran.blank? ? Time.now : last_ran + 14.hours).at_beginning_of_minute }
+  }
   # etc.
 }
 ```

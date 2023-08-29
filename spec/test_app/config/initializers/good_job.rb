@@ -38,6 +38,10 @@ when 'development'
           { wait: delay, queue: queue, priority: priority }
         end),
       },
+      complex_schedule: {
+        cron: -> (last_ran) { last_ran ? last_ran + 17.hours : Time.now},
+        class: "OtherJob",
+      }
     }
   end
 when 'test'
@@ -75,6 +79,10 @@ when 'demo'
         cron: "*/30 * * * * *",
         class: "ExampleJob::BatchJob",
       },
+      complex_schedule: {
+        cron: -> (last_ran) { last_ran ? last_ran + 17.hours : Time.now},
+        class: "OtherJob",
+      }
     }
   end
 when 'production'

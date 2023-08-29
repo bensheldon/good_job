@@ -57,6 +57,17 @@ describe GoodJob::CronEntry do
     it 'returns a timestamp of the next time to run' do
       expect(entry.next_at).to eq(Time.current.at_beginning_of_minute + 1.minute)
     end
+
+    context 'when the cron is a proc' do
+      let(:time_at) { 1.minute.from_now }
+      let(:my_proc) { instance_double(Proc, call: time_at, arity: 1) }
+      let(:params) { super().merge(cron: my_proc) }
+
+      it 'is executed' do
+        expect(entry.next_at).to eq time_at
+        expect(my_proc).to have_received(:call).with(nil)
+      end
+    end
   end
 
   describe 'schedule' do
@@ -68,19 +79,24 @@ describe GoodJob::CronEntry do
       entry = described_class.new(cron: 'every weekday at five')
       expect(entry.schedule).to eq('0 5 * * 1-5')
     end
+
+    it 'generates a schedule provided via a block' do
+      entry = described_class.new(cron: ->(last_run) {})
+      expect(entry.schedule).to eq('Custom schedule')
+    end
   end
 
   describe '#fugit' do
     it 'parses the cron configuration using fugit' do
       allow(Fugit).to receive(:parse).and_call_original
 
-      entry.fugit
+      entry.send(:fugit)
 
       expect(Fugit).to have_received(:parse).with('* * * * *')
     end
 
     it 'returns an instance of Fugit::Cron' do
-      expect(entry.fugit).to be_instance_of(Fugit::Cron)
+      expect(entry.send(:fugit)).to be_instance_of(Fugit::Cron)
     end
   end
 

@@ -82,12 +82,13 @@ module GoodJob # :nodoc:
 
     # Enqueues a scheduled task
     # @param cron_entry [CronEntry] the CronEntry object to schedule
-    def create_task(cron_entry)
-      cron_at = cron_entry.next_at
+    # @param previously_at [Date, Time, ActiveSupport::TimeWithZone, nil] the last, +in-memory+, scheduled time the cron task was intended to run
+    def create_task(cron_entry, previously_at: nil)
+      cron_at = cron_entry.next_at(previously_at: previously_at)
       delay = [(cron_at - Time.current).to_f, 0].max
       future = Concurrent::ScheduledTask.new(delay, args: [self, cron_entry, cron_at], executor: @executor) do |thr_scheduler, thr_cron_entry, thr_cron_at|
         # Re-schedule the next cron task before executing the current task
-        thr_scheduler.create_task(thr_cron_entry)
+        thr_scheduler.create_task(thr_cron_entry, previously_at: thr_cron_at)
 
         Rails.application.executor.wrap do
           cron_entry.enqueue(thr_cron_at) if thr_cron_entry.enabled?
