@@ -1,5 +1,23 @@
 # Changelog
 
+## [v3.18.1](https://github.com/bensheldon/good_job/tree/v3.18.1) (2023-08-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.0...v3.18.1)
+
+**Implemented enhancements:**
+
+- Respect the configured execution mode, even within the CLI [\#1056](https://github.com/bensheldon/good_job/pull/1056) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Bug: calling `GoodJob.restart` in Puma on\_worker\_boot starts GoodJob regardless of it being in async mode or not [\#1054](https://github.com/bensheldon/good_job/issues/1054)
+- \[Feature Request?\] Config Option to Inline Child-Jobs in Worker Processes [\#1052](https://github.com/bensheldon/good_job/issues/1052)
+- \[Feature Request\] Hook to extend cron schedules [\#1050](https://github.com/bensheldon/good_job/issues/1050)
+
+**Merged pull requests:**
+
+- `GoodJob.restart` should not start capsules \(job execution\) when in a webserver but not in async mode [\#1055](https://github.com/bensheldon/good_job/pull/1055) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.18.0](https://github.com/bensheldon/good_job/tree/v3.18.0) (2023-08-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.4...v3.18.0)
