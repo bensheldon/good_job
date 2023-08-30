@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 describe ActiveJob::QueueAdapters::GoodJobAdapter do
+  before do
+    GoodJob.configuration.instance_variable_set(:@_in_webserver, nil)
+  end
+
   it 'inherits from GoodJob::Adapter' do
     expect(described_class).to be < GoodJob::Adapter
   end

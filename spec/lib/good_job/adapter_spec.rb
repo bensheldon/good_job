@@ -7,6 +7,10 @@ RSpec.describe GoodJob::Adapter do
   let(:active_job) { instance_double(ActiveJob::Base) }
   let(:good_job) { instance_double(GoodJob::Execution, queue_name: 'default', scheduled_at: nil) }
 
+  before do
+    GoodJob.configuration.instance_variable_set(:@_in_webserver, nil)
+  end
+
   describe '#initialize' do
     it 'uses the global configuration value' do
       allow(GoodJob.configuration).to receive(:execution_mode).and_return(:external)

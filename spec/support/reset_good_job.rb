@@ -72,6 +72,8 @@ RSpec.configure do |config|
     end
 
     expect(PgLock.current_database.advisory_lock.others.count).to eq(0), "Existing others advisory locks AFTER test run"
+
+    GoodJob.configuration.instance_variable_set(:@_in_webserver, nil)
   end
 end
 

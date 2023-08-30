@@ -79,6 +79,8 @@ module GoodJob
     def initialize(options, env: ENV)
       @options = options
       @env = env
+
+      @_in_webserver = nil
     end
 
     def validate!
@@ -176,7 +178,7 @@ module GoodJob
 
     # The number of seconds to wait for jobs to finish when shutting down
     # before stopping the thread. +-1+ is forever.
-    # @return [Numeric]
+    # @return [Float]
     def shutdown_timeout
       (
         options[:shutdown_timeout] ||
@@ -248,7 +250,7 @@ module GoodJob
 
     # Number of jobs a {Scheduler} will execute before automatically cleaning up preserved jobs.
     # Positive values will clean up after that many jobs have run, false or 0 will disable, and -1 will clean up after every job.
-    # @return [Integer, nil]
+    # @return [Integer, Boolean, nil]
     def cleanup_interval_jobs
       if rails_config.key?(:cleanup_interval_jobs)
         value = rails_config[:cleanup_interval_jobs]
@@ -350,6 +352,20 @@ module GoodJob
 
     def dashboard_default_locale
       rails_config[:dashboard_default_locale] || DEFAULT_DASHBOARD_DEFAULT_LOCALE
+    end
+
+    # Whether running in a web server process.
+    # @return [Boolean, nil]
+    def in_webserver?
+      return @_in_webserver unless @_in_webserver.nil?
+
+      @_in_webserver = Rails.const_defined?(:Server) || begin
+        self_caller = caller
+        self_caller.grep(%r{config.ru}).any? || # EXAMPLE: config.ru:3:in `block in <main>' OR config.ru:3:in `new_from_string'
+          self_caller.grep(%r{puma/request}).any? || # EXAMPLE: puma-5.6.4/lib/puma/request.rb:76:in `handle_request'
+          self_caller.grep(%{/rack/handler/}).any? || # EXAMPLE: iodine-0.7.44/lib/rack/handler/iodine.rb:13:in `start'
+          (Concurrent.on_jruby? && self_caller.grep(%r{jruby/rack/rails_booter}).any?) # EXAMPLE: uri:classloader:/jruby/rack/rails_booter.rb:83:in `load_environment'
+      end || false
     end
 
     private
