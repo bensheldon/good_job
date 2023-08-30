@@ -151,6 +151,8 @@ module GoodJob
   # @param timeout [Numeric] Seconds to wait for active threads to finish.
   # @return [void]
   def self.restart(timeout: -1)
+    return if configuration.execution_mode != :async && configuration.in_webserver?
+
     _shutdown_all(Capsule.instances, :restart, timeout: timeout)
   end
 

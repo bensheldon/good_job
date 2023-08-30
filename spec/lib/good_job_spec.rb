@@ -36,6 +36,18 @@ describe GoodJob do
       GoodJob::Capsule.new(configuration: configuration)
       expect { described_class.restart }.to change(described_class, :shutdown?).from(true).to(false)
     end
+
+    context 'when in webserver but not in async mode' do
+      before do
+        allow(described_class.configuration).to receive(:execution_mode).and_return(:external)
+        allow(described_class.configuration).to receive(:in_webserver?).and_return(true)
+      end
+
+      it 'does not start capsules' do
+        GoodJob::Capsule.new(configuration: configuration)
+        expect { described_class.restart }.not_to change(described_class, :shutdown?).from(true)
+      end
+    end
   end
 
   describe '.cleanup_preserved_jobs' do
