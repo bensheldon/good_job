@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.18.0](https://github.com/bensheldon/good_job/tree/v3.18.0) (2023-08-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.4...v3.18.0)
+
+**Implemented enhancements:**
+
+- Support configuring cron schedule dynamically with a block [\#1051](https://github.com/bensheldon/good_job/pull/1051) ([DanielHeath](https://github.com/DanielHeath))
+
 ## [v3.17.4](https://github.com/bensheldon/good_job/tree/v3.17.4) (2023-08-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.3...v3.17.4)
