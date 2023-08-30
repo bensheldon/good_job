@@ -89,21 +89,24 @@ module GoodJob
     # for more details on possible values.
     # @return [Symbol]
     def execution_mode
-      mode = if GoodJob::CLI.within_exe?
-               :external
-             else
-               options[:execution_mode] ||
-                 rails_config[:execution_mode] ||
-                 env['GOOD_JOB_EXECUTION_MODE']
-             end
+      mode = options[:execution_mode] ||
+             rails_config[:execution_mode] ||
+             env['GOOD_JOB_EXECUTION_MODE']
+      mode = mode.to_sym if mode
 
       if mode
-        mode.to_sym
+        if GoodJob::CLI.within_exe? && [:async, :async_server].include?(mode)
+          :external
+        else
+          mode
+        end
+      elsif GoodJob::CLI.within_exe?
+        :external
       elsif Rails.env.development?
         :async
       elsif Rails.env.test?
         :inline
-      else
+      else # rubocop:disable Lint/DuplicateBranch
         :external
       end
     end
