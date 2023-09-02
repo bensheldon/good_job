@@ -59,6 +59,10 @@ module GoodJob
       end
     end
 
+    def self.primary_key
+      :id
+    end
+
     def self.find(id)
       new _record: BatchRecord.find(id)
     end
