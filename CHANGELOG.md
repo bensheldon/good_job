@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.18.2](https://github.com/bensheldon/good_job/tree/v3.18.2) (2023-09-02)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.1...v3.18.2)
+
+**Fixed bugs:**
+
+- Fix compatibility with Global ID v1.2.0 [\#1064](https://github.com/bensheldon/good_job/pull/1064) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Bump pg from 1.5.3 to 1.5.4 [\#1061](https://github.com/bensheldon/good_job/pull/1061) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v3.18.1](https://github.com/bensheldon/good_job/tree/v3.18.1) (2023-08-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.0...v3.18.1)
