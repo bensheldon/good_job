@@ -70,19 +70,19 @@ describe GoodJob::CronEntry do
     end
   end
 
-  describe 'schedule' do
+  describe 'display_schedule' do
     it 'returns the cron expression' do
-      expect(entry.schedule).to eq('* * * * *')
+      expect(entry.display_schedule).to eq('* * * * *')
     end
 
     it 'returns the cron expression for a schedule parsed using natual language' do
       entry = described_class.new(cron: 'every weekday at five')
-      expect(entry.schedule).to eq('0 5 * * 1-5')
+      expect(entry.display_schedule).to eq('0 5 * * 1-5')
     end
 
     it 'generates a schedule provided via a block' do
       entry = described_class.new(cron: ->(last_run) {})
-      expect(entry.schedule).to eq('Custom schedule')
+      expect(entry.display_schedule).to eq('Lambda/Callable')
     end
   end
 

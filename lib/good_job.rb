@@ -16,6 +16,7 @@ require "good_job/active_job_extensions/notify_options"
 
 require "good_job/assignable_connection"
 require "good_job/bulk"
+require "good_job/callable"
 require "good_job/capsule"
 require "good_job/cleanup_tracker"
 require "good_job/cli"

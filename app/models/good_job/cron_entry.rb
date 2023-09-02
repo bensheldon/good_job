@@ -60,29 +60,15 @@ module GoodJob # :nodoc:
 
     def next_at(previously_at: nil)
       if cron_proc?
-        result = Rails.application.executor.wrap { cron.call(previously_at || last_at) }
-        return Fugit.parse(result).next_time.to_t if result.is_a?(String)
-
-        return result
-
+        result = Rails.application.executor.wrap { cron.call(previously_at || last_job_at) }
+        if result.is_a?(String)
+          Fugit.parse(result).next_time.to_t
+        else
+          result
+        end
+      else
+        fugit.next_time.to_t
       end
-      fugit.next_time.to_t
-    end
-
-    def schedule
-      return "Custom schedule" if cron_proc?
-
-      fugit.original
-    end
-
-    def jobs
-      GoodJob::Job.where(cron_key: key)
-    end
-
-    def last_at
-      return if last_job.blank?
-
-      (last_job.cron_at || last_job.created_at).localtime
     end
 
     def enabled?
@@ -113,21 +99,35 @@ module GoodJob # :nodoc:
       false
     end
 
-    def last_job
-      jobs.order("cron_at DESC NULLS LAST").first
-    end
-
     def display_properties
       {
         key: key,
         class: job_class,
-        cron: schedule,
+        cron: display_schedule,
         set: display_property(set),
         description: display_property(description),
       }.tap do |properties|
         properties[:args] = display_property(args) if args.present?
         properties[:kwargs] = display_property(kwargs) if kwargs.present?
       end
+    end
+
+    def display_schedule
+      cron_proc? ? display_property(cron) : fugit.original
+    end
+
+    def jobs
+      GoodJob::Job.where(cron_key: key)
+    end
+
+    def last_job
+      jobs.order("cron_at DESC NULLS LAST").first
+    end
+
+    def last_job_at
+      return if last_job.blank?
+
+      (last_job.cron_at || last_job.created_at).localtime
     end
 
     private
@@ -163,7 +163,7 @@ module GoodJob # :nodoc:
       case value
       when NilClass
         "None"
-      when Proc
+      when Callable
         "Lambda/Callable"
       else
         value

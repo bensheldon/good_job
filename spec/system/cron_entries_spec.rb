@@ -12,7 +12,7 @@ describe 'Cron Schedules' do
   it 'can enqueue a cron_entry immediately' do
     visit '/good_job/cron_entries'
     expect(page).to have_content cron_entry.job_class
-    expect(cron_entry.last_at).to be_nil
+    expect(cron_entry.last_job_at).to be_nil
 
     within "##{dom_id(cron_entry)}" do
       accept_confirm { click_on "Enqueue cron entry now" }
