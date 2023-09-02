@@ -15,6 +15,16 @@ describe GoodJob::Batch do
     end)
   end
 
+  it 'is a valid GlobalId' do
+    batch = described_class.new
+    batch.save
+
+    global_id = batch.to_global_id
+    returned_batch = GlobalID::Locator.locate(global_id)
+
+    expect(returned_batch.id).to eq batch.id
+  end
+
   describe '.enqueue' do
     it 'creates a batch' do
       batch = described_class.enqueue do
