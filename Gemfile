@@ -20,30 +20,34 @@ gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 gem 'rack', '~> 2.2'
 gem 'rails'
-gem "sorbet", group: :development
-gem "sorbet-runtime"
-gem "spoom", require: false, group: :development
-gem "tapioca", require: false, group: :development
 
 platforms :ruby do
   gem "activerecord-explain-analyze", require: false
+  gem "dotenv"
+  gem "foreman"
+  gem "gem-release"
+  gem "github_changelog_generator", require: false
+  gem "net-imap", require: false
+  gem "net-pop", require: false
+  gem "net-smtp", require: false
   gem "pry-byebug"
-  gem 'rack-mini-profiler'
+  gem "rack-mini-profiler"
   gem "rbtrace"
-  gem 'stackprof'
 
-  gem 'net-imap', require: false
-  gem 'net-pop', require: false
-  gem 'net-smtp', require: false
+  gem "stackprof"
+  gem "tapioca", require: false, group: :development
 
   group :lint do
-    gem 'easy_translate'
+    gem "easy_translate"
     gem "erb_lint"
-    gem 'i18n-tasks'
+    gem "i18n-tasks"
     gem "mdl"
     gem "rubocop"
     gem "rubocop-performance"
     gem "rubocop-rails"
     gem "rubocop-rspec"
+    gem "sorbet"
+    gem "sorbet-runtime"
+    gem "spoom", require: false
   end
 end

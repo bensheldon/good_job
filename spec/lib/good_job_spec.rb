@@ -39,8 +39,7 @@ describe GoodJob do
 
     context 'when in webserver but not in async mode' do
       before do
-        allow(described_class.configuration).to receive(:execution_mode).and_return(:external)
-        allow(described_class.configuration).to receive(:in_webserver?).and_return(true)
+        allow(described_class.configuration).to receive_messages(execution_mode: :external, in_webserver?: true)
       end
 
       it 'does not start capsules' do

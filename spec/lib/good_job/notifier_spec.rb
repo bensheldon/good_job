@@ -12,6 +12,7 @@ RSpec.describe GoodJob::Notifier do
       end.to change { described_class.instances.size }.by(1)
 
       expect(described_class.instances).to include notifier
+      sleep 1
     end
   end
 
