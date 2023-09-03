@@ -7,8 +7,7 @@ RSpec.describe GoodJob::CLI do
 
   before do
     stub_const 'GoodJob::CLI::RAILS_ENVIRONMENT_RB', File.expand_path("spec/test_app/config/environment.rb")
-    allow(GoodJob).to receive(:configuration).and_return(GoodJob::Configuration.new({}))
-    allow(GoodJob).to receive(:capsule).and_return capsule_mock
+    allow(GoodJob).to receive_messages(configuration: GoodJob::Configuration.new({}), capsule: capsule_mock)
   end
 
   describe '#start' do

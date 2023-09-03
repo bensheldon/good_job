@@ -221,7 +221,7 @@ RSpec.describe 'Batches' do
       expect(GoodJob::Job.where(batch_id: batch.id).count).to eq 1
       expect(GoodJob::Job.where(batch_callback_id: batch.id).count).to eq 2
 
-      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map(&:head_execution).map(&:active_job).map(&:arguments).map(&:second)
+      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map { |job| job.head_execution.active_job.arguments.second }
       expect(callback_arguments).to contain_exactly({ event: :discard }, { event: :finish })
     end
 
@@ -237,7 +237,7 @@ RSpec.describe 'Batches' do
       expect(GoodJob::Job.where(batch_id: batch.id).count).to eq 1
       expect(GoodJob::Job.where(batch_callback_id: batch.id).count).to eq 2
 
-      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map(&:head_execution).map(&:active_job).map(&:arguments).map(&:second)
+      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map { |job| job.head_execution.active_job.arguments.second }
       expect(callback_arguments).to contain_exactly({ event: :success }, { event: :finish })
     end
   end

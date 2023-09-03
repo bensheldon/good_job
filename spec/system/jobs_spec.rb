@@ -4,8 +4,7 @@ require 'rails_helper'
 
 describe 'Jobs', js: true do
   before do
-    allow(GoodJob).to receive(:retry_on_unhandled_error).and_return(false)
-    allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+    allow(GoodJob).to receive_messages(retry_on_unhandled_error: false, preserve_job_records: true)
   end
 
   it 'renders chart js' do
