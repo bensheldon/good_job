@@ -76,7 +76,7 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        ruby: [2.6, 2.7, "3.0", 3.1, 3.2, jruby-9.3]
+        ruby: [2.6, 2.7, "3.0", 3.1, 3.2, jruby-9.3, jruby-9.4]
         pg: [15]
         include:
           - ruby: 3.2
@@ -87,13 +87,13 @@ jobs:
             pg: 13
           - ruby: 3.2
             pg: 14
-          - ruby: jruby-9.3
+          - ruby: jruby-9.4
             pg: 11
-          - ruby: jruby-9.3
+          - ruby: jruby-9.4
             pg: 12
-          - ruby: jruby-9.3
+          - ruby: jruby-9.4
             pg: 13
-          - ruby: jruby-9.3
+          - ruby: jruby-9.4
             pg: 14
     env:
       PGHOST: localhost

@@ -7,19 +7,24 @@ gem "appraisal", branch: "main", git: "https://github.com/thoughtbot/appraisal.g
 gem "matrix"
 gem "nokogiri"
 gem "pg", platforms: [:mri, :mingw, :x64_mingw]
-gem "rack", "~> 2.0"
+gem "rack", "~> 2.2"
 gem "rails", "~> 7.0.0"
 gem "selenium-webdriver", "~> 4.0"
 
 platforms :ruby do
   gem "activerecord-explain-analyze", require: false
+  gem "dotenv"
+  gem "foreman"
+  gem "gem-release"
+  gem "github_changelog_generator", require: false
+  gem "net-imap", require: false
+  gem "net-pop", require: false
+  gem "net-smtp", require: false
   gem "pry-byebug"
   gem "rack-mini-profiler"
   gem "rbtrace"
   gem "stackprof"
-  gem "net-imap", require: false
-  gem "net-pop", require: false
-  gem "net-smtp", require: false
+  gem "tapioca", require: false, group: :development
 
   group :lint do
     gem "easy_translate"
@@ -30,6 +35,9 @@ platforms :ruby do
     gem "rubocop-performance"
     gem "rubocop-rails"
     gem "rubocop-rspec"
+    gem "sorbet"
+    gem "sorbet-runtime"
+    gem "spoom", require: false
   end
 end
 
