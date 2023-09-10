@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'generators/good_job/update_generator'
 
-describe GoodJob::UpdateGenerator, skip_if_java: true, type: :generator do
+describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
   context 'when running the generator alone' do
     around do |example|
       within_example_app do

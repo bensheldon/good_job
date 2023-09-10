@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'uri'
 require 'net/http'
 
-RSpec.describe 'Server modes', skip_if_java: true do
+RSpec.describe 'Server modes', :skip_if_java do
   let(:port) { 3009 }
   let(:pidfile) { Rails.root.join('tmp/pids/test_server.pid') }
 

@@ -182,7 +182,7 @@ RSpec.describe GoodJob::Scheduler do
   describe '#create_thread' do
     # The JRuby version of the ThreadPoolExecutor sometimes does not immediately
     # create a thread, which causes this test to flake on JRuby.
-    it 'returns false if there are no threads available', skip_if_java: true do
+    it 'returns false if there are no threads available', :skip_if_java do
       configuration = GoodJob::Configuration.new({ queues: 'mice:1' })
       scheduler = described_class.from_configuration(configuration)
 

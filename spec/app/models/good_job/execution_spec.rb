@@ -177,12 +177,12 @@ RSpec.describe GoodJob::Execution do
         4.times do
           described_class.perform_with_advisory_lock
         end
-        expect(described_class.all.order(finished_at: :asc).to_a).to eq([
-                                                                          high_priority_job,
-                                                                          older_job,
-                                                                          newer_job,
-                                                                          low_priority_job,
-                                                                        ])
+        expect(described_class.order(finished_at: :asc).to_a).to eq([
+                                                                      high_priority_job,
+                                                                      older_job,
+                                                                      newer_job,
+                                                                      low_priority_job,
+                                                                    ])
       end
     end
 
@@ -199,10 +199,10 @@ RSpec.describe GoodJob::Execution do
         2.times do
           described_class.perform_with_advisory_lock(parsed_queues: parsed_queues)
         end
-        expect(described_class.all.order(finished_at: :asc).to_a).to eq([
-                                                                          queue_one_job,
-                                                                          queue_two_job,
-                                                                        ])
+        expect(described_class.order(finished_at: :asc).to_a).to eq([
+                                                                      queue_one_job,
+                                                                      queue_two_job,
+                                                                    ])
       end
     end
   end
