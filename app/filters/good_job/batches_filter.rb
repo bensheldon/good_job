@@ -16,7 +16,7 @@ module GoodJob
     end
 
     def default_base_query
-      GoodJob::BatchRecord.all.includes(:jobs)
+      GoodJob::BatchRecord.includes(:jobs)
     end
   end
 end

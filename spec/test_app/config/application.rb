@@ -24,6 +24,8 @@ module TestApp
 
     config.action_controller.include_all_helpers = false
 
+    config.skylight.environments << 'demo' if defined?(Skylight)
+
     # Set default locale to something not yet translated for GoodJob
     # config.i18n.available_locales = [:pt]
     # config.i18n.default_locale = :pt

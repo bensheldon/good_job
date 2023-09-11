@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe 'Live Poll', js: true do
+describe 'Live Poll', :js do
   before do
     allow(GoodJob).to receive_messages(retry_on_unhandled_error: false, preserve_job_records: true)
   end

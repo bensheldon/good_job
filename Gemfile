@@ -14,7 +14,7 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
-gem 'appraisal', github: 'thoughtbot/appraisal', branch: 'main'
+gem 'appraisal'
 gem 'matrix'
 gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
@@ -22,7 +22,6 @@ gem 'rack', '~> 2.2'
 gem 'rails'
 
 platforms :ruby do
-  gem "activerecord-explain-analyze", require: false
   gem "dotenv"
   gem "foreman"
   gem "gem-release"
@@ -30,12 +29,14 @@ platforms :ruby do
   gem "net-imap", require: false
   gem "net-pop", require: false
   gem "net-smtp", require: false
-  gem "pry-byebug"
-  gem "rack-mini-profiler"
-  gem "rbtrace"
 
-  gem "stackprof"
-  gem "tapioca", require: false, group: :development
+  group :debug do
+    gem "activerecord-explain-analyze", require: false
+    gem "pry-byebug"
+    gem "rack-mini-profiler"
+    gem "rbtrace"
+    gem "stackprof"
+  end
 
   group :lint do
     gem "easy_translate"
@@ -49,5 +50,10 @@ platforms :ruby do
     gem "sorbet"
     gem "sorbet-runtime"
     gem "spoom", require: false
+    gem "tapioca", require: false
+  end
+
+  group :demo, :production do
+    gem "skylight"
   end
 end

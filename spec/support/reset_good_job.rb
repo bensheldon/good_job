@@ -61,12 +61,12 @@ RSpec.configure do |config|
     if other_locks.any?
       puts "There are #{other_locks.count} advisory locks still open."
       puts "\n\nAdvisory Locks:"
-      other_locks.includes(:pg_stat_activity).each do |pg_lock|
+      other_locks.includes(:pg_stat_activity).find_each do |pg_lock|
         puts "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity.application_name}"
       end
 
       puts "\n\nCurrent connections:"
-      PgStatActivity.all.each do |pg_stat_activity|
+      PgStatActivity.find_each do |pg_stat_activity|
         puts "  - #{pg_stat_activity.pid}: #{pg_stat_activity.application_name}"
       end
     end

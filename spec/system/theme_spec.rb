@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe 'Light and Dark Themes', js: true do
+describe 'Light and Dark Themes', :js do
   specify do
     visit good_job.jobs_path
     expect(page).to have_css('html[data-bs-theme="light"]')

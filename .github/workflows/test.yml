@@ -102,7 +102,7 @@ jobs:
       BUNDLE_JOBS: 4
       BUNDLE_RETRY: 3
       BUNDLE_PATH: vendor/bundle
-      BUNDLE_WITHOUT: lint
+      BUNDLE_WITHOUT: debug:lint:demo:production
       RAILS_LOG_TO_STDOUT: false
     services:
       postgres:
