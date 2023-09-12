@@ -8,6 +8,7 @@ module GoodJob
     include ErrorEvents
     include Filterable
     include Reportable
+    include Queueable
 
     self.table_name = 'good_jobs'
 

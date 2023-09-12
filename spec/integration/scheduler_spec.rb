@@ -73,12 +73,45 @@ RSpec.describe 'Schedule Integration' do
         end
       end
 
-      performer = GoodJob::JobPerformer.new('*')
-      scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
-      max_threads.times { scheduler.create_thread }
+      GoodJob.capsule.tracker.register do
+        performer = GoodJob::JobPerformer.new('*')
+        scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
+        max_threads.times { scheduler.create_thread }
 
-      sleep_until(max: 45, increments_of: 0.5) { GoodJob::Execution.unfinished.count.zero? }
-      scheduler.shutdown
+        sleep_until(max: 45, increments_of: 0.5) { GoodJob::Execution.unfinished.count.zero? }
+        scheduler.shutdown
+      end
+
+      expect(GoodJob::Execution.unfinished.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Execution.unfinished.map(&:id)}" }
+      expect(RUN_JOBS.size).to eq(number_of_jobs), lambda {
+        jobs_tally = RUN_JOBS.each_with_object(Hash.new(0)) do |(provider_job_id, _job_id, _thread_name), hash|
+          hash[provider_job_id] += 1
+        end
+
+        rerun_provider_job_ids = jobs_tally.select { |_key, value| value > 1 }.keys
+        rerun_jobs = RUN_JOBS.select { |(provider_job_id, _job_id, _thread_name)| rerun_provider_job_ids.include? provider_job_id }
+
+        "Expected run jobs(#{RUN_JOBS.size}) to equal number of jobs (#{number_of_jobs}). Instead ran jobs multiple times:\n#{PP.pp(rerun_jobs, '')}"
+      }
+    end
+
+    it 'Works OK for Row Locked Items items off of the queue and runs them' do
+      expect(ActiveJob::Base.queue_adapter).to be_execute_externally
+
+      GoodJob::Execution.transaction do
+        number_of_jobs.times do |i|
+          TestJob.perform_later(i)
+        end
+      end
+
+      GoodJob.capsule.tracker.register do
+        performer = GoodJob::JobRowLockPerformer.new('*')
+        scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
+        max_threads.times { scheduler.create_thread }
+
+        sleep_until(max: 45, increments_of: 0.5) { GoodJob::Execution.unfinished.count.zero? }
+        scheduler.shutdown
+      end
 
       expect(GoodJob::Execution.unfinished.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Execution.unfinished.map(&:id)}" }
       expect(RUN_JOBS.size).to eq(number_of_jobs), lambda {
