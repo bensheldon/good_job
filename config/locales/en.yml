@@ -4,6 +4,7 @@ en:
     actions:
       destroy: Destroy
       discard: Discard
+      force_discard: Force discard
       inspect: Inspect
       reschedule: Reschedule
       retry: Retry
@@ -110,10 +111,14 @@ en:
       actions:
         confirm_destroy: Are you sure you want to destroy the job?
         confirm_discard: Are you usure you want to discard the job?
+        confirm_force_discard: 'Are you sure you want to force discard this job? The job will be marked as discarded but the running job will not be stopped - it will, however, not be retried on failures.
+
+          '
         confirm_reschedule: Are you sure you want to reschedule the job?
         confirm_retry: Are you sure you want to retry the job?
         destroy: Destroy job
         discard: Discard job
+        force_discard: Force discard job
         reschedule: Reschedule job
         retry: Retry job
       destroy:
@@ -124,6 +129,8 @@ en:
         in_queue: in queue
         runtime: runtime
         title: Executions
+      force_discard:
+        notice: Job has been force discarded. It will continue to run but it will not be retried on failures
       index:
         job_pagination: Job pagination
         older_jobs: Older jobs

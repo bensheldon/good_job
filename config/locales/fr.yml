@@ -4,6 +4,7 @@ fr:
     actions:
       destroy: Détruire
       discard: Mettre au rebut
+      force_discard: Forcer le rejet
       inspect: Inspecter
       reschedule: Reprogrammer
       retry: Recommencez
@@ -110,10 +111,14 @@ fr:
       actions:
         confirm_destroy: Voulez-vous vraiment détruire le job ?
         confirm_discard: Voulez-vous vraiment mettre au rebut le job ?
+        confirm_force_discard: 'Êtes-vous sûr de vouloir forcer l''abandon de cette tâche ? Le travail sera marqué comme abandonné mais le travail en cours d''exécution ne sera pas arrêté - il ne sera cependant pas réessayé en cas d''échec.
+
+          '
         confirm_reschedule: Voulez-vous vraiment replanifier le job ?
         confirm_retry: Voulez-vous vraiment réessayer le job ?
         destroy: Détruire le job
         discard: Mettre au rebut le job
+        force_discard: Forcer l'abandon du travail
         reschedule: Replanifier le job
         retry: Réessayer le job
       destroy:
@@ -124,6 +129,8 @@ fr:
         in_queue: Dans la file d'attente
         runtime: Durée
         title: Exécutions
+      force_discard:
+        notice: Le travail a été abandonné de force. Il continuera à fonctionner mais il ne sera pas réessayé en cas d'échec
       index:
         job_pagination: Pagination du job
         older_jobs: Jobs plus anciens
