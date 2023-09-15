@@ -25,56 +25,69 @@ RSpec.describe GoodJob::Notifier do
   describe '#connected?' do
     it 'becomes true when the notifier is connected' do
       notifier = described_class.new(enable_listening: true)
-      sleep_until(max: 5) { notifier.connected? }
+      expect(notifier.connected?(timeout: 5)).to be true
 
       expect do
         notifier.shutdown
       end.to change(notifier, :connected?).from(true).to(false)
     end
+
+    it 'remains true through multiple connection errors until CONNECTION_ERRORS_REPORTING_THRESHOLD is reached' do
+      error_event = Concurrent::Event.new
+      allow(GoodJob).to receive(:_on_thread_error) { error_event.set }
+
+      stub_const('GoodJob::Notifier::WAIT_INTERVAL', 0.1)
+      stub_const('GoodJob::Notifier::RECONNECT_INTERVAL', 0.1)
+      stub_const('GoodJob::Notifier::CONNECTION_ERRORS_REPORTING_THRESHOLD', 3)
+
+      notifier = described_class.new(enable_listening: true)
+      expect(notifier.connected?(timeout: 5)).to be true
+      allow(notifier).to receive(:wait_for_notify).and_raise(ActiveRecord::ConnectionTimeoutError)
+      error_event.wait(5)
+      expect(notifier).not_to be_connected
+    end
   end
 
   describe '#listen' do
     it 'loops until it receives a command' do
-      stub_const 'RECEIVED_MESSAGE', Concurrent::AtomicBoolean.new(false)
-
-      recipient = proc { |_payload| RECEIVED_MESSAGE.make_true }
+      event = Concurrent::Event.new
+      recipient = proc { |_payload| event.set }
 
       notifier = described_class.new(recipient, enable_listening: true)
-      sleep_until(max: 5) { notifier.listening? }
-      described_class.notify(true)
-      sleep_until(max: 5) { RECEIVED_MESSAGE.true? }
-      notifier.shutdown
+      notifier.listening?(timeout: 5)
 
-      expect(RECEIVED_MESSAGE.true?).to be true
+      described_class.notify(true)
+      expect(event.wait(5)).to be true
+
+      notifier.shutdown
     end
 
     it 'loops but does not receive a command if listening is not enabled' do
-      stub_const 'RECEIVED_MESSAGE', Concurrent::AtomicBoolean.new(false)
-
-      recipient = proc { |_payload| RECEIVED_MESSAGE.make_true }
+      latch = Concurrent::CountDownLatch.new(1)
+      recipient = proc { |_payload| latch.count_down }
       notifier = described_class.new(recipient, enable_listening: false)
-      expect(notifier.listening?).to be false
-      described_class.notify(true)
-      sleep_until(max: 1) { RECEIVED_MESSAGE.false? }
+
+      expect(notifier.connected?(timeout: 5)).to be true
+      expect(notifier.listening?(timeout: 1)).to be false
+      sleep 1
       notifier.shutdown
 
-      expect(RECEIVED_MESSAGE.false?).to be true
+      expect(latch.count).to eq 1
     end
 
     shared_examples 'calls refresh_if_stale on every tick' do
       specify do
-        stub_const 'REFRESH_IF_STALE_CALLED', Concurrent::AtomicFixnum.new(0)
-
-        allow_any_instance_of(GoodJob::Process).to receive(:refresh_if_stale) { REFRESH_IF_STALE_CALLED.increment }
+        refreshes = Concurrent::AtomicFixnum.new(0)
+        allow_any_instance_of(GoodJob::Process).to receive(:refresh_if_stale) { refreshes.increment }
 
         recipient = proc {}
         notifier = described_class.new(recipient, enable_listening: true)
-        sleep_until(max: 5) { notifier.listening? }
+        expect(notifier).to be_listening(timeout: 2)
         described_class.notify(true)
-        sleep_until(max: 5) { REFRESH_IF_STALE_CALLED.value > 0 }
-        notifier.shutdown
 
-        expect(REFRESH_IF_STALE_CALLED.value).to be > 0
+        wait_until(max: 5) { expect(refreshes.value).to be > 0 }
+
+        notifier.shutdown
       end
     end
 
@@ -98,7 +111,7 @@ RSpec.describe GoodJob::Notifier do
       allow(JSON).to receive(:parse).and_raise ExpectedError
 
       notifier = described_class.new(enable_listening: true)
-      sleep_until { notifier.listening? }
+      expect(notifier).to be_listening(timeout: 2)
 
       described_class.notify(true)
       wait_until { expect(on_thread_error).to have_received(:call).at_least(:once).with instance_of(ExpectedError) }
@@ -114,7 +127,7 @@ RSpec.describe GoodJob::Notifier do
       allow(JSON).to receive(:parse).and_raise ExpectedError
 
       notifier = described_class.new(enable_listening: true)
-      sleep_until { notifier.listening? }
+      expect(notifier).to be_listening(timeout: 2)
 
       described_class.notify(true)
       wait_until { expect(on_thread_error).to have_received(:call).at_least(:once).with instance_of(ExpectedError) }

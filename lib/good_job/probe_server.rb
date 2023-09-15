@@ -37,7 +37,7 @@ module GoodJob
         started ? [200, {}, ["Started"]] : [503, {}, ["Not started"]]
       when '/status/connected'
         connected = GoodJob::Scheduler.instances.any? && GoodJob::Scheduler.instances.all?(&:running?) &&
-                    GoodJob::Notifier.instances.any? && GoodJob::Notifier.instances.all?(&:listening?)
+                    GoodJob::Notifier.instances.any? && GoodJob::Notifier.instances.all?(&:connected?)
         connected ? [200, {}, ["Connected"]] : [503, {}, ["Not connected"]]
       else
         [404, {}, ["Not found"]]

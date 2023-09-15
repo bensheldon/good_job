@@ -82,12 +82,25 @@ RSpec.describe GoodJob::ProbeServer do
         end
       end
 
-      context 'when there are running schedulers and listening notifiers' do
+      context 'when there are running schedulers but disconnected notifiers' do
         it 'returns 200' do
           scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true)
           GoodJob::Scheduler.instances << scheduler
 
-          notifier = instance_double(GoodJob::Notifier, listening?: true, shutdown: true, shutdown?: true)
+          notifier = instance_double(GoodJob::Notifier, connected?: false, shutdown: true, shutdown?: true)
+          GoodJob::Notifier.instances << notifier
+
+          response = probe_server.call(env)
+          expect(response[0]).to eq(503)
+        end
+      end
+
+      context 'when there are running schedulers and connected notifiers' do
+        it 'returns 200' do
+          scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true)
+          GoodJob::Scheduler.instances << scheduler
+
+          notifier = instance_double(GoodJob::Notifier, connected?: true, shutdown: true, shutdown?: true)
           GoodJob::Notifier.instances << notifier
 
           response = probe_server.call(env)
