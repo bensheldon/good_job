@@ -1,5 +1,26 @@
 # Changelog
 
+## [v3.18.3](https://github.com/bensheldon/good_job/tree/v3.18.3) (2023-09-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.2...v3.18.3)
+
+**Fixed bugs:**
+
+- Allow Probe Server's `/connect` to handle a certain number of reconnects before statusing [\#1075](https://github.com/bensheldon/good_job/pull/1075) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+-  ActiveRecord::RecordNotUnique good\_jobs.id error in rspec test suite [\#1072](https://github.com/bensheldon/good_job/issues/1072)
+- Probe failures on heavy usage of dashboard\(?\) [\#1068](https://github.com/bensheldon/good_job/issues/1068)
+
+**Merged pull requests:**
+
+- Bump actions/checkout from 3 to 4 [\#1070](https://github.com/bensheldon/good_job/pull/1070) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add Skylight for demo site; create distinct development, lint, demo, production Gemfile groups; a little bit of Rubocop [\#1069](https://github.com/bensheldon/good_job/pull/1069) ([bensheldon](https://github.com/bensheldon))
+- Add JRuby 9.4 to testing matrix; nerf ActiveJob::TestQueueAdapter overrides [\#1067](https://github.com/bensheldon/good_job/pull/1067) ([bensheldon](https://github.com/bensheldon))
+- Reorganize dependencies to make booting JRuby easier [\#1066](https://github.com/bensheldon/good_job/pull/1066) ([bensheldon](https://github.com/bensheldon))
+- Slight refactoring to CronEntry [\#1063](https://github.com/bensheldon/good_job/pull/1063) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.18.2](https://github.com/bensheldon/good_job/tree/v3.18.2) (2023-09-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.1...v3.18.2)
