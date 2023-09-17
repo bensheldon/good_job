@@ -68,7 +68,7 @@ jobs:
       - name: bin/setup
         run: bin/rails db:test:prepare
       - name: bin/rspec
-        run: bin/rspec
+        run: bin/rspec --require ./spec/support/pre_documentation_formatter.rb --format PreDocumentationFormatter
 
   test:
     name: Test

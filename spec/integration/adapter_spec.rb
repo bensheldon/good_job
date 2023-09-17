@@ -108,14 +108,11 @@ RSpec.describe 'Adapter Integration' do
     let(:adapter) { GoodJob::Adapter.new(execution_mode: :async_all, _capsule: capsule) }
 
     it 'executes the job', :skip_if_java do
-      elephant_adapter = GoodJob::Adapter.new execution_mode: :async_all
       elephant_ajob = TestJob.set(queue: 'elephants').perform_later
 
       sleep_until { RUN_JOBS.include? elephant_ajob.provider_job_id }
 
       expect(RUN_JOBS).to include(elephant_ajob.provider_job_id)
-
-      elephant_adapter.shutdown
     end
   end
 

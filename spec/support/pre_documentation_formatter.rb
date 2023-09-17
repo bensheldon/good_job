@@ -10,6 +10,7 @@ class PreDocumentationFormatter < RSpec::Core::Formatters::BaseTextFormatter
   def initialize(output)
     super
     @group_level = 0
+    @failed_examples = []
   end
 
   def example_group_started(notification)
@@ -33,7 +34,9 @@ class PreDocumentationFormatter < RSpec::Core::Formatters::BaseTextFormatter
   end
 
   def example_failed(failure)
+    @failed_examples << failure.example
     output.puts failure_output(failure.example)
+    output.puts failure.fully_formatted(@failed_examples.size)
   end
 
   def example_started(notification)
