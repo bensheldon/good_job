@@ -4,6 +4,7 @@ nl:
     actions:
       destroy: Vernietigen
       discard: Weggooien
+      force_discard: Forceer weggooien
       inspect: Inspecteren
       reschedule: Opnieuw plannen
       retry: Opnieuw proberen
@@ -110,10 +111,14 @@ nl:
       actions:
         confirm_destroy: Weet je zeker dat je de baan wilt vernietigen?
         confirm_discard: Wilt u de baan afwijzen?
+        confirm_force_discard: 'Weet u zeker dat u deze taak geforceerd wilt weggooien? De taak wordt gemarkeerd als verwijderd, maar de lopende taak wordt niet gestopt. Bij fouten wordt deze echter niet opnieuw geprobeerd.
+
+          '
         confirm_reschedule: Weet u zeker dat u de taak opnieuw wilt inplannen?
         confirm_retry: Weet u zeker dat u de taak opnieuw wilt proberen?
         destroy: Baan vernietigen
         discard: Gooi de baan weg
+        force_discard: Forceer taak weggooien
         reschedule: Taak opnieuw plannen
         retry: Taak opnieuw proberen
       destroy:
@@ -124,6 +129,8 @@ nl:
         in_queue: in de wachtrij
         runtime: looptijd
         title: Executies
+      force_discard:
+        notice: Baan is gedwongen verwijderd. Het blijft actief, maar wordt niet opnieuw geprobeerd als er fouten optreden
       index:
         job_pagination: Taak paginering
         older_jobs: Oudere banen

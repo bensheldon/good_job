@@ -128,6 +128,13 @@
                       <% end %>
                     </li>
                     <li>
+                      <% job_force_discardable = job.status.in? [:running] %>
+                      <%= link_to force_discard_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_force_discardable}", title: t("good_job.jobs.actions.force_discard"), data: { confirm: t("good_job.jobs.actions.confirm_force_discard"), disable: true } do %>
+                        <%= render "good_job/shared/icons/eject" %>
+                        <%=t "good_job.actions.force_discard" %>
+                      <% end %>
+                    </li>
+                    <li>
                       <%= link_to retry_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job.status == :discarded}", title: t("good_job.jobs.actions.retry"), data: { confirm: t("good_job.jobs.actions.confirm_retry"), disable: true } do %>
                         <%= render "good_job/shared/icons/arrow_clockwise" %>
                         <%=t "good_job.actions.retry" %>

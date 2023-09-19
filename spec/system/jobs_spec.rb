@@ -139,6 +139,39 @@ describe 'Jobs', :js do
       end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
     end
 
+    it 'can force discard jobs' do
+      unfinished_job.update scheduled_at: 1.hour.ago
+
+      locked_event = Concurrent::Event.new
+      done_event = Concurrent::Event.new
+
+      promise = Concurrent::Promises.future do
+        rails_promise do
+          # pretend the job is running
+          unfinished_job.with_advisory_lock do
+            locked_event.set
+            done_event.wait(20)
+          end
+        end
+      end
+      locked_event.wait(10)
+
+      visit '/good_job'
+      click_on "Jobs"
+
+      expect do
+        within "##{dom_id(unfinished_job)}" do
+          click_on 'Actions'
+          accept_confirm { click_on 'Force discard' }
+        end
+        expect(page).to have_content "Job has been force discarded"
+      end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
+    ensure
+      locked_event.set
+      done_event.set
+      promise.value!
+    end
+
     it 'can destroy jobs' do
       visit '/good_job'
       click_on "Jobs"

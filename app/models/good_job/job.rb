@@ -215,30 +215,15 @@ module GoodJob
     # @return [void]
     def discard_job(message)
       with_advisory_lock do
-        execution = head_execution(reload: true)
-        active_job = execution.active_job(ignore_deserialization_errors: true)
-
-        raise ActionForStateMismatchError if execution.finished_at.present?
-
-        job_error = GoodJob::Job::DiscardJobError.new(message)
-
-        update_execution = proc do
-          execution.update(
-            {
-              finished_at: Time.current,
-              error: GoodJob::Execution.format_error(job_error),
-            }.tap do |attrs|
-              attrs[:error_event] = ERROR_EVENT_DISCARDED if self.class.error_event_migrated?
-            end
-          )
-        end
-
-        if active_job.respond_to?(:instrument)
-          active_job.send :instrument, :discard, error: job_error, &update_execution
-        else
-          update_execution.call
-        end
+        _discard_job(message)
       end
+    end
+
+    # Force discard a job so that it will not be executed further. Force discard allows discarding
+    # a running job.
+    # This action will add a {DiscardJobError} to the job's {Execution} and mark it as finished.
+    def force_discard_job(message)
+      _discard_job(message)
     end
 
     # Reschedule a scheduled job so that it executes immediately (or later) by the next available execution thread.
@@ -276,6 +261,34 @@ module GoodJob
     # @return [Boolean]
     def _head?
       _execution_id == head_execution(reload: true).id
+    end
+
+    private
+
+    def _discard_job(message)
+      execution = head_execution(reload: true)
+      active_job = execution.active_job(ignore_deserialization_errors: true)
+
+      raise ActionForStateMismatchError if execution.finished_at.present?
+
+      job_error = GoodJob::Job::DiscardJobError.new(message)
+
+      update_execution = proc do
+        execution.update(
+          {
+            finished_at: Time.current,
+            error: GoodJob::Execution.format_error(job_error),
+          }.tap do |attrs|
+            attrs[:error_event] = ERROR_EVENT_DISCARDED if self.class.error_event_migrated?
+          end
+        )
+      end
+
+      if active_job.respond_to?(:instrument)
+        active_job.send :instrument, :discard, error: job_error, &update_execution
+      else
+        update_execution.call
+      end
     end
   end
 end

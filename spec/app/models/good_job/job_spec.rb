@@ -326,6 +326,33 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  describe '#force_discard_job' do
+    it 'will discard the job even when advisory locked' do
+      locked_event = Concurrent::Event.new
+      done_event = Concurrent::Event.new
+
+      promise = Concurrent::Promises.future do
+        rails_promise do
+          # pretend the job is running
+          job.with_advisory_lock do
+            locked_event.set
+            done_event.wait(10)
+          end
+        end
+      end
+      locked_event.wait(10)
+
+      job.force_discard_job("Discarded in test")
+      job.reload
+      expect(job.finished_at).to be_present
+      expect(job.error).to eq "GoodJob::Job::DiscardJobError: Discarded in test"
+    ensure
+      locked_event.set
+      done_event.set
+      promise.value!
+    end
+  end
+
   describe '#reschedule_job' do
     context 'when a job is scheduled' do
       it 'reschedules the job to right now by default' do

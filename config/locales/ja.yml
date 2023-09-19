@@ -4,6 +4,7 @@ ja:
     actions:
       destroy: 削除する
       discard: 破棄する
+      force_discard: 強制破棄
       inspect: 調査する
       reschedule: 再スケジュールする
       retry: 再試行する
@@ -110,10 +111,14 @@ ja:
       actions:
         confirm_destroy: ジョブを削除してもよろしいですか？
         confirm_discard: ジョブを破棄してもよろしいですか？
+        confirm_force_discard: 'このジョブを強制的に破棄してもよろしいですか?ジョブは破棄済みとしてマークされますが、実行中のジョブは停止されません。ただし、失敗した場合は再試行されません。
+
+          '
         confirm_reschedule: ジョブを再スケジュールしてもよろしいですか？
         confirm_retry: ジョブを再試行してもよろしいですか？
         destroy: ジョブを削除
         discard: ジョブを破棄
+        force_discard: ジョブを強制的に破棄する
         reschedule: ジョブを再スケジュール
         retry: ジョブを再試行
       destroy:
@@ -124,6 +129,8 @@ ja:
         in_queue: 待機中
         runtime: 実行時間
         title: 実行
+      force_discard:
+        notice: ジョブは強制的に破棄されました。実行は継続されますが、失敗した場合は再試行されません
       index:
         job_pagination: ジョブのページネーション
         older_jobs: 古いジョブ
