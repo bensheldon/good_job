@@ -146,10 +146,12 @@ describe 'Jobs', :js do
       done_event = Concurrent::Event.new
 
       promise = Concurrent::Promises.future do
-        # pretend the job is running
-        unfinished_job.with_advisory_lock do
-          locked_event.set
-          done_event.wait(20)
+        rails_promise do
+          # pretend the job is running
+          unfinished_job.with_advisory_lock do
+            locked_event.set
+            done_event.wait(20)
+          end
         end
       end
       locked_event.wait(10)
@@ -164,7 +166,6 @@ describe 'Jobs', :js do
         end
         expect(page).to have_content "Job has been force discarded"
       end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
-
     ensure
       locked_event.set
       done_event.set

@@ -332,10 +332,12 @@ RSpec.describe GoodJob::Job do
       done_event = Concurrent::Event.new
 
       promise = Concurrent::Promises.future do
-        # pretend the job is running
-        job.with_advisory_lock do
-          locked_event.set
-          done_event.wait(10)
+        rails_promise do
+          # pretend the job is running
+          job.with_advisory_lock do
+            locked_event.set
+            done_event.wait(10)
+          end
         end
       end
       locked_event.wait(10)
