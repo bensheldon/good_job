@@ -133,7 +133,12 @@ module GoodJob
       # @return [Boolean]
       attr_accessor :create_with_advisory_lock
 
-      after_create -> { advisory_lock }, if: :create_with_advisory_lock
+      after_create lambda {
+        advisory_lock || begin
+          errors.add(self.class.advisory_lockable_column, "Failed to acquire advisory lock: #{lockable_key}")
+          raise ActiveRecord::RecordInvalid # do not reference the record because it can cause I18n missing translation error
+        end
+      }, if: :create_with_advisory_lock
     end
 
     class_methods do
@@ -220,6 +225,47 @@ module GoodJob
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
         ]
         connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Unlock', binds).first['unlocked']
+      end
+
+      # Tests whether the provided key has an advisory lock on it.
+      # @param key [String, Symbol] Key to test lock against
+      # @return [Boolean]
+      def advisory_locked_key?(key)
+        query = <<~SQL.squish
+          SELECT 1 AS one
+          FROM pg_locks
+          WHERE pg_locks.locktype = 'advisory'
+            AND pg_locks.objsubid = 1
+            AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
+            AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
+          LIMIT 1
+        SQL
+        binds = [
+          ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
+          ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
+        ]
+        connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Locked?', binds).any?
+      end
+
+      # Tests whether this record is locked by the current database session.
+      # @param key [String, Symbol] Key to test lock against
+      # @return [Boolean]
+      def owns_advisory_lock_key?(key)
+        query = <<~SQL.squish
+          SELECT 1 AS one
+          FROM pg_locks
+          WHERE pg_locks.locktype = 'advisory'
+            AND pg_locks.objsubid = 1
+            AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
+            AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
+            AND pg_locks.pid = pg_backend_pid()
+          LIMIT 1
+        SQL
+        binds = [
+          ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
+          ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
+        ]
+        connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Owns Advisory Lock?', binds).any?
       end
 
       def _advisory_lockable_column
@@ -318,20 +364,7 @@ module GoodJob
     # @param key [String, Symbol] Key to test lock against
     # @return [Boolean]
     def advisory_locked?(key: lockable_key)
-      query = <<~SQL.squish
-        SELECT 1 AS one
-        FROM pg_locks
-        WHERE pg_locks.locktype = 'advisory'
-          AND pg_locks.objsubid = 1
-          AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
-          AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
-        LIMIT 1
-      SQL
-      binds = [
-        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
-        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
-      ]
-      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Locked?', binds).any?
+      self.class.advisory_locked_key?(key)
     end
 
     # Tests whether this record does not have an advisory lock on it.
@@ -345,6 +378,7 @@ module GoodJob
     # @param key [String, Symbol] Key to test lock against
     # @return [Boolean]
     def owns_advisory_lock?(key: lockable_key)
+      self.class.owns_advisory_lock_key?(key)
       query = <<~SQL.squish
         SELECT 1 AS one
         FROM pg_locks
