@@ -1,5 +1,23 @@
 # Changelog
 
+## [v3.19.0](https://github.com/bensheldon/good_job/tree/v3.19.0) (2023-09-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.3...v3.19.0)
+
+**Implemented enhancements:**
+
+- "Force" discard jobs that are already running/runaway to prevent retry [\#1073](https://github.com/bensheldon/good_job/pull/1073) ([jgrau](https://github.com/jgrau))
+
+**Closed issues:**
+
+- Possible Memory Leak [\#1074](https://github.com/bensheldon/good_job/issues/1074)
+- What's the best way to stop and discard a running job? [\#625](https://github.com/bensheldon/good_job/issues/625)
+
+**Merged pull requests:**
+
+- AdvisoryLockable: Abort record create if with\_advisory\_lock fails to acquire advisory lock [\#1078](https://github.com/bensheldon/good_job/pull/1078) ([bensheldon](https://github.com/bensheldon))
+- Wrap all test background threads in Rails executors; better test logging/debugging [\#1077](https://github.com/bensheldon/good_job/pull/1077) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.18.3](https://github.com/bensheldon/good_job/tree/v3.18.3) (2023-09-16)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.2...v3.18.3)
