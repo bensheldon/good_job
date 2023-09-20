@@ -57,5 +57,7 @@ module GoodJob
         I18n.default_locale
       end
     end
+
+    ActiveSupport.run_load_hooks(:good_job_application_controller, self)
   end
 end
