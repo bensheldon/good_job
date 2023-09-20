@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.19.1](https://github.com/bensheldon/good_job/tree/v3.19.1) (2023-09-20)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.0...v3.19.1)
+
+**Implemented enhancements:**
+
+- Add `good_job_application_controller` load hook [\#1081](https://github.com/bensheldon/good_job/pull/1081) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.19.0](https://github.com/bensheldon/good_job/tree/v3.19.0) (2023-09-19)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.3...v3.19.0)
