@@ -380,6 +380,24 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
     end
     ```
 
+    To support custom authentication, you can extend GoodJob's `ApplicationController` using the following hook:
+
+    ```ruby
+    # config/initializers/good_job.rb
+
+    ActiveSupport.on_load(:good_job_application_controller) do
+      # context here is GoodJob::ApplicationController
+
+      before_action do
+        raise ActionController::RoutingError.new('Not Found') unless current_user&.admin?
+      end
+
+      def current_user
+        # load current user
+      end
+    end
+    ```
+
 _To view finished jobs (succeeded and discarded) on the Dashboard, GoodJob must be configured to preserve job records. Preservation is enabled by default._
 
 **Troubleshooting the Dashboard:** Some applications are unable to autoload the Goodjob Engine. To work around this, explicitly require the Engine at the top of your `config/application.rb` file, immediately after Rails is required and before Bundler requires the Rails' groups.
