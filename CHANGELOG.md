@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.19.2](https://github.com/bensheldon/good_job/tree/v3.19.2) (2023-09-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.1...v3.19.2)
+
+**Merged pull requests:**
+
+- Fix HttpServer to handle Errno::EPIPE [\#1083](https://github.com/bensheldon/good_job/pull/1083) ([shouichi](https://github.com/shouichi))
+
 ## [v3.19.1](https://github.com/bensheldon/good_job/tree/v3.19.1) (2023-09-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.0...v3.19.1)
