@@ -55,7 +55,7 @@ module GoodJob
           end
 
           client.close
-        rescue IO::WaitReadable, Errno::EINTR
+        rescue IO::WaitReadable, Errno::EINTR, Errno::EPIPE
           retry
         end
       end
