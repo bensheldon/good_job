@@ -15,6 +15,16 @@ describe GoodJob::Batch do
     end)
   end
 
+  it 'is a valid GlobalId' do
+    batch = described_class.new
+    batch.save
+
+    global_id = batch.to_global_id
+    returned_batch = GlobalID::Locator.locate(global_id)
+
+    expect(returned_batch.id).to eq batch.id
+  end
+
   describe '.enqueue' do
     it 'creates a batch' do
       batch = described_class.enqueue do
@@ -150,6 +160,17 @@ describe GoodJob::Batch do
 
         expect(batch.callback_active_jobs.size).to eq 1
       end
+    end
+  end
+
+  describe '#active_jobs' do
+    it 'returns associated Active Jobs' do
+      batch = described_class.enqueue do
+        TestJob.perform_later
+        TestJob.perform_later
+      end
+      expect(batch.active_jobs.count).to eq 2
+      expect(batch.active_jobs).to all be_a(TestJob)
     end
   end
 end

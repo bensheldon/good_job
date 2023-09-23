@@ -1,12 +1,293 @@
 # Changelog
 
+## [v3.19.2](https://github.com/bensheldon/good_job/tree/v3.19.2) (2023-09-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.1...v3.19.2)
+
+**Merged pull requests:**
+
+- Fix HttpServer to handle Errno::EPIPE [\#1083](https://github.com/bensheldon/good_job/pull/1083) ([shouichi](https://github.com/shouichi))
+
+## [v3.19.1](https://github.com/bensheldon/good_job/tree/v3.19.1) (2023-09-20)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.0...v3.19.1)
+
+**Implemented enhancements:**
+
+- Add `good_job_application_controller` load hook [\#1081](https://github.com/bensheldon/good_job/pull/1081) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.19.0](https://github.com/bensheldon/good_job/tree/v3.19.0) (2023-09-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.3...v3.19.0)
+
+**Implemented enhancements:**
+
+- "Force" discard jobs that are already running/runaway to prevent retry [\#1073](https://github.com/bensheldon/good_job/pull/1073) ([jgrau](https://github.com/jgrau))
+
+**Closed issues:**
+
+- Possible Memory Leak [\#1074](https://github.com/bensheldon/good_job/issues/1074)
+- What's the best way to stop and discard a running job? [\#625](https://github.com/bensheldon/good_job/issues/625)
+
+**Merged pull requests:**
+
+- AdvisoryLockable: Abort record create if with\_advisory\_lock fails to acquire advisory lock [\#1078](https://github.com/bensheldon/good_job/pull/1078) ([bensheldon](https://github.com/bensheldon))
+- Wrap all test background threads in Rails executors; better test logging/debugging [\#1077](https://github.com/bensheldon/good_job/pull/1077) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.18.3](https://github.com/bensheldon/good_job/tree/v3.18.3) (2023-09-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.2...v3.18.3)
+
+**Fixed bugs:**
+
+- Allow Probe Server's `/connect` to handle a certain number of reconnects before statusing [\#1075](https://github.com/bensheldon/good_job/pull/1075) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+-  ActiveRecord::RecordNotUnique good\_jobs.id error in rspec test suite [\#1072](https://github.com/bensheldon/good_job/issues/1072)
+- Probe failures on heavy usage of dashboard\(?\) [\#1068](https://github.com/bensheldon/good_job/issues/1068)
+
+**Merged pull requests:**
+
+- Bump actions/checkout from 3 to 4 [\#1070](https://github.com/bensheldon/good_job/pull/1070) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add Skylight for demo site; create distinct development, lint, demo, production Gemfile groups; a little bit of Rubocop [\#1069](https://github.com/bensheldon/good_job/pull/1069) ([bensheldon](https://github.com/bensheldon))
+- Add JRuby 9.4 to testing matrix; nerf ActiveJob::TestQueueAdapter overrides [\#1067](https://github.com/bensheldon/good_job/pull/1067) ([bensheldon](https://github.com/bensheldon))
+- Reorganize dependencies to make booting JRuby easier [\#1066](https://github.com/bensheldon/good_job/pull/1066) ([bensheldon](https://github.com/bensheldon))
+- Slight refactoring to CronEntry [\#1063](https://github.com/bensheldon/good_job/pull/1063) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.18.2](https://github.com/bensheldon/good_job/tree/v3.18.2) (2023-09-02)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.1...v3.18.2)
+
+**Fixed bugs:**
+
+- Fix compatibility with Global ID v1.2.0 [\#1064](https://github.com/bensheldon/good_job/pull/1064) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Bump pg from 1.5.3 to 1.5.4 [\#1061](https://github.com/bensheldon/good_job/pull/1061) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v3.18.1](https://github.com/bensheldon/good_job/tree/v3.18.1) (2023-08-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.0...v3.18.1)
+
+**Implemented enhancements:**
+
+- Respect the configured execution mode, even within the CLI [\#1056](https://github.com/bensheldon/good_job/pull/1056) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Bug: calling `GoodJob.restart` in Puma on\_worker\_boot starts GoodJob regardless of it being in async mode or not [\#1054](https://github.com/bensheldon/good_job/issues/1054)
+- \[Feature Request?\] Config Option to Inline Child-Jobs in Worker Processes [\#1052](https://github.com/bensheldon/good_job/issues/1052)
+- \[Feature Request\] Hook to extend cron schedules [\#1050](https://github.com/bensheldon/good_job/issues/1050)
+
+**Merged pull requests:**
+
+- `GoodJob.restart` should not start capsules \(job execution\) when in a webserver but not in async mode [\#1055](https://github.com/bensheldon/good_job/pull/1055) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.18.0](https://github.com/bensheldon/good_job/tree/v3.18.0) (2023-08-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.4...v3.18.0)
+
+**Implemented enhancements:**
+
+- Support configuring cron schedule dynamically with a block [\#1051](https://github.com/bensheldon/good_job/pull/1051) ([DanielHeath](https://github.com/DanielHeath))
+
+## [v3.17.4](https://github.com/bensheldon/good_job/tree/v3.17.4) (2023-08-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.3...v3.17.4)
+
+**Fixed bugs:**
+
+- Handle edge case of logger not responding to silence [\#1049](https://github.com/bensheldon/good_job/pull/1049) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- An idea for better .silence handling [\#1046](https://github.com/bensheldon/good_job/issues/1046)
+
+## [v3.17.3](https://github.com/bensheldon/good_job/tree/v3.17.3) (2023-08-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.2...v3.17.3)
+
+**Fixed bugs:**
+
+- New probe server fixes: allow accept\_nonblock to raise and IO.gets return nil [\#1043](https://github.com/bensheldon/good_job/pull/1043) ([stas](https://github.com/stas))
+
+**Closed issues:**
+
+- Dashboard as separate package? [\#965](https://github.com/bensheldon/good_job/issues/965)
+- Managing jobs with errors [\#929](https://github.com/bensheldon/good_job/issues/929)
+- Feature: dynamic options for good\_job\_control\_concurrency\_with [\#684](https://github.com/bensheldon/good_job/issues/684)
+
+**Merged pull requests:**
+
+- Attempt to overcome github\_changelog\_generator's rate limit problem [\#1045](https://github.com/bensheldon/good_job/pull/1045) ([bensheldon](https://github.com/bensheldon))
+- \[Doc\] for cron schedule add info about Dashboard view [\#1042](https://github.com/bensheldon/good_job/pull/1042) ([steveroot](https://github.com/steveroot))
+- Add description of  :class to readme for cron style repeating jobs section [\#1040](https://github.com/bensheldon/good_job/pull/1040) ([steveroot](https://github.com/steveroot))
+
+## [v3.17.2](https://github.com/bensheldon/good_job/tree/v3.17.2) (2023-08-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.1...v3.17.2)
+
+**Fixed bugs:**
+
+- 3.17.0 breaks health check endpoints [\#1033](https://github.com/bensheldon/good_job/issues/1033)
+- Fix NoMethodError: undefined method `silence' for nil:NilClass [\#1037](https://github.com/bensheldon/good_job/pull/1037) ([afn](https://github.com/afn))
+
+**Closed issues:**
+
+- NoMethodError in ProcessHeartbeat if ActiveRecord logger is nil [\#1036](https://github.com/bensheldon/good_job/issues/1036)
+- JRuby deprecation policy [\#1035](https://github.com/bensheldon/good_job/issues/1035)
+
+**Merged pull requests:**
+
+- Add helpful failure output for Sorbet linter [\#1038](https://github.com/bensheldon/good_job/pull/1038) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.17.1](https://github.com/bensheldon/good_job/tree/v3.17.1) (2023-08-08)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.17.0...v3.17.1)
+
+**Fixed bugs:**
+
+- Fix Probe Server by retrying IO.select instead of returning early [\#1034](https://github.com/bensheldon/good_job/pull/1034) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Add database connection pool details to Process state [\#1014](https://github.com/bensheldon/good_job/issues/1014)
+
+**Merged pull requests:**
+
+- Add YARD warnings to lint script; fix YARD warnings [\#1032](https://github.com/bensheldon/good_job/pull/1032) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.17.0](https://github.com/bensheldon/good_job/tree/v3.17.0) (2023-08-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.4...v3.17.0)
+
+**Implemented enhancements:**
+
+- Add Dark Mode color theme for Dashboard [\#1031](https://github.com/bensheldon/good_job/pull/1031) ([bensheldon](https://github.com/bensheldon))
+- Automatically send status notifications to systemd [\#1029](https://github.com/bensheldon/good_job/pull/1029) ([Mr0grog](https://github.com/Mr0grog))
+
+**Closed issues:**
+
+- Add systemd/sd\_notify support to CLI [\#1027](https://github.com/bensheldon/good_job/issues/1027)
+- Cron job by default runs on the web server even when "async" execution mode is not specified [\#1026](https://github.com/bensheldon/good_job/issues/1026)
+- Replace webrick with a small/simple custom rack-compatible http server [\#1017](https://github.com/bensheldon/good_job/issues/1017)
+- Dark mode for the dashboard ? [\#974](https://github.com/bensheldon/good_job/issues/974)
+
+**Merged pull requests:**
+
+-  Replace Webrick with custom simple http server [\#1030](https://github.com/bensheldon/good_job/pull/1030) ([dixpac](https://github.com/dixpac))
+- Bump appraisal from `b200e63` to `feb78bc` [\#1025](https://github.com/bensheldon/good_job/pull/1025) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump net-imap from 0.3.6 to 0.3.7 [\#1024](https://github.com/bensheldon/good_job/pull/1024) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rack from 2.2.7 to 2.2.8 [\#1023](https://github.com/bensheldon/good_job/pull/1023) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v3.16.4](https://github.com/bensheldon/good_job/tree/v3.16.4) (2023-07-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.3...v3.16.4)
+
+**Implemented enhancements:**
+
+- Add database\_connection\_pool stats to `GoodJob::Process.current_state` [\#1019](https://github.com/bensheldon/good_job/pull/1019) ([dixpac](https://github.com/dixpac))
+
+**Fixed bugs:**
+
+- Move `Execution#active_job` to BaseExecution to share with Job; refactor `Batch#active_jobs` to use job directly [\#1022](https://github.com/bensheldon/good_job/pull/1022) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Notifier errored: ArgumentError: wrong number of arguments \(given 1, expected 0\) [\#1016](https://github.com/bensheldon/good_job/issues/1016)
+- Understanding Database Connections and Cron [\#1013](https://github.com/bensheldon/good_job/issues/1013)
+- Experiencing various database exceptions with Rails 7.1  [\#796](https://github.com/bensheldon/good_job/issues/796)
+
+**Merged pull requests:**
+
+- Refactor Notifier to ensure \#restart is threadsafe [\#1021](https://github.com/bensheldon/good_job/pull/1021) ([bensheldon](https://github.com/bensheldon))
+- Notifier and CronManager share a 2-thread executor within the capsule [\#1018](https://github.com/bensheldon/good_job/pull/1018) ([bensheldon](https://github.com/bensheldon))
+- Clarify database connections and recurring processes in README.md [\#1015](https://github.com/bensheldon/good_job/pull/1015) ([blumhardts](https://github.com/blumhardts))
+- Deprecate `GoodJob::Lockable` and rename to `GoodJob::AdvisoryLockable` [\#1012](https://github.com/bensheldon/good_job/pull/1012) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.16.3](https://github.com/bensheldon/good_job/tree/v3.16.3) (2023-07-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.2...v3.16.3)
+
+**Fixed bugs:**
+
+- Fix bulk enqueue for unmigrated 'error\_event'; add `GoodJob.migrated?` check method; use custom enum implementation [\#1011](https://github.com/bensheldon/good_job/pull/1011) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- GoodJob::Bulk.enqueue not handling missing migrations [\#1010](https://github.com/bensheldon/good_job/issues/1010)
+
+**Merged pull requests:**
+
+- Move shared `BaseExecution` concerns into the base class. [\#1009](https://github.com/bensheldon/good_job/pull/1009) ([dixpac](https://github.com/dixpac))
+
+## [v3.16.2](https://github.com/bensheldon/good_job/tree/v3.16.2) (2023-07-13)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.1...v3.16.2)
+
+**Closed issues:**
+
+- Support for customized job display name [\#956](https://github.com/bensheldon/good_job/issues/956)
+
+**Merged pull requests:**
+
+- Add `GoodJob::Job#display_name` to allow customizing dashboard job display [\#1008](https://github.com/bensheldon/good_job/pull/1008) ([paul](https://github.com/paul))
+
+## [v3.16.1](https://github.com/bensheldon/good_job/tree/v3.16.1) (2023-07-11)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.16.0...v3.16.1)
+
+**Fixed bugs:**
+
+- Wrap Notifier's `refresh_process` with Rails executor [\#1007](https://github.com/bensheldon/good_job/pull/1007) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- uninitialized constant GoodJob::Process [\#1006](https://github.com/bensheldon/good_job/issues/1006)
+
+## [v3.16.0](https://github.com/bensheldon/good_job/tree/v3.16.0) (2023-07-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.14...v3.16.0)
+
+**Implemented enhancements:**
+
+- Add `GoodJob.configure_active_record` as alternative to `GoodJob.active_record_parent_class` [\#1004](https://github.com/bensheldon/good_job/pull/1004) ([bensheldon](https://github.com/bensheldon))
+- Configure `dashboard_default_locale` using custom subclass of `I18n::Config` to isolate I18n configuration from parent application [\#1001](https://github.com/bensheldon/good_job/pull/1001) ([bensheldon](https://github.com/bensheldon))
+- Create `error_event` column to track the context of an error \(discarded, retried, retry\_stopped, etc\) [\#995](https://github.com/bensheldon/good_job/pull/995) ([bensheldon](https://github.com/bensheldon))
+- Added metrics to Scheduler and track in Process state [\#984](https://github.com/bensheldon/good_job/pull/984) ([AndersGM](https://github.com/AndersGM))
+
+**Fixed bugs:**
+
+- Use Concurrent::Array for class `instances` to avoid JRuby synchronization errors [\#1002](https://github.com/bensheldon/good_job/pull/1002) ([bensheldon](https://github.com/bensheldon))
+- Add test to assert enqueuing behavior within transactions [\#998](https://github.com/bensheldon/good_job/pull/998) ([bensheldon](https://github.com/bensheldon))
+- Fix Ukrainian language code [\#996](https://github.com/bensheldon/good_job/pull/996) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Is `pgcrypto` necessary? [\#805](https://github.com/bensheldon/good_job/issues/805)
+- Integrate Sorbet type checking [\#404](https://github.com/bensheldon/good_job/issues/404)
+
+**Merged pull requests:**
+
+- Unify `frozen_string_literal` comment style [\#1003](https://github.com/bensheldon/good_job/pull/1003) ([dixpac](https://github.com/dixpac))
+- Add more execution mode details and caveats to Readme Set Up section [\#997](https://github.com/bensheldon/good_job/pull/997) ([bensheldon](https://github.com/bensheldon))
+- Add note in migrations that `pgcrypto` extension isn't necessary in PG 13+ [\#837](https://github.com/bensheldon/good_job/pull/837) ([bensheldon](https://github.com/bensheldon))
+- Add Sorbet to linter [\#760](https://github.com/bensheldon/good_job/pull/760) ([sam1el](https://github.com/sam1el))
+
 ## [v3.15.14](https://github.com/bensheldon/good_job/tree/v3.15.14) (2023-07-03)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.15.13...v3.15.14)
 
+**Implemented enhancements:**
+
+- Add Process heartbeat that is updated inside of Notifier [\#977](https://github.com/bensheldon/good_job/pull/977) ([bensheldon](https://github.com/bensheldon))
+
 **Fixed bugs:**
 
 - Dashboard error when trying to display 0 running/queued/retried jobs due to missing 'zero' translation [\#990](https://github.com/bensheldon/good_job/issues/990)
+- Add explicit namespace back to `GoodJob::DiscreteExecution` [\#983](https://github.com/bensheldon/good_job/pull/983) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
 
@@ -20,8 +301,6 @@
 - Bump rails from 7.0.5 to 7.0.6 [\#993](https://github.com/bensheldon/good_job/pull/993) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Fix CI: Lock traces version for Ruby 2.6 compatible version [\#987](https://github.com/bensheldon/good_job/pull/987) ([bensheldon](https://github.com/bensheldon))
 - Turkish Language support [\#986](https://github.com/bensheldon/good_job/pull/986) ([SemihCag](https://github.com/SemihCag))
-- Add explicit namespace back to `GoodJob::DiscreteExecution` [\#983](https://github.com/bensheldon/good_job/pull/983) ([bensheldon](https://github.com/bensheldon))
-- Add Process heartbeat that is updated inside of Notifier [\#977](https://github.com/bensheldon/good_job/pull/977) ([bensheldon](https://github.com/bensheldon))
 - Use generic error reporter in Readme examples [\#964](https://github.com/bensheldon/good_job/pull/964) ([shouichi](https://github.com/shouichi))
 
 ## [v3.15.13](https://github.com/bensheldon/good_job/tree/v3.15.13) (2023-06-14)

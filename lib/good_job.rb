@@ -16,6 +16,7 @@ require "good_job/active_job_extensions/notify_options"
 
 require "good_job/assignable_connection"
 require "good_job/bulk"
+require "good_job/callable"
 require "good_job/capsule"
 require "good_job/cleanup_tracker"
 require "good_job/cli"
@@ -29,8 +30,11 @@ require "good_job/log_subscriber"
 require "good_job/multi_scheduler"
 require "good_job/notifier"
 require "good_job/poller"
+require "good_job/http_server"
 require "good_job/probe_server"
 require "good_job/scheduler"
+require "good_job/shared_executor"
+require "good_job/systemd_service"
 
 # GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 #
@@ -47,7 +51,7 @@ module GoodJob
   #   @return [ActiveRecord::Base]
   #   @example Change the base class:
   #     GoodJob.active_record_parent_class = "CustomApplicationRecord"
-  mattr_accessor :active_record_parent_class, default: "ActiveRecord::Base"
+  mattr_accessor :active_record_parent_class, default: nil
 
   # @!attribute [rw] logger
   #   @!scope class
@@ -106,6 +110,19 @@ module GoodJob
     on_thread_error.call(exception) if on_thread_error.respond_to?(:call)
   end
 
+  # Custom Active Record configuration that is class_eval'ed into +GoodJob::BaseRecord+
+  # @param block Custom Active Record configuration
+  # @return [void]
+  #
+  # @example
+  #   GoodJob.configure_active_record do
+  #     connects_to database: :special_database
+  #   end
+  def self.configure_active_record(&block)
+    self._active_record_configuration = block
+  end
+  mattr_accessor :_active_record_configuration, default: nil
+
   # Stop executing jobs.
   # GoodJob does its work in pools of background threads.
   # When forking processes you should shut down these background threads before forking, and restart them after forking.
@@ -135,6 +152,8 @@ module GoodJob
   # @param timeout [Numeric] Seconds to wait for active threads to finish.
   # @return [void]
   def self.restart(timeout: -1)
+    return if configuration.execution_mode != :async && configuration.in_webserver?
+
     _shutdown_all(Capsule.instances, :restart, timeout: timeout)
   end
 
@@ -231,6 +250,18 @@ module GoodJob
       next_major_version = GEM_VERSION.segments[0] + 1
       ActiveSupport::Deprecation.new("#{next_major_version}.0", "GoodJob")
     end
+  end
+
+  include ActiveSupport::Deprecation::DeprecatedConstantAccessor
+  deprecate_constant :Lockable, 'GoodJob::AdvisoryLockable', deprecator: deprecator
+
+  # Whether all GoodJob migrations have been applied.
+  # For use in tests/CI to validate GoodJob is up-to-date.
+  # @return [Boolean]
+  def self.migrated?
+    # Always update with the most recent migration check
+    GoodJob::Execution.reset_column_information
+    GoodJob::Execution.error_event_migrated?
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)

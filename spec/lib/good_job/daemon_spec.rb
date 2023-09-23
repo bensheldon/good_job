@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe GoodJob::Daemon, skip_if_java: true do
+RSpec.describe GoodJob::Daemon, :skip_if_java do
   let(:pidfile) { Rails.application.root.join('tmp/pidfile.pid') }
   let(:daemon) { described_class.new(pidfile: pidfile) }
 

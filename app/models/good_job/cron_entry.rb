@@ -27,6 +27,7 @@ module GoodJob # :nodoc:
     def initialize(params = {})
       @params = params
 
+      return if cron_proc?
       raise ArgumentError, "Invalid cron format: '#{cron}'" unless fugit.instance_of?(Fugit::Cron)
     end
 
@@ -39,10 +40,6 @@ module GoodJob # :nodoc:
 
     def job_class
       params.fetch(:class)
-    end
-
-    def cron
-      params.fetch(:cron)
     end
 
     def set
@@ -61,29 +58,16 @@ module GoodJob # :nodoc:
       params[:description]
     end
 
-    def next_at
-      fugit.next_time.to_t
-    end
-
-    def schedule
-      fugit.original
-    end
-
-    def fugit
-      @_fugit ||= Fugit.parse(cron)
-    end
-
-    def jobs
-      GoodJob::Job.where(cron_key: key)
-    end
-
-    def last_at
-      return if last_job.blank?
-
-      if GoodJob::Job.column_names.include?('cron_at')
-        (last_job.cron_at || last_job.created_at).localtime
+    def next_at(previously_at: nil)
+      if cron_proc?
+        result = Rails.application.executor.wrap { cron.call(previously_at || last_job_at) }
+        if result.is_a?(String)
+          Fugit.parse(result).next_time.to_t
+        else
+          result
+        end
       else
-        last_job.created_at
+        fugit.next_time.to_t
       end
     end
 
@@ -115,19 +99,11 @@ module GoodJob # :nodoc:
       false
     end
 
-    def last_job
-      if GoodJob::Job.column_names.include?('cron_at')
-        jobs.order("cron_at DESC NULLS LAST").first
-      else
-        jobs.order(created_at: :asc).last
-      end
-    end
-
     def display_properties
       {
         key: key,
         class: job_class,
-        cron: schedule,
+        cron: display_schedule,
         set: display_property(set),
         description: display_property(description),
       }.tap do |properties|
@@ -136,7 +112,37 @@ module GoodJob # :nodoc:
       end
     end
 
+    def display_schedule
+      cron_proc? ? display_property(cron) : fugit.original
+    end
+
+    def jobs
+      GoodJob::Job.where(cron_key: key)
+    end
+
+    def last_job
+      jobs.order("cron_at DESC NULLS LAST").first
+    end
+
+    def last_job_at
+      return if last_job.blank?
+
+      (last_job.cron_at || last_job.created_at).localtime
+    end
+
     private
+
+    def cron
+      params.fetch(:cron)
+    end
+
+    def cron_proc?
+      cron.respond_to?(:call)
+    end
+
+    def fugit
+      @_fugit ||= Fugit.parse(cron)
+    end
 
     def set_value
       value = set || {}
@@ -157,7 +163,7 @@ module GoodJob # :nodoc:
       case value
       when NilClass
         "None"
-      when Proc
+      when Callable
         "Lambda/Callable"
       else
         value

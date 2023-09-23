@@ -14,15 +14,32 @@ module GoodJob
       ERROR_EVENT_DISCARDED = 'discarded',
     ].freeze
 
-    included do
-      enum error_event: {
-        ERROR_EVENT_INTERRUPTED => 0,
-        ERROR_EVENT_UNHANDLED => 1,
-        ERROR_EVENT_HANDLED => 2,
-        ERROR_EVENT_RETRIED => 3,
-        ERROR_EVENT_RETRY_STOPPED => 4,
-        ERROR_EVENT_DISCARDED => 5,
-      }.freeze, _prefix: :error_event
+    ERROR_EVENT_ENUMS = {
+      ERROR_EVENT_INTERRUPTED => 0,
+      ERROR_EVENT_UNHANDLED => 1,
+      ERROR_EVENT_HANDLED => 2,
+      ERROR_EVENT_RETRIED => 3,
+      ERROR_EVENT_RETRY_STOPPED => 4,
+      ERROR_EVENT_DISCARDED => 5,
+    }.freeze
+
+    # TODO: GoodJob v4 can make this an `enum` once migrations are guaranteed.
+    def error_event
+      return unless self.class.columns_hash['error_event']
+
+      enum = super
+      return unless enum
+
+      ERROR_EVENT_ENUMS.key(enum)
+    end
+
+    def error_event=(event)
+      return unless self.class.columns_hash['error_event']
+
+      enum = ERROR_EVENT_ENUMS[event]
+      raise(ArgumentError, "Invalid error_event: #{event}") if event && !enum
+
+      super(enum)
     end
   end
 end

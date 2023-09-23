@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe 'I18n Internationalization', js: true do
+describe 'I18n Internationalization', :js do
   describe "when changing language" do
     it "changes wording from English to Spanish" do
       visit good_job_path(locale: :en)

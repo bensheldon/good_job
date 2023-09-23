@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="<%= I18n.locale %>">
+<html lang="<%= I18n.locale %>" data-bs-theme="auto">
 <head>
   <title>Good Job Dashboard</title>
   <meta charset="utf-8">
@@ -19,6 +19,14 @@
   <% importmaps = GoodJob::FrontendsController.js_modules.keys.index_with { |module_name| frontend_module_path(module_name, format: :js, locale: nil, v: GoodJob::VERSION) } %>
   <%= tag.script({ imports: importmaps }.to_json.html_safe, type: "importmap", nonce: content_security_policy_nonce) %>
   <%= tag.script "", type: "module", nonce: content_security_policy_nonce do %> import "application"; <% end %>
+  <%= tag.script "", nonce: content_security_policy_nonce do %>
+    // Ensure theme is updated before dom loads to avoid flash of style
+    let theme = localStorage.getItem('good_job-theme');
+    if (!["light", "dark"].includes(theme)) {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-bs-theme', theme);
+  <% end %>
 </head>
 <body>
   <div class="d-flex flex-column min-vh-100">

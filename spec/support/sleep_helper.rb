@@ -3,7 +3,7 @@
 module SleepHelper
   TooSlowError = Class.new(StandardError)
 
-  def wait_until(max: 5, increments_of: 0.1)
+  def wait_until(max: 5.seconds, increments_of: 0.1.seconds)
     start_time = Time.current
 
     loop do

@@ -50,7 +50,6 @@ module GoodJob
     )
 
     # Create a new batch and enqueue it
-    # @param on_finish [String, Object] The class name of the callback job to be enqueued after the batch is finished
     # @param properties [Hash] Additional properties to be stored on the batch
     # @param block [Proc] Enqueue jobs within the block to add them to the batch
     # @return [GoodJob::BatchRecord]
@@ -58,6 +57,10 @@ module GoodJob
       new.tap do |batch|
         batch.enqueue(active_jobs, **properties, &block)
       end
+    end
+
+    def self.primary_key
+      :id
     end
 
     def self.find(id)
@@ -124,11 +127,11 @@ module GoodJob
     end
 
     def active_jobs
-      record.jobs.map(&:head_execution).map(&:active_job)
+      record.jobs.map(&:active_job)
     end
 
     def callback_active_jobs
-      record.callback_jobs.map(&:head_execution).map(&:active_job)
+      record.callback_jobs.map(&:active_job)
     end
 
     def assign_properties(properties)

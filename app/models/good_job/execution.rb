@@ -3,10 +3,6 @@
 module GoodJob
   # ActiveRecord model that represents an +ActiveJob+ job.
   class Execution < BaseExecution
-    include Lockable
-    include Filterable
-    include Reportable
-
     # Raised if something attempts to execute a previously completed Execution again.
     PreviouslyPerformedError = Class.new(StandardError)
 
@@ -80,7 +76,7 @@ module GoodJob
     }, if: -> { @_destroy_job }
 
     # Get executions with given ActiveJob ID
-    # @!method active_job_id
+    # @!method active_job_id(active_job_id)
     # @!scope class
     # @param active_job_id [String]
     #   ActiveJob ID
@@ -119,7 +115,7 @@ module GoodJob
     scope :creation_ordered, -> { order(created_at: :asc) }
 
     # Order executions for de-queueing
-    # @!method dequeueing_ordered
+    # @!method dequeueing_ordered(parsed_queues)
     # @!scope class
     # @param parsed_queues [Hash]
     #   optional output of .queue_parser, parsed queues, will be used for
@@ -134,7 +130,7 @@ module GoodJob
     end)
 
     # Order executions in order of queues in array param
-    # @!method queue_ordered
+    # @!method queue_ordered(queues)
     # @!scope class
     # @param queues [Array<string] ordered names of queues
     # @return [ActiveRecord::Relation]
@@ -304,9 +300,6 @@ module GoodJob
     #   Epoch timestamp when the job should be executed, if blank will delegate to the ActiveJob instance
     # @param create_with_advisory_lock [Boolean]
     #   Whether to establish a lock on the {Execution} record after it is created.
-    # @param persist_immediately [Boolean]
-    #   Whether to save the record immediately or just initialize it with values. When bulk-inserting
-    #   jobs the caller takes care of the persistence and sets this parameter to `false`
     # @return [Execution]
     #   The new {Execution} instance representing the queued ActiveJob job.
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
@@ -384,7 +377,7 @@ module GoodJob
                 error: interrupt_error_string,
                 finished_at: Time.current,
               }
-              discrete_execution_attrs[:error_event] = GoodJob::DiscreteExecution.error_events[GoodJob::DiscreteExecution::ERROR_EVENT_INTERRUPTED] if self.class.error_event_migrated?
+              discrete_execution_attrs[:error_event] = GoodJob::ErrorEvents::ERROR_EVENT_ENUMS[GoodJob::ErrorEvents::ERROR_EVENT_INTERRUPTED] if self.class.error_event_migrated?
               discrete_executions.where(finished_at: nil).where.not(performed_at: nil).update_all(discrete_execution_attrs) # rubocop:disable Rails/SkipsModelValidations
             end
           end
@@ -512,19 +505,6 @@ module GoodJob
       self.scheduled_at ||= current_time
     end
 
-    # Build an ActiveJob instance and deserialize the arguments, using `#active_job_data`.
-    #
-    # @param ignore_deserialization_errors [Boolean]
-    #   Whether to ignore ActiveJob::DeserializationError when deserializing the arguments.
-    #   This is most useful if you aren't planning to use the arguments directly.
-    def active_job(ignore_deserialization_errors: false)
-      ActiveJob::Base.deserialize(active_job_data).tap do |aj|
-        aj.send(:deserialize_arguments_if_needed)
-      rescue ActiveJob::DeserializationError
-        raise unless ignore_deserialization_errors
-      end
-    end
-
     # Return formatted serialized_params for display in the dashboard
     # @return [Hash]
     def display_serialized_params
@@ -568,14 +548,6 @@ module GoodJob
     end
 
     private
-
-    def active_job_data
-      serialized_params.deep_dup
-                       .tap do |job_data|
-        job_data["provider_job_id"] = id
-        job_data["good_job_concurrency_key"] = concurrency_key if concurrency_key
-      end
-    end
 
     def reset_batch_values(&block)
       GoodJob::Batch.within_thread(batch_id: nil, batch_callback_id: nil, &block)

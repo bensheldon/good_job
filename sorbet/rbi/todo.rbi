@@ -13,10 +13,12 @@ module ::ErrorJob; end
 module ::ExpectedError; end
 module ::JOB_PERFORMED; end
 module ::JobError; end
+module ::LATCH; end
 module ::MemoryProfiler; end
 module ::PERFORMED; end
 module ::POLL_COUNT; end
 module ::RECEIVED_MESSAGE; end
+module ::REFRESH_IF_STALE_CALLED; end
 module ::RESULTS; end
 module ::RUN_JOBS; end
 module ::RecursiveJob; end
@@ -27,7 +29,6 @@ module ::THREAD_JOBS; end
 module ::TestError; end
 module ::TestJob; end
 module ::TestJob::ExpectedError; end
-module GoodJob::DiscreteExecution::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Job::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Job::ERROR_EVENT_RETRIED; end
 module RSpec::Core::Example; end

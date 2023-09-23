@@ -20,20 +20,13 @@ module GoodJob # :nodoc:
 
     # Default Postgres channel for LISTEN/NOTIFY
     CHANNEL = 'good_job'
-    # Defaults for instance of Concurrent::ThreadPoolExecutor
-    EXECUTOR_OPTIONS = {
-      name: name,
-      min_threads: 0,
-      max_threads: 1,
-      auto_terminate: true,
-      idletime: 60,
-      max_queue: 1,
-      fallback_policy: :discard,
-    }.freeze
     # Seconds to block while LISTENing for a message
     WAIT_INTERVAL = 1
     # Seconds to wait if database cannot be connected to
     RECONNECT_INTERVAL = 5
+    # Number of consecutive connection errors before reporting an error
+    CONNECTION_ERRORS_REPORTING_THRESHOLD = 6
+
     # Connection errors that will wait {RECONNECT_INTERVAL} before reconnecting
     CONNECTION_ERRORS = %w[
       ActiveRecord::ConnectionNotEstablished
@@ -41,7 +34,6 @@ module GoodJob # :nodoc:
       PG::UnableToSend
       PG::Error
     ].freeze
-    CONNECTION_ERRORS_REPORTING_THRESHOLD = 3
 
     # @!attribute [r] instances
     #   @!scope class
@@ -70,40 +62,55 @@ module GoodJob # :nodoc:
 
     # @param recipients [Array<#call, Array(Object, Symbol)>]
     # @param enable_listening [true, false]
-    def initialize(*recipients, enable_listening: true)
+    # @param executor [Concurrent::ExecutorService]
+    def initialize(*recipients, enable_listening: true, executor: Concurrent.global_io_executor)
       @recipients = Concurrent::Array.new(recipients)
-      @connected = Concurrent::AtomicBoolean.new(false)
-      @listening = Concurrent::AtomicBoolean.new(false)
+      @enable_listening = enable_listening
+      @executor = executor
+
+      @mutex = Mutex.new
+      @shutdown_event = Concurrent::Event.new.tap(&:set)
+      @running = Concurrent::AtomicBoolean.new(false)
+      @connected = Concurrent::Event.new
+      @listening = Concurrent::Event.new
       @connection_errors_count = Concurrent::AtomicFixnum.new(0)
       @connection_errors_reported = Concurrent::AtomicBoolean.new(false)
       @enable_listening = enable_listening
+      @task = nil
 
-      create_executor
-      listen
+      start
       self.class.instances << self
     end
 
+    def running?
+      @executor.running? && @running.true?
+    end
+
     # Tests whether the notifier is active and has acquired a dedicated database connection.
+    # @param timeout [Numeric, nil] Seconds to wait for condition to be true, -1 is forever
     # @return [true, false, nil]
-    def connected?
-      @connected.true?
+    def connected?(timeout: nil)
+      if timeout.nil?
+        @connected.set?
+      else
+        @connected.wait(timeout == -1 ? nil : timeout)
+      end
     end
 
     # Tests whether the notifier is listening for new messages.
+    # @param timeout [Numeric, nil] Seconds to wait for condition to be true, -1 is forever
     # @return [true, false, nil]
-    def listening?
-      @listening.true?
+    def listening?(timeout: nil)
+      if timeout.nil?
+        @listening.set?
+      else
+        @listening.wait(timeout == -1 ? nil : timeout)
+      end
     end
 
-    # Tests whether the notifier is running.
-    # @!method running?
-    # @return [true, false, nil]
-    delegate :running?, to: :executor, allow_nil: true
-
-    # Tests whether the scheduler is shutdown.
-    # @!method shutdown?
-    # @return [true, false, nil]
-    delegate :shutdown?, to: :executor, allow_nil: true
+    def shutdown?
+      @shutdown_event.set?
+    end
 
     # Shut down the notifier.
     # This stops the background LISTENing thread.
@@ -111,17 +118,22 @@ module GoodJob # :nodoc:
     # @param timeout [Numeric, nil] Seconds to wait for active threads.
     #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
     #   * +-1+, the scheduler will wait until the shutdown is complete.
-    #   * +0+, the scheduler will immediately shutdown and stop any threads.
     #   * A positive number will wait that many seconds before stopping any remaining active threads.
     # @return [void]
     def shutdown(timeout: -1)
-      return if executor.nil? || executor.shutdown?
+      synchronize do
+        @running.make_false
 
-      executor.shutdown if executor.running?
-
-      if executor.shuttingdown? && timeout # rubocop:disable Style/GuardClause
-        executor_wait = timeout.negative? ? nil : timeout
-        executor.kill unless executor.wait_for_termination(executor_wait)
+        if @executor.shutdown? || @task&.complete?
+          # clean up in the even the executor is killed
+          @connected.reset
+          @listening.reset
+          @shutdown_event.set
+        else
+          @shutdown_event.wait(timeout == -1 ? nil : timeout) unless timeout.nil?
+          @connected.reset if @shutdown_event.set?
+        end
+        @shutdown_event.set?
       end
     end
 
@@ -130,9 +142,10 @@ module GoodJob # :nodoc:
     # @param timeout [nil, Numeric] Seconds to wait; shares same values as {#shutdown}.
     # @return [void]
     def restart(timeout: -1)
-      shutdown(timeout: timeout) if running?
-      create_executor
-      listen
+      synchronize do
+        shutdown(timeout: timeout) unless @shutdown_event.set?
+        start
+      end
     end
 
     # Invoked on completion of ThreadPoolExecutor task
@@ -152,6 +165,7 @@ module GoodJob # :nodoc:
         if connection_error
           @connection_errors_count.increment
           if @connection_errors_reported.false? && @connection_errors_count.value >= CONNECTION_ERRORS_REPORTING_THRESHOLD
+            @connected.reset
             GoodJob._on_thread_error(thread_error)
             @connection_errors_reported.make_true
           end
@@ -160,35 +174,43 @@ module GoodJob # :nodoc:
         end
       end
 
-      return if shutdown?
-
-      listen(delay: connection_error ? RECONNECT_INTERVAL : 0)
+      if @running.true?
+        create_listen_task(delay: connection_error ? RECONNECT_INTERVAL : 0)
+      else
+        @shutdown_event.set
+      end
     end
 
     private
 
-    attr_reader :executor
+    def start
+      synchronize do
+        return if @running.true?
 
-    def create_executor
-      @executor = Concurrent::ThreadPoolExecutor.new(EXECUTOR_OPTIONS)
+        @running.make_true
+        @shutdown_event.reset
+        create_listen_task(delay: 0)
+      end
     end
 
-    def listen(delay: 0)
-      future = Concurrent::ScheduledTask.new(delay, args: [@recipients, executor, @enable_listening, @listening], executor: @executor) do |thr_recipients, thr_executor, thr_enable_listening, thr_listening|
+    def create_listen_task(delay: 0)
+      @task = Concurrent::ScheduledTask.new(delay, args: [@recipients, @running, @executor, @enable_listening, @connected, @listening], executor: @executor) do |thr_recipients, thr_running, thr_executor, thr_enable_listening, thr_connected, thr_listening|
         with_connection do
+          thr_connected.set
+
           begin
             Rails.application.executor.wrap do
               run_callbacks :listen do
                 if thr_enable_listening
                   ActiveSupport::Notifications.instrument("notifier_listen.good_job") do
                     connection.execute("LISTEN #{CHANNEL}")
-                    thr_listening.make_true
+                    thr_listening.set
                   end
                 end
               end
             end
 
-            while thr_executor.running?
+            while thr_executor.running? && thr_running.true?
               run_callbacks :tick do
                 wait_for_notify do |channel, payload|
                   next unless channel == CHANNEL
@@ -210,7 +232,7 @@ module GoodJob # :nodoc:
             run_callbacks :unlisten do
               if thr_enable_listening
                 ActiveSupport::Notifications.instrument("notifier_unlisten.good_job") do
-                  thr_listening.make_false
+                  thr_listening.reset
                   connection.execute("UNLISTEN *")
                 end
               end
@@ -219,8 +241,9 @@ module GoodJob # :nodoc:
         end
       end
 
-      future.add_observer(self, :listen_observer)
-      future.execute
+      @task.add_observer(self, :listen_observer)
+      @task.execute
+      @task
     end
 
     def with_connection
@@ -230,11 +253,9 @@ module GoodJob # :nodoc:
         end
       end
       connection.execute("SET application_name = #{connection.quote(self.class.name)}")
-      @connected.make_true
 
       yield
     ensure
-      @connected.make_false
       connection&.disconnect!
       self.connection = nil
     end
@@ -262,6 +283,14 @@ module GoodJob # :nodoc:
     def reset_connection_errors
       @connection_errors_count.value = 0
       @connection_errors_reported.make_false
+    end
+
+    def synchronize(&block)
+      if @mutex.owned?
+        yield
+      else
+        @mutex.synchronize(&block)
+      end
     end
   end
 end

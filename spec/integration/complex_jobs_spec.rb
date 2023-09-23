@@ -11,6 +11,11 @@ RSpec.describe 'Complex Jobs' do
   end
 
   describe 'Job with retry stopped but no block' do
+    after do
+      # This spec will intentionally raise an error on the thread.
+      THREAD_ERRORS.clear
+    end
+
     specify do
       stub_const "TestJob", (Class.new(ActiveJob::Base) do
         retry_on StandardError, wait: 0, attempts: 1
@@ -37,7 +42,6 @@ RSpec.describe 'Complex Jobs' do
       )
 
       expect(THREAD_ERRORS.size).to eq 1
-      THREAD_ERRORS.clear
     end
   end
 

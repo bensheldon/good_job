@@ -4,6 +4,7 @@ de:
     actions:
       destroy: Zerstören
       discard: Verwerfen
+      force_discard: Verwerfen erzwingen
       inspect: Prüfen
       reschedule: Umplanen
       retry: Wiederholen
@@ -110,10 +111,14 @@ de:
       actions:
         confirm_destroy: Sind Sie sicher, dass Sie den Job zerstören wollen?
         confirm_discard: Sind Sie sicher, dass Sie den Job verwerfen wollen?
+        confirm_force_discard: 'Sind Sie sicher, dass Sie das Verwerfen dieses Jobs erzwingen möchten? Der Job wird als verworfen markiert, aber der laufende Job wird nicht gestoppt – er wird jedoch bei Fehlern nicht erneut versucht.
+
+          '
         confirm_reschedule: Möchten Sie den Auftrag wirklich verschieben?
         confirm_retry: Möchten Sie den Job wirklich wiederholen?
         destroy: Arbeit vernichten
         discard: Auftrag verwerfen
+        force_discard: Job verwerfen erzwingen
         reschedule: Auftrag neu planen
         retry: Job wiederholen
       destroy:
@@ -124,6 +129,8 @@ de:
         in_queue: in der Warteschlange
         runtime: Laufzeit
         title: Hinrichtungen
+      force_discard:
+        notice: Der Job wurde zwangsweise verworfen. Die Ausführung wird fortgesetzt, bei Fehlern wird der Vorgang jedoch nicht wiederholt
       index:
         job_pagination: Job-Paginierung
         older_jobs: Ältere Berufe
@@ -218,6 +225,11 @@ de:
         live_poll: Live Poll
         name: "GoodJob 👍"
         processes: Prozesse
+        theme:
+          auto: Auto
+          dark: Dunkel
+          light: Licht
+          theme: Thema
     status:
       discarded: Ausrangiert
       queued: In der Warteschlange

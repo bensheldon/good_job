@@ -4,7 +4,7 @@
 
 <div class="card my-3" data-live-poll-region="processes">
   <div class="list-group list-group-flush text-nowrap" role="table">
-    <header class="list-group-item bg-light">
+    <header class="list-group-item bg-body-tertiary">
       <div class="row small text-muted text-uppercase align-items-center">
         <div class="col"><%= t ".process" %></div>
         <div class="col"><%= t ".schedulers" %></div>
@@ -34,9 +34,9 @@
             <% end %>
             <div>
               <span class="text-muted small">PID</span>
-              <span class="badge rounded-pill bg-light text-dark"><%= process.state["pid"] %></span>
+              <span class="badge rounded-pill bg-body-secondary text-secondary"><%= process.state["pid"] %></span>
               <span class="text-muted small">@</span>
-              <span class="badge rounded-pill bg-light text-dark"><%= process.state["hostname"] %></span>
+              <span class="badge rounded-pill bg-body-secondary text-secondary"><%= process.state["hostname"] %></span>
             </div>
           </div>
           <div class="col">

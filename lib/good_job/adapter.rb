@@ -64,7 +64,15 @@ module GoodJob
 
       inline_executions = []
       GoodJob::Execution.transaction(requires_new: true, joinable: false) do
-        results = GoodJob::Execution.insert_all(executions.map(&:attributes), returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
+        execution_attributes = executions.map do |execution|
+          if GoodJob::Execution.error_event_migrated?
+            execution.attributes
+          else
+            execution.attributes.except('error_event')
+          end
+        end
+
+        results = GoodJob::Execution.insert_all(execution_attributes, returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
 
         job_id_to_provider_job_id = results.each_with_object({}) { |result, hash| hash[result['active_job_id']] = result['id'] }
         active_jobs.each do |active_job|
@@ -177,7 +185,7 @@ module GoodJob
     # @return [Boolean]
     def execute_async?
       execution_mode == :async_all ||
-        (execution_mode.in?([:async, :async_server]) && in_server_process?)
+        (execution_mode.in?([:async, :async_server]) && GoodJob.configuration.in_webserver?)
     end
 
     # Whether in +:external+ execution mode.
@@ -185,7 +193,7 @@ module GoodJob
     def execute_externally?
       execution_mode.nil? ||
         execution_mode == :external ||
-        (execution_mode.in?([:async, :async_server]) && !in_server_process?)
+        (execution_mode.in?([:async, :async_server]) && !GoodJob.configuration.in_webserver?)
     end
 
     # Whether in +:inline+ execution mode.
@@ -210,21 +218,6 @@ module GoodJob
     end
 
     private
-
-    # Whether running in a web server process.
-    # @return [Boolean, nil]
-    def in_server_process?
-      return @_in_server_process if defined? @_in_server_process
-
-      @_in_server_process = Rails.const_defined?(:Server) || begin
-        self_caller = caller
-
-        self_caller.grep(%r{config.ru}).any? || # EXAMPLE: config.ru:3:in `block in <main>' OR config.ru:3:in `new_from_string'
-          self_caller.grep(%r{puma/request}).any? || # EXAMPLE: puma-5.6.4/lib/puma/request.rb:76:in `handle_request'
-          self_caller.grep(%{/rack/handler/}).any? || # EXAMPLE: iodine-0.7.44/lib/rack/handler/iodine.rb:13:in `start'
-          (Concurrent.on_jruby? && self_caller.grep(%r{jruby/rack/rails_booter}).any?) # EXAMPLE: uri:classloader:/jruby/rack/rails_booter.rb:83:in `load_environment'
-      end
-    end
 
     def send_notify?(active_job)
       return false unless GoodJob.configuration.enable_listen_notify

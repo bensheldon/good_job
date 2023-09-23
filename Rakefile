@@ -6,7 +6,6 @@ rescue LoadError
   puts 'You must `gem install bundler` and `bundle install` to run rake tasks'
 end
 
-require 'dotenv/load'
 require_relative "lib/good_job/version"
 Rake.load_rakefile 'spec/test_app/Rakefile'
 Bundler::GemHelper.install_tasks
@@ -27,6 +26,8 @@ end
 
 desc 'Commit version and changelog'
 task :release_good_job, [:version_bump] do |_t, args|
+  require 'dotenv/load'
+
   version_bump = args[:version_bump]
   if version_bump.nil?
     puts "Pass a version [major|minor|patch|pre|release] or a given version number [x.x.x]:"
@@ -42,7 +43,7 @@ task :release_good_job, [:version_bump] do |_t, args|
   puts GoodJob::VERSION
 
   puts "\n== Updating Changelog =="
-  system! ENV, "bundle exec github_changelog_generator --user bensheldon --project good_job --future-release v#{GoodJob::VERSION}"
+  system! ENV, "bundle exec github_changelog_generator --user bensheldon --project good_job --future-release v#{GoodJob::VERSION} --cache-file=tmp/github-changelog-http-cache"
 
   puts "\n== Updating Gemfile.lock version =="
   system! "bundle update --conservative good_job"

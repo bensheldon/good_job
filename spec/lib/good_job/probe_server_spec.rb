@@ -12,7 +12,7 @@ RSpec.describe GoodJob::ProbeServer do
   end
 
   describe '#start' do
-    it 'starts a webrick server that binds to all interfaces' do
+    it 'starts a http server that binds to all interfaces' do
       probe_server.start
       wait_until(max: 1) { expect(probe_server).to be_running }
 
@@ -24,6 +24,15 @@ RSpec.describe GoodJob::ProbeServer do
         ip_addresses.each do |ip_address|
           response = Net::HTTP.get(ip_address, "/", port)
           expect(response).to eq("OK")
+
+          response = Net::HTTP.get(ip_address, "/status", port)
+          expect(response).to eq("OK")
+
+          response = Net::HTTP.get(ip_address, "/status/started", port)
+          expect(response).to eq("Not started")
+
+          response = Net::HTTP.get(ip_address, "/status/connected", port)
+          expect(response).to eq("Not connected")
         end
       end
     end
@@ -73,12 +82,25 @@ RSpec.describe GoodJob::ProbeServer do
         end
       end
 
-      context 'when there are running schedulers and listening notifiers' do
+      context 'when there are running schedulers but disconnected notifiers' do
         it 'returns 200' do
           scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true)
           GoodJob::Scheduler.instances << scheduler
 
-          notifier = instance_double(GoodJob::Notifier, listening?: true, shutdown: true, shutdown?: true)
+          notifier = instance_double(GoodJob::Notifier, connected?: false, shutdown: true, shutdown?: true)
+          GoodJob::Notifier.instances << notifier
+
+          response = probe_server.call(env)
+          expect(response[0]).to eq(503)
+        end
+      end
+
+      context 'when there are running schedulers and connected notifiers' do
+        it 'returns 200' do
+          scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true)
+          GoodJob::Scheduler.instances << scheduler
+
+          notifier = instance_double(GoodJob::Notifier, connected?: true, shutdown: true, shutdown?: true)
           GoodJob::Notifier.instances << notifier
 
           response = probe_server.call(env)

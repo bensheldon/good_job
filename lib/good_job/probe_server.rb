@@ -2,8 +2,6 @@
 
 module GoodJob
   class ProbeServer
-    RACK_SERVER = 'webrick'
-
     def self.task_observer(time, output, thread_error) # rubocop:disable Lint/UnusedMethodArgument
       return if thread_error.is_a? Concurrent::CancelledOperationError
 
@@ -15,20 +13,18 @@ module GoodJob
     end
 
     def start
-      @handler = Rack::Handler.get(RACK_SERVER)
-      @future = Concurrent::Future.new(args: [@handler, @port, GoodJob.logger]) do |thr_handler, thr_port, thr_logger|
-        thr_handler.run(self, Port: thr_port, Host: '0.0.0.0', Logger: thr_logger, AccessLog: [])
-      end
+      @handler = HttpServer.new(self, port: @port, logger: GoodJob.logger)
+      @future = Concurrent::Future.new { @handler.run }
       @future.add_observer(self.class, :task_observer)
       @future.execute
     end
 
     def running?
-      @handler&.instance_variable_get(:@server)&.status == :Running
+      @handler&.running?
     end
 
     def stop
-      @handler&.shutdown
+      @handler&.stop
       @future&.value # wait for Future to exit
     end
 
@@ -41,7 +37,7 @@ module GoodJob
         started ? [200, {}, ["Started"]] : [503, {}, ["Not started"]]
       when '/status/connected'
         connected = GoodJob::Scheduler.instances.any? && GoodJob::Scheduler.instances.all?(&:running?) &&
-                    GoodJob::Notifier.instances.any? && GoodJob::Notifier.instances.all?(&:listening?)
+                    GoodJob::Notifier.instances.any? && GoodJob::Notifier.instances.all?(&:connected?)
         connected ? [200, {}, ["Connected"]] : [503, {}, ["Not connected"]]
       else
         [404, {}, ["Not found"]]

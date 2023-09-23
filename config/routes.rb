@@ -11,6 +11,7 @@ GoodJob::Engine.routes.draw do
 
     member do
       put :discard
+      put :force_discard
       put :reschedule
       put :retry
     end

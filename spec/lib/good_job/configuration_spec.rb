@@ -9,7 +9,7 @@ RSpec.describe GoodJob::Configuration do
     end
 
     it 'counts up the total estimated threads' do
-      expect(described_class.total_estimated_threads).to eq 1
+      expect(described_class.total_estimated_threads).to eq 2
     end
 
     it 'outputs a warning message' do

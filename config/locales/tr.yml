@@ -4,6 +4,7 @@ tr:
     actions:
       destroy: Sil
       discard: İptal Et
+      force_discard: Atmaya zorla
       inspect: İncele
       reschedule: Yeniden planla
       retry: Tekrar dene
@@ -110,10 +111,14 @@ tr:
       actions:
         confirm_destroy: Bu işi silmek istediğinizden emin misiniz?
         confirm_discard: Bu işi iptal etmek istediğinizden emin misiniz?
+        confirm_force_discard: 'Bu işi zorla iptal etmek istediğinizden emin misiniz? İş atıldı olarak işaretlenecek ancak devam eden iş durdurulmayacak; ancak başarısızlık durumunda yeniden denenmeyecek.
+
+          '
         confirm_reschedule: Bu işi yeniden planlamak istediğinizden emin misiniz?
         confirm_retry: Bu işi tekrar denemek istediğinizden emin misiniz?
         destroy: İşi Sil
         discard: İşi İptal Et
+        force_discard: İşi zorla atmaya zorla
         reschedule: İşi Yeniden Planla
         retry: İşi Tekrar Dene
       destroy:
@@ -124,6 +129,8 @@ tr:
         in_queue: sırada
         runtime: çalışma süresi
         title: İşlemler
+      force_discard:
+        notice: İş zorla atıldı. Çalışmaya devam edecek ancak arıza durumunda yeniden denenmeyecek
       index:
         job_pagination: İş sayfalandırması
         older_jobs: Daha eski işler
@@ -218,6 +225,11 @@ tr:
         live_poll: Anlık Güncelleme
         name: "GoodJob 👍"
         processes: Süreçler
+        theme:
+          auto: Oto
+          dark: Karanlık
+          light: Işık
+          theme: Tema
     status:
       discarded: İptal Edildi
       queued: Sırada

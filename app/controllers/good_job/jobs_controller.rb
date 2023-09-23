@@ -3,6 +3,7 @@
 module GoodJob
   class JobsController < GoodJob::ApplicationController
     DISCARD_MESSAGE = "Discarded through dashboard"
+    FORCE_DISCARD_MESSAGE = "Force discarded through dashboard"
 
     ACTIONS = {
       discard: "discarded",
@@ -63,6 +64,12 @@ module GoodJob
     def discard
       @job = Job.find(params[:id])
       @job.discard_job(DISCARD_MESSAGE)
+      redirect_back(fallback_location: jobs_path, notice: t(".notice"))
+    end
+
+    def force_discard
+      @job = Job.find(params[:id])
+      @job.force_discard_job(FORCE_DISCARD_MESSAGE)
       redirect_back(fallback_location: jobs_path, notice: t(".notice"))
     end
 

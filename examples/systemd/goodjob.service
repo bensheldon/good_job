@@ -1,0 +1,92 @@
+# This is an example systemd service configuration that keeps GoodJob running.
+#
+# Customize this file based on your bundler location, app directory, etc.
+#
+# TO RUN AS A USER SERVICE...
+# Customize and copy this file to ~/.config/systemd/user/goodjob.service
+# Then run:
+#   - systemctl --user enable goodjob
+#   - systemctl --user {start,stop,restart,status} goodjob
+# Also you might want to run:
+#   - loginctl enable-linger username
+# So that the service is not killed when the user logs out.
+#
+# TO RUN AS A SYSTEM SERVICE...
+# Customize and copy this to:
+#   (on CentOS) /usr/lib/systemd/system/goodjob.service
+#   (on Ubuntu) /lib/systemd/system/goodjob.service
+# Then run (you may need to use `sudo`):
+#   - systemctl enable goodjob
+#   - systemctl {start,stop,restart,status} goodjob
+#
+# This file corresponds to a single GoodJob process. Add multiple copies
+# to run multiple processes (goodjob-1, goodjob-2, etc).
+#
+# Use `journalctl --unit goodjob -rn 100` to view the last 100 log lines.
+# Or  `journalctl --unit goodjob --follow` to view live log output.
+#
+[Unit]
+Description=GoodJob Background Job Processor
+# Start only once the network is available.
+# If running Postgres locally and it's also managed by systemd, consider adding
+# `postgresql.service` (this list is space-separated).
+After=network.target
+
+# See these pages for lots of options:
+#
+#   https://www.freedesktop.org/software/systemd/man/systemd.service.html
+#   https://www.freedesktop.org/software/systemd/man/systemd.exec.html
+#
+# THOSE PAGES ARE CRITICAL FOR ANY LINUX DEVOPS WORK; read them multiple
+# times! systemd is a critical tool for all developers to know and understand.
+#
+[Service]
+# Type=notify is supported as of GoodJob v3.17.0. In earlier versions, use
+# Type=simple and remove the WatchdogSec line.
+Type=notify
+# If systemd doesn't get pinged by GoodJob at least this often, restart GoodJob.
+WatchdogSec=5s
+
+WorkingDirectory=<PATH_TO_YOUR_RAILS_APP>
+# The actual command to run.
+# If you use the system's ruby:
+ExecStart=/usr/local/bin/bundle exec good_job start
+# If you use rbenv:
+# ExecStart=/bin/bash -lc 'exec /home/<USERNAME>/.rbenv/shims/bundle exec good_job start'
+# If you use rvm in production without gemset and your ruby version is 2.6.5
+# ExecStart=/home/<USERNAME>/.rvm/gems/ruby-2.6.5/wrappers/bundle exec good_job start
+# If you use rvm in production with gemset and your ruby version is 2.6.5
+# ExecStart=/home/<USERNAME>/.rvm/gems/ruby-2.6.5@gemset-name/wrappers/bundle exec good_job start
+# If you use rvm in production with gemset and ruby version/gemset is specified in .ruby-version,
+# .ruby-gemsetor or .rvmrc file in the working directory:
+# ExecStart=/home/<USERNAME>/.rvm/bin/rvm in <PATH_TO_YOUR_RAILS_APP> do bundle exec good_job start
+
+# Uncomment this if you are going to use this as a system service
+# if using as a user service then leave commented out, or you will get an error trying to start the service
+# !!! Change this to your deploy user account if you are using this as a system service !!!
+# User=<USERNAME>
+# Group=<USERGROUP>
+# UMask=0002
+
+# Set any environment variables your application needs, one `Environment=X` line
+# per environment variable.
+Environment=RAILS_ENV=production
+# Greatly reduce Ruby memory fragmentation and heap usage:
+# https://www.mikeperham.com/2018/04/25/taming-rails-memory-bloat/
+Environment=MALLOC_ARENA_MAX=2
+
+# If GoodJob crashes, restart after a short delay:
+RestartSec=1s
+Restart=always
+
+# Send output to the systemd journal. You can view it with:
+#   journalctl --unit goodjob
+# To send output to a file, set the path here instead.
+StandardOutput=journal
+StandardError=journal
+
+# This will default to "bundler" if we don't specify it.
+SyslogIdentifier=goodjob
+
+[Install]
+WantedBy=multi-user.target

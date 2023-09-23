@@ -8,7 +8,9 @@ import setupPopovers from "popovers";
 import LivePoll from "live_poll";
 
 import { Application } from "stimulus";
+import ThemeController from "theme_controller";
 window.Stimulus = Application.start();
+Stimulus.register("theme", ThemeController)
 
 documentReady(function() {
   renderCharts();

@@ -104,6 +104,23 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  describe '#reload' do
+    it 'reloads the job execution' do
+      job = undiscrete_job
+      original_head_execution = job.head_execution
+
+      new_execution = GoodJob::Execution.create!(
+        active_job_id: job.active_job_id,
+        queue_name: 'newnewnew'
+      )
+      original_head_execution.update!(retried_good_job_id: new_execution.id)
+
+      expect do
+        job.reload
+      end.to change { job.queue_name }.from('mice').to('newnewnew')
+    end
+  end
+
   describe '#head_execution' do
     it 'is the head execution (which should be the same record)' do
       job = undiscrete_job
@@ -244,11 +261,10 @@ RSpec.describe GoodJob::Job do
 
     context 'when job is already locked' do
       it 'raises an Error' do
-        ActiveRecord::Base.clear_active_connections!
         job.with_advisory_lock do
           expect do
-            Concurrent::Promises.future(job, &:retry_job).value!
-          end.to raise_error GoodJob::Lockable::RecordAlreadyAdvisoryLockedError
+            rails_promise(job, &:retry_job).value!
+          end.to raise_error GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
         end
       end
     end
@@ -307,6 +323,33 @@ RSpec.describe GoodJob::Job do
           job.discard_job("Discarded in test")
         end.to change { job.reload.status }.from(:scheduled).to(:discarded)
       end
+    end
+  end
+
+  describe '#force_discard_job' do
+    it 'will discard the job even when advisory locked' do
+      locked_event = Concurrent::Event.new
+      done_event = Concurrent::Event.new
+
+      promise = Concurrent::Promises.future do
+        rails_promise do
+          # pretend the job is running
+          job.with_advisory_lock do
+            locked_event.set
+            done_event.wait(10)
+          end
+        end
+      end
+      locked_event.wait(10)
+
+      job.force_discard_job("Discarded in test")
+      job.reload
+      expect(job.finished_at).to be_present
+      expect(job.error).to eq "GoodJob::Job::DiscardJobError: Discarded in test"
+    ensure
+      locked_event.set
+      done_event.set
+      promise.value!
     end
   end
 

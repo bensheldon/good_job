@@ -32,9 +32,23 @@ describe GoodJob do
       expect { described_class.restart }.not_to change(described_class, :shutdown?).from(true)
     end
 
-    it 'restarts down all capsule instances' do
-      GoodJob::Capsule.new(configuration: configuration)
-      expect { described_class.restart }.to change(described_class, :shutdown?).from(true).to(false)
+    it 'restarts all capsule instances' do
+      capsule = GoodJob::Capsule.new(configuration: configuration)
+      expect { described_class.restart }.to change(capsule, :shutdown?).from(true).to(false)
+      capsule.shutdown
+
+      described_class.shutdown
+    end
+
+    context 'when in webserver but not in async mode' do
+      before do
+        allow(described_class.configuration).to receive_messages(execution_mode: :external, in_webserver?: true)
+      end
+
+      it 'does not start capsules' do
+        GoodJob::Capsule.new(configuration: configuration)
+        expect { described_class.restart }.not_to change(described_class, :shutdown?).from(true)
+      end
     end
   end
 

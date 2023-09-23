@@ -4,6 +4,7 @@ es:
     actions:
       destroy: Eliminar
       discard: Descartar
+      force_discard: Forzar descarte
       inspect: Inspeccionar
       reschedule: Reprogramar
       retry: Reintentar
@@ -110,10 +111,12 @@ es:
       actions:
         confirm_destroy: "¿Estás seguro que querés eliminar esta tarea?"
         confirm_discard: "¿Estás seguro que querés descartar esta tarea?"
+        confirm_force_discard: "¿Está seguro de que desea forzar el descarte de este trabajo? El trabajo se marcará como descartado, pero el trabajo en ejecución no se detendrá; sin embargo, no se volverá a intentar en caso de falla.\n"
         confirm_reschedule: "¿Estás seguro que querés reprogramar esta tarea?"
         confirm_retry: "¿Estás seguro que querés reintentar esta tarea?"
         destroy: Eliminar tarea
         discard: Descartar tarea
+        force_discard: Forzar el descarte del trabajo
         reschedule: Reprogramar tarea
         retry: Reiuntentar tarea
       destroy:
@@ -124,6 +127,8 @@ es:
         in_queue: en cola
         runtime: en ejecución
         title: Ejecuciones
+      force_discard:
+        notice: Job ha sido descartado a la fuerza. Continuará ejecutándose pero no se volverá a intentar en caso de fallas.
       index:
         job_pagination: Paginación de tareas
         older_jobs: Tareas anteriores
@@ -218,6 +223,11 @@ es:
         live_poll: En vivo
         name: "GoodJob 👍"
         processes: Procesos
+        theme:
+          auto: Auto
+          dark: Oscuro
+          light: Luz
+          theme: Tema
     status:
       discarded:
         one: Descartada

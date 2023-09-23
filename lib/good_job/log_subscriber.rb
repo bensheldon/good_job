@@ -161,6 +161,24 @@ module GoodJob
       end
     end
 
+    # @!macro notification_responder
+    def systemd_watchdog_start(event)
+      interval = event.payload[:interval]
+
+      info do
+        "Pinging systemd watchdog every #{interval.round(1)} seconds"
+      end
+    end
+
+    # @!macro notification_responder
+    def systemd_watchdog_error(event)
+      exception = event.payload[:error]
+
+      error do
+        "Error pinging systemd: #{exception.class}: #{exception}\n #{exception.backtrace}"
+      end
+    end
+
     # @!endgroup
 
     # Get the logger associated with this {LogSubscriber} instance.
