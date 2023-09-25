@@ -6,7 +6,7 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = false
 
   config.before(:suite) do
-    ApplicationRecord.clear_active_connections!
+    ApplicationRecord.connection_handler.clear_active_connections!
     ApplicationRecord.connection_pool.disconnect
     ApplicationRecord.connection_pool.with_connection do |connection|
       connection.truncate_tables(*connection.tables)
@@ -16,7 +16,7 @@ RSpec.configure do |config|
   config.around do |example|
     example.run
 
-    ApplicationRecord.clear_active_connections!
+    ApplicationRecord.connection_handler.clear_active_connections!
     ApplicationRecord.connection_pool.disconnect
     ApplicationRecord.connection_pool.with_connection do |connection|
       connection.truncate_tables(*connection.tables)
