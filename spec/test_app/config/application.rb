@@ -1,10 +1,11 @@
 require_relative 'boot'
 
 require 'rails/all'
+require "good_job"
 require "good_job/engine"
 
 Bundler.require(*Rails.groups)
-require "good_job"
+require_relative "../lib/thread_name_formatter"
 
 module TestApp
   class Application < Rails::Application
@@ -16,6 +17,7 @@ module TestApp
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
     #
+    config.log_formatter = ThreadNameFormatter.new
 
     config.active_job.queue_adapter = :good_job
 
