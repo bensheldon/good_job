@@ -1,5 +1,21 @@
 # Changelog
 
+## [v3.19.3](https://github.com/bensheldon/good_job/tree/v3.19.3) (2023-09-28)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.2...v3.19.3)
+
+**Closed issues:**
+
+- Explicitly write that jobs with higher priority jobs run first \(unlike Que or DelayedJob\) at readme. [\#991](https://github.com/bensheldon/good_job/issues/991)
+
+**Merged pull requests:**
+
+- Correct `discrete_execution#status` method [\#1092](https://github.com/bensheldon/good_job/pull/1092) ([coreyaus](https://github.com/coreyaus))
+- Use ActiveSupport::BroadcastLogger [\#1089](https://github.com/bensheldon/good_job/pull/1089) ([bensheldon](https://github.com/bensheldon))
+- Log thread name for gem development debugging [\#1085](https://github.com/bensheldon/good_job/pull/1085) ([bensheldon](https://github.com/bensheldon))
+- Describe ApplicationController hook in README [\#1082](https://github.com/bensheldon/good_job/pull/1082) ([maxim](https://github.com/maxim))
+- \[Docs\] Explain how `priority` works in GoodJob [\#1005](https://github.com/bensheldon/good_job/pull/1005) ([coreyaus](https://github.com/coreyaus))
+
 ## [v3.19.2](https://github.com/bensheldon/good_job/tree/v3.19.2) (2023-09-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.1...v3.19.2)
@@ -1044,7 +1060,7 @@
 
 - Add cron\_enabled attribute to good\_job and pass it to process current state [\#675](https://github.com/bensheldon/good_job/pull/675) ([saksham-jain](https://github.com/saksham-jain))
 - Reverse Dashboard Filter Hierarchy to be: queues+jobs then state [\#666](https://github.com/bensheldon/good_job/pull/666) ([bensheldon](https://github.com/bensheldon))
-- Allow cron entries to be temporarily disabled and re-enabled through the Dashboard [\#649](https://github.com/bensheldon/good_job/pull/649) ([alex-klepa](https://github.com/alex-klepa))
+- Allow cron entries to be temporarily disabled and re-enabled through the Dashboard [\#649](https://github.com/bensheldon/good_job/pull/649) ([sasha-id](https://github.com/sasha-id))
 - Add Configuration.total\_estimated\_threads to report number of threads consumed by GoodJob [\#645](https://github.com/bensheldon/good_job/pull/645) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
