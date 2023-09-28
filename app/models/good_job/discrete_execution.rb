@@ -40,10 +40,10 @@ module GoodJob # :nodoc:
 
     def status
       if finished_at.present?
-        if error.present?
-          :retried
-        elsif error.present? && job.finished_at.present?
+        if error.present? && job.finished_at.present?
           :discarded
+        elsif error.present?
+          :retried
         else
           :succeeded
         end
