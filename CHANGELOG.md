@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.19.4](https://github.com/bensheldon/good_job/tree/v3.19.4) (2023-10-04)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.3...v3.19.4)
+
+**Closed issues:**
+
+- Including GoodJob::ActiveJobExtensions::Concurrency triggers rails deprecation notice [\#1096](https://github.com/bensheldon/good_job/issues/1096)
+- Add retries exhaused callback [\#1080](https://github.com/bensheldon/good_job/issues/1080)
+
+**Merged pull requests:**
+
+- Address rails 7.1 deprecation when using `ActiveJobExtensions::Concurrency` [\#1097](https://github.com/bensheldon/good_job/pull/1097) ([Earlopain](https://github.com/Earlopain))
+
 ## [v3.19.3](https://github.com/bensheldon/good_job/tree/v3.19.3) (2023-09-28)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.2...v3.19.3)
