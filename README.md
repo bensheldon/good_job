@@ -816,7 +816,7 @@ GoodJob.on_thread_error = -> (exception) { Rails.error.report(exception) }
 
 By default, GoodJob relies on ActiveJob's retry functionality.
 
-ActiveJob can be configured to retry an infinite number of times, with an exponential backoff. Using ActiveJob's `retry_on` prevents exceptions from reaching GoodJob:
+ActiveJob can be configured to retry an infinite number of times, with a polynomial backoff. Using ActiveJob's `retry_on` prevents exceptions from reaching GoodJob:
 
 ```ruby
 class ApplicationJob < ActiveJob::Base

@@ -36,10 +36,16 @@ module GoodJob
           end
         end
 
+        wait_key = if ActiveJob.gem_version >= Gem::Version.new("7.1.0")
+                     :polynomially_longer
+                   else
+                     :exponentially_longer
+                   end
+
         retry_on(
           GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError,
           attempts: Float::INFINITY,
-          wait: :exponentially_longer
+          wait: wait_key
         )
 
         before_perform do |job|
