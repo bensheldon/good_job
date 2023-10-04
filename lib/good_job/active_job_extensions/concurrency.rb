@@ -36,7 +36,7 @@ module GoodJob
           end
         end
 
-        wait_key = if ActiveJob.gem_version >= Gem::Version.new("7.1.0")
+        wait_key = if ActiveJob.gem_version >= Gem::Version.new("7.1.0.a")
                      :polynomially_longer
                    else
                      :exponentially_longer
