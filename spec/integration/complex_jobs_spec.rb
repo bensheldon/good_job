@@ -8,6 +8,41 @@ RSpec.describe 'Complex Jobs' do
 
   before do
     GoodJob.capsule.restart
+    allow(GoodJob.on_thread_error).to receive(:call).and_call_original
+  end
+
+  describe 'Job without error handler / unhandled' do
+    after do
+      # This spec will intentionally raise an error on the thread.
+      THREAD_ERRORS.clear
+    end
+
+    specify do
+      stub_const "TestJob", (Class.new(ActiveJob::Base) do
+        def perform
+          raise "error"
+        end
+      end)
+
+      TestJob.queue_adapter = async_adapter
+      TestJob.perform_later
+
+      wait_until { expect(GoodJob::Job.last.finished_at).to be_present }
+      good_job = GoodJob::Job.last
+      expect(good_job).to have_attributes(
+        executions_count: 1,
+        error: "RuntimeError: error",
+        error_event: "unhandled"
+      )
+      expect(good_job.executions.size).to eq 1
+      expect(good_job.executions.last).to have_attributes(
+        error: "RuntimeError: error",
+        error_event: "unhandled"
+      )
+
+      expect(THREAD_ERRORS.size).to eq 1
+      expect(GoodJob.on_thread_error).to have_received(:call).with(instance_of(RuntimeError))
+    end
   end
 
   describe 'Job with retry stopped but no block' do
