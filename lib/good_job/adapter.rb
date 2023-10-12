@@ -90,11 +90,11 @@ module GoodJob
         end
       end
 
-      begin
+      @capsule.tracker.register do
         until inline_executions.empty?
           begin
             inline_execution = inline_executions.shift
-            inline_result = inline_execution.perform
+            inline_result = inline_execution.perform(id_for_lock: @capsule.tracker.id_for_lock)
           ensure
             inline_execution.advisory_unlock
             inline_execution.run_callbacks(:perform_unlocked)
@@ -145,8 +145,8 @@ module GoodJob
       )
 
       if will_execute_inline
-        begin
-          result = execution.perform
+        result = @capsule.tracker.register do
+          execution.perform(id_for_lock: @capsule.tracker.id_for_lock)
         ensure
           execution.advisory_unlock
           execution.run_callbacks(:perform_unlocked)
@@ -156,7 +156,7 @@ module GoodJob
         job_state = { queue_name: execution.queue_name }
         job_state[:scheduled_at] = execution.scheduled_at if execution.scheduled_at
 
-        executed_locally = execute_async? && @capsule&.create_thread(job_state)
+        executed_locally = execute_async? && @capsule.create_thread(job_state)
         Notifier.notify(job_state) if !executed_locally && send_notify?(active_job)
       end
 
@@ -164,13 +164,13 @@ module GoodJob
     end
 
     # Shut down the thread pool executors.
-    # @param timeout [nil, Numeric, Symbol] Seconds to wait for active threads.
+    # @param timeout [nil, Numeric, GoodJob::USE_GLOBAL_SHUTDOWN_TIMEOUT] Seconds to wait for active threads.
     #   * +nil+ trigger a shutdown but not wait for it to complete.
     #   * +-1+ wait until the shutdown is complete.
     #   * +0+ immediately shutdown and stop any threads.
     #   * A positive number will wait that many seconds before stopping any remaining active threads.
     # @return [void]
-    def shutdown(timeout: :default)
+    def shutdown(timeout: GoodJob::USE_GLOBAL_SHUTDOWN_TIMEOUT)
       @capsule&.shutdown(timeout: timeout)
       @_async_started = false
     end

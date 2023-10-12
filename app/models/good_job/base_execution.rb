@@ -49,6 +49,13 @@ module GoodJob
         migration_pending_warning!
         false
       end
+
+      def process_lock_migrated?
+        return true if columns_hash["locked_by_id"].present?
+
+        migration_pending_warning!
+        false
+      end
     end
 
     # The ActiveJob job class, as a string

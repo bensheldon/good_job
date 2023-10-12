@@ -58,7 +58,7 @@ module ExampleAppHelper
       GoodJob::BatchRecord,
       GoodJob::Execution,
       GoodJob::DiscreteExecution,
-      GoodJob::Process,
+      GoodJob::CapsuleRecord,
       GoodJob::Setting,
     ]
     quiet do

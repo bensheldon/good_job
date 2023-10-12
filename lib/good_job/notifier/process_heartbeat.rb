@@ -14,17 +14,17 @@ module GoodJob # :nodoc:
 
       # Registers the current process.
       def register_process
-        GoodJob::Process.with_connection(connection) do
-          GoodJob::Process.cleanup
-          @process = GoodJob::Process.register
+        GoodJob::CapsuleRecord.with_connection(connection) do
+          GoodJob::CapsuleRecord.cleanup
+          @capsule.tracker.register(with_advisory_lock: true)
         end
       end
 
       def refresh_process
         Rails.application.executor.wrap do
-          GoodJob::Process.with_connection(connection) do
-            GoodJob::Process.with_logger_silenced do
-              @process&.refresh_if_stale(cleanup: true)
+          GoodJob::CapsuleRecord.with_connection(connection) do
+            GoodJob::CapsuleRecord.with_logger_silenced do
+              @capsule.tracker.record&.refresh_if_stale(cleanup: true)
             end
           end
         end
@@ -32,8 +32,8 @@ module GoodJob # :nodoc:
 
       # Deregisters the current process.
       def deregister_process
-        GoodJob::Process.with_connection(connection) do
-          @process&.deregister
+        GoodJob::CapsuleRecord.with_connection(connection) do
+          @capsule.tracker.unregister(with_advisory_lock: true)
         end
       end
     end

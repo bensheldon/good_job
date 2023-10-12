@@ -32,6 +32,7 @@ require "good_job/notifier"
 require "good_job/poller"
 require "good_job/http_server"
 require "good_job/probe_server"
+require "good_job/capsule_tracker"
 require "good_job/scheduler"
 require "good_job/shared_executor"
 require "good_job/systemd_service"
@@ -42,7 +43,11 @@ require "good_job/systemd_service"
 module GoodJob
   include GoodJob::Dependencies
 
+  # Default logger that will typically be overridden by Rails.logger
   DEFAULT_LOGGER = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
+
+  # Constant value to use global timeout for shutdown.
+  USE_GLOBAL_SHUTDOWN_TIMEOUT = Object.new
 
   # @!attribute [rw] active_record_parent_class
   #   @!scope class
@@ -254,6 +259,7 @@ module GoodJob
 
   include ActiveSupport::Deprecation::DeprecatedConstantAccessor
   deprecate_constant :Lockable, 'GoodJob::AdvisoryLockable', deprecator: deprecator
+  deprecate_constant :Process, 'GoodJob::CapsuleRecord', deprecator: deprecator
 
   # Whether all GoodJob migrations have been applied.
   # For use in tests/CI to validate GoodJob is up-to-date.
@@ -261,7 +267,7 @@ module GoodJob
   def self.migrated?
     # Always update with the most recent migration check
     GoodJob::Execution.reset_column_information
-    GoodJob::Execution.error_event_migrated?
+    GoodJob::Execution.process_lock_migrated?
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)
