@@ -29,6 +29,7 @@ end
 if ruby_31_or_higher
   appraise "rails-7.0-ruby-3.1" do
     gem "capybara", "~> 3.36" # For Ruby 3.1 support https://github.com/teamcapybara/capybara/pull/2468
+    gem 'psych', '5.1.0' # https://github.com/jruby/jruby/issues/7962
     gem "rails", "~> 7.0.1" # Ruby 3.1 requires Rails 7.0.1+
     gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
   end
