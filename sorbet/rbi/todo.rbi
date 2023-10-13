@@ -22,6 +22,7 @@ module ::RUN_JOBS; end
 module ::RecursiveJob; end
 module ::RetryableError; end
 module ::SimpleJob; end
+module ::Skylight::Middleware; end
 module ::THREAD_HAS_RUN; end
 module ::THREAD_JOBS; end
 module ::TestError; end
