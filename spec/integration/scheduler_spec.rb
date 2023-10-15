@@ -61,23 +61,21 @@ RSpec.describe 'Schedule Integration' do
   end
 
   context 'when there are a large number of jobs' do
-    let(:number_of_jobs) { 500 }
-    let(:max_threads) { 5 }
+    let(:number_of_jobs) { 2000 }
+    let(:max_threads) { 10 }
 
     it 'pops items off of the queue and runs them' do
       expect(ActiveJob::Base.queue_adapter).to be_execute_externally
 
-      GoodJob::Execution.transaction do
-        number_of_jobs.times do |i|
-          TestJob.perform_later(i)
-        end
+      ActiveRecord::Base.logger.silence do
+        TestJob.queue_adapter.enqueue_all Array.new(number_of_jobs) { |i| TestJob.new(i) }
       end
 
       performer = GoodJob::JobPerformer.new('*')
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       max_threads.times { scheduler.create_thread }
 
-      sleep_until(max: 30, increments_of: 0.5) { GoodJob::Execution.unfinished.count.zero? }
+      wait_until(max: 60, increments_of: 0.5) { expect(GoodJob::Execution.unfinished.count).to be_zero }
       scheduler.shutdown
 
       expect(GoodJob::Execution.unfinished.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Execution.unfinished.map(&:id)}" }
