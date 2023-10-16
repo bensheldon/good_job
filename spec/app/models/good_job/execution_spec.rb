@@ -133,6 +133,116 @@ RSpec.describe GoodJob::Execution do
     end
   end
 
+  describe '.experimental_dequeue_sql' do
+    it 'handles simple queries' do
+      expected_sql, expected_binds = described_class.experimental_dequeue_sql(parsed_queues: described_class.queue_parser('*'))
+
+      expect(normalize_sql(expected_sql)).to eq(normalize_sql(<<~SQL.squish))
+        WITH rows AS MATERIALIZED (
+          SELECT "id", "active_job_id"
+          FROM "good_jobs"
+          WHERE "finished_at" IS NULL
+            AND ( "scheduled_at" IS NULL OR "scheduled_at" <= $1 )
+          ORDER BY "priority" ASC NULLS LAST, "created_at" ASC
+        ), locked_rows AS MATERIALIZED (
+           SELECT *
+           FROM "rows"
+           WHERE pg_try_advisory_lock ( ( 'x' || substr ( md5 ( 'good_jobs' || '-' || "rows"."active_job_id"::text ) , 1, 16 ) ) ::bit ( 64 ) ::bigint )
+           LIMIT 1
+        )
+        SELECT *
+        FROM "good_jobs"
+        WHERE "id" IN ( SELECT "id" FROM "locked_rows" )
+      SQL
+
+      expect(expected_binds.size).to eq 1
+      expect { described_class.find_by_sql(expected_sql, expected_binds) }.not_to raise_error
+    end
+
+    it 'returns a proper SQL string with queues and queue_select_limit' do
+      expected_sql, expected_binds = described_class.experimental_dequeue_sql(parsed_queues: described_class.queue_parser('mice,elephants'), queue_select_limit: 99)
+
+      expect(normalize_sql(expected_sql)).to eq(normalize_sql(<<~SQL.squish))
+        WITH rows AS MATERIALIZED (
+          SELECT "id", "active_job_id"
+          FROM "good_jobs"
+          WHERE "finished_at" IS NULL
+            AND "queue_name" = ANY ( $1::text[] )
+            AND ( "scheduled_at" IS NULL OR "scheduled_at" <= $2 )
+          ORDER BY "priority" ASC NULLS LAST, "created_at" ASC
+          LIMIT 99
+        ), locked_rows AS MATERIALIZED (
+           SELECT *
+           FROM "rows"
+           WHERE pg_try_advisory_lock ( ( 'x' || substr ( md5 ( 'good_jobs' || '-' || "rows"."active_job_id"::text ) , 1, 16 ) ) ::bit ( 64 ) ::bigint )
+           LIMIT 1
+        )
+        SELECT *
+        FROM "good_jobs"
+        WHERE "id" IN ( SELECT "id" FROM "locked_rows" )
+      SQL
+
+      expect(expected_binds.size).to eq 2
+      expect { described_class.find_by_sql(expected_sql, expected_binds) }.not_to raise_error
+    end
+
+    it 'returns a proper SQL string with omitted queues and queue_select_limit' do
+      expected_sql, expected_binds = described_class.experimental_dequeue_sql(parsed_queues: described_class.queue_parser('-mice,elephants'), queue_select_limit: 99)
+
+      expect(normalize_sql(expected_sql)).to eq(normalize_sql(<<~SQL.squish))
+        WITH rows AS MATERIALIZED (
+          SELECT "id", "active_job_id"
+          FROM "good_jobs"
+          WHERE "finished_at" IS NULL
+            AND "queue_name" != ANY ( $1::text[] )
+            AND ( "scheduled_at" IS NULL OR "scheduled_at" <= $2 )
+          ORDER BY "priority" ASC NULLS LAST, "created_at" ASC
+          LIMIT 99
+        ), locked_rows AS MATERIALIZED (
+           SELECT *
+           FROM "rows"
+           WHERE pg_try_advisory_lock ( ( 'x' || substr ( md5 ( 'good_jobs' || '-' || "rows"."active_job_id"::text ) , 1, 16 ) ) ::bit ( 64 ) ::bigint )
+           LIMIT 1
+        )
+        SELECT *
+        FROM "good_jobs"
+        WHERE "id" IN ( SELECT "id" FROM "locked_rows" )
+      SQL
+
+      expect(expected_binds.size).to eq 2
+      expect { described_class.find_by_sql(expected_sql, expected_binds) }.not_to raise_error
+    end
+
+    it 'returns a proper SQL string with ordered queues and queue_select_limit' do
+      expected_sql, expected_binds = described_class.experimental_dequeue_sql(parsed_queues: described_class.queue_parser('+mice,elephants'), queue_select_limit: 99)
+
+      expect(normalize_sql(expected_sql)).to eq(normalize_sql(<<~SQL.squish))
+        WITH rows AS MATERIALIZED (
+          SELECT "id", "active_job_id"
+          FROM "good_jobs"
+          WHERE "finished_at" IS NULL
+            AND "queue_name" = ANY ( $1::text[] )
+            AND ( "scheduled_at" IS NULL OR "scheduled_at" <= $2 )
+          ORDER BY
+              (CASE WHEN "queue_name" = 'mice' THEN 0 WHEN "queue_name" = 'elephants' THEN 1 ELSE 2 END) ASC,
+              "priority" ASC NULLS LAST, "created_at" ASC
+          LIMIT 99
+        ), locked_rows AS MATERIALIZED (
+           SELECT *
+           FROM "rows"
+           WHERE pg_try_advisory_lock ( ( 'x' || substr ( md5 ( 'good_jobs' || '-' || "rows"."active_job_id"::text ) , 1, 16 ) ) ::bit ( 64 ) ::bigint )
+           LIMIT 1
+        )
+        SELECT *
+        FROM "good_jobs"
+        WHERE "id" IN ( SELECT "id" FROM "locked_rows" )
+      SQL
+
+      expect(expected_binds.size).to eq 2
+      expect { described_class.find_by_sql(expected_sql, expected_binds) }.not_to raise_error
+    end
+  end
+
   describe '.perform_with_advisory_lock' do
     context 'with one job' do
       let(:active_job) { TestJob.new('a string') }
@@ -196,13 +306,12 @@ RSpec.describe GoodJob::Execution do
       let!(:queue_one_job) { described_class.create!(job_params.merge(queue_name: "one", created_at: 1.minute.ago, priority: 1)) }
 
       it "orders by queue order" do
-        2.times do
-          described_class.perform_with_advisory_lock(parsed_queues: parsed_queues)
+        described_class.perform_with_advisory_lock(parsed_queues: parsed_queues) do |execution|
+          expect(execution).to eq queue_one_job
         end
-        expect(described_class.order(finished_at: :asc).to_a).to eq([
-                                                                      queue_one_job,
-                                                                      queue_two_job,
-                                                                    ])
+        described_class.perform_with_advisory_lock(parsed_queues: parsed_queues) do |execution|
+          expect(execution).to eq queue_two_job
+        end
       end
     end
   end

@@ -74,14 +74,12 @@ module GoodJob
       # @example Get the records that have a session awaiting a lock:
       #   MyLockableRecord.joins_advisory_locks.where("pg_locks.granted = ?", false)
       scope :joins_advisory_locks, (lambda do |column: _advisory_lockable_column|
-        join_sql = <<~SQL.squish
+        joins(<<~SQL.squish)
           LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'
             AND pg_locks.objsubid = 1
-            AND pg_locks.classid = ('x' || substr(md5(:table_name || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(32)::int
-            AND pg_locks.objid = (('x' || substr(md5(:table_name || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64) << 32)::bit(32)::int
+            AND pg_locks.classid = ('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(32)::int
+            AND pg_locks.objid = (('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64) << 32)::bit(32)::int
         SQL
-
-        joins(sanitize_sql_for_conditions([join_sql, { table_name: table_name }]))
       end)
 
       # Joins the current query with Postgres's +pg_locks+ table AND SELECTs the resulting columns
@@ -151,6 +149,10 @@ module GoodJob
       # can (as in {Lockable.advisory_lock}) and only pass those that could be
       # locked to the block.
       #
+      # If the Active Record Relation has WHERE conditions that have the potential
+      # to be updated/changed elsewhere, be sure to verify the conditions are still
+      # satisfied, or check the lock status, as an unlocked and out-of-date record could be returned.
+      #
       # @param column [String, Symbol]  name of advisory lock or unlock function
       # @param function [String, Symbol] Postgres Advisory Lock function name to use
       # @param unlock_session [Boolean] Whether to unlock all advisory locks in the session afterwards
@@ -165,14 +167,25 @@ module GoodJob
         raise ArgumentError, "Must provide a block" unless block_given?
 
         records = advisory_lock(column: column, function: function, select_limit: select_limit).to_a
+        skip_unlock_records = []
+        return_value = nil
 
         begin
-          unscoped { yield(records) }
+          unscoped do
+            caught = catch(:skip_unlock) do
+              return_value = yield(records)
+              nil
+            end
+
+            skip_unlock_records = Array(caught) if caught
+          end
+
+          return_value
         ensure
           if unlock_session
             advisory_unlock_session
           else
-            records.each do |record|
+            (records - skip_unlock_records).each do |record|
               record.advisory_unlock(key: record.lockable_column_key(column: column), function: advisory_unlockable_function(function))
             end
           end
