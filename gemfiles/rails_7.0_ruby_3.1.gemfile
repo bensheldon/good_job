@@ -10,7 +10,6 @@ gem "pg", platforms: [:mri, :mingw, :x64_mingw]
 gem "rack", "~> 2.2"
 gem "rails", "~> 7.0.1"
 gem "capybara", "~> 3.36"
-gem "psych", "5.1.0"
 gem "selenium-webdriver", "~> 4.0"
 
 platforms :ruby do
