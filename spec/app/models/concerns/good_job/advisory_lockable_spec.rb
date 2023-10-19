@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe GoodJob::AdvisoryLockable do
   let(:model_class) { GoodJob::Execution }
   let!(:execution) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default") }
+  let!(:another_execution) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default") }
 
   describe '.advisory_lock' do
     around do |example|
@@ -88,17 +89,21 @@ RSpec.describe GoodJob::AdvisoryLockable do
     end
 
     it 'returns first row of the query with a lock' do
+      execution.update!(queue_name: "aaaaaa")
+      another_execution.update!(queue_name: "bbbbbb")
+
       expect(execution).not_to be_advisory_locked
-      result_execution = model_class.advisory_lock.first
+      result_execution = model_class.order(queue_name: :asc).limit(1).advisory_lock.first
       expect(result_execution).to eq execution
       expect(execution).to be_advisory_locked
+      expect(another_execution).not_to be_advisory_locked
 
       execution.advisory_unlock
     end
 
     it 'can lock an alternative column' do
       expect(execution).not_to be_advisory_locked
-      result_execution = model_class.advisory_lock(column: :queue_name).first
+      result_execution = model_class.order(created_at: :asc).limit(1).advisory_lock(column: :queue_name).first
       expect(result_execution).to eq execution
       expect(execution).to be_advisory_locked(key: "good_jobs-default")
       expect(execution).not_to be_advisory_locked # on default key

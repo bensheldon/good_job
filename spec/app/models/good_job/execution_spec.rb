@@ -196,13 +196,12 @@ RSpec.describe GoodJob::Execution do
       let!(:queue_one_job) { described_class.create!(job_params.merge(queue_name: "one", created_at: 1.minute.ago, priority: 1)) }
 
       it "orders by queue order" do
-        2.times do
-          described_class.perform_with_advisory_lock(parsed_queues: parsed_queues)
+        described_class.perform_with_advisory_lock(parsed_queues: parsed_queues) do |execution|
+          expect(execution).to eq queue_one_job
         end
-        expect(described_class.order(finished_at: :asc).to_a).to eq([
-                                                                      queue_one_job,
-                                                                      queue_two_job,
-                                                                    ])
+        described_class.perform_with_advisory_lock(parsed_queues: parsed_queues) do |execution|
+          expect(execution).to eq queue_two_job
+        end
       end
     end
   end

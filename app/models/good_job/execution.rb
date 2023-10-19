@@ -256,12 +256,13 @@ module GoodJob
     def self.perform_with_advisory_lock(parsed_queues: nil, queue_select_limit: nil)
       execution = nil
       result = nil
-      unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(unlock_session: true, select_limit: queue_select_limit) do |executions|
+      unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(select_limit: queue_select_limit) do |executions|
         execution = executions.first
         break if execution.blank?
 
         unless execution.executable?
           result = ExecutionResult.new(value: nil, unexecutable: true)
+          execution = nil
           break
         end
 
@@ -491,7 +492,9 @@ module GoodJob
     # Tests whether this job is safe to be executed by this thread.
     # @return [Boolean]
     def executable?
-      self.class.unscoped.unfinished.owns_advisory_locked.exists?(id: id)
+      reload.finished_at.blank?
+    rescue ActiveRecord::RecordNotFound
+      false
     end
 
     def make_discrete
