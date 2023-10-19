@@ -1,4 +1,6 @@
-FROM mcr.microsoft.com/devcontainers/ruby:2.7-bullseye
+# [Choice] Ruby version: 3, 3.0, 2, 2.7, 2.6
+ARG VARIANT="3"
+FROM mcr.microsoft.com/devcontainers/ruby:${VARIANT}
 
 # Default value to allow debug server to serve content over GitHub Codespace's port forwarding service
 # The value is a comma-separated list of allowed domains
@@ -20,8 +22,14 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     postgresql-client \
   && rm -rf /var/lib/apt/lists/*
 
-# Install specific version of Bundler
-RUN gem install bundler:2.3.25
-
-# [Optional] Uncomment this line to install global node packages.
-# RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
+# Add Gemfile and install the gems. This means the gem install can be done
+# during build instead of on start. When a fork or branch has different gems, we still have an
+# advantage due to caching of the other gems.
+RUN mkdir -p /tmp/good_job
+COPY Gemfile Gemfile.lock good_job.gemspec /tmp/good_job/
+RUN mkdir -p /tmp/good_job/lib/good_job
+COPY lib/good_job/version.rb /tmp/good_job/lib/good_job
+RUN cd /tmp/good_job \
+    && bundle install \
+    && rm -rf /tmp/good_job
+RUN chown -R vscode:vscode /usr/local/rvm
