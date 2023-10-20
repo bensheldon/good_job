@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe 'Jobs', :js do
+describe 'Jobs', :js, :without_executor do
   before do
     allow(GoodJob).to receive_messages(retry_on_unhandled_error: false, preserve_job_records: true)
   end

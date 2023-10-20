@@ -378,7 +378,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
   end
 
   it 'is lockable' do
-    ActiveRecord::Base.clear_active_connections!
+    ActiveRecord::Base.connection_handler.clear_active_connections!
     execution.advisory_lock!
 
     expect do
