@@ -68,7 +68,7 @@ RSpec.configure do |config|
       puts "There are #{other_locks.count} advisory locks still open AFTER test run."
       puts "\n\nAdvisory Locks:"
       other_locks.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
-        puts "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity.application_name}"
+        puts "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity&.application_name}"
       end
 
       puts "\n\nCurrent connections:"
