@@ -61,22 +61,47 @@ RSpec.configure do |config|
     RSpec::Mocks.space.proxy_for(GoodJob::Capsule).reset
     GoodJob.capsule = GoodJob::Capsule.new
 
-    expect(PgLock.current_database.advisory_lock.owns.count).to eq(0), "Existing owned advisory locks AFTER test run"
+    own_locks = PgLock.current_database.advisory_lock.owns
+    if own_locks.any?
+      puts "There are #{own_locks.count} advisory locks still open by the current database connection AFTER test run."
 
-    other_locks = PgLock.current_database.advisory_lock.others
-    if other_locks.any?
-      puts "There are #{other_locks.count} advisory locks still open AFTER test run."
-      puts "\n\nAdvisory Locks:"
-      other_locks.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
+      puts "\nAdvisory locked executions:"
+      GoodJob::Execution.advisory_locked.owns_advisory_locked.each do |execution|
+        puts "  - Execution ID: #{execution.id} / Active Job ID: #{execution.active_job_id}"
+      end
+
+      puts "\nAdvisory Locks:"
+      own_locks.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
         puts "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity&.application_name}"
       end
 
-      puts "\n\nCurrent connections:"
+      puts "\nCurrent connections:"
       PgStatActivity.all.each do |pg_stat_activity| # rubocop:disable Rails/FindEach
         puts "  - #{pg_stat_activity.pid}: #{pg_stat_activity.application_name}"
       end
     end
 
+    expect(PgLock.current_database.advisory_lock.owns.count).to eq(0), "Existing owned advisory locks AFTER test run"
+
+    other_locks = PgLock.current_database.advisory_lock.others
+    if other_locks.any?
+      puts "There are #{other_locks.count} advisory locks owned by other connections still open AFTER test run."
+
+      puts "\nAdvisory locked executions:"
+      GoodJob::Execution.advisory_locked.each do |execution|
+        puts "  - Execution ID: #{execution.id} / Active Job ID: #{execution.active_job_id} / Locked by: #{execution[:pid]}"
+      end
+
+      puts "\nAdvisory Locks:"
+      other_locks.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
+        puts "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity&.application_name}"
+      end
+
+      puts "\nCurrent connections:"
+      PgStatActivity.all.each do |pg_stat_activity| # rubocop:disable Rails/FindEach
+        puts "  - #{pg_stat_activity.pid}: #{pg_stat_activity.application_name}"
+      end
+    end
     expect(PgLock.current_database.advisory_lock.others.count).to eq(0), "Existing others advisory locks AFTER test run"
 
     GoodJob.configuration.instance_variable_set(:@_in_webserver, nil)
