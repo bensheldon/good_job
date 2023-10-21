@@ -19,9 +19,11 @@ RSpec.describe GoodJob::ActiveJobExtensions::Batches do
 
   describe 'batch accessors' do
     it 'access batch' do
-      batch = GoodJob::Batch.enqueue(some_property: "Apple") do
-        TestJob.perform_later
-        TestJob.perform_later
+      batch = Rails.application.executor.wrap do
+        GoodJob::Batch.enqueue(some_property: "Apple") do
+          TestJob.perform_later
+          TestJob.perform_later
+        end
       end
 
       expect(batch).to be_a GoodJob::Batch

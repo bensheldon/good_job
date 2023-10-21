@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Execution do
+  around do |example|
+    Rails.application.executor.wrap { example.run }
+  end
+
   before do
     allow(described_class).to receive(:discrete_support?).and_return(false)
 

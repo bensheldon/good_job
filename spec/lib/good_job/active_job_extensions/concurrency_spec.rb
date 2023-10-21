@@ -55,8 +55,10 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       it "is inclusive of both performing and enqueued jobs" do
         expect(TestJob.perform_later(name: "Alice")).to be_present
 
-        GoodJob::Execution.all.with_advisory_lock do
-          expect(TestJob.perform_later(name: "Alice")).to be false
+        Rails.application.executor.wrap do
+          GoodJob::Execution.all.with_advisory_lock do
+            expect(TestJob.perform_later(name: "Alice")).to be false
+          end
         end
       end
     end
@@ -96,9 +98,11 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(TestJob.perform_later(name: "Alice")).to be_present
 
         # Lock one of the jobs
-        GoodJob::Execution.first.with_advisory_lock do
-          # Third usage does enqueue
-          expect(TestJob.perform_later(name: "Alice")).to be_present
+        Rails.application.executor.wrap do
+          GoodJob::Execution.first.with_advisory_lock do
+            # Third usage does enqueue
+            expect(TestJob.perform_later(name: "Alice")).to be_present
+          end
         end
       end
     end
