@@ -30,6 +30,8 @@ RSpec.configure do |config|
   config.include SystemTestHelpers, type: :system
 
   config.before(:each, type: :system) do |example|
+    ActiveRecord::Base.connection.disable_query_cache!
+
     if ENV['SHOW_BROWSER']
       example.metadata[:js] = true
       driven_by :selenium, using: :chrome, screen_size: [1024, 800]
