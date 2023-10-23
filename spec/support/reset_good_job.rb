@@ -127,11 +127,15 @@ ActiveSupport.on_load :active_record do
 end
 
 class PgStatActivity < ActiveRecord::Base
+  include GoodJob::AssignableConnection
+
   self.table_name = 'pg_stat_activity'
   self.primary_key = 'datid'
 end
 
 class PgLock < ActiveRecord::Base
+  include GoodJob::AssignableConnection
+
   self.table_name = 'pg_locks'
   self.primary_key = 'objid'
 
@@ -141,6 +145,46 @@ class PgLock < ActiveRecord::Base
   scope :advisory_lock, -> { where(locktype: 'advisory') }
   scope :owns, -> { where('pid = pg_backend_pid()') }
   scope :others, -> { where('pid != pg_backend_pid()') }
+
+  def self.debug_own_locks(connection = ActiveRecord::Base.connection)
+    count = PgLock.with_connection(connection) do
+      PgLock.current_database.advisory_lock.owns.count
+    end
+    return false if count.zero?
+
+    output = []
+    output << "There are #{count} advisory locks still open by the current database connection."
+    GoodJob::Execution.include(GoodJob::AssignableConnection)
+    GoodJob::Execution.with_connection(connection) do
+      GoodJob::Execution.owns_advisory_locked.each.with_index do |execution, index|
+        output << "\nAdvisory locked GoodJob::Execution:" if index.zero?
+        output << "  - Execution ID: #{execution.id} / Active Job ID: #{execution.active_job_id}"
+      end
+    end
+
+    GoodJob::BatchRecord.include(GoodJob::AssignableConnection)
+    GoodJob::BatchRecord.with_connection(connection) do
+      GoodJob::BatchRecord.owns_advisory_locked.each.with_index do |batch, index|
+        output << "\nAdvisory locked GoodJob::Batch:" if index.zero?
+        output << "  - BatchRecord ID: #{batch.id}"
+      end
+    end
+
+    GoodJob::Process.include(GoodJob::AssignableConnection)
+    GoodJob::Process.with_connection(connection) do
+      GoodJob::Process.owns_advisory_locked.each.with_index do |process, index|
+        output << "\nAdvisory locked GoodJob::Process:" if index.zero?
+        output << "  - Process ID: #{process.id}"
+      end
+    end
+
+    output << "\nAdvisory Locks:"
+    PgLock.current_database.advisory_lock.owns.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
+      output << "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity&.application_name}"
+    end
+
+    output.join("\n")
+  end
 
   def unlock
     query = <<~SQL.squish

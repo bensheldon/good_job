@@ -237,7 +237,7 @@ module GoodJob
   def self.perform_inline(queue_string = "*")
     job_performer = JobPerformer.new(queue_string)
     loop do
-      result = job_performer.next
+      result = Rails.application.reloader.wrap { job_performer.next }
       break unless result
       raise result.unhandled_error if result.unhandled_error
     end

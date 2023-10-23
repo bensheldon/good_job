@@ -101,9 +101,13 @@ module GoodJob
 
       active_jobs = add(active_jobs, &block)
 
-      record.with_advisory_lock(function: "pg_advisory_lock") do
-        record.update!(enqueued_at: Time.current)
-        record._continue_discard_or_finish(lock: false)
+      Rails.application.reloader.wrap do
+        record.with_advisory_lock(function: "pg_advisory_lock") do
+          record.update!(enqueued_at: Time.current)
+
+          # During inline execution, this could enqueue and execute further jobs
+          record._continue_discard_or_finish(lock: false)
+        end
       end
 
       active_jobs

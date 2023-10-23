@@ -6,7 +6,7 @@ describe GoodJob::JobsController do
   around do |example|
     orig_value = ActionController::Base.allow_forgery_protection
     ActionController::Base.allow_forgery_protection = false
-    example.call
+    example.run
     ActionController::Base.allow_forgery_protection = orig_value
   end
 

@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Complex Jobs' do
   let(:inline_adapter) { GoodJob::Adapter.new(execution_mode: :inline) }
-  let(:async_adapter) { GoodJob::Adapter.new(execution_mode: :async) }
+  let(:async_adapter) { GoodJob::Adapter.new(execution_mode: :async_all) }
 
   before do
     GoodJob.capsule.restart
