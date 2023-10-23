@@ -1,5 +1,30 @@
 # Changelog
 
+## [v3.20.0](https://github.com/bensheldon/good_job/tree/v3.20.0) (2023-10-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.4...v3.20.0)
+
+**Closed issues:**
+
+- Dashboard blocked in iframe tag [\#1111](https://github.com/bensheldon/good_job/issues/1111)
+- PG::ConnectionBad: PQsocket\(\) can't get socket descriptor [\#1100](https://github.com/bensheldon/good_job/issues/1100)
+
+**Merged pull requests:**
+
+- Wrap Adapter enqueue methods and Batch callbacks with Rails Reloader; verify in tests that no Advisory locks remain at database connection check-in  [\#1124](https://github.com/bensheldon/good_job/pull/1124) ([bensheldon](https://github.com/bensheldon))
+- Run all RSpec examples within a Rails Executor [\#1122](https://github.com/bensheldon/good_job/pull/1122) ([bensheldon](https://github.com/bensheldon))
+- Print better debugging for retained advisory locks in test [\#1121](https://github.com/bensheldon/good_job/pull/1121) ([bensheldon](https://github.com/bensheldon))
+- Replace Heroku-specific Rake tasks with `db:prepare` now that Demo is upgraded to Rails 7.1 [\#1120](https://github.com/bensheldon/good_job/pull/1120) ([bensheldon](https://github.com/bensheldon))
+- Do not error debug logs if `pg_stat_activity` join is empty [\#1119](https://github.com/bensheldon/good_job/pull/1119) ([bensheldon](https://github.com/bensheldon))
+- Remove pinned psych version [\#1114](https://github.com/bensheldon/good_job/pull/1114) ([bensheldon](https://github.com/bensheldon))
+- Remove `pg_advisory_unlock_all()` after job is run; only verify blank `finished_at` \(and not lock presence\) before performing job [\#1113](https://github.com/bensheldon/good_job/pull/1113) ([bensheldon](https://github.com/bensheldon))
+- Update docs url [\#1112](https://github.com/bensheldon/good_job/pull/1112) ([ur5us](https://github.com/ur5us))
+- Pin psych gem 5.1.0 [\#1108](https://github.com/bensheldon/good_job/pull/1108) ([bensheldon](https://github.com/bensheldon))
+- Add sampling for Skylight traces on Demo [\#1107](https://github.com/bensheldon/good_job/pull/1107) ([bensheldon](https://github.com/bensheldon))
+- Add Rails 7.1 to test matrix [\#1105](https://github.com/bensheldon/good_job/pull/1105) ([bensheldon](https://github.com/bensheldon))
+- Add spec to verify unhandled thread errors are reported [\#1104](https://github.com/bensheldon/good_job/pull/1104) ([bensheldon](https://github.com/bensheldon))
+- Update Codespace configuration [\#1101](https://github.com/bensheldon/good_job/pull/1101) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.19.4](https://github.com/bensheldon/good_job/tree/v3.19.4) (2023-10-04)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.3...v3.19.4)
