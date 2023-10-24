@@ -168,13 +168,13 @@ module GoodJob
     end
 
     # Shut down the thread pool executors.
-    # @param timeout [nil, Numeric, Symbol] Seconds to wait for active threads.
+    # @param timeout [nil, Numeric, NONE] Seconds to wait for active threads.
     #   * +nil+ trigger a shutdown but not wait for it to complete.
     #   * +-1+ wait until the shutdown is complete.
     #   * +0+ immediately shutdown and stop any threads.
     #   * A positive number will wait that many seconds before stopping any remaining active threads.
     # @return [void]
-    def shutdown(timeout: :default)
+    def shutdown(timeout: NONE)
       @capsule&.shutdown(timeout: timeout)
       @_async_started = false
     end

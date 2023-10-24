@@ -44,23 +44,23 @@ module GoodJob
     end
 
     # Shut down the thread pool executors.
-    # @param timeout [nil, Numeric, Symbol] Seconds to wait for active threads.
+    # @param timeout [nil, Numeric, NONE] Seconds to wait for active threads.
     #   * +-1+ will wait for all active threads to complete.
     #   * +0+ will interrupt active threads.
     #   * +N+ will wait at most N seconds and then interrupt active threads.
     #   * +nil+ will trigger a shutdown but not wait for it to complete.
     # @return [void]
-    def shutdown(timeout: :default)
-      timeout = @configuration.shutdown_timeout if timeout == :default
+    def shutdown(timeout: NONE)
+      timeout = @configuration.shutdown_timeout if timeout == NONE
       GoodJob._shutdown_all([@shared_executor, @notifier, @poller, @scheduler, @cron_manager].compact, timeout: timeout)
       @startable = false
       @running = false
     end
 
     # Shutdown and then start the capsule again.
-    # @param timeout [Numeric, Symbol] Seconds to wait for active threads.
+    # @param timeout [Numeric, NONE] Seconds to wait for active threads.
     # @return [void]
-    def restart(timeout: :default)
+    def restart(timeout: NONE)
       raise ArgumentError, "Capsule#restart cannot be called with a timeout of nil" if timeout.nil?
 
       shutdown(timeout: timeout)

@@ -42,6 +42,10 @@ require "good_job/systemd_service"
 module GoodJob
   include GoodJob::Dependencies
 
+  # Default, null, blank value placeholder.
+  NONE = Module.new.freeze
+
+  # Default logger for GoodJob; overridden by Rails.logger in Railtie.
   DEFAULT_LOGGER = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
 
   # @!attribute [rw] active_record_parent_class
