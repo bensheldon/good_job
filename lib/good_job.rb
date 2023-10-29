@@ -237,13 +237,19 @@ module GoodJob
   # This is primarily intended for usage in a test environment.
   # Unhandled job errors will be raised.
   # @param queue_string [String] Queues to execute jobs from
+  # @param limit [Integer, nil] Maximum number of iterations for the loop
   # @return [void]
-  def self.perform_inline(queue_string = "*")
+  def self.perform_inline(queue_string = "*", limit: nil)
     job_performer = JobPerformer.new(queue_string)
+    iteration = 0
     loop do
+      break if limit && iteration >= limit
+
       result = Rails.application.reloader.wrap { job_performer.next }
       break unless result
       raise result.unhandled_error if result.unhandled_error
+
+      iteration += 1
     end
   end
 

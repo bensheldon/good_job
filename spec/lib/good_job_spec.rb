@@ -156,5 +156,14 @@ describe GoodJob do
       end
       expect(PERFORMED.size).to eq 1
     end
+
+    it 'can accept a limit' do
+      TestJob.perform_later
+      TestJob.perform_later
+
+      described_class.perform_inline(limit: 1)
+
+      expect(PERFORMED.size).to eq 1
+    end
   end
 end
