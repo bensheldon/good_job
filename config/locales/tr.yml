@@ -207,8 +207,8 @@ tr:
         updated: Güncellenmiş
     shared:
       boolean:
-        "true": "Evet"
-        "false": "Hayır"
+        'false': Hayır
+        'true': Evet
       error: Hata
       filter:
         all: Tümü

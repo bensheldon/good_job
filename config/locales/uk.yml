@@ -233,8 +233,8 @@ uk:
         updated: Оновлено
     shared:
       boolean:
-        "true": "Так"
-        "false": "Ні"
+        'false': Ні
+        'true': Так
       error: Помилка
       filter:
         all: Всі

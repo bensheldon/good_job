@@ -233,8 +233,8 @@ ru:
         updated: Обновлено
     shared:
       boolean:
-        "true": "Да"
-        "false": "Нет"
+        'false': Нет
+        'true': Да
       error: Ошибка
       filter:
         all: Все

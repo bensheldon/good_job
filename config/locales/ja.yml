@@ -207,8 +207,8 @@ ja:
         updated: 更新された
     shared:
       boolean:
-        "true": "はい"
-        "false": "いいえ"
+        'false': いいえ
+        'true': はい
       error: エラー
       filter:
         all: 全て

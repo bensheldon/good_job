@@ -205,8 +205,8 @@ es:
         updated: Actualizado
     shared:
       boolean:
-        "true": "Sí"
-        "false": "No"
+        'false': 'No'
+        'true': Sí
       error: Error
       filter:
         all: Todas

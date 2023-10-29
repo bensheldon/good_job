@@ -207,8 +207,8 @@ de:
         updated: Aktualisiert
     shared:
       boolean:
-        "true": "Ja"
-        "false": "Nein"
+        'false': Nein
+        'true': Ja
       error: Fehler
       filter:
         all: Alle

@@ -207,8 +207,8 @@ nl:
         updated: Bijgewerkt
     shared:
       boolean:
-        "true": "Ja"
-        "false": "Nee"
+        'false': Nee
+        'true': Ja
       error: Fout
       filter:
         all: Alle
