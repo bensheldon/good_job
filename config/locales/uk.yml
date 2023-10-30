@@ -224,6 +224,7 @@ uk:
             unit: ''
     processes:
       index:
+        cron_enabled: Cron увімкнено
         no_good_job_processes_found: Процеси GoodJob не знайдені.
         process: Процес
         schedulers: Планувальники
@@ -231,6 +232,9 @@ uk:
         title: Процеси
         updated: Оновлено
     shared:
+      boolean:
+        'false': Ні
+        'true': Так
       error: Помилка
       filter:
         all: Всі

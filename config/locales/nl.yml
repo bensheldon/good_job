@@ -198,6 +198,7 @@ nl:
             unit: ''
     processes:
       index:
+        cron_enabled: Cron ingeschakeld
         no_good_job_processes_found: Geen GoodJob-processen gevonden.
         process: Proces
         schedulers: Planners
@@ -205,6 +206,9 @@ nl:
         title: Processen
         updated: Bijgewerkt
     shared:
+      boolean:
+        'false': Nee
+        'true': Ja
       error: Fout
       filter:
         all: Alle

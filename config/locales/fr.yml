@@ -198,6 +198,7 @@ fr:
             unit: ''
     processes:
       index:
+        cron_enabled: Cron activé
         no_good_job_processes_found: Aucun processus GoodJob trouvé.
         process: Processus
         schedulers: Schedulers
@@ -205,6 +206,9 @@ fr:
         title: Processus
         updated: Mis à jour
     shared:
+      boolean:
+        'false': Non
+        'true': Oui
       error: Erreur
       filter:
         all: Tous

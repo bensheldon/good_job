@@ -196,6 +196,7 @@ es:
             unit: ''
     processes:
       index:
+        cron_enabled: Cron habilitado
         no_good_job_processes_found: No hay procesos de GoodJob.
         process: Proceso
         schedulers: Schedulers
@@ -203,6 +204,9 @@ es:
         title: Procesos
         updated: Actualizado
     shared:
+      boolean:
+        'false': 'No'
+        'true': Sí
       error: Error
       filter:
         all: Todas

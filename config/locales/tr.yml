@@ -198,6 +198,7 @@ tr:
             unit: ''
     processes:
       index:
+        cron_enabled: Cron etkin
         no_good_job_processes_found: GoodJob süreci bulunamadı.
         process: Süreç
         schedulers: Planlayıcılar
@@ -205,6 +206,9 @@ tr:
         title: Süreçler
         updated: Güncellenmiş
     shared:
+      boolean:
+        'false': Hayır
+        'true': Evet
       error: Hata
       filter:
         all: Tümü

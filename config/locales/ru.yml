@@ -224,6 +224,7 @@ ru:
             unit: ''
     processes:
       index:
+        cron_enabled: Крон включен
         no_good_job_processes_found: Процессы GoodJob не найдены.
         process: Процесс
         schedulers: Планировщики
@@ -231,6 +232,9 @@ ru:
         title: Процессы
         updated: Обновлено
     shared:
+      boolean:
+        'false': Нет
+        'true': Да
       error: Ошибка
       filter:
         all: Все

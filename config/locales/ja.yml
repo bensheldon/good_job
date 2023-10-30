@@ -198,6 +198,7 @@ ja:
             unit: ''
     processes:
       index:
+        cron_enabled: Cron が有効になっている
         no_good_job_processes_found: GoodJobのプロセスが見つかりませんでした。
         process: プロセス
         schedulers: スケジューラー
@@ -205,6 +206,9 @@ ja:
         title: プロセス
         updated: 更新された
     shared:
+      boolean:
+        'false': いいえ
+        'true': はい
       error: エラー
       filter:
         all: 全て
