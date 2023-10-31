@@ -69,6 +69,21 @@ jobs:
         run: bin/rails db:test:prepare
       - name: bin/rspec
         run: bin/rspec --require ./spec/support/pre_documentation_formatter.rb --format PreDocumentationFormatter
+      # Archive
+      - name: Archive system spec screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: screenshots
+          path: |
+            spec/test_app/tmp/screenshots
+            spec/test_app/tmp/capybara
+      - name: Archive Rails logs
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: rails_logs
+          path: spec/test_app/log
 
   test:
     name: Test
