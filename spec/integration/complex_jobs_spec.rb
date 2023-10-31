@@ -3,12 +3,16 @@
 require 'rails_helper'
 
 RSpec.describe 'Complex Jobs' do
-  let(:inline_adapter) { GoodJob::Adapter.new(execution_mode: :inline) }
-  let(:async_adapter) { GoodJob::Adapter.new(execution_mode: :async_all) }
+  let(:capsule) { GoodJob::Capsule.new }
+  let(:inline_adapter) { GoodJob::Adapter.new(execution_mode: :inline, _capsule: capsule) }
+  let(:async_adapter) { GoodJob::Adapter.new(execution_mode: :async_all, _capsule: capsule) }
 
   before do
-    GoodJob.capsule.restart
     allow(GoodJob.on_thread_error).to receive(:call).and_call_original
+  end
+
+  after do
+    capsule.shutdown
   end
 
   describe 'Job without error handler / unhandled' do
@@ -28,6 +32,8 @@ RSpec.describe 'Complex Jobs' do
       TestJob.perform_later
 
       wait_until { expect(GoodJob::Job.last.finished_at).to be_present }
+      capsule.shutdown
+
       good_job = GoodJob::Job.last
       expect(good_job).to have_attributes(
         executions_count: 1,
@@ -64,6 +70,8 @@ RSpec.describe 'Complex Jobs' do
       TestJob.perform_later
 
       wait_until { expect(GoodJob::Job.last.finished_at).to be_present }
+      capsule.shutdown
+
       good_job = GoodJob::Job.last
       expect(good_job).to have_attributes(
         executions_count: 1,
@@ -94,6 +102,8 @@ RSpec.describe 'Complex Jobs' do
       TestJob.perform_later
 
       wait_until { expect(GoodJob::Job.last.finished_at).to be_present }
+      capsule.shutdown
+
       good_job = GoodJob::Job.last
       expect(good_job).to have_attributes(
         executions_count: 1,
@@ -124,6 +134,8 @@ RSpec.describe 'Complex Jobs' do
       TestJob.perform_later
 
       wait_until { expect(GoodJob::Job.last.finished_at).to be_present }
+      capsule.shutdown
+
       good_job = GoodJob::Job.last
       expect(good_job).to have_attributes(
         executions_count: 2,
@@ -151,6 +163,8 @@ RSpec.describe 'Complex Jobs' do
       TestJob.perform_later
 
       wait_until { expect(GoodJob::Job.last.finished_at).to be_present }
+      capsule.shutdown
+
       good_job = GoodJob::Job.last
       expect(good_job).to have_attributes(
         executions_count: 2,
