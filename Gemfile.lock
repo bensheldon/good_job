@@ -463,7 +463,7 @@ GEM
       yard-sorbet
     terminal-table (3.0.2)
       unicode-display_width (>= 1.1.1, < 3)
-    thor (1.2.2)
+    thor (1.3.0)
     thread (0.2.2)
     thread_safe (0.3.6)
     thread_safe (0.3.6-java)
