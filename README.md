@@ -914,6 +914,69 @@ class ApplicationJob < ActiveJob::Base
 end
 ```
 
+### Querying Jobs
+
+Jobs are contained in the mounted GoodJob::Job table. The schema is:
+
+```
+GoodJob::Job < GoodJob::Execution {
+                     :id => :uuid,
+             :queue_name => :text,
+               :priority => :integer,
+      :serialized_params => :jsonb,
+           :scheduled_at => :datetime,
+           :performed_at => :datetime,
+            :finished_at => :datetime,
+                  :error => :text,
+             :created_at => :datetime,
+             :updated_at => :datetime,
+          :active_job_id => :uuid,
+        :concurrency_key => :text,
+               :cron_key => :text,
+    :retried_good_job_id => :uuid,
+                :cron_at => :datetime
+}
+```
+
+Most of the relevant information to identify a job is in its `serialized_params` field which looks something like:
+```
+{
+                  "job_id" => "dffd4af9-d4ed-482f-acb6-04cf757ff9b8",
+                  "locale" => "en",
+                "priority" => 0,
+                "timezone" => "UTC",
+               "arguments" => [1234],
+               "job_class" => "DoSomeThingJob",
+              "executions" => 0,
+              "queue_name" => "urgent",
+             "enqueued_at" => "2023-10-27T00:09:37Z",
+         "provider_job_id" => nil,
+    "exception_executions" => {}
+}
+```
+
+You can query via parameters in the `serialized_parameters` field using normal Postgres JSON operations:
+```
+jobs = GoodJob::Job
+  .where("serialized_params ->> 'job_class' = 'DoSomeThingJob'")
+```
+
+GoodJob provides a scope for finding jobs by job class, as this is a common operation:
+```
+jobs = GoodJob::Job.job_class('DoSomeThingJob')
+```
+
+### Dequeuing Jobs
+
+Jobs can be dequeued by deleting them out of the Jobs table:
+
+```
+GoodJob::Job
+  .job_class("<JobNameHere>") # Filter to a particular job type
+  .where(finished_at: nil) # Only query jobs that haven't run
+  .delete_all # Or `.each(&:destroy)` for callback support
+```
+
 ### Optimize queues, threads, and processes
 
 By default, GoodJob creates a single thread execution pool that will execute jobs from any queue. Depending on your application's workload, job types, and service level objectives, you may wish to optimize execution resources. For example, providing dedicated execution resources for transactional emails so they are not delayed by long-running batch jobs. Some options:
