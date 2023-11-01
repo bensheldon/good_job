@@ -961,10 +961,19 @@ jobs = GoodJob::Job
   .where("serialized_params ->> 'job_class' = 'DoSomeThingJob'")
 ```
 
-GoodJob provides a scope for finding jobs by job class, as this is a common operation:
+GoodJob provides some scopes for finding jobs by common identifiers. Eg. to find a job by job-class without manually querying serialized parameters, you can instead query via the `job_class` scope:
 ```
 jobs = GoodJob::Job.job_class('DoSomeThingJob')
 ```
+
+Other scopes include:
+- `running`
+- `finished` - jobs that have been completed (with or without an error) and will not be re-run
+- `scheduled` - jobs that have not run yet and will run in the future
+- `retried` - jobs that have attempted to run at least once, did not complete, and will run again in the future
+- `queued` - jobs whose scheduled time to run has passed and will run when a thread to run them becomes available
+- `succeeded` - jobs that have run without an error
+- `discarded` - jobs that encountered an error while running and wil not be retried
 
 ### Dequeuing Jobs
 
@@ -973,8 +982,8 @@ Jobs can be dequeued by deleting them out of the Jobs table:
 ```
 GoodJob::Job
   .job_class("<JobNameHere>") # Filter to a particular job type
-  .where(finished_at: nil) # Only query jobs that haven't run
-  .delete_all # Or `.each(&:destroy)` for callback support
+  .where(finished_at: nil) # Filter to enqueued jobs, ignoring those that have previously completed
+  .delete_all # Or `.each(&:destroy)` for Rails callback support (at the expense of speed)
 ```
 
 ### Optimize queues, threads, and processes
