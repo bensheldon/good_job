@@ -181,7 +181,7 @@ GEM
     fiber-annotation (0.2.0)
     fiber-local (1.0.0)
     foreman (0.87.2)
-    fugit (1.8.1)
+    fugit (1.9.0)
       et-orbi (~> 1, >= 1.2.7)
       raabro (~> 1.4)
     gem-release (2.2.2)
