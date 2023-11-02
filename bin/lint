@@ -20,10 +20,12 @@ FileUtils.chdir GEM_ROOT do
 
   system! "bundle exec srb tc", failure: <<~MESSAGE
     You may need to run one of the following commands
-    - bin/tapioca todo         # generate RBI files for unresolved constants (e.g. RSpec `stub_const`)
-    - bin/tapioca dsl          # generate RBIs for dynamic methods
-    - bin/tapioca gem          # generate RBIs for gems
-    - bin/tapioca check-shims  # check duplicated definitions in shim RBIs
+      1. Regenerate gem RBIs by running `bin/tapioca gem --all` and `bin/tapioca annotations`
+      2. Generate RBIs for DSLs by running `bin/tapioca dsl`
+      3. If the missing constants are defined in files that a gem does not load by default,
+         manually require those files in `sorbet/tapioca/require.rb` and regenerate gem RBIs
+      4. Manually create an RBI shim defining the missing constants
+      5. Add files to sorbet/rbi/todo.rbi or `bin/tapioca todo` (though that's being deprecated)
   MESSAGE
 
   puts "\n== Rubocop =="

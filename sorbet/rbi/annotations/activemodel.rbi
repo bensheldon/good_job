@@ -1,13 +1,11 @@
-# typed: strict
+# typed: true
 
 # DO NOT EDIT MANUALLY
 # This file was pulled from a central RBI files repository.
 # Please run `bin/tapioca annotations` to update it.
 
 class ActiveModel::Errors
-  Elem = type_member {
-  { fixed: ActiveModel::Error }
-}
+  Elem = type_member { { fixed: ActiveModel::Error } }
 
   sig { params(attribute: T.any(Symbol, String)).returns(T::Array[String]) }
   def [](attribute); end

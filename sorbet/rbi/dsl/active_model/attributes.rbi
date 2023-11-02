@@ -7,28 +7,23 @@
 module ActiveModel::Attributes
   include GeneratedInstanceMethods
 
+  mixes_in_class_methods ::ActiveModel::AttributeRegistration::ClassMethods
   mixes_in_class_methods ::ActiveModel::AttributeMethods::ClassMethods
   mixes_in_class_methods GeneratedClassMethods
 
   module GeneratedClassMethods
-    def _default_attributes; end
-    def _default_attributes=(value); end
-    def _default_attributes?; end
     def attribute_aliases; end
     def attribute_aliases=(value); end
     def attribute_aliases?; end
-    def attribute_method_matchers; end
-    def attribute_method_matchers=(value); end
-    def attribute_method_matchers?; end
-    def attribute_types; end
-    def attribute_types=(value); end
-    def attribute_types?; end
+    def attribute_method_patterns; end
+    def attribute_method_patterns=(value); end
+    def attribute_method_patterns?; end
   end
 
   module GeneratedInstanceMethods
     def attribute_aliases; end
     def attribute_aliases?; end
-    def attribute_method_matchers; end
-    def attribute_method_matchers?; end
+    def attribute_method_patterns; end
+    def attribute_method_patterns?; end
   end
 end

@@ -13,15 +13,15 @@ module ActiveModel::AttributeMethods
     def attribute_aliases; end
     def attribute_aliases=(value); end
     def attribute_aliases?; end
-    def attribute_method_matchers; end
-    def attribute_method_matchers=(value); end
-    def attribute_method_matchers?; end
+    def attribute_method_patterns; end
+    def attribute_method_patterns=(value); end
+    def attribute_method_patterns?; end
   end
 
   module GeneratedInstanceMethods
     def attribute_aliases; end
     def attribute_aliases?; end
-    def attribute_method_matchers; end
-    def attribute_method_matchers?; end
+    def attribute_method_patterns; end
+    def attribute_method_patterns?; end
   end
 end
