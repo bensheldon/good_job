@@ -13,9 +13,12 @@ module ActiveRecord::TestFixtures
     def fixture_class_names; end
     def fixture_class_names=(value); end
     def fixture_class_names?; end
-    def fixture_path; end
-    def fixture_path=(value); end
-    def fixture_path?; end
+    def fixture_paths; end
+    def fixture_paths=(value); end
+    def fixture_paths?; end
+    def fixture_sets; end
+    def fixture_sets=(value); end
+    def fixture_sets?; end
     def fixture_table_names; end
     def fixture_table_names=(value); end
     def fixture_table_names?; end
@@ -37,8 +40,11 @@ module ActiveRecord::TestFixtures
     def fixture_class_names; end
     def fixture_class_names=(value); end
     def fixture_class_names?; end
-    def fixture_path; end
-    def fixture_path?; end
+    def fixture_paths; end
+    def fixture_paths?; end
+    def fixture_sets; end
+    def fixture_sets=(value); end
+    def fixture_sets?; end
     def fixture_table_names; end
     def fixture_table_names=(value); end
     def fixture_table_names?; end

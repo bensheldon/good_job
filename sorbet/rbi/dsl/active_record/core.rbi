@@ -10,6 +10,9 @@ module ActiveRecord::Core
   mixes_in_class_methods GeneratedClassMethods
 
   module GeneratedClassMethods
+    def _destroy_association_async_job; end
+    def _destroy_association_async_job=(value); end
+    def _destroy_association_async_job?; end
     def belongs_to_required_by_default; end
     def belongs_to_required_by_default=(value); end
     def belongs_to_required_by_default?; end
@@ -22,8 +25,8 @@ module ActiveRecord::Core
     def default_shard; end
     def default_shard=(value); end
     def default_shard?; end
-    def destroy_association_async_job; end
-    def destroy_association_async_job=(value); end
+    def destroy_association_async_batch_size; end
+    def destroy_association_async_batch_size=(value); end
     def enumerate_columns_in_select_statements; end
     def enumerate_columns_in_select_statements=(value); end
     def enumerate_columns_in_select_statements?; end
@@ -33,6 +36,9 @@ module ActiveRecord::Core
     def logger; end
     def logger=(value); end
     def logger?; end
+    def run_commit_callbacks_on_first_saved_instances_in_transaction; end
+    def run_commit_callbacks_on_first_saved_instances_in_transaction=(value); end
+    def run_commit_callbacks_on_first_saved_instances_in_transaction?; end
     def shard_selector; end
     def shard_selector=(value); end
     def shard_selector?; end
@@ -48,7 +54,7 @@ module ActiveRecord::Core
     def default_role?; end
     def default_shard; end
     def default_shard?; end
-    def destroy_association_async_job; end
+    def destroy_association_async_batch_size; end
     def logger; end
     def logger?; end
   end

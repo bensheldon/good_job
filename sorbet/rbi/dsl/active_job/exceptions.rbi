@@ -10,9 +10,16 @@ module ActiveJob::Exceptions
   mixes_in_class_methods GeneratedClassMethods
 
   module GeneratedClassMethods
+    def after_discard_procs; end
+    def after_discard_procs=(value); end
+    def after_discard_procs?; end
     def retry_jitter; end
     def retry_jitter=(value); end
   end
 
-  module GeneratedInstanceMethods; end
+  module GeneratedInstanceMethods
+    def after_discard_procs; end
+    def after_discard_procs=(value); end
+    def after_discard_procs?; end
+  end
 end

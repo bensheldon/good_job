@@ -15,14 +15,14 @@ describe 'Cron Schedules' do
     expect(cron_entry.last_job_at).to be_nil
 
     within "##{dom_id(cron_entry)}" do
-      accept_confirm { click_on "Enqueue cron entry now" }
+      accept_confirm { click_button "Enqueue cron entry now" }
     end
 
     wait_until do
       expect(cron_entry.last_job).to be_present
     end
 
-    click_on "Job #{cron_entry.last_job.id}"
+    click_link "Job #{cron_entry.last_job.id}"
     expect(page).to have_content cron_entry.last_job.id
   end
 
@@ -30,12 +30,12 @@ describe 'Cron Schedules' do
     visit '/good_job/cron_entries'
 
     within "##{dom_id(cron_entry)}" do
-      accept_confirm { click_on "Disable cron entry" }
+      accept_confirm { click_button "Disable cron entry" }
     end
     expect(cron_entry.enabled?).to be false
 
     within "##{dom_id(cron_entry)}" do
-      accept_confirm { click_on "Enable cron entry" }
+      accept_confirm { click_button "Enable cron entry" }
     end
 
     expect(cron_entry.enabled?).to be true
