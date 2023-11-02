@@ -1370,7 +1370,7 @@ bin/setup
 
 #### Rails development harness
 
-A Rails application exists within `spec/test_app` that is used for development, test, and GoodJob Demo environments.
+A Rails application exists within `demo` that is used for development, test, and GoodJob Demo environments.
 
 ```bash
 # Run a local development webserver

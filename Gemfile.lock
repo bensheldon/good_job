@@ -545,5 +545,8 @@ DEPENDENCIES
   yard
   yard-activesupport-concern
 
+RUBY VERSION
+   ruby 3.2.2p53
+
 BUNDLED WITH
    2.4.21

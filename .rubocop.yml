@@ -20,7 +20,7 @@ AllCops:
     - Rakefile
   Exclude:
     - pkg/**/*
-    - spec/test_app/**/*
+    - demo/**/*
     - tmp/**/*
     - scripts/**/*
     - gemfiles/**/*

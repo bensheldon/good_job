@@ -10,6 +10,6 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
-//= require rails-ujs
+//= require ../../../../../../../.rbenv/versions/3.2.2/lib/ruby/gems/3.2.0/gems/actionview-7.1.1/app/assets/javascripts/rails-ujs
 //= require activestorage
 //= require_tree .

@@ -7,7 +7,7 @@ module ExampleAppHelper
     FileUtils.rm_rf(example_app_path)
 
     # Rails will not install within a directory containing `bin/rails`
-    Rails.root.join("../../bin/rails").rename(Rails.root.join("../../bin/_rails")) if Rails.root.join("../../bin/rails").exist?
+    Rails.root.join("../bin/rails").rename(Rails.root.join("../bin/_rails")) if Rails.root.join("../bin/rails").exist?
 
     root_path = example_app_path.join('..')
     FileUtils.cd(root_path) do
@@ -23,7 +23,7 @@ module ExampleAppHelper
   end
 
   def teardown_example_app
-    Rails.root.join("../../bin/_rails").rename(Rails.root.join("../../bin/rails"))
+    Rails.root.join("../bin/_rails").rename(Rails.root.join("../bin/rails"))
     FileUtils.rm_rf(example_app_path)
   end
 
@@ -33,7 +33,7 @@ module ExampleAppHelper
     end
   end
 
-  def run_in_test_app(*args)
+  def run_in_demo_app(*args)
     FileUtils.cd(Rails.root) do
       system(*args) || raise("Command #{args} failed")
     end
@@ -68,7 +68,7 @@ module ExampleAppHelper
       ActiveRecord::Base.connection.execute("TRUNCATE schema_migrations")
 
       setup_example_app
-      run_in_test_app("bin/rails db:environment:set RAILS_ENV=test")
+      run_in_demo_app("bin/rails db:environment:set RAILS_ENV=test")
       models.each(&:reset_column_information)
     end
 
@@ -82,7 +82,7 @@ module ExampleAppHelper
       end
       ActiveRecord::Base.connection.execute("TRUNCATE schema_migrations")
 
-      run_in_test_app("bin/rails db:schema:load db:environment:set RAILS_ENV=test")
+      run_in_demo_app("bin/rails db:schema:load db:environment:set RAILS_ENV=test")
       models.each(&:reset_column_information)
     end
   end

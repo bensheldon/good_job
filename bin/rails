@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 ENGINE_ROOT = File.expand_path("..", __dir__)
 ENGINE_PATH = File.expand_path("../lib/good_job/engine", __dir__)
-APP_PATH = File.expand_path("../spec/test_app/config/application", __dir__)
+APP_PATH = File.expand_path("../demo/config/application", __dir__)
 
 # Set up gems listed in the Gemfile.
 ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)

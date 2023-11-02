@@ -1,6 +1,6 @@
 ENV['GOOD_JOB_EXECUTION_MODE'] = 'external'
 
-require_relative '../spec/test_app/config/environment'
+require_relative '../demo/config/environment'
 require_relative '../lib/good_job'
 require 'benchmark/ips'
 

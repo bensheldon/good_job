@@ -2,9 +2,9 @@
 log/
 pkg/
 vendor/bundle
-spec/test_app/log/*.log
-spec/test_app/storage/
-spec/test_app/tmp/
+demo/log/*.log
+demo/storage/
+demo/tmp/
 spec/tmp/example_app
 .env
 doc
