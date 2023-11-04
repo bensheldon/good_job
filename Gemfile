@@ -3,6 +3,12 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
+ruby_version_path = File.join(File.dirname(__FILE__), '.ruby-version')
+if File.exist?(ruby_version_path)
+  # .ruby-version may not always contain a complete/valid 3+ identifier Ruby version
+  ruby_version_contents = File.read(ruby_version_path).strip
+  ruby(ruby_version_contents) if ruby_version_contents.match?(%r{\d+\.\d+\.\d+})
+end
 # Declare your gem's dependencies in good_job.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.

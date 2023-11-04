@@ -12,7 +12,7 @@ if RUBY_PLATFORM.include?('java')
   require "i18n/backend/simple"
 end
 
-require File.expand_path('test_app/config/environment', __dir__)
+require File.expand_path('../demo/config/environment', __dir__)
 
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?

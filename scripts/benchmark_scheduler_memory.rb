@@ -1,7 +1,7 @@
 #
 # $ bundle exec ruby scripts/benchmark_scheduler.rb
 #
-require_relative '../spec/test_app/config/environment'
+require_relative '../demo/config/environment'
 require_relative '../lib/good_job'
 require 'memory_profiler'
 require 'pry'
