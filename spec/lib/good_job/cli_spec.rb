@@ -7,6 +7,7 @@ RSpec.describe GoodJob::CLI do
 
   before do
     stub_const 'GoodJob::CLI::RAILS_ENVIRONMENT_RB', File.expand_path("demo/config/environment.rb")
+    stub_const 'GoodJob::CLI::SHUTDOWN_EVENT_TIMEOUT', 0.1
     allow(GoodJob).to receive_messages(configuration: GoodJob::Configuration.new({}), capsule: capsule_mock)
   end
 
@@ -25,7 +26,7 @@ RSpec.describe GoodJob::CLI do
       cli = described_class.new([], {}, {})
 
       cli_thread = Concurrent::Promises.future { cli.start }
-      sleep_until { cli.instance_variable_get(:@stop_good_job_executable) == false }
+      sleep_until { cli.instance_variable_get(:@stop_good_job_executable) }
 
       Process.kill 'INT', Process.pid # Send the signal to ourselves
 
@@ -76,7 +77,7 @@ RSpec.describe GoodJob::CLI do
         cli = described_class.new([], {}, {})
 
         cli_thread = Concurrent::Promises.future { cli.start }
-        sleep_until { cli.instance_variable_get(:@stop_good_job_executable) == false }
+        sleep_until { cli.instance_variable_get(:@stop_good_job_executable) }
         expect(GoodJob::SystemdService).to have_received(:new)
         expect(systemd).to have_received(:start)
         expect(systemd).not_to have_received(:stop)
