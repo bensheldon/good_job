@@ -17,6 +17,9 @@ module GoodJob
     # Requiring this loads the application's configuration and classes.
     RAILS_ENVIRONMENT_RB = File.expand_path("config/environment.rb")
 
+    # Number of seconds between checking shutdown conditions
+    SHUTDOWN_EVENT_TIMEOUT = 10
+
     class << self
       # Whether the CLI is running from the executable
       # @return [Boolean, nil]
@@ -106,14 +109,15 @@ module GoodJob
         probe_server.start
       end
 
-      @stop_good_job_executable = false
+      require 'concurrent/atomic/event'
+      @stop_good_job_executable = Concurrent::Event.new
       %w[INT TERM].each do |signal|
-        trap(signal) { @stop_good_job_executable = true }
+        trap(signal) { Thread.new { @stop_good_job_executable.set }.join }
       end
 
       Kernel.loop do
-        sleep 0.1
-        break if @stop_good_job_executable || capsule.shutdown?
+        @stop_good_job_executable.wait(SHUTDOWN_EVENT_TIMEOUT)
+        break if @stop_good_job_executable.set? || capsule.shutdown?
       end
 
       systemd.stop do
