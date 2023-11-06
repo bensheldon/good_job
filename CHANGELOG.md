@@ -1,5 +1,28 @@
 # Changelog
 
+## [v3.21.0](https://github.com/bensheldon/good_job/tree/v3.21.0) (2023-11-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.20.0...v3.21.0)
+
+**Implemented enhancements:**
+
+- Add "cron enabled" column to processes index page [\#1127](https://github.com/bensheldon/good_job/pull/1127) ([bforma](https://github.com/bforma))
+- Add `limit:` kwarg to `GoodJob.perform_inline` [\#1126](https://github.com/bensheldon/good_job/pull/1126) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Cron scheduler and multiple processes [\#1128](https://github.com/bensheldon/good_job/issues/1128)
+- `GoodJob.on_thread_error` not called in tests [\#1102](https://github.com/bensheldon/good_job/issues/1102)
+
+**Merged pull requests:**
+
+- Use a Concurrent::Event for CLI signal-trapping loop [\#1141](https://github.com/bensheldon/good_job/pull/1141) ([bensheldon](https://github.com/bensheldon))
+- Update README's optimize queue explanation [\#1138](https://github.com/bensheldon/good_job/pull/1138) ([maestromac](https://github.com/maestromac))
+- Update development dependencies and light Rubocop'ing [\#1136](https://github.com/bensheldon/good_job/pull/1136) ([bensheldon](https://github.com/bensheldon))
+- Move the Rails app harness from `spec/test_app` to `demo` [\#1135](https://github.com/bensheldon/good_job/pull/1135) ([bensheldon](https://github.com/bensheldon))
+- In test, shutdown schedulers/capsules before doing assertions because of race conditions; store CI logs for Dev Env tests [\#1129](https://github.com/bensheldon/good_job/pull/1129) ([bensheldon](https://github.com/bensheldon))
+- Use a constant to represent `None` for default/blank memoizable values [\#1125](https://github.com/bensheldon/good_job/pull/1125) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.20.0](https://github.com/bensheldon/good_job/tree/v3.20.0) (2023-10-23)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.4...v3.20.0)
