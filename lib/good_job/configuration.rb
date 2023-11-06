@@ -33,7 +33,7 @@ module GoodJob
     DEFAULT_DASHBOARD_DEFAULT_LOCALE = :en
 
     def self.validate_execution_mode(execution_mode)
-      raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
+      raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(", ")}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
     end
 
     # The options that were explicitly set when initializing +Configuration+.
@@ -92,8 +92,8 @@ module GoodJob
     # @return [Symbol]
     def execution_mode
       mode = options[:execution_mode] ||
-             rails_config[:execution_mode] ||
-             env['GOOD_JOB_EXECUTION_MODE']
+        rails_config[:execution_mode] ||
+        env["GOOD_JOB_EXECUTION_MODE"]
       mode = mode.to_sym if mode
 
       if mode
@@ -121,8 +121,8 @@ module GoodJob
       (
         options[:max_threads] ||
           rails_config[:max_threads] ||
-          env['GOOD_JOB_MAX_THREADS'] ||
-          env['RAILS_MAX_THREADS'] ||
+          env["GOOD_JOB_MAX_THREADS"] ||
+          env["RAILS_MAX_THREADS"] ||
           DEFAULT_MAX_THREADS
       ).to_i
     end
@@ -135,8 +135,8 @@ module GoodJob
     def queue_string
       options[:queues].presence ||
         rails_config[:queues].presence ||
-        env['GOOD_JOB_QUEUES'].presence ||
-        '*'
+        env["GOOD_JOB_QUEUES"].presence ||
+        "*"
     end
 
     # The number of seconds between polls for jobs. GoodJob will execute jobs
@@ -147,7 +147,7 @@ module GoodJob
       interval = (
         options[:poll_interval] ||
           rails_config[:poll_interval] ||
-          env['GOOD_JOB_POLL_INTERVAL']
+          env["GOOD_JOB_POLL_INTERVAL"]
       )
 
       if interval
@@ -171,7 +171,7 @@ module GoodJob
       (
         options[:max_cache] ||
           rails_config[:max_cache] ||
-          env['GOOD_JOB_MAX_CACHE'] ||
+          env["GOOD_JOB_MAX_CACHE"] ||
           DEFAULT_MAX_CACHE
       ).to_i
     end
@@ -183,7 +183,7 @@ module GoodJob
       (
         options[:shutdown_timeout] ||
           rails_config[:shutdown_timeout] ||
-          env['GOOD_JOB_SHUTDOWN_TIMEOUT'] ||
+          env["GOOD_JOB_SHUTDOWN_TIMEOUT"] ||
           DEFAULT_SHUTDOWN_TIMEOUT
       ).to_f
     end
@@ -194,16 +194,16 @@ module GoodJob
       value = ActiveModel::Type::Boolean.new.cast(
         options[:enable_cron] ||
           rails_config[:enable_cron] ||
-          env['GOOD_JOB_ENABLE_CRON'] ||
+          env["GOOD_JOB_ENABLE_CRON"] ||
           false
       )
       value && cron.size.positive?
     end
 
-    alias enable_cron? enable_cron
+    alias_method :enable_cron?, :enable_cron
 
     def cron
-      env_cron = JSON.parse(ENV.fetch('GOOD_JOB_CRON'), symbolize_names: true) if ENV['GOOD_JOB_CRON'].present?
+      env_cron = JSON.parse(ENV.fetch("GOOD_JOB_CRON"), symbolize_names: true) if ENV["GOOD_JOB_CRON"].present?
 
       options[:cron] ||
         rails_config[:cron] ||
@@ -224,15 +224,27 @@ module GoodJob
       (
         options[:queue_select_limit] ||
         rails_config[:queue_select_limit] ||
-        env['GOOD_JOB_QUEUE_SELECT_LIMIT']
+        env["GOOD_JOB_QUEUE_SELECT_LIMIT"]
       )&.to_i
+    end
+
+    # The number of seconds that a good_job process will idle with out runnin a job.
+    # -1 means do not idle out.
+    # Since the loop sleeps every 0.1 seconds, this multiples by 10 to get the seconds.
+    # @return [Integer, -1]
+    def count_till_idle
+      (
+        options[:count_till_idle] ||
+        rails_config[:count_till_idle] ||
+        env["GOOD_JOB_COUNT_TILL_IDLE"]
+      )&.to_i&.*(10) || -1
     end
 
     # Whether to automatically destroy discarded jobs that have been preserved.
     # @return [Boolean]
     def cleanup_discarded_jobs?
       return rails_config[:cleanup_discarded_jobs] unless rails_config[:cleanup_discarded_jobs].nil?
-      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_CLEANUP_DISCARDED_JOBS']) unless env['GOOD_JOB_CLEANUP_DISCARDED_JOBS'].nil?
+      return ActiveModel::Type::Boolean.new.cast(env["GOOD_JOB_CLEANUP_DISCARDED_JOBS"]) unless env["GOOD_JOB_CLEANUP_DISCARDED_JOBS"].nil?
 
       true
     end
@@ -243,7 +255,7 @@ module GoodJob
       (
         options[:before_seconds_ago] ||
           rails_config[:cleanup_preserved_jobs_before_seconds_ago] ||
-          env['GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO'] ||
+          env["GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO"] ||
           DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO
       ).to_i
     end
@@ -265,14 +277,14 @@ module GoodJob
           )
           value = -1
         end
-      elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_JOBS')
-        value = env['GOOD_JOB_CLEANUP_INTERVAL_JOBS']
+      elsif env.key?("GOOD_JOB_CLEANUP_INTERVAL_JOBS")
+        value = env["GOOD_JOB_CLEANUP_INTERVAL_JOBS"]
         if value.blank?
           GoodJob.deprecator.warn(
             %(Setting `GOOD_JOB_CLEANUP_INTERVAL_JOBS` to `""` will no longer disable count-based cleanups in GoodJob v4. Set to `0` to disable, or `-1` to run every time.)
           )
           value = false
-        elsif value == '0'
+        elsif value == "0"
           value = false
         end
       else
@@ -300,14 +312,14 @@ module GoodJob
           )
           value = -1
         end
-      elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_SECONDS')
-        value = env['GOOD_JOB_CLEANUP_INTERVAL_SECONDS']
+      elsif env.key?("GOOD_JOB_CLEANUP_INTERVAL_SECONDS")
+        value = env["GOOD_JOB_CLEANUP_INTERVAL_SECONDS"]
         if value.blank?
           GoodJob.deprecator.warn(
             %(Setting `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` to `""` will no longer disable time-based cleanups in GoodJob v4. Set to `0` to disable, or `-1` to run every time.)
           )
           value = false
-        elsif value == '0'
+        elsif value == "0"
           value = false
         end
       else
@@ -327,21 +339,21 @@ module GoodJob
     # @return [Pathname,String]
     def pidfile
       options[:pidfile] ||
-        env['GOOD_JOB_PIDFILE'] ||
-        Rails.application.root.join('tmp', 'pids', 'good_job.pid')
+        env["GOOD_JOB_PIDFILE"] ||
+        Rails.application.root.join("tmp", "pids", "good_job.pid")
     end
 
     # Port of the probe server
     # @return [nil,Integer]
     def probe_port
       options[:probe_port] ||
-        env['GOOD_JOB_PROBE_PORT']
+        env["GOOD_JOB_PROBE_PORT"]
     end
 
     def enable_listen_notify
       return options[:enable_listen_notify] unless options[:enable_listen_notify].nil?
       return rails_config[:enable_listen_notify] unless rails_config[:enable_listen_notify].nil?
-      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_LISTEN_NOTIFY']) unless env['GOOD_JOB_ENABLE_LISTEN_NOTIFY'].nil?
+      return ActiveModel::Type::Boolean.new.cast(env["GOOD_JOB_ENABLE_LISTEN_NOTIFY"]) unless env["GOOD_JOB_ENABLE_LISTEN_NOTIFY"].nil?
 
       DEFAULT_ENABLE_LISTEN_NOTIFY
     end
@@ -363,7 +375,7 @@ module GoodJob
         self_caller = caller
         self_caller.grep(%r{config.ru}).any? || # EXAMPLE: config.ru:3:in `block in <main>' OR config.ru:3:in `new_from_string'
           self_caller.grep(%r{puma/request}).any? || # EXAMPLE: puma-5.6.4/lib/puma/request.rb:76:in `handle_request'
-          self_caller.grep(%{/rack/handler/}).any? || # EXAMPLE: iodine-0.7.44/lib/rack/handler/iodine.rb:13:in `start'
+          self_caller.grep(%(/rack/handler/)).any? || # EXAMPLE: iodine-0.7.44/lib/rack/handler/iodine.rb:13:in `start'
           (Concurrent.on_jruby? && self_caller.grep(%r{jruby/rack/rails_booter}).any?) # EXAMPLE: uri:classloader:/jruby/rack/rails_booter.rb:83:in `load_environment'
       end || false
     end
