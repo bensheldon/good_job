@@ -21,6 +21,10 @@ module GoodJob
       self.class.instances << self
     end
 
+    def stats
+      @scheduler.stats
+    end
+
     # Start the capsule once. After a shutdown, {#restart} must be used to start again.
     # @return [nil, Boolean] Whether the capsule was started.
     def start(force: false)

@@ -122,13 +122,13 @@ module GoodJob
       @checks = configuration.count_till_idle
       Kernel.loop do
         sleep 0.1
-        if @checks.present? && capsule.stats[:active_threads] == 0
+        if configuration.count_till_idle.positive? && capsule.stats[:active_threads] == 0
           @checks -= 1
         elsif capsule.stats[:active_threads] > 0
           @checks = configuration.count_till_idle
         end
 
-        break if @stop_good_job_executable || capsule.shutdown? || @checks.zero?
+        break if @stop_good_job_executable.set? || capsule.shutdown? || @checks.zero?
       end
 
       systemd.stop do
