@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "thor"
+require 'thor'
 
 module GoodJob
   #
@@ -55,46 +55,46 @@ module GoodJob
 
     DESCRIPTION
     method_option :queues,
-      type: :string,
-      banner: "QUEUE_LIST",
-      desc: "Queues or queue pools to work from. (env var: GOOD_JOB_QUEUES, default: *)"
+                  type: :string,
+                  banner: "QUEUE_LIST",
+                  desc: "Queues or queue pools to work from. (env var: GOOD_JOB_QUEUES, default: *)"
     method_option :max_threads,
-      type: :numeric,
-      banner: "COUNT",
-      desc: "Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)"
+                  type: :numeric,
+                  banner: 'COUNT',
+                  desc: "Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)"
     method_option :poll_interval,
-      type: :numeric,
-      banner: "SECONDS",
-      desc: "Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 5)"
+                  type: :numeric,
+                  banner: 'SECONDS',
+                  desc: "Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 5)"
     method_option :max_cache,
-      type: :numeric,
-      banner: "COUNT",
-      desc: "Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)"
+                  type: :numeric,
+                  banner: 'COUNT',
+                  desc: "Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)"
     method_option :shutdown_timeout,
-      type: :numeric,
-      banner: "SECONDS",
-      desc: "Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))"
+                  type: :numeric,
+                  banner: 'SECONDS',
+                  desc: "Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))"
     method_option :enable_cron,
-      type: :boolean,
-      desc: "Whether to run cron process (default: false)"
+                  type: :boolean,
+                  desc: "Whether to run cron process (default: false)"
     method_option :daemonize,
-      type: :boolean,
-      desc: "Run as a background daemon (default: false)"
+                  type: :boolean,
+                  desc: "Run as a background daemon (default: false)"
     method_option :pidfile,
-      type: :string,
-      desc: "Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)"
+                  type: :string,
+                  desc: "Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)"
     method_option :probe_port,
-      type: :numeric,
-      banner: "PORT",
-      desc: "Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)"
+                  type: :numeric,
+                  banner: 'PORT',
+                  desc: "Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)"
     method_option :queue_select_limit,
-      type: :numeric,
-      banner: "COUNT",
-      desc: "The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
+                  type: :numeric,
+                  banner: 'COUNT',
+                  desc: "The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
     method_option :count_till_idle,
-      type: :numeric,
-      banner: "COUNT_TILL_IDLE",
-      desc: "Approximatly how long in seconds to wait before good_job exits"
+                  type: :numeric,
+                  banner: 'COUNT_TILL_IDLE',
+                  desc: 'Approximatly how long in seconds to wait before good_job exits'
 
     def start
       set_up_application!
@@ -113,7 +113,7 @@ module GoodJob
         probe_server.start
       end
 
-      require "concurrent/atomic/event"
+      require 'concurrent/atomic/event'
       @stop_good_job_executable = Concurrent::Event.new
       %w[INT TERM].each do |signal|
         trap(signal) { Thread.new { @stop_good_job_executable.set }.join }
@@ -122,9 +122,9 @@ module GoodJob
       @checks = configuration.count_till_idle
       Kernel.loop do
         sleep 0.1
-        if configuration.count_till_idle.positive? && capsule.stats[:active_threads] == 0
+        if configuration.count_till_idle.positive? && capsule.stats[:active_threads].positive?
           @checks -= 1
-        elsif capsule.stats[:active_threads] > 0
+        elsif capsule.stats[:active_threads].positive?
           @checks = configuration.count_till_idle
         end
 
@@ -149,9 +149,9 @@ module GoodJob
 
     DESCRIPTION
     method_option :before_seconds_ago,
-      type: :numeric,
-      banner: "SECONDS",
-      desc: "Destroy records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 1209600 (14 days))"
+                  type: :numeric,
+                  banner: 'SECONDS',
+                  desc: "Destroy records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 1209600 (14 days))"
 
     def cleanup_preserved_jobs
       set_up_application!
