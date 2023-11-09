@@ -468,6 +468,14 @@ class MyJob < ApplicationJob
 
     # A unique key to be globally locked against.
     # Can be String or Lambda/Proc that is invoked in the context of the job.
+    #
+    # If a key is not provided GoodJob will create one for you. This key will be
+    # composed of the jobs class, the queue, and all passed arguments.
+    # `MyJob.set(queue: "special_queue").perform_later("Bob")` => 'MyJob-special_queue-["Bob"]'
+    # If you provide a custom concurrency key (for example, if one of your arguments
+    # is transient) make sure that it sufficiently unique across jobs and queues
+    # by adding the job class or queue to the key yourself, if needed.
+    #
     # Note: Arguments passed to #perform_later can be accessed through ActiveJob's `arguments` method
     # which is an array containing positional arguments and, optionally, a kwarg hash.
     key: -> { "MyJob-#{arguments.first}-#{arguments.last[:version]}" } #  MyJob.perform_later("Alice", version: 'v2') => "MyJob-Alice-v2"

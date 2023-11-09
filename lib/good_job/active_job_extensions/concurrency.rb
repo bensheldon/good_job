@@ -97,7 +97,7 @@ module GoodJob
       # @return [Object] concurrency key
       def _good_job_concurrency_key
         key = self.class.good_job_concurrency_config[:key]
-        return if key.blank?
+        return "#{self.class.name}-#{queue_name}-#{ActiveJob::Arguments.serialize(arguments)}" if key.blank?
 
         key = instance_exec(&key) if key.respond_to?(:call)
         raise TypeError, "Concurrency key must be a String; was a #{key.class}" unless VALID_TYPES.any? { |type| key.is_a?(type) }
