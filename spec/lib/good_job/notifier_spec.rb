@@ -45,6 +45,8 @@ RSpec.describe GoodJob::Notifier do
       allow(notifier).to receive(:wait_for_notify).and_raise(ActiveRecord::ConnectionTimeoutError)
       error_event.wait(5)
       expect(notifier).not_to be_connected
+
+      notifier.shutdown
     end
   end
 
