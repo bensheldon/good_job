@@ -16,6 +16,7 @@ module GoodJob
     # @param queue_string [String] Queues to execute jobs from
     def initialize(queue_string)
       @queue_string = queue_string
+      @metrics = Metrics.new
     end
 
     # A meaningful name to identify the performer in logs and for debugging.
@@ -29,11 +30,22 @@ module GoodJob
     def next
       active_job_id = nil
       job_query.perform_with_advisory_lock(parsed_queues: parsed_queues, queue_select_limit: GoodJob.configuration.queue_select_limit) do |execution|
-        active_job_id = execution.active_job_id
-        performing_active_job_ids << active_job_id
+        @metrics.touch_check_queue_at
+
+        if execution
+          active_job_id = execution.active_job_id
+          performing_active_job_ids << active_job_id
+          @metrics.touch_execution_at
+        else
+          @metrics.increment_empty_executions
+        end
+      end.tap do |result|
+        if result
+          result.succeeded? ? @metrics.increment_succeeded_executions : @metrics.increment_errored_executions
+        end
       end
     ensure
-      performing_active_job_ids.delete(active_job_id)
+      performing_active_job_ids.delete(active_job_id) if active_job_id
     end
 
     # Tests whether this performer should be used in GoodJob's current state.
@@ -70,6 +82,20 @@ module GoodJob
     # @return [void]
     def cleanup
       GoodJob.cleanup_preserved_jobs
+    end
+
+    # Metrics about this performer
+    # @return [Hash]
+    def stats
+      {
+        name: name,
+      }.merge(@metrics.to_h)
+    end
+
+    # Reset metrics about this performer
+    # @return [void]
+    def reset_stats
+      @metrics.reset
     end
 
     private

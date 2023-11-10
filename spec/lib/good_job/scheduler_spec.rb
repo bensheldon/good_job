@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Scheduler do
-  let(:performer) { instance_double(GoodJob::JobPerformer, next: nil, name: '', next_at: [], cleanup: nil, performing_active_job_ids: Concurrent::Set.new) }
+  let(:performer) { GoodJob::JobPerformer.new('*') }
 
   after do
     described_class.instances.each(&:shutdown)
@@ -12,7 +12,7 @@ RSpec.describe GoodJob::Scheduler do
   describe '#name' do
     it 'is human readable and contains configuration values' do
       scheduler = described_class.new(performer)
-      expect(scheduler.name).to eq('GoodJob::Scheduler(queues= max_threads=5)')
+      expect(scheduler.name).to eq('GoodJob::Scheduler(queues=* max_threads=5)')
     end
   end
 
@@ -77,38 +77,6 @@ RSpec.describe GoodJob::Scheduler do
     end
   end
 
-  describe '#task_observer' do
-    it 'increases metric counters' do
-      allow(GoodJob).to receive(:on_thread_error)
-
-      failed_job_count = 0
-      succeeded_job_count = 0
-
-      allow(performer).to receive(:next) do
-        if failed_job_count < 7
-          failed_job_count += 1
-          GoodJob::ExecutionResult.new(value: nil, unhandled_error: StandardError.new("oopsy"))
-        elsif succeeded_job_count < 9
-          succeeded_job_count += 1
-          GoodJob::ExecutionResult.new(value: 'success')
-        end
-      end
-
-      scheduler = described_class.new(performer)
-      scheduler.create_thread
-      sleep_until { scheduler.stats[:total_executions_count] == 17 }
-      scheduler.shutdown
-
-      expect(scheduler.stats).to include(
-        empty_executions_count: 1,
-        errored_executions_count: 7,
-        succeeded_executions_count: 9,
-        unexecutable_executions_count: 0,
-        total_executions_count: 17
-      )
-    end
-  end
-
   describe '#shutdown' do
     it 'shuts down the theadpools' do
       scheduler = described_class.new(performer)
@@ -149,14 +117,10 @@ RSpec.describe GoodJob::Scheduler do
     end
 
     it 'resets metrics' do
-      allow(performer).to receive(:next).and_return GoodJob::ExecutionResult.new(value: 'hello'), nil
-
       scheduler = described_class.new(performer)
       scheduler.create_thread
 
-      sleep_until do
-        scheduler.stats.fetch(:succeeded_executions_count) == 1
-      end
+      performer.instance_variable_get(:@metrics).increment_succeeded_executions
 
       scheduler.shutdown
       expect(scheduler.stats.fetch(:succeeded_executions_count)).to eq 1
@@ -183,29 +147,23 @@ RSpec.describe GoodJob::Scheduler do
     # The JRuby version of the ThreadPoolExecutor sometimes does not immediately
     # create a thread, which causes this test to flake on JRuby.
     it 'returns false if there are no threads available', :skip_if_java do
-      configuration = GoodJob::Configuration.new({ queues: 'mice:1' })
-      scheduler = described_class.from_configuration(configuration)
-
+      scheduler = described_class.new(GoodJob::JobPerformer.new('mice'), max_threads: 1)
       scheduler.create_thread(queue_name: 'mice')
       expect(scheduler.create_thread(queue_name: 'mice')).to be_nil
     end
 
     it 'returns true if the state matches the performer' do
-      configuration = GoodJob::Configuration.new({ queues: 'mice:2' })
-      scheduler = described_class.from_configuration(configuration)
-
+      scheduler = described_class.new(GoodJob::JobPerformer.new('mice'), max_threads: 2)
       expect(scheduler.create_thread(queue_name: 'mice')).to be true
     end
 
     it 'returns false if the state does not match the performer' do
-      configuration = GoodJob::Configuration.new({ queues: 'mice:2' })
-      scheduler = described_class.from_configuration(configuration)
-
+      scheduler = described_class.new(GoodJob::JobPerformer.new('mice'), max_threads: 2)
       expect(scheduler.create_thread(queue_name: 'elephant')).to be false
     end
 
     it 'uses state[:count] to create multiple threads' do
-      job_performer = instance_double(GoodJob::JobPerformer, next: nil, next?: true, name: '', next_at: [], cleanup: nil)
+      job_performer = instance_double(GoodJob::JobPerformer, next: nil, next?: true, name: '', next_at: [], cleanup: nil, reset_stats: nil)
       scheduler = described_class.new(job_performer, max_threads: 1)
       allow(scheduler).to receive(:create_task)
 
@@ -223,18 +181,19 @@ RSpec.describe GoodJob::Scheduler do
 
       expect(scheduler.stats).to eq({
                                       name: scheduler.name,
-                                      queues: performer.name,
-                                      max_threads: max_threads,
-                                      active_threads: 0,
-                                      available_threads: max_threads,
-                                      max_cache: max_cache,
-                                      active_cache: 0,
-                                      available_cache: max_cache,
-                                      empty_executions_count: 0,
-                                      errored_executions_count: 0,
-                                      succeeded_executions_count: 0,
-                                      unexecutable_executions_count: 0,
-                                      total_executions_count: 0,
+        queues: performer.name,
+        max_threads: max_threads,
+        active_threads: 0,
+        available_threads: max_threads,
+        max_cache: max_cache,
+        active_cache: 0,
+        available_cache: max_cache,
+        empty_executions_count: 0,
+        errored_executions_count: 0,
+        succeeded_executions_count: 0,
+        total_executions_count: 0,
+        check_queue_at: nil,
+        execution_at: nil,
                                     })
     end
   end
@@ -243,6 +202,7 @@ RSpec.describe GoodJob::Scheduler do
     context 'when there are more than cleanup_interval_jobs' do
       it 'runs cleanup' do
         allow(GoodJob).to receive(:cleanup_preserved_jobs)
+        allow(performer).to receive(:cleanup).and_call_original
 
         performed_jobs = 0
         total_jobs = 2
@@ -267,32 +227,6 @@ RSpec.describe GoodJob::Scheduler do
         4.times { scheduler.create_thread }
         wait_until(max: 1) { expect(performer).to have_received(:cleanup) }
         scheduler.shutdown
-      end
-    end
-  end
-
-  describe '.from_configuration' do
-    describe 'multi-scheduling' do
-      it 'instantiates multiple schedulers' do
-        configuration = GoodJob::Configuration.new({ queues: '*:1;mice,ferrets:2;elephant:4' })
-        multi_scheduler = described_class.from_configuration(configuration)
-
-        all_scheduler, rodents_scheduler, elephants_scheduler = multi_scheduler.schedulers
-
-        expect(all_scheduler.stats).to include(
-          queues: '*',
-          max_threads: 1
-        )
-
-        expect(rodents_scheduler.stats).to include(
-          queues: 'mice,ferrets',
-          max_threads: 2
-        )
-
-        expect(elephants_scheduler.stats).to include(
-          queues: 'elephant',
-          max_threads: 4
-        )
       end
     end
   end

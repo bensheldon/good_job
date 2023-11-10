@@ -28,6 +28,8 @@ RSpec.describe GoodJob::JobPerformer do
       allow(GoodJob::Execution).to receive(:perform_with_advisory_lock) do |&block|
         block.call(execution)
         expect(job_performer.performing_active_job_ids).to include('123')
+
+        GoodJob::ExecutionResult.new(value: nil)
       end
 
       expect(job_performer.performing_active_job_ids).to be_empty

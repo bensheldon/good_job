@@ -32,9 +32,9 @@ module GoodJob
         @shared_executor = GoodJob::SharedExecutor.new
         @notifier = GoodJob::Notifier.new(enable_listening: @configuration.enable_listen_notify, executor: @shared_executor.executor)
         @poller = GoodJob::Poller.new(poll_interval: @configuration.poll_interval)
-        @scheduler = GoodJob::Scheduler.from_configuration(@configuration, warm_cache_on_initialize: true)
-        @notifier.recipients << [@scheduler, :create_thread]
-        @poller.recipients << [@scheduler, :create_thread]
+        @multi_scheduler = GoodJob::MultiScheduler.from_configuration(@configuration, warm_cache_on_initialize: true)
+        @notifier.recipients << [@multi_scheduler, :create_thread]
+        @poller.recipients << [@multi_scheduler, :create_thread]
 
         @cron_manager = GoodJob::CronManager.new(@configuration.cron_entries, start_on_initialize: true, executor: @shared_executor.executor) if @configuration.enable_cron?
 
@@ -52,7 +52,7 @@ module GoodJob
     # @return [void]
     def shutdown(timeout: NONE)
       timeout = @configuration.shutdown_timeout if timeout == NONE
-      GoodJob._shutdown_all([@shared_executor, @notifier, @poller, @scheduler, @cron_manager].compact, timeout: timeout)
+      GoodJob._shutdown_all([@shared_executor, @notifier, @poller, @multi_scheduler, @cron_manager].compact, timeout: timeout)
       @startable = false
       @running = false
     end
@@ -74,7 +74,7 @@ module GoodJob
 
     # @return [Boolean] Whether the capsule has been shutdown.
     def shutdown?
-      [@shared_executor, @notifier, @poller, @scheduler, @cron_manager].compact.all?(&:shutdown?)
+      [@shared_executor, @notifier, @poller, @multi_scheduler, @cron_manager].compact.all?(&:shutdown?)
     end
 
     # Creates an execution thread(s) with the given attributes.
@@ -82,7 +82,7 @@ module GoodJob
     # @return [Boolean, nil] Whether the thread was created.
     def create_thread(job_state = nil)
       start if startable?
-      @scheduler&.create_thread(job_state)
+      @multi_scheduler&.create_thread(job_state)
     end
 
     private

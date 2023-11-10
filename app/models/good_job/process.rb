@@ -52,6 +52,10 @@ module GoodJob # :nodoc:
     end
 
     def self.ns_current_state
+      total_succeeded_executions_count = GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:succeeded_executions_count, 0) }
+      total_errored_executions_count = GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:errored_executions_count, 0) }
+      total_empty_executions_count = GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:empty_executions_count, 0) }
+
       {
         id: ns_current_id,
         hostname: Socket.gethostname,
@@ -61,8 +65,10 @@ module GoodJob # :nodoc:
         retry_on_unhandled_error: GoodJob.retry_on_unhandled_error,
         schedulers: GoodJob::Scheduler.instances.map(&:stats),
         cron_enabled: GoodJob.configuration.enable_cron?,
-        total_succeeded_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:succeeded_executions_count) },
-        total_errored_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:errored_executions_count) },
+        total_succeeded_executions_count: total_succeeded_executions_count,
+        total_errored_executions_count: total_errored_executions_count,
+        total_executions_count: total_succeeded_executions_count + total_errored_executions_count,
+        total_empty_executions_count: total_empty_executions_count,
         database_connection_pool: {
           size: connection_pool.size,
           active: connection_pool.connections.count(&:in_use?),
