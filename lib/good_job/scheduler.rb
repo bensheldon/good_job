@@ -123,15 +123,16 @@ module GoodJob # :nodoc:
     # Wakes a thread to allow the performer to execute a task.
     # @param state [Hash, nil] Contextual information for the performer. See {JobPerformer#next?}.
     # @return [Boolean, nil] Whether work was started.
-    #
     #   * +nil+ if the scheduler is unable to take new work, for example if the thread pool is shut down or at capacity.
     #   * +true+ if the performer started executing work.
     #   * +false+ if the performer decides not to attempt to execute a task based on the +state+ that is passed to it.
     def create_thread(state = nil)
       return nil unless executor.running?
 
-      if state
+      if state.present?
         return false unless performer.next?(state)
+
+        fanout = state&.fetch(:fanout, nil)
 
         if state[:count]
           # When given state for multiple jobs, try to create a thread for each one.
@@ -164,7 +165,7 @@ module GoodJob # :nodoc:
         return nil unless remaining_cache_count.positive?
       end
 
-      create_task(delay)
+      create_task(delay, fanout: fanout)
 
       run_now ? true : nil
     end
@@ -262,12 +263,15 @@ module GoodJob # :nodoc:
     end
 
     # @param delay [Integer]
+    # @param fanout [Boolean] Whether to eagerly create a 2nd execution thread if a job is found.
     # @return [void]
-    def create_task(delay = 0)
-      future = Concurrent::ScheduledTask.new(delay, args: [performer], executor: executor, timer_set: timer_set) do |thr_performer|
+    def create_task(delay = 0, fanout: false)
+      future = Concurrent::ScheduledTask.new(delay, args: [self, performer], executor: executor, timer_set: timer_set) do |thr_scheduler, thr_performer|
         Thread.current.name = Thread.current.name.sub("-worker-", "-thread-") if Thread.current.name
         Rails.application.reloader.wrap do
-          thr_performer.next
+          thr_performer.next do |found|
+            thr_scheduler.create_thread({ fanout: fanout }) if found && fanout
+          end
         end
       end
       future.add_observer(self, :task_observer)

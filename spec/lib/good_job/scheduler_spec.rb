@@ -148,18 +148,18 @@ RSpec.describe GoodJob::Scheduler do
     # create a thread, which causes this test to flake on JRuby.
     it 'returns false if there are no threads available', :skip_if_java do
       scheduler = described_class.new(GoodJob::JobPerformer.new('mice'), max_threads: 1)
-      scheduler.create_thread(queue_name: 'mice')
-      expect(scheduler.create_thread(queue_name: 'mice')).to be_nil
+      scheduler.create_thread({ queue_name: 'mice' })
+      expect(scheduler.create_thread({ queue_name: 'mice' })).to be_nil
     end
 
     it 'returns true if the state matches the performer' do
       scheduler = described_class.new(GoodJob::JobPerformer.new('mice'), max_threads: 2)
-      expect(scheduler.create_thread(queue_name: 'mice')).to be true
+      expect(scheduler.create_thread({ queue_name: 'mice' })).to be true
     end
 
     it 'returns false if the state does not match the performer' do
       scheduler = described_class.new(GoodJob::JobPerformer.new('mice'), max_threads: 2)
-      expect(scheduler.create_thread(queue_name: 'elephant')).to be false
+      expect(scheduler.create_thread({ queue_name: 'elephant' })).to be false
     end
 
     it 'uses state[:count] to create multiple threads' do
@@ -170,6 +170,31 @@ RSpec.describe GoodJob::Scheduler do
       result = scheduler.create_thread({ count: 10 })
       expect(result).to be true
       expect(scheduler).to have_received(:create_task).exactly(10).times
+    end
+
+    it 'uses fanout:true to eagerly create threads', :skip_if_java do
+      job_performer = GoodJob::JobPerformer.new("*")
+
+      # Engage all of the threads, then hold them until assertions are finished
+      barrier = Concurrent::CyclicBarrier.new(4)
+      finish_event = Concurrent::Event.new
+
+      allow(job_performer).to receive(:next_at).and_return([])
+      allow(job_performer).to receive(:next) do |&block|
+        next if finish_event.set?
+
+        block.call(true)
+        barrier.wait(10)
+        finish_event.wait(10)
+      end
+
+      scheduler = described_class.new(job_performer, max_threads: 3)
+      scheduler.create_thread({ fanout: true })
+
+      expect(barrier.wait(10)).to eq true
+
+      finish_event.set
+      scheduler.shutdown
     end
   end
 

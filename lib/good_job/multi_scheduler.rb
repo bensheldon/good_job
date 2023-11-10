@@ -66,7 +66,7 @@ module GoodJob
     def create_thread(state = nil)
       results = []
 
-      if state
+      if state && !state[:fanout]
         schedulers.any? do |scheduler|
           scheduler.create_thread(state).tap { |result| results << result }
         end
