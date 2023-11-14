@@ -229,15 +229,14 @@ module GoodJob
     end
 
     # The number of seconds that a good_job process will idle with out runnin a job.
-    # -1 means do not idle out.
-    # Since the loop sleeps every 0.1 seconds, this multiples by 10 to get the seconds.
-    # @return [Integer, -1]
+    # nil means do not idle out.
+    # @return [Integer, nil]
     def shutdown_on_idle
       (
         options[:shutdown_on_idle] ||
         rails_config[:shutdown_on_idle] ||
         env['GOOD_JOB_SHUTDOWN_ON_IDLE']
-      )&.to_i || -1
+      )&.to_i || nil
     end
 
     # Whether to automatically destroy discarded jobs that have been preserved.

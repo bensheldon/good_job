@@ -120,7 +120,7 @@ module GoodJob
       end
 
       Kernel.loop do
-        sleep 0.1
+        @stop_good_job_executable.wait(configuration.shutdown_on_idle || SHUTDOWN_EVENT_TIMEOUT)
         break if @stop_good_job_executable.set? || capsule.shutdown? || capsule.idle?
       end
 
