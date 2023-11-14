@@ -91,10 +91,10 @@ module GoodJob
                   type: :numeric,
                   banner: 'COUNT',
                   desc: "The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
-    method_option :count_till_idle,
+    method_option :shutdown_on_idle,
                   type: :numeric,
-                  banner: 'COUNT_TILL_IDLE',
-                  desc: 'Approximatly how long in seconds to wait before good_job exits'
+                  banner: 'SECONDS',
+                  desc: 'How long in seconds to wait before good_job exits'
 
     def start
       set_up_application!
@@ -119,16 +119,9 @@ module GoodJob
         trap(signal) { Thread.new { @stop_good_job_executable.set }.join }
       end
 
-      @checks = configuration.count_till_idle
       Kernel.loop do
         sleep 0.1
-        if configuration.count_till_idle.positive? && capsule.stats[:active_threads].positive?
-          @checks -= 1
-        elsif capsule.stats[:active_threads].positive?
-          @checks = configuration.count_till_idle
-        end
-
-        break if @stop_good_job_executable.set? || capsule.shutdown? || @checks.zero?
+        break if @stop_good_job_executable.set? || capsule.shutdown? || capsule.idle?
       end
 
       systemd.stop do

@@ -29,4 +29,31 @@ RSpec.describe 'Capsule' do
 
     expect(GoodJob::DiscreteExecution.count).to eq(total_jobs)
   end
+
+  it 'computes ilde base on configuation' do
+    stub_const "TestJob", (Class.new(ActiveJob::Base) do
+      def perform
+        # noop
+      end
+    end)
+
+    never_idle_capsule = GoodJob::Capsule.new(configuration: GoodJob::Configuration.new({}))
+    idle_capsule = GoodJob::Capsule.new(configuration: GoodJob::Configuration.new({shutdown_on_idle: 10}))
+    never_idle_capsule.start
+    idle_capsule.start
+
+    expect(never_idle_capsule.idle?).to be(false)
+
+    adapter = GoodJob::Adapter.new(execution_mode: :async, _capsule: idle_capsule)
+    TestJob.queue_adapter = adapter
+    TestJob.perform_later
+
+    GoodJob.perform_inline
+
+    expect(idle_capsule.idle?).to be(false)
+
+    travel_to Time.now.utc + 30.seconds do
+      expect(idle_capsule.idle?).to be(true)
+    end
+  end
 end

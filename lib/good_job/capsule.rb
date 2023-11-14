@@ -15,14 +15,20 @@ module GoodJob
     def initialize(configuration: GoodJob.configuration)
       @configuration = configuration
       @startable = true
+      @shutdown_on_idle_enabled = false
       @running = false
       @mutex = Mutex.new
 
       self.class.instances << self
     end
 
+    # Expose stats from the scheduler
+    # @return [Hash] stats plucked out of all the schedulers
     def stats
-      @scheduler.stats
+      {
+        active_execution_thread_count: @multi_scheduler.stats.fetch(:active_execution_thread_count, 0),
+        last_job_executed_at: @multi_scheduler.stats.fetch(:execution_at, nil)
+      }
     end
 
     # Start the capsule once. After a shutdown, {#restart} must be used to start again.
@@ -42,6 +48,7 @@ module GoodJob
 
         @cron_manager = GoodJob::CronManager.new(@configuration.cron_entries, start_on_initialize: true, executor: @shared_executor.executor) if @configuration.enable_cron?
 
+        @shutdown_on_idle_enabled = @configuration.shutdown_on_idle.positive?
         @startable = false
         @running = true
       end
@@ -80,6 +87,17 @@ module GoodJob
     def shutdown?
       [@shared_executor, @notifier, @poller, @multi_scheduler, @cron_manager].compact.all?(&:shutdown?)
     end
+
+    # @return [Boolean] Whether the capsule is idle
+    def idle?
+      return false unless @shutdown_on_idle_enabled
+
+      seconds = @configuration.shutdown_on_idle
+      last_job_executed_at = stats[:last_job_executed_at] || Time.now.utc
+
+      Time.now.utc - last_job_executed_at >= seconds
+    end
+
 
     # Creates an execution thread(s) with the given attributes.
     # @param job_state [Hash, nil] See {GoodJob::Scheduler#create_thread}.
