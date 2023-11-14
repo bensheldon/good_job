@@ -93,9 +93,9 @@ module GoodJob
       return false unless @shutdown_on_idle_enabled
 
       seconds = @configuration.shutdown_on_idle
-      last_job_executed_at = stats[:last_job_executed_at] || Time.now.utc
+      last_job_executed_at = stats[:last_job_executed_at]
 
-      Time.now.utc - last_job_executed_at >= seconds
+      last_job_executed_at.nil? || (Time.current - last_job_executed_at >= seconds)
     end
 
 
