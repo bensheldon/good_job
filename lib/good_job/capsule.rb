@@ -33,8 +33,8 @@ module GoodJob
         @notifier = GoodJob::Notifier.new(enable_listening: @configuration.enable_listen_notify, executor: @shared_executor.executor)
         @poller = GoodJob::Poller.new(poll_interval: @configuration.poll_interval)
         @multi_scheduler = GoodJob::MultiScheduler.from_configuration(@configuration, warm_cache_on_initialize: true)
-        @notifier.recipients << [@multi_scheduler, :create_thread]
-        @poller.recipients << [@multi_scheduler, :create_thread]
+        @notifier.recipients.push([@multi_scheduler, :create_thread])
+        @poller.recipients.push(-> { @multi_scheduler.create_thread({ fanout: true }) })
 
         @cron_manager = GoodJob::CronManager.new(@configuration.cron_entries, start_on_initialize: true, executor: @shared_executor.executor) if @configuration.enable_cron?
 

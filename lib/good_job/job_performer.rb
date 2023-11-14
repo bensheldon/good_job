@@ -26,6 +26,7 @@ module GoodJob
     end
 
     # Perform the next eligible job
+    # @yield [Execution] Yields the execution, if one is dequeued
     # @return [Object, nil] Returns job result or +nil+ if no job was found
     def next
       active_job_id = nil
@@ -36,6 +37,7 @@ module GoodJob
           active_job_id = execution.active_job_id
           performing_active_job_ids << active_job_id
           @metrics.touch_execution_at
+          yield(execution) if block_given?
         else
           @metrics.increment_empty_executions
         end

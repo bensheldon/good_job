@@ -66,7 +66,7 @@ describe GoodJob::Capsule do
     it 'passes the job state to the scheduler' do
       scheduler = instance_double(GoodJob::Scheduler, create_thread: nil, shutdown?: true, shutdown: nil)
       allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
-      job_state = "STATE"
+      job_state = { animal: "cat" }
 
       capsule = described_class.new
       capsule.start
