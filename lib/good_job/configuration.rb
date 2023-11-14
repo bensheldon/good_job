@@ -232,12 +232,12 @@ module GoodJob
     # -1 means do not idle out.
     # Since the loop sleeps every 0.1 seconds, this multiples by 10 to get the seconds.
     # @return [Integer, -1]
-    def count_till_idle
+    def shutdown_on_idle
       (
-        options[:count_till_idle] ||
-        rails_config[:count_till_idle] ||
-        env['GOOD_JOB_COUNT_TILL_IDLE']
-      )&.to_i&.*(10) || -1
+        options[:shutdown_on_idle] ||
+        rails_config[:shutdown_on_idle] ||
+        env['GOOD_JOB_SHUTDOWN_ON_IDLE']
+      )&.to_i || -1
     end
 
     # Whether to automatically destroy discarded jobs that have been preserved.
@@ -383,7 +383,7 @@ module GoodJob
     private
 
     def rails_config
-      Rails.application.config.good_job
+      Rails.application.config.good_job || {}
     end
   end
 end
