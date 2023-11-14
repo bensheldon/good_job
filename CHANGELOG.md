@@ -1,5 +1,29 @@
 # Changelog
 
+## [v3.21.1](https://github.com/bensheldon/good_job/tree/v3.21.1) (2023-11-14)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.0...v3.21.1)
+
+**Fixed bugs:**
+
+- Explicitly require `active_job/arguments` in `GoodJob::BatchRecord` [\#1150](https://github.com/bensheldon/good_job/pull/1150) ([hidenba](https://github.com/hidenba))
+- Bug: Polling only activates single thread, should eagerly create additional threads when jobs exist [\#1148](https://github.com/bensheldon/good_job/pull/1148) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Error when executing ActiveJob::Batch.new in Rails 7.1.x [\#1149](https://github.com/bensheldon/good_job/issues/1149)
+- Show whether or not cron scheduler is enable in dashboard \(UI\) [\#1117](https://github.com/bensheldon/good_job/issues/1117)
+- ActiveRecord::ConnectionNotEstablished For rails multi DB [\#1103](https://github.com/bensheldon/good_job/issues/1103)
+- Rails API dies when using latest good\_job version [\#952](https://github.com/bensheldon/good_job/issues/952)
+- config.good\_job.preserve\_job\_records = false not working with CRON [\#927](https://github.com/bensheldon/good_job/issues/927)
+- Pundit::NotDefinedError \(unable to find policy `Admin::GoodJob::JobPolicy` for \) - version 2.13.0 and above [\#618](https://github.com/bensheldon/good_job/issues/618)
+- Running CLI under foreman doesn't display log output until exit [\#490](https://github.com/bensheldon/good_job/issues/490)
+
+**Merged pull requests:**
+
+- Always instantiate MultiScheduler; delegate Scheduler Metrics to JobPerformer [\#1147](https://github.com/bensheldon/good_job/pull/1147) ([bensheldon](https://github.com/bensheldon))
+- Clarify on concurrency uniqueness constraints [\#1144](https://github.com/bensheldon/good_job/pull/1144) ([Earlopain](https://github.com/Earlopain))
+
 ## [v3.21.0](https://github.com/bensheldon/good_job/tree/v3.21.0) (2023-11-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.20.0...v3.21.0)
