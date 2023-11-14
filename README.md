@@ -470,7 +470,7 @@ class MyJob < ApplicationJob
     # Can be String or Lambda/Proc that is invoked in the context of the job.
     # Note: Arguments passed to #perform_later can be accessed through ActiveJob's `arguments` method
     # which is an array containing positional arguments and, optionally, a kwarg hash.
-    key: -> { "Unique-#{arguments.first}-#{arguments.last[:version]}" } #  MyJob.perform_later("Alice", version: 'v2') => "Unique-Alice-v2"
+    key: -> { "MyJob-#{arguments.first}-#{arguments.last[:version]}" } #  MyJob.perform_later("Alice", version: 'v2') => "MyJob-Alice-v2"
   )
 
   def perform(first_name)
@@ -483,7 +483,7 @@ When testing, the resulting concurrency key value can be inspected:
 
 ```ruby
 job = MyJob.perform_later("Alice")
-job.good_job_concurrency_key #=> "Unique-Alice"
+job.good_job_concurrency_key #=> "MyJob-Alice"
 ```
 
 #### How concurrency controls work

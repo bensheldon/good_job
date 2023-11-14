@@ -26,6 +26,7 @@ require 'good_job/current_thread'
 require "good_job/daemon"
 require "good_job/dependencies"
 require "good_job/job_performer"
+require "good_job/job_performer/metrics"
 require "good_job/log_subscriber"
 require "good_job/multi_scheduler"
 require "good_job/notifier"

@@ -24,15 +24,15 @@ RSpec.describe GoodJob::Poller do
 
   describe 'polling' do
     it 'is instrumented' do
-      stub_const 'POLL_COUNT', Concurrent::AtomicFixnum.new(0)
+      latch = Concurrent::CountDownLatch.new(3)
 
       payloads = []
       callback = proc { |*args| payloads << args }
 
       ActiveSupport::Notifications.subscribed(callback, "finished_timer_task") do
-        recipient = proc { |_payload| POLL_COUNT.increment }
-        poller = described_class.new(recipient, poll_interval: 1)
-        sleep_until(max: 5, increments_of: 0.5) { POLL_COUNT.value > 1 }
+        recipient = proc { |_payload| latch.count_down }
+        poller = described_class.new(recipient, poll_interval: 0.1)
+        latch.wait(10)
         poller.shutdown
       end
 
@@ -42,14 +42,14 @@ RSpec.describe GoodJob::Poller do
 
   describe '#recipients' do
     it 'polls recipients method' do
-      stub_const 'POLL_COUNT', Concurrent::AtomicFixnum.new(0)
-      recipient = proc { |_payload| POLL_COUNT.increment }
+      latch = Concurrent::CountDownLatch.new(3)
 
-      poller = described_class.new(recipient, poll_interval: 1)
-      sleep_until(max: 5, increments_of: 0.5) { POLL_COUNT.value > 2 }
+      recipient = proc { |_payload| latch.count_down }
+      poller = described_class.new(recipient, poll_interval: 0.1)
+
+      expect(latch.wait(10)).to eq true
+
       poller.shutdown
-
-      expect(POLL_COUNT.value).to be > 2
     end
   end
 end
