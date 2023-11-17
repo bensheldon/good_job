@@ -588,7 +588,7 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
     batch.add do
       10.times { MyJob.perform_later }
     end
-    
+
     batch.add do
       10.times { OtherJob.perform_later }
     end
