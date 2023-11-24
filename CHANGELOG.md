@@ -1,5 +1,21 @@
 # Changelog
 
+## [v3.21.2](https://github.com/bensheldon/good_job/tree/v3.21.2) (2023-11-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.1...v3.21.2)
+
+**Fixed bugs:**
+
+- Skip `RecordAlreadyAdvisoryLockedError` during mass-update action [\#1158](https://github.com/bensheldon/good_job/pull/1158) ([jmarsh24](https://github.com/jmarsh24))
+
+**Closed issues:**
+
+- Processes are created for puma workers after version v3.12.5 with execution\_mode==:external [\#1156](https://github.com/bensheldon/good_job/issues/1156)
+
+**Merged pull requests:**
+
+- Update README.md [\#1152](https://github.com/bensheldon/good_job/pull/1152) ([LucasKendi](https://github.com/LucasKendi))
+
 ## [v3.21.1](https://github.com/bensheldon/good_job/tree/v3.21.1) (2023-11-14)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.0...v3.21.1)
@@ -2009,7 +2025,7 @@
 - Warn in Readme that configuration should not go into `config/initializers/*.rb` [\#418](https://github.com/bensheldon/good_job/pull/418) ([bensheldon](https://github.com/bensheldon))
 - Replace worker wording [\#409](https://github.com/bensheldon/good_job/pull/409) ([Hugo-Hache](https://github.com/Hugo-Hache))
 - Improve Readme's "Optimize queues, threads, processes" section [\#405](https://github.com/bensheldon/good_job/pull/405) ([Hugo-Hache](https://github.com/Hugo-Hache))
-- Update GH Test Matrix with more PG versions [\#401](https://github.com/bensheldon/good_job/pull/401) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
+- Update GH Test Matrix with more PG versions [\#401](https://github.com/bensheldon/good_job/pull/401) ([tedt10e](https://github.com/tedt10e))
 - Extract cron configuration hash into CronEntry ActiveModel objects [\#400](https://github.com/bensheldon/good_job/pull/400) ([bensheldon](https://github.com/bensheldon))
 - Remove errant copy-paste from app.json [\#397](https://github.com/bensheldon/good_job/pull/397) ([morgoth](https://github.com/morgoth))
 
@@ -2049,7 +2065,7 @@
 
 **Merged pull requests:**
 
-- Update GH Test Matrix with latest JRuby 9.3.0.0 [\#387](https://github.com/bensheldon/good_job/pull/387) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
+- Update GH Test Matrix with latest JRuby 9.3.0.0 [\#387](https://github.com/bensheldon/good_job/pull/387) ([tedt10e](https://github.com/tedt10e))
 - Improve test support's ShellOut command's process termination and add test logs [\#385](https://github.com/bensheldon/good_job/pull/385) ([bensheldon](https://github.com/bensheldon))
 - @bensheldon Add Rails 7 alpha to Appraisal; update development dependencies [\#384](https://github.com/bensheldon/good_job/pull/384) ([bensheldon](https://github.com/bensheldon))
 
@@ -2308,7 +2324,7 @@
 
 - Have prettier Dashboard asset urls e.g. `bootstrap.css` instead of `bootstrap_css.css` [\#306](https://github.com/bensheldon/good_job/pull/306) ([bensheldon](https://github.com/bensheldon))
 - Create dashboard demo app on Heroku [\#305](https://github.com/bensheldon/good_job/pull/305) ([bensheldon](https://github.com/bensheldon))
-- Add Frozen String Literal to all files [\#302](https://github.com/bensheldon/good_job/pull/302) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
+- Add Frozen String Literal to all files [\#302](https://github.com/bensheldon/good_job/pull/302) ([tedt10e](https://github.com/tedt10e))
 
 ## [v1.11.2](https://github.com/bensheldon/good_job/tree/v1.11.2) (2021-07-20)
 
@@ -2366,7 +2382,7 @@
 
 **Merged pull requests:**
 
-- Update GH Test Matrix with latest JRuby 9.2.19.0 [\#283](https://github.com/bensheldon/good_job/pull/283) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
+- Update GH Test Matrix with latest JRuby 9.2.19.0 [\#283](https://github.com/bensheldon/good_job/pull/283) ([tedt10e](https://github.com/tedt10e))
 
 ## [v1.10.0](https://github.com/bensheldon/good_job/tree/v1.10.0) (2021-06-29)
 
@@ -2516,11 +2532,11 @@
 - Move executable flags from constants to accessors on GoodJob::CLI [\#234](https://github.com/bensheldon/good_job/pull/234) ([bensheldon](https://github.com/bensheldon))
 - Add custom Scheduler::TimerSet [\#232](https://github.com/bensheldon/good_job/pull/232) ([bensheldon](https://github.com/bensheldon))
 - Fix assorted constant references in YARD documentation [\#231](https://github.com/bensheldon/good_job/pull/231) ([bensheldon](https://github.com/bensheldon))
-- Update GH Test Matrix with latest JRuby 9.2.17.0 [\#228](https://github.com/bensheldon/good_job/pull/228) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
+- Update GH Test Matrix with latest JRuby 9.2.17.0 [\#228](https://github.com/bensheldon/good_job/pull/228) ([tedt10e](https://github.com/tedt10e))
 - Update gem dependencies [\#227](https://github.com/bensheldon/good_job/pull/227) ([bensheldon](https://github.com/bensheldon))
 - Remove leftover text from Readme [\#226](https://github.com/bensheldon/good_job/pull/226) ([weh](https://github.com/weh))
 - Fix appraisal and bundler version CI conflicts [\#224](https://github.com/bensheldon/good_job/pull/224) ([bensheldon](https://github.com/bensheldon))
-- Update GH Test Matrix with latest JRuby [\#223](https://github.com/bensheldon/good_job/pull/223) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
+- Update GH Test Matrix with latest JRuby [\#223](https://github.com/bensheldon/good_job/pull/223) ([tedt10e](https://github.com/tedt10e))
 
 ## [v1.8.0](https://github.com/bensheldon/good_job/tree/v1.8.0) (2021-03-04)
 
@@ -2603,8 +2619,8 @@
 **Merged pull requests:**
 
 - Update bundler version to 2.2.5 [\#200](https://github.com/bensheldon/good_job/pull/200) ([bensheldon](https://github.com/bensheldon))
-- Update GH Test Matrix with minimum & latest JRuby version [\#197](https://github.com/bensheldon/good_job/pull/197) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
-- Fix JRuby version number [\#193](https://github.com/bensheldon/good_job/pull/193) ([tedthetnaungsoe](https://github.com/tedthetnaungsoe))
+- Update GH Test Matrix with minimum & latest JRuby version [\#197](https://github.com/bensheldon/good_job/pull/197) ([tedt10e](https://github.com/tedt10e))
+- Fix JRuby version number [\#193](https://github.com/bensheldon/good_job/pull/193) ([tedt10e](https://github.com/tedt10e))
 
 ## [v1.4.1](https://github.com/bensheldon/good_job/tree/v1.4.1) (2021-01-09)
 
