@@ -44,7 +44,7 @@ module GoodJob
         end
 
         job
-      rescue GoodJob::Job::ActionForStateMismatchError
+      rescue GoodJob::Job::ActionForStateMismatchError, GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
         nil
       end.compact
 
