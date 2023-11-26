@@ -20,6 +20,9 @@ module GoodJob
     # Number of seconds between checking shutdown conditions
     SHUTDOWN_EVENT_TIMEOUT = 10
 
+    # Number of seconds between checking shutdown conditions when exit-on-idle is enabled
+    EXIT_ON_IDLE_SHUTDOWN_EVENT_TIMEOUT = 1
+
     class << self
       # Whether the CLI is running from the executable
       # @return [Boolean, nil]
@@ -74,6 +77,10 @@ module GoodJob
                   type: :numeric,
                   banner: 'SECONDS',
                   desc: "Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))"
+    method_option :exit_on_idle,
+                  type: :numeric,
+                  banner: 'SECONDS',
+                  desc: 'Exit process when no jobs have been performed for this many seconds (env var: GOOD_JOB_EXIT_ON_IDLE, default: nil)'
     method_option :enable_cron,
                   type: :boolean,
                   desc: "Whether to run cron process (default: false)"
@@ -91,10 +98,6 @@ module GoodJob
                   type: :numeric,
                   banner: 'COUNT',
                   desc: "The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
-    method_option :shutdown_on_idle,
-                  type: :numeric,
-                  banner: 'SECONDS',
-                  desc: 'How long in seconds to wait before good_job exits'
 
     def start
       set_up_application!
@@ -119,9 +122,10 @@ module GoodJob
         trap(signal) { Thread.new { @stop_good_job_executable.set }.join }
       end
 
+      loop_wait = configuration.exit_on_idle_duration ? EXIT_ON_IDLE_SHUTDOWN_EVENT_TIMEOUT : SHUTDOWN_EVENT_TIMEOUT
       Kernel.loop do
-        @stop_good_job_executable.wait(configuration.shutdown_on_idle || SHUTDOWN_EVENT_TIMEOUT)
-        break if @stop_good_job_executable.set? || capsule.shutdown? || capsule.idle?
+        @stop_good_job_executable.wait(loop_wait)
+        break if @stop_good_job_executable.set? || capsule.shutdown? || (configuration.exit_on_idle_duration && capsule.idle?(configuration.exit_on_idle_duration))
       end
 
       systemd.stop do
