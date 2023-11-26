@@ -48,11 +48,11 @@ RSpec.describe GoodJob::CLI do
       end
     end
 
-    describe 'exit-on-idle' do
+    describe 'idle-timeout' do
       it 'exits when the capsule is idle' do
         allow(capsule_mock).to receive(:idle?).and_return true
 
-        cli = described_class.new([], { exit_on_idle: 1 }, {})
+        cli = described_class.new([], { idle_timeout: 1 }, {})
         cli.start
 
         expect(capsule_mock).to have_received(:idle?).with(1)
