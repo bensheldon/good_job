@@ -7,10 +7,10 @@ class RecreateGoodJobCronIndexes < ActiveRecord::Migration<%= migration_version 
     reversible do |dir|
       dir.up do
         if connection.index_name_exists?(:good_jobs, :index_good_jobs_on_cron_key_and_created_at)
-          remove_index :good_jobs, [:cron_key, :created_at], name: :index_good_jobs_on_cron_key_and_created_at
+          remove_index :good_jobs, name: :index_good_jobs_on_cron_key_and_created_at
         end
         if connection.index_name_exists?(:good_jobs, :index_good_jobs_on_cron_key_and_cron_at)
-          remove_index :good_jobs, [:cron_key, :cron_at], name: :index_good_jobs_on_cron_key_and_cron_at
+          remove_index :good_jobs, name: :index_good_jobs_on_cron_key_and_cron_at
         end
 
         unless connection.index_name_exists?(:good_jobs, :index_good_jobs_on_cron_key_and_created_at)
