@@ -4,6 +4,7 @@
 
 # typed: false
 
+module ::ACTIVE_EVENT; end
 module ::CustomError; end
 module ::DONE; end
 module ::DiscardableError; end
@@ -16,7 +17,6 @@ module ::JobError; end
 module ::LATCH; end
 module ::MemoryProfiler; end
 module ::PERFORMED; end
-module ::POLL_COUNT; end
 module ::RESULTS; end
 module ::RUN_JOBS; end
 module ::RecursiveJob; end
@@ -26,6 +26,7 @@ module ::THREAD_HAS_RUN; end
 module ::THREAD_JOBS; end
 module ::TestError; end
 module ::TestJob; end
+module ::WAIT_EVENT; end
 module ::TestJob::ExpectedError; end
 module GoodJob::Job::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Job::ERROR_EVENT_RETRIED; end

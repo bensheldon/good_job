@@ -62,6 +62,61 @@ describe GoodJob::Capsule do
     end
   end
 
+  describe 'idle?' do
+    before do
+      stub_const "ACTIVE_EVENT", Concurrent::Event.new
+      stub_const "WAIT_EVENT", Concurrent::Event.new
+
+      stub_const("TestJob", Class.new(ActiveJob::Base) do
+        self.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+        def perform
+          ACTIVE_EVENT.set
+          WAIT_EVENT.wait(10)
+        end
+      end)
+    end
+
+    it 'returns true if no threads are active' do
+      capsule = described_class.new
+      expect(capsule).to be_idle
+    end
+
+    it 'will return false if started in last N seconds' do
+      capsule = described_class.new
+      capsule.start
+      expect(capsule).not_to be_idle(10.seconds)
+      capsule.shutdown
+    end
+
+    it 'will return false if there is an active thread' do
+      capsule = described_class.new
+      capsule.start
+
+      TestJob.perform_later
+      capsule.create_thread
+
+      ACTIVE_EVENT.wait(5)
+
+      expect(capsule).not_to be_idle
+
+      WAIT_EVENT.set
+      capsule.shutdown
+    end
+
+    it 'can look for activity in the last N seconds' do
+      capsule = described_class.new
+      capsule.start
+
+      TestJob.perform_later
+      capsule.create_thread
+
+      ACTIVE_EVENT.wait(5)
+      WAIT_EVENT.set
+
+      wait_until { expect(capsule).to be_idle(1.second) }
+    end
+  end
+
   describe '#create_thread' do
     it 'passes the job state to the scheduler' do
       scheduler = instance_double(GoodJob::Scheduler, create_thread: nil, shutdown?: true, shutdown: nil)

@@ -184,6 +184,7 @@ Options:
   [--shutdown-timeout=SECONDS] # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
   [--enable-cron]              # Whether to run cron process (default: false)
   [--enable-listen-notify]     # Whether to enqueue and read jobs with Postgres LISTEN/NOTIFY (default: true)
+  [--idle-timeout=SECONDS]     # Exit process when no jobs have been performed for this many seconds (env var: GOOD_JOB_IDLE_TIMEOUT, default: nil)
   [--daemonize]                # Run as a background daemon (default: false)
   [--pidfile=PIDFILE]          # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
   [--probe-port=PORT]          # Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)
