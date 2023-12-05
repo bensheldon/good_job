@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+# This file is a wrapper around the rails and derailed executables
+# to make it easier to boot in PRODUCTION mode.
+#
+# Usage: bin/profile [rails|derailed] [command]
+
+ENV["RAILS_ENV"] = ENV.fetch("RAILS_ENV", "production")
+ENV["RACK_ENV"] = "production"
+ENV["RAILS_LOG_TO_STDOUT"] = "true"
+ENV["RAILS_SERVE_STATIC_FILES"] = "true"
+ENV["FORCE_SSL"] = "false"
+## ^^ Put ENV to boot in production mode here ^^
+
+executable = ARGV.shift
+if executable == "rails"
+  load File.join(File.dirname(__FILE__), "rails")
+elsif executable == "derailed"
+  require 'bundler/setup'
+  load Gem.bin_path('derailed_benchmarks', 'derailed')
+else
+  puts "ERROR: '#{executable}' is not a valid command."
+  puts "Usage: bin/profile [rails|derailed]"
+  exit 1
+end
