@@ -107,7 +107,7 @@ module GoodJob
       middleware = Rails.application.config.good_job.middleware
       port = Rails.application.config.good_job.middleware_port
       if middleware && port
-        probe_server = GoodJob::UtilityServer.new(app: middleware, port: port)
+        probe_server = GoodJob::ProbeServer.new(app: middleware, port: port)
         probe_server.start
       end
 
