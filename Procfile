@@ -1,2 +1,2 @@
-release: bin/rails heroku:release
+release: bin/rails db:prepare
 web: bin/rails server

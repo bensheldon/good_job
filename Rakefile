@@ -7,7 +7,7 @@ rescue LoadError
 end
 
 require_relative "lib/good_job/version"
-Rake.load_rakefile 'spec/test_app/Rakefile'
+Rake.load_rakefile 'demo/Rakefile'
 Bundler::GemHelper.install_tasks
 
 require 'rdoc/task'

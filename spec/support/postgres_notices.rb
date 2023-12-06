@@ -11,8 +11,18 @@ ActiveSupport.on_load :active_record do
     next unless raw_connection.respond_to? :set_notice_receiver
 
     raw_connection.set_notice_receiver do |result|
+      Rails.logger.warn(result.error_message.strip)
       POSTGRES_NOTICES << result.error_message
     end
+  }
+
+  ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkin, :before, lambda { |conn|
+    warning = PgLock.debug_own_locks(conn)
+    next if warning.blank?
+
+    $stdout.puts warning
+    Rails.logger.warn(warning)
+    POSTGRES_NOTICES << warning
   }
 end
 

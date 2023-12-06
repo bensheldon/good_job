@@ -1,4 +1,4 @@
-# typed: strong
+# typed: true
 
 # DO NOT EDIT MANUALLY
 # This file was pulled from a central RBI files repository.

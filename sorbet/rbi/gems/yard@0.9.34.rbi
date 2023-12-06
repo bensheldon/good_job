@@ -490,19 +490,19 @@ RUBY19 = T.let(T.unsafe(nil), TrueClass)
 #
 # source://yard//lib/yard/server/rack_adapter.rb#93
 class Rack::Request
-  # source://rack/2.2.7/lib/rack/request.rb#26
+  # source://rack/2.2.8/lib/rack/request.rb#26
   def initialize(env); end
 
-  # source://rack/2.2.7/lib/rack/request.rb#40
+  # source://rack/2.2.8/lib/rack/request.rb#40
   def delete_param(k); end
 
-  # source://rack/2.2.7/lib/rack/request.rb#31
+  # source://rack/2.2.8/lib/rack/request.rb#31
   def params; end
 
-  # source://rack/2.2.7/lib/rack/request.rb#31
+  # source://rack/2.2.8/lib/rack/request.rb#31
   def query; end
 
-  # source://rack/2.2.7/lib/rack/request.rb#35
+  # source://rack/2.2.8/lib/rack/request.rb#35
   def update_param(k, v); end
 
   # Returns the value of attribute version_supplied.
@@ -523,10 +523,10 @@ class Rack::Request
   def xhr?; end
 
   class << self
-    # source://rack/2.2.7/lib/rack/request.rb#16
+    # source://rack/2.2.8/lib/rack/request.rb#16
     def ip_filter; end
 
-    # source://rack/2.2.7/lib/rack/request.rb#16
+    # source://rack/2.2.8/lib/rack/request.rb#16
     def ip_filter=(_arg0); end
   end
 end

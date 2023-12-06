@@ -261,10 +261,9 @@ RSpec.describe GoodJob::Job do
 
     context 'when job is already locked' do
       it 'raises an Error' do
-        ActiveRecord::Base.clear_active_connections!
         job.with_advisory_lock do
           expect do
-            Concurrent::Promises.future(job, &:retry_job).value!
+            rails_promise(job, &:retry_job).value!
           end.to raise_error GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
         end
       end
@@ -324,6 +323,33 @@ RSpec.describe GoodJob::Job do
           job.discard_job("Discarded in test")
         end.to change { job.reload.status }.from(:scheduled).to(:discarded)
       end
+    end
+  end
+
+  describe '#force_discard_job' do
+    it 'will discard the job even when advisory locked' do
+      locked_event = Concurrent::Event.new
+      done_event = Concurrent::Event.new
+
+      promise = Concurrent::Promises.future do
+        rails_promise do
+          # pretend the job is running
+          job.with_advisory_lock do
+            locked_event.set
+            done_event.wait(10)
+          end
+        end
+      end
+      locked_event.wait(10)
+
+      job.force_discard_job("Discarded in test")
+      job.reload
+      expect(job.finished_at).to be_present
+      expect(job.error).to eq "GoodJob::Job::DiscardJobError: Discarded in test"
+    ensure
+      locked_event.set
+      done_event.set
+      promise.value!
     end
   end
 

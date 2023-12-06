@@ -26,6 +26,7 @@ require 'good_job/current_thread'
 require "good_job/daemon"
 require "good_job/dependencies"
 require "good_job/job_performer"
+require "good_job/job_performer/metrics"
 require "good_job/log_subscriber"
 require "good_job/multi_scheduler"
 require "good_job/notifier"
@@ -44,6 +45,10 @@ require "good_job/systemd_service"
 module GoodJob
   include GoodJob::Dependencies
 
+  # Default, null, blank value placeholder.
+  NONE = Module.new.freeze
+
+  # Default logger for GoodJob; overridden by Rails.logger in Railtie.
   DEFAULT_LOGGER = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
 
   # @!attribute [rw] active_record_parent_class
@@ -235,13 +240,19 @@ module GoodJob
   # This is primarily intended for usage in a test environment.
   # Unhandled job errors will be raised.
   # @param queue_string [String] Queues to execute jobs from
+  # @param limit [Integer, nil] Maximum number of iterations for the loop
   # @return [void]
-  def self.perform_inline(queue_string = "*")
+  def self.perform_inline(queue_string = "*", limit: nil)
     job_performer = JobPerformer.new(queue_string)
+    iteration = 0
     loop do
-      result = job_performer.next
+      break if limit && iteration >= limit
+
+      result = Rails.application.reloader.wrap { job_performer.next }
       break unless result
       raise result.unhandled_error if result.unhandled_error
+
+      iteration += 1
     end
   end
 

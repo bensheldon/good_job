@@ -2,22 +2,30 @@
 
 THREAD_ERRORS = Concurrent::Array.new
 
+ActiveSupport.on_load :active_record do
+  ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkout, :before, lambda { |conn|
+    thread_name = Thread.current.name || Thread.current.object_id
+    conn.exec_query("SET application_name = '#{thread_name}'", "Set application name")
+  }
+end
+
 RSpec.configure do |config|
   config.around do |example|
     GoodJob.preserve_job_records = true
-    GoodJob::CurrentThread.reset
 
     PgLock.current_database.advisory_lock.owns.all?(&:unlock) if PgLock.advisory_lock.owns.count > 0
     PgLock.current_database.advisory_lock.others.each(&:unlock!) if PgLock.advisory_lock.others.count > 0
     expect(PgLock.current_database.advisory_lock.count).to eq(0), "Existing advisory locks BEFORE test run"
 
+    GoodJob::CurrentThread.reset
     THREAD_ERRORS.clear
-    Thread.current.name = "RSpec: #{example.description}"
     GoodJob.on_thread_error = lambda do |exception|
       THREAD_ERRORS << [Thread.current.name, exception, exception.backtrace]
     end
 
     example.run
+
+    expect(THREAD_ERRORS).to be_empty
   end
 
   config.after do
@@ -33,8 +41,6 @@ RSpec.configure do |config|
       GoodJob::CronManager.instances
     )
     GoodJob._shutdown_all(executables, timeout: -1)
-
-    expect(THREAD_ERRORS).to be_empty
 
     expect(GoodJob::Notifier.instances).to all be_shutdown
     GoodJob::Notifier.instances.clear
@@ -55,33 +61,51 @@ RSpec.configure do |config|
     RSpec::Mocks.space.proxy_for(GoodJob::Capsule).reset
     GoodJob.capsule = GoodJob::Capsule.new
 
-    expect(PgLock.current_database.advisory_lock.owns.count).to eq(0), "Existing owned advisory locks AFTER test run"
+    own_locks = PgLock.current_database.advisory_lock.owns
+    if own_locks.any?
+      puts "There are #{own_locks.count} advisory locks still open by the current database connection AFTER test run."
 
-    other_locks = PgLock.current_database.advisory_lock.others
-    if other_locks.any?
-      puts "There are #{other_locks.count} advisory locks still open."
-      puts "\n\nAdvisory Locks:"
-      other_locks.includes(:pg_stat_activity).find_each do |pg_lock|
-        puts "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity.application_name}"
+      puts "\nAdvisory locked executions:"
+      GoodJob::Execution.advisory_locked.owns_advisory_locked.each do |execution|
+        puts "  - Execution ID: #{execution.id} / Active Job ID: #{execution.active_job_id}"
       end
 
-      puts "\n\nCurrent connections:"
-      PgStatActivity.find_each do |pg_stat_activity|
+      puts "\nAdvisory Locks:"
+      own_locks.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
+        puts "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity&.application_name}"
+      end
+
+      puts "\nCurrent connections:"
+      PgStatActivity.all.each do |pg_stat_activity| # rubocop:disable Rails/FindEach
         puts "  - #{pg_stat_activity.pid}: #{pg_stat_activity.application_name}"
       end
     end
 
+    expect(PgLock.current_database.advisory_lock.owns.count).to eq(0), "Existing owned advisory locks AFTER test run"
+
+    other_locks = PgLock.current_database.advisory_lock.others
+    if other_locks.any?
+      puts "There are #{other_locks.count} advisory locks owned by other connections still open AFTER test run."
+
+      puts "\nAdvisory locked executions:"
+      GoodJob::Execution.advisory_locked.each do |execution|
+        puts "  - Execution ID: #{execution.id} / Active Job ID: #{execution.active_job_id} / Locked by: #{execution[:pid]}"
+      end
+
+      puts "\nAdvisory Locks:"
+      other_locks.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
+        puts "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity&.application_name}"
+      end
+
+      puts "\nCurrent connections:"
+      PgStatActivity.all.each do |pg_stat_activity| # rubocop:disable Rails/FindEach
+        puts "  - #{pg_stat_activity.pid}: #{pg_stat_activity.application_name}"
+      end
+    end
     expect(PgLock.current_database.advisory_lock.others.count).to eq(0), "Existing others advisory locks AFTER test run"
 
     GoodJob.configuration.instance_variable_set(:@_in_webserver, nil)
   end
-end
-
-ActiveSupport.on_load :active_record do
-  ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkout, :before, lambda { |conn|
-    thread_name = Thread.current.name || Thread.current.object_id
-    conn.exec_query("SET application_name = '#{thread_name}'", "Set application name")
-  }
 end
 
 module PostgresXidExtension
@@ -103,11 +127,15 @@ ActiveSupport.on_load :active_record do
 end
 
 class PgStatActivity < ActiveRecord::Base
+  include GoodJob::AssignableConnection
+
   self.table_name = 'pg_stat_activity'
   self.primary_key = 'datid'
 end
 
 class PgLock < ActiveRecord::Base
+  include GoodJob::AssignableConnection
+
   self.table_name = 'pg_locks'
   self.primary_key = 'objid'
 
@@ -117,6 +145,46 @@ class PgLock < ActiveRecord::Base
   scope :advisory_lock, -> { where(locktype: 'advisory') }
   scope :owns, -> { where('pid = pg_backend_pid()') }
   scope :others, -> { where('pid != pg_backend_pid()') }
+
+  def self.debug_own_locks(connection = ActiveRecord::Base.connection)
+    count = PgLock.with_connection(connection) do
+      PgLock.current_database.advisory_lock.owns.count
+    end
+    return false if count.zero?
+
+    output = []
+    output << "There are #{count} advisory locks still open by the current database connection."
+    GoodJob::Execution.include(GoodJob::AssignableConnection)
+    GoodJob::Execution.with_connection(connection) do
+      GoodJob::Execution.owns_advisory_locked.each.with_index do |execution, index|
+        output << "\nAdvisory locked GoodJob::Execution:" if index.zero?
+        output << "  - Execution ID: #{execution.id} / Active Job ID: #{execution.active_job_id}"
+      end
+    end
+
+    GoodJob::BatchRecord.include(GoodJob::AssignableConnection)
+    GoodJob::BatchRecord.with_connection(connection) do
+      GoodJob::BatchRecord.owns_advisory_locked.each.with_index do |batch, index|
+        output << "\nAdvisory locked GoodJob::Batch:" if index.zero?
+        output << "  - BatchRecord ID: #{batch.id}"
+      end
+    end
+
+    GoodJob::Process.include(GoodJob::AssignableConnection)
+    GoodJob::Process.with_connection(connection) do
+      GoodJob::Process.owns_advisory_locked.each.with_index do |process, index|
+        output << "\nAdvisory locked GoodJob::Process:" if index.zero?
+        output << "  - Process ID: #{process.id}"
+      end
+    end
+
+    output << "\nAdvisory Locks:"
+    PgLock.current_database.advisory_lock.owns.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
+      output << "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity&.application_name}"
+    end
+
+    output.join("\n")
+  end
 
   def unlock
     query = <<~SQL.squish

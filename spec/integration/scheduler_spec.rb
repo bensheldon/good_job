@@ -34,6 +34,8 @@ RSpec.describe 'Schedule Integration' do
           PgLock.advisory_lock.owns.each do |pg_lock|
             puts "  -  #{pg_lock.attributes.to_json}"
           end
+        elsif locks_count < expected_locks_per_thread
+          puts "Doesn't own a lock for #{active_job_id}"
         end
 
         RUN_JOBS << [provider_job_id, job_id, thread_name]
@@ -61,23 +63,22 @@ RSpec.describe 'Schedule Integration' do
   end
 
   context 'when there are a large number of jobs' do
-    let(:number_of_jobs) { 500 }
-    let(:max_threads) { 5 }
+    let(:number_of_jobs) { 1_000 }
+    let(:max_threads) { 10 }
 
     it 'pops items off of the queue and runs them' do
       expect(ActiveJob::Base.queue_adapter).to be_execute_externally
 
-      GoodJob::Execution.transaction do
-        number_of_jobs.times do |i|
-          TestJob.perform_later(i)
-        end
+      GoodJob::Job.logger.silence do
+        jobs = Array.new(number_of_jobs) { |i| TestJob.new(i) }
+        TestJob.queue_adapter.enqueue_all(jobs)
       end
 
       performer = GoodJob::JobPerformer.new('*')
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       max_threads.times { scheduler.create_thread }
 
-      sleep_until(max: 30, increments_of: 0.5) { GoodJob::Execution.unfinished.count.zero? }
+      wait_until(max: 60, increments_of: 0.5) { expect(GoodJob::Execution.unfinished.count).to be_zero }
       scheduler.shutdown
 
       expect(GoodJob::Execution.unfinished.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Execution.unfinished.map(&:id)}" }
@@ -89,8 +90,9 @@ RSpec.describe 'Schedule Integration' do
         rerun_provider_job_ids = jobs_tally.select { |_key, value| value > 1 }.keys
         rerun_jobs = RUN_JOBS.select { |(provider_job_id, _job_id, _thread_name)| rerun_provider_job_ids.include? provider_job_id }
 
-        "Expected run jobs(#{RUN_JOBS.size}) to equal number of jobs (#{number_of_jobs}). Instead ran jobs multiple times:\n#{PP.pp(rerun_jobs, '')}"
+        "Expected run jobs(#{RUN_JOBS.size}) to equal number of jobs (#{number_of_jobs}). Instead ran jobs multiple times:\n#{rerun_jobs.join("\n")}"
       }
+      expect(GoodJob::DiscreteExecution.count).to eq number_of_jobs
     end
   end
 
@@ -101,10 +103,9 @@ RSpec.describe 'Schedule Integration' do
     it 'executes all jobs' do
       expect(ActiveJob::Base.queue_adapter).to be_execute_externally
 
-      GoodJob::Execution.transaction do
-        number_of_jobs.times do |i|
-          TestJob.perform_later(i)
-        end
+      GoodJob::Job.logger.silence do
+        jobs = Array.new(number_of_jobs) { |i| TestJob.new(i) }
+        TestJob.queue_adapter.enqueue_all(jobs)
       end
 
       performer = GoodJob::JobPerformer.new('*')

@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe GoodJob::AdvisoryLockable do
   let(:model_class) { GoodJob::Execution }
   let!(:execution) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default") }
+  let!(:another_execution) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default") }
 
   describe '.advisory_lock' do
     around do |example|
@@ -88,17 +89,21 @@ RSpec.describe GoodJob::AdvisoryLockable do
     end
 
     it 'returns first row of the query with a lock' do
+      execution.update!(queue_name: "aaaaaa")
+      another_execution.update!(queue_name: "bbbbbb")
+
       expect(execution).not_to be_advisory_locked
-      result_execution = model_class.advisory_lock.first
+      result_execution = model_class.order(queue_name: :asc).limit(1).advisory_lock.first
       expect(result_execution).to eq execution
       expect(execution).to be_advisory_locked
+      expect(another_execution).not_to be_advisory_locked
 
       execution.advisory_unlock
     end
 
     it 'can lock an alternative column' do
       expect(execution).not_to be_advisory_locked
-      result_execution = model_class.advisory_lock(column: :queue_name).first
+      result_execution = model_class.order(created_at: :asc).limit(1).advisory_lock(column: :queue_name).first
       expect(result_execution).to eq execution
       expect(execution).to be_advisory_locked(key: "good_jobs-default")
       expect(execution).not_to be_advisory_locked # on default key
@@ -111,6 +116,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
     it 'locks a key' do
       model_class.advisory_lock_key(execution.lockable_key)
       expect(execution).to be_advisory_locked
+      expect(model_class.advisory_locked_key?(execution.lockable_key)).to be true
       model_class.advisory_unlock_key(execution.lockable_key)
     end
 
@@ -128,13 +134,49 @@ RSpec.describe GoodJob::AdvisoryLockable do
 
       it 'does not invoke the block if the key is already locked' do
         model_class.advisory_lock_key(execution.lockable_key) do
-          promise = Concurrent::Promises.future do
+          promise = rails_promise do
             result = model_class.advisory_lock_key(execution.lockable_key) { raise }
             expect(result).to be_nil
           end
           expect { promise.value! }.not_to raise_error
         end
       end
+    end
+  end
+
+  describe '.advisory_locked_key?' do
+    it 'tests whether the key is locked' do
+      key = SecureRandom.uuid
+      expect(model_class.advisory_locked_key?(key)).to eq false
+
+      model_class.advisory_lock_key(key)
+      expect(model_class.advisory_locked_key?(key)).to eq true
+
+      model_class.advisory_unlock_key(key)
+      expect(model_class.advisory_locked_key?(key)).to eq false
+    end
+  end
+
+  describe '.owns_advisory_lock_key?' do
+    it 'tests whether the key is locked' do
+      locked_event = Concurrent::Event.new
+      done_event = Concurrent::Event.new
+
+      promise = rails_promise do
+        model_class.advisory_lock_key(execution.lockable_key) do
+          expect(execution.owns_advisory_lock?).to be true
+
+          locked_event.set
+          done_event.wait(5)
+        end
+      end
+
+      locked_event.wait(5)
+      expect(execution.owns_advisory_lock?).to be false
+    ensure
+      locked_event.set
+      done_event.set
+      promise.value!
     end
   end
 
@@ -169,6 +211,29 @@ RSpec.describe GoodJob::AdvisoryLockable do
 
       expect(sql).to eq 'SELECT "good_jobs".* FROM "good_jobs"'
     end
+
+    it 'aborts save if cannot be advisory locked' do
+      uuid = SecureRandom.uuid
+      locked_event = Concurrent::Event.new
+      done_event = Concurrent::Event.new
+
+      promise = rails_promise do
+        model_class.advisory_lock_key("good_jobs-#{uuid}") do
+          locked_event.set
+          done_event.wait(5)
+        end
+      end
+
+      locked_event.wait(5)
+      record = model_class.create(id: uuid, active_job_id: uuid, create_with_advisory_lock: true)
+      expect(record).not_to be_persisted
+      expect(record.errors[:active_job_id]).to include("Failed to acquire advisory lock: good_jobs-#{uuid}")
+
+      expect { model_class.create!(id: uuid, active_job_id: uuid, create_with_advisory_lock: true) }.to raise_error ActiveRecord::RecordInvalid
+    ensure
+      done_event.set
+      promise.value!
+    end
   end
 
   describe '.includes_advisory_locks' do
@@ -189,7 +254,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
       expect(execution.advisory_locked?).to be true
       expect(execution.owns_advisory_lock?).to be true
 
-      other_thread_owns_advisory_lock = Concurrent::Promises.future(execution, &:owns_advisory_lock?).value!
+      other_thread_owns_advisory_lock = rails_promise(execution, &:owns_advisory_lock?).value!
       expect(other_thread_owns_advisory_lock).to be false
 
       execution.advisory_unlock
@@ -198,7 +263,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
     it 'returns true or false if the lock is acquired' do
       expect(execution.advisory_lock).to be true
 
-      expect(Concurrent::Promises.future(execution, &:advisory_lock).value!).to be false
+      expect(rails_promise(execution, &:advisory_lock).value!).to be false
 
       execution.advisory_unlock
     end
@@ -250,7 +315,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
     it 'returns true or false if the unlock operation is successful' do
       execution.advisory_lock
 
-      expect(Concurrent::Promises.future(execution, &:advisory_unlock).value!).to be false
+      expect(rails_promise(execution, &:advisory_unlock).value!).to be false
       expect(execution.advisory_unlock).to be true
 
       unless RUBY_PLATFORM.include?('java')
@@ -313,13 +378,74 @@ RSpec.describe GoodJob::AdvisoryLockable do
   end
 
   it 'is lockable' do
-    ActiveRecord::Base.clear_active_connections!
+    ActiveRecord::Base.connection_handler.clear_active_connections!
     execution.advisory_lock!
 
     expect do
-      Concurrent::Promises.future(execution, &:advisory_lock!).value!
+      rails_promise(execution, &:advisory_lock!).value!
     end.to raise_error GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
 
     execution.advisory_unlock
+  end
+
+  describe 'Advisory Lock behavior' do
+    it 'connection-level locks lock immediately within transactions' do
+      locked_event = Concurrent::Event.new
+      commit_event = Concurrent::Event.new
+      committed_event = Concurrent::Event.new
+      done_event = Concurrent::Event.new
+
+      promise = rails_promise do
+        execution.class.transaction do
+          execution.advisory_lock
+          locked_event.set
+
+          commit_event.wait(10)
+        end
+        committed_event.set
+
+        done_event.wait(10)
+        execution.advisory_unlock
+      end
+
+      locked_event.wait(10)
+      expect(execution.advisory_locked?).to be true
+      commit_event.set
+
+      committed_event.wait(10)
+      expect(execution.advisory_locked?).to be true
+
+      done_event.set
+      promise.value!
+    end
+
+    it 'transaction-level locks only lock within transactions' do
+      locked_event = Concurrent::Event.new
+      commit_event = Concurrent::Event.new
+      committed_event = Concurrent::Event.new
+      done_event = Concurrent::Event.new
+
+      promise = rails_promise do
+        execution.class.transaction do
+          execution.advisory_lock(function: "pg_advisory_xact_lock")
+          locked_event.set
+
+          commit_event.wait(10)
+        end
+        committed_event.set
+
+        done_event.wait(10)
+      end
+
+      locked_event.wait(10)
+      expect(execution.advisory_locked?).to be true
+      commit_event.set
+
+      committed_event.wait(10)
+      expect(execution.advisory_locked?).to be false
+
+      done_event.set
+      promise.value!
+    end
   end
 end

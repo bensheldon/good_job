@@ -208,13 +208,15 @@ module GoodJob
       # each of the loggers in {LogSubscriber.loggers}.
       # @return [Logger]
       def logger
-        @_logger ||= begin
-          logger = Logger.new(StringIO.new)
-          loggers.each do |each_logger|
-            logger.extend(ActiveSupport::Logger.broadcast(each_logger))
-          end
-          logger
-        end
+        @_logger ||= if defined?(ActiveSupport::BroadcastLogger)
+                       ActiveSupport::BroadcastLogger.new(*loggers)
+                     else
+                       logger = Logger.new(StringIO.new)
+                       loggers.each do |each_logger|
+                         logger.extend(ActiveSupport::Logger.broadcast(each_logger))
+                       end
+                       logger
+                     end
       end
 
       # Reset {LogSubscriber.logger} and force it to rebuild a new shortcut to

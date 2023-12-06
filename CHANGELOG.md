@@ -1,5 +1,161 @@
 # Changelog
 
+## [v3.21.1](https://github.com/bensheldon/good_job/tree/v3.21.1) (2023-11-14)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.0...v3.21.1)
+
+**Fixed bugs:**
+
+- Explicitly require `active_job/arguments` in `GoodJob::BatchRecord` [\#1150](https://github.com/bensheldon/good_job/pull/1150) ([hidenba](https://github.com/hidenba))
+- Bug: Polling only activates single thread, should eagerly create additional threads when jobs exist [\#1148](https://github.com/bensheldon/good_job/pull/1148) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Error when executing ActiveJob::Batch.new in Rails 7.1.x [\#1149](https://github.com/bensheldon/good_job/issues/1149)
+- Show whether or not cron scheduler is enable in dashboard \(UI\) [\#1117](https://github.com/bensheldon/good_job/issues/1117)
+- ActiveRecord::ConnectionNotEstablished For rails multi DB [\#1103](https://github.com/bensheldon/good_job/issues/1103)
+- Rails API dies when using latest good\_job version [\#952](https://github.com/bensheldon/good_job/issues/952)
+- config.good\_job.preserve\_job\_records = false not working with CRON [\#927](https://github.com/bensheldon/good_job/issues/927)
+- Pundit::NotDefinedError \(unable to find policy `Admin::GoodJob::JobPolicy` for \) - version 2.13.0 and above [\#618](https://github.com/bensheldon/good_job/issues/618)
+- Running CLI under foreman doesn't display log output until exit [\#490](https://github.com/bensheldon/good_job/issues/490)
+
+**Merged pull requests:**
+
+- Always instantiate MultiScheduler; delegate Scheduler Metrics to JobPerformer [\#1147](https://github.com/bensheldon/good_job/pull/1147) ([bensheldon](https://github.com/bensheldon))
+- Clarify on concurrency uniqueness constraints [\#1144](https://github.com/bensheldon/good_job/pull/1144) ([Earlopain](https://github.com/Earlopain))
+
+## [v3.21.0](https://github.com/bensheldon/good_job/tree/v3.21.0) (2023-11-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.20.0...v3.21.0)
+
+**Implemented enhancements:**
+
+- Add "cron enabled" column to processes index page [\#1127](https://github.com/bensheldon/good_job/pull/1127) ([bforma](https://github.com/bforma))
+- Add `limit:` kwarg to `GoodJob.perform_inline` [\#1126](https://github.com/bensheldon/good_job/pull/1126) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Cron scheduler and multiple processes [\#1128](https://github.com/bensheldon/good_job/issues/1128)
+- `GoodJob.on_thread_error` not called in tests [\#1102](https://github.com/bensheldon/good_job/issues/1102)
+
+**Merged pull requests:**
+
+- Use a Concurrent::Event for CLI signal-trapping loop [\#1141](https://github.com/bensheldon/good_job/pull/1141) ([bensheldon](https://github.com/bensheldon))
+- Update README's optimize queue explanation [\#1138](https://github.com/bensheldon/good_job/pull/1138) ([maestromac](https://github.com/maestromac))
+- Update development dependencies and light Rubocop'ing [\#1136](https://github.com/bensheldon/good_job/pull/1136) ([bensheldon](https://github.com/bensheldon))
+- Move the Rails app harness from `spec/test_app` to `demo` [\#1135](https://github.com/bensheldon/good_job/pull/1135) ([bensheldon](https://github.com/bensheldon))
+- In test, shutdown schedulers/capsules before doing assertions because of race conditions; store CI logs for Dev Env tests [\#1129](https://github.com/bensheldon/good_job/pull/1129) ([bensheldon](https://github.com/bensheldon))
+- Use a constant to represent `None` for default/blank memoizable values [\#1125](https://github.com/bensheldon/good_job/pull/1125) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.20.0](https://github.com/bensheldon/good_job/tree/v3.20.0) (2023-10-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.4...v3.20.0)
+
+**Closed issues:**
+
+- Dashboard blocked in iframe tag [\#1111](https://github.com/bensheldon/good_job/issues/1111)
+- PG::ConnectionBad: PQsocket\(\) can't get socket descriptor [\#1100](https://github.com/bensheldon/good_job/issues/1100)
+
+**Merged pull requests:**
+
+- Wrap Adapter enqueue methods and Batch callbacks with Rails Reloader; verify in tests that no Advisory locks remain at database connection check-in  [\#1124](https://github.com/bensheldon/good_job/pull/1124) ([bensheldon](https://github.com/bensheldon))
+- Run all RSpec examples within a Rails Executor [\#1122](https://github.com/bensheldon/good_job/pull/1122) ([bensheldon](https://github.com/bensheldon))
+- Print better debugging for retained advisory locks in test [\#1121](https://github.com/bensheldon/good_job/pull/1121) ([bensheldon](https://github.com/bensheldon))
+- Replace Heroku-specific Rake tasks with `db:prepare` now that Demo is upgraded to Rails 7.1 [\#1120](https://github.com/bensheldon/good_job/pull/1120) ([bensheldon](https://github.com/bensheldon))
+- Do not error debug logs if `pg_stat_activity` join is empty [\#1119](https://github.com/bensheldon/good_job/pull/1119) ([bensheldon](https://github.com/bensheldon))
+- Remove pinned psych version [\#1114](https://github.com/bensheldon/good_job/pull/1114) ([bensheldon](https://github.com/bensheldon))
+- Remove `pg_advisory_unlock_all()` after job is run; only verify blank `finished_at` \(and not lock presence\) before performing job [\#1113](https://github.com/bensheldon/good_job/pull/1113) ([bensheldon](https://github.com/bensheldon))
+- Update docs url [\#1112](https://github.com/bensheldon/good_job/pull/1112) ([ur5us](https://github.com/ur5us))
+- Pin psych gem 5.1.0 [\#1108](https://github.com/bensheldon/good_job/pull/1108) ([bensheldon](https://github.com/bensheldon))
+- Add sampling for Skylight traces on Demo [\#1107](https://github.com/bensheldon/good_job/pull/1107) ([bensheldon](https://github.com/bensheldon))
+- Add Rails 7.1 to test matrix [\#1105](https://github.com/bensheldon/good_job/pull/1105) ([bensheldon](https://github.com/bensheldon))
+- Add spec to verify unhandled thread errors are reported [\#1104](https://github.com/bensheldon/good_job/pull/1104) ([bensheldon](https://github.com/bensheldon))
+- Update Codespace configuration [\#1101](https://github.com/bensheldon/good_job/pull/1101) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.19.4](https://github.com/bensheldon/good_job/tree/v3.19.4) (2023-10-04)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.3...v3.19.4)
+
+**Closed issues:**
+
+- Including GoodJob::ActiveJobExtensions::Concurrency triggers rails deprecation notice [\#1096](https://github.com/bensheldon/good_job/issues/1096)
+- Add retries exhaused callback [\#1080](https://github.com/bensheldon/good_job/issues/1080)
+
+**Merged pull requests:**
+
+- Address rails 7.1 deprecation when using `ActiveJobExtensions::Concurrency` [\#1097](https://github.com/bensheldon/good_job/pull/1097) ([Earlopain](https://github.com/Earlopain))
+
+## [v3.19.3](https://github.com/bensheldon/good_job/tree/v3.19.3) (2023-09-28)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.2...v3.19.3)
+
+**Closed issues:**
+
+- Explicitly write that jobs with higher priority jobs run first \(unlike Que or DelayedJob\) at readme. [\#991](https://github.com/bensheldon/good_job/issues/991)
+
+**Merged pull requests:**
+
+- Correct `discrete_execution#status` method [\#1092](https://github.com/bensheldon/good_job/pull/1092) ([coreyaus](https://github.com/coreyaus))
+- Use ActiveSupport::BroadcastLogger [\#1089](https://github.com/bensheldon/good_job/pull/1089) ([bensheldon](https://github.com/bensheldon))
+- Log thread name for gem development debugging [\#1085](https://github.com/bensheldon/good_job/pull/1085) ([bensheldon](https://github.com/bensheldon))
+- Describe ApplicationController hook in README [\#1082](https://github.com/bensheldon/good_job/pull/1082) ([maxim](https://github.com/maxim))
+- \[Docs\] Explain how `priority` works in GoodJob [\#1005](https://github.com/bensheldon/good_job/pull/1005) ([coreyaus](https://github.com/coreyaus))
+
+## [v3.19.2](https://github.com/bensheldon/good_job/tree/v3.19.2) (2023-09-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.1...v3.19.2)
+
+**Merged pull requests:**
+
+- Fix HttpServer to handle Errno::EPIPE [\#1083](https://github.com/bensheldon/good_job/pull/1083) ([shouichi](https://github.com/shouichi))
+
+## [v3.19.1](https://github.com/bensheldon/good_job/tree/v3.19.1) (2023-09-20)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.19.0...v3.19.1)
+
+**Implemented enhancements:**
+
+- Add `good_job_application_controller` load hook [\#1081](https://github.com/bensheldon/good_job/pull/1081) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.19.0](https://github.com/bensheldon/good_job/tree/v3.19.0) (2023-09-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.3...v3.19.0)
+
+**Implemented enhancements:**
+
+- "Force" discard jobs that are already running/runaway to prevent retry [\#1073](https://github.com/bensheldon/good_job/pull/1073) ([jgrau](https://github.com/jgrau))
+
+**Closed issues:**
+
+- Possible Memory Leak [\#1074](https://github.com/bensheldon/good_job/issues/1074)
+- What's the best way to stop and discard a running job? [\#625](https://github.com/bensheldon/good_job/issues/625)
+
+**Merged pull requests:**
+
+- AdvisoryLockable: Abort record create if with\_advisory\_lock fails to acquire advisory lock [\#1078](https://github.com/bensheldon/good_job/pull/1078) ([bensheldon](https://github.com/bensheldon))
+- Wrap all test background threads in Rails executors; better test logging/debugging [\#1077](https://github.com/bensheldon/good_job/pull/1077) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.18.3](https://github.com/bensheldon/good_job/tree/v3.18.3) (2023-09-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.2...v3.18.3)
+
+**Fixed bugs:**
+
+- Allow Probe Server's `/connect` to handle a certain number of reconnects before statusing [\#1075](https://github.com/bensheldon/good_job/pull/1075) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+-  ActiveRecord::RecordNotUnique good\_jobs.id error in rspec test suite [\#1072](https://github.com/bensheldon/good_job/issues/1072)
+- Probe failures on heavy usage of dashboard\(?\) [\#1068](https://github.com/bensheldon/good_job/issues/1068)
+
+**Merged pull requests:**
+
+- Bump actions/checkout from 3 to 4 [\#1070](https://github.com/bensheldon/good_job/pull/1070) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add Skylight for demo site; create distinct development, lint, demo, production Gemfile groups; a little bit of Rubocop [\#1069](https://github.com/bensheldon/good_job/pull/1069) ([bensheldon](https://github.com/bensheldon))
+- Add JRuby 9.4 to testing matrix; nerf ActiveJob::TestQueueAdapter overrides [\#1067](https://github.com/bensheldon/good_job/pull/1067) ([bensheldon](https://github.com/bensheldon))
+- Reorganize dependencies to make booting JRuby easier [\#1066](https://github.com/bensheldon/good_job/pull/1066) ([bensheldon](https://github.com/bensheldon))
+- Slight refactoring to CronEntry [\#1063](https://github.com/bensheldon/good_job/pull/1063) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.18.2](https://github.com/bensheldon/good_job/tree/v3.18.2) (2023-09-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.18.1...v3.18.2)
@@ -989,7 +1145,7 @@
 
 - Add cron\_enabled attribute to good\_job and pass it to process current state [\#675](https://github.com/bensheldon/good_job/pull/675) ([saksham-jain](https://github.com/saksham-jain))
 - Reverse Dashboard Filter Hierarchy to be: queues+jobs then state [\#666](https://github.com/bensheldon/good_job/pull/666) ([bensheldon](https://github.com/bensheldon))
-- Allow cron entries to be temporarily disabled and re-enabled through the Dashboard [\#649](https://github.com/bensheldon/good_job/pull/649) ([alex-klepa](https://github.com/alex-klepa))
+- Allow cron entries to be temporarily disabled and re-enabled through the Dashboard [\#649](https://github.com/bensheldon/good_job/pull/649) ([sasha-id](https://github.com/sasha-id))
 - Add Configuration.total\_estimated\_threads to report number of threads consumed by GoodJob [\#645](https://github.com/bensheldon/good_job/pull/645) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**

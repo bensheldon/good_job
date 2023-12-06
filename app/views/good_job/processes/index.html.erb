@@ -8,6 +8,7 @@
       <div class="row small text-muted text-uppercase align-items-center">
         <div class="col"><%= t ".process" %></div>
         <div class="col"><%= t ".schedulers" %></div>
+        <div class="col-2 d-flex gap-2"><%= t ".cron_enabled" %></div>
         <div class="col-2 d-flex gap-2">
           <span><%= t ".started" %></span>
         </div>
@@ -44,6 +45,7 @@
               <pre class="mb-0"><%= scheduler.is_a?(Hash) ? scheduler['name'] : scheduler %></pre>
             <% end %>
           </div>
+          <div class="col-2 small"><%= t(ActiveModel::Type::Boolean.new.cast(process.state["cron_enabled"]), scope: "good_job.shared.boolean") %></div>
           <div class="col-2 small"><%= relative_time(process.created_at) %></div>
           <div class="col-2 small"><%= relative_time(process.updated_at) %></div>
           <div class="col-auto">

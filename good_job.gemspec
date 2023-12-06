@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.metadata = {
     "bug_tracker_uri"   => "https://github.com/bensheldon/good_job/issues",
     "changelog_uri"     => "https://github.com/bensheldon/good_job/blob/master/CHANGELOG.md",
-    "documentation_uri" => "https://rdoc.info/github/bensheldon/good_job",
+    "documentation_uri" => "https://rubydoc.info/gems/good_job",
     "homepage_uri"      => spec.homepage,
     "source_code_uri"   => "https://github.com/bensheldon/good_job",
     "rubygems_mfa_required" => "true",

@@ -4,6 +4,12 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    groups:
+      bundler-dependencies:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - puma
   - package-ecosystem: github-actions
     directory: "/"
     schedule:

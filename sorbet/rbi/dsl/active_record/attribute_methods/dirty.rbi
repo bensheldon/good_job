@@ -14,9 +14,9 @@ module ActiveRecord::AttributeMethods::Dirty
     def attribute_aliases; end
     def attribute_aliases=(value); end
     def attribute_aliases?; end
-    def attribute_method_matchers; end
-    def attribute_method_matchers=(value); end
-    def attribute_method_matchers?; end
+    def attribute_method_patterns; end
+    def attribute_method_patterns=(value); end
+    def attribute_method_patterns?; end
     def partial_inserts; end
     def partial_inserts=(value); end
     def partial_inserts?; end
@@ -28,8 +28,8 @@ module ActiveRecord::AttributeMethods::Dirty
   module GeneratedInstanceMethods
     def attribute_aliases; end
     def attribute_aliases?; end
-    def attribute_method_matchers; end
-    def attribute_method_matchers?; end
+    def attribute_method_patterns; end
+    def attribute_method_patterns?; end
     def partial_inserts; end
     def partial_inserts?; end
     def partial_updates; end

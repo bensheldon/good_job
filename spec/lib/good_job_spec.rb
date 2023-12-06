@@ -32,9 +32,12 @@ describe GoodJob do
       expect { described_class.restart }.not_to change(described_class, :shutdown?).from(true)
     end
 
-    it 'restarts down all capsule instances' do
-      GoodJob::Capsule.new(configuration: configuration)
-      expect { described_class.restart }.to change(described_class, :shutdown?).from(true).to(false)
+    it 'restarts all capsule instances' do
+      capsule = GoodJob::Capsule.new(configuration: configuration)
+      expect { described_class.restart }.to change(capsule, :shutdown?).from(true).to(false)
+      capsule.shutdown
+
+      described_class.shutdown
     end
 
     context 'when in webserver but not in async mode' do
@@ -151,6 +154,15 @@ describe GoodJob do
       travel_to(6.minutes.from_now) do
         described_class.perform_inline
       end
+      expect(PERFORMED.size).to eq 1
+    end
+
+    it 'can accept a limit' do
+      TestJob.perform_later
+      TestJob.perform_later
+
+      described_class.perform_inline(limit: 1)
+
       expect(PERFORMED.size).to eq 1
     end
   end

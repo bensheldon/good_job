@@ -8,13 +8,12 @@ module GoodJob
       GoodJob._on_thread_error(thread_error) if thread_error
     end
 
-    def initialize(app:, port:)
+    def initialize(port:)
       @port = port
-      @app = app
     end
 
     def start
-      @handler = HttpServer.new(@app, port: @port, logger: GoodJob.logger)
+      @handler = HttpServer.new(self, port: @port, logger: GoodJob.logger)
       @future = Concurrent::Future.new { @handler.run }
       @future.add_observer(self.class, :task_observer)
       @future.execute

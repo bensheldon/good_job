@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe 'Jobs', :js do
+describe 'Jobs', :js, :without_executor do
   before do
     allow(GoodJob).to receive_messages(retry_on_unhandled_error: false, preserve_job_records: true)
   end
@@ -16,13 +16,13 @@ describe 'Jobs', :js do
     visit good_job.jobs_path
     expect(page).to have_content 'GoodJob 👍'
 
-    click_on "Jobs"
+    click_link "Jobs"
     expect(page).to have_content 'GoodJob 👍'
 
-    click_on "Cron"
+    click_link "Cron"
     expect(page).to have_content 'GoodJob 👍'
 
-    click_on "Processes"
+    click_link "Processes"
     expect(page).to have_content 'GoodJob 👍'
   end
 
@@ -60,7 +60,7 @@ describe 'Jobs', :js do
         expect(current_url).to match(/job_class=ConfigurableQueueJob/)
 
         table = page.find("[role=table]")
-        expect(table).to have_selector("[role=row]", count: 1)
+        expect(table).to have_css("[role=row]", count: 1)
         expect(table).to have_content(foo_queue_job.job_id)
       end
 
@@ -68,13 +68,13 @@ describe 'Jobs', :js do
         visit good_job.jobs_path
 
         within "#filter" do
-          click_on "Scheduled"
+          click_link "Scheduled"
         end
 
         expect(current_url).to match(/state=scheduled/)
 
         table = page.find("[role=table]")
-        expect(table).to have_selector("[role=row]", count: 2)
+        expect(table).to have_css("[role=row]", count: 2)
         expect(table).to have_content(foo_queue_job.job_id)
       end
 
@@ -85,7 +85,7 @@ describe 'Jobs', :js do
         expect(current_url).to match(/queue_name=foo/)
 
         table = page.find("[role=table]")
-        expect(table).to have_selector("[role=row]", count: 1)
+        expect(table).to have_css("[role=row]", count: 1)
         expect(table).to have_content(foo_queue_job.job_id)
       end
 
@@ -104,23 +104,23 @@ describe 'Jobs', :js do
 
       it 'can search by argument' do
         visit '/good_job'
-        click_on "Jobs"
+        click_link "Jobs"
 
-        expect(page).to have_selector('[role=row]', count: 3)
+        expect(page).to have_css('[role=row]', count: 3)
         fill_in 'query', with: ExampleJob::DEAD_TYPE
-        click_on 'Search'
-        expect(page).to have_selector('[role=row]', count: 1)
+        click_button 'Search'
+        expect(page).to have_css('[role=row]', count: 1)
       end
     end
 
     it 'can retry discarded jobs' do
       visit '/good_job'
-      click_on "Jobs"
+      click_link "Jobs"
 
       expect do
         within "##{dom_id(discarded_job)}" do
-          click_on 'Actions'
-          accept_confirm { click_on 'Retry job' }
+          click_button 'Actions'
+          accept_confirm { click_link 'Retry job' }
         end
         expect(page).to have_content "Job has been retried"
       end.to change { discarded_job.reload.status }.from(:discarded).to(:queued)
@@ -128,24 +128,57 @@ describe 'Jobs', :js do
 
     it 'can discard jobs' do
       visit '/good_job'
-      click_on "Jobs"
+      click_link "Jobs"
 
       expect do
         within "##{dom_id(unfinished_job)}" do
-          click_on 'Actions'
-          accept_confirm { click_on 'Discard job' }
+          click_button 'Actions'
+          accept_confirm { click_link 'Discard job' }
         end
         expect(page).to have_content "Job has been discarded"
       end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
     end
 
+    it 'can force discard jobs' do
+      unfinished_job.update scheduled_at: 1.hour.ago
+
+      locked_event = Concurrent::Event.new
+      done_event = Concurrent::Event.new
+
+      promise = Concurrent::Promises.future do
+        rails_promise do
+          # pretend the job is running
+          unfinished_job.with_advisory_lock do
+            locked_event.set
+            done_event.wait(20)
+          end
+        end
+      end
+      locked_event.wait(10)
+
+      visit '/good_job'
+      click_link "Jobs"
+
+      expect do
+        within "##{dom_id(unfinished_job)}" do
+          click_button 'Actions'
+          accept_confirm { click_link 'Force discard' }
+        end
+        expect(page).to have_content "Job has been force discarded"
+      end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
+    ensure
+      locked_event.set
+      done_event.set
+      promise.value!
+    end
+
     it 'can destroy jobs' do
       visit '/good_job'
-      click_on "Jobs"
+      click_link "Jobs"
 
       within "##{dom_id(discarded_job)}" do
-        click_on 'Actions'
-        accept_confirm { click_on 'Destroy job' }
+        click_button 'Actions'
+        accept_confirm { click_link 'Destroy job' }
       end
       expect(page).to have_content "Job has been destroyed"
       expect { discarded_job.reload }.to raise_error(ActiveRecord::RecordNotFound)
@@ -153,7 +186,7 @@ describe 'Jobs', :js do
 
     it 'performs batch job actions' do
       visit "/good_job"
-      click_on "Jobs"
+      click_link "Jobs"
 
       expect(page).to have_field(checked: true, count: 0)
 
@@ -165,19 +198,19 @@ describe 'Jobs', :js do
 
       expect do
         check "toggle_job_ids"
-        within("[role=table] header") { accept_confirm { click_on "Reschedule all" } }
+        within("[role=table] header") { accept_confirm { click_button "Reschedule all" } }
         expect(page).to have_field(checked: true, count: 0)
       end.to change { unfinished_job.reload.scheduled_at }.to within(1.second).of(Time.current)
 
       expect do
         check "toggle_job_ids"
-        within("[role=table] header") { accept_confirm { click_on "Discard all" } }
+        within("[role=table] header") { accept_confirm { click_button "Discard all" } }
         expect(page).to have_field(checked: true, count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(1).to(2)
 
       expect do
         check "toggle_job_ids"
-        within("[role=table] header") { accept_confirm { click_on "Retry all" } }
+        within("[role=table] header") { accept_confirm { click_button "Retry all" } }
         expect(page).to have_field(checked: true, count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(2).to(0)
 
@@ -185,17 +218,17 @@ describe 'Jobs', :js do
       expect do
         check "toggle_job_ids"
         check "Apply to all 2 jobs"
-        within("[role=table] header") { accept_confirm { click_on "Discard all" } }
+        within("[role=table] header") { accept_confirm { click_button "Discard all" } }
         expect(page).to have_field(checked: true, count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(0).to(2)
 
       visit "/good_job"
-      click_on "Jobs"
+      click_link "Jobs"
       expect do
         check "toggle_job_ids"
         within("[role=table] header") do
-          click_on "Toggle Actions"
-          accept_confirm { click_on "Destroy all" }
+          click_button "Toggle Actions"
+          accept_confirm { click_button "Destroy all" }
         end
         expect(page).to have_field(checked: true, count: 0)
       end.to change(GoodJob::Job, :count).from(2).to(0)

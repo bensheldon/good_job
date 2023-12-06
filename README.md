@@ -40,7 +40,8 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Global options](#global-options)
     - [Dashboard](#dashboard)
         - [API-only Rails applications](#api-only-rails-applications)
-        - [Live Polling](#live-polling)
+        - [Live polling](#live-polling)
+    - [Job priority](#job-priority)
     - [Concurrency controls](#concurrency-controls)
         - [How concurrency controls work](#how-concurrency-controls-work)
     - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
@@ -290,6 +291,7 @@ Available configuration options are:
 - `inline_execution_respects_schedule` (boolean) Opt-in to future behavior of inline execution respecting scheduled jobs. Defaults to `false`.
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
 - `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
+- `smaller_number_is_higher_priority` (boolean) allows you to specifiy that jobs should be run in ascending order of priority (smallest priority numbers first). This will be enabled by default in the next major version of GoodJob (v4.0), but jobs with the highest priority number are run first by default in all earlier versions of GoodJob.
 - `retry_on_unhandled_error` (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Be advised this may lead to jobs being repeated infinitely ([see below for more on retries](#retries)). Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `false`)
 - `on_thread_error` (proc, lambda, or callable) will be called when there is an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake. Example:
 
@@ -380,6 +382,24 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
     end
     ```
 
+    To support custom authentication, you can extend GoodJob's `ApplicationController` using the following hook:
+
+    ```ruby
+    # config/initializers/good_job.rb
+
+    ActiveSupport.on_load(:good_job_application_controller) do
+      # context here is GoodJob::ApplicationController
+
+      before_action do
+        raise ActionController::RoutingError.new('Not Found') unless current_user&.admin?
+      end
+
+      def current_user
+        # load current user
+      end
+    end
+    ```
+
 _To view finished jobs (succeeded and discarded) on the Dashboard, GoodJob must be configured to preserve job records. Preservation is enabled by default._
 
 **Troubleshooting the Dashboard:** Some applications are unable to autoload the Goodjob Engine. To work around this, explicitly require the Engine at the top of your `config/application.rb` file, immediately after Rails is required and before Bundler requires the Rails' groups.
@@ -409,9 +429,13 @@ module MyApp
 end
 ```
 
-#### Live Polling
+#### Live polling
 
 The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
+
+### Job priority
+
+Higher priority numbers run first in all versions of GoodJob v3.x and below. GoodJob v4.x will change job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority (see #524). To opt-in to this behavior now, set `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or `application.rb`.
 
 ### Concurrency controls
 
@@ -446,7 +470,7 @@ class MyJob < ApplicationJob
     # Can be String or Lambda/Proc that is invoked in the context of the job.
     # Note: Arguments passed to #perform_later can be accessed through ActiveJob's `arguments` method
     # which is an array containing positional arguments and, optionally, a kwarg hash.
-    key: -> { "Unique-#{arguments.first}-#{arguments.last[:version]}" } #  MyJob.perform_later("Alice", version: 'v2') => "Unique-Alice-v2"
+    key: -> { "MyJob-#{arguments.first}-#{arguments.last[:version]}" } #  MyJob.perform_later("Alice", version: 'v2') => "MyJob-Alice-v2"
   )
 
   def perform(first_name)
@@ -459,7 +483,7 @@ When testing, the resulting concurrency key value can be inspected:
 
 ```ruby
 job = MyJob.perform_later("Alice")
-job.good_job_concurrency_key #=> "Unique-Alice"
+job.good_job_concurrency_key #=> "MyJob-Alice"
 ```
 
 #### How concurrency controls work
@@ -561,9 +585,10 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
 
     ```ruby
     batch = GoodJob::Batch.new
-    batch = GoodJob::Batch.add do
+    batch.add do
       10.times { MyJob.perform_later }
     end
+
     batch.add do
       10.times { OtherJob.perform_later }
     end
@@ -792,7 +817,7 @@ GoodJob.on_thread_error = -> (exception) { Rails.error.report(exception) }
 
 By default, GoodJob relies on ActiveJob's retry functionality.
 
-ActiveJob can be configured to retry an infinite number of times, with an exponential backoff. Using ActiveJob's `retry_on` prevents exceptions from reaching GoodJob:
+ActiveJob can be configured to retry an infinite number of times, with a polynomial backoff. Using ActiveJob's `retry_on` prevents exceptions from reaching GoodJob:
 
 ```ruby
 class ApplicationJob < ActiveJob::Base
@@ -915,7 +940,7 @@ By default, GoodJob creates a single thread execution pool that will execute job
 
     - `transactional_messages:2`: execute jobs enqueued on `transactional_messages`, with up to 2 threads.
     - `batch_processing:1` execute jobs enqueued on `batch_processing`, with a single thread.
-    - `-transactional_messages,batch_processing`: execute jobs enqueued on _any_ queue _excluding_ `transactional_messages` or `batch_processing`, with up to 2 threads.
+    - `-transactional_messages,batch_processing:2`: execute jobs enqueued on _any_ queue _excluding_ `transactional_messages` or `batch_processing`, with up to 2 threads.
     - `*`: execute jobs on any queue, with up to 5 threads (as configured by `--max-threads=5`).
 
     When a pool is performing jobs from multiple queues, jobs will be performed from specified queues, ordered by priority and creation time. To perform jobs from queues in the queues' given order, use the `+` modifier. In this example, jobs in `batch_processing` will be performed only when there are no jobs in `transactional_messages`:
@@ -1346,7 +1371,7 @@ bin/setup
 
 #### Rails development harness
 
-A Rails application exists within `spec/test_app` that is used for development, test, and GoodJob Demo environments.
+A Rails application exists within `demo` that is used for development, test, and GoodJob Demo environments.
 
 ```bash
 # Run a local development webserver

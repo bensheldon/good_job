@@ -7,16 +7,16 @@
 # source://websocket-extensions//lib/websocket/extensions.rb#1
 module WebSocket
   class << self
-    # source://websocket/1.2.9/lib/websocket.rb#20
+    # source://websocket/1.2.10/lib/websocket.rb#20
     def max_frame_size; end
 
-    # source://websocket/1.2.9/lib/websocket.rb#25
+    # source://websocket/1.2.10/lib/websocket.rb#25
     def max_frame_size=(val); end
 
-    # source://websocket/1.2.9/lib/websocket.rb#31
+    # source://websocket/1.2.10/lib/websocket.rb#31
     def should_raise; end
 
-    # source://websocket/1.2.9/lib/websocket.rb#36
+    # source://websocket/1.2.10/lib/websocket.rb#36
     def should_raise=(val); end
   end
 end

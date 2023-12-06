@@ -29,6 +29,6 @@
     }
   ],
   "scripts": {
-    "postdeploy": "bin/rails heroku:postdeploy"
+    "postdeploy": "bin/rails db:prepare"
   }
 }

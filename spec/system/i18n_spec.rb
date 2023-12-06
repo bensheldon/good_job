@@ -10,7 +10,7 @@ describe 'I18n Internationalization', :js do
       expect(page).to have_content "Processes"
       find_by_id('localeOptions').click
       within ".navbar" do
-        click_on "es"
+        click_link "es"
       end
       expect(page).to have_content "Procesos"
     end
@@ -21,7 +21,7 @@ describe 'I18n Internationalization', :js do
       expect(page).to have_content "Processes"
       find_by_id('localeOptions').click
       within ".navbar" do
-        click_on "uk"
+        click_link "uk"
       end
       expect(page).to have_content "Процеси"
     end

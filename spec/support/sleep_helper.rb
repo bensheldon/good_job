@@ -3,14 +3,14 @@
 module SleepHelper
   TooSlowError = Class.new(StandardError)
 
-  def wait_until(max: 5.seconds, increments_of: 0.1.seconds)
+  def wait_until(max: 5.seconds, increments_of: 0.1.seconds, &block)
     start_time = Time.current
 
     loop do
       failed = false
 
       begin
-        yield
+        GoodJob::BaseRecord.uncached(&block)
       rescue RSpec::Expectations::ExpectationNotMetError
         failed = true
         raise if Time.current > start_time + max
@@ -21,12 +21,12 @@ module SleepHelper
     end
   end
 
-  def sleep_until(max: 5, increments_of: 0.1)
+  def sleep_until(max: 5, increments_of: 0.1, &block)
     so_many = (max.to_f / increments_of).ceil.to_i
 
     finished = catch(:finished) do
       so_many.times do
-        throw(:finished, true) if yield
+        throw(:finished, true) if GoodJob::BaseRecord.uncached(&block)
 
         sleep increments_of
       end
