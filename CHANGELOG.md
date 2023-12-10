@@ -1,5 +1,32 @@
 # Changelog
 
+## [v3.21.3](https://github.com/bensheldon/good_job/tree/v3.21.3) (2023-12-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.2...v3.21.3)
+
+**Implemented enhancements:**
+
+- Add `--idle-timeout` CLI option to create temporary processes that exit when inactive [\#1159](https://github.com/bensheldon/good_job/pull/1159) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Add correct paths to $LOAD\_PATH [\#1169](https://github.com/bensheldon/good_job/pull/1169) ([jklina](https://github.com/jklina))
+- Recreate cron indexes to be conditional [\#1163](https://github.com/bensheldon/good_job/pull/1163) ([defkode](https://github.com/defkode))
+
+**Closed issues:**
+
+- Use partial indices for cron\_key? [\#1161](https://github.com/bensheldon/good_job/issues/1161)
+- Mass Update Error [\#1157](https://github.com/bensheldon/good_job/issues/1157)
+- v3 roadmap plan [\#705](https://github.com/bensheldon/good_job/issues/705)
+- Allow customisation of the dashboard controller parent class [\#687](https://github.com/bensheldon/good_job/issues/687)
+
+**Merged pull requests:**
+
+- \[minor\] Use symbol form of index name [\#1171](https://github.com/bensheldon/good_job/pull/1171) ([andyatkinson](https://github.com/andyatkinson))
+- Fix development schema.rb to include conditional index name change [\#1168](https://github.com/bensheldon/good_job/pull/1168) ([bensheldon](https://github.com/bensheldon))
+- Create new conditional Cron indexes before dropping old indexes [\#1165](https://github.com/bensheldon/good_job/pull/1165) ([bensheldon](https://github.com/bensheldon))
+- Fix test that references Rails logger for Rails 7.2a change [\#1160](https://github.com/bensheldon/good_job/pull/1160) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.21.2](https://github.com/bensheldon/good_job/tree/v3.21.2) (2023-11-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.1...v3.21.2)
