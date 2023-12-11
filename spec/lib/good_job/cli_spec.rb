@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::CLI do
-  let(:capsule_mock) { instance_double GoodJob::Capsule, start: nil, shutdown?: false, shutdown: nil }
+  let(:capsule_mock) { instance_double GoodJob::Capsule, start: nil, shutdown?: false, shutdown: nil, idle?: false }
 
   before do
     stub_const 'GoodJob::CLI::RAILS_ENVIRONMENT_RB', File.expand_path("demo/config/environment.rb")
@@ -45,6 +45,18 @@ RSpec.describe GoodJob::CLI do
         cli.start
 
         expect(GoodJob.configuration.poll_interval).to eq 5
+      end
+    end
+
+    describe 'idle-timeout' do
+      it 'exits when the capsule is idle' do
+        allow(capsule_mock).to receive(:idle?).and_return true
+
+        cli = described_class.new([], { idle_timeout: 1 }, {})
+        cli.start
+
+        expect(capsule_mock).to have_received(:idle?).with(1)
+        expect(capsule_mock).to have_received(:shutdown)
       end
     end
 

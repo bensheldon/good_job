@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'active_job/arguments'
+
 module GoodJob
   class BatchRecord < BaseRecord
     include AdvisoryLockable

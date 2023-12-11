@@ -248,6 +248,7 @@ module GoodJob
 
     # Finds the next eligible Execution, acquire an advisory lock related to it, and
     # executes the job.
+    # @yield [Execution, nil] The next eligible Execution, or +nil+ if none found, before it is performed.
     # @return [ExecutionResult, nil]
     #   If a job was executed, returns an array with the {Execution} record, the
     #   return value for the job's +#perform+ method, and the exception the job
@@ -256,21 +257,19 @@ module GoodJob
     def self.perform_with_advisory_lock(parsed_queues: nil, queue_select_limit: nil)
       execution = nil
       result = nil
+
       unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(select_limit: queue_select_limit) do |executions|
         execution = executions.first
-        break if execution.blank?
-
-        unless execution.executable?
-          result = ExecutionResult.new(value: nil, unexecutable: true)
+        if execution&.executable?
+          yield(execution) if block_given?
+          result = execution.perform
+        else
           execution = nil
-          break
+          yield(nil) if block_given?
         end
-
-        yield(execution) if block_given?
-        result = execution.perform
       end
-      execution&.run_callbacks(:perform_unlocked)
 
+      execution&.run_callbacks(:perform_unlocked)
       result
     end
 

@@ -20,6 +20,9 @@ module GoodJob
     # Number of seconds between checking shutdown conditions
     SHUTDOWN_EVENT_TIMEOUT = 10
 
+    # Number of seconds between checking shutdown conditions when idle-timeout is enabled
+    SHUTDOWN_EVENT_TIMEOUT_FOR_IDLE_TIMEOUT = 1
+
     class << self
       # Whether the CLI is running from the executable
       # @return [Boolean, nil]
@@ -74,6 +77,10 @@ module GoodJob
                   type: :numeric,
                   banner: 'SECONDS',
                   desc: "Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))"
+    method_option :idle_timeout,
+                  type: :numeric,
+                  banner: 'SECONDS',
+                  desc: 'Exit process when no jobs have been performed for this many seconds (env var: GOOD_JOB_IDLE_TIMEOUT, default: nil)'
     method_option :enable_cron,
                   type: :boolean,
                   desc: "Whether to run cron process (default: false)"
@@ -115,9 +122,10 @@ module GoodJob
         trap(signal) { Thread.new { @stop_good_job_executable.set }.join }
       end
 
+      loop_wait = configuration.idle_timeout ? SHUTDOWN_EVENT_TIMEOUT_FOR_IDLE_TIMEOUT : SHUTDOWN_EVENT_TIMEOUT
       Kernel.loop do
-        @stop_good_job_executable.wait(SHUTDOWN_EVENT_TIMEOUT)
-        break if @stop_good_job_executable.set? || capsule.shutdown?
+        @stop_good_job_executable.wait(loop_wait)
+        break if @stop_good_job_executable.set? || capsule.shutdown? || (configuration.idle_timeout && capsule.idle?(configuration.idle_timeout))
       end
 
       systemd.stop do
