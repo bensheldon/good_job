@@ -272,7 +272,7 @@ module GoodJob
   def self.migrated?
     # Always update with the most recent migration check
     GoodJob::Execution.reset_column_information
-    GoodJob::Execution.error_event_migrated?
+    GoodJob::Execution.cron_indices_migrated?
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)
