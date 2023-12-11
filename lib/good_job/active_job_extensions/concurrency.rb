@@ -96,13 +96,21 @@ module GoodJob
       # Generates the concurrency key from the configuration
       # @return [Object] concurrency key
       def _good_job_concurrency_key
+        return _good_job_default_concurrency_key unless self.class.good_job_concurrency_config.key?(:key)
+
         key = self.class.good_job_concurrency_config[:key]
-        return "#{self.class.name}-#{queue_name}-#{ActiveJob::Arguments.serialize(arguments)}" if key.blank?
+        return if key.blank?
 
         key = instance_exec(&key) if key.respond_to?(:call)
         raise TypeError, "Concurrency key must be a String; was a #{key.class}" unless VALID_TYPES.any? { |type| key.is_a?(type) }
 
         key
+      end
+
+      # Generates the default concurrency key when the configuration doesn't provide one
+      # @return [String] concurrency key
+      def _good_job_default_concurrency_key
+        "#{self.class.name}-#{queue_name}-#{ActiveJob::Arguments.serialize(arguments)}"
       end
 
       private

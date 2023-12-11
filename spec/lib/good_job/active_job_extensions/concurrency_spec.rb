@@ -26,11 +26,23 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
-  describe 'when concurrency key is nil' do
+  describe 'when concurrency key returns nil' do
     it 'does not limit concurrency' do
       TestJob.good_job_control_concurrency_with(
         total_limit: -> { 1 },
         key: -> {}
+      )
+
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+    end
+  end
+
+  describe 'when concurrency key is nil' do
+    it 'does not limit concurrency' do
+      TestJob.good_job_control_concurrency_with(
+        total_limit: -> { 1 },
+        key: nil
       )
 
       expect(TestJob.perform_later(name: "Alice")).to be_present
