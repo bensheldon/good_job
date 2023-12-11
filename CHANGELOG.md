@@ -1,5 +1,14 @@
 # Changelog
 
+## [v3.21.4](https://github.com/bensheldon/good_job/tree/v3.21.4) (2023-12-11)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.3...v3.21.4)
+
+**Fixed bugs:**
+
+- Fix latest migration not affecting `GoodJob.migrated?` [\#1175](https://github.com/bensheldon/good_job/pull/1175) ([Earlopain](https://github.com/Earlopain))
+- Fix no method error in systemd service [\#1173](https://github.com/bensheldon/good_job/pull/1173) ([tagrudev](https://github.com/tagrudev))
+
 ## [v3.21.3](https://github.com/bensheldon/good_job/tree/v3.21.3) (2023-12-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.2...v3.21.3)
