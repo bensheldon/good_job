@@ -474,7 +474,7 @@ class MyJob < ApplicationJob
     # composed of the jobs class, the queue, and all passed arguments.
     # `MyJob.set(queue: "special_queue").perform_later("Bob")` => 'MyJob-special_queue-["Bob"]'
     # If you provide a custom concurrency key (for example, if one of your arguments
-    # is transient) make sure that it sufficiently unique across jobs and queues
+    # is transient) make sure that it is sufficiently unique across jobs and queues
     # by adding the job class or queue to the key yourself, if needed.
     #
     # Note: Arguments passed to #perform_later can be accessed through ActiveJob's `arguments` method
