@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.21.5](https://github.com/bensheldon/good_job/tree/v3.21.5) (2023-12-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.4...v3.21.5)
+
+**Fixed bugs:**
+
+- Fix conditional index migration to be rollbackable [\#1176](https://github.com/bensheldon/good_job/pull/1176) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.21.4](https://github.com/bensheldon/good_job/tree/v3.21.4) (2023-12-11)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.3...v3.21.4)
