@@ -737,7 +737,7 @@ GoodJob follows semantic versioning, though updates may be encouraged through de
 
 Upgrading between minor versions (e.g. v1.4 to v1.5) should not introduce breaking changes, but can introduce new deprecation warnings and database migration warnings.
 
-Database migrations introduced in minor releases are _not required_ to be applied until the next major release. If you would like apply newly introduced migrations immediately, assert `GoodJob.migrated?` in your application's test suite.
+Database migrations introduced in minor releases are _not required_ to be applied until the next major release. If you would like to apply newly introduced migrations immediately, assert `GoodJob.migrated?` in your application's test suite.
 
 To perform upgrades to the GoodJob database tables:
 
