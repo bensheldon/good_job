@@ -3,13 +3,9 @@
 require 'rails_helper'
 require 'net/http'
 
-RSpec.describe GoodJob::ProbeServer do
-  let(:healthcheck_rack_app) do
-    Rack::Builder.app do
-      use GoodJob::Middleware::Healthcheck
-      run GoodJob::Middleware::CatchAll
-    end
-  end
+RSpec.describe GoodJob::ProbeServer::Middleware::Healthcheck do
+  let(:app) { instance_double(Proc, call: nil) }
+  let(:healthcheck_middleware) { described_class.new(app) }
   let(:port) { 3434 }
 
   describe '#call' do
@@ -20,7 +16,7 @@ RSpec.describe GoodJob::ProbeServer do
       let(:path) { '/' }
 
       it 'returns "OK"' do
-        response = healthcheck_rack_app.call(env)
+        response = healthcheck_middleware.call(env)
         expect(response[0]).to eq(200)
       end
     end
@@ -30,7 +26,7 @@ RSpec.describe GoodJob::ProbeServer do
 
       context 'when there are no running schedulers' do
         it 'returns 503' do
-          response = healthcheck_rack_app.call(env)
+          response = healthcheck_middleware.call(env)
           expect(response[0]).to eq(503)
         end
       end
@@ -40,7 +36,7 @@ RSpec.describe GoodJob::ProbeServer do
           scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true)
           GoodJob::Scheduler.instances << scheduler
 
-          response = healthcheck_rack_app.call(env)
+          response = healthcheck_middleware.call(env)
           expect(response[0]).to eq(200)
         end
       end
@@ -51,7 +47,7 @@ RSpec.describe GoodJob::ProbeServer do
 
       context 'when there are no running schedulers or notifiers' do
         it 'returns 503' do
-          response = healthcheck_rack_app.call(env)
+          response = healthcheck_middleware.call(env)
           expect(response[0]).to eq(503)
         end
       end
@@ -64,7 +60,7 @@ RSpec.describe GoodJob::ProbeServer do
           notifier = instance_double(GoodJob::Notifier, connected?: false, shutdown: true, shutdown?: true)
           GoodJob::Notifier.instances << notifier
 
-          response = healthcheck_rack_app.call(env)
+          response = healthcheck_middleware.call(env)
           expect(response[0]).to eq(503)
         end
       end
@@ -77,9 +73,18 @@ RSpec.describe GoodJob::ProbeServer do
           notifier = instance_double(GoodJob::Notifier, connected?: true, shutdown: true, shutdown?: true)
           GoodJob::Notifier.instances << notifier
 
-          response = healthcheck_rack_app.call(env)
+          response = healthcheck_middleware.call(env)
           expect(response[0]).to eq(200)
         end
+      end
+    end
+
+    describe 'forwarding unknown requests to given app' do
+      let(:path) { '/unhandled_path' }
+
+      it 'passes the request to the given app' do
+        healthcheck_middleware.call(env)
+        expect(app).to have_received(:call).with(env)
       end
     end
   end

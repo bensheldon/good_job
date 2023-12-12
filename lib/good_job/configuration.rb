@@ -338,6 +338,12 @@ module GoodJob
         env['GOOD_JOB_PROBE_PORT']
     end
 
+    # Rack compliant application to be run on the ProbeServer
+    # @return [nil, Class]
+    def probe_server_app
+      rails_config[:probe_server_app]
+    end
+
     def enable_listen_notify
       return options[:enable_listen_notify] unless options[:enable_listen_notify].nil?
       return rails_config[:enable_listen_notify] unless rails_config[:enable_listen_notify].nil?

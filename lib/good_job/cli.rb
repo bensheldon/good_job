@@ -104,10 +104,8 @@ module GoodJob
       capsule.start
       systemd.start
 
-      middleware = Rails.application.config.good_job.middleware
-      port = Rails.application.config.good_job.middleware_port
-      if middleware && port
-        probe_server = GoodJob::ProbeServer.new(app: middleware, port: port)
+      if configuration.probe_port
+        probe_server = GoodJob::ProbeServer.new(app: configuration.probe_server_app, port: configuration.probe_port)
         probe_server.start
       end
 

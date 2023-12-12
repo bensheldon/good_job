@@ -8,7 +8,7 @@ module GoodJob
       GoodJob._on_thread_error(thread_error) if thread_error
     end
 
-    def initialize(app:, port:)
+    def initialize(port:, app: default_probe_server)
       @port = port
       @app = app
     end
@@ -27,6 +27,15 @@ module GoodJob
     def stop
       @handler&.stop
       @future&.value # wait for Future to exit
+    end
+
+    private
+
+    def default_probe_server
+      Rack::Builder.new do
+        use Middleware::Healthcheck
+        run Middleware::Catchall.new
+      end
     end
   end
 end
