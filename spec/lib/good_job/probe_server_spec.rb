@@ -42,7 +42,7 @@ RSpec.describe GoodJob::ProbeServer do
 
     context 'with a provided app' do
       it 'starts a http server that binds to all interfaces and returns healthcheck responses' do
-        app = Proc.new { [ 200, { "Content-Type" => "text/plain" }, ["Hello World"] ] }
+        app = proc { [200, { "Content-Type" => "text/plain" }, ["Hello World"]] }
         probe_server = described_class.new(app: app, port: port)
         probe_server.start
         wait_until(max: 1) { expect(probe_server).to be_running }

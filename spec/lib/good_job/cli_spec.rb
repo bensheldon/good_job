@@ -72,11 +72,11 @@ RSpec.describe GoodJob::CLI do
           app_mock = instance_double(Proc, call: nil)
           configuration_mock = instance_double(
             GoodJob::Configuration,
-            probe_server_app: app_mock, 
+            probe_server_app: app_mock,
             probe_port: 3838,
             options: {},
             daemonize?: false,
-            shutdown_timeout: 100,
+            shutdown_timeout: 100
           )
           allow(GoodJob).to receive_messages(configuration: configuration_mock)
           cli = described_class.new([], [], {})
