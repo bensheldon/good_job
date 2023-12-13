@@ -135,6 +135,8 @@ jobs:
       - run: chrome --version
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Update .ruby-version with matrix value
         run: echo "${{ matrix.ruby }}" >| .ruby-version
       # Dependencies
@@ -180,6 +182,10 @@ jobs:
           bundle exec appraisal rspec --require ./spec/support/pre_documentation_formatter.rb \
                                       --format PreDocumentationFormatter \
                                       spec/generators
+
+      - name: Check generated migrations reverse cleanly
+        run: |
+          script/check_migrations.sh
 
       # Archive
       - name: Archive system spec screenshots
