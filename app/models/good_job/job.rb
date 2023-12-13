@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module GoodJob
-  # ActiveRecord model that represents an +ActiveJob+ job.
+  # Active Record model that represents an +ActiveJob+ job.
   # There is not a table in the database whose discrete rows represents "Jobs".
   # The +good_jobs+ table is a table of individual {GoodJob::Execution}s that share the same +active_job_id+.
   # A single row from the +good_jobs+ table of executions is fetched to represent a Job.
@@ -9,7 +9,7 @@ module GoodJob
   class Job < BaseExecution
     # Raised when an inappropriate action is applied to a Job based on its state.
     ActionForStateMismatchError = Class.new(StandardError)
-    # Raised when an action requires GoodJob to be the ActiveJob Queue Adapter but GoodJob is not.
+    # Raised when GoodJob is not configured as the Active Job Queue Adapter
     AdapterNotGoodJobError = Class.new(StandardError)
     # Attached to a Job's Execution when the Job is discarded.
     DiscardJobError = Class.new(StandardError)
@@ -60,7 +60,7 @@ module GoodJob
 
     scope :unfinished_undiscrete, -> { where(finished_at: nil, retried_good_job_id: nil, is_discrete: [nil, false]) }
 
-    # The job's ActiveJob UUID
+    # The job's Active Job UUID
     # @return [String]
     def id
       active_job_id
@@ -101,7 +101,7 @@ module GoodJob
       executions.first
     end
 
-    # The number of times this job has been executed, according to ActiveJob's serialized state.
+    # The number of times this job has been executed, according to Active Job's serialized state.
     # @return [Numeric]
     def executions_count
       aj_count = serialized_params.fetch('executions', 0)

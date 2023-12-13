@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module GoodJob
-  # ActiveRecord model to share behavior between {Job} and {Execution} models
+  # Active Record model to share behavior between {Job} and {Execution} models
   # which both read out of the same table.
   class BaseExecution < BaseRecord
     include AdvisoryLockable
