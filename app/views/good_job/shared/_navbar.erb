@@ -41,7 +41,7 @@
 
       <ul class="navbar-nav">
         <li class="nav-item d-flex flex-column justify-content-center">
-          <div class="form-check form-switch m-0">
+          <div title="<%= t(".last_update_on_hover", time: Time.current.utc.iso8601) %>" class="form-check form-switch m-0">
             <%= check_box_tag "live_poll", params.fetch("poll", 30), params[:poll].present?, role: "switch", class: "form-check-input" %>
             <label class="form-check-label navbar-text p-0" for="live_poll">
               <%= t(".live_poll") %>
