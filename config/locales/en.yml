@@ -223,6 +223,7 @@ en:
         last_update_html: Last updated <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: Remember, you're doing a Good Job too!
       navbar:
+        last_update_on_hover: Last update "%{time}"
         batches: Batches
         cron_schedules: Cron
         jobs: Jobs
