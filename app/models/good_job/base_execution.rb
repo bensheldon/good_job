@@ -56,6 +56,20 @@ module GoodJob
         migration_pending_warning!
         false
       end
+
+      def labels_migrated?
+        return true if columns_hash["labels"].present?
+
+        migration_pending_warning!
+        false
+      end
+
+      def labels_indices_migrated?
+        return true if connection.index_name_exists?(:good_jobs, :index_good_jobs_on_labels)
+
+        migration_pending_warning!
+        false
+      end
     end
 
     # The ActiveJob job class, as a string
@@ -88,6 +102,7 @@ module GoodJob
                        .tap do |job_data|
         job_data["provider_job_id"] = id
         job_data["good_job_concurrency_key"] = concurrency_key if concurrency_key
+        job_data["good_job_labels"] = Array(labels) if self.class.labels_migrated? && labels.present?
       end
     end
   end

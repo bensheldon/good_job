@@ -29,6 +29,7 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       t.integer :executions_count
       t.text :job_class
       t.integer :error_event, limit: 2
+      t.text :labels, array: true
     end
 
     create_table :good_job_batches, id: :uuid do |t|
@@ -82,6 +83,7 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       where: "finished_at IS NULL", name: :index_good_jobs_jobs_on_priority_created_at_when_unfinished
     add_index :good_jobs, [:batch_id], where: "batch_id IS NOT NULL"
     add_index :good_jobs, [:batch_callback_id], where: "batch_callback_id IS NOT NULL"
+    add_index :good_jobs, :labels, using: :gin, where: "(labels IS NOT NULL)", name: :index_good_jobs_on_labels
 
     add_index :good_job_executions, [:active_job_id, :created_at], name: :index_good_job_executions_on_active_job_id_and_created_at
   end

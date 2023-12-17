@@ -12,6 +12,7 @@ require "good_job/active_job_extensions/batches"
 require "good_job/active_job_extensions/concurrency"
 require "good_job/interrupt_error"
 require "good_job/active_job_extensions/interrupt_errors"
+require "good_job/active_job_extensions/labels"
 require "good_job/active_job_extensions/notify_options"
 
 require "good_job/assignable_connection"
@@ -22,7 +23,7 @@ require "good_job/cleanup_tracker"
 require "good_job/cli"
 require "good_job/configuration"
 require "good_job/cron_manager"
-require 'good_job/current_thread'
+require "good_job/current_thread"
 require "good_job/daemon"
 require "good_job/dependencies"
 require "good_job/job_performer"
@@ -272,7 +273,7 @@ module GoodJob
   def self.migrated?
     # Always update with the most recent migration check
     GoodJob::Execution.reset_column_information
-    GoodJob::Execution.cron_indices_migrated?
+    GoodJob::Execution.labels_indices_migrated?
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)
