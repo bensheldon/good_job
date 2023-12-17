@@ -137,6 +137,14 @@ jobs:
         uses: actions/checkout@v4
       - name: Update .ruby-version with matrix value
         run: echo "${{ matrix.ruby }}" >| .ruby-version
+      - name: Set Rubygems version
+        id: rubygems
+        run: |
+          if [[ "${{ matrix.ruby }}" == "2.6" || "${{ matrix.ruby }}" == "2.7" || "${{ matrix.ruby }}" == "jruby-9.3" ]]; then
+            echo "version=3.3.27" >> $GITHUB_OUTPUT
+          else
+            echo "version=latest" >> $GITHUB_OUTPUT
+          fi
       # Dependencies
       - name: Set up generic Ruby
         uses: ruby/setup-ruby@v1
@@ -149,7 +157,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          rubygems: latest
+          rubygems: ${{ steps.rubygems.outputs.version }}
       - name: Cache Appraisal gems
         uses: actions/cache@v3
         with:
