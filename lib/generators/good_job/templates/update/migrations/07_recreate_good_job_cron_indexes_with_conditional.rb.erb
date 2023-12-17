@@ -25,11 +25,11 @@ class RecreateGoodJobCronIndexesWithConditional < ActiveRecord::Migration<%= mig
 
       dir.down do
         unless connection.index_name_exists?(:good_jobs, :index_good_jobs_on_cron_key_and_created_at)
-          add_index :good_jobs, [:cron_key, :created_at], where: "(cron_key IS NOT NULL)",
+          add_index :good_jobs, [:cron_key, :created_at],
                     name: :index_good_jobs_on_cron_key_and_created_at, algorithm: :concurrently
         end
         unless connection.index_name_exists?(:good_jobs, :index_good_jobs_on_cron_key_and_cron_at)
-          add_index :good_jobs, [:cron_key, :cron_at], where: "(cron_key IS NOT NULL)", unique: true,
+          add_index :good_jobs, [:cron_key, :cron_at], unique: true,
                     name: :index_good_jobs_on_cron_key_and_cron_at, algorithm: :concurrently
         end
 

@@ -49,6 +49,13 @@ module GoodJob
         migration_pending_warning!
         false
       end
+
+      def cron_indices_migrated?
+        return true if connection.index_name_exists?(:good_jobs, :index_good_jobs_on_cron_key_and_created_at_cond)
+
+        migration_pending_warning!
+        false
+      end
     end
 
     # The ActiveJob job class, as a string
