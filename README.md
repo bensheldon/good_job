@@ -438,6 +438,31 @@ The Dashboard can be set to automatically refresh by checking "Live Poll" in the
 
 Higher priority numbers run first in all versions of GoodJob v3.x and below. GoodJob v4.x will change job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority (see #524). To opt-in to this behavior now, set `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or `application.rb`.
 
+### Labelled jobs
+
+Labels are the recommended way to add context or metadata to specific jobs. For example, all jobs that have a dependency on an email service could be labeled `email`. Using labels requires adding the Active Job extension `GoodJob::ActiveJobExtensions::Labels` to your job class.
+
+```ruby
+class ApplicationRecord < ActiveJob::Base
+  include GoodJob::ActiveJobExtensions::Labels
+end
+
+# Add a default label to every job within the class
+class WelcomeJob < ApplicationRecord
+  self.good_job_labels = ["email"]
+
+  def perform
+    # Labels can be inspected from within the job
+    puts good_job_labels # => ["email"]
+  end
+end
+
+# Or add to individual jobs when enqueued
+WelcomeJob.set(good_job_labels: ["email"]).perform_later
+```
+
+Labels can be used to search jobs in the Dashboard. For example, to find all jobs labeled `email`, search for `email`.
+
 ### Concurrency controls
 
 GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unnecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.

@@ -34,7 +34,7 @@ module GoodJob
         query = query.to_s.strip
         next if query.blank?
 
-        tsvector = "(to_tsvector('english', serialized_params) || to_tsvector('english', id::text) || to_tsvector('english', COALESCE(error, '')::text))"
+        tsvector = "(to_tsvector('english', id::text) || to_tsvector('english', COALESCE(active_job_id::text, '')) || to_tsvector('english', serialized_params) || to_tsvector('english', COALESCE(error, ''))#{" || to_tsvector('english', COALESCE(array_to_string(labels, ' '), ''))" if labels_migrated?})"
         to_tsquery_function = database_supports_websearch_to_tsquery? ? 'websearch_to_tsquery' : 'plainto_tsquery'
         where("#{tsvector} @@ #{to_tsquery_function}(?)", query)
           .order(sanitize_sql_for_order([Arel.sql("ts_rank(#{tsvector}, #{to_tsquery_function}(?))"), query]) => 'DESC')

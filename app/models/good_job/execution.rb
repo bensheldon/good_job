@@ -225,6 +225,13 @@ module GoodJob
       execution_args[:scheduled_at] = Time.zone.at(active_job.scheduled_at) if active_job.scheduled_at
       execution_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
 
+      if active_job.respond_to?(:good_job_labels) && active_job.good_job_labels.any? && labels_migrated?
+        labels = active_job.good_job_labels.dup
+        labels.map! { |label| label.to_s.strip.presence }
+        labels.tap(&:compact!).tap(&:uniq!)
+        execution_args[:labels] = labels
+      end
+
       reenqueued_current_execution = CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
       current_execution = CurrentThread.execution
 
