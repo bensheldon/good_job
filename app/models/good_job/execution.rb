@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module GoodJob
-  # ActiveRecord model that represents an +ActiveJob+ job.
+  # Active Record model that represents an +ActiveJob+ job.
   class Execution < BaseExecution
     # Raised if something attempts to execute a previously completed Execution again.
     PreviouslyPerformedError = Class.new(StandardError)
@@ -150,9 +150,9 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :schedule_ordered, -> { order(coalesce_scheduled_at_created_at.asc) }
 
-    # Get Jobs were completed before the given timestamp. If no timestamp is
-    # provided, get all jobs that have been completed. By default, GoodJob
-    # destroys jobs after they are completed and this will find no jobs.
+    # Get completed jobs before the given timestamp. If no timestamp is
+    # provided, get *all* completed jobs. By default, GoodJob
+    # destroys jobs after they're completed, meaning this returns no jobs.
     # However, if you have changed {GoodJob.preserve_job_records}, this may
     # find completed Jobs.
     # @!method finished(timestamp = nil)
