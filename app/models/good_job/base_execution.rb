@@ -70,6 +70,13 @@ module GoodJob
         migration_pending_warning!
         false
       end
+
+      def active_job_id_index_removal_migrated?
+        return true unless connection.index_name_exists?(:good_jobs, :index_good_jobs_on_active_job_id)
+
+        migration_pending_warning!
+        false
+      end
     end
 
     # The ActiveJob job class, as a string
