@@ -15,7 +15,7 @@ module GoodJob
     def initialize(configuration: GoodJob.configuration)
       @configuration = configuration
       @startable = true
-      @running = false
+      @started_at = nil
       @mutex = Mutex.new
 
       self.class.instances << self
@@ -39,7 +39,7 @@ module GoodJob
         @cron_manager = GoodJob::CronManager.new(@configuration.cron_entries, start_on_initialize: true, executor: @shared_executor.executor) if @configuration.enable_cron?
 
         @startable = false
-        @running = true
+        @started_at = Time.current
       end
     end
 
@@ -54,7 +54,7 @@ module GoodJob
       timeout = @configuration.shutdown_timeout if timeout == NONE
       GoodJob._shutdown_all([@shared_executor, @notifier, @poller, @multi_scheduler, @cron_manager].compact, timeout: timeout)
       @startable = false
-      @running = false
+      @started_at = nil
     end
 
     # Shutdown and then start the capsule again.
@@ -69,12 +69,26 @@ module GoodJob
 
     # @return [Boolean] Whether the capsule is currently running.
     def running?
-      @running
+      @started_at.present?
     end
 
     # @return [Boolean] Whether the capsule has been shutdown.
     def shutdown?
       [@shared_executor, @notifier, @poller, @multi_scheduler, @cron_manager].compact.all?(&:shutdown?)
+    end
+
+    # @param duration [nil, Numeric] Length of idleness to check for (in seconds).
+    # @return [Boolean] Whether the capsule is idle
+    def idle?(duration = nil)
+      scheduler_stats = @multi_scheduler&.stats || {}
+      is_idle = scheduler_stats.fetch(:active_execution_thread_count, 0).zero?
+
+      if is_idle && duration
+        active_at = scheduler_stats.fetch(:execution_at, nil) || @started_at
+        active_at.nil? || (Time.current - active_at >= duration)
+      else
+        is_idle
+      end
     end
 
     # Creates an execution thread(s) with the given attributes.
@@ -88,7 +102,7 @@ module GoodJob
     private
 
     def startable?(force: false)
-      !@running && (@startable || force)
+      !@started_at && (@startable || force)
     end
   end
 end

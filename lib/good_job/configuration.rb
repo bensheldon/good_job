@@ -228,6 +228,16 @@ module GoodJob
       )&.to_i
     end
 
+    # The number of seconds that a good_job process will idle with out running a job before exiting
+    # @return [Integer, nil] Number of seconds or nil means do not idle out.
+    def idle_timeout
+      (
+        options[:idle_timeout] ||
+        rails_config[:idle_timeout] ||
+        env['GOOD_JOB_IDLE_TIMEOUT']
+      )&.to_i || nil
+    end
+
     # Whether to automatically destroy discarded jobs that have been preserved.
     # @return [Boolean]
     def cleanup_discarded_jobs?

@@ -24,7 +24,7 @@ describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
         run_in_example_app 'rails db:migrate'
       end
 
-      # Check that `GoodJob.pending_migrations?` is updated
+      # Check that `GoodJob.migrated?` is updated
       expect(GoodJob.migrated?).to be true
       quiet do
         run_in_example_app 'rails db:rollback'

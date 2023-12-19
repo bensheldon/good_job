@@ -11,10 +11,10 @@ module GoodJob # :nodoc:
   #
   class SystemdService
     def self.task_observer(_time, _output, thread_error) # :nodoc:
-      return if thread_error.is_a? Concurrent::CancelledOperationError
+      return if !thread_error || thread_error.is_a?(Concurrent::CancelledOperationError)
 
       ActiveSupport::Notifications.instrument("systemd_watchdog_error.good_job", { error: thread_error })
-      GoodJob._on_thread_error(thread_error) if thread_error
+      GoodJob._on_thread_error(thread_error)
     end
 
     # Indicates whether the service is actively notifying systemd's watchdog.
