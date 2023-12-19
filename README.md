@@ -5,7 +5,6 @@
 [![Ruby Toolbox](https://img.shields.io/badge/dynamic/json?color=blue&label=Ruby%20Toolbox&query=%24.projects%5B0%5D.score&url=https%3A%2F%2Fwww.ruby-toolbox.com%2Fapi%2Fprojects%2Fcompare%2Fgood_job&logo=data:image/svg+xml;base64,PHN2ZyBhcmlhLWhpZGRlbj0idHJ1ZSIgZm9jdXNhYmxlPSJmYWxzZSIgZGF0YS1wcmVmaXg9ImZhcyIgZGF0YS1pY29uPSJmbGFzayIgY2xhc3M9InN2Zy1pbmxpbmUtLWZhIGZhLWZsYXNrIGZhLXctMTQiIHJvbGU9ImltZyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDQ4IDUxMiI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik00MzcuMiA0MDMuNUwzMjAgMjE1VjY0aDhjMTMuMyAwIDI0LTEwLjcgMjQtMjRWMjRjMC0xMy4zLTEwLjctMjQtMjQtMjRIMTIwYy0xMy4zIDAtMjQgMTAuNy0yNCAyNHYxNmMwIDEzLjMgMTAuNyAyNCAyNCAyNGg4djE1MUwxMC44IDQwMy41Qy0xOC41IDQ1MC42IDE1LjMgNTEyIDcwLjkgNTEyaDMwNi4yYzU1LjcgMCA4OS40LTYxLjUgNjAuMS0xMDguNXpNMTM3LjkgMzIwbDQ4LjItNzcuNmMzLjctNS4yIDUuOC0xMS42IDUuOC0xOC40VjY0aDY0djE2MGMwIDYuOSAyLjIgMTMuMiA1LjggMTguNGw0OC4yIDc3LjZoLTE3MnoiPjwvcGF0aD48L3N2Zz4=)](https://www.ruby-toolbox.com/projects/good_job)
 
 GoodJob is a multithreaded, Postgres-based, Active Job backend for Ruby on Rails.
-GoodJob is a multithreaded, Postgres-based, Active Job backend for Ruby on Rails.
 
 **Inspired by [Delayed::Job](https://github.com/collectiveidea/delayed_job) and [Que](https://github.com/que-rb/que), GoodJob is designed for maximum compatibility with Ruby on Rails, Active Job, and Postgres to be simple and performant for most workloads.**
 
