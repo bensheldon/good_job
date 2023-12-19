@@ -71,7 +71,7 @@ jobs:
         run: bin/rspec --require ./spec/support/pre_documentation_formatter.rb --format PreDocumentationFormatter
       # Archive
       - name: Archive system spec screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: screenshots
@@ -79,7 +79,7 @@ jobs:
             demo/tmp/screenshots
             demo/tmp/capybara
       - name: Archive Rails logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: rails_logs
@@ -191,7 +191,7 @@ jobs:
 
       # Archive
       - name: Archive system spec screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: screenshots
@@ -199,7 +199,7 @@ jobs:
             demo/tmp/screenshots
             demo/tmp/capybara
       - name: Archive Rails logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: rails_logs
