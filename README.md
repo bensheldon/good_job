@@ -918,9 +918,9 @@ class MyJob < ApplicationJob
   # The extension must be included before other extensions
   include GoodJob::ActiveJobExtensions::InterruptErrors
   # Discard the job if it is interrupted
-  discard_on InterruptError
+  discard_on GoodJob::InterruptError
   # Retry the job if it is interrupted
-  retry_on InterruptError, wait: 0, attempts: Float::INFINITY
+  retry_on GoodJob::InterruptError, wait: 0, attempts: Float::INFINITY
 end
 ```
 
