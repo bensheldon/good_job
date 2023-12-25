@@ -2,19 +2,15 @@
 
 class CreateGoodJobSettings < ActiveRecord::Migration<%= migration_version %>
   def change
-    reversible do |dir|
-      dir.up do
-        # Ensure this incremental update migration is idempotent
-        # with monolithic install migration.
-        return if connection.table_exists?(:good_job_settings)
+    # Ensure this incremental update migration is idempotent
+    # with monolithic install migration.
+    unless connection.table_exists?(:good_job_settings)
+      create_table :good_job_settings, id: :uuid do |t|
+        t.timestamps
+        t.text :key
+        t.jsonb :value
+        t.index :key, unique: true
       end
-    end
-
-    create_table :good_job_settings, id: :uuid do |t|
-      t.timestamps
-      t.text :key
-      t.jsonb :value
-      t.index :key, unique: true
     end
   end
 end
