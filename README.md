@@ -41,6 +41,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Dashboard](#dashboard)
         - [API-only Rails applications](#api-only-rails-applications)
         - [Live polling](#live-polling)
+        - [Extending dashboard views](#extending-dashboard-views)
     - [Job priority](#job-priority)
     - [Concurrency controls](#concurrency-controls)
         - [How concurrency controls work](#how-concurrency-controls-work)
@@ -433,6 +434,41 @@ end
 #### Live polling
 
 The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
+
+#### Extending dashboard views
+
+**Warning:** this feature exposes classes that are considered internal implementation details of GoodJob. You should always test your custom partials after upgrading GoodJob, even for patch releases. Do not use this feature if you are not comfortable with the risk.
+
+The Dashboard includes certain empty partials that can be overridden in your application to provide additional content.
+
+For example, if your app deals with widgets and you want to show a link to the widgets a job receives as arguments, you can create a partial at `app/views/good_job/jobs/_custom_job_details.html.erb` with the following content:
+
+```erb
+<%# file: app/views/good_job/jobs/_custom_job_details.html.erb %>
+<% arguments = job.active_job.arguments rescue [] %>
+<% widgets = arguments.select { |arg| arg.is_a?(Widget) } %>
+<% if widgets.any? %>
+  <div class="my-4">
+    <h5>Widgets</h5>
+    <ul>
+      <% widgets.each do |widget| %>
+        <li><%= link_to widget.name, main_app.widget_url(widget) %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+```
+
+As a second example, you may wish to show a link to a log aggregator next to each job execution. You can do this by creating a partial at `app/views/good_job/jobs/_custom_execution_details.html.erb` with the following content:
+
+```erb
+<%# file: app/views/good_job/jobs/_custom_execution_details.html.erb %>
+<div class="py-3">
+  <%= link_to "Logs", main_app.logs_url(filter: { job_id: job.id }, start_time: execution.performed_at, end_time: execution.finished_at + 1.minute) %>
+</div>
+```
+
+Note that you must use `main_app` to access helpers from your app, as the default helpers will be those of GoodJob itself.
 
 ### Job priority
 
