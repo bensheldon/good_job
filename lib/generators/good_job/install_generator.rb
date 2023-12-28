@@ -21,6 +21,12 @@ module GoodJob
       migration_template 'migrations/create_good_jobs.rb.erb', File.join(db_migrate_path, "create_good_jobs.rb")
     end
 
+    def copy_empty_partials
+      %w[custom_job_details custom_execution_details].each do |partial|
+        copy_file  "views/_#{partial}.html.erb", "app/views/good_job/jobs/_#{partial}.html.erb"
+      end
+    end
+
     private
 
     def migration_version
