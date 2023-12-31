@@ -234,6 +234,9 @@ ja:
           dark: 暗い
           light: ライト
           theme: テーマ
+      secondary_navbar:
+        last_update_html: 最終更新 <time id="page-updated-at" datetime="%{time}">%{time}</time>
+        wording: Remember, you're doing a Good Job too!
     status:
       discarded: 破棄済み
       queued: 処理待ち

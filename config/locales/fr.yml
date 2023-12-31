@@ -234,6 +234,9 @@ fr:
           dark: Sombre
           light: Lumière
           theme: Thème
+      secondary_navbar:
+        last_update_html: Dernière mise à jour <time id="page-updated-at" datetime="%{time}">%{time}</time>
+        wording: N'oublie pas, toi aussi tu fais du bon boulot !
     status:
       discarded: Mis au rebut
       queued: À la file

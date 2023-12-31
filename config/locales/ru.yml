@@ -260,6 +260,9 @@ ru:
           dark: Темный
           light: Свет
           theme: Тема
+      secondary_navbar:
+        last_update_html: Последнее обновление <time id="page-updated-at" datetime="%{time}">%{time}</time>
+        wording: Запомни, ты делаешь Good Job тоже!
     status:
       discarded: Отброшено
       queued: В очереди
