@@ -96,7 +96,7 @@ module GoodJob
     def redirect_on_error(exception)
       alert = case exception
               when GoodJob::Job::AdapterNotGoodJobError
-                "ActiveJob Queue Adapter must be GoodJob."
+                "Active Job Queue Adapter must be GoodJob."
               when GoodJob::Job::ActionForStateMismatchError
                 "Job is not in an appropriate state for this action."
               else
