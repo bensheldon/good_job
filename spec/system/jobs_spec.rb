@@ -198,19 +198,19 @@ describe 'Jobs', :js, :without_executor do
 
       expect do
         check "toggle_job_ids"
-        within("[role=table] header") { accept_confirm { click_button "Reschedule all" } }
+        within("[role=table] .header") { accept_confirm { click_button "Reschedule all" } }
         expect(page).to have_field(checked: true, count: 0)
       end.to change { unfinished_job.reload.scheduled_at }.to within(1.second).of(Time.current)
 
       expect do
         check "toggle_job_ids"
-        within("[role=table] header") { accept_confirm { click_button "Discard all" } }
+        within("[role=table] .header") { accept_confirm { click_button "Discard all" } }
         expect(page).to have_field(checked: true, count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(1).to(2)
 
       expect do
         check "toggle_job_ids"
-        within("[role=table] header") { accept_confirm { click_button "Retry all" } }
+        within("[role=table] .header") { accept_confirm { click_button "Retry all" } }
         expect(page).to have_field(checked: true, count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(2).to(0)
 
@@ -218,7 +218,7 @@ describe 'Jobs', :js, :without_executor do
       expect do
         check "toggle_job_ids"
         check "Apply to all 2 jobs"
-        within("[role=table] header") { accept_confirm { click_button "Discard all" } }
+        within("[role=table] .header") { accept_confirm { click_button "Discard all" } }
         expect(page).to have_field(checked: true, count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(0).to(2)
 
@@ -226,7 +226,7 @@ describe 'Jobs', :js, :without_executor do
       click_link "Jobs"
       expect do
         check "toggle_job_ids"
-        within("[role=table] header") do
+        within("[role=table] .header") do
           click_button "Toggle Actions"
           accept_confirm { click_button "Destroy all" }
         end
