@@ -542,6 +542,7 @@ DEPENDENCIES
   spoom
   stackprof
   tapioca
+  webrick
   yard
   yard-activesupport-concern
 
