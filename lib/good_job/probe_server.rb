@@ -9,9 +9,7 @@ module GoodJob
     end
 
     def initialize(port:, handler: nil, app: default_probe_server)
-      @port = port
-      @app = app
-      @handler = handler || default_handler
+      @handler = build_handler(port: port, handler: handler, app: app)
     end
 
     def start
@@ -38,8 +36,13 @@ module GoodJob
       end
     end
 
-    def default_handler
-      HttpServer.new(@app, port: @port, logger: GoodJob.logger)
+    def build_handler(port:, handler:, app:)
+      if handler == 'webrick'
+        require 'webrick'
+        WebrickHandler.new(app, port: port, logger: GoodJob.logger)
+      else
+        HttpServerHandler.new(app, port: port, logger: GoodJob.logger)
+      end
     end
   end
 end

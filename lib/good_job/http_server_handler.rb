@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module GoodJob
-  class HttpServer
+  class HttpServerHandler
     SOCKET_READ_TIMEOUT = 5 # in seconds
 
     def initialize(app, options = {})
@@ -10,16 +10,6 @@ module GoodJob
       @logger = options[:logger]
 
       @running = Concurrent::AtomicBoolean.new(false)
-    end
-
-    def run
-      @running.make_true
-      start_server
-      handle_connections if @running.true?
-    rescue StandardError => e
-      @logger.error "Server encountered an error: #{e}"
-    ensure
-      stop
     end
 
     def stop
@@ -36,6 +26,16 @@ module GoodJob
     end
 
     private
+
+    def run
+      @running.make_true
+      start_server
+      handle_connections if @running.true?
+    rescue StandardError => e
+      @logger.error "Server encountered an error: #{e}"
+    ensure
+      stop
+    end
 
     def start_server
       @server = TCPServer.new('0.0.0.0', @port)
