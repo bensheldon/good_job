@@ -77,7 +77,6 @@ RSpec.describe GoodJob::CLI do
             options: {},
             daemonize?: false,
             shutdown_timeout: 100,
-            idle_timeout: 100
           )
           allow(GoodJob).to receive_messages(configuration: configuration_mock)
           cli = described_class.new([], [], {})

@@ -31,6 +31,10 @@ module GoodJob
       @running.true?
     end
 
+    def build_future
+      Concurrent::Future.new { run }
+    end
+
     private
 
     def start_server

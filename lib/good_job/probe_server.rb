@@ -8,14 +8,14 @@ module GoodJob
       GoodJob._on_thread_error(thread_error) if thread_error
     end
 
-    def initialize(port:, app: default_probe_server)
+    def initialize(port:, handler: nil, app: default_probe_server)
       @port = port
       @app = app
+      @handler = handler || default_handler
     end
 
     def start
-      @handler = HttpServer.new(@app, port: @port, logger: GoodJob.logger)
-      @future = Concurrent::Future.new { @handler.run }
+      @future = @handler.build_future
       @future.add_observer(self.class, :task_observer)
       @future.execute
     end
@@ -36,6 +36,10 @@ module GoodJob
         use Middleware::Healthcheck
         run Middleware::Catchall.new
       end
+    end
+
+    def default_handler
+      HttpServer.new(@app, port: @port, logger: GoodJob.logger)
     end
   end
 end
