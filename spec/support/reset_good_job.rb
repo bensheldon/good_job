@@ -5,7 +5,7 @@ THREAD_ERRORS = Concurrent::Array.new
 ActiveSupport.on_load :active_record do
   ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkout, :before, lambda { |conn|
     thread_name = Thread.current.name || Thread.current.object_id
-    conn.exec_query("SET application_name = '#{thread_name}'", "Set application name")
+    conn.exec_query("SET application_name = #{conn.quote(thread_name)}", "Set application name")
   }
 end
 

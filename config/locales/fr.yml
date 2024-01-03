@@ -232,8 +232,8 @@ fr:
           light: Lumière
           theme: Thème
       secondary_navbar:
-        last_update_html: Dernière mise à jour <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: N'oublie pas, toi aussi tu fais du bon boulot !
+        inspiration: N'oublie pas, toi aussi tu fais du bon boulot !
+        last_updated: Dernière mise à jour
     status:
       discarded: Mis au rebut
       queued: À la file

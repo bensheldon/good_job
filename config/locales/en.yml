@@ -232,8 +232,8 @@ en:
           light: Light
           theme: Theme
       secondary_navbar:
-        last_update_html: Last updated <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: Remember, you're doing a Good Job too!
+        inspiration: Remember, you're doing a Good Job too!
+        last_updated: Last updated
     status:
       discarded: Discarded
       queued: Queued

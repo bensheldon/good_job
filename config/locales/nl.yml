@@ -232,8 +232,8 @@ nl:
           light: Licht
           theme: Thema
       secondary_navbar:
-        last_update_html: Laatst bijgewerkt <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: 'Onthoud: jij levert ook goed werk!'
+        inspiration: 'Onthoud: jij levert ook goed werk!'
+        last_updated: Laatst bijgewerkt
     status:
       discarded: weggegooid
       queued: In de wachtrij

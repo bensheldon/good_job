@@ -232,8 +232,8 @@ ja:
           light: ライト
           theme: テーマ
       secondary_navbar:
-        last_update_html: 最終更新 <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: Remember, you're doing a Good Job too!
+        inspiration: 覚えておいてください、あなたも良い仕事をしています！
+        last_updated: 最終更新
     status:
       discarded: 破棄済み
       queued: 処理待ち

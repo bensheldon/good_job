@@ -258,8 +258,8 @@ uk:
           light: світло
           theme: Тема
       secondary_navbar:
-        last_update_html: Останнє оновлення <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: Пам'ятайте, ви теж робите хорошу роботу!
+        inspiration: Пам'ятайте, ви теж робите хорошу роботу!
+        last_updated: Останнє оновлення
     status:
       discarded: Відхилено
       queued: У черзі
