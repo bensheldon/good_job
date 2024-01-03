@@ -23,7 +23,7 @@ module GoodJob
 
     def copy_empty_partials
       %w[custom_job_details custom_execution_details].each do |partial|
-        copy_file  "views/_#{partial}.html.erb", "app/views/good_job/jobs/_#{partial}.html.erb"
+        copy_file "views/_#{partial}.html.erb", "app/views/good_job/jobs/_#{partial}.html.erb"
       end
     end
 
