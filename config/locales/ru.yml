@@ -245,7 +245,7 @@ ru:
         placeholder: Поиск по классу, идентификатору задания, параметрам задания и тексту ошибки.
         queue_name: Имя очереди
         search: Поиск
-      footer:
+      secondary_navbar:
         last_update_html: Последнее обновление <time id="page-updated-at" datetime="%{time}">%{time}</time>
         wording: Запомни, ты делаешь Good Job тоже!
       navbar:

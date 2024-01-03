@@ -1,0 +1,12 @@
+<nav class="navbar navbar-expand-md shadow-sm  mt-auto py-3 border-top text-muted small" id="secondary-navbar" data-live-poll-region="footer">
+  <div class="container-fluid">
+    <div class="row w-100">
+      <div class="col-md-6">
+        <%= t(".last_update_html", time: Time.current.utc.iso8601) %>
+      </div>
+      <div class="col-md-6 text-end">
+        <%= t(".wording") %>
+      </div>
+    </div>
+  </div>
+</nav>
