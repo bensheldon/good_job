@@ -66,7 +66,20 @@ RSpec.describe GoodJob::ProbeServer do
 
     context "with WEBrick" do
       context 'with the default healthcheck app' do
-        it 'starts a http server that binds to all interfaces and returns healthcheck responses' do
+        it 'starts a WEBrick http server' do
+          probe_server = described_class.new(port: port, handler: "webrick")
+          probe_server.start
+          wait_until(max: 1) { expect(probe_server).to be_running }
+
+          ip_address = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address).first
+          res = Net::HTTP.get_response(ip_address, "/", port)
+
+          expect(res["server"]).to match(/WEBrick/)
+
+          probe_server.stop
+        end
+
+        it 'server binds to all interfaces and returns healthcheck responses' do
           probe_server = described_class.new(port: port, handler: "webrick")
           probe_server.start
           wait_until(max: 1) { expect(probe_server).to be_running }

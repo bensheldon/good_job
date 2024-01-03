@@ -338,6 +338,13 @@ module GoodJob
         env['GOOD_JOB_PROBE_PORT']
     end
 
+    # Probe server handler
+    # @return [nil,String]
+    def probe_handler
+      options[:probe_handler] ||
+        env['GOOD_JOB_PROBE_HANDLER']
+    end
+
     # Rack compliant application to be run on the ProbeServer
     # @return [nil, Class]
     def probe_server_app

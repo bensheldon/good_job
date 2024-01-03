@@ -48,6 +48,26 @@ RSpec.describe GoodJob::CLI do
       end
     end
 
+    describe 'probe-handler' do
+      let(:probe_server) { instance_double GoodJob::ProbeServer, start: nil, stop: nil }
+
+      before do
+        allow(Kernel).to receive(:loop)
+        allow(GoodJob::ProbeServer).to receive(:new).and_return probe_server
+      end
+
+      context 'when a port and handler are specified' do
+        it 'starts a ProbeServer with the specified port and a "nil" app' do
+          cli = described_class.new([], { probe_port: 3838, probe_handler: "webrick" }, {})
+          cli.start
+
+          expect(GoodJob::ProbeServer).to have_received(:new).with(app: nil, port: 3838, handler: "webrick")
+          expect(probe_server).to have_received(:start)
+          expect(probe_server).to have_received(:stop)
+        end
+      end
+    end
+
     describe 'probe-port' do
       let(:probe_server) { instance_double GoodJob::ProbeServer, start: nil, stop: nil }
 
@@ -61,7 +81,7 @@ RSpec.describe GoodJob::CLI do
           cli = described_class.new([], { probe_port: 3838 }, {})
           cli.start
 
-          expect(GoodJob::ProbeServer).to have_received(:new).with(app: nil, port: 3838)
+          expect(GoodJob::ProbeServer).to have_received(:new).with(app: nil, port: 3838, handler: nil)
           expect(probe_server).to have_received(:start)
           expect(probe_server).to have_received(:stop)
         end
@@ -74,6 +94,7 @@ RSpec.describe GoodJob::CLI do
             GoodJob::Configuration,
             probe_server_app: app_mock,
             probe_port: 3838,
+            probe_handler: nil,
             options: {},
             daemonize?: false,
             shutdown_timeout: 100
@@ -82,7 +103,7 @@ RSpec.describe GoodJob::CLI do
           cli = described_class.new([], [], {})
           cli.start
 
-          expect(GoodJob::ProbeServer).to have_received(:new).with(app: app_mock, port: 3838)
+          expect(GoodJob::ProbeServer).to have_received(:new).with(app: app_mock, port: 3838, handler: nil)
           expect(probe_server).to have_received(:start)
           expect(probe_server).to have_received(:stop)
         end
