@@ -72,7 +72,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
 
       it "does not enqueue if enqueue concurrency limit is exceeded for a particular key" do
-        allow(Rails.logger.formatter).to receive(:call).and_call_original
+        allow(TestJob.logger.formatter).to receive(:call).and_call_original
 
         expect(TestJob.perform_later(name: "Alice")).to be_present
         expect(TestJob.perform_later(name: "Alice")).to be_present
@@ -86,10 +86,10 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(GoodJob::Execution.where(concurrency_key: "Alice").count).to eq 2
         expect(GoodJob::Execution.where(concurrency_key: "Bob").count).to eq 1
 
-        expect(Rails.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its limit of 2 jobs/)).exactly(:once)
+        expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its limit of 2 jobs/)).exactly(:once)
         if ActiveJob.gem_version >= Gem::Version.new("6.1.0")
-          expect(Rails.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
-          expect(Rails.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
+          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
+          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
         end
       end
 

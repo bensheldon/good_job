@@ -32,7 +32,6 @@ module GoodJob # :nodoc:
       # Increments number of dequeue attempts with no executions.
       # @return [Integer]
       def increment_empty_executions
-        @execution_at = Time.current
         @empty_executions.increment
       end
 

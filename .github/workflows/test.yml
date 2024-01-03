@@ -71,7 +71,7 @@ jobs:
         run: bin/rspec --require ./spec/support/pre_documentation_formatter.rb --format PreDocumentationFormatter
       # Archive
       - name: Archive system spec screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: screenshots
@@ -79,7 +79,7 @@ jobs:
             demo/tmp/screenshots
             demo/tmp/capybara
       - name: Archive Rails logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: rails_logs
@@ -137,6 +137,14 @@ jobs:
         uses: actions/checkout@v4
       - name: Update .ruby-version with matrix value
         run: echo "${{ matrix.ruby }}" >| .ruby-version
+      - name: Set Rubygems version
+        id: rubygems
+        run: |
+          if [[ "${{ matrix.ruby }}" == "2.6" || "${{ matrix.ruby }}" == "2.7" || "${{ matrix.ruby }}" == "jruby-9.3" ]]; then
+            echo "version=3.3.27" >> $GITHUB_OUTPUT
+          else
+            echo "version=latest" >> $GITHUB_OUTPUT
+          fi
       # Dependencies
       - name: Set up generic Ruby
         uses: ruby/setup-ruby@v1
@@ -149,7 +157,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          rubygems: latest
+          rubygems: ${{ steps.rubygems.outputs.version }}
       - name: Cache Appraisal gems
         uses: actions/cache@v3
         with:
@@ -183,7 +191,7 @@ jobs:
 
       # Archive
       - name: Archive system spec screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: screenshots
@@ -191,7 +199,7 @@ jobs:
             demo/tmp/screenshots
             demo/tmp/capybara
       - name: Archive Rails logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: rails_logs
