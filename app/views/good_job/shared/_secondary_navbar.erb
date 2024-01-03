@@ -1,0 +1,11 @@
+<nav class="navbar p-1 shadow-sm mt-auto border-bottom text-muted small" id="secondary-navbar" data-live-poll-region="secondary-navbar">
+  <div class="container-fluid">
+    <div class="flex-fill d-none d-sm-block ">
+      <%= t(".inspiration") %>
+    </div>
+    <div class="flex-fill text-end">
+      <% last_updated_at = Time.current.utc.iso8601 %>
+      <%= t(".last_updated") %>&nbsp;<time id="page-updated-at" datetime="<%= last_updated_at %>"><%== last_updated_at %></time>
+    </div>
+  </div>
+</nav>

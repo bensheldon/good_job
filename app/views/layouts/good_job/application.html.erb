@@ -1,44 +1,38 @@
 <!DOCTYPE html>
 <html lang="<%= I18n.locale %>" data-bs-theme="auto">
-<head>
-  <title>Good Job Dashboard</title>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
-
-  <%# Do not use asset tag helpers to avoid paths being overriden by config.asset_host %>
-  <%= tag.link rel: "stylesheet", href: frontend_static_path(:bootstrap, format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
-  <%= tag.link rel: "stylesheet", href: frontend_static_path(:style, format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
-
-  <%= tag.script "", src: frontend_static_path(:bootstrap, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
-  <%= tag.script "", src: frontend_static_path(:chartjs, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
-  <%= tag.script "", src: frontend_static_path(:rails_ujs, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
-
-  <%= tag.script "", src: frontend_static_path(:es_module_shims, format: :js, v: GoodJob::VERSION, locale: nil), async: true, nonce: content_security_policy_nonce %>
-  <% importmaps = GoodJob::FrontendsController.js_modules.keys.index_with { |module_name| frontend_module_path(module_name, format: :js, locale: nil, v: GoodJob::VERSION) } %>
-  <%= tag.script({ imports: importmaps }.to_json.html_safe, type: "importmap", nonce: content_security_policy_nonce) %>
-  <%= tag.script "", type: "module", nonce: content_security_policy_nonce do %> import "application"; <% end %>
-  <%= tag.script "", nonce: content_security_policy_nonce do %>
-    // Ensure theme is updated before dom loads to avoid flash of style
-    let theme = localStorage.getItem('good_job-theme');
-    if (!["light", "dark"].includes(theme)) {
+  <head>
+    <title>Good Job Dashboard</title>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%# Do not use asset tag helpers to avoid paths being overriden by config.asset_host %>
+    <%= tag.link rel: "stylesheet", href: frontend_static_path(:bootstrap, format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+    <%= tag.link rel: "stylesheet", href: frontend_static_path(:style, format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+    <%= tag.script "", src: frontend_static_path(:bootstrap, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+    <%= tag.script "", src: frontend_static_path(:chartjs, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+    <%= tag.script "", src: frontend_static_path(:rails_ujs, format: :js, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>
+    <%= tag.script "", src: frontend_static_path(:es_module_shims, format: :js, v: GoodJob::VERSION, locale: nil), async: true, nonce: content_security_policy_nonce %>
+    <% importmaps = GoodJob::FrontendsController.js_modules.keys.index_with { |module_name| frontend_module_path(module_name, format: :js, locale: nil, v: GoodJob::VERSION) } %>
+    <%= tag.script({ imports: importmaps }.to_json.html_safe, type: "importmap", nonce: content_security_policy_nonce) %>
+    <%= tag.script "", type: "module", nonce: content_security_policy_nonce do %> import "application"; <% end %>
+    <%= tag.script "", nonce: content_security_policy_nonce do %>
+      // Ensure theme is updated before dom loads to avoid flash of style
+      let theme = localStorage.getItem('good_job-theme');
+      if (!["light", "dark"].includes(theme)) {
       theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    }
-    document.documentElement.setAttribute('data-bs-theme', theme);
-  <% end %>
-</head>
-<body>
-  <div class="d-flex flex-column min-vh-100">
-    <%= render "good_job/shared/navbar" %>
-
-    <div class="container-fluid flex-grow-1 relative">
-      <%= render "good_job/shared/alert" %>
-
-      <%= yield %>
+      }
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    <% end %>
+  </head>
+  <body>
+    <div class="d-flex flex-column min-vh-100">
+      <%= render "good_job/shared/navbar" %>
+      <%= render "good_job/shared/secondary_navbar" %>
+      <div class="container-fluid flex-grow-1 relative">
+        <%= render "good_job/shared/alert" %>
+        <%= yield %>
+      </div>
     </div>
-
-    <%= render "good_job/shared/footer" %>
-  </div>
-</body>
+  </body>
 </html>
