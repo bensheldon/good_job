@@ -112,6 +112,7 @@ RSpec.describe GoodJob::ProbeServer do
 
         context "when WEBrick isn't in the load path" do
           it 'sends out a warning and falls back to the built in server' do
+            pp $LOAD_PATH.select { |p| p.include?('webrick') }
             webrick_path = $LOAD_PATH.find { |p| p.include?('webrick') }
             $LOAD_PATH.delete(webrick_path)
             allow(GoodJob.logger).to receive(:warn)
