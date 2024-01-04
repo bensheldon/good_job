@@ -109,6 +109,25 @@ RSpec.describe GoodJob::ProbeServer do
 
           probe_server.stop
         end
+
+        context "when WEBrick isn't in the load path" do
+          it 'sends out a warning and falls back to the built in server' do
+            allow_any_instance_of(described_class).to receive(:require).with("webrick").and_raise(LoadError)
+            allow(GoodJob.logger).to receive(:warn)
+
+            probe_server = described_class.new(port: port, handler: "webrick")
+            probe_server.start
+            wait_until(max: 1) { expect(probe_server).to be_running }
+
+            ip_address = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address).first
+            response = Net::HTTP.get(ip_address, "/", port)
+
+            expect(GoodJob.logger).to have_received(:warn).with(/WEBrick was requested/)
+            expect(response).to eq("OK")
+
+            probe_server.stop
+          end
+        end
       end
 
       context 'with a provided app' do
