@@ -7,7 +7,7 @@ RSpec.describe GoodJob::ProbeServer do
   let(:port) { 3434 }
 
   describe '#start' do
-    context "with default HTTP server" do
+    context "with default http server" do
       context 'with the default healthcheck app' do
         it 'starts a http server that binds to all interfaces and returns healthcheck responses' do
           probe_server = described_class.new(port: port)
@@ -72,9 +72,9 @@ RSpec.describe GoodJob::ProbeServer do
           wait_until(max: 1) { expect(probe_server).to be_running }
 
           ip_address = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address).first
-          res = Net::HTTP.get_response(ip_address, "/", port)
+          response = Net::HTTP.get_response(ip_address, "/", port)
 
-          expect(res["server"]).to match(/WEBrick/)
+          expect(response["server"]).to match(/WEBrick/)
 
           probe_server.stop
         end
@@ -108,6 +108,27 @@ RSpec.describe GoodJob::ProbeServer do
           end
 
           probe_server.stop
+        end
+
+        context "when WEBrick isn't in the load path" do
+          it 'sends out a warning and falls back to the built in server' do
+            webrick_path = $LOAD_PATH.find { |p| p.include?('webrick') }
+            $LOAD_PATH.delete(webrick_path)
+            allow(GoodJob.logger).to receive(:warn)
+
+            probe_server = described_class.new(port: port, handler: "webrick")
+            probe_server.start
+            wait_until(max: 1) { expect(probe_server).to be_running }
+
+            ip_address = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address).first
+            response = Net::HTTP.get(ip_address, "/", port)
+
+            expect(GoodJob.logger).to have_received(:warn).with(/WEBrick was requested/)
+            expect(response).to eq("OK")
+
+            probe_server.stop
+            $LOAD_PATH.unshift(webrick_path)
+          end
         end
       end
 

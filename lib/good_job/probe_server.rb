@@ -38,8 +38,13 @@ module GoodJob
 
     def build_handler(port:, handler:, app:)
       if handler == 'webrick'
-        require 'webrick'
-        WebrickHandler.new(app, port: port, logger: GoodJob.logger)
+        begin
+          require 'webrick'
+          WebrickHandler.new(app, port: port, logger: GoodJob.logger)
+        rescue LoadError
+          GoodJob.logger.warn("WEBrick was requested as the probe server handler, but it's not in the load path. GoodJob doesn't keep WEBrick as a dependency, so you'll have to make sure its added to your Gemfile to make use of it. GoodJob will fallback to its own webserver in the meantime.")
+          HttpServerHandler.new(app, port: port, logger: GoodJob.logger)
+        end
       else
         HttpServerHandler.new(app, port: port, logger: GoodJob.logger)
       end
