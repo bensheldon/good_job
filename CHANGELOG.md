@@ -1,5 +1,37 @@
 # Changelog
 
+## [v3.22.0](https://github.com/bensheldon/good_job/tree/v3.22.0) (2024-01-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.5...v3.22.0)
+
+**Implemented enhancements:**
+
+- Add "updated at" info in secondary top navbar [\#1204](https://github.com/bensheldon/good_job/pull/1204) ([sparshalc](https://github.com/sparshalc))
+- Re-add footer with GoodJob version number [\#1201](https://github.com/bensheldon/good_job/pull/1201) ([Pauloparakleto](https://github.com/Pauloparakleto))
+- Add Active Job extension for Labels [\#1188](https://github.com/bensheldon/good_job/pull/1188) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Limiting by executed jobs count by period [\#1198](https://github.com/bensheldon/good_job/issues/1198)
+- Cron jobs processing in async mode [\#1196](https://github.com/bensheldon/good_job/issues/1196)
+- Dashboard Missing Translation? [\#1192](https://github.com/bensheldon/good_job/issues/1192)
+- Show last update on top nav bar [\#1183](https://github.com/bensheldon/good_job/issues/1183)
+- Wrong quoting of the query to spot new jobs? [\#1179](https://github.com/bensheldon/good_job/issues/1179)
+- \[Possible bug\] good\_job does not honour the wait parameter on retry\_on [\#1174](https://github.com/bensheldon/good_job/issues/1174)
+- Running GoodJob in production with systemd throws an error due to a wrong communication with WatchDog [\#1172](https://github.com/bensheldon/good_job/issues/1172)
+
+**Merged pull requests:**
+
+- Bump the bundler-dependencies group with 3 updates [\#1202](https://github.com/bensheldon/good_job/pull/1202) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Remove duplicated intro sentence in README [\#1195](https://github.com/bensheldon/good_job/pull/1195) ([benoittgt](https://github.com/benoittgt))
+- Fix namespace for `InterruptError` in README [\#1193](https://github.com/bensheldon/good_job/pull/1193) ([padde](https://github.com/padde))
+- Bump github/codeql-action from 2 to 3 [\#1191](https://github.com/bensheldon/good_job/pull/1191) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/upload-artifact from 3 to 4 [\#1190](https://github.com/bensheldon/good_job/pull/1190) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Lock RubyGems version for Ruby \< 3.0 in CI [\#1189](https://github.com/bensheldon/good_job/pull/1189) ([bensheldon](https://github.com/bensheldon))
+- Active Record and Active Job name formatting [\#1182](https://github.com/bensheldon/good_job/pull/1182) ([andyatkinson](https://github.com/andyatkinson))
+- Remove redundant `good_jobs.active_job_id` index [\#1181](https://github.com/bensheldon/good_job/pull/1181) ([andyatkinson](https://github.com/andyatkinson))
+- Add missing word in readme [\#1177](https://github.com/bensheldon/good_job/pull/1177) ([Earlopain](https://github.com/Earlopain))
+
 ## [v3.21.5](https://github.com/bensheldon/good_job/tree/v3.21.5) (2023-12-12)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.4...v3.21.5)

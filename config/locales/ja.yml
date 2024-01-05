@@ -219,9 +219,6 @@ ja:
         placeholder: クラス名、ジョブID、ジョブパラメータ、エラーテキストで検索
         queue_name: キュー名
         search: 検索
-      footer:
-        last_update_html: 最終更新 <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: Remember, you're doing a Good Job too!
       navbar:
         batches: バッチ
         cron_schedules: Cron
@@ -234,6 +231,9 @@ ja:
           dark: 暗い
           light: ライト
           theme: テーマ
+      secondary_navbar:
+        inspiration: 覚えておいてください、あなたも良い仕事をしています！
+        last_updated: 最終更新
     status:
       discarded: 破棄済み
       queued: 処理待ち

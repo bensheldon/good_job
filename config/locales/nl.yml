@@ -219,9 +219,6 @@ nl:
         placeholder: Zoek op klasse, taak-ID, taakparameters en fouttekst.
         queue_name: Wachtrij naam
         search: Zoekopdracht
-      footer:
-        last_update_html: Laatst bijgewerkt <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: 'Onthoud: jij levert ook goed werk!'
       navbar:
         batches: Batches
         cron_schedules: Cron
@@ -234,6 +231,9 @@ nl:
           dark: Donker
           light: Licht
           theme: Thema
+      secondary_navbar:
+        inspiration: 'Onthoud: jij levert ook goed werk!'
+        last_updated: Laatst bijgewerkt
     status:
       discarded: weggegooid
       queued: In de wachtrij

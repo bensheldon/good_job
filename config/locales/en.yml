@@ -219,9 +219,6 @@ en:
         placeholder: Search by class, job id, job params, and error text.
         queue_name: Queue name
         search: Search
-      footer:
-        last_update_html: Last updated <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: Remember, you're doing a Good Job too!
       navbar:
         batches: Batches
         cron_schedules: Cron
@@ -234,6 +231,9 @@ en:
           dark: Dark
           light: Light
           theme: Theme
+      secondary_navbar:
+        inspiration: Remember, you're doing a Good Job too!
+        last_updated: Last updated
     status:
       discarded: Discarded
       queued: Queued

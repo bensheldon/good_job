@@ -217,9 +217,6 @@ es:
         placeholder: Buscar por clase, id de tarea, parámetros y mensaje de error.
         queue_name: Nombre de la cola
         search: Buscar
-      footer:
-        last_update_html: Última actualización <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: "¡Recuerda, también tú estás haciendo un buen trabajo!"
       navbar:
         batches: Batches
         cron_schedules: Cron
@@ -232,6 +229,9 @@ es:
           dark: Oscuro
           light: Luz
           theme: Tema
+      secondary_navbar:
+        inspiration: "¡Recuerda, también tú estás haciendo un buen trabajo!"
+        last_updated: Última actualización
     status:
       discarded:
         one: Descartada

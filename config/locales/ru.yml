@@ -245,9 +245,6 @@ ru:
         placeholder: Поиск по классу, идентификатору задания, параметрам задания и тексту ошибки.
         queue_name: Имя очереди
         search: Поиск
-      footer:
-        last_update_html: Последнее обновление <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: Запомни, ты делаешь Good Job тоже!
       navbar:
         batches: Batches
         cron_schedules: Cron
@@ -260,6 +257,9 @@ ru:
           dark: Темный
           light: Свет
           theme: Тема
+      secondary_navbar:
+        inspiration: Запомни, ты делаешь Good Job тоже!
+        last_updated: Последнее обновление
     status:
       discarded: Отброшено
       queued: В очереди
