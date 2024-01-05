@@ -352,6 +352,7 @@ module GoodJob
     # @return [nil,String]
     def probe_handler
       options[:probe_handler] ||
+        rails_config[:probe_handler] ||
         env['GOOD_JOB_PROBE_HANDLER']
     end
 
