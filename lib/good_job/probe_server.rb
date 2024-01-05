@@ -8,7 +8,8 @@ module GoodJob
       GoodJob._on_thread_error(thread_error) if thread_error
     end
 
-    def initialize(port:, handler: nil, app: default_probe_server)
+    def initialize(port:, handler: nil, app: nil)
+      app ||= default_probe_server
       @handler = build_handler(port: port, handler: handler, app: app)
     end
 

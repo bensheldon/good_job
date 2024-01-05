@@ -10,7 +10,7 @@ RSpec.describe GoodJob::ProbeServer do
     context "with default http server" do
       context 'with the default healthcheck app' do
         it 'starts a http server that binds to all interfaces and returns healthcheck responses' do
-          probe_server = described_class.new(port: port)
+          probe_server = described_class.new(port: port, app: nil)
           probe_server.start
           wait_until(max: 1) { expect(probe_server).to be_running }
 
