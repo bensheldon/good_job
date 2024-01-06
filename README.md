@@ -1399,20 +1399,15 @@ To customize the probe server, set `config.good_job.probe_app` to a Rack app or 
 
 Rails.application.configure do
   config.good_job.probe_app = Rack::Builder.new do
+    # Add your custom middleware
+    use Custom::AuthorizationMiddleware
+    use Custom::PrometheusExporter
+
+    # This are the default middleware
     use GoodJob::ProbeServer::HealthcheckMiddleware
-    run ->(env) do
-      case Rack::Request.new(env).path
-      when '/howdy'
-        [200, {}, ['howdy']]
-      when '/test'
-        [200, {}, ['test']]
-      else
-        [404, {}, ['Not Found']]
-      end
-    end
+    run GoodJob::ProbeServer::NotFoundApp # will return 404 for all other requests
   end
 end
-
 ```
 
 ##### Using WEBrick
@@ -1423,7 +1418,7 @@ If your custom app requires a fully Rack compliant server, you can configure Goo
 # config/initializers/good_job.rb OR config/application.rb OR config/environments/{RAILS_ENV}.rb
 
 Rails.application.configure do
-  config.good_job.probe_handler = 'webrick'
+  config.good_job.probe_handler = :webrick
 end
 
 ```
