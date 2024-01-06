@@ -73,7 +73,7 @@ RSpec.describe GoodJob::CLI do
           cli = described_class.new([], { probe_port: 3838, probe_handler: "webrick" }, {})
           cli.start
 
-          expect(GoodJob::ProbeServer).to have_received(:new).with(app: nil, port: 3838, handler: "webrick")
+          expect(GoodJob::ProbeServer).to have_received(:new).with(app: nil, port: 3838, handler: :webrick)
           expect(probe_server).to have_received(:start)
           expect(probe_server).to have_received(:stop)
         end
@@ -104,7 +104,7 @@ RSpec.describe GoodJob::CLI do
           app_mock = instance_double(Proc, call: nil)
           configuration_mock = instance_double(
             GoodJob::Configuration,
-            probe_server_app: app_mock,
+            probe_app: app_mock,
             probe_port: 3838,
             probe_handler: nil,
             options: {},

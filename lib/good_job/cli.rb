@@ -115,7 +115,7 @@ module GoodJob
       systemd.start
 
       if configuration.probe_port
-        probe_server = GoodJob::ProbeServer.new(app: configuration.probe_server_app, port: configuration.probe_port, handler: configuration.probe_handler)
+        probe_server = GoodJob::ProbeServer.new(app: configuration.probe_app, port: configuration.probe_port, handler: configuration.probe_handler)
         probe_server.start
       end
 

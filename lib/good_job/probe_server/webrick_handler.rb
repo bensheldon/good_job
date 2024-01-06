@@ -7,7 +7,7 @@ module GoodJob
         @app    = app
         @port   = options[:port]
         @logger = options[:logger]
-        @handler = Rack::Handler.get('webrick')
+        @handler = ::Rack::Handler.get('webrick')
       end
 
       def stop

@@ -8,8 +8,15 @@ module GoodJob
       GoodJob._on_thread_error(thread_error) if thread_error
     end
 
+    def self.default_app
+      ::Rack::Builder.new do
+        use GoodJob::ProbeServer::HealthcheckMiddleware
+        run GoodJob::ProbeServer::NotFoundApp
+      end
+    end
+
     def initialize(port:, handler: nil, app: nil)
-      app ||= default_probe_server
+      app ||= self.class.default_app
       @handler = build_handler(port: port, handler: handler, app: app)
     end
 
@@ -28,26 +35,17 @@ module GoodJob
       @future&.value # wait for Future to exit
     end
 
-    private
-
-    def default_probe_server
-      Rack::Builder.new do
-        use Middleware::Healthcheck
-        run Middleware::Catchall.new
-      end
-    end
-
     def build_handler(port:, handler:, app:)
-      if handler == 'webrick'
+      if handler == :webrick
         begin
           require 'webrick'
           WebrickHandler.new(app, port: port, logger: GoodJob.logger)
         rescue LoadError
           GoodJob.logger.warn("WEBrick was requested as the probe server handler, but it's not in the load path. GoodJob doesn't keep WEBrick as a dependency, so you'll have to make sure its added to your Gemfile to make use of it. GoodJob will fallback to its own webserver in the meantime.")
-          HttpServerHandler.new(app, port: port, logger: GoodJob.logger)
+          SimpleHandler.new(app, port: port, logger: GoodJob.logger)
         end
       else
-        HttpServerHandler.new(app, port: port, logger: GoodJob.logger)
+        SimpleHandler.new(app, port: port, logger: GoodJob.logger)
       end
     end
   end

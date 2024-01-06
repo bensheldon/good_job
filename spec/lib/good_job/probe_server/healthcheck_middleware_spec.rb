@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'net/http'
 
-RSpec.describe GoodJob::ProbeServer::Middleware::Healthcheck do
+RSpec.describe GoodJob::ProbeServer::HealthcheckMiddleware do
   let(:app) { instance_double(Proc, call: nil) }
   let(:healthcheck_middleware) { described_class.new(app) }
   let(:port) { 3434 }

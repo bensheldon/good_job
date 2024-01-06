@@ -304,7 +304,7 @@ Available configuration options are:
 - `probe_server_app` (Rack application) allows you to specify a Rack application to be used for the probe server. Defaults to `nil` which uses the default probe server. Example:
 
     ```ruby
-    config.good_job.probe_server_app = -> (env) { [200, {}, ["OK"]] }
+    config.good_job.probe_app = -> (env) { [200, {}, ["OK"]] }
     ```
 
 - `probe_handler` (string) allows you to use WEBrick, a fully Rack compliant webserver instead of the simple default server. **Note:** You'll need to ensure WEBrick is in your load path as GoodJob doesn't have WEBrick as a dependency. Example:
@@ -1387,20 +1387,19 @@ spec:
 
 #### Custom configuration
 
-The CLI health check probe server can be customized to serve a different application. Two things to note when customizing the probe server:
+The CLI health check probe server can be customized to serve additional information. Two things to note when customizing the probe server:
 
-1. By default, the probe server uses a homespun single thread, blocking server so your custom app should be very simple and lightly used.
-1. The default probe server is not fully Rack compliant. Rack specifies various mandatory fields and some Rack apps assume those fields exist. If you do need to use a Rack app that depends on being fully Rack compliant, you can configure GoodJob to [use WEBrick as the server](#using-webrick)
+- By default, the probe server uses a homespun single thread, blocking server so your custom app should be very simple and lightly used and could affect job performance.
+- The default probe server is not fully Rack compliant. Rack specifies various mandatory fields and some Rack apps assume those fields exist. If you do need to use a Rack app that depends on being fully Rack compliant, you can configure GoodJob to [use WEBrick as the server](#using-webrick)
 
-To customize the probe server, set `config.good_job.probe_server_app` to a Rack app or a Rack builder:
+To customize the probe server, set `config.good_job.probe_app` to a Rack app or a Rack builder:
 
 ```ruby
 # config/initializers/good_job.rb OR config/application.rb OR config/environments/{RAILS_ENV}.rb
 
 Rails.application.configure do
-  config.good_job.probe_server_app = Rack::Builder.new do
-    # The default healthcheck app is available at GoodJob::ProbeServer::Middleware::Healthcheck
-    use GoodJob::ProbeServer::Middleware::Healthcheck
+  config.good_job.probe_app = Rack::Builder.new do
+    use GoodJob::ProbeServer::HealthcheckMiddleware
     run ->(env) do
       case Rack::Request.new(env).path
       when '/howdy'
@@ -1445,7 +1444,6 @@ Note that GoodJob doesn't include WEBrick as a dependency, so you'll need to add
 
 ```ruby
 # Gemfile
-
 gem 'webrick'
 ```
 

@@ -2,7 +2,7 @@
 
 module GoodJob
   class ProbeServer
-    class HttpServerHandler
+    class SimpleHandler
       SOCKET_READ_TIMEOUT = 5 # in seconds
 
       def initialize(app, options = {})

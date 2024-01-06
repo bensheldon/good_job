@@ -6,6 +6,29 @@ require 'net/http'
 RSpec.describe GoodJob::ProbeServer do
   let(:port) { 3434 }
 
+  describe 'default rack app' do
+    include Rack::Test::Methods
+    let(:app) { described_class.default_app }
+
+    it "responds to the expected routes" do
+      get "/"
+      expect(last_response.status).to eq 200
+      expect(last_response.body).to eq("OK")
+
+      get "/status"
+      expect(last_response.body).to eq("OK")
+
+      get "/status/started"
+      expect(last_response.body).to eq("Not started")
+
+      get "/status/connected"
+      expect(last_response.body).to eq("Not connected")
+
+      get "/unimplemented_url"
+      expect(last_response.status).to eq 404
+    end
+  end
+
   describe '#start' do
     context "with default http server" do
       context 'with the default healthcheck app' do
@@ -67,7 +90,7 @@ RSpec.describe GoodJob::ProbeServer do
     context "with WEBrick" do
       context 'with the default healthcheck app' do
         it 'starts a WEBrick http server' do
-          probe_server = described_class.new(port: port, handler: "webrick")
+          probe_server = described_class.new(port: port, handler: :webrick)
           probe_server.start
           wait_until(max: 1) { expect(probe_server).to be_running }
 
@@ -80,7 +103,7 @@ RSpec.describe GoodJob::ProbeServer do
         end
 
         it 'server binds to all interfaces and returns healthcheck responses' do
-          probe_server = described_class.new(port: port, handler: "webrick")
+          probe_server = described_class.new(port: port, handler: :webrick)
           probe_server.start
           wait_until(max: 1) { expect(probe_server).to be_running }
 
@@ -115,7 +138,7 @@ RSpec.describe GoodJob::ProbeServer do
             allow_any_instance_of(described_class).to receive(:require).with("webrick").and_raise(LoadError)
             allow(GoodJob.logger).to receive(:warn)
 
-            probe_server = described_class.new(port: port, handler: "webrick")
+            probe_server = described_class.new(port: port, handler: :webrick)
             probe_server.start
             wait_until(max: 1) { expect(probe_server).to be_running }
 
