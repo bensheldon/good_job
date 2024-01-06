@@ -1403,7 +1403,7 @@ Rails.application.configure do
     use Custom::AuthorizationMiddleware
     use Custom::PrometheusExporter
 
-    # This are the default middleware
+    # This is the default middleware
     use GoodJob::ProbeServer::HealthcheckMiddleware
     run GoodJob::ProbeServer::NotFoundApp # will return 404 for all other requests
   end
