@@ -6,9 +6,6 @@
     <div class="flex-fill text-end">
       <% last_updated_at = Time.current.utc.iso8601 %>
       <%= t(".last_updated") %>&nbsp;<time id="page-updated-at" datetime="<%= last_updated_at %>"><%== last_updated_at %></time>
-      <h6>
-        <span class="badge bg-<%= Rails.env.production? ? 'danger' : 'primary' %> rounded-pill"><%= Rails.env.capitalize %></span>
-      </h6>
     </div>
   </div>
 </nav>
