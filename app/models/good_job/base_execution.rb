@@ -97,9 +97,9 @@ module GoodJob
     def active_job(ignore_deserialization_errors: false)
       ActiveJob::Base.deserialize(active_job_data).tap do |aj|
         aj.send(:deserialize_arguments_if_needed)
-      rescue ActiveJob::DeserializationError
-        raise unless ignore_deserialization_errors
       end
+    rescue ActiveJob::DeserializationError, NameError
+      raise unless ignore_deserialization_errors
     end
 
     private
