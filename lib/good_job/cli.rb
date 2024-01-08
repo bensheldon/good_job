@@ -68,7 +68,7 @@ module GoodJob
     method_option :poll_interval,
                   type: :numeric,
                   banner: 'SECONDS',
-                  desc: "Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 5)"
+                  desc: "Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 10)"
     method_option :max_cache,
                   type: :numeric,
                   banner: 'COUNT',
