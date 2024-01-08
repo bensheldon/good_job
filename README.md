@@ -179,7 +179,7 @@ Usage:
 Options:
   [--queues=QUEUE_LIST]        # Queues or pools to work from. (env var: GOOD_JOB_QUEUES, default: *)
   [--max-threads=COUNT]        # Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
-  [--poll-interval=SECONDS]    # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 1)
+  [--poll-interval=SECONDS]    # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 10)
   [--max-cache=COUNT]          # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
   [--shutdown-timeout=SECONDS] # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
   [--enable-cron]              # Whether to run cron process (default: false)
