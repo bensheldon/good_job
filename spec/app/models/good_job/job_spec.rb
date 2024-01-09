@@ -327,7 +327,7 @@ RSpec.describe GoodJob::Job do
 
     context 'when job class does not exist' do
       before do
-        job.update!(serialized_params: { 'job_class' => 'NonExistentJob' })
+        job.update!(serialized_params: { 'job_class' => 'NonexistentJob' })
       end
 
       it 'ignores the error and discards the job' do
