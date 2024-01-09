@@ -92,7 +92,7 @@ module GoodJob
     # Build an ActiveJob instance and deserialize the arguments, using `#active_job_data`.
     #
     # @param ignore_deserialization_errors [Boolean]
-    #   Whether to ignore ActiveJob::DeserializationError when deserializing the arguments.
+    #   Whether to ignore ActiveJob::DeserializationError and NameError when deserializing the arguments.
     #   This is most useful if you aren't planning to use the arguments directly.
     def active_job(ignore_deserialization_errors: false)
       ActiveJob::Base.deserialize(active_job_data).tap do |aj|
