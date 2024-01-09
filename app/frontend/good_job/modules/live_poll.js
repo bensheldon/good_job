@@ -3,6 +3,23 @@ import renderCharts from "charts";
 
 const MINIMUM_POLL_INTERVAL = 1;
 const STORAGE_KEY = "live_poll";
+const input_box = document.getElementById('query');
+
+input_box.addEventListener('keyup', () => {
+  closePolling(input_box.value);
+})
+
+function closePolling(value) {
+  const checkbox = document.querySelector('input[name="live_poll"]');
+  const livePollInstance = new LivePoll();
+
+  checkbox.checked = false;
+  if(value > 0){
+    livePollInstance.togglePolling();
+  }else{
+    this.togglePolling()
+  }
+}
 
 function getStorage(key) {
   const value = localStorage.getItem('good_job-' + key);
