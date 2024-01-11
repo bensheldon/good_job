@@ -68,13 +68,13 @@ ko:
         half_a_minute: 약 반 분
         less_than_x_minutes:
           one: 1분 미만
-          other: %{count}분 미만
+          other: "%{count}분 미만"
         less_than_x_seconds:
           one: 1초 미만
-          other: %{count}초 미만
+          other: "%{count}초 미만"
         over_x_years:
           one: 1년 이상
-          other: %{count}년 이상
+          other: "%{count}년 이상"
         x_days:
           one: 1일
           other: "%{count}일"
@@ -105,8 +105,8 @@ ko:
       unhandled: 처리되지 않음
     helpers:
       relative_time:
-        future: %{time} 후
-        past: %{time} 전
+        future: "%{time} 후"
+        past: "%{time} 전"
     jobs:
       actions:
         confirm_destroy: 해당 작업을 삭제하시겠습니까?
