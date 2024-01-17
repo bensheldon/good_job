@@ -219,6 +219,8 @@ GEM
       reline (>= 0.3.8)
     jar-dependencies (0.4.1)
     jdbc-postgres (42.6.0)
+    job-iteration (1.4.1)
+      activejob (>= 5.2)
     json (2.6.3)
     json (2.6.3-java)
     kramdown (2.4.0)
@@ -514,6 +516,7 @@ DEPENDENCIES
   github_changelog_generator
   good_job!
   i18n-tasks
+  job-iteration
   kramdown
   kramdown-parser-gfm
   matrix

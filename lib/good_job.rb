@@ -38,6 +38,8 @@ require "good_job/scheduler"
 require "good_job/shared_executor"
 require "good_job/systemd_service"
 
+require "job_iteration/integrations/good_job"
+
 # GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 #
 # +GoodJob+ is the top-level namespace and exposes configuration attributes.
