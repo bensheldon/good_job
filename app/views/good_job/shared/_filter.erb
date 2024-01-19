@@ -1,4 +1,4 @@
-<div data-live-poll-region id="filter" class="">
+<div id="filter">
   <div class="">
     <div class="border-bottom mb-3">
       <h2 class="pt-3 pb-2"><%= title %></h2>
@@ -47,7 +47,7 @@
       </div>
     <% end %>
 
-    <ul class="nav nav-tabs my-3">
+    <ul data-live-poll-region="filter-tabs" class="nav nav-tabs my-3">
       <li class="nav-item">
         <%= link_to t(".all"), filter.to_params(state: nil), class: "nav-link #{"active" unless params[:state].present?}" %>
       </li>
