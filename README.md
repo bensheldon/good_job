@@ -280,6 +280,10 @@ Available configuration options are:
 - `queues` (string) sets queues or pools to execute jobs. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
 - `max_threads` (integer) sets the default number of threads per pool to use for working jobs. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`. A poll interval of `-1` disables polling completely.
+    - production default: 10 seconds (in case of a LISTEN/NOTIFY blip)
+    - development default: -1, disabled (because the application is likely being restarted often and won't be running unobserved). You can enable it by setting a `poll_interval`.
+    - LISTEN/NOTIFY is enabled in both production and development, so polling is not strictly necessary.
+    - If LISTEN/NOTIFY is disabled, you should configure polling for future-scheduled jobs. GoodJob will cache in memory the scheduled time and check for executable jobs at that time. If the cache is exceeded (10k scheduled jobs by default) that's another reason to poll just in case.
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
 - `shutdown_timeout` (integer) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 - `enable_cron` (boolean) whether to run cron process. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_CRON`.
