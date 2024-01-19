@@ -77,6 +77,13 @@ module GoodJob
         migration_pending_warning!
         false
       end
+
+      def candidate_lookup_index_migrated?
+        return true if connection.index_name_exists?(:good_jobs, :index_good_job_jobs_for_candidate_lookup)
+
+        migration_pending_warning!
+        false
+      end
     end
 
     # The ActiveJob job class, as a string

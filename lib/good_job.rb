@@ -273,7 +273,7 @@ module GoodJob
   def self.migrated?
     # Always update with the most recent migration check
     GoodJob::Execution.reset_column_information
-    GoodJob::Execution.active_job_id_index_removal_migrated?
+    GoodJob::Execution.candidate_lookup_index_migrated?
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)
