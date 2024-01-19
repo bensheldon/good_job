@@ -37,6 +37,10 @@ export default class LivePoll {
       this.togglePolling();
     });
 
+    document.querySelector("input#query").addEventListener('click', () => {
+      this.pause();
+    });
+
     this.togglePolling();
   }
 
@@ -55,6 +59,15 @@ export default class LivePoll {
       this.interval = setInterval(LivePoll.refreshPage, pollIntervalMilliseconds);
     } else {
       removeStorage(STORAGE_KEY);
+    }
+  }
+
+  pause = () => {
+    const checkbox = document.querySelector('input[name="live_poll"]');
+    if (checkbox.checked) {
+      checkbox.checked = false;
+      clearInterval(this.interval);
+      this.interval = null;
     }
   }
 
