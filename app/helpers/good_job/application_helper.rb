@@ -53,10 +53,11 @@ module GoodJob
       content_tag :span, icon, **options
     end
 
-    def render_icon(name)
+    def render_icon(name, **options)
       # workaround to render svg icons without all of the log messages
       partial = lookup_context.find_template("good_job/shared/icons/#{name}", [], true)
-      partial.render(self, {})
+      options[:class] = Array(options[:class]).join(" ")
+      partial.render(self, { class: options[:class] })
     end
 
     def translate_hash(key, **options)

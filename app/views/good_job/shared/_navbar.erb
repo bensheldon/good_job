@@ -1,7 +1,15 @@
 <nav class="navbar navbar-expand-lg border-bottom bg-body sticky-top">
   <div class="container-fluid">
     <%= link_to t(".name"), root_path, class: "navbar-brand mb-0 h1" %>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+
+    <div class="d-lg-none d-flex flex-fill justify-content-end me-2">
+      <span class="navbar-text">
+        <%= render_icon "globe", class: "align-text-bottom" %>
+        <small><%= Rails.env.capitalize %></small>
+      </span>
+    </div>
+
+    <button class="navbar-toggler position-relative" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -37,12 +45,12 @@
         </li>
       </ul>
 
-      <hr class="d-lg-none text-secondary">
-
       <ul class="navbar-nav">
-        <li class="nav-item d-flex align-items-center">
-          <%= render_icon "environment" %>
-          <label class="nav-link nav-text fw-bold"><%= Rails.env.capitalize.first(3) %></label>
+        <li class="nav-item d-none d-lg-flex align-items-center">
+          <span class="navbar-text">
+            <%= render_icon "globe", class: "align-text-bottom" %>
+            <small><%= Rails.env.capitalize %></small>
+          </span>
         </li>
 
         <li class="nav-item py-2 py-lg-1 col-12 col-lg-auto">
