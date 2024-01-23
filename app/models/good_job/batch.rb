@@ -101,7 +101,7 @@ module GoodJob
 
       active_jobs = add(active_jobs, &block)
 
-      Rails.application.reloader.wrap do
+      Rails.application.executor.wrap do
         record.with_advisory_lock(function: "pg_advisory_lock") do
           record.update!(enqueued_at: Time.current)
 
