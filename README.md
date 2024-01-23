@@ -177,18 +177,19 @@ Usage:
   good_job start
 
 Options:
-  [--queues=QUEUE_LIST]        # Queues or pools to work from. (env var: GOOD_JOB_QUEUES, default: *)
-  [--max-threads=COUNT]        # Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
-  [--poll-interval=SECONDS]    # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 10)
-  [--max-cache=COUNT]          # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
-  [--shutdown-timeout=SECONDS] # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
-  [--enable-cron]              # Whether to run cron process (default: false)
-  [--enable-listen-notify]     # Whether to enqueue and read jobs with Postgres LISTEN/NOTIFY (default: true)
-  [--idle-timeout=SECONDS]     # Exit process when no jobs have been performed for this many seconds (env var: GOOD_JOB_IDLE_TIMEOUT, default: nil)
-  [--daemonize]                # Run as a background daemon (default: false)
-  [--pidfile=PIDFILE]          # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
-  [--probe-port=PORT]          # Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)
-  [--queue-select-limit=COUNT] # The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
+  [--queues=QUEUE_LIST]           # Queues or pools to work from. (env var: GOOD_JOB_QUEUES, default: *)
+  [--max-threads=COUNT]           # Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
+  [--poll-interval=SECONDS]       # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 10)
+  [--max-cache=COUNT]             # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
+  [--shutdown-timeout=SECONDS]    # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
+  [--enable-cron]                 # Whether to run cron process (default: false)
+  [--enable-listen-notify]        # Whether to enqueue and read jobs with Postgres LISTEN/NOTIFY (default: true)
+  [--idle-timeout=SECONDS]        # Exit process when no jobs have been performed for this many seconds (env var: GOOD_JOB_IDLE_TIMEOUT, default: nil)
+  [--daemonize]                   # Run as a background daemon (default: false)
+  [--pidfile=PIDFILE]             # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
+  [--probe-port=PORT]             # Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)
+  [--probe-handler=PROBE_HANDLER] # Use 'webrick' to use WEBrick to handle probe server requests which is Rack compliant, otherwise default server that is not Rack compliant is used.
+  [--queue-select-limit=COUNT]    # The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
 
 Executes queued jobs.
 
@@ -302,6 +303,18 @@ Available configuration options are:
 
     ```ruby
     config.good_job.on_thread_error = -> (exception) { Rails.error.report(exception) }
+    ```
+
+- `probe_server_app` (Rack application) allows you to specify a Rack application to be used for the probe server. Defaults to `nil` which uses the default probe server. Example:
+
+    ```ruby
+    config.good_job.probe_app = -> (env) { [200, {}, ["OK"]] }
+    ```
+
+- `probe_handler` (string) allows you to use WEBrick, a fully Rack compliant webserver instead of the simple default server. **Note:** You'll need to ensure WEBrick is in your load path as GoodJob doesn't have WEBrick as a dependency. Example:
+
+    ```ruby
+    config.good_job.probe_handler = 'webrick'
     ```
 
 By default, GoodJob configures the following execution modes per environment:
@@ -1321,6 +1334,8 @@ A workaround to this limitation is to make a direct database connection availabl
 
 ### CLI HTTP health check probes
 
+#### Default configuration
+
 GoodJob's CLI offers an http health check probe to better manage process lifecycle in containerized environments like Kubernetes:
 
 ```bash
@@ -1373,6 +1388,65 @@ spec:
         failureThreshold: 1
         periodSeconds: 10
 ```
+
+#### Custom configuration
+
+The CLI health check probe server can be customized to serve additional information. Two things to note when customizing the probe server:
+
+- By default, the probe server uses a homespun single thread, blocking server so your custom app should be very simple and lightly used and could affect job performance.
+- The default probe server is not fully Rack compliant. Rack specifies various mandatory fields and some Rack apps assume those fields exist. If you do need to use a Rack app that depends on being fully Rack compliant, you can configure GoodJob to [use WEBrick as the server](#using-webrick)
+
+To customize the probe server, set `config.good_job.probe_app` to a Rack app or a Rack builder:
+
+```ruby
+# config/initializers/good_job.rb OR config/application.rb OR config/environments/{RAILS_ENV}.rb
+
+Rails.application.configure do
+  config.good_job.probe_app = Rack::Builder.new do
+    # Add your custom middleware
+    use Custom::AuthorizationMiddleware
+    use Custom::PrometheusExporter
+
+    # This is the default middleware
+    use GoodJob::ProbeServer::HealthcheckMiddleware
+    run GoodJob::ProbeServer::NotFoundApp # will return 404 for all other requests
+  end
+end
+```
+
+##### Using WEBrick
+
+If your custom app requires a fully Rack compliant server, you can configure GoodJob to use WEBrick as the server:
+
+```ruby
+# config/initializers/good_job.rb OR config/application.rb OR config/environments/{RAILS_ENV}.rb
+
+Rails.application.configure do
+  config.good_job.probe_handler = :webrick
+end
+
+```
+
+You can also enable WEBrick through the command line:
+
+```bash
+good_job start --probe-handler=webrick
+```
+
+or via an environment variable:
+
+```bash
+GOOD_JOB_PROBE_HANDLER=webrick good_job start
+```
+
+Note that GoodJob doesn't include WEBrick as a dependency, so you'll need to add it to your Gemfile:
+
+```ruby
+# Gemfile
+gem 'webrick'
+```
+
+If WEBrick is configured to be used, but the dependency is not found, GoodJob will log a warning and fallback to the default probe server.
 
 ## Contribute
 

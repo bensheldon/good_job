@@ -94,6 +94,9 @@ module GoodJob
                   type: :numeric,
                   banner: 'PORT',
                   desc: "Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)"
+    method_option :probe_handler,
+                  type: :string,
+                  desc: "Use 'webrick' to use WEBrick to handle probe server requests which is Rack compliant, otherwise default server that is not Rack compliant is used. (env var: GOOD_JOB_PROBE_HANDLER, default: nil)"
     method_option :queue_select_limit,
                   type: :numeric,
                   banner: 'COUNT',
@@ -112,7 +115,7 @@ module GoodJob
       systemd.start
 
       if configuration.probe_port
-        probe_server = GoodJob::ProbeServer.new(port: configuration.probe_port)
+        probe_server = GoodJob::ProbeServer.new(app: configuration.probe_app, port: configuration.probe_port, handler: configuration.probe_handler)
         probe_server.start
       end
 
