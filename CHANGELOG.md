@@ -1,5 +1,40 @@
 # Changelog
 
+## [v3.23.0](https://github.com/bensheldon/good_job/tree/v3.23.0) (2024-01-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.22.0...v3.23.0)
+
+**Implemented enhancements:**
+
+- Add environment label to navbar [\#1206](https://github.com/bensheldon/good_job/pull/1206) ([sparshalc](https://github.com/sparshalc))
+- Make health probe server more general purpose [\#1079](https://github.com/bensheldon/good_job/pull/1079) ([jklina](https://github.com/jklina))
+
+**Fixed bugs:**
+
+- Use Rails executor instead of reloader when wrapping inline execution [\#1225](https://github.com/bensheldon/good_job/pull/1225) ([bensheldon](https://github.com/bensheldon))
+- Add an index to better support `smaller_number_is_higher_priority` [\#1213](https://github.com/bensheldon/good_job/pull/1213) ([mkrfowler](https://github.com/mkrfowler))
+- Fix discard job with nonexistent job class [\#1211](https://github.com/bensheldon/good_job/pull/1211) ([yenshirak](https://github.com/yenshirak))
+- Fix: Interacting with input field should pause the live poll [\#1210](https://github.com/bensheldon/good_job/pull/1210) ([sparshalc](https://github.com/sparshalc))
+
+**Closed issues:**
+
+- can't write unknown attribute `active_job_id` [\#1216](https://github.com/bensheldon/good_job/issues/1216)
+- Regression: use of Rails reloader causing mixed constants during seeding [\#1215](https://github.com/bensheldon/good_job/issues/1215)
+- Production worker doesn't show any processes [\#1214](https://github.com/bensheldon/good_job/issues/1214)
+- Clarify required async mode DB pool size [\#1209](https://github.com/bensheldon/good_job/issues/1209)
+- Mac forking exception when using Spring [\#1115](https://github.com/bensheldon/good_job/issues/1115)
+- Jobs should have labels [\#1095](https://github.com/bensheldon/good_job/issues/1095)
+- Set up Dependabot grouped updates [\#1062](https://github.com/bensheldon/good_job/issues/1062)
+- Fix documentation to always include space in "Active Job", "Active Record", etc. [\#1048](https://github.com/bensheldon/good_job/issues/1048)
+
+**Merged pull requests:**
+
+- Bump actions/cache from 3 to 4 [\#1223](https://github.com/bensheldon/good_job/pull/1223) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update README, add poll\_interval defaults/recommendations [\#1220](https://github.com/bensheldon/good_job/pull/1220) ([andynu](https://github.com/andynu))
+- Update Russian translation [\#1219](https://github.com/bensheldon/good_job/pull/1219) ([alec-c4](https://github.com/alec-c4))
+- Add Korean translation \(ko\) [\#1212](https://github.com/bensheldon/good_job/pull/1212) ([hahwul](https://github.com/hahwul))
+- Fix default poll interval in documentation [\#1208](https://github.com/bensheldon/good_job/pull/1208) ([yenshirak](https://github.com/yenshirak))
+
 ## [v3.22.0](https://github.com/bensheldon/good_job/tree/v3.22.0) (2024-01-03)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.5...v3.22.0)
@@ -1603,7 +1638,6 @@
 **Fixed bugs:**
 
 - `ActionMailer::MailDeliveryJob` executing twice [\#329](https://github.com/bensheldon/good_job/issues/329)
-- Email job breaks dashboard [\#313](https://github.com/bensheldon/good_job/issues/313)
 
 **Closed issues:**
 
