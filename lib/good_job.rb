@@ -250,7 +250,7 @@ module GoodJob
     loop do
       break if limit && iteration >= limit
 
-      result = Rails.application.reloader.wrap { job_performer.next }
+      result = Rails.application.executor.wrap { job_performer.next }
       break unless result
       raise result.unhandled_error if result.unhandled_error
 
