@@ -1,0 +1,243 @@
+---
+ko:
+  good_job:
+    actions:
+      destroy: 삭제하기
+      discard: 폐기하기
+      force_discard: 강제 폐기
+      inspect: 검사하기
+      reschedule: 재예약하기
+      retry: 다시 시도하기
+    batches:
+      index:
+        older_batches: 더 오래된 배치
+        pending_migrations: GoodJob에 보류 중인 데이터베이스 마이그레이션 작업이 있습니다.
+        title: 배치
+      jobs:
+        actions:
+          confirm_destroy: 이 작업을 삭제하시겠습니까?
+          confirm_discard: 이 작업을 폐기하시겠습니까?
+          confirm_reschedule: 이 작업을 다시 예약하시겠습니까?
+          confirm_retry: 이 작업을 다시 시도하시겠습니까?
+          destroy: 작업 삭제
+          discard: 작업 폐기
+          reschedule: 작업 재예약
+          retry: 작업 다시 시도
+          title: 작업 액션
+        no_jobs_found: 작업이 없습니다.
+      show:
+        attributes: 속성
+        batched_jobs: 배치된 작업
+        callback_jobs: 콜백 작업
+      table:
+        no_batches_found: 배치를 찾을 수 없습니다.
+    cron_entries:
+      actions:
+        confirm_disable: 이 cron 엔트리를 비활성화하시겠습니까?
+        confirm_enable: 이 cron 엔트리를 활성화하시겠습니까?
+        confirm_enqueue: 이 cron 엔트리를 큐에 넣으시겠습니까?
+        disable: cron 엔트리 비활성화
+        enable: cron 엔트리 활성화
+        enqueue: cron 엔트리 즉시 큐에 넣기
+      disable:
+        notice: cron 엔트리가 비활성화되었습니다.
+      enable:
+        notice: cron 엔트리가 활성화되었습니다.
+      enqueue:
+        notice: cron 엔트리가 큐에 넣어졌습니다.
+      index:
+        no_cron_schedules_found: cron 스케줄을 찾을 수 없습니다.
+        title: cron 스케줄
+      pending_migrations: 보류 중인 GoodJob 데이터베이스 마이그레이션이 필요합니다.
+      show:
+        cron_entry_key: cron 엔트리 키
+    datetime:
+      distance_in_words:
+        about_x_hours:
+          one: 약 1시간
+          other: 약 %{count}시간
+        about_x_months:
+          one: 약 1개월
+          other: 약 %{count}개월
+        about_x_years:
+          one: 약 1년
+          other: 약 %{count}년
+        almost_x_years:
+          one: 거의 1년
+          other: 거의 %{count}년
+        half_a_minute: 약 반 분
+        less_than_x_minutes:
+          one: 1분 미만
+          other: "%{count}분 미만"
+        less_than_x_seconds:
+          one: 1초 미만
+          other: "%{count}초 미만"
+        over_x_years:
+          one: 1년 이상
+          other: "%{count}년 이상"
+        x_days:
+          one: 1일
+          other: "%{count}일"
+        x_minutes:
+          one: 1분
+          other: "%{count}분"
+        x_months:
+          one: 1개월
+          other: "%{count}개월"
+        x_seconds:
+          one: 1초
+          other: "%{count}초"
+        x_years:
+          one: 1년
+          other: "%{count}년"
+    duration:
+      hours: "%{hour}시간 %{min}분"
+      less_than_10_seconds: "%{sec}초 미만"
+      milliseconds: "%{ms}밀리초"
+      minutes: "%{min}분 %{sec}초"
+      seconds: "%{sec}초"
+    error_event:
+      discarded: 폐기됨
+      handled: 처리됨
+      interrupted: 중단됨
+      retried: 다시 시도됨
+      retry_stopped: 다시 시도 중지됨
+      unhandled: 처리되지 않음
+    helpers:
+      relative_time:
+        future: "%{time} 후"
+        past: "%{time} 전"
+    jobs:
+      actions:
+        confirm_destroy: 해당 작업을 삭제하시겠습니까?
+        confirm_discard: 해당 작업을 폐기하시겠습니까?
+        confirm_force_discard: '이 작업을 강제로 폐기하시겠습니까? 작업은 폐기로 표시되지만, 실행 중인 작업은 중지되지 않습니다. 그러나 실패한 경우 재시도되지 않습니다.
+
+          '
+        confirm_reschedule: 해당 작업을 재예약하시겠습니까?
+        confirm_retry: 해당 작업을 다시 시도하시겠습니까?
+        destroy: 작업 삭제
+        discard: 작업 폐기
+        force_discard: 작업 강제 폐기
+        reschedule: 작업 재예약
+        retry: 작업 다시 시도
+      destroy:
+        notice: 작업이 삭제되었습니다.
+      discard:
+        notice: 작업이 폐기되었습니다.
+      executions:
+        in_queue: 대기 중
+        runtime: 실행 시간
+        title: 실행
+      force_discard:
+        notice: 작업이 강제로 폐기되었습니다. 계속해서 실행되지만 실패한 경우 재시도되지 않습니다.
+      index:
+        job_pagination: 작업 페이지네이션
+        older_jobs: 오래된 작업
+      reschedule:
+        notice: 작업이 재예약되었습니다.
+      retry:
+        notice: 작업이 다시 시도되었습니다.
+      show:
+        jobs: 작업
+      table:
+        actions:
+          apply_to_all:
+            one: 모든 1개의 작업에 적용
+            other: 모든 %{count}개의 작업에 적용
+          confirm_destroy_all: 선택한 작업을 모두 삭제해도 괜찮습니까?
+          confirm_discard_all: 선택한 작업을 모두 폐기해도 괜찮습니까?
+          confirm_reschedule_all: 선택한 작업을 모두 재예약해도 괜찮습니까?
+          confirm_retry_all: 선택한 작업을 모두 다시 시도해도 괜찮습니까?
+          destroy_all: 모두 삭제
+          discard_all: 모두 폐기
+          reschedule_all: 모두 재예약
+          retry_all: 모두 다시 시도
+          title: 액션
+        no_jobs_found: 작업을 찾을 수 없습니다.
+        toggle_actions: 액션 전환
+        toggle_all_jobs: 모든 작업 전환
+    models:
+      batch:
+        created: 생성됨
+        created_at: 생성 일시
+        discarded: 폐기됨
+        discarded_at: 폐기 일시
+        enqueued: 큐에 추가됨
+        enqueued_at: 큐에 추가된 일시
+        finished: 완료됨
+        finished_at: 완료 일시
+        jobs: 작업
+        name: 이름
+      cron:
+        class: 클래스
+        last_run: 마지막 실행 일시
+        next_scheduled: 다음 예정 일시
+        schedule: 스케줄
+      job:
+        arguments: 인수
+        attempts: 시도 횟수
+        priority: 우선순위
+        queue: 큐
+    number:
+      format:
+        delimiter: ","
+        separator: "."
+      human:
+        decimal_units:
+          delimiter: ","
+          format: "%n%u"
+          precision: 3
+          separator: "."
+          units:
+            billion: B
+            million: M
+            quadrillion: Q
+            thousand: K
+            trillion: T
+            unit: ''
+    processes:
+      index:
+        cron_enabled: Cron이 활성화되어 있음
+        no_good_job_processes_found: GoodJob의 프로세스를 찾을 수 없습니다.
+        process: 프로세스
+        schedulers: 스케줄러
+        started: 시작 일시
+        title: 프로세스
+        updated: 업데이트됨
+    shared:
+      boolean:
+        'false': 아니요
+        'true': 예
+      error: 오류
+      filter:
+        all: 모두
+        all_jobs: 모든 작업
+        all_queues: 모든 큐
+        clear: 지우기
+        job_name: 작업 이름
+        placeholder: 클래스 이름, 작업 ID, 작업 매개변수, 오류 텍스트로 검색
+        queue_name: 큐 이름
+        search: 검색
+      navbar:
+        batches: 배치
+        cron_schedules: Cron
+        jobs: 작업
+        live_poll: 실시간 업데이트
+        name: "GoodJob 👍"
+        processes: 프로세스
+        theme:
+          auto: 자동
+          dark: 어두운
+          light: 밝은
+          theme: 테마
+      secondary_navbar:
+        inspiration: 기억하세요, 당신도 좋은 일을 하고 있습니다!
+        last_updated: 최종 업데이트
+    status:
+      discarded: 폐기됨
+      queued: 대기 중
+      retried: 다시 시도됨
+      running: 실행 중
+      scheduled: 예정됨
+      succeeded: 성공함
