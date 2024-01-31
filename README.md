@@ -514,6 +514,9 @@ class MyJob < ApplicationJob
     #
     # If a key is not provided GoodJob will use the job class name.
     #
+    # To disable concurrency control, for example in a subclass, set the
+    # key explicitly to nil (e.g. `key: nil` or `key: -> { nil }`)
+    #
     # If you provide a custom concurrency key (for example, if one of your arguments
     # is transient) make sure that it is sufficiently unique across jobs and queues
     # by adding the job class or queue to the key yourself, if needed.
