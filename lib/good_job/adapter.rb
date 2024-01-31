@@ -49,7 +49,7 @@ module GoodJob
       active_jobs = Array(active_jobs)
       return 0 if active_jobs.empty?
 
-      Rails.application.reloader.wrap do
+      Rails.application.executor.wrap do
         current_time = Time.current
         executions = active_jobs.map do |active_job|
           GoodJob::Execution.build_for_enqueue(active_job).tap do |execution|
@@ -139,7 +139,7 @@ module GoodJob
       # job there to be enqueued using enqueue_all
       return if GoodJob::Bulk.capture(active_job, queue_adapter: self)
 
-      Rails.application.reloader.wrap do
+      Rails.application.executor.wrap do
         will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
         execution = GoodJob::Execution.enqueue(
           active_job,

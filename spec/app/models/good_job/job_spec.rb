@@ -324,6 +324,18 @@ RSpec.describe GoodJob::Job do
         end.to change { job.reload.status }.from(:scheduled).to(:discarded)
       end
     end
+
+    context 'when job class does not exist' do
+      before do
+        job.update!(serialized_params: { 'job_class' => 'NonexistentJob' })
+      end
+
+      it 'ignores the error and discards the job' do
+        expect do
+          job.discard_job("Discarded in test")
+        end.to change { job.reload.status }.from(:scheduled).to(:discarded)
+      end
+    end
   end
 
   describe '#force_discard_job' do

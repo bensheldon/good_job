@@ -4,11 +4,11 @@
 [![Test Status](https://github.com/bensheldon/good_job/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/bensheldon/good_job/actions/workflows/test.yml?query=branch%3Amain)
 [![Ruby Toolbox](https://img.shields.io/badge/dynamic/json?color=blue&label=Ruby%20Toolbox&query=%24.projects%5B0%5D.score&url=https%3A%2F%2Fwww.ruby-toolbox.com%2Fapi%2Fprojects%2Fcompare%2Fgood_job&logo=data:image/svg+xml;base64,PHN2ZyBhcmlhLWhpZGRlbj0idHJ1ZSIgZm9jdXNhYmxlPSJmYWxzZSIgZGF0YS1wcmVmaXg9ImZhcyIgZGF0YS1pY29uPSJmbGFzayIgY2xhc3M9InN2Zy1pbmxpbmUtLWZhIGZhLWZsYXNrIGZhLXctMTQiIHJvbGU9ImltZyIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgNDQ4IDUxMiI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik00MzcuMiA0MDMuNUwzMjAgMjE1VjY0aDhjMTMuMyAwIDI0LTEwLjcgMjQtMjRWMjRjMC0xMy4zLTEwLjctMjQtMjQtMjRIMTIwYy0xMy4zIDAtMjQgMTAuNy0yNCAyNHYxNmMwIDEzLjMgMTAuNyAyNCAyNCAyNGg4djE1MUwxMC44IDQwMy41Qy0xOC41IDQ1MC42IDE1LjMgNTEyIDcwLjkgNTEyaDMwNi4yYzU1LjcgMCA4OS40LTYxLjUgNjAuMS0xMDguNXpNMTM3LjkgMzIwbDQ4LjItNzcuNmMzLjctNS4yIDUuOC0xMS42IDUuOC0xOC40VjY0aDY0djE2MGMwIDYuOSAyLjIgMTMuMiA1LjggMTguNGw0OC4yIDc3LjZoLTE3MnoiPjwvcGF0aD48L3N2Zz4=)](https://www.ruby-toolbox.com/projects/good_job)
 
-GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
+GoodJob is a multithreaded, Postgres-based, Active Job backend for Ruby on Rails.
 
-**Inspired by [Delayed::Job](https://github.com/collectiveidea/delayed_job) and [Que](https://github.com/que-rb/que), GoodJob is designed for maximum compatibility with Ruby on Rails, ActiveJob, and Postgres to be simple and performant for most workloads.**
+**Inspired by [Delayed::Job](https://github.com/collectiveidea/delayed_job) and [Que](https://github.com/que-rb/que), GoodJob is designed for maximum compatibility with Ruby on Rails, Active Job, and Postgres to be simple and performant for most workloads.**
 
-- **Designed for ActiveJob.** Complete support for [async, queues, delays, priorities, timeouts, and retries](https://edgeguides.rubyonrails.org/active_job_basics.html) with near-zero configuration.
+- **Designed for Active Job.** Complete support for [async, queues, delays, priorities, timeouts, and retries](https://edgeguides.rubyonrails.org/active_job_basics.html) with near-zero configuration.
 - **Built for Rails.** Fully adopts Ruby on Rails [threading and code execution guidelines](https://guides.rubyonrails.org/threading_and_code_execution.html) with [Concurrent::Ruby](https://github.com/ruby-concurrency/concurrent-ruby).
 - **Backed by Postgres.** Relies upon Postgres integrity, session-level Advisory Locks to provide run-once safety and stay within the limits of `schema.rb`, and LISTEN/NOTIFY to reduce queuing latency.
 - **For most workloads.** Targets full-stack teams, economy-minded solo developers, and applications that enqueue 1-million jobs/day and more.
@@ -55,7 +55,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
         - [Exceptions](#exceptions)
         - [Retries](#retries)
-        - [ActionMailer retries](#actionmailer-retries)
+        - [Action Mailer retries](#action-mailer-retries)
         - [Interrupts](#interrupts)
     - [Timeouts](#timeouts)
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
@@ -63,7 +63,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Production setup](#production-setup)
     - [Queue performance with Queue Select Limit](#queue-performance-with-queue-select-limit)
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
-    - [Migrate to GoodJob from a different ActiveJob backend](#migrate-to-goodjob-from-a-different-activejob-backend)
+    - [Migrate to GoodJob from a different Active Job backend](#migrate-to-goodjob-from-a-different-active-job-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
     - [Write tests](#write-tests)
     - [PgBouncer compatibility](#pgbouncer-compatibility)
@@ -103,7 +103,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     bin/rails db:migrate:animals
     ```
 
-1. Configure the ActiveJob adapter:
+1. Configure the Active Job adapter:
 
     ```ruby
     # config/application.rb or config/environments/{RAILS_ENV}.rb
@@ -116,7 +116,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     YourJob.perform_later
     ```
 
-    GoodJob supports all ActiveJob features:
+    GoodJob supports all Active Job features:
 
     ```ruby
     YourJob.set(queue: :some_queue, wait: 5.minutes, priority: 10).perform_later
@@ -177,18 +177,19 @@ Usage:
   good_job start
 
 Options:
-  [--queues=QUEUE_LIST]        # Queues or pools to work from. (env var: GOOD_JOB_QUEUES, default: *)
-  [--max-threads=COUNT]        # Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
-  [--poll-interval=SECONDS]    # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 1)
-  [--max-cache=COUNT]          # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
-  [--shutdown-timeout=SECONDS] # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
-  [--enable-cron]              # Whether to run cron process (default: false)
-  [--enable-listen-notify]     # Whether to enqueue and read jobs with Postgres LISTEN/NOTIFY (default: true)
-  [--idle-timeout=SECONDS]     # Exit process when no jobs have been performed for this many seconds (env var: GOOD_JOB_IDLE_TIMEOUT, default: nil)
-  [--daemonize]                # Run as a background daemon (default: false)
-  [--pidfile=PIDFILE]          # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
-  [--probe-port=PORT]          # Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)
-  [--queue-select-limit=COUNT] # The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
+  [--queues=QUEUE_LIST]           # Queues or pools to work from. (env var: GOOD_JOB_QUEUES, default: *)
+  [--max-threads=COUNT]           # Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
+  [--poll-interval=SECONDS]       # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 10)
+  [--max-cache=COUNT]             # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
+  [--shutdown-timeout=SECONDS]    # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
+  [--enable-cron]                 # Whether to run cron process (default: false)
+  [--enable-listen-notify]        # Whether to enqueue and read jobs with Postgres LISTEN/NOTIFY (default: true)
+  [--idle-timeout=SECONDS]        # Exit process when no jobs have been performed for this many seconds (env var: GOOD_JOB_IDLE_TIMEOUT, default: nil)
+  [--daemonize]                   # Run as a background daemon (default: false)
+  [--pidfile=PIDFILE]             # Path to write daemonized Process ID (env var: GOOD_JOB_PIDFILE, default: tmp/pids/good_job.pid)
+  [--probe-port=PORT]             # Port for http health check (env var: GOOD_JOB_PROBE_PORT, default: nil)
+  [--probe-handler=PROBE_HANDLER] # Use 'webrick' to use WEBrick to handle probe server requests which is Rack compliant, otherwise default server that is not Rack compliant is used.
+  [--queue-select-limit=COUNT]    # The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
 
 Executes queued jobs.
 
@@ -222,7 +223,7 @@ and this command is not required to be used.
 
 ### Configuration options
 
-ActiveJob configuration depends on where the code is placed:
+Active Job configuration depends on where the code is placed:
 
 - `config.active_job.queue_adapter = :good_job` within `config/application.rb` or `config/environments/*.rb`.
 - `ActiveJob::Base.queue_adapter = :good_job` within an initializer (e.g. `config/initializers/active_job.rb`).
@@ -280,6 +281,10 @@ Available configuration options are:
 - `queues` (string) sets queues or pools to execute jobs. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
 - `max_threads` (integer) sets the default number of threads per pool to use for working jobs. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`. A poll interval of `-1` disables polling completely.
+    - production default: 10 seconds (in case of a LISTEN/NOTIFY blip)
+    - development default: -1, disabled (because the application is likely being restarted often and won't be running unobserved). You can enable it by setting a `poll_interval`.
+    - LISTEN/NOTIFY is enabled in both production and development, so polling is not strictly necessary.
+    - If LISTEN/NOTIFY is disabled, you should configure polling for future-scheduled jobs. GoodJob will cache in memory the scheduled time and check for executable jobs at that time. If the cache is exceeded (10k scheduled jobs by default) that's another reason to poll just in case.
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
 - `shutdown_timeout` (integer) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 - `enable_cron` (boolean) whether to run cron process. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_CRON`.
@@ -298,6 +303,18 @@ Available configuration options are:
 
     ```ruby
     config.good_job.on_thread_error = -> (exception) { Rails.error.report(exception) }
+    ```
+
+- `probe_server_app` (Rack application) allows you to specify a Rack application to be used for the probe server. Defaults to `nil` which uses the default probe server. Example:
+
+    ```ruby
+    config.good_job.probe_app = -> (env) { [200, {}, ["OK"]] }
+    ```
+
+- `probe_handler` (string) allows you to use WEBrick, a fully Rack compliant webserver instead of the simple default server. **Note:** You'll need to ensure WEBrick is in your load path as GoodJob doesn't have WEBrick as a dependency. Example:
+
+    ```ruby
+    config.good_job.probe_handler = 'webrick'
     ```
 
 By default, GoodJob configures the following execution modes per environment:
@@ -321,7 +338,7 @@ config.good_job.execution_mode = :external
 
 Good Job’s general behavior can also be configured via attributes directly on the `GoodJob` module:
 
-- **`GoodJob.configure_active_record { ... }`** Inject Active Record configuration into GoodJob's base model, for example, when using [multiple databases with ActiveRecord](https://guides.rubyonrails.org/active_record_multiple_databases.html) or when other custom configuration is necessary for the ActiveRecord model to connect to the Postgres database. Example:
+- **`GoodJob.configure_active_record { ... }`** Inject Active Record configuration into GoodJob's base model, for example, when using [multiple databases with Active Record](https://guides.rubyonrails.org/active_record_multiple_databases.html) or when other custom configuration is necessary for the Active Record model to connect to the Postgres database. Example:
 
     ```ruby
     # config/initializers/good_job.rb
@@ -331,7 +348,7 @@ Good Job’s general behavior can also be configured via attributes directly on 
     end
     ```
 
-- **`GoodJob.active_record_parent_class`** (string) Alternatively, modify the ActiveRecord parent class inherited by GoodJob's Active Record model `GoodJob::Job` (defaults to `"ActiveRecord::Base"`). Configure this _The value must be a String to avoid premature initialization of ActiveRecord._
+- **`GoodJob.active_record_parent_class`** (string) Alternatively, modify the Active Record parent class inherited by GoodJob's Active Record model `GoodJob::Job` (defaults to `"ActiveRecord::Base"`). Configure this _The value must be a String to avoid premature initialization of Active Record._
 
 You’ll generally want to configure these in `config/initializers/good_job.rb`, like so:
 
@@ -438,9 +455,34 @@ The Dashboard can be set to automatically refresh by checking "Live Poll" in the
 
 Higher priority numbers run first in all versions of GoodJob v3.x and below. GoodJob v4.x will change job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority (see #524). To opt-in to this behavior now, set `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or `application.rb`.
 
+### Labelled jobs
+
+Labels are the recommended way to add context or metadata to specific jobs. For example, all jobs that have a dependency on an email service could be labeled `email`. Using labels requires adding the Active Job extension `GoodJob::ActiveJobExtensions::Labels` to your job class.
+
+```ruby
+class ApplicationRecord < ActiveJob::Base
+  include GoodJob::ActiveJobExtensions::Labels
+end
+
+# Add a default label to every job within the class
+class WelcomeJob < ApplicationRecord
+  self.good_job_labels = ["email"]
+
+  def perform
+    # Labels can be inspected from within the job
+    puts good_job_labels # => ["email"]
+  end
+end
+
+# Or add to individual jobs when enqueued
+WelcomeJob.set(good_job_labels: ["email"]).perform_later
+```
+
+Labels can be used to search jobs in the Dashboard. For example, to find all jobs labeled `email`, search for `email`.
+
 ### Concurrency controls
 
-GoodJob can extend ActiveJob to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unnecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.
+GoodJob can extend Active Job to provide limits on concurrently running jobs, either at time of _enqueue_ or at _perform_. Limiting concurrency can help prevent duplicate, double or unnecessary jobs from being enqueued, or race conditions when performing, for example when interacting with 3rd-party APIs.
 
 ```ruby
 class MyJob < ApplicationJob
@@ -469,15 +511,15 @@ class MyJob < ApplicationJob
 
     # A unique key to be globally locked against.
     # Can be String or Lambda/Proc that is invoked in the context of the job.
+    # Note: Arguments passed to #perform_later can be accessed through Active Job's `arguments` method
+    # 
+    # If a key is not provided GoodJob will use the job class name.
     #
-    # If a key is not provided GoodJob will create one for you. This key will be
-    # composed of the jobs class, the queue, and all passed arguments.
-    # `MyJob.set(queue: "special_queue").perform_later("Bob")` => 'MyJob-special_queue-["Bob"]'
     # If you provide a custom concurrency key (for example, if one of your arguments
     # is transient) make sure that it is sufficiently unique across jobs and queues
     # by adding the job class or queue to the key yourself, if needed.
     #
-    # Note: Arguments passed to #perform_later can be accessed through ActiveJob's `arguments` method
+    # Note: Arguments passed to #perform_later can be accessed through Active Job's `arguments` method
     # which is an array containing positional arguments and, optionally, a kwarg hash.
     key: -> { "MyJob-#{arguments.first}-#{arguments.last[:version]}" } #  MyJob.perform_later("Alice", version: 'v2') => "MyJob-Alice-v2"
   )
@@ -557,11 +599,11 @@ active_jobs = GoodJob::Bulk.enqueue do
   # If an exception is raised within this block, no jobs will be inserted.
 end
 
-# All ActiveJob instances are returned from GoodJob::Bulk.enqueue.
+# All Active Job instances are returned from GoodJob::Bulk.enqueue.
 # Jobs that have been successfully enqueued have a `provider_job_id` set.
 active_jobs.all?(&:provider_job_id)
 
-# Bulk enqueue ActiveJob instances directly without using `.perform_later`:
+# Bulk enqueue Active Job instances directly without using `.perform_later`:
 GoodJob::Bulk.enqueue(MyJob.new, AnotherJob.new)
 ```
 
@@ -745,7 +787,7 @@ GoodJob follows semantic versioning, though updates may be encouraged through de
 
 Upgrading between minor versions (e.g. v1.4 to v1.5) should not introduce breaking changes, but can introduce new deprecation warnings and database migration warnings.
 
-Database migrations introduced in minor releases are _not required_ to be applied until the next major release. If you would like apply newly introduced migrations immediately, assert `GoodJob.migrated?` in your application's test suite.
+Database migrations introduced in minor releases are _not required_ to be applied until the next major release. If you would like to apply newly introduced migrations immediately, assert `GoodJob.migrated?` in your application's test suite.
 
 To perform upgrades to the GoodJob database tables:
 
@@ -799,7 +841,7 @@ Notable changes:
 - Renames `:async_server` execution mode to `:async`; renames prior `:async` execution mode to `:async_all`.
 - Sets default Development environment's execution mode to `:async` with disabled polling.
 - Excludes performing jobs from `enqueue_limit`'s count in `GoodJob::ActiveJobExtensions::Concurrency`.
-- Triggers `GoodJob.on_thread_error` for unhandled ActiveJob exceptions.
+- Triggers `GoodJob.on_thread_error` for unhandled Active Job exceptions.
 - Renames `GoodJob.reperform_jobs_on_standard_error` accessor to `GoodJob.retry_on_unhandled_error`.
 - Renames `GoodJob::Adapter.shutdown(wait:)` argument to `GoodJob::Adapter.shutdown(timeout:)`.
 - Changes Advisory Lock key format from `good_jobs[ROW_ID]` to `good_jobs-[ACTIVE_JOB_ID]`.
@@ -809,11 +851,11 @@ Notable changes:
 
 ### Exceptions, retries, and reliability
 
-GoodJob guarantees that a completely-performed job will run once and only once. GoodJob fully supports ActiveJob's built-in functionality for error handling, retries and timeouts.
+GoodJob guarantees that a completely-performed job will run once and only once. GoodJob fully supports Active Job's built-in functionality for error handling, retries and timeouts.
 
 #### Exceptions
 
-ActiveJob provides [tools for rescuing and retrying exceptions](https://guides.rubyonrails.org/active_job_basics.html#exceptions), including `retry_on`, `discard_on`, `rescue_from` that will rescue exceptions before they get to GoodJob.
+Active Job provides [tools for rescuing and retrying exceptions](https://guides.rubyonrails.org/active_job_basics.html#exceptions), including `retry_on`, `discard_on`, `rescue_from` that will rescue exceptions before they get to GoodJob.
 
 If errors do reach GoodJob, you can assign a callable to `GoodJob.on_thread_error` to be notified. For example, to log errors to an exception monitoring service like Sentry (or Bugsnag, Airbrake, Honeybadger, etc.):
 
@@ -824,9 +866,9 @@ GoodJob.on_thread_error = -> (exception) { Rails.error.report(exception) }
 
 #### Retries
 
-By default, GoodJob relies on ActiveJob's retry functionality.
+By default, GoodJob relies on Active Job's retry functionality.
 
-ActiveJob can be configured to retry an infinite number of times, with a polynomial backoff. Using ActiveJob's `retry_on` prevents exceptions from reaching GoodJob:
+Active Job can be configured to retry an infinite number of times, with a polynomial backoff. Using Active Job's `retry_on` prevents exceptions from reaching GoodJob:
 
 ```ruby
 class ApplicationJob < ActiveJob::Base
@@ -868,7 +910,7 @@ end
 
 By default, jobs will not be retried unless `retry_on` is configured. This can be overridden by setting `GoodJob.retry_on_unhandled_error` to `true`; GoodJob will then retry the failing job immediately and infinitely, potentially causing high load.
 
-#### ActionMailer retries
+#### Action Mailer retries
 
 Any configuration in `ApplicationJob` will have to be duplicated on `ActionMailer::MailDeliveryJob` because ActionMailer uses that custom class which inherits from `ActiveJob::Base`,  rather than your application's `ApplicationJob`.
 
@@ -894,16 +936,16 @@ might also be configured to use (deprecated now) `ActionMailer::DeliveryJob`.
 
 Jobs will be automatically retried if the process is interrupted while performing a job, for example as the result of a `SIGKILL` or power failure.
 
-If you need more control over interrupt-caused retries, include the `GoodJob::ActiveJobExtensions::InterruptErrors` extension in your job class. When an interrupted job is retried, the extension will raise a `GoodJob::InterruptError` exception within the job, which allows you to use ActiveJob's `retry_on` and `discard_on` to control the behavior of the job.
+If you need more control over interrupt-caused retries, include the `GoodJob::ActiveJobExtensions::InterruptErrors` extension in your job class. When an interrupted job is retried, the extension will raise a `GoodJob::InterruptError` exception within the job, which allows you to use Active Job's `retry_on` and `discard_on` to control the behavior of the job.
 
 ```ruby
 class MyJob < ApplicationJob
   # The extension must be included before other extensions
   include GoodJob::ActiveJobExtensions::InterruptErrors
   # Discard the job if it is interrupted
-  discard_on InterruptError
+  discard_on GoodJob::InterruptError
   # Retry the job if it is interrupted
-  retry_on InterruptError, wait: 0, attempts: Float::INFINITY
+  retry_on GoodJob::InterruptError, wait: 0, attempts: Float::INFINITY
 end
 ```
 
@@ -1184,9 +1226,9 @@ Depending on your application configuration, you may need to take additional ste
 
   If you are using cron-style jobs, you might also want to look at your Passenger configuration, especially at [`passenger_pool_idle_time`](https://www.phusionpassenger.com/library/config/nginx/reference/#passenger_pool_idle_time) and [`passenger_min_instances`](https://www.phusionpassenger.com/library/config/nginx/reference/#passenger_min_instances) to make sure there's always at least once process running that can execute cron-style scheduled jobs. See also [Passenger's optimization guide](https://www.phusionpassenger.com/library/config/nginx/optimization/#minimizing-process-spawning) for more information.
 
-### Migrate to GoodJob from a different ActiveJob backend
+### Migrate to GoodJob from a different Active Job backend
 
-If your application is already using an ActiveJob backend, you will need to install GoodJob to enqueue and perform newly created jobs _and_ finish performing pre-existing jobs on the previous backend.
+If your application is already using an Active Job backend, you will need to install GoodJob to enqueue and perform newly created jobs _and_ finish performing pre-existing jobs on the previous backend.
 
 1. Enqueue newly created jobs on GoodJob either entirely by setting `ActiveJob::Base.queue_adapter = :good_job` or progressively via individual job classes:
 
@@ -1206,7 +1248,7 @@ If your application is already using an ActiveJob backend, you will need to inst
     worker: bundle exec que ./config/environment.rb & bundle exec good_job & wait -n
     ```
 
-1. Once you are confident that no unperformed jobs remain in the previous ActiveJob backend, code and configuration for that backend can be completely removed.
+1. Once you are confident that no unperformed jobs remain in the previous Active Job backend, code and configuration for that backend can be completely removed.
 
 ### Monitor and preserve worked jobs
 
@@ -1279,7 +1321,7 @@ A workaround to this limitation is to make a direct database connection availabl
         url: postgres://database_host/my_database
     ```
 
-1. Create a new ActiveRecord base class that uses the direct database connection
+1. Create a new Active Record base class that uses the direct database connection
 
     ```ruby
     # app/models/application_direct_record.rb
@@ -1290,7 +1332,7 @@ A workaround to this limitation is to make a direct database connection availabl
     end
     ```
 
-1. Configure GoodJob to use the newly created ActiveRecord base class:
+1. Configure GoodJob to use the newly created Active Record base class:
 
     ```ruby
     # config/initializers/good_job.rb
@@ -1299,6 +1341,8 @@ A workaround to this limitation is to make a direct database connection availabl
     ```
 
 ### CLI HTTP health check probes
+
+#### Default configuration
 
 GoodJob's CLI offers an http health check probe to better manage process lifecycle in containerized environments like Kubernetes:
 
@@ -1352,6 +1396,65 @@ spec:
         failureThreshold: 1
         periodSeconds: 10
 ```
+
+#### Custom configuration
+
+The CLI health check probe server can be customized to serve additional information. Two things to note when customizing the probe server:
+
+- By default, the probe server uses a homespun single thread, blocking server so your custom app should be very simple and lightly used and could affect job performance.
+- The default probe server is not fully Rack compliant. Rack specifies various mandatory fields and some Rack apps assume those fields exist. If you do need to use a Rack app that depends on being fully Rack compliant, you can configure GoodJob to [use WEBrick as the server](#using-webrick)
+
+To customize the probe server, set `config.good_job.probe_app` to a Rack app or a Rack builder:
+
+```ruby
+# config/initializers/good_job.rb OR config/application.rb OR config/environments/{RAILS_ENV}.rb
+
+Rails.application.configure do
+  config.good_job.probe_app = Rack::Builder.new do
+    # Add your custom middleware
+    use Custom::AuthorizationMiddleware
+    use Custom::PrometheusExporter
+
+    # This is the default middleware
+    use GoodJob::ProbeServer::HealthcheckMiddleware
+    run GoodJob::ProbeServer::NotFoundApp # will return 404 for all other requests
+  end
+end
+```
+
+##### Using WEBrick
+
+If your custom app requires a fully Rack compliant server, you can configure GoodJob to use WEBrick as the server:
+
+```ruby
+# config/initializers/good_job.rb OR config/application.rb OR config/environments/{RAILS_ENV}.rb
+
+Rails.application.configure do
+  config.good_job.probe_handler = :webrick
+end
+
+```
+
+You can also enable WEBrick through the command line:
+
+```bash
+good_job start --probe-handler=webrick
+```
+
+or via an environment variable:
+
+```bash
+GOOD_JOB_PROBE_HANDLER=webrick good_job start
+```
+
+Note that GoodJob doesn't include WEBrick as a dependency, so you'll need to add it to your Gemfile:
+
+```ruby
+# Gemfile
+gem 'webrick'
+```
+
+If WEBrick is configured to be used, but the dependency is not found, GoodJob will log a warning and fallback to the default probe server.
 
 ## Contribute
 
