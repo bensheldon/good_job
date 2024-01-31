@@ -110,7 +110,7 @@ module GoodJob
       # Generates the default concurrency key when the configuration doesn't provide one
       # @return [String] concurrency key
       def _good_job_default_concurrency_key
-        "#{self.class.name}-#{queue_name}-#{ActiveJob::Arguments.serialize(arguments)}"
+        self.class.name.to_s
       end
 
       private

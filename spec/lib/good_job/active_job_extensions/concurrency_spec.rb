@@ -216,20 +216,9 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         end)
       end
 
-      it 'calculates a default concurrency key' do
+      it 'uses the class name as the default concurrency key' do
         job = TestJob.perform_later("Alice")
-        expect(job.good_job_concurrency_key).to eq('TestJob-default-["Alice"]')
-      end
-
-      it 'uses the overwritten queue name in the key' do
-        job = TestJob.set(queue: "different").perform_later("Alice")
-        expect(job.good_job_concurrency_key).to eq('TestJob-different-["Alice"]')
-      end
-
-      it 'works with complex parameters' do
-        execution = GoodJob::Execution.create(active_job_id: SecureRandom.uuid, queue_name: "default")
-        job = TestJob.perform_later(execution)
-        expect(job.good_job_concurrency_key).to eq("TestJob-default-[{\"_aj_globalid\"=>\"#{execution.to_global_id}\"}]")
+        expect(job.good_job_concurrency_key).to eq('TestJob')
       end
     end
 
