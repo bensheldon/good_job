@@ -26,11 +26,23 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
-  describe 'when concurrency key is nil' do
+  describe 'when concurrency key returns nil' do
     it 'does not limit concurrency' do
       TestJob.good_job_control_concurrency_with(
         total_limit: -> { 1 },
         key: -> {}
+      )
+
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+    end
+  end
+
+  describe 'when concurrency key is nil' do
+    it 'does not limit concurrency' do
+      TestJob.good_job_control_concurrency_with(
+        total_limit: -> { 1 },
+        key: nil
       )
 
       expect(TestJob.perform_later(name: "Alice")).to be_present
@@ -191,6 +203,22 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
             expect(retried_execution.concurrency_key).to eq first_execution.concurrency_key
           end
         end
+      end
+    end
+
+    context 'when no key is specified' do
+      before do
+        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+          include GoodJob::ActiveJobExtensions::Concurrency
+
+          def perform(name)
+          end
+        end)
+      end
+
+      it 'uses the class name as the default concurrency key' do
+        job = TestJob.perform_later("Alice")
+        expect(job.good_job_concurrency_key).to eq('TestJob')
       end
     end
 

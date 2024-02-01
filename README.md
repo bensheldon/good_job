@@ -511,12 +511,22 @@ class MyJob < ApplicationJob
 
     # A unique key to be globally locked against.
     # Can be String or Lambda/Proc that is invoked in the context of the job.
+    #
+    # If a key is not provided GoodJob will use the job class name.
+    #
+    # To disable concurrency control, for example in a subclass, set the
+    # key explicitly to nil (e.g. `key: nil` or `key: -> { nil }`)
+    #
+    # If you provide a custom concurrency key (for example, if one of your arguments
+    # is transient) make sure that it is sufficiently unique across jobs and queues
+    # by adding the job class or queue to the key yourself, if needed.
+    #
     # Note: Arguments passed to #perform_later can be accessed through Active Job's `arguments` method
     # which is an array containing positional arguments and, optionally, a kwarg hash.
-    key: -> { "MyJob-#{arguments.first}-#{arguments.last[:version]}" } #  MyJob.perform_later("Alice", version: 'v2') => "MyJob-Alice-v2"
+    key: -> { "#{self.class.name}-#{queue_name}-#{arguments.first}-#{arguments.last[:version]}" } #  MyJob.perform_later("Alice", version: 'v2') => "MyJob-default-Alice-v2"
   )
 
-  def perform(first_name)
+  def perform(first_name, version:)
     # do work
   end
 end
@@ -525,8 +535,8 @@ end
 When testing, the resulting concurrency key value can be inspected:
 
 ```ruby
-job = MyJob.perform_later("Alice")
-job.good_job_concurrency_key #=> "MyJob-Alice"
+job = MyJob.perform_later("Alice", version: 'v1')
+job.good_job_concurrency_key #=> "MyJob-default-Alice-v1"
 ```
 
 #### How concurrency controls work
