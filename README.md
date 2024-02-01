@@ -517,9 +517,12 @@ class MyJob < ApplicationJob
     # To disable concurrency control, for example in a subclass, set the
     # key explicitly to nil (e.g. `key: nil` or `key: -> { nil }`)
     #
-    # If you provide a custom concurrency key (for example, if one of your arguments
-    # is transient) make sure that it is sufficiently unique across jobs and queues
-    # by adding the job class or queue to the key yourself, if needed.
+    # If you provide a custom concurrency key (for example, if concurrency is supposed
+    # to be controlled by the first job argument) make sure that it is sufficiently unique across
+    # jobs and queues by adding the job class or queue to the key yourself, if needed.
+    #
+    # Note: When using a model instance as part of your custom concurrency key, make sure
+    # to explicitly use its `id` or `to_global_id` because otherwise it will not stringify as expected.
     #
     # Note: Arguments passed to #perform_later can be accessed through Active Job's `arguments` method
     # which is an array containing positional arguments and, optionally, a kwarg hash.
