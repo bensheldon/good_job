@@ -460,6 +460,7 @@ module GoodJob
           self.error_event = nil if self.class.error_event_migrated?
         end
 
+        puts "result.error #{result.handled_error} result.retried? #{result.retried?} retried_good_job_id #{retried_good_job_id}"
         reenqueued = result.retried? || retried_good_job_id.present?
         if result.unhandled_error && GoodJob.retry_on_unhandled_error
           if discrete_execution
