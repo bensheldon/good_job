@@ -12,6 +12,7 @@ gem "rails", "~> 7.0.0"
 gem "selenium-webdriver", "~> 4.0"
 
 platforms :ruby do
+  gem "bootsnap"
   gem "dotenv"
   gem "foreman"
   gem "gem-release"

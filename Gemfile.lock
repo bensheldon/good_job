@@ -12,62 +12,63 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actioncable (7.1.1)
-      actionpack (= 7.1.1)
-      activesupport (= 7.1.1)
+    actioncable (7.1.3)
+      actionpack (= 7.1.3)
+      activesupport (= 7.1.3)
       nio4r (~> 2.0)
       websocket-driver (>= 0.6.1)
       zeitwerk (~> 2.6)
-    actionmailbox (7.1.1)
-      actionpack (= 7.1.1)
-      activejob (= 7.1.1)
-      activerecord (= 7.1.1)
-      activestorage (= 7.1.1)
-      activesupport (= 7.1.1)
+    actionmailbox (7.1.3)
+      actionpack (= 7.1.3)
+      activejob (= 7.1.3)
+      activerecord (= 7.1.3)
+      activestorage (= 7.1.3)
+      activesupport (= 7.1.3)
       mail (>= 2.7.1)
       net-imap
       net-pop
       net-smtp
-    actionmailer (7.1.1)
-      actionpack (= 7.1.1)
-      actionview (= 7.1.1)
-      activejob (= 7.1.1)
-      activesupport (= 7.1.1)
+    actionmailer (7.1.3)
+      actionpack (= 7.1.3)
+      actionview (= 7.1.3)
+      activejob (= 7.1.3)
+      activesupport (= 7.1.3)
       mail (~> 2.5, >= 2.5.4)
       net-imap
       net-pop
       net-smtp
       rails-dom-testing (~> 2.2)
-    actionpack (7.1.1)
-      actionview (= 7.1.1)
-      activesupport (= 7.1.1)
+    actionpack (7.1.3)
+      actionview (= 7.1.3)
+      activesupport (= 7.1.3)
       nokogiri (>= 1.8.5)
+      racc
       rack (>= 2.2.4)
       rack-session (>= 1.0.1)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    actiontext (7.1.1)
-      actionpack (= 7.1.1)
-      activerecord (= 7.1.1)
-      activestorage (= 7.1.1)
-      activesupport (= 7.1.1)
+    actiontext (7.1.3)
+      actionpack (= 7.1.3)
+      activerecord (= 7.1.3)
+      activestorage (= 7.1.3)
+      activesupport (= 7.1.3)
       globalid (>= 0.6.0)
       nokogiri (>= 1.8.5)
-    actionview (7.1.1)
-      activesupport (= 7.1.1)
+    actionview (7.1.3)
+      activesupport (= 7.1.3)
       builder (~> 3.1)
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
-    activejob (7.1.1)
-      activesupport (= 7.1.1)
+    activejob (7.1.3)
+      activesupport (= 7.1.3)
       globalid (>= 0.3.6)
-    activemodel (7.1.1)
-      activesupport (= 7.1.1)
-    activerecord (7.1.1)
-      activemodel (= 7.1.1)
-      activesupport (= 7.1.1)
+    activemodel (7.1.3)
+      activesupport (= 7.1.3)
+    activerecord (7.1.3)
+      activemodel (= 7.1.3)
+      activesupport (= 7.1.3)
       timeout (>= 0.4.0)
     activerecord-explain-analyze (0.1.0)
       activerecord (>= 4)
@@ -77,13 +78,13 @@ GEM
     activerecord-jdbcpostgresql-adapter (70.1-java)
       activerecord-jdbc-adapter (= 70.1)
       jdbc-postgres (>= 9.4, < 43)
-    activestorage (7.1.1)
-      actionpack (= 7.1.1)
-      activejob (= 7.1.1)
-      activerecord (= 7.1.1)
-      activesupport (= 7.1.1)
+    activestorage (7.1.3)
+      actionpack (= 7.1.3)
+      activejob (= 7.1.3)
+      activerecord (= 7.1.3)
+      activesupport (= 7.1.3)
       marcel (~> 1.0)
-    activesupport (7.1.1)
+    activesupport (7.1.3)
       base64
       bigdecimal
       concurrent-ruby (~> 1.0, >= 1.0.2)
@@ -120,7 +121,7 @@ GEM
       async
     async-pool (0.4.0)
       async (>= 1.25)
-    base64 (0.1.1)
+    base64 (0.2.0)
     benchmark-ips (2.13.0)
     better_html (2.0.2)
       actionview (>= 6.0)
@@ -129,8 +130,10 @@ GEM
       erubi (~> 1.4)
       parser (>= 2.4)
       smart_properties
-    bigdecimal (3.1.4)
-    bigdecimal (3.1.4-java)
+    bigdecimal (3.1.6)
+    bigdecimal (3.1.6-java)
+    bootsnap (1.18.3)
+      msgpack (~> 1.2)
     builder (3.2.4)
     byebug (11.1.3)
     capybara (3.39.2)
@@ -145,17 +148,17 @@ GEM
     chef-utils (18.3.0)
       concurrent-ruby
     coderay (1.1.3)
-    concurrent-ruby (1.2.2)
+    concurrent-ruby (1.2.3)
     connection_pool (2.4.1)
     console (1.23.2)
       fiber-annotation
       fiber-local
     crass (1.0.6)
-    date (3.3.3)
-    date (3.3.3-java)
+    date (3.3.4)
+    date (3.3.4-java)
     diff-lcs (1.5.0)
     dotenv (2.8.1)
-    drb (2.1.1)
+    drb (2.2.0)
       ruby2_keywords
     easy_translate (0.5.1)
       thread
@@ -211,12 +214,12 @@ GEM
       rails-i18n
       rainbow (>= 2.2.2, < 4.0)
       terminal-table (>= 1.5.1)
-    io-console (0.6.0)
-    io-console (0.6.0-java)
+    io-console (0.7.2)
+    io-console (0.7.2-java)
     io-event (1.3.3)
-    irb (1.8.3)
+    irb (1.11.2)
       rdoc
-      reline (>= 0.3.8)
+      reline (>= 0.4.2)
     jar-dependencies (0.4.1)
     jdbc-postgres (42.6.0)
     json (2.6.3)
@@ -226,7 +229,7 @@ GEM
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
     language_server-protocol (3.17.0.3)
-    loofah (2.21.4)
+    loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     mail (2.8.1)
@@ -244,7 +247,7 @@ GEM
       mixlib-shellout
     method_source (1.0.0)
     mini_mime (1.1.5)
-    minitest (5.20.0)
+    minitest (5.22.2)
     mixlib-cli (2.1.8)
     mixlib-config (3.0.27)
       tomlrb
@@ -253,26 +256,24 @@ GEM
     msgpack (1.7.2)
     msgpack (1.7.2-java)
     multi_json (1.15.0)
-    mutex_m (0.1.2)
-    net-imap (0.4.3)
+    mutex_m (0.2.0)
+    net-imap (0.4.10)
       date
       net-protocol
     net-pop (0.1.2)
       net-protocol
-    net-protocol (0.2.1)
+    net-protocol (0.2.2)
       timeout
-    net-smtp (0.4.0)
+    net-smtp (0.4.0.1)
       net-protocol
     netrc (0.11.0)
-    nio4r (2.5.9)
-    nio4r (2.5.9-java)
-    nokogiri (1.15.4-arm64-darwin)
+    nio4r (2.7.0)
+    nio4r (2.7.0-java)
+    nokogiri (1.16.2-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.15.4-java)
+    nokogiri (1.16.2-java)
       racc (~> 1.4)
-    nokogiri (1.15.4-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.15.4-x86_64-linux)
+    nokogiri (1.16.2-x86_64-linux)
       racc (~> 1.4)
     octokit (4.25.1)
       faraday (>= 1, < 3)
@@ -304,9 +305,9 @@ GEM
       pry (>= 0.13, < 0.15)
     pry-rails (0.3.9)
       pry (>= 0.10.4)
-    psych (5.1.1.1)
+    psych (5.1.2)
       stringio
-    psych (5.1.1.1-java)
+    psych (5.1.2-java)
       jar-dependencies (>= 0.1.7)
     public_suffix (5.0.3)
     puma (5.6.7)
@@ -314,32 +315,32 @@ GEM
     puma (5.6.7-java)
       nio4r (~> 2.0)
     raabro (1.4.0)
-    racc (1.7.2)
-    racc (1.7.2-java)
+    racc (1.7.3)
+    racc (1.7.3-java)
     rack (2.2.8)
     rack-mini-profiler (3.1.1)
       rack (>= 1.2.0)
-    rack-session (1.0.1)
+    rack-session (1.0.2)
       rack (< 3)
     rack-test (2.1.0)
       rack (>= 1.3)
     rackup (1.0.0)
       rack (< 3)
       webrick
-    rails (7.1.1)
-      actioncable (= 7.1.1)
-      actionmailbox (= 7.1.1)
-      actionmailer (= 7.1.1)
-      actionpack (= 7.1.1)
-      actiontext (= 7.1.1)
-      actionview (= 7.1.1)
-      activejob (= 7.1.1)
-      activemodel (= 7.1.1)
-      activerecord (= 7.1.1)
-      activestorage (= 7.1.1)
-      activesupport (= 7.1.1)
+    rails (7.1.3)
+      actioncable (= 7.1.3)
+      actionmailbox (= 7.1.3)
+      actionmailer (= 7.1.3)
+      actionpack (= 7.1.3)
+      actiontext (= 7.1.3)
+      actionview (= 7.1.3)
+      activejob (= 7.1.3)
+      activemodel (= 7.1.3)
+      activerecord (= 7.1.3)
+      activestorage (= 7.1.3)
+      activesupport (= 7.1.3)
       bundler (>= 1.15.0)
-      railties (= 7.1.1)
+      railties (= 7.1.3)
     rails-dom-testing (2.2.0)
       activesupport (>= 5.0.0)
       minitest
@@ -350,9 +351,9 @@ GEM
     rails-i18n (7.0.8)
       i18n (>= 0.7, < 2)
       railties (>= 6.0.0, < 8)
-    railties (7.1.1)
-      actionpack (= 7.1.1)
-      activesupport (= 7.1.1)
+    railties (7.1.3)
+      actionpack (= 7.1.3)
+      activesupport (= 7.1.3)
       irb
       rackup (>= 1.0.0)
       rake (>= 12.2)
@@ -367,10 +368,10 @@ GEM
       ffi (>= 1.0.6)
       msgpack (>= 0.4.3)
       optimist (>= 3.0.0)
-    rdoc (6.5.0)
+    rdoc (6.6.2)
       psych (>= 4.0.0)
     regexp_parser (2.8.2)
-    reline (0.3.9)
+    reline (0.4.2)
       io-console (~> 0.5)
     rexml (3.2.6)
     rspec-core (3.12.2)
@@ -448,7 +449,7 @@ GEM
     spoon (0.0.6)
       ffi
     stackprof (0.2.25)
-    stringio (3.0.8)
+    stringio (3.1.0)
     syntax_tree (6.2.0)
       prettier_print (>= 1.2.0)
     tapioca (0.11.10)
@@ -466,7 +467,7 @@ GEM
     thread (0.2.2)
     thread_safe (0.3.6)
     thread_safe (0.3.6-java)
-    timeout (0.4.0)
+    timeout (0.4.1)
     timers (4.3.5)
     tomlrb (2.0.3)
     traces (0.11.1)
@@ -488,16 +489,13 @@ GEM
     yard-sorbet (0.8.1)
       sorbet-runtime (>= 0.5)
       yard (>= 0.9)
-    zeitwerk (2.6.12)
+    zeitwerk (2.6.13)
 
 PLATFORMS
-  arm64-darwin
   arm64-darwin-22
-  java
+  arm64-darwin-23
   universal-java-11
-  universal-java-17
   universal-java-20
-  x86_64-darwin
   x86_64-linux
 
 DEPENDENCIES
@@ -505,6 +503,7 @@ DEPENDENCIES
   activerecord-jdbcpostgresql-adapter
   appraisal
   benchmark-ips
+  bootsnap
   capybara
   dotenv
   easy_translate
@@ -547,7 +546,7 @@ DEPENDENCIES
   yard-activesupport-concern
 
 RUBY VERSION
-   ruby 3.2.2p53
+   ruby 3.3.0p0
 
 BUNDLED WITH
    2.4.21

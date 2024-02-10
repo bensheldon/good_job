@@ -28,6 +28,7 @@ gem 'rack', '~> 2.2'
 gem 'rails'
 
 platforms :ruby do
+  gem "bootsnap"
   gem "dotenv"
   gem "foreman"
   gem "gem-release"
