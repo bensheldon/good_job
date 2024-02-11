@@ -16,6 +16,7 @@ module GoodJob
       execution
       execution_interrupted
       execution_retried
+      retry_now
     ].freeze
 
     # @!attribute [rw] cron_at
@@ -65,6 +66,12 @@ module GoodJob
     #   Execution Retried
     #   @return [Boolean, nil]
     thread_mattr_accessor :execution_retried
+
+    # @!attribute [rw] retry_now
+    #   @!scope class
+    #   Execution Retried
+    #   @return [Boolean, nil]
+    thread_mattr_accessor :retry_now
 
     # Resets attributes
     # @param [Hash] values to assign

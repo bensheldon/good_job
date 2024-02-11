@@ -178,4 +178,38 @@ RSpec.describe 'Complex Jobs' do
       THREAD_ERRORS.clear
     end
   end
+
+  describe 'inline job retry behavior' do
+    before do
+      stub_const "TestJob", (Class.new(ActiveJob::Base) do
+        retry_on StandardError, wait: 0, attempts: Float::INFINITY
+
+        def perform
+          raise 'failing' if executions < 3
+        end
+      end)
+
+      TestJob.queue_adapter = inline_adapter
+    end
+
+    it 'runs retries iteratively rather than recursively' do
+      TestJob.perform_later
+
+      expect(GoodJob::Job.count).to eq 1
+      job = GoodJob::Job.order(:created_at).last
+      executions = job.discrete_executions.order(:created_at).to_a
+
+      expect(job.status).to eq :succeeded
+      expect(job.performed_at).to be_present
+      expect(job.finished_at).to be_present
+
+      expect(executions.size).to eq 3
+      expect(executions[0].status).to eq :discarded
+      expect(executions[1].status).to eq :discarded
+      expect(executions[2].status).to eq :succeeded
+
+      expect(executions[0].finished_at).to be < executions[1].finished_at
+      expect(executions[1].finished_at).to be < executions[2].finished_at
+    end
+  end
 end

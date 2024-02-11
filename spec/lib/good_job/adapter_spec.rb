@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe GoodJob::Adapter do
   let(:adapter) { described_class.new(execution_mode: :external) }
   let(:active_job) { instance_double(ActiveJob::Base) }
-  let(:good_job) { instance_double(GoodJob::Execution, queue_name: 'default', scheduled_at: nil) }
+  let(:good_job) { instance_double(GoodJob::Execution, queue_name: 'default', scheduled_at: nil, job_state: { queue_name: 'default' }) }
 
   before do
     GoodJob.configuration.instance_variable_set(:@_in_webserver, nil)
@@ -33,8 +33,7 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        scheduled_at: nil,
-        create_with_advisory_lock: false
+        scheduled_at: nil
       )
     end
 
@@ -102,8 +101,7 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        scheduled_at: scheduled_at.change(usec: 0),
-        create_with_advisory_lock: false
+        scheduled_at: scheduled_at.change(usec: 0)
       )
     end
   end
@@ -149,7 +147,7 @@ RSpec.describe GoodJob::Adapter do
         expect(result).to eq 1
 
         expect(active_jobs.map(&:provider_job_id)).to eq [active_jobs.first.provider_job_id, nil]
-        expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default', count: 1, scheduled_at: within(0.1).of(Time.current) })
+        expect(GoodJob::Notifier).to have_received(:notify).once.with({ queue_name: 'default', count: 1, scheduled_at: within(1).of(Time.current) })
       end
 
       it 'sets successfully_enqueued, if Rails supports it' do

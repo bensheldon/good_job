@@ -27,7 +27,9 @@ module ::THREAD_JOBS; end
 module ::TestError; end
 module ::TestJob; end
 module ::WAIT_EVENT; end
+module ::TestJob::Error; end
 module ::TestJob::ExpectedError; end
+module ::TestJob::RunError; end
 module ::TestJob::SuccessCallbackJob; end
 module GoodJob::Job::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Job::ERROR_EVENT_RETRIED; end
