@@ -95,7 +95,7 @@ module GoodJob
           until inline_executions.empty?
             begin
               inline_execution = inline_executions.shift
-              inline_result = inline_execution.perform
+              inline_result = inline_execution.perform(inline: true)
             ensure
               inline_execution.advisory_unlock
               inline_execution.run_callbacks(:perform_unlocked)
@@ -149,7 +149,7 @@ module GoodJob
 
         if will_execute_inline
           begin
-            result = execution.perform
+            result = execution.perform(inline: true)
           ensure
             execution.advisory_unlock
             execution.run_callbacks(:perform_unlocked)

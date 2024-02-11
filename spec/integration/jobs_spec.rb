@@ -178,4 +178,37 @@ RSpec.describe 'Complex Jobs' do
       THREAD_ERRORS.clear
     end
   end
+
+  describe 'job status after retry' do
+    before do
+      stub_const "TestJob", (Class.new(ActiveJob::Base) do
+        retry_on StandardError, wait: 0, attempts: Float::INFINITY
+
+        def perform
+          raise 'failing' if executions < 2
+        end
+      end)
+
+      TestJob.queue_adapter = inline_adapter
+    end
+
+    it 'retries a job once and then succeeds' do
+      TestJob.perform_later
+
+      expect(GoodJob::Job.count).to eq 1
+      job = GoodJob::Job.order(:created_at).last
+      executions = job.discrete_executions.order(:created_at).to_a
+
+      puts "Job: #{job.attributes}"
+      puts "Executions: #{executions.map(&:attributes)}"
+
+      expect(job.status).to eq :succeeded
+      expect(job.performed_at).to be_present
+      expect(job.finished_at).to be_present
+
+      expect(executions.size).to eq 2
+      expect(executions.first.status).to eq :discarded
+      expect(executions.last.status).to eq :succeeded
+    end
+  end
 end
