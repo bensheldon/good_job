@@ -7,6 +7,9 @@ Rails.application.configure do
   config.cache_classes = true
   config.eager_load = ENV["CI"].present?
 
+  # Do not use dotenv feature to autorestore ENV after tests
+  config.dotenv.autorestore = false if config.respond_to?(:dotenv)
+
   config.active_job.queue_adapter = :test
 
   # Raises error for missing translations.
