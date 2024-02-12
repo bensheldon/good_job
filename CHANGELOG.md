@@ -1,5 +1,27 @@
 # Changelog
 
+## [v3.24.0](https://github.com/bensheldon/good_job/tree/v3.24.0) (2024-02-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.23.0...v3.24.0)
+
+**Fixed bugs:**
+
+- Fix batches so that retried-and-successful jobs leave the batch succeeded [\#1243](https://github.com/bensheldon/good_job/pull/1243) ([bensheldon](https://github.com/bensheldon))
+- Use the job class as the default concurrency key if none is provided [\#1145](https://github.com/bensheldon/good_job/pull/1145) ([Earlopain](https://github.com/Earlopain))
+
+**Closed issues:**
+
+- Batch callbacks not run when job fails, then succeeds [\#1239](https://github.com/bensheldon/good_job/issues/1239)
+- Broken pipe @ io\_writev - \<STDERR\> \(Errno::EPIPE\) [\#1233](https://github.com/bensheldon/good_job/issues/1233)
+- PG::UniqueViolation unique constraint "index\_good\_jobs\_on\_cron\_key\_and\_cron\_at\_cond" [\#1230](https://github.com/bensheldon/good_job/issues/1230)
+- Default concurrency key [\#1110](https://github.com/bensheldon/good_job/issues/1110)
+
+**Merged pull requests:**
+
+- Use Ruby 3.3 for development; add Bootsnap; update to Rails 7.1.3 [\#1240](https://github.com/bensheldon/good_job/pull/1240) ([bensheldon](https://github.com/bensheldon))
+- Tweak docs for new concurrency default [\#1229](https://github.com/bensheldon/good_job/pull/1229) ([Earlopain](https://github.com/Earlopain))
+- Brazilian Portuguese locale [\#1226](https://github.com/bensheldon/good_job/pull/1226) ([hss-mateus](https://github.com/hss-mateus))
+
 ## [v3.23.0](https://github.com/bensheldon/good_job/tree/v3.23.0) (2024-01-23)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.22.0...v3.23.0)
