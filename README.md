@@ -437,14 +437,17 @@ The Dashboard can be set to automatically refresh by checking "Live Poll" in the
 
 #### Extending dashboard views
 
-The `good_job:install` generator creates a `good_job` folder in your `app/views` directory. This folder contains a number of partials that can be overridden to customize the GoodJob dashboard.
+GoodJob exposes some views that are intended to be overriden by placing views in your application:
+
+- [`app/views/good_job/jobs/_custom_job_details.html.erb`](app/views/good_job/_custom_job_details.html.erb): content added to this partial will be displayed above the argument list on the good_job/jobs#show page.
+- [`app/views/good_job/jobs/_custom_execution_details.html.erb`](app/views/good_job/_custom_execution_details.html.erb): content added to this partial will be displayed above each execution on the good_job/jobs#show page.
 
 **Warning:** these partials expose classes (such as `GoodJob::Job`) that are considered internal implementation details of GoodJob. You should always test your custom partials after upgrading GoodJob.
 
-For example, if your app deals with widgets and you want to show a link to the widget a job acted on, you can add the following to `app/views/good_job/jobs/_custom_job_details.html.erb`:
+For example, if your app deals with widgets and you want to show a link to the widget a job acted on, you can add the following to `app/views/good_job/_custom_job_details.html.erb`:
 
 ```erb
-<%# file: app/views/good_job/jobs/_custom_job_details.html.erb %>
+<%# file: app/views/good_job/_custom_job_details.html.erb %>
 <% arguments = job.active_job.arguments rescue [] %>
 <% widgets = arguments.select { |arg| arg.is_a?(Widget) } %>
 <% if widgets.any? %>
@@ -459,10 +462,10 @@ For example, if your app deals with widgets and you want to show a link to the w
 <% end %>
 ```
 
-As a second example, you may wish to show a link to a log aggregator next to each job execution. You can do this by adding the following to `app/views/good_job/jobs/_custom_execution_details.html.erb`:
+As a second example, you may wish to show a link to a log aggregator next to each job execution. You can do this by adding the following to `app/views/good_job/_custom_execution_details.html.erb`:
 
 ```erb
-<%# file: app/views/good_job/jobs/_custom_execution_details.html.erb %>
+<%# file: app/views/good_job/_custom_execution_details.html.erb %>
 <div class="py-3">
   <%= link_to "Logs", main_app.logs_url(filter: { job_id: job.id }, start_time: execution.performed_at, end_time: execution.finished_at + 1.minute) %>
 </div>
