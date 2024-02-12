@@ -29,7 +29,7 @@ gem 'rails'
 
 platforms :ruby do
   gem "bootsnap"
-  gem "dotenv"
+  gem "dotenv-rails"
   gem "foreman"
   gem "gem-release"
   gem "github_changelog_generator", require: false

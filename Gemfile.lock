@@ -157,7 +157,10 @@ GEM
     date (3.3.4)
     date (3.3.4-java)
     diff-lcs (1.5.0)
-    dotenv (2.8.1)
+    dotenv (3.0.0)
+    dotenv-rails (3.0.0)
+      dotenv (= 3.0.0)
+      railties (>= 6.1)
     drb (2.2.0)
       ruby2_keywords
     easy_translate (0.5.1)
@@ -505,7 +508,7 @@ DEPENDENCIES
   benchmark-ips
   bootsnap
   capybara
-  dotenv
+  dotenv-rails
   easy_translate
   erb_lint
   foreman
