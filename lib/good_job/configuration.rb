@@ -342,10 +342,26 @@ module GoodJob
     end
 
     # Port of the probe server
-    # @return [nil,Integer]
+    # @return [nil, Integer]
     def probe_port
-      options[:probe_port] ||
+      (options[:probe_port] ||
         env['GOOD_JOB_PROBE_PORT']
+      )&.to_i
+    end
+
+    # Probe server handler
+    # @return [nil, Symbol]
+    def probe_handler
+      (options[:probe_handler] ||
+        rails_config[:probe_handler] ||
+        env['GOOD_JOB_PROBE_HANDLER']
+      )&.to_sym
+    end
+
+    # Rack compliant application to be run on the ProbeServer
+    # @return [nil, Class]
+    def probe_app
+      rails_config[:probe_app]
     end
 
     def enable_listen_notify

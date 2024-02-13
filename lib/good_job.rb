@@ -32,8 +32,11 @@ require "good_job/log_subscriber"
 require "good_job/multi_scheduler"
 require "good_job/notifier"
 require "good_job/poller"
-require "good_job/http_server"
 require "good_job/probe_server"
+require "good_job/probe_server/healthcheck_middleware"
+require "good_job/probe_server/not_found_app"
+require "good_job/probe_server/simple_handler"
+require "good_job/probe_server/webrick_handler"
 require "good_job/scheduler"
 require "good_job/shared_executor"
 require "good_job/systemd_service"
@@ -247,7 +250,7 @@ module GoodJob
     loop do
       break if limit && iteration >= limit
 
-      result = Rails.application.reloader.wrap { job_performer.next }
+      result = Rails.application.executor.wrap { job_performer.next }
       break unless result
       raise result.unhandled_error if result.unhandled_error
 
@@ -273,7 +276,7 @@ module GoodJob
   def self.migrated?
     # Always update with the most recent migration check
     GoodJob::Execution.reset_column_information
-    GoodJob::Execution.active_job_id_index_removal_migrated?
+    GoodJob::Execution.candidate_lookup_index_migrated?
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)

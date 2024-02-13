@@ -60,6 +60,26 @@ RSpec.describe GoodJob::CLI do
       end
     end
 
+    describe 'probe-handler' do
+      let(:probe_server) { instance_double GoodJob::ProbeServer, start: nil, stop: nil }
+
+      before do
+        allow(Kernel).to receive(:loop)
+        allow(GoodJob::ProbeServer).to receive(:new).and_return probe_server
+      end
+
+      context 'when a port and handler are specified' do
+        it 'starts a ProbeServer with the specified port and a "nil" app' do
+          cli = described_class.new([], { probe_port: 3838, probe_handler: "webrick" }, {})
+          cli.start
+
+          expect(GoodJob::ProbeServer).to have_received(:new).with(app: nil, port: 3838, handler: :webrick)
+          expect(probe_server).to have_received(:start)
+          expect(probe_server).to have_received(:stop)
+        end
+      end
+    end
+
     describe 'probe-port' do
       let(:probe_server) { instance_double GoodJob::ProbeServer, start: nil, stop: nil }
 
@@ -68,13 +88,49 @@ RSpec.describe GoodJob::CLI do
         allow(GoodJob::ProbeServer).to receive(:new).and_return probe_server
       end
 
-      it 'starts a ProbeServer' do
-        cli = described_class.new([], { probe_port: 3838 }, {})
-        cli.start
+      context 'when a port is specified' do
+        it 'starts a ProbeServer with the specified port and a "nil" app' do
+          cli = described_class.new([], { probe_port: 3838 }, {})
+          cli.start
 
-        expect(GoodJob::ProbeServer).to have_received(:new).with(port: 3838)
-        expect(probe_server).to have_received(:start)
-        expect(probe_server).to have_received(:stop)
+          expect(GoodJob::ProbeServer).to have_received(:new).with(app: nil, port: 3838, handler: nil)
+          expect(probe_server).to have_received(:start)
+          expect(probe_server).to have_received(:stop)
+        end
+      end
+
+      context 'when a port and an app are set in the Rails configuration' do
+        it 'starts a ProbesServer with the configured port and app' do
+          app_mock = instance_double(Proc, call: nil)
+          configuration_mock = instance_double(
+            GoodJob::Configuration,
+            probe_app: app_mock,
+            probe_port: 3838,
+            probe_handler: nil,
+            options: {},
+            daemonize?: false,
+            shutdown_timeout: 100,
+            idle_timeout: 100
+          )
+          allow(GoodJob).to receive_messages(configuration: configuration_mock)
+          cli = described_class.new([], [], {})
+          cli.start
+
+          expect(GoodJob::ProbeServer).to have_received(:new).with(app: app_mock, port: 3838, handler: nil)
+          expect(probe_server).to have_received(:start)
+          expect(probe_server).to have_received(:stop)
+        end
+      end
+
+      context 'when a port is not specified' do
+        it 'does not start a ProbeServer' do
+          cli = described_class.new([], {}, {})
+          cli.start
+
+          expect(GoodJob::ProbeServer).not_to have_received(:new)
+          expect(probe_server).not_to have_received(:start)
+          expect(probe_server).not_to have_received(:stop)
+        end
       end
     end
 

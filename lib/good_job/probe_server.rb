@@ -8,13 +8,20 @@ module GoodJob
       GoodJob._on_thread_error(thread_error) if thread_error
     end
 
-    def initialize(port:)
-      @port = port
+    def self.default_app
+      ::Rack::Builder.new do
+        use GoodJob::ProbeServer::HealthcheckMiddleware
+        run GoodJob::ProbeServer::NotFoundApp
+      end
+    end
+
+    def initialize(port:, handler: nil, app: nil)
+      app ||= self.class.default_app
+      @handler = build_handler(port: port, handler: handler, app: app)
     end
 
     def start
-      @handler = HttpServer.new(self, port: @port, logger: GoodJob.logger)
-      @future = Concurrent::Future.new { @handler.run }
+      @future = @handler.build_future
       @future.add_observer(self.class, :task_observer)
       @future.execute
     end
@@ -28,19 +35,17 @@ module GoodJob
       @future&.value # wait for Future to exit
     end
 
-    def call(env)
-      case Rack::Request.new(env).path
-      when '/', '/status'
-        [200, {}, ["OK"]]
-      when '/status/started'
-        started = GoodJob::Scheduler.instances.any? && GoodJob::Scheduler.instances.all?(&:running?)
-        started ? [200, {}, ["Started"]] : [503, {}, ["Not started"]]
-      when '/status/connected'
-        connected = GoodJob::Scheduler.instances.any? && GoodJob::Scheduler.instances.all?(&:running?) &&
-                    GoodJob::Notifier.instances.any? && GoodJob::Notifier.instances.all?(&:connected?)
-        connected ? [200, {}, ["Connected"]] : [503, {}, ["Not connected"]]
+    def build_handler(port:, handler:, app:)
+      if handler == :webrick
+        begin
+          require 'webrick'
+          WebrickHandler.new(app, port: port, logger: GoodJob.logger)
+        rescue LoadError
+          GoodJob.logger.warn("WEBrick was requested as the probe server handler, but it's not in the load path. GoodJob doesn't keep WEBrick as a dependency, so you'll have to make sure its added to your Gemfile to make use of it. GoodJob will fallback to its own webserver in the meantime.")
+          SimpleHandler.new(app, port: port, logger: GoodJob.logger)
+        end
       else
-        [404, {}, ["Not found"]]
+        SimpleHandler.new(app, port: port, logger: GoodJob.logger)
       end
     end
   end

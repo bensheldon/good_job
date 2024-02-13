@@ -219,9 +219,6 @@ tr:
         placeholder: Sınıfa, iş kimliğine, iş parametrelerine ve hata metnine göre ara.
         queue_name: Kuyruk adı
         search: Ara
-      footer:
-        last_update_html: Son güncelleme <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: Unutmayın, siz de iyi bir iş yapıyorsunuz!
       navbar:
         batches: Toplu İşler
         cron_schedules: Cron
@@ -234,6 +231,9 @@ tr:
           dark: Karanlık
           light: Işık
           theme: Tema
+      secondary_navbar:
+        inspiration: Unutmayın, siz de iyi bir iş yapıyorsunuz!
+        last_updated: Son güncelleme
     status:
       discarded: İptal Edildi
       queued: Sırada

@@ -1,5 +1,94 @@
 # Changelog
 
+## [v3.24.0](https://github.com/bensheldon/good_job/tree/v3.24.0) (2024-02-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.23.0...v3.24.0)
+
+**Fixed bugs:**
+
+- Fix batches so that retried-and-successful jobs leave the batch succeeded [\#1243](https://github.com/bensheldon/good_job/pull/1243) ([bensheldon](https://github.com/bensheldon))
+- Use the job class as the default concurrency key if none is provided [\#1145](https://github.com/bensheldon/good_job/pull/1145) ([Earlopain](https://github.com/Earlopain))
+
+**Closed issues:**
+
+- Batch callbacks not run when job fails, then succeeds [\#1239](https://github.com/bensheldon/good_job/issues/1239)
+- Broken pipe @ io\_writev - \<STDERR\> \(Errno::EPIPE\) [\#1233](https://github.com/bensheldon/good_job/issues/1233)
+- PG::UniqueViolation unique constraint "index\_good\_jobs\_on\_cron\_key\_and\_cron\_at\_cond" [\#1230](https://github.com/bensheldon/good_job/issues/1230)
+- Default concurrency key [\#1110](https://github.com/bensheldon/good_job/issues/1110)
+
+**Merged pull requests:**
+
+- Use Ruby 3.3 for development; add Bootsnap; update to Rails 7.1.3 [\#1240](https://github.com/bensheldon/good_job/pull/1240) ([bensheldon](https://github.com/bensheldon))
+- Tweak docs for new concurrency default [\#1229](https://github.com/bensheldon/good_job/pull/1229) ([Earlopain](https://github.com/Earlopain))
+- Brazilian Portuguese locale [\#1226](https://github.com/bensheldon/good_job/pull/1226) ([hss-mateus](https://github.com/hss-mateus))
+
+## [v3.23.0](https://github.com/bensheldon/good_job/tree/v3.23.0) (2024-01-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.22.0...v3.23.0)
+
+**Implemented enhancements:**
+
+- Add environment label to navbar [\#1206](https://github.com/bensheldon/good_job/pull/1206) ([sparshalc](https://github.com/sparshalc))
+- Make health probe server more general purpose [\#1079](https://github.com/bensheldon/good_job/pull/1079) ([jklina](https://github.com/jklina))
+
+**Fixed bugs:**
+
+- Use Rails executor instead of reloader when wrapping inline execution [\#1225](https://github.com/bensheldon/good_job/pull/1225) ([bensheldon](https://github.com/bensheldon))
+- Add an index to better support `smaller_number_is_higher_priority` [\#1213](https://github.com/bensheldon/good_job/pull/1213) ([mkrfowler](https://github.com/mkrfowler))
+- Fix discard job with nonexistent job class [\#1211](https://github.com/bensheldon/good_job/pull/1211) ([yenshirak](https://github.com/yenshirak))
+- Fix: Interacting with input field should pause the live poll [\#1210](https://github.com/bensheldon/good_job/pull/1210) ([sparshalc](https://github.com/sparshalc))
+
+**Closed issues:**
+
+- can't write unknown attribute `active_job_id` [\#1216](https://github.com/bensheldon/good_job/issues/1216)
+- Regression: use of Rails reloader causing mixed constants during seeding [\#1215](https://github.com/bensheldon/good_job/issues/1215)
+- Production worker doesn't show any processes [\#1214](https://github.com/bensheldon/good_job/issues/1214)
+- Clarify required async mode DB pool size [\#1209](https://github.com/bensheldon/good_job/issues/1209)
+- Mac forking exception when using Spring [\#1115](https://github.com/bensheldon/good_job/issues/1115)
+- Jobs should have labels [\#1095](https://github.com/bensheldon/good_job/issues/1095)
+- Set up Dependabot grouped updates [\#1062](https://github.com/bensheldon/good_job/issues/1062)
+- Fix documentation to always include space in "Active Job", "Active Record", etc. [\#1048](https://github.com/bensheldon/good_job/issues/1048)
+
+**Merged pull requests:**
+
+- Bump actions/cache from 3 to 4 [\#1223](https://github.com/bensheldon/good_job/pull/1223) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update README, add poll\_interval defaults/recommendations [\#1220](https://github.com/bensheldon/good_job/pull/1220) ([andynu](https://github.com/andynu))
+- Update Russian translation [\#1219](https://github.com/bensheldon/good_job/pull/1219) ([alec-c4](https://github.com/alec-c4))
+- Add Korean translation \(ko\) [\#1212](https://github.com/bensheldon/good_job/pull/1212) ([hahwul](https://github.com/hahwul))
+- Fix default poll interval in documentation [\#1208](https://github.com/bensheldon/good_job/pull/1208) ([yenshirak](https://github.com/yenshirak))
+
+## [v3.22.0](https://github.com/bensheldon/good_job/tree/v3.22.0) (2024-01-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.5...v3.22.0)
+
+**Implemented enhancements:**
+
+- Add "updated at" info in secondary top navbar [\#1204](https://github.com/bensheldon/good_job/pull/1204) ([sparshalc](https://github.com/sparshalc))
+- Re-add footer with GoodJob version number [\#1201](https://github.com/bensheldon/good_job/pull/1201) ([Pauloparakleto](https://github.com/Pauloparakleto))
+- Add Active Job extension for Labels [\#1188](https://github.com/bensheldon/good_job/pull/1188) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Limiting by executed jobs count by period [\#1198](https://github.com/bensheldon/good_job/issues/1198)
+- Cron jobs processing in async mode [\#1196](https://github.com/bensheldon/good_job/issues/1196)
+- Dashboard Missing Translation? [\#1192](https://github.com/bensheldon/good_job/issues/1192)
+- Show last update on top nav bar [\#1183](https://github.com/bensheldon/good_job/issues/1183)
+- Wrong quoting of the query to spot new jobs? [\#1179](https://github.com/bensheldon/good_job/issues/1179)
+- \[Possible bug\] good\_job does not honour the wait parameter on retry\_on [\#1174](https://github.com/bensheldon/good_job/issues/1174)
+- Running GoodJob in production with systemd throws an error due to a wrong communication with WatchDog [\#1172](https://github.com/bensheldon/good_job/issues/1172)
+
+**Merged pull requests:**
+
+- Bump the bundler-dependencies group with 3 updates [\#1202](https://github.com/bensheldon/good_job/pull/1202) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Remove duplicated intro sentence in README [\#1195](https://github.com/bensheldon/good_job/pull/1195) ([benoittgt](https://github.com/benoittgt))
+- Fix namespace for `InterruptError` in README [\#1193](https://github.com/bensheldon/good_job/pull/1193) ([padde](https://github.com/padde))
+- Bump github/codeql-action from 2 to 3 [\#1191](https://github.com/bensheldon/good_job/pull/1191) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/upload-artifact from 3 to 4 [\#1190](https://github.com/bensheldon/good_job/pull/1190) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Lock RubyGems version for Ruby \< 3.0 in CI [\#1189](https://github.com/bensheldon/good_job/pull/1189) ([bensheldon](https://github.com/bensheldon))
+- Active Record and Active Job name formatting [\#1182](https://github.com/bensheldon/good_job/pull/1182) ([andyatkinson](https://github.com/andyatkinson))
+- Remove redundant `good_jobs.active_job_id` index [\#1181](https://github.com/bensheldon/good_job/pull/1181) ([andyatkinson](https://github.com/andyatkinson))
+- Add missing word in readme [\#1177](https://github.com/bensheldon/good_job/pull/1177) ([Earlopain](https://github.com/Earlopain))
+
 ## [v3.21.5](https://github.com/bensheldon/good_job/tree/v3.21.5) (2023-12-12)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.21.4...v3.21.5)
@@ -1571,7 +1660,6 @@
 **Fixed bugs:**
 
 - `ActionMailer::MailDeliveryJob` executing twice [\#329](https://github.com/bensheldon/good_job/issues/329)
-- Email job breaks dashboard [\#313](https://github.com/bensheldon/good_job/issues/313)
 
 **Closed issues:**
 

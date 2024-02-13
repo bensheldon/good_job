@@ -219,9 +219,6 @@ de:
         placeholder: Suchen Sie nach Klasse, Job-ID, Jobparametern und Fehlertext.
         queue_name: Warteschlangenname
         search: Suchen
-      footer:
-        last_update_html: Zuletzt aktualisiert <time id="page-updated-at" datetime="%{time}">%{time}</time>
-        wording: Denk daran, auch du machst einen guten Job!
       navbar:
         batches: Batches
         cron_schedules: Cron
@@ -234,6 +231,9 @@ de:
           dark: Dunkel
           light: Licht
           theme: Thema
+      secondary_navbar:
+        inspiration: Denk daran, auch du machst einen guten Job!
+        last_updated: Zuletzt aktualisiert
     status:
       discarded: Ausrangiert
       queued: In der Warteschlange
