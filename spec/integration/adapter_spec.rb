@@ -123,7 +123,7 @@ RSpec.describe 'Adapter Integration' do
       stub_const 'PERFORMED', []
       stub_const 'JobError', Class.new(StandardError)
       stub_const 'TestJob', (Class.new(ActiveJob::Base) do
-        retry_on JobError, attempts: 3
+        retry_on JobError, attempts: 3, wait: 1.minute
 
         def perform
           PERFORMED << Time.current
@@ -140,13 +140,43 @@ RSpec.describe 'Adapter Integration' do
     it 'raises unhandled exceptions' do
       expect do
         TestJob.perform_later
-        5.times do
+        2.times do
           travel(5.minutes)
           GoodJob.perform_inline
         end
         travel_back
       end.to raise_error JobError
       expect(PERFORMED.size).to eq 3
+    end
+
+    describe 'immediate retries' do
+      before do
+        stub_const "TestJob", (Class.new(ActiveJob::Base) do
+          retry_on JobError, wait: 0, attempts: Float::INFINITY
+
+          def perform
+            raise JobError if executions < 3
+          end
+        end)
+      end
+
+      it 'retries immediately' do
+        TestJob.perform_later
+
+        expect(GoodJob::Job.count).to eq 1
+        job = GoodJob::Job.first
+
+        expect(job.status).to eq :succeeded
+        expect(job.discrete_executions.count).to eq 3
+      end
+
+      it 'retries immediately when bulk enqueued' do
+        active_jobs = [TestJob.new, TestJob.new]
+        adapter.enqueue_all(active_jobs)
+
+        expect(GoodJob::Job.count).to eq 2
+        expect(GoodJob::Job.all.to_a).to all have_attributes(status: :succeeded, executions_count: 3)
+      end
     end
   end
 end

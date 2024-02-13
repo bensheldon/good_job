@@ -78,10 +78,11 @@ RSpec.describe GoodJob::Job do
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
 
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
-      def perform
-        raise "Didn't expect to perform this job"
+      def perform(*)
+        raise TestJob::RunError, "Ran this job"
       end
     end)
+    stub_const 'TestJob::RunError', Class.new(StandardError)
     stub_const 'TestJob::Error', Class.new(StandardError)
   end
 
@@ -255,6 +256,32 @@ RSpec.describe GoodJob::Job do
 
           original_head_execution.reload
           expect(original_head_execution.retried_good_job_id).to eq new_head_execution.id
+        end
+      end
+
+      context 'when run inline' do
+        before do
+          stub_const "TestJob", (Class.new(ActiveJob::Base) do
+            retry_on TestJob::Error, wait: 0
+
+            def perform(*)
+              raise TestJob::Error if executions < 4
+            end
+          end)
+          stub_const "TestJob::Error", Class.new(StandardError)
+        end
+
+        it 'executes the job' do
+          TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+          job.retry_job
+
+          expect(job).to be_finished
+          executions = job.discrete_executions.order(:created_at).to_a
+
+          expect(executions.size).to eq 3 # initial execution isn't created in test
+          expect(executions.map(&:error)).to eq ["TestJob::Error: TestJob::Error", "TestJob::Error: TestJob::Error", nil]
+          expect(executions[0].finished_at).to be < executions[1].finished_at
+          expect(executions[1].finished_at).to be < executions[2].finished_at
         end
       end
     end

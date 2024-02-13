@@ -96,6 +96,13 @@ module GoodJob
             begin
               inline_execution = inline_executions.shift
               inline_result = inline_execution.perform
+
+              retried_execution = inline_result.retried
+              while retried_execution && retried_execution.scheduled_at <= Time.current
+                inline_execution = retried_execution
+                inline_result = inline_execution.perform
+                retried_execution = inline_result.retried
+              end
             ensure
               inline_execution.advisory_unlock
               inline_execution.run_callbacks(:perform_unlocked)
@@ -141,26 +148,43 @@ module GoodJob
 
       Rails.application.executor.wrap do
         will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
-        execution = GoodJob::Execution.enqueue(
-          active_job,
-          scheduled_at: scheduled_at,
-          create_with_advisory_lock: will_execute_inline
-        )
+        will_retry_inline = will_execute_inline && CurrentThread.execution&.active_job_id == active_job.job_id && !CurrentThread.retry_now
 
-        if will_execute_inline
+        if will_retry_inline
+          execution = GoodJob::Execution.enqueue(
+            active_job,
+            scheduled_at: scheduled_at
+          )
+        elsif will_execute_inline
+          execution = GoodJob::Execution.enqueue(
+            active_job,
+            scheduled_at: scheduled_at,
+            create_with_advisory_lock: true
+          )
           begin
             result = execution.perform
+
+            retried_execution = result.retried
+            while retried_execution && (retried_execution.scheduled_at.nil? || retried_execution.scheduled_at <= Time.current)
+              execution = retried_execution
+              result = execution.perform
+              retried_execution = result.retried
+            end
+
+            Notifier.notify(retried_execution.job_state) if retried_execution&.scheduled_at && retried_execution.scheduled_at > Time.current && send_notify?(active_job)
           ensure
             execution.advisory_unlock
             execution.run_callbacks(:perform_unlocked)
           end
           raise result.unhandled_error if result.unhandled_error
         else
-          job_state = { queue_name: execution.queue_name }
-          job_state[:scheduled_at] = execution.scheduled_at if execution.scheduled_at
+          execution = GoodJob::Execution.enqueue(
+            active_job,
+            scheduled_at: scheduled_at
+          )
 
-          executed_locally = execute_async? && @capsule&.create_thread(job_state)
-          Notifier.notify(job_state) if !executed_locally && send_notify?(active_job)
+          executed_locally = execute_async? && @capsule&.create_thread(execution.job_state)
+          Notifier.notify(execution.job_state) if !executed_locally && send_notify?(active_job)
         end
 
         execution

@@ -13,9 +13,8 @@ module GoodJob
     attr_reader :error_event
     # @return [Boolean, nil]
     attr_reader :unexecutable
-    # @return [Boolean, nil]
+    # @return [GoodJob::Execution, nil]
     attr_reader :retried
-    alias retried? retried
 
     # @param value [Object, nil]
     # @param handled_error [Exception, nil]
@@ -23,7 +22,7 @@ module GoodJob
     # @param error_event [String, nil]
     # @param unexecutable [Boolean, nil]
     # @param retried [Boolean, nil]
-    def initialize(value:, handled_error: nil, unhandled_error: nil, error_event: nil, unexecutable: nil, retried: false)
+    def initialize(value:, handled_error: nil, unhandled_error: nil, error_event: nil, unexecutable: nil, retried: nil)
       @value = value
       @handled_error = handled_error
       @unhandled_error = unhandled_error
@@ -34,7 +33,12 @@ module GoodJob
 
     # @return [Boolean]
     def succeeded?
-      !(handled_error || unhandled_error || unexecutable || retried)
+      !(handled_error || unhandled_error || unexecutable || retried?)
+    end
+
+    # @return [Boolean]
+    def retried?
+      retried.present?
     end
   end
 end
