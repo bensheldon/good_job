@@ -52,27 +52,27 @@
 
                 <div class="dropdown float-end">
                   <button class="d-flex align-items-center btn btn-sm" type="button" id="<%= dom_id(job, :actions) %>" data-bs-toggle="dropdown" aria-expanded="false">
-                    <%= render "good_job/shared/icons/dots" %>
+                    <%= render_icon :dots %>
                     <span class="visually-hidden"><%=t ".actions.title" %></span>
                   </button>
                   <ul class="dropdown-menu shadow" aria-labelledby="<%= dom_id(job, :actions) %>">
                     <li>
                       <% job_reschedulable = job.status.in? [:scheduled, :retried, :queued] %>
                       <%= link_to reschedule_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_reschedulable}", title: t(".actions.reschedule"), data: { confirm: t(".actions.confirm_reschedule"), disable: true } do %>
-                        <%= render "good_job/shared/icons/skip_forward" %>
+                        <%= render_icon "skip_forward" %>
                         <%=t "good_job.actions.reschedule" %>
                       <% end %>
                     </li>
                     <li>
                       <% job_discardable = job.status.in? [:scheduled, :retried, :queued] %>
                       <%= link_to discard_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_discardable}", title: t(".actions.discard"), data: { confirm: t(".actions.confirm_discard"), disable: true } do %>
-                        <%= render "good_job/shared/icons/stop" %>
+                        <%= render_icon "stop" %>
                         <%=t "good_job.actions.discard" %>
                       <% end %>
                     </li>
                     <li>
                       <%= link_to retry_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job.status == :discarded}", title: t(".actions.retry"), data: { confirm: t(".actions.confirm_retry"), disable: true } do %>
-                        <%= render "good_job/shared/icons/arrow_clockwise" %>
+                        <%= render_icon "arrow_clockwise" %>
                         <%=t "good_job.actions.retry" %>
                       <% end %>
                     </li>

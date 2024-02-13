@@ -2,7 +2,7 @@
   <% if notice %>
     <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-body d-flex align-items-center gap-2">
-        <%= render "good_job/shared/icons/check", class: "flex-shrink-0 text-success" %>
+        <%= render_icon "check", class: "flex-shrink-0 text-success" %>
         <div class="flex-fill"><%= notice %></div>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
@@ -11,7 +11,7 @@
   <% if alert %>
     <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-body d-flex align-items-center gap-2">
-        <%= render "good_job/shared/icons/exclamation", class: "flex-shrink-0 text-danger" %>
+        <%= render_icon "exclamation", class: "flex-shrink-0 text-danger" %>
         <div class="flex-fill"><%= alert %></div>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
