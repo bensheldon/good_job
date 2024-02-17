@@ -93,7 +93,7 @@ module GoodJob # :nodoc:
       if timeout.nil?
         @connected.set?
       else
-        @connected.wait(timeout == -1 ? nil : timeout)
+        @connected.wait(timeout&.negative? ? nil : timeout)
       end
     end
 
@@ -104,7 +104,7 @@ module GoodJob # :nodoc:
       if timeout.nil?
         @listening.set?
       else
-        @listening.wait(timeout == -1 ? nil : timeout)
+        @listening.wait(timeout&.negative? ? nil : timeout)
       end
     end
 
@@ -130,7 +130,7 @@ module GoodJob # :nodoc:
           @listening.reset
           @shutdown_event.set
         else
-          @shutdown_event.wait(timeout == -1 ? nil : timeout) unless timeout.nil?
+          @shutdown_event.wait(timeout&.negative? ? nil : timeout) unless timeout.nil?
           @connected.reset if @shutdown_event.set?
         end
         @shutdown_event.set?

@@ -147,6 +147,14 @@ RSpec.describe GoodJob::Notifier do
       notifier.shutdown
       expect(notifier).to be_shutdown
     end
+
+    it 'can be shut down asynchronously' do
+      notifier = described_class.new(executor: executor, enable_listening: true)
+      wait_until { expect(notifier).to be_listening }
+      notifier.shutdown(timeout: nil)
+      wait_until { expect(notifier).to be_shutdown }
+      notifier.shutdown
+    end
   end
 
   describe '#restart' do

@@ -57,7 +57,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         - [Exceptions](#exceptions)
         - [Retries](#retries)
         - [Action Mailer retries](#action-mailer-retries)
-        - [Interrupts](#interrupts)
+        - [Interrupts, graceful shutdown, and SIGKILL](#Interrupts-graceful-shutdown-and-SIGKILL)
     - [Timeouts](#timeouts)
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
     - [Database connections](#database-connections)
@@ -974,9 +974,24 @@ end
 Note, that `ActionMailer::MailDeliveryJob` is a default since Rails 6.0. Be sure that your app is using that class, as it
 might also be configured to use (deprecated now) `ActionMailer::DeliveryJob`.
 
-### Interrupts
+### Interrupts, graceful shutdown, and SIGKILL
 
-Jobs will be automatically retried if the process is interrupted while performing a job, for example as the result of a `SIGKILL` or power failure.
+When GoodJob receives an interrupt (SIGINT, SIGTERM) or explicitly with `GoodJob.shutdown`, GoodJob will attempt to gracefully shut down, waiting for all jobs to finish before exiting based on the `shutdown_timeout` configuration.
+
+To detect the start of a graceful shutdown from within a performing job, for example while looping/iterating over multiple items, you can call `GoodJob.current_thread_shutting_down?` or `GoodJob.current_thread_running?` from within the job. For example:
+
+```ruby
+def perform(lots_of_records)
+  lots_of_records.each do |record|
+    break if GoodJob.current_thread_shutting_down? # or `unless GoodJob.current_thread.running?`
+    # process record ...
+  end
+end
+````
+
+Note that when running jobs in `:inline` execution mode, `GoodJob.current_thread_running?` will always be truthy and `GoodJob.current_thread_shutting_down?` will always be falsey.
+
+Jobs will be automatically retried if the process is interrupted while performing a job and the job is unable to finish before the timeout or as the result of a `SIGKILL` or power failure.
 
 If you need more control over interrupt-caused retries, include the `GoodJob::ActiveJobExtensions::InterruptErrors` extension in your job class. When an interrupted job is retried, the extension will raise a `GoodJob::InterruptError` exception within the job, which allows you to use Active Job's `retry_on` and `discard_on` to control the behavior of the job.
 
