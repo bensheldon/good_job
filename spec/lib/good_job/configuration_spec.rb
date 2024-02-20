@@ -268,13 +268,13 @@ RSpec.describe GoodJob::Configuration do
     end
 
     it 'returns entries specified in options' do
-      configuration = described_class.new({ cron: })
+      configuration = described_class.new({ cron: cron })
 
       expect(configuration.cron).to eq(cron)
     end
 
     it 'returns entries specified in rails config' do
-      allow(Rails.application.config).to receive(:good_job).and_return({ cron: })
+      allow(Rails.application.config).to receive(:good_job).and_return({ cron: cron })
 
       configuration = described_class.new({})
 
