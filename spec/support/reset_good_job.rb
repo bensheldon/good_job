@@ -6,11 +6,9 @@ ActiveSupport.on_load :active_record do
   ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkout, :after, lambda {
     thread_name = Thread.current.name || Thread.current.object_id
     sql = "SET application_name = #{quote(thread_name)}"
-    if @raw_connection
-      @raw_connection.query(sql)
-    else
-      exec_query(sql, "Set application name")
-    end
+
+    # Necessary because of https://github.com/rails/rails/pull/51083/files#r1496720821
+    @raw_connection ? @raw_connection.query(sql) : exec_query(sql, "Set application name")
   }
 end
 
@@ -132,14 +130,14 @@ ActiveSupport.on_load :active_record do
 end
 
 class PgStatActivity < ActiveRecord::Base
-  include GoodJob::AssignableConnection
+  include GoodJob::OverridableConnection
 
   self.table_name = 'pg_stat_activity'
   self.primary_key = 'datid'
 end
 
 class PgLock < ActiveRecord::Base
-  include GoodJob::AssignableConnection
+  include GoodJob::OverridableConnection
 
   self.table_name = 'pg_locks'
   self.primary_key = 'objid'
@@ -152,31 +150,31 @@ class PgLock < ActiveRecord::Base
   scope :others, -> { where('pid != pg_backend_pid()') }
 
   def self.debug_own_locks(connection = ActiveRecord::Base.connection)
-    count = PgLock.with_connection(connection) do
+    count = PgLock.override_connection(connection) do
       PgLock.current_database.advisory_lock.owns.count
     end
     return false if count.zero?
 
     output = []
     output << "There are #{count} advisory locks still open by the current database connection."
-    GoodJob::Execution.include(GoodJob::AssignableConnection)
-    GoodJob::Execution.with_connection(connection) do
+    GoodJob::Execution.include(GoodJob::OverridableConnection)
+    GoodJob::Execution.override_connection(connection) do
       GoodJob::Execution.owns_advisory_locked.each.with_index do |execution, index|
         output << "\nAdvisory locked GoodJob::Execution:" if index.zero?
         output << "  - Execution ID: #{execution.id} / Active Job ID: #{execution.active_job_id}"
       end
     end
 
-    GoodJob::BatchRecord.include(GoodJob::AssignableConnection)
-    GoodJob::BatchRecord.with_connection(connection) do
+    GoodJob::BatchRecord.include(GoodJob::OverridableConnection)
+    GoodJob::BatchRecord.override_connection(connection) do
       GoodJob::BatchRecord.owns_advisory_locked.each.with_index do |batch, index|
         output << "\nAdvisory locked GoodJob::Batch:" if index.zero?
         output << "  - BatchRecord ID: #{batch.id}"
       end
     end
 
-    GoodJob::Process.include(GoodJob::AssignableConnection)
-    GoodJob::Process.with_connection(connection) do
+    GoodJob::Process.include(GoodJob::OverridableConnection)
+    GoodJob::Process.override_connection(connection) do
       GoodJob::Process.owns_advisory_locked.each.with_index do |process, index|
         output << "\nAdvisory locked GoodJob::Process:" if index.zero?
         output << "  - Process ID: #{process.id}"
