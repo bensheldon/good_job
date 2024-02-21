@@ -396,6 +396,8 @@ RSpec.describe GoodJob::AdvisoryLockable do
       done_event = Concurrent::Event.new
 
       promise = rails_promise do
+        execution.class.connection # <= This is necessary to fixate the connection in the thread
+
         execution.class.transaction do
           execution.advisory_lock
           locked_event.set
