@@ -609,7 +609,7 @@ end
 active_jobs.all?(&:provider_job_id)
 
 # Bulk enqueue Active Job instances directly without using `.perform_later`:
-GoodJob::Bulk.enqueue(MyJob.new, AnotherJob.new)
+GoodJob::Bulk.enqueue([MyJob.new, AnotherJob.new])
 ```
 
 ### Batches
