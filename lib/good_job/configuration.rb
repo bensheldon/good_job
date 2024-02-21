@@ -204,9 +204,10 @@ module GoodJob
 
     def cron
       env_cron = JSON.parse(ENV.fetch('GOOD_JOB_CRON'), symbolize_names: true) if ENV['GOOD_JOB_CRON'].present?
+      rails_config_cron = rails_config[:cron].presence
 
       options[:cron] ||
-        rails_config[:cron] ||
+        rails_config_cron ||
         env_cron ||
         {}
     end

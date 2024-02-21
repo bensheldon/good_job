@@ -6,6 +6,7 @@ module GoodJob
     isolate_namespace GoodJob
 
     config.good_job = ActiveSupport::OrderedOptions.new
+    config.good_job.cron = {}
 
     initializer "good_job.logger" do |_app|
       ActiveSupport.on_load(:good_job) do
