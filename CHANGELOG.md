@@ -1,5 +1,33 @@
 # Changelog
 
+## [v3.25.0](https://github.com/bensheldon/good_job/tree/v3.25.0) (2024-02-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.24.0...v3.25.0)
+
+**Implemented enhancements:**
+
+- Allow disabling of Dashboard Live Polling configuration [\#1235](https://github.com/bensheldon/good_job/pull/1235) ([erick-tmr](https://github.com/erick-tmr))
+- Add customizable extension partials to good\_job/jobs\#show view [\#1200](https://github.com/bensheldon/good_job/pull/1200) ([grncdr](https://github.com/grncdr))
+
+**Fixed bugs:**
+
+- Fix default engine cron value [\#1258](https://github.com/bensheldon/good_job/pull/1258) ([hss-mateus](https://github.com/hss-mateus))
+- Print an error when daemon pidfile dir doesn't exist [\#1252](https://github.com/bensheldon/good_job/pull/1252) ([thepry](https://github.com/thepry))
+
+**Closed issues:**
+
+- Production deployment question [\#1257](https://github.com/bensheldon/good_job/issues/1257)
+- Daemon and App not connecting to secondary database [\#1254](https://github.com/bensheldon/good_job/issues/1254)
+- Logging with logger.warn in classes is suppressed by good job? \(semantic\_logger\) [\#1250](https://github.com/bensheldon/good_job/issues/1250)
+
+**Merged pull requests:**
+
+- Fix Active Record connection changes on Rails head [\#1259](https://github.com/bensheldon/good_job/pull/1259) ([bensheldon](https://github.com/bensheldon))
+- \[Docs\] Bulk.enqueue takes an array of jobs [\#1256](https://github.com/bensheldon/good_job/pull/1256) ([jpcamara](https://github.com/jpcamara))
+- Clean up icon helpers for less noisy view rendering [\#1248](https://github.com/bensheldon/good_job/pull/1248) ([bensheldon](https://github.com/bensheldon))
+- Use dotenv-rails instead of dotenv [\#1247](https://github.com/bensheldon/good_job/pull/1247) ([bensheldon](https://github.com/bensheldon))
+- Perform inline retries iteratively instead of recursively [\#1246](https://github.com/bensheldon/good_job/pull/1246) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.24.0](https://github.com/bensheldon/good_job/tree/v3.24.0) (2024-02-12)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.23.0...v3.24.0)
