@@ -60,7 +60,7 @@
 
         <li class="nav-item d-flex flex-column justify-content-center">
           <div class="form-check form-switch m-0">
-            <%= check_box_tag "live_poll", params.fetch("poll", 30), params[:poll].present?, role: "switch", class: "form-check-input" %>
+            <%= check_box_tag "live_poll", params.fetch("poll", 30), (GoodJob.configuration.dashboard_live_poll_enabled && params[:poll].present?), role: "switch", class: "form-check-input", disabled: !GoodJob.configuration.dashboard_live_poll_enabled %>
             <label class="form-check-label navbar-text p-0" for="live_poll">
               <%= t(".live_poll") %>
             </label>

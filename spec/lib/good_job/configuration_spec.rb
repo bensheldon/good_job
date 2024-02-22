@@ -325,4 +325,17 @@ RSpec.describe GoodJob::Configuration do
       expect(configuration.dashboard_default_locale).to eq :de
     end
   end
+
+  describe '#dashboard_live_poll_enabled' do
+    it 'delegates to rails configuration' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ dashboard_live_poll_enabled: false })
+      configuration = described_class.new({})
+      expect(configuration.dashboard_live_poll_enabled).to eq false
+    end
+
+    it 'has a "true" default value' do
+      configuration = described_class.new({})
+      expect(configuration.dashboard_live_poll_enabled).to eq true
+    end
+  end
 end
