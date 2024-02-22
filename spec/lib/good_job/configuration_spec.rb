@@ -259,6 +259,43 @@ RSpec.describe GoodJob::Configuration do
     end
   end
 
+  describe '#cron' do
+    let(:cron) { { some_task: { cron: "every day", class: "FooJob" } } }
+
+    before do
+      stub_const 'ENV', ENV.to_hash.except('GOOD_JOB_CRON')
+      allow(Rails.application.config).to receive(:good_job).and_return({})
+    end
+
+    it 'returns entries specified in options' do
+      configuration = described_class.new({ cron: cron })
+
+      expect(configuration.cron).to eq(cron)
+    end
+
+    it 'returns entries specified in rails config' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ cron: cron })
+
+      configuration = described_class.new({})
+
+      expect(configuration.cron).to eq(cron)
+    end
+
+    it 'returns entries specified in ENV' do
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CRON' => cron.to_json })
+
+      configuration = described_class.new({})
+
+      expect(configuration.cron).to eq(cron)
+    end
+
+    it 'returns an empty hash without any entry specified' do
+      configuration = described_class.new({})
+
+      expect(configuration.cron).to eq({})
+    end
+  end
+
   describe '#enable_listen_notify' do
     it 'defaults to true' do
       configuration = described_class.new({})
