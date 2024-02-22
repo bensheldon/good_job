@@ -41,6 +41,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Dashboard](#dashboard)
         - [API-only Rails applications](#api-only-rails-applications)
         - [Live polling](#live-polling)
+        - [Extending dashboard views](#extending-dashboard-views)
     - [Job priority](#job-priority)
     - [Concurrency controls](#concurrency-controls)
         - [How concurrency controls work](#how-concurrency-controls-work)
@@ -450,6 +451,42 @@ end
 #### Live polling
 
 The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
+
+#### Extending dashboard views
+
+GoodJob exposes some views that are intended to be overriden by placing views in your application:
+
+- [`app/views/good_job/jobs/_custom_job_details.html.erb`](app/views/good_job/_custom_job_details.html.erb): content added to this partial will be displayed above the argument list on the good_job/jobs#show page.
+- [`app/views/good_job/jobs/_custom_execution_details.html.erb`](app/views/good_job/_custom_execution_details.html.erb): content added to this partial will be displayed above each execution on the good_job/jobs#show page.
+
+**Warning:** these partials expose classes (such as `GoodJob::Job`) that are considered internal implementation details of GoodJob. You should always test your custom partials after upgrading GoodJob.
+
+For example, if your app deals with widgets and you want to show a link to the widget a job acted on, you can add the following to `app/views/good_job/_custom_job_details.html.erb`:
+
+```erb
+<%# file: app/views/good_job/_custom_job_details.html.erb %>
+<% arguments = job.active_job.arguments rescue [] %>
+<% widgets = arguments.select { |arg| arg.is_a?(Widget) } %>
+<% if widgets.any? %>
+  <div class="my-4">
+    <h5>Widgets</h5>
+    <ul>
+      <% widgets.each do |widget| %>
+        <li><%= link_to widget.name, main_app.widget_url(widget) %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+```
+
+As a second example, you may wish to show a link to a log aggregator next to each job execution. You can do this by adding the following to `app/views/good_job/_custom_execution_details.html.erb`:
+
+```erb
+<%# file: app/views/good_job/_custom_execution_details.html.erb %>
+<div class="py-3">
+  <%= link_to "Logs", main_app.logs_url(filter: { job_id: job.id }, start_time: execution.performed_at, end_time: execution.finished_at + 1.minute) %>
+</div>
+```
 
 ### Job priority
 

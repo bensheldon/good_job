@@ -40,6 +40,7 @@
           </div>
         <% end %>
       <% end %>
+      <%= render 'good_job/custom_execution_details', execution: execution, job: @job %>
       <%= tag.div id: dom_id(execution, "params"), class: "list-group-item collapse small bg-dark text-light" do %>
         <%= tag.pre JSON.pretty_generate(execution.display_serialized_params) %>
       <% end %>
