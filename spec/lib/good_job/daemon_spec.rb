@@ -13,7 +13,7 @@ RSpec.describe GoodJob::Daemon, :skip_if_java do
   end
 
   after do
-    File.delete(pidfile)
+    File.delete(pidfile) if File.exist?(pidfile) # rubocop:disable Lint/NonAtomicFileOperation
   end
 
   describe '#daemonize' do
@@ -35,6 +35,14 @@ RSpec.describe GoodJob::Daemon, :skip_if_java do
 
       it 'aborts with a message' do
         expect { daemon.daemonize }.to output("A server is already running. Check #{pidfile}\n").to_stderr.and raise_error SystemExit
+      end
+    end
+
+    context "when a pidfile directory doesn't exist" do
+      let(:pidfile) { './tmp/missing_dir/pidfile.pid' }
+
+      it 'aborts with a message' do
+        expect { daemon.daemonize }.to output("Pidfile directory \"./tmp/missing_dir\" doesn't exist. Aborting...\n").to_stderr.and raise_error SystemExit
       end
     end
   end

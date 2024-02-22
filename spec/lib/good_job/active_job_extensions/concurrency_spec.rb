@@ -166,7 +166,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
           )
           retry_on StandardError
 
-          def perform
+          def perform(*)
             raise "ERROR"
           end
         end)

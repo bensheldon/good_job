@@ -28,7 +28,8 @@ gem 'rack', '~> 2.2'
 gem 'rails'
 
 platforms :ruby do
-  gem "dotenv"
+  gem "bootsnap"
+  gem "dotenv-rails"
   gem "foreman"
   gem "gem-release"
   gem "github_changelog_generator", require: false

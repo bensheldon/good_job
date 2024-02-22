@@ -17,6 +17,7 @@ module GoodJob
     # Daemonizes the current process and writes out a pidfile.
     # @return [void]
     def daemonize
+      check_pid_dir
       check_pid
       ::Process.daemon
       write_pid
@@ -36,6 +37,14 @@ module GoodJob
     # @return [void]
     def delete_pid
       File.delete(pidfile) if File.exist?(pidfile) # rubocop:disable Lint/NonAtomicFileOperation
+    end
+
+    # @return [void]
+    def check_pid_dir
+      dirname = File.dirname(pidfile)
+      return if Dir.exist?(dirname)
+
+      abort "Pidfile directory \"#{dirname}\" doesn't exist. Aborting..."
     end
 
     # @return [void]

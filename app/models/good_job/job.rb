@@ -195,12 +195,20 @@ module GoodJob
         # Do not update `exception_executions` because that comes from rescue_from's arguments
         active_job.executions = (active_job.executions || 0) + 1
 
+        begin
+          error_class, error_message = execution.error.split(GoodJob::Execution::ERROR_MESSAGE_SEPARATOR).map(&:strip)
+          error = error_class.constantize.new(error_message)
+        rescue StandardError
+          error = StandardError.new(execution.error)
+        end
+
         new_active_job = nil
         GoodJob::CurrentThread.within do |current_thread|
           current_thread.execution = execution
+          current_thread.retry_now = true
 
           execution.class.transaction(joinable: false, requires_new: true) do
-            new_active_job = active_job.retry_job(wait: 0, error: execution.error)
+            new_active_job = active_job.retry_job(wait: 0, error: error)
             execution.error_event = ERROR_EVENT_RETRIED if execution.error && execution.class.error_event_migrated?
             execution.save!
           end

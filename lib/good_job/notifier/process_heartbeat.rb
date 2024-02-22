@@ -14,7 +14,7 @@ module GoodJob # :nodoc:
 
       # Registers the current process.
       def register_process
-        GoodJob::Process.with_connection(connection) do
+        GoodJob::Process.override_connection(connection) do
           GoodJob::Process.cleanup
           @process = GoodJob::Process.register
         end
@@ -22,7 +22,7 @@ module GoodJob # :nodoc:
 
       def refresh_process
         Rails.application.executor.wrap do
-          GoodJob::Process.with_connection(connection) do
+          GoodJob::Process.override_connection(connection) do
             GoodJob::Process.with_logger_silenced do
               @process&.refresh_if_stale(cleanup: true)
             end
@@ -32,7 +32,7 @@ module GoodJob # :nodoc:
 
       # Deregisters the current process.
       def deregister_process
-        GoodJob::Process.with_connection(connection) do
+        GoodJob::Process.override_connection(connection) do
           @process&.deregister
         end
       end

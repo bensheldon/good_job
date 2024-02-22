@@ -272,4 +272,58 @@ RSpec.describe 'Batches' do
       capsule.shutdown(timeout: -1)
     end
   end
+
+  describe 'job that errors once then succeeds' do
+    before do
+      stub_const "TestJob", (Class.new(ActiveJob::Base) do
+        retry_on StandardError, wait: 0, attempts: Float::INFINITY
+
+        def perform
+          raise 'failing' if executions < 2
+        end
+      end)
+
+      stub_const "TestJob::SuccessCallbackJob", (Class.new(ActiveJob::Base) do
+        def perform(_batch, _params)
+          nil
+        end
+      end)
+
+      stub_const "TestJob::DiscardCallbackJob", (Class.new(ActiveJob::Base) do
+        def perform(_batch, _params)
+          nil
+        end
+      end)
+    end
+
+    it 'calls the success callbacks' do
+      batch = GoodJob::Batch.new
+      batch.on_success = 'TestJob::SuccessCallbackJob'
+      batch.on_discard = 'TestJob::DiscardCallbackJob'
+      batch.add do
+        TestJob.perform_later
+      end
+      batch.enqueue
+
+      GoodJob.perform_inline
+
+      batch.reload
+      expect(batch).to be_succeeded
+      expect(batch.callback_active_jobs.count).to eq 1
+      expect(batch.callback_active_jobs.first).to be_a TestJob::SuccessCallbackJob
+
+      job, callback_job = GoodJob::Job.order(:created_at).to_a
+      expect(job.status).to eq :succeeded
+      expect(job.performed_at).to be_present
+      expect(job.finished_at).to be_present
+
+      job_executions = job.discrete_executions.order(:created_at).to_a
+      expect(job_executions.size).to eq 2
+      expect(job_executions.first.status).to eq :discarded
+      expect(job_executions.last.status).to eq :succeeded
+
+      expect(callback_job.job_class).to eq 'TestJob::SuccessCallbackJob'
+      expect(callback_job.status).to eq :succeeded
+    end
+  end
 end

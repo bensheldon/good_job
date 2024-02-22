@@ -12,7 +12,8 @@ gem "rails", "~> 6.0.0"
 gem "traces", "~> 0.9.1"
 
 platforms :ruby do
-  gem "dotenv"
+  gem "bootsnap"
+  gem "dotenv-rails"
   gem "foreman"
   gem "gem-release"
   gem "github_changelog_generator", require: false
