@@ -21,12 +21,10 @@ module GoodJob
       @executor&.running?
     end
 
+    # Tests whether the scheduler is shutdown and no tasks are running.
+    # @return [Boolean, nil]
     def shutdown?
-      if @executor
-        @executor.shutdown?
-      else
-        true
-      end
+      @executor.nil? || (@executor.shutdown? && !@executor.shuttingdown?)
     end
 
     # Shut down the SharedExecutor.
@@ -38,13 +36,16 @@ module GoodJob
     #   * A positive number will wait that many seconds before stopping any remaining active threads.
     # @return [void]
     def shutdown(timeout: -1)
-      return if @executor.nil? || @executor.shutdown?
+      return if @executor.nil? || (@executor.shutdown? && !@executor.shuttingdown?)
 
       @executor.shutdown if @executor.running?
 
       if @executor.shuttingdown? && timeout # rubocop:disable Style/GuardClause
         executor_wait = timeout.negative? ? nil : timeout
-        @executor.kill unless @executor.wait_for_termination(executor_wait)
+        return if @executor.wait_for_termination(executor_wait)
+
+        @executor.kill
+        @executor.wait_for_termination
       end
     end
 

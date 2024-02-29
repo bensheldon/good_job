@@ -71,9 +71,11 @@ module GoodJob # :nodoc:
     # @return [Boolean, nil]
     delegate :running?, to: :executor, allow_nil: true
 
-    # Tests whether the scheduler is shutdown.
+    # Tests whether the scheduler is shutdown and no tasks are running.
     # @return [Boolean, nil]
-    delegate :shutdown?, to: :executor, allow_nil: true
+    def shutdown?
+      @executor.nil? || (executor.shutdown? && !executor.shuttingdown?)
+    end
 
     # Shut down the scheduler.
     # This stops all threads in the thread pool.
@@ -85,7 +87,7 @@ module GoodJob # :nodoc:
     #   * A positive number will wait that many seconds before stopping any remaining active tasks.
     # @return [void]
     def shutdown(timeout: -1)
-      return if executor.nil? || executor.shutdown?
+      return if executor.nil? || (executor.shutdown? && !executor.shuttingdown?)
 
       instrument("scheduler_shutdown_start", { timeout: timeout })
       instrument("scheduler_shutdown", { timeout: timeout }) do
@@ -96,11 +98,11 @@ module GoodJob # :nodoc:
 
         if executor.shuttingdown? && timeout
           executor_wait = timeout.negative? ? nil : timeout
+          return if executor.wait_for_termination(executor_wait)
 
-          unless executor.wait_for_termination(executor_wait)
-            instrument("scheduler_shutdown_kill", { active_job_ids: @performer.performing_active_job_ids.to_a })
-            executor.kill
-          end
+          instrument("scheduler_shutdown_kill", { active_job_ids: @performer.performing_active_job_ids.to_a })
+          executor.kill
+          executor.wait_for_termination
         end
       end
     end
