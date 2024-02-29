@@ -111,10 +111,9 @@ it:
       actions:
         confirm_destroy: Sei sicuro di voler eliminare il job?
         confirm_discard: Sei sicuro di voler scartare il job?
-        confirm_force_discard:
-          "Sei sicuro di voler forzare lo scarto di questo job? Il job verrà contrassegnato come scartato ma il job in esecuzione non verrà interrotto - tuttavia, non verrà riprovato in caso di fallimento.
+        confirm_force_discard: 'Sei sicuro di voler forzare lo scarto di questo job? Il job verrà contrassegnato come scartato ma il job in esecuzione non verrà interrotto - tuttavia, non verrà riprovato in caso di fallimento.
 
-          "
+          '
         confirm_reschedule: Sei sicuro di voler riprogrammare il job?
         confirm_retry: Sei sicuro di voler riprovare il job?
         destroy: Elimina job
@@ -196,7 +195,7 @@ it:
             quadrillion: Q
             thousand: K
             trillion: T
-            unit: ""
+            unit: ''
     processes:
       index:
         cron_enabled: Cron abilitato
@@ -208,8 +207,8 @@ it:
         updated: Aggiornato
     shared:
       boolean:
-        "false": "No"
-        "true": "Sì"
+        'false': 'No'
+        'true': Sì
       error: Errore
       filter:
         all: Tutti
