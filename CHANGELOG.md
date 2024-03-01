@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.26.1](https://github.com/bensheldon/good_job/tree/v3.26.1) (2024-03-01)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.26.0...v3.26.1)
+
+**Fixed bugs:**
+
+- Ignore job deserialization errors when mass-retrying through the dashboard [\#1269](https://github.com/bensheldon/good_job/pull/1269) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Plain HTTP 500 Error when retrying a job for deleted record [\#1263](https://github.com/bensheldon/good_job/issues/1263)
+
 ## [v3.26.0](https://github.com/bensheldon/good_job/tree/v3.26.0) (2024-03-01)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.25.0...v3.26.0)
