@@ -13,6 +13,8 @@ module GoodJob
     AdapterNotGoodJobError = Class.new(StandardError)
     # Attached to a Job's Execution when the Job is discarded.
     DiscardJobError = Class.new(StandardError)
+    # Raised when Active Job data cannot be deserialized
+    ActiveJobDeserializationError = Class.new(StandardError)
 
     class << self
       delegate :table_name, to: GoodJob::Execution
@@ -186,8 +188,9 @@ module GoodJob
     def retry_job
       with_advisory_lock do
         execution = head_execution(reload: true)
-        active_job = execution.active_job
+        active_job = execution.active_job(ignore_deserialization_errors: true)
 
+        raise ActiveJobDeserializationError if active_job.nil?
         raise AdapterNotGoodJobError unless active_job.class.queue_adapter.is_a? GoodJob::Adapter
         raise ActionForStateMismatchError if execution.finished_at.blank? || execution.error.blank?
 

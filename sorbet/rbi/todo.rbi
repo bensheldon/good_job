@@ -34,6 +34,7 @@ module ::TestJob::Error; end
 module ::TestJob::ExpectedError; end
 module ::TestJob::RunError; end
 module ::TestJob::SuccessCallbackJob; end
+module GoodJob::Job::DeserializationError; end
 module GoodJob::Job::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Job::ERROR_EVENT_RETRIED; end
 module Prism::AliasGlobalVariableNode::AliasGlobalVariableNode; end

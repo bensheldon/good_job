@@ -110,6 +110,21 @@ describe GoodJob::JobsController do
         job.reload
         expect(job.discrete_executions.count).to eq 2
       end
+
+      context 'when Job is not deserializable' do
+        before do
+          job.update(serialized_params: { "job_class" => "NonExistentJob" })
+        end
+
+        it 'ignores the job' do
+          put good_job.mass_update_jobs_path, params: {
+            mass_action: 'retry',
+            job_ids: [job.id],
+          }
+          expect(response).to have_http_status(:found)
+          expect(flash[:notice]).to eq("No jobs were retried")
+        end
+      end
     end
 
     describe 'mass_action=destroy' do
