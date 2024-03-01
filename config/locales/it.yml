@@ -1,0 +1,243 @@
+---
+it:
+  good_job:
+    actions:
+      destroy: Elimina
+      discard: Scarta
+      force_discard: Forza scarto
+      inspect: Ispeziona
+      reschedule: Riprogramma
+      retry: Riprova
+    batches:
+      index:
+        older_batches: Batch più vecchi
+        pending_migrations: GoodJob ha migrazioni del database in sospeso.
+        title: Batch
+      jobs:
+        actions:
+          confirm_destroy: Sei sicuro di voler eliminare questo job?
+          confirm_discard: Sei sicuro di voler scartare questo job?
+          confirm_reschedule: Sei sicuro di voler riprogrammare questo job?
+          confirm_retry: Sei sicuro di voler riprovare questo job?
+          destroy: Elimina job
+          discard: Scarta job
+          reschedule: Riprogramma job
+          retry: Riprova job
+          title: Azioni
+        no_jobs_found: Nessun job trovato.
+      show:
+        attributes: Attributi
+        batched_jobs: Job raggruppati
+        callback_jobs: Job di callback
+      table:
+        no_batches_found: Nessun batch trovato.
+    cron_entries:
+      actions:
+        confirm_disable: Sei sicuro di voler disabilitare questa voce cron?
+        confirm_enable: Sei sicuro di voler confermare questa voce cron?
+        confirm_enqueue: Sei sicuro di voler mettere in coda questa voce cron?
+        disable: Disabilita voce cron
+        enable: Abilita voce cron
+        enqueue: Metti in coda voce cron ora
+      disable:
+        notice: Voce cron è stata disabilitata.
+      enable:
+        notice: Voce cron è stata abilitata.
+      enqueue:
+        notice: Voce cron è stata messa in coda.
+      index:
+        no_cron_schedules_found: Nessuna pianificazione cron trovata.
+        title: Pianificazioni cron
+      pending_migrations: Richiede migrazione del database GoodJob in sospeso.
+      show:
+        cron_entry_key: Chiave voce cron
+    datetime:
+      distance_in_words:
+        about_x_hours:
+          one: circa 1 ora
+          other: circa %{count} ore
+        about_x_months:
+          one: circa 1 mese
+          other: circa %{count} mesi
+        about_x_years:
+          one: circa 1 anno
+          other: circa %{count} anni
+        almost_x_years:
+          one: quasi 1 anno
+          other: quasi %{count} anni
+        half_a_minute: mezzo minuto
+        less_than_x_minutes:
+          one: meno di un minuto
+          other: meno di %{count} minuti
+        less_than_x_seconds:
+          one: meno di 1 secondo
+          other: meno di %{count} secondi
+        over_x_years:
+          one: più di 1 anno
+          other: più di %{count} anni
+        x_days:
+          one: 1 giorno
+          other: "%{count} giorni"
+        x_minutes:
+          one: 1 minuto
+          other: "%{count} minuti"
+        x_months:
+          one: 1 mese
+          other: "%{count} mesi"
+        x_seconds:
+          one: 1 secondo
+          other: "%{count} secondi"
+        x_years:
+          one: 1 anno
+          other: "%{count} anni"
+    duration:
+      hours: "%{hour}h %{min}m"
+      less_than_10_seconds: "%{sec}s"
+      milliseconds: "%{ms}ms"
+      minutes: "%{min}m %{sec}s"
+      seconds: "%{sec}s"
+    error_event:
+      discarded: Scartato
+      handled: Gestito
+      interrupted: Interrotto
+      retried: Riprovato
+      retry_stopped: Interrotto riprova
+      unhandled: Non gestito
+    helpers:
+      relative_time:
+        future: tra %{time}
+        past: "%{time} fa"
+    jobs:
+      actions:
+        confirm_destroy: Sei sicuro di voler eliminare il job?
+        confirm_discard: Sei sicuro di voler scartare il job?
+        confirm_force_discard: 'Sei sicuro di voler forzare lo scarto di questo job? Il job verrà contrassegnato come scartato ma il job in esecuzione non verrà interrotto - tuttavia, non verrà riprovato in caso di fallimento.
+
+          '
+        confirm_reschedule: Sei sicuro di voler riprogrammare il job?
+        confirm_retry: Sei sicuro di voler riprovare il job?
+        destroy: Elimina job
+        discard: Scarta job
+        force_discard: Forza scarto job
+        reschedule: Riprogramma job
+        retry: Riprova job
+      destroy:
+        notice: Il job è stato eliminato
+      discard:
+        notice: Il job è stato scartato
+      executions:
+        in_queue: in coda
+        runtime: tempo di esecuzione
+        title: Esecuzioni
+      force_discard:
+        notice: Il job è stato forzatamente scartato. Continuerà ad eseguirsi ma non verrà riprovato in caso di fallimento
+      index:
+        job_pagination: Paginazione job
+        older_jobs: Job più vecchi
+      reschedule:
+        notice: Il job è stato riprogrammato
+      retry:
+        notice: Il job è stato riprovato
+      show:
+        jobs: Job
+      table:
+        actions:
+          apply_to_all:
+            one: Applica al job (1).
+            other: Applica a tutti %{count} i job.
+          confirm_destroy_all: Sei sicuro di voler eliminare i job selezionati?
+          confirm_discard_all: Sei sicuro di voler scartare i job selezionati?
+          confirm_reschedule_all: Sei sicuro di voler riprogrammare i job selezionati?
+          confirm_retry_all: Sei sicuro di voler riprovare i job selezionati?
+          destroy_all: Elimina tutti
+          discard_all: Scarta tutti
+          reschedule_all: Riprogramma tutti
+          retry_all: Riprova tutti
+          title: Azioni
+        no_jobs_found: Nessun job trovato.
+        toggle_actions: Attiva/Disattiva Azioni
+        toggle_all_jobs: Attiva/Disattiva tutti i job
+    models:
+      batch:
+        created: Creato
+        created_at: Creato il
+        discarded: Scartato
+        discarded_at: Scartato il
+        enqueued: In coda
+        enqueued_at: In coda il
+        finished: Finito
+        finished_at: Finito il
+        jobs: Job
+        name: Nome
+      cron:
+        class: Classe
+        last_run: Ultima esecuzione
+        next_scheduled: Prossima pianificazione
+        schedule: Pianificazione
+      job:
+        arguments: Argomenti
+        attempts: Tentativi
+        priority: Priorità
+        queue: Coda
+    number:
+      format:
+        delimiter: ","
+        separator: "."
+      human:
+        decimal_units:
+          delimiter: ","
+          format: "%n%u"
+          precision: 3
+          separator: "."
+          units:
+            billion: B
+            million: M
+            quadrillion: Q
+            thousand: K
+            trillion: T
+            unit: ''
+    processes:
+      index:
+        cron_enabled: Cron abilitato
+        no_good_job_processes_found: Nessun processo GoodJob trovato.
+        process: Processo
+        schedulers: Schedulers
+        started: Avviato
+        title: Processi
+        updated: Aggiornato
+    shared:
+      boolean:
+        'false': 'No'
+        'true': Sì
+      error: Errore
+      filter:
+        all: Tutti
+        all_jobs: Tutti i job
+        all_queues: Tutte le code
+        clear: Cancella
+        job_name: Nome job
+        placeholder: Cerca per classe, ID job, parametri job e testo errore.
+        queue_name: Nome coda
+        search: Cerca
+      navbar:
+        batches: Batch
+        cron_schedules: Cron
+        jobs: Job
+        live_poll: Live Poll
+        name: "GoodJob 👍"
+        processes: Processi
+        theme:
+          auto: Auto
+          dark: Scuro
+          light: Chiaro
+          theme: Tema
+      secondary_navbar:
+        inspiration: Ricorda, stai facendo anche tu un Buon Lavoro!
+        last_updated: Ultimo aggiornamento
+    status:
+      discarded: Scartato
+      queued: In coda
+      retried: Riprovato
+      running: In esecuzione
+      scheduled: Pianificato
+      succeeded: Riuscito
