@@ -1,5 +1,27 @@
 # Changelog
 
+## [v3.26.0](https://github.com/bensheldon/good_job/tree/v3.26.0) (2024-03-01)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.25.0...v3.26.0)
+
+**Implemented enhancements:**
+
+- Add `GoodJob.current_thread_running?` and `GoodJob.current_thread_shutting_down?` for graceful shutdowns [\#1253](https://github.com/bensheldon/good_job/pull/1253) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Ensure "shutdown?" behavior is consistent between J Ruby and C Ruby [\#1267](https://github.com/bensheldon/good_job/pull/1267) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- PG Good Job rows add up [\#1262](https://github.com/bensheldon/good_job/issues/1262)
+- Bulk operations do not work for Batches [\#1255](https://github.com/bensheldon/good_job/issues/1255)
+- What's the difference between 'reschedule' and 'retry' in the dashboard? [\#1241](https://github.com/bensheldon/good_job/issues/1241)
+
+**Merged pull requests:**
+
+- feat: add italian locale [\#1268](https://github.com/bensheldon/good_job/pull/1268) ([metalelf0](https://github.com/metalelf0))
+
 ## [v3.25.0](https://github.com/bensheldon/good_job/tree/v3.25.0) (2024-02-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.24.0...v3.25.0)
