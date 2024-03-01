@@ -44,10 +44,13 @@ module GoodJob
         end
 
         job
-      rescue GoodJob::Job::ActionForStateMismatchError, GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
+      rescue GoodJob::Job::ActiveJobDeserializationError,
+             GoodJob::Job::ActionForStateMismatchError,
+             GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
         nil
       end.compact
 
+      # TODO: Put these messages through I18n
       notice = if processed_jobs.any?
                  "Successfully #{ACTIONS[mass_action]} #{processed_jobs.count} #{'job'.pluralize(processed_jobs.count)}"
                else
@@ -94,11 +97,14 @@ module GoodJob
     private
 
     def redirect_on_error(exception)
+      # TODO: Put these messages through I18n
       alert = case exception
               when GoodJob::Job::AdapterNotGoodJobError
                 "Active Job Queue Adapter must be GoodJob."
               when GoodJob::Job::ActionForStateMismatchError
                 "Job is not in an appropriate state for this action."
+              when GoodJob::Job::ActiveJobDeserializationError
+                "Active Job data could not be deserialized."
               else
                 exception.to_s
               end
