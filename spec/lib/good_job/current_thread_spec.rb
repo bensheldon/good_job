@@ -18,10 +18,10 @@ RSpec.describe GoodJob::CurrentThread do
   ].each do |accessor|
     describe ".#{accessor}" do
       it 'maintains value across threads' do
-        described_class.send "#{accessor}=", 'apple'
+        described_class.send :"#{accessor}=", 'apple'
 
         Thread.new do
-          described_class.send "#{accessor}=", 'bear'
+          described_class.send :"#{accessor}=", 'bear'
         end.join
 
         expect(described_class.send(accessor)).to eq 'apple'
@@ -29,14 +29,14 @@ RSpec.describe GoodJob::CurrentThread do
 
       it 'maintains value across Rails reloader wrapper' do
         Rails.application.reloader.wrap do
-          described_class.send "#{accessor}=", 'apple'
+          described_class.send :"#{accessor}=", 'apple'
         end
 
         expect(described_class.send(accessor)).to eq 'apple'
       end
 
       it 'is resettable' do
-        described_class.send "#{accessor}=", 'apple'
+        described_class.send :"#{accessor}=", 'apple'
         described_class.reset
         expect(described_class.send(accessor)).to be_nil
       end

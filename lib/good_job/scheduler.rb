@@ -270,6 +270,8 @@ module GoodJob # :nodoc:
     def create_task(delay = 0, fanout: false)
       future = Concurrent::ScheduledTask.new(delay, args: [self, performer], executor: executor, timer_set: timer_set) do |thr_scheduler, thr_performer|
         Thread.current.name = Thread.current.name.sub("-worker-", "-thread-") if Thread.current.name
+        Thread.current[:good_job_scheduler] = thr_scheduler
+
         Rails.application.reloader.wrap do
           thr_performer.next do |found|
             thr_scheduler.create_thread({ fanout: fanout }) if found && fanout

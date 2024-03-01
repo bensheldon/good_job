@@ -40,12 +40,14 @@ require "good_job/probe_server/webrick_handler"
 require "good_job/scheduler"
 require "good_job/shared_executor"
 require "good_job/systemd_service"
+require "good_job/thread_status"
 
 # GoodJob is a multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 #
 # +GoodJob+ is the top-level namespace and exposes configuration attributes.
 module GoodJob
   include GoodJob::Dependencies
+  include GoodJob::ThreadStatus
 
   # Default, null, blank value placeholder.
   NONE = Module.new.freeze

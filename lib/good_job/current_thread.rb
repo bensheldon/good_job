@@ -78,7 +78,7 @@ module GoodJob
     # @return [void]
     def self.reset(values = {})
       ACCESSORS.each do |accessor|
-        send("#{accessor}=", values[accessor])
+        send(:"#{accessor}=", values[accessor])
       end
     end
 

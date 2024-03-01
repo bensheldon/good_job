@@ -13,6 +13,7 @@ module ::ERROR_TRIGGERED; end
 module ::ErrorJob; end
 module ::ExpectedError; end
 module ::JOB_PERFORMED; end
+module ::JOB_RUNNING_EVENT; end
 module ::JobError; end
 module ::LATCH; end
 module ::MemoryProfiler; end
@@ -21,6 +22,8 @@ module ::RESULTS; end
 module ::RUN_JOBS; end
 module ::RecursiveJob; end
 module ::RetryableError; end
+module ::START_SHUTDOWN_EVENT; end
+module ::STATUSES; end
 module ::SimpleJob; end
 module ::THREAD_HAS_RUN; end
 module ::THREAD_JOBS; end
