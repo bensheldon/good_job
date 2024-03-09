@@ -149,7 +149,18 @@ class PgLock < ActiveRecord::Base
   scope :owns, -> { where('pid = pg_backend_pid()') }
   scope :others, -> { where('pid != pg_backend_pid()') }
 
-  def self.debug_own_locks(connection = ActiveRecord::Base.connection)
+  def self.count_locks_for(connection)
+    connection.execute(<<~SQL.squish).first['count'].to_i
+      SELECT count(*)
+      FROM pg_locks
+      WHERE
+        database = (SELECT oid FROM pg_database WHERE datname = current_database())
+        AND pid = pg_backend_pid()
+        AND locktype = 'advisory'
+    SQL
+  end
+
+  def self.debug_own_locks(connection)
     count = PgLock.override_connection(connection) do
       PgLock.current_database.advisory_lock.owns.count
     end
