@@ -18,19 +18,19 @@
         <li class="nav-item">
           <%= link_to jobs_path, class: ["nav-link", ("active" if controller_name == 'jobs')] do %>
             <%= t(".jobs") %>
-            <span data-async-values-target="values" data-async-values-key="jobsCount" data-async-values-target="jobsCount" class="badge bg-secondary rounded-pill"></span>
+            <span data-async-values-target="values" data-async-values-key="jobs_count" class="badge bg-secondary rounded-pill"></span>
         <% end %>
         </li>
         <li class="nav-item">
           <%= link_to batches_path, class: ["nav-link", ("active" if controller_name == 'batches')] do %>
             <%=t ".batches" %>
-            <span data-async-values-target="values" data-async-values-key="batchesCount" class="badge bg-secondary rounded-pill"></span>
+            <span data-async-values-target="values" data-async-values-key="batches_count" class="badge bg-secondary rounded-pill"></span>
           <% end %>
         </li>
         <li class="nav-item">
           <%= link_to cron_entries_path, class: ["nav-link", ("active" if controller_name == 'cron_entries')] do %>
             <%= t(".cron_schedules") %>
-            <span data-async-values-target="values" data-async-values-key="cronEntriesCount" class="badge bg-secondary rounded-pill"></span>
+            <span data-async-values-target="values" data-async-values-key="cron_entries_count" class="badge bg-secondary rounded-pill"></span>
         <% end %>
         </li>
         <li class="nav-item">

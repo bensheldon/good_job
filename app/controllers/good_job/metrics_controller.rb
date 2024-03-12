@@ -4,7 +4,7 @@ module GoodJob
       jobs_count = number_to_human(GoodJob::Job.count)
       batches_count = number_to_human(GoodJob::BatchRecord.migrated? ? GoodJob::BatchRecord.all.size : 0)
       cron_entries_count = GoodJob::CronEntry.all.size
-      render json: { jobsCount: jobs_count, batchesCount: batches_count, cronEntriesCount: cron_entries_count }
+      render json: { jobs_count:, batches_count:, cron_entries_count:, }
     end
 
     private
