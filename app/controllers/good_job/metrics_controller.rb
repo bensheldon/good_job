@@ -1,10 +1,19 @@
+# frozen_string_literal: true
+
 module GoodJob
   class MetricsController < ApplicationController
     def primary_nav
-      jobs_count = number_to_human(GoodJob::Job.count)
-      batches_count = number_to_human(GoodJob::BatchRecord.migrated? ? GoodJob::BatchRecord.all.size : 0)
+      jobs_count = GoodJob::Job.count
+      batches_count = GoodJob::BatchRecord.migrated? ? GoodJob::BatchRecord.all.size : 0
       cron_entries_count = GoodJob::CronEntry.all.size
-      render json: { jobs_count:, batches_count:, cron_entries_count:, }
+      processes_count = GoodJob::Process.active.count
+
+      render json: {
+        jobs_count: number_to_human(jobs_count),
+        batches_count: number_to_human(batches_count),
+        cron_entries_count: number_to_human(cron_entries_count),
+        processes_count: number_to_human(processes_count),
+      }
     end
 
     private
