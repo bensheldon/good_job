@@ -14,33 +14,29 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto">
+      <ul class="navbar-nav me-auto" data-controller="async-values" data-async-values-url-value="<%= metrics_primary_nav_path %>">
         <li class="nav-item">
           <%= link_to jobs_path, class: ["nav-link", ("active" if controller_name == 'jobs')] do %>
             <%= t(".jobs") %>
-            <% jobs_count = GoodJob::Job.count %>
-            <span class="badge bg-secondary rounded-pill"><%= number_to_human(jobs_count, **translate_hash("good_job.number.human.decimal_units")) %></span>
+            <span data-async-values-target="value" data-async-values-key="jobs_count" class="badge bg-secondary rounded-pill d-none"></span>
         <% end %>
         </li>
         <li class="nav-item">
           <%= link_to batches_path, class: ["nav-link", ("active" if controller_name == 'batches')] do %>
             <%=t ".batches" %>
-            <% batches_count = GoodJob::BatchRecord.migrated? ? GoodJob::BatchRecord.all.size : 0 %>
-            <span class="badge bg-secondary rounded-pill"><%= number_to_human(batches_count, **translate_hash("good_job.number.human.decimal_units")) %></span>
+            <span data-async-values-target="value" data-async-values-key="batches_count" class="badge bg-secondary rounded-pill  d-none"></span>
           <% end %>
         </li>
         <li class="nav-item">
           <%= link_to cron_entries_path, class: ["nav-link", ("active" if controller_name == 'cron_entries')] do %>
             <%= t(".cron_schedules") %>
-            <% cron_entries_count = GoodJob::CronEntry.all.size %>
-            <span class="badge bg-secondary rounded-pill"><%= cron_entries_count %></span>
+            <span data-async-values-target="value" data-async-values-key="cron_entries_count" class="badge bg-secondary rounded-pill d-none"></span>
         <% end %>
         </li>
         <li class="nav-item">
           <%= link_to processes_path, class: ["nav-link", ("active" if controller_name == 'processes')] do %>
             <%= t(".processes") %>
-            <% processes_count = GoodJob::Process.active.count %>
-            <span class="badge bg-secondary rounded-pill <%= "bg-danger" if processes_count == 0 %>"><%= processes_count %></span>
+            <span data-async-values-target="value" data-async-values-key="processes_count" data-async-values-zero-class="bg-danger" class="badge bg-secondary rounded-pill d-none"></span>
           <% end %>
         </li>
       </ul>

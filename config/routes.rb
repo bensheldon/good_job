@@ -16,6 +16,7 @@ GoodJob::Engine.routes.draw do
       put :retry
     end
   end
+  get 'jobs/metrics/primary_nav', to: 'metrics#primary_nav', as: :metrics_primary_nav
 
   resources :batches, only: %i[index show]
 

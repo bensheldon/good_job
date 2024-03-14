@@ -9,8 +9,10 @@ import LivePoll from "live_poll";
 
 import { Application } from "stimulus";
 import ThemeController from "theme_controller";
+import AsyncValuesController from "async_values_controller";
 window.Stimulus = Application.start();
 Stimulus.register("theme", ThemeController)
+Stimulus.register("async-values", AsyncValuesController)
 
 documentReady(function() {
   renderCharts();
