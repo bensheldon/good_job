@@ -8,11 +8,13 @@ unless ruby_31_or_higher # https://github.com/rails/rails/issues/44090#issuecomm
   appraise "rails-6.0" do
     gem "rails", "~> 6.0.0"
     gem "traces", "~> 0.9.1"
+    gem "puma", "~> 5.6"
   end
 
   appraise "rails-6.1" do
     gem "rails", "~> 6.1.0"
     gem "traces", "~> 0.9.1"
+    gem "puma", "~> 5.6"
   end
 end
 

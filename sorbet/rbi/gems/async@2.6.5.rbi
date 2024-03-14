@@ -713,6 +713,9 @@ class Async::Scheduler < ::Async::Node
   # source://async//lib/async/scheduler.rb#169
   def io_wait(io, events, timeout = T.unsafe(nil)); end
 
+  # source://async//lib/async/scheduler.rb#189
+  def io_write(io, buffer, length, offset = T.unsafe(nil)); end
+
   # source://async//lib/async/scheduler.rb#152
   def kernel_sleep(duration = T.unsafe(nil)); end
 

@@ -14997,9 +14997,6 @@ SyntaxTree::YARV::CallData::CALL_ARGS_SIMPLE = T.let(T.unsafe(nil), Integer)
 SyntaxTree::YARV::CallData::CALL_ARGS_SPLAT = T.let(T.unsafe(nil), Integer)
 
 # source://syntax_tree//lib/syntax_tree/yarv/calldata.rb#27
-SyntaxTree::YARV::CallData::CALL_BLOCKISEQ = T.let(T.unsafe(nil), Integer)
-
-# source://syntax_tree//lib/syntax_tree/yarv/calldata.rb#27
 SyntaxTree::YARV::CallData::CALL_FCALL = T.let(T.unsafe(nil), Integer)
 
 # source://syntax_tree//lib/syntax_tree/yarv/calldata.rb#27
