@@ -1088,6 +1088,9 @@ module RuboCop::AST::CollectionNode
   def to_h(*args, **_arg1, &block); end
 
   # source://forwardable/1.3.3/forwardable.rb#231
+  def to_msgpack(*args, **_arg1, &block); end
+
+  # source://forwardable/1.3.3/forwardable.rb#231
   def to_sentence(*args, **_arg1, &block); end
 
   # source://forwardable/1.3.3/forwardable.rb#231

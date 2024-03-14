@@ -7,31 +7,31 @@
 # source://yard-activesupport-concern//lib/yard-activesupport-concern/version.rb#1
 module YARD
   class << self
-    # source://yard/0.9.34/lib/yard.rb#31
+    # source://yard/0.9.36/lib/yard.rb#31
     def load_plugins; end
 
-    # source://yard/0.9.34/lib/yard.rb#20
+    # source://yard/0.9.36/lib/yard.rb#20
     def parse(*args); end
 
-    # source://yard/0.9.34/lib/yard.rb#27
+    # source://yard/0.9.36/lib/yard.rb#27
     def parse_string(*args); end
 
-    # source://yard/0.9.34/lib/yard.rb#44
+    # source://yard/0.9.36/lib/yard.rb#44
     def ruby18?; end
 
-    # source://yard/0.9.34/lib/yard.rb#47
+    # source://yard/0.9.36/lib/yard.rb#47
     def ruby19?; end
 
-    # source://yard/0.9.34/lib/yard.rb#50
+    # source://yard/0.9.36/lib/yard.rb#50
     def ruby2?; end
 
-    # source://yard/0.9.34/lib/yard.rb#56
+    # source://yard/0.9.36/lib/yard.rb#56
     def ruby31?; end
 
-    # source://yard/0.9.34/lib/yard.rb#53
+    # source://yard/0.9.36/lib/yard.rb#53
     def ruby3?; end
 
-    # source://yard/0.9.34/lib/yard.rb#34
+    # source://yard/0.9.36/lib/yard.rb#34
     def windows?; end
   end
 end
