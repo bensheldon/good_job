@@ -1,14 +1,7 @@
 # frozen_string_literal: true
 
-require_paths = ["lib"]
-require_paths.each do |require_path|
-  $LOAD_PATH.push File.expand_path(require_path, __dir__)
-end
+require_relative "lib/good_job/version"
 
-# Maintain your gem's version:
-require "good_job/version"
-
-# Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
   spec.name        = "good_job"
   spec.version     = GoodJob::VERSION
@@ -36,7 +29,7 @@ Gem::Specification.new do |spec|
     "CHANGELOG.md",
     "LICENSE.txt",
   ]
-  spec.require_paths = require_paths
+  spec.require_paths = ["lib"]
   spec.bindir = "exe"
   spec.executables = %w[good_job]
 
@@ -51,12 +44,12 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 2.6.0"
 
-  spec.add_dependency "activejob", ">= 6.0.0"
-  spec.add_dependency "activerecord", ">= 6.0.0"
-  spec.add_dependency "concurrent-ruby", ">= 1.0.2"
-  spec.add_dependency "fugit", ">= 1.1"
-  spec.add_dependency "railties", ">= 6.0.0"
-  spec.add_dependency "thor", ">= 0.14.1"
+  spec.add_runtime_dependency "activejob", ">= 6.0.0"
+  spec.add_runtime_dependency "activerecord", ">= 6.0.0"
+  spec.add_runtime_dependency "concurrent-ruby", ">= 1.0.2"
+  spec.add_runtime_dependency "fugit", ">= 1.1"
+  spec.add_runtime_dependency "railties", ">= 6.0.0"
+  spec.add_runtime_dependency "thor", ">= 0.14.1"
 
   spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "capybara"
