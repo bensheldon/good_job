@@ -1,5 +1,22 @@
 # Changelog
 
+## [v3.26.2](https://github.com/bensheldon/good_job/tree/v3.26.2) (2024-03-15)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.26.1...v3.26.2)
+
+**Closed issues:**
+
+- Async mode blocks ActionDispatch::Reloader [\#1274](https://github.com/bensheldon/good_job/issues/1274)
+
+**Merged pull requests:**
+
+- Update dependencies and their Sorbet / Tapioca files [\#1284](https://github.com/bensheldon/good_job/pull/1284) ([bensheldon](https://github.com/bensheldon))
+- Use require\_relative and do not modify $LOAD\_PATH in gemspec [\#1283](https://github.com/bensheldon/good_job/pull/1283) ([bensheldon](https://github.com/bensheldon))
+- Tweak rbtrace script [\#1279](https://github.com/bensheldon/good_job/pull/1279) ([bensheldon](https://github.com/bensheldon))
+- Fix for Rails head: Don't try to override connection on connection checkin in tests [\#1277](https://github.com/bensheldon/good_job/pull/1277) ([bensheldon](https://github.com/bensheldon))
+- Tiny improvements to french translation [\#1273](https://github.com/bensheldon/good_job/pull/1273) ([francois-ferrandis](https://github.com/francois-ferrandis))
+- Load metrics for top nav asynchronously [\#1231](https://github.com/bensheldon/good_job/pull/1231) ([binarygit](https://github.com/binarygit))
+
 ## [v3.26.1](https://github.com/bensheldon/good_job/tree/v3.26.1) (2024-03-01)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.26.0...v3.26.1)
