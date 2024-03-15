@@ -22,9 +22,9 @@ describe ExampleJob do
         active_job = described_class.perform_later(described_class::ERROR_ONCE_TYPE)
         10.times do
           GoodJob.perform_inline
-          travel(5.minutes)
+          Timecop.travel(5.minutes)
         end
-        travel_back
+        Timecop.return
 
         good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
         expect(good_job.discrete_executions.count).to eq 2
@@ -37,9 +37,9 @@ describe ExampleJob do
         active_job = described_class.perform_later(described_class::ERROR_FIVE_TIMES_TYPE)
         10.times do
           GoodJob.perform_inline
-          travel(5.minutes)
+          Timecop.travel(5.minutes)
         end
-        travel_back
+        Timecop.return
 
         good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
 
@@ -53,9 +53,9 @@ describe ExampleJob do
         active_job = described_class.perform_later(described_class::DEAD_TYPE)
         10.times do
           GoodJob.perform_inline
-          travel(5.minutes)
+          Timecop.travel(5.minutes)
         end
-        travel_back
+        Timecop.return
 
         good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
         expect(good_job.discrete_executions.count).to eq 3

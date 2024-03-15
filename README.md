@@ -541,6 +541,16 @@ class MyJob < ApplicationJob
     # Can be an Integer or Lambda/Proc that is invoked in the context of the job
     perform_limit: 1,
 
+    # Maximum number of jobs with the concurrency key to be enqueued within
+    # the time period, looking backwards from the current time. Must be an array
+    # with two elements: the number of jobs and the time period.
+    enqueue_throttle: [10, 1.minute],
+
+    # Maximum number of jobs with the concurrency key to be performed within
+    # the time period, looking backwards from the current time. Must be an array
+    # with two elements: the number of jobs and the time period.
+    perform_throttle: [100, 1.hour],
+
     # Note: Under heavy load, the total number of jobs may exceed the
     # sum of `enqueue_limit` and `perform_limit` because of race conditions
     # caused by imperfectly disjunctive states. If you need to constrain

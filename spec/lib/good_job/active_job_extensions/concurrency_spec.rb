@@ -98,7 +98,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(GoodJob::Execution.where(concurrency_key: "Alice").count).to eq 2
         expect(GoodJob::Execution.where(concurrency_key: "Bob").count).to eq 1
 
-        expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its limit of 2 jobs/)).exactly(:once)
+        expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its enqueue limit of 2 jobs/)).exactly(:once)
         if ActiveJob.gem_version >= Gem::Version.new("6.1.0")
           expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
           expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
@@ -150,6 +150,56 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       it 'is ignored with the job is executed via perform_now' do
         TestJob.perform_now(name: "Alice")
         expect(JOB_PERFORMED).to be_true
+      end
+    end
+
+    describe '#enqueue_throttle' do
+      before do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+
+        TestJob.good_job_control_concurrency_with(
+          enqueue_throttle: -> { [1, 1.minute] },
+          key: -> { arguments.first[:name] }
+        )
+      end
+
+      it 'does not enqueue if throttle period has not passed' do
+        expect(TestJob.perform_later(name: "Alice")).to be_present
+        expect(TestJob.perform_later(name: "Alice")).to be false
+        Timecop.travel(61.seconds.from_now) do
+          expect(TestJob.perform_later(name: "Alice")).to be_present
+        end
+      end
+    end
+
+    describe '#perform_throttle' do
+      before do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+
+        TestJob.good_job_control_concurrency_with(
+          perform_throttle: -> { [1, 1.minute] },
+          key: -> { arguments.first[:name] }
+        )
+      end
+
+      it 'does not perform if throttle period has not passed' do
+        TestJob.perform_later(name: "Alice")
+        TestJob.perform_later(name: "Alice")
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 1
+
+        Timecop.travel(61.seconds)
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 2
+
+        Timecop.travel(61.seconds)
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 3
       end
     end
   end

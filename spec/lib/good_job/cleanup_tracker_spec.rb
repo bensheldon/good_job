@@ -16,7 +16,7 @@ describe GoodJob::CleanupTracker do
         tracker = described_class.new
 
         1000.times { tracker.increment }
-        travel_to 1.year.from_now do
+        Timecop.travel 1.year.from_now do
           expect(tracker.cleanup?).to be false
         end
       end
@@ -46,7 +46,7 @@ describe GoodJob::CleanupTracker do
       tracker = described_class.new
 
       1000.times { tracker.increment }
-      travel_to 1.year.from_now do
+      Timecop.travel 1.year.from_now do
         tracker.reset
 
         expect(tracker.job_count).to eq 0

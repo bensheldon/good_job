@@ -289,7 +289,7 @@ RSpec.describe GoodJob::Execution do
 
     it 'returns previously scheduled and unscheduled jobs' do
       described_class.enqueue(active_job, scheduled_at: 1.day.ago)
-      travel_to 5.minutes.ago do
+      Timecop.travel 5.minutes.ago do
         described_class.enqueue(active_job, scheduled_at: nil)
       end
 

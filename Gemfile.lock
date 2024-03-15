@@ -471,6 +471,7 @@ GEM
     thread (0.2.2)
     thread_safe (0.3.6)
     thread_safe (0.3.6-java)
+    timecop (0.9.8)
     timeout (0.4.1)
     timers (4.3.5)
     tomlrb (2.0.3)
@@ -546,6 +547,7 @@ DEPENDENCIES
   spoom
   stackprof
   tapioca
+  timecop
   webrick
   yard
   yard-activesupport-concern
