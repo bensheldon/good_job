@@ -94,13 +94,13 @@ module GoodJob
               throttle_limit = throttle[0]
               throttle_period = throttle[1]
 
-              allowed_active_job_ids = DiscreteExecution.joins(:job)
-                                                        .where(GoodJob::Job.table_name => { concurrency_key: key })
-                                                        .where(DiscreteExecution.arel_table[:created_at].gt(Arel::Nodes::BindParam.new(throttle_period.ago)))
-                                                        .where(error: nil).or(DiscreteExecution.where.not(error: "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError: GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"))
-                                                        .order(created_at: :asc)
-                                                        .limit(throttle_limit)
-              allowed_active_job_ids = allowed_active_job_ids.pluck(:active_job_id)
+              query = DiscreteExecution.joins(:job)
+                                       .where(GoodJob::Job.table_name => { concurrency_key: key })
+                                       .where(DiscreteExecution.arel_table[:created_at].gt(Arel::Nodes::BindParam.new(throttle_period.ago)))
+              allowed_active_job_ids = query.where(error: nil).or(query.where.not(error: "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError: GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"))
+                                            .order(created_at: :asc)
+                                            .limit(throttle_limit)
+                                            .pluck(:active_job_id)
 
               raise ThrottleExceededError unless allowed_active_job_ids.include?(job.job_id)
             end
