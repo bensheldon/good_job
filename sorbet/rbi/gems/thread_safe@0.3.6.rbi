@@ -791,10 +791,10 @@ class ThreadSafe::SynchronizedCacheBackend < ::ThreadSafe::NonConcurrentCacheBac
   # source://thread_safe//lib/thread_safe/synchronized_cache_backend.rb#44
   def key?(key); end
 
-  # source://mutex_m/0.1.2/mutex_m.rb#93
+  # source://mutex_m/0.2.0/mutex_m.rb#91
   def lock; end
 
-  # source://mutex_m/0.1.2/mutex_m.rb#83
+  # source://mutex_m/0.2.0/mutex_m.rb#81
   def locked?; end
 
   # source://thread_safe//lib/thread_safe/synchronized_cache_backend.rb#28
@@ -809,13 +809,13 @@ class ThreadSafe::SynchronizedCacheBackend < ::ThreadSafe::NonConcurrentCacheBac
   # source://thread_safe//lib/thread_safe/synchronized_cache_backend.rb#64
   def size; end
 
-  # source://mutex_m/0.1.2/mutex_m.rb#78
+  # source://mutex_m/0.2.0/mutex_m.rb#76
   def synchronize(&block); end
 
-  # source://mutex_m/0.1.2/mutex_m.rb#88
+  # source://mutex_m/0.2.0/mutex_m.rb#86
   def try_lock; end
 
-  # source://mutex_m/0.1.2/mutex_m.rb#98
+  # source://mutex_m/0.2.0/mutex_m.rb#96
   def unlock; end
 
   # @return [Boolean]

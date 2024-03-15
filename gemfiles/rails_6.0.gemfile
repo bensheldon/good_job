@@ -10,6 +10,7 @@ gem "pg", platforms: [:mri, :mingw, :x64_mingw]
 gem "rack", "~> 2.2"
 gem "rails", "~> 6.0.0"
 gem "traces", "~> 0.9.1"
+gem "puma", "~> 5.6"
 
 platforms :ruby do
   gem "bootsnap"

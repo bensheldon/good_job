@@ -1871,10 +1871,8 @@ HighLine::YELLOW_STYLE = T.let(T.unsafe(nil), HighLine::Style)
 #
 # source://skylight//lib/skylight/probes.rb#161
 module Kernel
-  # @api private
-  #
   # source://skylight//lib/skylight/probes.rb#165
-  def require(name); end
+  def require_without_bootsnap(name); end
 end
 
 # Used from extconf and to load libskylight
@@ -2158,10 +2156,10 @@ class Skylight::CLI::Base < ::Thor
   # source://skylight//lib/skylight/cli.rb#78
   def disable_env_warning; end
 
-  # source://thor/1.3.0/lib/thor.rb#40
+  # source://thor/1.3.1/lib/thor.rb#40
   def doctor(*args); end
 
-  # source://thor/1.3.0/lib/thor.rb#40
+  # source://thor/1.3.1/lib/thor.rb#40
   def merge(*args); end
 
   # @api private
@@ -2306,10 +2304,10 @@ class Skylight::CLI::Merger < ::Thor::Group
   # source://skylight//lib/skylight/cli/merger.rb#30
   def fetch_apps; end
 
-  # source://thor/1.3.0/lib/thor/base.rb#163
+  # source://thor/1.3.1/lib/thor/base.rb#163
   def merge_token; end
 
-  # source://thor/1.3.0/lib/thor/base.rb#163
+  # source://thor/1.3.1/lib/thor/base.rb#163
   def merge_token=(_arg0); end
 
   # source://skylight//lib/skylight/cli/merger.rb#127
@@ -2624,7 +2622,7 @@ class Skylight::Deprecation < ::ActiveSupport::Deprecation
   def ignored_callstack(path); end
 
   class << self
-    # source://activesupport/7.1.1/lib/active_support/deprecation/instance_delegator.rb#34
+    # source://activesupport/7.1.3/lib/active_support/deprecation/instance_delegator.rb#34
     def ignored_callstack(*_arg0, **_arg1, &_arg2); end
   end
 end

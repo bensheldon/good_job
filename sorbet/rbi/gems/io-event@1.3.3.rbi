@@ -29,7 +29,7 @@ class IO::Buffer
   def get_string(*_arg0); end
   def get_value(_arg0, _arg1); end
   def get_values(_arg0, _arg1); end
-  def hexdump; end
+  def hexdump(*_arg0); end
   def inspect; end
   def internal?; end
   def locked; end
@@ -39,6 +39,7 @@ class IO::Buffer
   def null?; end
   def or!(_arg0); end
   def pread(*_arg0); end
+  def private?; end
   def pwrite(*_arg0); end
   def read(*_arg0); end
   def readonly?; end
@@ -66,6 +67,7 @@ class IO::Buffer
     def for(_arg0); end
     def map(*_arg0); end
     def size_of(_arg0); end
+    def string(_arg0); end
   end
 end
 
@@ -253,7 +255,7 @@ class IO::Event::Selector::Select
 
   # Ruby <= 3.1, limited IO::Buffer support.
   #
-  # source://io-event//lib/io/event/selector/select.rb#223
+  # source://io-event//lib/io/event/selector/select.rb#168
   def io_read(fiber, io, buffer, length, offset = T.unsafe(nil)); end
 
   # source://io-event//lib/io/event/selector/select.rb#150
@@ -262,7 +264,7 @@ class IO::Event::Selector::Select
   # source://io-event//lib/io/event/selector/select.rb#142
   def io_wait(fiber, io, events); end
 
-  # source://io-event//lib/io/event/selector/select.rb#252
+  # source://io-event//lib/io/event/selector/select.rb#196
   def io_write(fiber, io, buffer, length, offset = T.unsafe(nil)); end
 
   # Returns the value of attribute loop.
