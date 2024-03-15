@@ -96,7 +96,7 @@ module GoodJob
 
               query = DiscreteExecution.joins(:job)
                                        .where(GoodJob::Job.table_name => { concurrency_key: key })
-                                       .where(DiscreteExecution.arel_table[:created_at].gt(Arel::Nodes::BindParam.new(throttle_period.ago)))
+                                       .where(DiscreteExecution.arel_table[:created_at].gt(ActiveModel::Attribute.with_cast_value("created_at", throttle_period.ago, ActiveModel::Type.default_value)))
               allowed_active_job_ids = query.where(error: nil).or(query.where.not(error: "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError: GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"))
                                             .order(created_at: :asc)
                                             .limit(throttle_limit)
@@ -192,7 +192,7 @@ module GoodJob
             throttle_limit = throttle[0]
             throttle_period = throttle[1]
             enqueued_within_period = GoodJob::Job.where(concurrency_key: key)
-                                                 .where(GoodJob::Job.arel_table[:created_at].gt(Arel::Nodes::BindParam.new(throttle_period.ago)))
+                                                 .where(GoodJob::Job.arel_table[:created_at].gt(Arel::Nodes::BindParam.new(ActiveModel::Attribute.with_cast_value("created_at", throttle_period.ago, ActiveModel::Type.default_value))))
                                                  .count
 
             if (enqueued_within_period + 1) > throttle_limit
