@@ -214,11 +214,11 @@ fr:
         all: Tous
         all_jobs: Tous les jobs
         all_queues: Toutes les files d'attente
-        clear: Clair
+        clear: Réinitialiser
         job_name: Nom du job
         placeholder: Recherche par classe, ID de job, paramètres de job et texte d'erreur.
         queue_name: Nom de la file d'attente
-        search: Recherche
+        search: Rechercher
       navbar:
         batches: Lots
         cron_schedules: Cron
@@ -232,12 +232,12 @@ fr:
           light: Lumière
           theme: Thème
       secondary_navbar:
-        inspiration: N'oublie pas, toi aussi tu fais du bon boulot !
+        inspiration: N'oublie pas, toi aussi tu fais du bon boulot !
         last_updated: Dernière mise à jour
     status:
       discarded: Mis au rebut
       queued: À la file
       retried: Réessayés
       running: En cours
-      scheduled: Replanifiés
+      scheduled: Planifiés
       succeeded: Réussis

@@ -17,9 +17,10 @@ ActiveSupport.on_load :active_record do
   }
 
   ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkin, :before, lambda { |conn|
-    warning = PgLock.debug_own_locks(conn)
-    next if warning.blank?
+    count = PgLock.count_locks_for(conn)
+    next if count.zero?
 
+    warning = "Connection returned to pool with #{count} advisory locks"
     $stdout.puts warning
     Rails.logger.warn(warning)
     POSTGRES_NOTICES << warning
