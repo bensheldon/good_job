@@ -94,7 +94,7 @@ module GoodJob
     # @!method only_scheduled
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(Time.current)).or(where(scheduled_at: nil)) }
+    scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(Arel::Nodes::BindParam.new(ActiveModel::Attribute.with_cast_value("scheduled_at", Time.current, ActiveModel::Type::DateTime.new)))).or(where(scheduled_at: nil)) }
 
     # Order executions by priority (highest priority first).
     # @!method priority_ordered

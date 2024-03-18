@@ -44,13 +44,8 @@ module GoodJob
         cte_table = Arel::Table.new(:rows)
         cte_query = original_query.select(primary_key, column).except(:limit)
         cte_query = cte_query.limit(select_limit) if select_limit
-        cte_type = if supports_cte_materialization_specifiers?
-                     'MATERIALIZED'
-                   else
-                     ''
-                   end
-
-        composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::SqlLiteral.new([cte_type, "(", cte_query.to_sql, ")"].join(' ')))
+        cte_type = supports_cte_materialization_specifiers? ? :MATERIALIZED : :""
+        composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(cte_type, cte_query.arel))
         query = cte_table.project(cte_table[:id])
                          .with(composed_cte)
                          .where(Arel.sql("#{function}(('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)"))

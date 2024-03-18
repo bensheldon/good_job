@@ -21,6 +21,15 @@ RSpec.describe GoodJob::AdvisoryLockable do
       end
     end
 
+    it 'generates bind parameters instead of serialized values' do
+      messages = []
+      allow(model_class.logger).to receive(:debug) do |message|
+        messages << message
+      end
+      model_class.where(priority: 99).order(priority: :desc).advisory_lock.to_a
+      expect(messages.first).to match(/WHERE "good_jobs"."priority" = (\$1|\?)/)
+    end
+
     describe 'lockable column do' do
       it 'default column generates appropriate SQL' do
         allow(model_class).to receive(:advisory_lockable_column).and_return(:id)
