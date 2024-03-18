@@ -18,13 +18,13 @@ RSpec.describe GoodJob::JobsFilter do
     ExampleJob.set(queue: 'default').perform_later(ExampleJob::SUCCESS_TYPE)
     ExampleJob.set(queue: 'mice').perform_later(ExampleJob::ERROR_ONCE_TYPE)
 
-    travel_to 1.hour.ago
+    Timecop.travel 1.hour.ago
     ExampleJob.set(queue: 'elephants').perform_later(ExampleJob::DEAD_TYPE)
     5.times do
-      travel 5.minutes
+      Timecop.travel 5.minutes
       GoodJob.perform_inline
     end
-    travel_back
+    Timecop.return
 
     running_job = ExampleJob.perform_later('success')
     running_execution = GoodJob::Execution.find(running_job.provider_job_id)

@@ -13,6 +13,8 @@ module GoodJob
         end
       end
 
+      ThrottleExceededError = Class.new(ConcurrencyExceededError)
+
       module Prepends
         def deserialize(job_data)
           super
@@ -62,8 +64,13 @@ module GoodJob
             total_limit = nil unless total_limit.present? && (0...Float::INFINITY).cover?(total_limit)
           end
 
+          perform_throttle = job.class.good_job_concurrency_config[:perform_throttle]
+          perform_throttle = instance_exec(&perform_throttle) if perform_throttle.respond_to?(:call)
+          perform_throttle = nil unless GoodJob::DiscreteExecution.migrated? && perform_throttle.present? && perform_throttle.is_a?(Array) && perform_throttle.size == 2
+
           limit = perform_limit || total_limit
-          next unless limit
+          throttle = perform_throttle
+          next unless limit || throttle
 
           key = job.good_job_concurrency_key
           next if key.blank?
@@ -74,9 +81,29 @@ module GoodJob
           end
 
           GoodJob::Execution.advisory_lock_key(key, function: "pg_advisory_lock") do
-            allowed_active_job_ids = GoodJob::Execution.unfinished.where(concurrency_key: key).advisory_locked.order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC")).limit(limit).pluck(:active_job_id)
-            # The current job has already been locked and will appear in the previous query
-            raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include? job.job_id
+            if limit
+              allowed_active_job_ids = GoodJob::Execution.unfinished.where(concurrency_key: key)
+                                                         .advisory_locked
+                                                         .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
+                                                         .limit(limit).pluck(:active_job_id)
+              # The current job has already been locked and will appear in the previous query
+              raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include?(job.job_id)
+            end
+
+            if throttle
+              throttle_limit = throttle[0]
+              throttle_period = throttle[1]
+
+              query = DiscreteExecution.joins(:job)
+                                       .where(GoodJob::Job.table_name => { concurrency_key: key })
+                                       .where(DiscreteExecution.arel_table[:created_at].gt(throttle_period.ago))
+              allowed_active_job_ids = query.where(error: nil).or(query.where.not(error: "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError: GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"))
+                                            .order(created_at: :asc)
+                                            .limit(throttle_limit)
+                                            .pluck(:active_job_id)
+
+              raise ThrottleExceededError unless allowed_active_job_ids.include?(job.job_id)
+            end
           end
         end
       end
@@ -137,23 +164,45 @@ module GoodJob
           total_limit = nil unless total_limit.present? && (0...Float::INFINITY).cover?(total_limit)
         end
 
+        enqueue_throttle = job.class.good_job_concurrency_config[:enqueue_throttle]
+        enqueue_throttle = instance_exec(&enqueue_throttle) if enqueue_throttle.respond_to?(:call)
+        enqueue_throttle = nil unless enqueue_throttle.present? && enqueue_throttle.is_a?(Array) && enqueue_throttle.size == 2
+
         limit = enqueue_limit || total_limit
-        return on_enqueue&.call unless limit
+        throttle = enqueue_throttle
+        return on_enqueue&.call unless limit || throttle
 
         GoodJob::Execution.advisory_lock_key(key, function: "pg_advisory_lock") do
-          enqueue_concurrency = if enqueue_limit
-                                  GoodJob::Execution.where(concurrency_key: key).unfinished.advisory_unlocked.count
-                                else
-                                  GoodJob::Execution.where(concurrency_key: key).unfinished.count
-                                end
+          if limit
+            enqueue_concurrency = if enqueue_limit
+                                    GoodJob::Execution.where(concurrency_key: key).unfinished.advisory_unlocked.count
+                                  else
+                                    GoodJob::Execution.where(concurrency_key: key).unfinished.count
+                                  end
 
-          # The job has not yet been enqueued, so check if adding it will go over the limit
-          if (enqueue_concurrency + 1) > limit
-            logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its limit of #{limit} #{'job'.pluralize(limit)}"
-            on_abort&.call
-          else
-            on_enqueue&.call
+            # The job has not yet been enqueued, so check if adding it will go over the limit
+            if (enqueue_concurrency + 1) > limit
+              logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its enqueue limit of #{limit} #{'job'.pluralize(limit)}"
+              on_abort&.call
+              break
+            end
           end
+
+          if throttle
+            throttle_limit = throttle[0]
+            throttle_period = throttle[1]
+            enqueued_within_period = GoodJob::Job.where(concurrency_key: key)
+                                                 .where(GoodJob::Job.arel_table[:created_at].gt(throttle_period.ago))
+                                                 .count
+
+            if (enqueued_within_period + 1) > throttle_limit
+              logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its throttle limit of #{limit} #{'job'.pluralize(limit)}"
+              on_abort&.call
+              break
+            end
+          end
+
+          on_enqueue&.call
         end
       end
     end

@@ -151,7 +151,7 @@ describe GoodJob do
       TestJob.set(wait: 5.minutes).perform_later
 
       expect(PERFORMED.size).to eq 0
-      travel_to(6.minutes.from_now) do
+      Timecop.travel(6.minutes.from_now) do
         described_class.perform_inline
       end
       expect(PERFORMED.size).to eq 1

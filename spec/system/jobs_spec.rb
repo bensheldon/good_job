@@ -33,13 +33,13 @@ describe 'Jobs', :js, :without_executor do
     end
 
     let(:discarded_job) do
-      travel_to 1.hour.ago
+      Timecop.travel 1.hour.ago
       ExampleJob.set(queue: :elephants).perform_later(ExampleJob::DEAD_TYPE)
       5.times do
-        travel 5.minutes
+        Timecop.travel 5.minutes
         GoodJob.perform_inline
       end
-      travel_back
+      Timecop.return
       GoodJob::Job.order(created_at: :asc).last
     end
 

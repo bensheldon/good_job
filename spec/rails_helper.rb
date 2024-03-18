@@ -12,6 +12,8 @@ if RUBY_PLATFORM.include?('java')
   require "i18n/backend/simple"
 end
 
+require "timecop"
+
 require File.expand_path('../demo/config/environment', __dir__)
 
 # Prevent database truncation if the environment is production

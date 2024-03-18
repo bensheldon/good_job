@@ -141,10 +141,10 @@ RSpec.describe 'Adapter Integration' do
       expect do
         TestJob.perform_later
         2.times do
-          travel(5.minutes)
+          Timecop.travel(5.minutes)
           GoodJob.perform_inline
         end
-        travel_back
+        Timecop.return
       end.to raise_error JobError
       expect(PERFORMED.size).to eq 3
     end
