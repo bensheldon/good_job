@@ -2,6 +2,10 @@
 
 module GoodJob
   class JobsFilter < BaseFilter
+    def state_names
+      %w[scheduled retried queued running succeeded discarded]
+    end
+
     def states
       @_states ||= begin
         query = filtered_query(params.except(:state))

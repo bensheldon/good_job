@@ -42,6 +42,10 @@ module GoodJob
       raise NotImplementedError
     end
 
+    def state_names
+      raise NotImplementedError
+    end
+
     def to_params(override = {})
       {
         job_class: params[:job_class],

@@ -52,8 +52,7 @@
         <%= link_to t(".all"), filter.to_params(state: nil), class: "nav-link #{"active" unless params[:state].present?}" %>
       </li>
 
-      <% states = %w[scheduled retried queued running succeeded discarded] %>
-      <% states.each do |name| %>
+      <% filter.state_names.each do |name| %>
         <li class="nav-item">
           <%= link_to filter.to_params(state: name), class: "nav-link #{"active" if params[:state] == name}" do %>
             <%= t(name, scope: 'good_job.status') %>
