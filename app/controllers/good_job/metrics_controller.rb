@@ -16,10 +16,20 @@ module GoodJob
       }
     end
 
+    def job_status
+      @filter = JobsFilter.new(params)
+
+      render json: @filter.states.transform_values { |count| number_with_delimiter(count) }
+    end
+
     private
 
     def number_to_human(count)
       helpers.number_to_human(count, **helpers.translate_hash("good_job.number.human.decimal_units"))
+    end
+
+    def number_with_delimiter(count)
+      helpers.number_with_delimiter(count, **helpers.translate_hash('good_job.number.format'))
     end
   end
 end

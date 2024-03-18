@@ -17,6 +17,7 @@ GoodJob::Engine.routes.draw do
     end
   end
   get 'jobs/metrics/primary_nav', to: 'metrics#primary_nav', as: :metrics_primary_nav
+  get 'jobs/metrics/job_status', to: 'metrics#job_status', as: :metrics_job_status
 
   resources :batches, only: %i[index show]
 
