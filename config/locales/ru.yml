@@ -34,7 +34,7 @@ ru:
     cron_entries:
       actions:
         confirm_disable: Вы уверены, что хотите отключить эту задачу cron?
-        confirm_enable: Вы уверены, что хотите подтвердить эту задачу cron?
+        confirm_enable: Вы уверены, что хотите включить это задание cron?
         confirm_enqueue: Вы уверены, что хотите поставить эту задачу cron в очередь?
         disable: Отключить задачу cron
         enable: Включить задачу cron

@@ -34,7 +34,7 @@ de:
     cron_entries:
       actions:
         confirm_disable: Möchten Sie diesen Cron-Eintrag wirklich deaktivieren?
-        confirm_enable: Möchten Sie diesen Cron-Eintrag wirklich bestätigen?
+        confirm_enable: Möchten Sie diesen Cron-Eintrag wirklich aktivieren?
         confirm_enqueue: Möchten Sie diesen Cron-Eintrag wirklich in die Warteschlange stellen?
         disable: Cron-Eintrag deaktivieren
         enable: Cron-Eintrag aktivieren

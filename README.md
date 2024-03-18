@@ -627,9 +627,10 @@ config.good_job.cron = {
     set: { priority: -10 }, # additional Active Job properties; can also be a lambda/proc e.g. `-> { { priority: [1,2].sample } }`
     description: "Something helpful", # optional description that appears in Dashboard
   },
-  another_task: {
+  production_task: {
     cron: "0 0,12 * * *",
-    class: "AnotherJob",
+    class: "ProductionJob",
+    enabled_by_default: -> { Rails.env.production? } # Only enable in production, otherwise can be enabled manually through Dashboard
   },
   complex_schedule: {
     class: "ComplexScheduleJob",

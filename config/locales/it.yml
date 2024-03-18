@@ -34,7 +34,7 @@ it:
     cron_entries:
       actions:
         confirm_disable: Sei sicuro di voler disabilitare questa voce cron?
-        confirm_enable: Sei sicuro di voler confermare questa voce cron?
+        confirm_enable: Sei sicuro di voler abilita questa voce cron?
         confirm_enqueue: Sei sicuro di voler mettere in coda questa voce cron?
         disable: Disabilita voce cron
         enable: Abilita voce cron
