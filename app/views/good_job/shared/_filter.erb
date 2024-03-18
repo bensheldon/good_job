@@ -47,16 +47,16 @@
       </div>
     <% end %>
 
-    <ul data-live-poll-region="filter-tabs" class="nav nav-tabs my-3">
+    <ul data-controller="async-values" data-async-values-url-value="<%= metrics_job_status_path %>" data-live-poll-region="filter-tabs" class="nav nav-tabs my-3">
       <li class="nav-item">
         <%= link_to t(".all"), filter.to_params(state: nil), class: "nav-link #{"active" unless params[:state].present?}" %>
       </li>
 
-      <% filter.states.each do |name, count| %>
+      <% filter.state_names.each do |name| %>
         <li class="nav-item">
           <%= link_to filter.to_params(state: name), class: "nav-link #{"active" if params[:state] == name}" do %>
-            <%= t(name, scope: 'good_job.status', count: count) %>
-            <span class="badge bg-primary rounded-pill <%= "bg-secondary" if count == 0 %>"><%= number_with_delimiter(count, t('good_job.number.format')) %></span>
+            <%= t(name, scope: 'good_job.status') %>
+            <span data-async-values-target="value", data-async-values-key="<%= name %>" data-async-values-zero-class="bg-secondary" class="badge bg-primary rounded-pill d-none"></span>
           <% end %>
         </li>
       <% end %>

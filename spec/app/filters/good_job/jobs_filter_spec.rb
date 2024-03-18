@@ -57,6 +57,12 @@ RSpec.describe GoodJob::JobsFilter do
     end
   end
 
+  describe '#state_names' do
+    it 'matches states' do
+      expect(filter.state_names).to match_array(filter.states.keys)
+    end
+  end
+
   describe '#states' do
     it 'is a valid result' do
       expect(filter.states).to eq({
