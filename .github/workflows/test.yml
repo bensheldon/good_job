@@ -152,12 +152,15 @@ jobs:
           bundler-cache: false
       - name: Delete and recreate Gemfile.lock
         run: |
-          rm Gemfile.lock && bundle lock && bundle update && cat Gemfile.lock
+          rm Gemfile.lock && bundle lock --update && cat Gemfile.lock
       - name: Set up Ruby and bundle install
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
           rubygems: ${{ steps.rubygems.outputs.version }}
+      - name: Generate Appraisal Gemfile.lock files
+        run: |
+          bundle exec appraisal bundle lock --update
       - name: Cache Appraisal gems
         uses: actions/cache@v4
         with:
