@@ -16,6 +16,7 @@ module GoodJob
 
     self.table_name = 'good_jobs'
     self.advisory_lockable_column = 'active_job_id'
+    self.implicit_order_column = 'created_at'
 
     define_model_callbacks :perform
     define_model_callbacks :perform_unlocked, only: :after
