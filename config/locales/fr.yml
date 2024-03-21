@@ -33,9 +33,9 @@ fr:
         no_batches_found: Aucun lot trouvé.
     cron_entries:
       actions:
-        confirm_disable: Voulez-vous vraiment désactiver cette entrée cron ?
-        confirm_enable: Voulez-vous vraiment activer cette entrée cron ?
-        confirm_enqueue: Voulez-vous vraiment mettre en file d'attente cette entrée cron ?
+        confirm_disable: Voulez-vous vraiment désactiver cette entrée cron?
+        confirm_enable: Voulez-vous vraiment activer cette entrée cron?
+        confirm_enqueue: Voulez-vous vraiment mettre en file d'attente cette entrée cron?
         disable: Désactiver l'entrée cron
         enable: Activer l'entrée cron
         enqueue: Mettre en file d'attente l'entrée cron maintenant

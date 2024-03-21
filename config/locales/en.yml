@@ -34,7 +34,7 @@ en:
     cron_entries:
       actions:
         confirm_disable: Are you sure you want to disable this cron entry?
-        confirm_enable: Are you sure you want to confirm this cron entry?
+        confirm_enable: Are you sure you want to enable this cron entry?
         confirm_enqueue: Are you sure you want to enqueue this cron entry?
         disable: Disable cron entry
         enable: Enable cron entry

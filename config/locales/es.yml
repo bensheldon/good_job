@@ -34,7 +34,7 @@ es:
     cron_entries:
       actions:
         confirm_disable: "¿Estás seguro que querés deshabilitar esta tarea programada?"
-        confirm_enable: "¿Estás seguro que querés confirmar esta tarea programada?"
+        confirm_enable: "¿Estás seguro que querés habilitar esta tarea programada?"
         confirm_enqueue: "¿Estás seguro que querés encolar esta tarea programada?"
         disable: Deshabilitar tarea programada
         enable: Habilitar tarea programada

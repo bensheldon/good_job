@@ -70,6 +70,44 @@ describe GoodJob::CronEntry do
     end
   end
 
+  describe '#enabled' do
+    it 'is enabled by default' do
+      expect(entry).to be_enabled
+    end
+
+    it 'can be enabled and disabled' do
+      entry.disable
+      expect(entry).not_to be_enabled
+
+      entry.enable
+      expect(entry).to be_enabled
+    end
+
+    context "when enabled_by_default=false" do
+      let(:params) { super().merge(enabled_by_default: false) }
+
+      it 'is disabled by default' do
+        expect(entry).not_to be_enabled
+      end
+
+      it 'can be enabled and disabled' do
+        entry.enable
+        expect(entry).to be_enabled
+
+        entry.disable
+        expect(entry).not_to be_enabled
+      end
+    end
+
+    context 'when a lambda' do
+      let(:params) { super().merge(enabled_by_default: -> { false }) }
+
+      it 'is disabled by default' do
+        expect(entry).not_to be_enabled
+      end
+    end
+  end
+
   describe 'display_schedule' do
     it 'returns the cron expression' do
       expect(entry.display_schedule).to eq('* * * * *')

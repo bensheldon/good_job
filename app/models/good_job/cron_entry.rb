@@ -74,7 +74,7 @@ module GoodJob # :nodoc:
     def enabled?
       return true unless GoodJob::Setting.migrated?
 
-      GoodJob::Setting.cron_key_enabled?(key)
+      GoodJob::Setting.cron_key_enabled?(key, default: enabled_by_default?)
     end
 
     def enable
@@ -131,6 +131,11 @@ module GoodJob # :nodoc:
     end
 
     private
+
+    def enabled_by_default?
+      value = params.fetch(:enabled_by_default, true)
+      value.respond_to?(:call) ? value.call : value
+    end
 
     def cron
       params.fetch(:cron)

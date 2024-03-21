@@ -34,7 +34,7 @@ nl:
     cron_entries:
       actions:
         confirm_disable: Weet u zeker dat u deze cron-vermelding wilt uitschakelen?
-        confirm_enable: Weet u zeker dat u deze cron-invoer wilt bevestigen?
+        confirm_enable: Weet u zeker dat u deze cron-invoer wilt inschakelen?
         confirm_enqueue: Weet u zeker dat u deze cron-vermelding in de wachtrij wilt plaatsen?
         disable: Schakel cron-invoer uit
         enable: Schakel cron-invoer in
