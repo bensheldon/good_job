@@ -82,6 +82,11 @@ when 'demo'
       complex_schedule: {
         cron: -> (last_ran) { last_ran ? last_ran + 17.hours : Time.now},
         class: "OtherJob",
+      },
+      pg_hero_maintenance: {
+        cron: "*/10 * * * *", # Every 10 minutes
+        class: "PgHeroMaintenanceJob",
+        description: "Runs PG Hero maintenance",
       }
     }
   end
