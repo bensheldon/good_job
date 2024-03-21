@@ -26,6 +26,9 @@ gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 gem 'rack', '~> 2.2'
 gem 'rails'
+gem "sprockets-rails"
+# PGHero for the demo app
+gem 'pghero'
 
 platforms :ruby do
   gem "bootsnap"
