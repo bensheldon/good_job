@@ -6,6 +6,7 @@ module GoodJob
     CRON_KEYS_DISABLED = "cron_keys_disabled"
 
     self.table_name = 'good_job_settings'
+    self.implicit_order_column = 'created_at'
 
     def self.cron_key_enabled?(key, default: true)
       if default

@@ -3,6 +3,19 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Setting do
+  describe 'implicit sort order' do
+    it 'is by created_at' do
+      first_job = described_class.create(id: '67160140-1bec-4c3b-bc34-1a8b36f87b21')
+      described_class.create(id: '3732d706-fd5a-4c39-b1a5-a9bc6d265811')
+      last_job = described_class.create(id: '4fbae77c-6f22-488f-ad42-5bd20f39c28c')
+
+      result = described_class.all
+
+      expect(result.first).to eq first_job
+      expect(result.last).to eq last_job
+    end
+  end
+
   describe 'cron_key_disabled setting' do
     describe '.cron_key_enabled?' do
       it 'returns true when the key is not disabled' do

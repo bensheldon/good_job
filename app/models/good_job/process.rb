@@ -14,6 +14,7 @@ module GoodJob # :nodoc:
     EXPIRED_INTERVAL = 5.minutes
 
     self.table_name = 'good_job_processes'
+    self.implicit_order_column = 'created_at'
 
     cattr_reader :mutex, default: Mutex.new
     cattr_accessor :_current_id, default: nil

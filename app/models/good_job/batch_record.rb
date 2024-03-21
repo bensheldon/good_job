@@ -7,6 +7,7 @@ module GoodJob
     include AdvisoryLockable
 
     self.table_name = 'good_job_batches'
+    self.implicit_order_column = 'created_at'
 
     has_many :jobs, class_name: 'GoodJob::Job', inverse_of: :batch, foreign_key: :batch_id, dependent: nil
     has_many :executions, class_name: 'GoodJob::Execution', foreign_key: :batch_id, inverse_of: :batch, dependent: nil

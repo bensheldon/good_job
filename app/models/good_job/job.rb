@@ -26,6 +26,7 @@ module GoodJob
 
     self.primary_key = 'active_job_id'
     self.advisory_lockable_column = 'active_job_id'
+    self.implicit_order_column = 'created_at'
 
     belongs_to :batch, class_name: 'GoodJob::BatchRecord', inverse_of: :jobs, optional: true
     has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent

@@ -5,6 +5,7 @@ module GoodJob # :nodoc:
     include ErrorEvents
 
     self.table_name = 'good_job_executions'
+    self.implicit_order_column = 'created_at'
 
     belongs_to :execution, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', primary_key: 'active_job_id', inverse_of: :discrete_executions, optional: true
     belongs_to :job, class_name: 'GoodJob::Job', foreign_key: 'active_job_id', primary_key: 'active_job_id', inverse_of: :discrete_executions, optional: true
