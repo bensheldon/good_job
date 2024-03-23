@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe 'PGHero', driver: :rack_test do
+describe 'PGHero', :demo_only do
   describe 'access' do
     context 'with the appropriate environment variables set' do
       before do

@@ -28,8 +28,8 @@ jobs:
       - name: Run linter
         run: bin/lint --nofix
 
-  development_environment:
-    name: Development Environment
+  development_demo:
+    name: Tests for Development and Demo
     runs-on: ubuntu-latest
     timeout-minutes: 10
     env:
@@ -39,6 +39,7 @@ jobs:
       BUNDLE_RETRY: 3
       BUNDLE_PATH: vendor/bundle
       DISABLE_SPRING: 1
+      TEST_DEMO: 1
     services:
       postgres:
         image: postgres:15
