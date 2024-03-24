@@ -1,5 +1,31 @@
 # Changelog
 
+## [v3.27.0](https://github.com/bensheldon/good_job/tree/v3.27.0) (2024-03-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.26.2...v3.27.0)
+
+**Implemented enhancements:**
+
+- Add `enabled_by_default: false` as option for cron configuration [\#1289](https://github.com/bensheldon/good_job/pull/1289) ([bensheldon](https://github.com/bensheldon))
+- Load metrics for job statuses asynchronously [\#1286](https://github.com/bensheldon/good_job/pull/1286) ([binarygit](https://github.com/binarygit))
+- Implement throttling options in concurrency extension [\#1270](https://github.com/bensheldon/good_job/pull/1270) ([marckohlbrugge](https://github.com/marckohlbrugge))
+
+**Fixed bugs:**
+
+- fix\(ui-dropdown\): use dropdown-end on locales dropdown [\#1296](https://github.com/bensheldon/good_job/pull/1296) ([WailanTirajoh](https://github.com/WailanTirajoh))
+
+**Closed issues:**
+
+- Disabling probe [\#1290](https://github.com/bensheldon/good_job/issues/1290)
+- Set an implicit order on models [\#1242](https://github.com/bensheldon/good_job/issues/1242)
+
+**Merged pull requests:**
+
+- docs\(readme\): remove double "using" [\#1295](https://github.com/bensheldon/good_job/pull/1295) ([WailanTirajoh](https://github.com/WailanTirajoh))
+- Set an implicit order on models [\#1293](https://github.com/bensheldon/good_job/pull/1293) ([mec](https://github.com/mec))
+- CI: install gems after loading cache, not before [\#1288](https://github.com/bensheldon/good_job/pull/1288) ([bensheldon](https://github.com/bensheldon))
+- Ensure job execution Advisory Lock query uses bind parameters [\#1287](https://github.com/bensheldon/good_job/pull/1287) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.26.2](https://github.com/bensheldon/good_job/tree/v3.26.2) (2024-03-15)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.26.1...v3.26.2)
