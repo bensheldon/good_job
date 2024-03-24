@@ -73,7 +73,7 @@
             <%= I18n.locale %>
           </a>
 
-          <ul class="dropdown-menu min-w-auto" aria-labelledby="localeOptions">
+          <ul class="dropdown-menu dropdown-menu-end min-w-auto" aria-labelledby="localeOptions">
             <% possible_locales = I18n.available_locales %>
             <% possible_locales.reject { |locale| locale == I18n.locale }.each do |locale| %>
               <li><%= link_to locale, url_for(locale: locale), class: "dropdown-item" %></li>
