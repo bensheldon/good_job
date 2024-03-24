@@ -38,3 +38,7 @@
 .btn-outline-secondary {
   border-color: #ced4da; /* $gray-400 */
 }
+
+.min-w-auto {
+  min-width: auto;
+}
