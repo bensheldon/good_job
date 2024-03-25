@@ -11,6 +11,8 @@ GoodJob is a multithreaded, Postgres-based, Active Job backend for Ruby on Rails
 - **Designed for Active Job.** Complete support for [async, queues, delays, priorities, timeouts, and retries](https://edgeguides.rubyonrails.org/active_job_basics.html) with near-zero configuration.
 - **Built for Rails.** Fully adopts Ruby on Rails [threading and code execution guidelines](https://guides.rubyonrails.org/threading_and_code_execution.html) with [Concurrent::Ruby](https://github.com/ruby-concurrency/concurrent-ruby).
 - **Backed by Postgres.** Relies upon Postgres integrity, session-level Advisory Locks to provide run-once safety and stay within the limits of `schema.rb`, and LISTEN/NOTIFY to reduce queuing latency.
+- **Fully featured.** Includes support for cron-like scheduled jobs, batches, concurrency and throttling controls, and a powerful Web Dashboard (check out the [Demo](https://goodjob-demo.herokuapp.com/)).
+- **Flexible and lightweight.** Safely runnable within a single existing web process or scaled via an independent CLI process across development, test, and production environments.
 - **For most workloads.** Targets full-stack teams, economy-minded solo developers, and applications that enqueue 1-million jobs/day and more.
 
 For more of the story of GoodJob, read the [introductory blog post](https://island94.org/2020/07/introducing-goodjob-1-0).
@@ -21,6 +23,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 |                 | Queues, priority, retries | Database                              | Concurrency       | Reliability/Integrity  | Latency                  |
 |-----------------|---------------------------|---------------------------------------|-------------------|------------------------|--------------------------|
 | **GoodJob**     | ✅ Yes                     | ✅ Postgres                            | ✅ Multithreaded   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
+| **Solid Queue** | ✅ Yes                     | ✅ Postgres and other databases ✨     | 🔶 Multithreaded in forked process   | ✅ ACID, Advisory Locks | 🔶 Polling |
 | **Que**         | ✅ Yes                     | 🔶️ Postgres, requires  `structure.sql` | ✅ Multithreaded   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
 | **Delayed Job** | ✅ Yes                     | ✅ Postgres                            | 🔴 Single-threaded | ✅ ACID, record-based   | 🔶 Polling                |
 | **Sidekiq**     | ✅ Yes                     | 🔴 Redis                               | ✅ Multithreaded   | 🔴 Crashes lose jobs    | ✅ Redis BRPOP            |
