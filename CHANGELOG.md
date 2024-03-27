@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.27.2](https://github.com/bensheldon/good_job/tree/v3.27.2) (2024-03-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.1...v3.27.2)
+
+**Fixed bugs:**
+
+- Use scope-resolutioned constants in Notifier loop [\#1300](https://github.com/bensheldon/good_job/pull/1300) ([bensheldon](https://github.com/bensheldon))
+- Invoke inline Bootstrap Color Mode javascript above CSS link tag to better avoid flash of un-themed content [\#1298](https://github.com/bensheldon/good_job/pull/1298) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Buggy theme animation while switching tabs [\#1224](https://github.com/bensheldon/good_job/issues/1224)
+
 ## [v3.27.1](https://github.com/bensheldon/good_job/tree/v3.27.1) (2024-03-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.0...v3.27.1)
