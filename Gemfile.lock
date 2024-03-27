@@ -288,6 +288,8 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.5.4)
+    pghero (3.4.1)
+      activerecord (>= 6)
     prettier_print (1.2.1)
     prism (0.24.0)
     protocol-hpack (1.4.2)
@@ -452,6 +454,13 @@ GEM
       thor (>= 0.19.2)
     spoon (0.0.6)
       ffi
+    sprockets (4.2.1)
+      concurrent-ruby (~> 1.0)
+      rack (>= 2.2.4, < 4)
+    sprockets-rails (3.4.2)
+      actionpack (>= 5.2)
+      activesupport (>= 5.2)
+      sprockets (>= 3.0.0)
     stackprof (0.2.25)
     stringio (3.1.0)
     syntax_tree (6.2.0)
@@ -528,6 +537,7 @@ DEPENDENCIES
   net-smtp
   nokogiri
   pg
+  pghero
   pry-byebug
   pry-rails
   puma
@@ -545,6 +555,7 @@ DEPENDENCIES
   sorbet
   sorbet-runtime
   spoom
+  sprockets-rails
   stackprof
   tapioca
   timecop
