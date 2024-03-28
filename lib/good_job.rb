@@ -25,6 +25,7 @@ require_relative "good_job/configuration"
 require_relative "good_job/cron_manager"
 require_relative "good_job/current_thread"
 require_relative "good_job/daemon"
+require_relative "good_job/dependencies"
 require_relative "good_job/job_performer"
 require_relative "good_job/job_performer/metrics"
 require_relative "good_job/log_subscriber"
@@ -45,6 +46,7 @@ require_relative "good_job/thread_status"
 #
 # +GoodJob+ is the top-level namespace and exposes configuration attributes.
 module GoodJob
+  include GoodJob::Dependencies
   include GoodJob::ThreadStatus
 
   # Default, null, blank value placeholder.
@@ -111,11 +113,6 @@ module GoodJob
   #   Global/default execution capsule for GoodJob.
   #   @return [GoodJob::Capsule, nil]
   mattr_accessor :capsule, default: GoodJob::Capsule.new(configuration: configuration)
-
-  mattr_accessor :_async_ready, default: false
-  def self._async_ready?
-    _async_ready
-  end
 
   # Called with exception when a GoodJob thread raises an exception
   # @param exception [Exception] Exception that was raised
