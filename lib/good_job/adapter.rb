@@ -30,7 +30,7 @@ module GoodJob
       GoodJob::Configuration.validate_execution_mode(@_execution_mode_override) if @_execution_mode_override
       @capsule = _capsule
 
-      start_async if GoodJob._async_ready?
+      start_async if GoodJob.async_ready?
       self.class.instances << self
     end
 
