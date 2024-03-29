@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.27.3](https://github.com/bensheldon/good_job/tree/v3.27.3) (2024-03-29)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.2...v3.27.3)
+
+**Merged pull requests:**
+
+- Revert "Start async adapters `after_initialize` instead of once Active Job and Active Record are loaded and Rails initialized?" [\#1303](https://github.com/bensheldon/good_job/pull/1303) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.27.2](https://github.com/bensheldon/good_job/tree/v3.27.2) (2024-03-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.1...v3.27.2)
