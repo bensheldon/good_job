@@ -233,19 +233,9 @@ es:
         inspiration: "¡Recuerda, también tú estás haciendo un buen trabajo!"
         last_updated: Última actualización
     status:
-      discarded:
-        one: Descartada
-        other: Descartadas
-      queued:
-        one: Encolada
-        other: Encoladas
-      retried:
-        one: Reintentada
-        other: Reintentadas
-      running: Corriendo
-      scheduled:
-        one: Programada
-        other: Programadas
-      succeeded:
-        one: Exitosa
-        other: Exitosas
+      discarded: Descartado
+      queued: Encolado
+      retried: Reintentado
+      running: Ejecutando
+      scheduled: Programado
+      succeeded: Exitoso
