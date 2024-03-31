@@ -111,9 +111,7 @@ pt-BR:
       actions:
         confirm_destroy: Tem certeza de que deseja excluir a tarefa?
         confirm_discard: Tem certeza de que deseja descartar a tarefa?
-        confirm_force_discard: 'Tem certeza de que deseja forçar o descarte desta tarefa? A tarefa será marcada como descartada, mas a tarefa em execução não será interrompida - no entanto, ela não será tentada novamente em falhas.
-
-          '
+        confirm_force_discard: Tem certeza de que deseja forçar o descarte desta tarefa? A tarefa será marcada como descartada, mas a tarefa em execução não será interrompida - no entanto, ela não será tentada novamente em falhas.
         confirm_reschedule: Tem certeza de que deseja reagendar a tarefa?
         confirm_retry: Tem certeza de que deseja tentar novamente a tarefa?
         destroy: Excluir tarefa

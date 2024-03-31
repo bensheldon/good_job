@@ -111,9 +111,7 @@ de:
       actions:
         confirm_destroy: Sind Sie sicher, dass Sie den Job zerstören wollen?
         confirm_discard: Sind Sie sicher, dass Sie den Job verwerfen wollen?
-        confirm_force_discard: 'Sind Sie sicher, dass Sie das Verwerfen dieses Jobs erzwingen möchten? Der Job wird als verworfen markiert, aber der laufende Job wird nicht gestoppt – er wird jedoch bei Fehlern nicht erneut versucht.
-
-          '
+        confirm_force_discard: Sind Sie sicher, dass Sie das Verwerfen dieses Jobs erzwingen möchten? Der Job wird als verworfen markiert, aber der laufende Job wird nicht gestoppt – er wird jedoch bei Fehlern nicht erneut versucht.
         confirm_reschedule: Möchten Sie den Auftrag wirklich verschieben?
         confirm_retry: Möchten Sie den Job wirklich wiederholen?
         destroy: Arbeit vernichten
