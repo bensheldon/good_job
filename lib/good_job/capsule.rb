@@ -12,7 +12,7 @@ module GoodJob
     cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
 
     # @param configuration [GoodJob::Configuration] Configuration to use for this capsule.
-    def initialize(configuration: GoodJob.configuration)
+    def initialize(configuration: nil)
       @configuration = configuration
       @startable = true
       @started_at = nil
@@ -30,13 +30,13 @@ module GoodJob
         return unless startable?(force: force)
 
         @shared_executor = GoodJob::SharedExecutor.new
-        @notifier = GoodJob::Notifier.new(enable_listening: @configuration.enable_listen_notify, executor: @shared_executor.executor)
-        @poller = GoodJob::Poller.new(poll_interval: @configuration.poll_interval)
-        @multi_scheduler = GoodJob::MultiScheduler.from_configuration(@configuration, warm_cache_on_initialize: true)
+        @notifier = GoodJob::Notifier.new(enable_listening: configuration.enable_listen_notify, executor: @shared_executor.executor)
+        @poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
+        @multi_scheduler = GoodJob::MultiScheduler.from_configuration(configuration, warm_cache_on_initialize: true)
         @notifier.recipients.push([@multi_scheduler, :create_thread])
         @poller.recipients.push(-> { @multi_scheduler.create_thread({ fanout: true }) })
 
-        @cron_manager = GoodJob::CronManager.new(@configuration.cron_entries, start_on_initialize: true, executor: @shared_executor.executor) if @configuration.enable_cron?
+        @cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true, executor: @shared_executor.executor) if configuration.enable_cron?
 
         @startable = false
         @started_at = Time.current
@@ -51,7 +51,7 @@ module GoodJob
     #   * +nil+ will trigger a shutdown but not wait for it to complete.
     # @return [void]
     def shutdown(timeout: NONE)
-      timeout = @configuration.shutdown_timeout if timeout == NONE
+      timeout = configuration.shutdown_timeout if timeout == NONE
       GoodJob._shutdown_all([@shared_executor, @notifier, @poller, @multi_scheduler, @cron_manager].compact, timeout: timeout)
       @startable = false
       @started_at = nil
@@ -100,6 +100,10 @@ module GoodJob
     end
 
     private
+
+    def configuration
+      @configuration || GoodJob.configuration
+    end
 
     def startable?(force: false)
       !@started_at && (@startable || force)
