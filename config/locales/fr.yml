@@ -33,9 +33,9 @@ fr:
         no_batches_found: Aucun lot trouvé.
     cron_entries:
       actions:
-        confirm_disable: Voulez-vous vraiment désactiver cette entrée cron?
-        confirm_enable: Voulez-vous vraiment activer cette entrée cron?
-        confirm_enqueue: Voulez-vous vraiment mettre en file d'attente cette entrée cron?
+        confirm_disable: Voulez-vous vraiment désactiver cette entrée cron ?
+        confirm_enable: Voulez-vous vraiment activer cette entrée cron ?
+        confirm_enqueue: Voulez-vous vraiment mettre en file d'attente cette entrée cron ?
         disable: Désactiver l'entrée cron
         enable: Activer l'entrée cron
         enqueue: Mettre en file d'attente l'entrée cron maintenant
@@ -111,9 +111,7 @@ fr:
       actions:
         confirm_destroy: Voulez-vous vraiment détruire le job ?
         confirm_discard: Voulez-vous vraiment mettre au rebut le job ?
-        confirm_force_discard: 'Êtes-vous sûr de vouloir forcer l''abandon de cette tâche ? Le travail sera marqué comme abandonné mais le travail en cours d''exécution ne sera pas arrêté - il ne sera cependant pas réessayé en cas d''échec.
-
-          '
+        confirm_force_discard: Êtes-vous sûr de vouloir forcer l'abandon du travail? Le travail sera marqué comme abandonné mais le travail en cours ne sera pas arrêté - cependant, il ne sera pas réessayé en cas d'échec.
         confirm_reschedule: Voulez-vous vraiment replanifier le job ?
         confirm_retry: Voulez-vous vraiment réessayer le job ?
         destroy: Détruire le job
@@ -146,7 +144,7 @@ fr:
             one: Appliquer à ce job
             other: Appliquer aux %{count} jobs
           confirm_destroy_all: Voulez-vous vraiment détruire les jobs sélectionnés ?
-          confirm_discard_all: Voulez-vous vraiment mettre au rebut les jobs sélectionnés?
+          confirm_discard_all: Voulez-vous vraiment mettre au rebut les jobs sélectionnés ?
           confirm_reschedule_all: Voulez-vous vraiment replanifier les jobs sélectionnées ?
           confirm_retry_all: Voulez-vous vraiment réessayer les jobs sélectionnées ?
           destroy_all: Tout détruire
