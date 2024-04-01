@@ -21,13 +21,16 @@ RSpec.describe GoodJob::AdvisoryLockable do
       end
     end
 
-    it 'generates bind parameters instead of serialized values' do
-      messages = []
-      allow(model_class.logger).to receive(:debug) do |message|
-        messages << message
-      end
-      model_class.where(priority: 99).order(priority: :desc).advisory_lock.to_a
-      expect(messages.first).to match(/WHERE "good_jobs"."priority" = (\$1|\?)/)
+    it 'generates bind parameters' do
+      query = model_class.where(priority: 99).order(priority: :desc).limit(2).advisory_lock
+      _sql, binds, _preparable = model_class.connection.send :to_sql_and_binds, query.arel
+      expect(binds.size).to eq 2 # priority and limit
+    end
+
+    it 'is preparable', skip: !defined?(Arel::Nodes::BoundSqlLiteral) do
+      query = model_class.where(priority: 99).order(priority: :desc).limit(2).advisory_lock
+      _sql, _binds, preparable = model_class.connection.send :to_sql_and_binds, query.arel
+      expect(preparable).to eq true
     end
 
     describe 'lockable column do' do
