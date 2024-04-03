@@ -14,7 +14,7 @@ module GoodJob
 
     # Capture jobs to a buffer. Pass either a block, or specific Active Jobs to be buffered.
     # @param active_jobs [Array<ActiveJob::Base>] Active Jobs to be buffered.
-    # @param queue_adapter Override the jobs implict queue adapter with an explicit one.
+    # @param queue_adapter Override the jobs implicit queue adapter with an explicit one.
     # @return [nil, Array<ActiveJob::Base>] The ActiveJob instances that have been buffered; nil if no active buffer
     def self.capture(active_jobs = nil, queue_adapter: nil, &block)
       raise(ArgumentError, "Use either the block form or the argument form, not both") if block && active_jobs
