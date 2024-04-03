@@ -25,7 +25,7 @@ module GoodJob
     #   -+test+: +:inline+
     #  - +production+ and all other environments: +:external+
     #
-    def initialize(execution_mode: nil, _capsule: GoodJob.capsule, enqueue_after_transaction_commit: true) # rubocop:disable Lint/UnderscorePrefixedVariableName
+    def initialize(execution_mode: nil, _capsule: GoodJob.capsule, enqueue_after_transaction_commit: false) # rubocop:disable Lint/UnderscorePrefixedVariableName
       @_execution_mode_override = execution_mode
       @enqueue_after_transaction_commit = enqueue_after_transaction_commit
       GoodJob::Configuration.validate_execution_mode(@_execution_mode_override) if @_execution_mode_override
