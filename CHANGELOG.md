@@ -1,5 +1,27 @@
 # Changelog
 
+## [v3.27.4](https://github.com/bensheldon/good_job/tree/v3.27.4) (2024-04-04)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.3...v3.27.4)
+
+**Fixed bugs:**
+
+- Fix status tabs for Spanish translation [\#1307](https://github.com/bensheldon/good_job/pull/1307) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Adapter to implement `enqueue_after_transaction_commit` [\#1310](https://github.com/bensheldon/good_job/issues/1310)
+- PG::SyntaxError: ERROR from timestamp [\#1305](https://github.com/bensheldon/good_job/issues/1305)
+- Spanish translation while on the dashboard displays hashes instead of the job status name [\#1304](https://github.com/bensheldon/good_job/issues/1304)
+- Exception raised during asset precompilation when no `config/database.yml` [\#1302](https://github.com/bensheldon/good_job/issues/1302)
+- Good job is running with standalone action cable server [\#1299](https://github.com/bensheldon/good_job/issues/1299)
+- Growing memory usage [\#1276](https://github.com/bensheldon/good_job/issues/1276)
+
+**Merged pull requests:**
+
+- Implement enqueue\_after\_transaction\_commit? [\#1311](https://github.com/bensheldon/good_job/pull/1311) ([luizkowalski](https://github.com/luizkowalski))
+- Fix localization formatting of `confirm_force_discard` [\#1309](https://github.com/bensheldon/good_job/pull/1309) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.27.3](https://github.com/bensheldon/good_job/tree/v3.27.3) (2024-03-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.2...v3.27.3)
