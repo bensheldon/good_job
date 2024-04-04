@@ -96,7 +96,8 @@ describe GoodJob::Bulk do
     end
 
     it 'can handle non-GoodJob jobs that are directly inserted into the buffer' do
-      adapter = instance_double(ActiveJob::QueueAdapters::InlineAdapter, enqueue: nil, enqueue_at: nil)
+      optional_adapter_kwargs = ActiveJob::QueueAdapters::InlineAdapter.method_defined?(:enqueue_after_transaction_commit?) ? { enqueue_after_transaction_commit?: false } : {}
+      adapter = instance_double(ActiveJob::QueueAdapters::InlineAdapter, enqueue: nil, enqueue_at: nil, **optional_adapter_kwargs)
       TestJob.queue_adapter = adapter
 
       described_class.enqueue(TestJob.new)

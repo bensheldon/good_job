@@ -42,6 +42,12 @@ module GoodJob
       enqueue_at(active_job, nil)
     end
 
+    # Defines if enqueueing this job from inside an Active Record transaction
+    # automatically defers the enqueue to after the transaction commit.
+    def enqueue_after_transaction_commit?
+      GoodJob.configuration.enqueue_after_transaction_commit
+    end
+
     # Enqueues multiple ActiveJob instances at once
     # @param active_jobs [Array<ActiveJob::Base>] jobs to be enqueued
     # @return [Integer] number of jobs that were successfully enqueued
