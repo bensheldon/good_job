@@ -25,9 +25,8 @@ module GoodJob
     #   -+test+: +:inline+
     #  - +production+ and all other environments: +:external+
     #
-    def initialize(execution_mode: nil, _capsule: GoodJob.capsule, enqueue_after_transaction_commit: false) # rubocop:disable Lint/UnderscorePrefixedVariableName
+    def initialize(execution_mode: nil, _capsule: GoodJob.capsule) # rubocop:disable Lint/UnderscorePrefixedVariableName
       @_execution_mode_override = execution_mode
-      @enqueue_after_transaction_commit = enqueue_after_transaction_commit
       GoodJob::Configuration.validate_execution_mode(@_execution_mode_override) if @_execution_mode_override
       @capsule = _capsule
 
@@ -46,7 +45,7 @@ module GoodJob
     # Defines if enqueueing this job from inside an Active Record transaction
     # automatically defers the enqueue to after the transaction commit.
     def enqueue_after_transaction_commit?
-      @enqueue_after_transaction_commit
+      GoodJob.configuration.enqueue_after_transaction_commit
     end
 
     # Enqueues multiple ActiveJob instances at once
