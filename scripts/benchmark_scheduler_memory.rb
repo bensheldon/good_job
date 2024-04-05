@@ -4,7 +4,6 @@
 require_relative '../demo/config/environment'
 require_relative '../lib/good_job'
 require 'memory_profiler'
-require 'pry'
 
 MAX_CACHE = 10_000
 MAX_THREADS = 0

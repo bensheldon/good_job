@@ -39,8 +39,9 @@ platforms :ruby do
 
   group :debug do
     gem "activerecord-explain-analyze", require: false
+    gem "benchmark-ips"
+    gem "debug"
     gem "memory_profiler"
-    gem "pry-byebug"
     gem "rack-mini-profiler"
     gem "rbtrace"
     gem "stackprof"
