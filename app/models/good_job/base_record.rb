@@ -40,6 +40,10 @@ module GoodJob
       end
     end
 
+    def self.bind_value(name, value, type_class)
+      Arel::Nodes::BindParam.new(ActiveRecord::Relation::QueryAttribute.new(name, value, type_class.new))
+    end
+
     ActiveSupport.run_load_hooks(:good_job_base_record, self)
   end
 end

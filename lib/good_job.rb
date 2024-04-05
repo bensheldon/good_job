@@ -203,7 +203,7 @@ module GoodJob
       deleted_batches_count = 0
       deleted_discrete_executions_count = 0
 
-      jobs_query = GoodJob::Job.where('finished_at <= ?', timestamp).order(finished_at: :asc).limit(in_batches_of)
+      jobs_query = GoodJob::Job.finished_before(timestamp).order(finished_at: :asc).limit(in_batches_of)
       jobs_query = jobs_query.succeeded unless include_discarded
       loop do
         active_job_ids = jobs_query.pluck(:active_job_id)
@@ -219,7 +219,7 @@ module GoodJob
       end
 
       if GoodJob::BatchRecord.migrated?
-        batches_query = GoodJob::BatchRecord.where('finished_at <= ?', timestamp).limit(in_batches_of)
+        batches_query = GoodJob::BatchRecord.finished_before(timestamp).limit(in_batches_of)
         batches_query = batches_query.succeeded unless include_discarded
         loop do
           deleted = batches_query.delete_all

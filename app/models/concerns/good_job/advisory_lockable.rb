@@ -46,14 +46,19 @@ module GoodJob
         cte_query = cte_query.limit(select_limit) if select_limit
         cte_type = supports_cte_materialization_specifiers? ? :MATERIALIZED : :""
         composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(cte_type, cte_query.arel))
+
+        lock_condition = "#{function}(('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)"
         query = cte_table.project(cte_table[:id])
                          .with(composed_cte)
-                         .where(Arel.sql("#{function}(('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)"))
+                         .where(defined?(Arel::Nodes::BoundSqlLiteral) ? Arel::Nodes::BoundSqlLiteral.new(lock_condition, [], {}) : Arel::Nodes::SqlLiteral.new(lock_condition))
 
         limit = original_query.arel.ast.limit
         query.limit = limit.value if limit.present?
 
-        unscoped.where(arel_table[primary_key].in(query)).merge(original_query.only(:order))
+        # Arel.sql and the IN clause prevent this from being preparable
+        # That's why this is manually composed of BoundSqlLiteral's and an InfixOperation
+        # to sidestep anywhere in Arel where the `collector.preparable = false` is set
+        unscoped.where(Arel::Nodes::InfixOperation.new("IN", arel_table[primary_key], query)).merge(original_query.only(:order))
       end)
 
       # Joins the current query with Postgres's +pg_locks+ table (it provides

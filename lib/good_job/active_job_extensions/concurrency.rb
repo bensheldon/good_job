@@ -96,7 +96,7 @@ module GoodJob
 
               query = DiscreteExecution.joins(:job)
                                        .where(GoodJob::Job.table_name => { concurrency_key: key })
-                                       .where(DiscreteExecution.arel_table[:created_at].gt(throttle_period.ago))
+                                       .where(DiscreteExecution.arel_table[:created_at].gt(DiscreteExecution.bind_value('created_at', throttle_period.ago, ActiveRecord::Type::DateTime)))
               allowed_active_job_ids = query.where(error: nil).or(query.where.not(error: "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError: GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"))
                                             .order(created_at: :asc)
                                             .limit(throttle_limit)

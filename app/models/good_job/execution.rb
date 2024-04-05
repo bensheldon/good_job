@@ -95,7 +95,7 @@ module GoodJob
     # @!method only_scheduled
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(Arel::Nodes::BindParam.new(ActiveModel::Attribute.with_cast_value("scheduled_at", Time.current, ActiveModel::Type::DateTime.new)))).or(where(scheduled_at: nil)) }
+    scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(bind_value('scheduled_at', DateTime.current, ActiveRecord::Type::DateTime))).or(where(scheduled_at: nil)) }
 
     # Order executions by priority (highest priority first).
     # @!method priority_ordered
@@ -161,7 +161,7 @@ module GoodJob
     # @param timestamp (Float)
     #   Get jobs that finished before this time (in epoch time).
     # @return [ActiveRecord::Relation]
-    scope :finished, ->(timestamp = nil) { timestamp ? where(arel_table['finished_at'].lteq(timestamp)) : where.not(finished_at: nil) }
+    scope :finished, ->(timestamp = nil) { timestamp ? where(arel_table['finished_at'].lteq(bind_value('finished_at', timestamp, ActiveRecord::Type::DateTime))) : where.not(finished_at: nil) }
 
     # Get Jobs that started but not finished yet.
     # @!method running
@@ -290,11 +290,12 @@ module GoodJob
       query = advisory_unlocked.unfinished.schedule_ordered
 
       after ||= Time.current
-      after_query = query.where('scheduled_at > ?', after).or query.where(scheduled_at: nil).where('created_at > ?', after)
+      after_bind = bind_value('scheduled_at', after, ActiveRecord::Type::DateTime)
+      after_query = query.where(arel_table['scheduled_at'].gt(after_bind)).or query.where(scheduled_at: nil).where(arel_table['created_at'].gt(after_bind))
       after_at = after_query.limit(limit).pluck(:scheduled_at, :created_at).map { |timestamps| timestamps.compact.first }
 
       if now_limit&.positive?
-        now_query = query.where('scheduled_at < ?', Time.current).or query.where(scheduled_at: nil)
+        now_query = query.where(arel_table['scheduled_at'].lt(bind_value('scheduled_at', Time.current, ActiveRecord::Type::DateTime))).or query.where(scheduled_at: nil)
         now_at = now_query.limit(now_limit).pluck(:scheduled_at, :created_at).map { |timestamps| timestamps.compact.first }
       end
 
