@@ -17,9 +17,9 @@ module GoodJob
       scope :display_all, (lambda do |after_scheduled_at: nil, after_id: nil|
         query = order(Arel.sql('COALESCE(scheduled_at, created_at) DESC, id DESC'))
         if after_scheduled_at.present? && after_id.present?
-          query = query.where(Arel.sql('(COALESCE(scheduled_at, created_at), id) < (:after_scheduled_at, :after_id)'), after_scheduled_at: after_scheduled_at, after_id: after_id)
+          query = query.where Arel::Nodes::Grouping.new([coalesce_scheduled_at_created_at, arel_table["id"]]).lt(Arel::Nodes::Grouping.new([bind_value('coalesce', after_scheduled_at, ActiveRecord::Type::DateTime), bind_value('id', after_id, ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Uuid)]))
         elsif after_scheduled_at.present?
-          query = query.where(Arel.sql('(COALESCE(scheduled_at, created_at)) < (:after_scheduled_at)'), after_scheduled_at: after_scheduled_at)
+          query = query.where coalesce_scheduled_at_created_at.lt(bind_value('coalesce', after_scheduled_at, ActiveRecord::Type::DateTime))
         end
         query
       end)
@@ -34,6 +34,7 @@ module GoodJob
         query = query.to_s.strip
         next if query.blank?
 
+        # TODO: turn this into proper bind parameters in Arel
         tsvector = "(to_tsvector('english', id::text) || to_tsvector('english', COALESCE(active_job_id::text, '')) || to_tsvector('english', serialized_params) || to_tsvector('english', COALESCE(error, ''))#{" || to_tsvector('english', COALESCE(array_to_string(labels, ' '), ''))" if labels_migrated?})"
         to_tsquery_function = database_supports_websearch_to_tsquery? ? 'websearch_to_tsquery' : 'plainto_tsquery'
         where("#{tsvector} @@ #{to_tsquery_function}(?)", query)
