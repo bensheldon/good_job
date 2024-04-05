@@ -25,7 +25,8 @@ pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 # Workers do not work on JRuby or Windows (both of which do not support
 # processes).
 #
-workers ENV.fetch("WEB_CONCURRENCY") { 0 }
+web_concurrency = ENV.fetch("WEB_CONCURRENCY") { 0 }.to_i
+workers web_concurrency
 
 # Use the `preload_app!` method when specifying a `workers` number.
 # This directive tells Puma to first boot the application and load code
@@ -36,15 +37,15 @@ preload_app! if ENV["PRELOAD_APP"]
 
 before_fork do
   GoodJob.shutdown
-end
+end if web_concurrency > 0
 
 on_worker_boot do
   GoodJob.restart
-end
+end if web_concurrency > 0
 
 on_worker_shutdown do
   GoodJob.shutdown
-end
+end if web_concurrency > 0
 
 MAIN_PID = Process.pid
 at_exit do
