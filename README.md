@@ -500,12 +500,12 @@ Higher priority numbers run first in all versions of GoodJob v3.x and below. Goo
 Labels are the recommended way to add context or metadata to specific jobs. For example, all jobs that have a dependency on an email service could be labeled `email`. Using labels requires adding the Active Job extension `GoodJob::ActiveJobExtensions::Labels` to your job class.
 
 ```ruby
-class ApplicationRecord < ActiveJob::Base
+class ApplicationJob < ActiveJob::Base
   include GoodJob::ActiveJobExtensions::Labels
 end
 
 # Add a default label to every job within the class
-class WelcomeJob < ApplicationRecord
+class WelcomeJob < ApplicationJob
   self.good_job_labels = ["email"]
 
   def perform
