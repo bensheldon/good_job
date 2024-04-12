@@ -92,7 +92,7 @@ module GoodJob
           executions = executions.select(&:persisted?) # prune unpersisted executions
 
           if execute_inline?
-            inline_executions = executions.select { |execution| (execution.scheduled_at.nil? || execution.scheduled_at <= Time.current) }
+            inline_executions = executions.select { |execution| execution.scheduled_at.present? && execution.scheduled_at <= Time.current }
             inline_executions.each(&:advisory_lock!)
           end
         end
@@ -153,7 +153,7 @@ module GoodJob
       return if GoodJob::Bulk.capture(active_job, queue_adapter: self)
 
       Rails.application.executor.wrap do
-        will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
+        will_execute_inline = execute_inline? && (scheduled_at.present? && scheduled_at <= Time.current)
         will_retry_inline = will_execute_inline && CurrentThread.execution&.active_job_id == active_job.job_id && !CurrentThread.retry_now
 
         if will_retry_inline
@@ -171,7 +171,7 @@ module GoodJob
             result = execution.perform
 
             retried_execution = result.retried
-            while retried_execution && (retried_execution.scheduled_at.nil? || retried_execution.scheduled_at <= Time.current)
+            while retried_execution && (retried_execution.scheduled_at.present? && retried_execution.scheduled_at <= Time.current)
               execution = retried_execution
               result = execution.perform
               retried_execution = result.retried

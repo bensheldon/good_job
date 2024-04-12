@@ -26,6 +26,7 @@ gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 gem 'rack', '~> 2.2'
 gem 'rails'
+gem "byebug"
 
 platforms :ruby do
   gem "bootsnap"

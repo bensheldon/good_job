@@ -91,11 +91,11 @@ module GoodJob
     scope :unfinished, -> { where(finished_at: nil) }
 
     # Get executions that are not scheduled for a later time than now (i.e. jobs that
-    # are not scheduled or scheduled for earlier than the current time).
+    # are scheduled for earlier than the current time).  Paused jobs are excluded.
     # @!method only_scheduled
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(bind_value('scheduled_at', DateTime.current, ActiveRecord::Type::DateTime))).or(where(scheduled_at: nil)) }
+    scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(bind_value('scheduled_at', DateTime.current, ActiveRecord::Type::DateTime))) }
 
     # Order executions by priority (highest priority first).
     # @!method priority_ordered
@@ -312,6 +312,8 @@ module GoodJob
     # @return [Execution]
     #   The new {Execution} instance representing the queued ActiveJob job.
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
+      puts 'Execution.enqueue'
+      # byebug
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         current_execution = CurrentThread.execution
 
@@ -342,6 +344,9 @@ module GoodJob
         end
 
         instrument_payload[:execution] = execution
+        if active_job.respond_to?(:good_job_paused) && active_job.good_job_paused
+          execution.scheduled_at = nil
+        end
         execution.save!
 
         if retried
