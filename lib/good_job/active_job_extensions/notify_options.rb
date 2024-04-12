@@ -9,7 +9,7 @@ module GoodJob
     # @example
     #   # Include the concern to your job class:
     #   class MyJob < ApplicationJob
-    #     include GoodJob::ActiveJobExtensions::Notify
+    #     include GoodJob::ActiveJobExtensions::NotifyOptions
     #     self.good_job_notify = false
     #   end
     #
