@@ -72,6 +72,11 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Write tests](#write-tests)
     - [PgBouncer compatibility](#pgbouncer-compatibility)
     - [CLI HTTP health check probes](#cli-http-health-check-probes)
+- [Doing your best job with GoodJob](#doing-your-best-job-with-goodjob)
+    - [Sizing jobs: mice and elephants](#sizing-jobs-mice-and-elephants)
+    - [Isolating by total latency](#isolating-by-total-latency)
+    - [Configuring your queues](#configuring-your-queues)
+    - [Additional observations](#additional-observations)
 - [Contribute](#contribute)
     - [Gem development](#gem-development)
         - [Development setup](#development-setup)
@@ -1526,6 +1531,90 @@ gem 'webrick'
 ```
 
 If WEBrick is configured to be used, but the dependency is not found, GoodJob will log a warning and fallback to the default probe server.
+
+## Doing your best job with GoodJob
+
+_This section explains how to use GoodJob the most efficiently and performantly, according to its maintainers. GoodJob is very flexible and you don’t necessarily have to use it this way, but the concepts explained here are part of GoodJob’s design intent._
+
+Background jobs are hard. There are two extremes:
+
+- **Throw resources (compute, servers, money) at it** by creating dedicated processes (or servers) for each type of job or queue and scaling them independently to achieve the lowest latency and highest throughput.
+- **Do the best you can in a small budget** by creating dedicated _thread pools_ within a process for each type of job or queue to produce quality-of-service and compromise maximum latency (or tail latency) because of shared resources and thread contention. You can even run them in the web process if you’re really cheap.
+
+This section will largely focused on optimizing within the latter small-budget scenario, but the concepts and explanation should help you optimize the big-budget scenario too.
+
+Let’s start with anti-patterns, and then the rest of this section will explain an alternative:
+
+- **Don’t use functional names for your queues** like `mailers` or `sms` or `turbo` or `batch`.  Instead name them after the total latency target (the total duration within queue and executing till finish) you expect for that job e.g.`latency_30s` or `latency_5m` or `literally_whenever`.
+- **Priority can’t fix a lack of capacity.** Priority rules (i.e. weighing or ordering which jobs or queues execute first) only works when there is  capacity available to execute that _next_ job. When all capacity is in-use, priority cannot preempt a job that is already executing ("head-of-line blocking").
+
+The following will explain methods to create homogenous workloads (based on latency) and increase execution capacity when queuing latency causes the jobs to exceed their total latency target.
+
+### Sizing jobs: mice and elephants
+
+Queuing theory will refer to fast/small/low-latency tasks as **Mice** (e.g. a password reset email, an MFA token via SMS) and slow/big/high-latency tasks as **Elephants** (e.g. sending an email newsletter to 10k recipients, a batched update that touches every record in the database).
+
+Explicitly group your jobs by their latency: how quickly you expect them to finish to achieve your expected quality of service. This should be their **total latency** (or duration) which is the sum of: **queuing latency** which is how long the job waits in queue until execution capacity becomes available (which ideally should be zero, because you have idle capacity and can start executing a job immediately as soon as it is enqueued or upon its scheduled time) and **execution latency** which is how long the job’s execution takes (e.g. the email being sent). Example: I expect this Password Reset Email Job to have a total latency of 30 seconds or less.
+
+In a working application, you likely will have more gradations than just small and big or slow and fast (analogously: badgers, wildebeests; maybe even tardigrades or blue whales for tiny and huge, respectively), but there will regardless be a relatively small and countable number of discrete latency buckets to organize your jobs into.
+
+### Isolating by total latency
+
+The most efficient workloads are homogenous (similar) workloads. If you know every job to be executed will take about the same amount of time, you can estimate the maximum delay for a new job at the back of the queue and have that drive decisions about capacity. Alternatively, if those jobs are heterogenous (mixed) it’s possible that a very slow/long-duration job could hold everything back for much longer than anticipated and it’s sorta random. That’s bad!
+
+A fun visual image here for a single-file queue is a doorway: If you only have 1 doorway, it must be big enough to fit an elephant. But if an elephant is going through the door (and it will go through slowly!) no mice can fit through the door until the elephant is fully clear. Your mice will be delayed!
+
+Priority will not help when an elephant is in the doorway. Yes, you could say mice have a higher priority than elephants and always allow any mouse to go _before_ any elephant in queue will start. But once an elephant *has started* going through the door, any subsequent mouse who arrives must wait for the elephant to egress regardless of their priority. In Active Job and Ruby, it’s really hard to stop or cancel or preempt a running job (unless you’ve already architected that into your jobs, like with the [`job-iteration`](https://github.com/Shopify/job-iteration) library)
+
+The best solution is to have a 2nd door, but only sized for mice, so an elephant can’t ever block it. With a mouse-sized doorway _and_ an elephant-sized doorway, mice can still go through the big elephant door when an elephant isn’t using it. Each door has a _maximum_ size (or “latency”) we want it to accept, and smaller is ok, just not larger.
+
+### Configuring your queues
+
+If we wanted to capture the previous 2-door scenario in GoodJob, we’d configure the queues like this;
+
+```ruby
+config.good_job.queues = "mice:1; elephant,mice:1"
+```
+
+This configuration creates two isolated thread pools (separated by a semicolon) each with 1 thread each (the number after the colon). The 2nd thread pool recognizes that both elephants and mice can use that isolated thread pool; if there is an influx of mice, it's possible to use the elephant’s thread pool if an elephant isn't already in progress.
+
+So what if we add an intermediately-sized `badgers` ? In that case, we can make 3 distinct queues:
+
+```ruby
+config.good_job.queues = "mice:1; badgers,mice:1; elephants,badgers,mice:1"
+```
+
+In this case, we make a mouse sized queue, a badger sized queue, and an elephant sized queue. We can simplify this even further:
+
+```ruby
+config.good_job.queues = "mice:1; badgers,mice:1; *:1"
+```
+
+Using the wildcard  `*` for any queue also helps ensure that if a job is enqueued to a newly declared queue (maybe via a dependency or just inadvertently) it will still get executed until you notice and decide on its appropriate latency target.
+
+In these examples, the order doesn’t matter; it just is maybe more readable to go from the lowest-latency to largest-latency pool (the semicolon groups), and then within a pool to list the largest allowable latency first (the commas). Nothing here is about “job priority” or “queue priority”, this is wholly about grouping.
+
+In your application, not the zoo, you’ll want to enqueue your `PaswordResetJob` on the `mice` queue, your `CreateComplicatedObjectJob` on the `badger` queue, and your `AuditEveryAccountEverJob` on the `elephant` queue. But you want to name your queues by latency, so that ends up being:
+
+```ruby
+config.good_job.queues = "latency_30s:1; latency_2m,latency_30s:1; *:1"
+```
+
+And you likely want to have more than one thread (though more than 3-5 threads per process will cause thread contention and slow everything down a bit):
+
+```ruby
+config.good_job.queues = "latency_30s:2; latency_2m,latency_30s:2; *:2"
+```
+
+### Additional observations
+
+- Unlike GoodJob, other Active Job backends may treat a "queue" and an "isolated execution pool" as one and the same. GoodJob allows composing multiple Active Job queues into the same pool for flexibility and to make it easier to migrate from functionally-named queues to latency-based ones.
+- You don't *have* to name your queues explicitly like `latency_30s` but it makes it easier to identify outliers and communicate your operational targets. Many people push back on this; that's ok. An option to capture functional details is to use GoodJob's Labels feature instead of encoding them in the queue name.
+- The downside of organizing your jobs like this is that you may have jobs with the same latency target but wildly different operational parameters, like being coupled to another system that has limited throughput or questionable reliability. GoodJob offers Concurrency and Throttling Controls, but isolation is always the most performant and reliable option, though it requires dedicated resources and costs more.
+- Observe, monitor, and adapt your job queues over time. You likely have incomplete information about the execution latency of your jobs inclusive of all dependencies across all scenarios. You should expect to adjust your queues and grouping over time as you observe their behavior.
+- If you find you have unreliable external dependencies that introduce latency, you may also want to further isolate your jobs based on those dependencies, for example, isolating `latency_10s_email_service` to its own execution pool.
+- Scale on queue latency. Per the previous point in which you do not have complete control over execution latency, you do have control over the queue latency. If queue latency is causing your jobs to miss their total latency target, you must add more capacity (e.g. processes or servers.
+- This is all largely about latency-based queue design. It’s possible to go further and organize by latency _and_ parallelism. For that I recommend Nate Berkopec’s [*Complete Guide to Rails Performance*](https://www.railsspeed.com/) which covers things like Amdahl’s Law.
 
 ## Contribute
 
