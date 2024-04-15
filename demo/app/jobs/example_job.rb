@@ -31,7 +31,7 @@ class ExampleJob < ApplicationJob
   end
 
   def perform(type = SUCCESS_TYPE)
-    return true
+    # return true
     if type == SUCCESS_TYPE
       true
     elsif type == ERROR_ONCE_TYPE
