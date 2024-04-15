@@ -130,14 +130,17 @@ module GoodJob
       buffer.active_jobs
     end
 
+    # TODO: document
     def paused?
       # TODO: consider querying to see if any jobs within the batch are paused, and if/how that should be represented if that result does not match properties[:paused]
+      # I think there are probably going to need to be separate methods for "is the batch set to pause all jobs within it" and "does the batch contain any paused jobs" as those cases aren't always lined up
       properties[:paused] || false
     end
 
     # TODO
     # def pause; end
 
+    # TODO: document
     def unpause
       # TODO: consider raising an exception if the batch isn't paused in the first place
 
