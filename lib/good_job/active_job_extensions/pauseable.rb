@@ -49,4 +49,4 @@ module GoodJob
 end
 
 # Jobs can be paused through batches which rely on good_job_paused being available, so this must be included globally
-ActiveJob::Base.include GoodJob::ActiveJobExtensions::Pauseable
+ActiveSupport.on_load(:active_job) { include GoodJob::ActiveJobExtensions::Pauseable }
