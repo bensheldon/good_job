@@ -147,8 +147,8 @@ module GoodJob
       # TODO: this could be implemented with COALESCE and `jsonb_path_query(serialized_params, '$.scheduled_at.datetime()')` to extract the previously scheduled time within a single UPDATE, but that method is not available in PG12 (still supported at the time of writing)
       unpaused_count = 0
 
-      while true
-        jobs = GoodJob::Job.where(batch_id: self.id, scheduled_at: nil).limit(1_000)
+      loop do
+        jobs = GoodJob::Job.where(batch_id: id, scheduled_at: nil).limit(1_000)
         break if jobs.empty?
 
         jobs.each do |job|

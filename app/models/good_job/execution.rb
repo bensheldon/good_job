@@ -342,9 +342,7 @@ module GoodJob
         end
 
         instrument_payload[:execution] = execution
-        if active_job.respond_to?(:good_job_paused) && active_job.good_job_paused
-          execution.scheduled_at = nil
-        end
+        execution.scheduled_at = nil if active_job.respond_to?(:good_job_paused) && active_job.good_job_paused
         execution.save!
 
         if retried
