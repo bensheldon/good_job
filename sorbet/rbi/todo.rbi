@@ -18,6 +18,10 @@ module ::JobError; end
 module ::LATCH; end
 module ::MemoryProfiler; end
 module ::PERFORMED; end
+module ::POLL_COUNT; end
+module ::PROCESS_IDS; end
+module ::RECEIVED_MESSAGE; end
+module ::REFRESH_IF_STALE_CALLED; end
 module ::RESULTS; end
 module ::RUN_JOBS; end
 module ::RecursiveJob; end

@@ -184,25 +184,11 @@ RSpec.describe GoodJob::Notifier do
       wait_until { expect(GoodJob::Process.count).to eq 1 }
 
       process = GoodJob::Process.first
-      expect(process.id).to eq GoodJob::Process.current_id
+      expect(process.id).to eq GoodJob.capsule.tracker.id_for_lock
       expect(process).to be_advisory_locked
 
       notifier.shutdown
       expect { process.reload }.to raise_error ActiveRecord::RecordNotFound
-    end
-
-    context 'when, for some reason, the process already exists' do
-      it 'does not create a new process' do
-        process = GoodJob::Process.register
-        notifier = described_class.new(enable_listening: true)
-
-        wait_until { expect(notifier).to be_listening }
-        expect(GoodJob::Process.count).to eq 1
-
-        notifier.shutdown
-        expect(process.reload).to eq process
-        process.advisory_unlock
-      end
     end
   end
 end

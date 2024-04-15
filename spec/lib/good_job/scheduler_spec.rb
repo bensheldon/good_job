@@ -5,10 +5,6 @@ require 'rails_helper'
 RSpec.describe GoodJob::Scheduler do
   let(:performer) { GoodJob::JobPerformer.new('*') }
 
-  after do
-    described_class.instances.each(&:shutdown)
-  end
-
   describe '#name' do
     it 'is human readable and contains configuration values' do
       scheduler = described_class.new(performer)
