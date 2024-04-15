@@ -62,6 +62,7 @@ module GoodJob
             if GoodJob::Execution.discrete_support?
               execution.make_discrete
               execution.scheduled_at = current_time if execution.scheduled_at == execution.created_at
+              execution.scheduled_at = nil if active_job.respond_to?(:good_job_paused) && active_job.good_job_paused
             end
 
             execution.created_at = current_time

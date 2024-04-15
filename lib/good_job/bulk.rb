@@ -60,8 +60,9 @@ module GoodJob
     end
 
     class Buffer
-      def initialize
+      def initialize(pause_jobs: false)
         @values = []
+        @pause_jobs = pause_jobs
       end
 
       def capture
@@ -78,6 +79,9 @@ module GoodJob
 
           adapter = queue_adapter || active_job.class.queue_adapter
           raise Error, "Jobs must have a Queue Adapter" unless adapter
+
+          # TODO: should explicitly setting `good_job_paused = false` on a job override this?
+          active_job.good_job_paused = true if @pause_jobs && active_job.respond_to?(:good_job_paused)
 
           [active_job, adapter]
         end

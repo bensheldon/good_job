@@ -17,6 +17,8 @@ module GoodJob
     #   MyJob.set(good_job_paused: true).perform_later
 
     # TODO: should this be enabled globally/by default? (the 'do not run if nil' logic will always be active)
+    # Yeah I think this is going to need to be, otherwise you can add jobs to a paused batch and they won't actually be paused
+
     # TODO: consider renaming to 'Pauseable'
 
     module PausedOptions
@@ -28,17 +30,17 @@ module GoodJob
           super
         end
 
-        def serialize
-          super.tap do |job_data|
-            # Only serialize the value if present to reduce the size of the serialized job
-            job_data["good_job_paused"] = good_job_paused unless good_job_paused.nil?
-          end
-        end
+        # good_job_paused is intentionally excluded from the serialized params so we fully rely on the scheduled_at value once the job is enqueued
+        # def serialize
+        #   super.tap do |job_data|
+        #     # job_data["good_job_paused"] = good_job_paused unless good_job_paused.nil?
+        #   end
+        # end
 
-        def deserialize(job_data)
-          super
-          self.good_job_paused = job_data["good_job_paused"]
-        end
+        # def deserialize(job_data)
+        #   super
+        #   self.good_job_paused = job_data["good_job_paused"]
+        # end
       end
 
       included do
