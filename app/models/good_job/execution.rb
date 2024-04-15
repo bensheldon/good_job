@@ -312,8 +312,6 @@ module GoodJob
     # @return [Execution]
     #   The new {Execution} instance representing the queued ActiveJob job.
     def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
-      puts 'Execution.enqueue'
-      # byebug
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         current_execution = CurrentThread.execution
 
