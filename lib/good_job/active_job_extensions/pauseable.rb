@@ -26,6 +26,7 @@ module GoodJob
         end
 
         # good_job_paused is intentionally excluded from the serialized params so we fully rely on the scheduled_at value once the job is enqueued
+        # TODO: remove before merge
         # def serialize
         #   super.tap do |job_data|
         #     # job_data["good_job_paused"] = good_job_paused unless good_job_paused.nil?
