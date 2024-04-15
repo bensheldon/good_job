@@ -7,21 +7,16 @@ module GoodJob
     # on initial enqueue and subsequent retries.
     #
     # @example
-    #   # Include the concern to your job class:
     #   class MyJob < ApplicationJob
-    #     include GoodJob::ActiveJobExtensions::PausedOptions
     #     self.good_job_paused = true
     #   end
     #
     #   # Or, configure jobs individually to not notify:
     #   MyJob.set(good_job_paused: true).perform_later
+    #
+    # See also - GoodJob:Batch#new's `paused` option
 
-    # TODO: should this be enabled globally/by default? (the 'do not run if nil' logic will always be active)
-    # Yeah I think this is going to need to be, otherwise you can add jobs to a paused batch and they won't actually be paused
-
-    # TODO: consider renaming to 'Pauseable'
-
-    module PausedOptions
+    module Pauseable
       extend ActiveSupport::Concern
 
       module Prepends
@@ -51,3 +46,6 @@ module GoodJob
     end
   end
 end
+
+# Jobs can be paused through batches which rely on good_job_paused being available, so this must be included globally
+ActiveJob::Base.include GoodJob::ActiveJobExtensions::Pauseable
