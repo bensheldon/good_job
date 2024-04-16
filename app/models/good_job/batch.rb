@@ -144,6 +144,9 @@ module GoodJob
     def unpause
       # TODO: consider raising an exception if the batch isn't paused in the first place
 
+      # TODO: encountered this edge case with unpausing a non-persisted batch
+      raise 'need to investigate how jobs are handled when batches arent persisted or else the query will end up being where batch is null' if id.nil?
+
       # TODO: consider setting this at the end of the method, or doing something similar to help handle situations where an exception is raised during unpausing
       assign_properties(paused: false)
 
