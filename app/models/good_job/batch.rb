@@ -144,9 +144,6 @@ module GoodJob
     def unpause
       # TODO: consider raising an exception if the batch isn't paused in the first place
 
-      # TODO: encountered this edge case with unpausing a non-persisted batch
-      raise 'need to investigate how jobs are handled when batches arent persisted or else the query will end up being where batch is null' if id.nil?
-
       # TODO: consider setting this at the end of the method, or doing something similar to help handle situations where an exception is raised during unpausing
       assign_properties(paused: false)
 
@@ -154,7 +151,7 @@ module GoodJob
       unpaused_count = 0
 
       loop do
-        jobs = GoodJob::Job.where(batch_id: id, scheduled_at: nil).limit(1_000)
+        jobs = record.jobs.where(scheduled_at: nil).limit(1_000)
         break if jobs.empty?
 
         jobs.each do |job|
