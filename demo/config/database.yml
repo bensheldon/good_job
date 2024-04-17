@@ -59,6 +59,7 @@ development:
 test:
   <<: *default
   database: good_job_test
+  url: <%= ENV['DATABASE_URL'] %>
   reaping_frequency: 0
 
 # As with config/credentials.yml, you never want to store sensitive information,
