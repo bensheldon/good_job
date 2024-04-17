@@ -277,6 +277,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.2-java)
       racc (~> 1.4)
+    nokogiri (1.16.2-x86_64-darwin)
+      racc (~> 1.4)
     nokogiri (1.16.2-x86_64-linux)
       racc (~> 1.4)
     octokit (4.25.1)
@@ -487,6 +489,7 @@ PLATFORMS
   arm64-darwin-23
   universal-java-11
   universal-java-20
+  x86_64-darwin-23
   x86_64-linux
 
 DEPENDENCIES

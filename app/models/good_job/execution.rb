@@ -362,6 +362,10 @@ module GoodJob
       [error.class.to_s, ERROR_MESSAGE_SEPARATOR, error.message].join
     end
 
+    def self.format_backtrace(backtrace)
+      Rails.backtrace_cleaner.clean(backtrace || [])
+    end
+
     # Execute the ActiveJob job this {Execution} represents.
     # @return [ExecutionResult]
     #   An array of the return value of the job's +#perform+ method and the
@@ -455,12 +459,14 @@ module GoodJob
         job_error = result.handled_error || result.unhandled_error
         if job_error
           error_string = self.class.format_error(job_error)
+          error_backtrace = self.class.format_backtrace(job_error.backtrace)
 
           job_attributes[:error] = error_string
           job_attributes[:error_event] = result.error_event if self.class.error_event_migrated?
           if discrete_execution
             discrete_execution.error = error_string
             discrete_execution.error_event = result.error_event
+            discrete_execution.error_backtrace = error_backtrace if discrete_execution.class.backtrace_migrated?
           end
         else
           job_attributes[:error] = nil
