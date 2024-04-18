@@ -466,7 +466,10 @@ module GoodJob
           if discrete_execution
             discrete_execution.error = error_string
             discrete_execution.error_event = result.error_event
-            discrete_execution.error_backtrace = error_backtrace if discrete_execution.class.backtrace_migrated?
+            if discrete_execution.class.backtrace_migrated?
+              error_backtrace = self.class.format_backtrace(job_error.backtrace)
+              discrete_execution.error_backtrace = error_backtrace
+            end
           end
         else
           job_attributes[:error] = nil
