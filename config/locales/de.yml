@@ -124,6 +124,8 @@ de:
       discard:
         notice: Auftrag wurde verworfen
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: in der Warteschlange
         runtime: Laufzeit
         title: Hinrichtungen

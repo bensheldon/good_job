@@ -124,6 +124,8 @@ tr:
       discard:
         notice: İş İptal Edildi
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: sırada
         runtime: çalışma süresi
         title: İşlemler

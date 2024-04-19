@@ -124,6 +124,8 @@ ja:
       discard:
         notice: ジョブが破棄されました
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: 待機中
         runtime: 実行時間
         title: 実行

@@ -148,6 +148,8 @@ uk:
       discard:
         notice: Завдання було відхилено
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: у черзі
         runtime: час виконання
         title: Виконання

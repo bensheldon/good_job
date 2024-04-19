@@ -65,5 +65,9 @@ module GoodJob # :nodoc:
                                 _good_job_execution: attributes.except('serialized_params'),
                               })
     end
+
+    def filtered_error_backtrace
+      Rails.backtrace_cleaner.clean(error_backtrace || [])
+    end
   end
 end

@@ -124,6 +124,8 @@ fr:
       discard:
         notice: Le job a été mis au rebut
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: Dans la file d'attente
         runtime: Durée
         title: Exécutions
