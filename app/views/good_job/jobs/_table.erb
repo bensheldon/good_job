@@ -68,7 +68,7 @@
                 <%= tag.h5 tag.code(link_to(job.display_name, job_path(job), class: "text-reset text-decoration-none")), class: "text-reset mb-0" %>
                 <% if job.error %>
                   <div class="mt-1 small">
-                    <strong class="small"><%=t "good_job.shared.error" %>:</strong>
+                    <strong class="small text-danger"><%=t "good_job.shared.error" %>:</strong>
                     <code class="text-wrap text-break m-0 text-secondary-emphasis"><%= job.error %></code>
                   </div>
                 <% end %>
