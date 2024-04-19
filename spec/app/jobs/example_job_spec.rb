@@ -60,6 +60,7 @@ describe ExampleJob do
         good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
         expect(good_job.discrete_executions.count).to eq 3
         expect(good_job.discrete_executions.last.error).to be_present
+        expect(good_job.discrete_executions.last.error_backtrace).to eq(["app/jobs/example_job.rb:41:in `perform'"])
       end
     end
 
