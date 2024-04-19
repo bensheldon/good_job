@@ -25,7 +25,7 @@
             </button>
             <ul class="dropdown-menu" aria-labelledby="destroy-dropdown-toggle">
               <li>
-                <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn', title: t(".actions.destroy_all"), data: { confirm: t(".actions.confirm_destroy_all"), disable: true } do %>
+                <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn dropdown-item', title: t(".actions.destroy_all"), data: { confirm: t(".actions.confirm_destroy_all"), disable: true } do %>
                   <span class="me-1"><%= render_icon "trash" %></span> <%=t "good_job.actions.destroy" %>
                 <% end %>
               </li>
