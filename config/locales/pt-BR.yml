@@ -124,6 +124,8 @@ pt-BR:
       discard:
         notice: A tarefa foi descartada.
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: na fila
         runtime: tempo de execução
         title: Execuções

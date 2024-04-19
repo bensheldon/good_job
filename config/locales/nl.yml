@@ -33,7 +33,7 @@ nl:
         no_batches_found: Geen batches gevonden.
     cron_entries:
       actions:
-        confirm_disable: Weet u zeker dat u deze cron-vermelding wilt uitschakelen?
+        confirm_disable: Weet u zekerf dat u deze cron-vermelding wilt uitschakelen?
         confirm_enable: Weet u zeker dat u deze cron-invoer wilt inschakelen?
         confirm_enqueue: Weet u zeker dat u deze cron-vermelding in de wachtrij wilt plaatsen?
         disable: Schakel cron-invoer uit
@@ -124,6 +124,8 @@ nl:
       discard:
         notice: Job is weggegooid
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: in de wachtrij
         runtime: looptijd
         title: Executies

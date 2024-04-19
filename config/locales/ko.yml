@@ -124,6 +124,8 @@ ko:
       discard:
         notice: 작업이 폐기되었습니다.
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: 대기 중
         runtime: 실행 시간
         title: 실행

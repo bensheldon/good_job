@@ -124,6 +124,8 @@ it:
       discard:
         notice: Il job è stato scartato
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: in coda
         runtime: tempo di esecuzione
         title: Esecuzioni

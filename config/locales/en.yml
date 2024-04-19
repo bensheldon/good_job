@@ -124,6 +124,8 @@ en:
       discard:
         notice: Job has been discarded
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: in queue
         runtime: runtime
         title: Executions

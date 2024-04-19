@@ -39,9 +39,30 @@
             <code class="text-wrap text-break m-0 text-secondary-emphasis"><%= execution.error %></code>
           </div>
           <% if GoodJob::DiscreteExecution.backtrace_migrated? && execution.error_backtrace&.any? %>
-            <div class="small">
-              <code class="text-wrap text-break m-0 text-secondary-emphasis"><%= execution.error_backtrace[0] %></code>
-            </div>
+            <%= tag.ul class: "nav nav-tabs small w-fit-content", id: dom_id(execution, :tab), role:"tablist" do %>
+              <li class="nav-item" role="presentation">
+                <%= tag.button t(".application_trace"), class: "nav-link active p-1", id: dom_id(execution, :application), data: { bs_toggle: "tab", bs_target: dom_id(execution, :"#application_pane") }, type: "button", role: "tab", aria: { controls: dom_id(execution, :application_pane), selected: true  }  %>
+              </li>
+              <li class="nav-item" role="presentation">
+                <%= tag.button t(".full_trace"), class: "nav-link p-1", id: dom_id(execution, :full), data: { bs_toggle: "tab", bs_target: dom_id(execution, :"#full_pane") }, type: "button", role: "tab", aria: { controls: dom_id(execution, :full_pane), selected: false } %>
+              </li>
+            <% end %>
+            <%= tag.div class: "tab-content", id: "#{dom_id(execution, :tab)}Content" do %>
+              <%= tag.div class: "tab-pane fade show active", id: dom_id(execution, :application_pane), role: "tabpane", aria: { labelledby: dom_id(execution, :application) }, tabindex: 0 do %>
+                <div class="small">
+                  <code class="text-wrap text-break m-0 text-secondary-emphasis">
+                    <%= safe_join(execution.filtered_error_backtrace, tag.br) %>
+                  </code>
+                </div>
+              <% end %>
+              <%= tag.div class: "tab-pane fade", id: dom_id(execution, :full_pane), role: "tabpane", aria: { labelledby: dom_id(execution, :full) }, tabindex: 0 do %>
+                <div class="small">
+                  <code class="text-wrap text-break m-0 text-secondary-emphasis">
+                    <%= safe_join(execution.error_backtrace, tag.br) %>
+                  </code>
+                </div>
+              <% end %>
+            <% end %>
           <% end %>
         <% end %>
       <% end %>

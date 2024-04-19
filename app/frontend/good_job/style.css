@@ -42,3 +42,7 @@
 .min-w-auto {
   min-width: auto;
 }
+
+.w-fit-content {
+  width: fit-content
+}
