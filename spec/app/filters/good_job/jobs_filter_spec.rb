@@ -11,20 +11,16 @@ RSpec.describe GoodJob::JobsFilter do
     allow(GoodJob).to receive_messages(retry_on_unhandled_error: false, preserve_job_records: true)
 
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
-    byebug
     ExampleJob.set(queue: 'cron').perform_later
-    byebug
 
     GoodJob::Job.order(created_at: :asc).last.update!(cron_key: "frequent_cron")
 
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
     ExampleJob.set(queue: 'default').perform_later(ExampleJob::SUCCESS_TYPE)
     ExampleJob.set(queue: 'mice').perform_later(ExampleJob::ERROR_ONCE_TYPE)
-    byebug
 
     Timecop.travel 1.hour.ago
     ExampleJob.set(queue: 'elephants').perform_later(ExampleJob::DEAD_TYPE)
-    byebug
 
     5.times do
       Timecop.travel 5.minutes
@@ -33,7 +29,6 @@ RSpec.describe GoodJob::JobsFilter do
     Timecop.return
 
     running_job = ExampleJob.perform_later('success')
-    byebug
     running_execution = GoodJob::Execution.find(running_job.provider_job_id)
     running_execution.update!(
       finished_at: nil
