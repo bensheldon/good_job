@@ -459,7 +459,6 @@ module GoodJob
         job_error = result.handled_error || result.unhandled_error
         if job_error
           error_string = self.class.format_error(job_error)
-          error_backtrace = self.class.format_backtrace(job_error.backtrace)
 
           job_attributes[:error] = error_string
           job_attributes[:error_event] = result.error_event if self.class.error_event_migrated?
