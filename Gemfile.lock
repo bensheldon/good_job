@@ -121,7 +121,6 @@ GEM
       async
     async-pool (0.4.0)
       async (>= 1.25)
-    awesome_print (1.9.2)
     base64 (0.2.0)
     benchmark-ips (2.13.0)
     better_html (2.0.2)
@@ -136,7 +135,6 @@ GEM
     bootsnap (1.18.3)
       msgpack (~> 1.2)
     builder (3.2.4)
-    byebug (11.1.3)
     capybara (3.40.0)
       addressable
       matrix
@@ -498,10 +496,8 @@ DEPENDENCIES
   activerecord-explain-analyze
   activerecord-jdbcpostgresql-adapter
   appraisal
-  awesome_print
   benchmark-ips
   bootsnap
-  byebug
   capybara
   debug
   dotenv-rails
