@@ -1,5 +1,36 @@
 # Changelog
 
+## [v3.28.0](https://github.com/bensheldon/good_job/tree/v3.28.0) (2024-04-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.4...v3.28.0)
+
+**Implemented enhancements:**
+
+- Store and optionally display the full execution backtrace [\#1328](https://github.com/bensheldon/good_job/pull/1328) ([Earlopain](https://github.com/Earlopain))
+- Store error backtraces on discrete executions [\#1325](https://github.com/bensheldon/good_job/pull/1325) ([Intrepidd](https://github.com/Intrepidd))
+
+**Fixed bugs:**
+
+- add missing dropdown-item class [\#1327](https://github.com/bensheldon/good_job/pull/1327) ([patriciomacadden](https://github.com/patriciomacadden))
+
+**Closed issues:**
+
+- Proposal: Migrating Documentation to a Separate Website [\#1324](https://github.com/bensheldon/good_job/issues/1324)
+- Potential documentation error in GoodJob::ActiveJobExtensions::NotifyOptions [\#1321](https://github.com/bensheldon/good_job/issues/1321)
+- ActiveSupport::CurrentAttributes reset after `perform_later` [\#1320](https://github.com/bensheldon/good_job/issues/1320)
+- Storing backtrace in database? [\#1162](https://github.com/bensheldon/good_job/issues/1162)
+- Potential locking race condition when using cron scheduler across multiple processes [\#731](https://github.com/bensheldon/good_job/issues/731)
+
+**Merged pull requests:**
+
+- docs: corrected a typo regarding the use of GoodJob::ActiveJobExtensions::NotifyOptions [\#1322](https://github.com/bensheldon/good_job/pull/1322) ([pgvsalamander](https://github.com/pgvsalamander))
+- Add "best practices" section to Readme [\#1318](https://github.com/bensheldon/good_job/pull/1318) ([bensheldon](https://github.com/bensheldon))
+- Change ApplicationRecord to ApplicationJob for label documentation. [\#1317](https://github.com/bensheldon/good_job/pull/1317) ([frans-k](https://github.com/frans-k))
+- Run test matrix against Ruby 3.3; remove pry [\#1315](https://github.com/bensheldon/good_job/pull/1315) ([bensheldon](https://github.com/bensheldon))
+- Add `Rails.application.load_server` to Demo `config.ru`; quiet puma web-concurrency warnings [\#1314](https://github.com/bensheldon/good_job/pull/1314) ([bensheldon](https://github.com/bensheldon))
+- Fix test leakage of configuration double [\#1312](https://github.com/bensheldon/good_job/pull/1312) ([bensheldon](https://github.com/bensheldon))
+- Rewrite queries to all use bind parameters and prepare: true [\#1308](https://github.com/bensheldon/good_job/pull/1308) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.27.4](https://github.com/bensheldon/good_job/tree/v3.27.4) (2024-04-04)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.3...v3.27.4)
