@@ -329,7 +329,8 @@ module GoodJob
             execution = build_for_enqueue(active_job, { scheduled_at: scheduled_at })
           end
         else
-          execution = build_for_enqueue(active_job, { scheduled_at: scheduled_at })
+          # Based on the discussion on github, I think the intent in current GJ versions is that scheduled_at is always set - need to confirm
+          execution = build_for_enqueue(active_job, { scheduled_at: scheduled_at || Time.current })
           execution.make_discrete if discrete_support?
         end
 

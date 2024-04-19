@@ -147,7 +147,8 @@ module GoodJob
     # @param timestamp [Integer, nil] the epoch time to perform the job
     # @return [GoodJob::Execution]
     def enqueue_at(active_job, timestamp)
-      scheduled_at = timestamp ? Time.zone.at(timestamp) : nil
+      # Based on the discussion on github, I think the intent in current GJ versions is that scheduled_at is always set - need to confirm
+      scheduled_at = timestamp ? Time.zone.at(timestamp) : Time.current # nil
 
       # If there is a currently open Bulk in the current thread, direct the
       # job there to be enqueued using enqueue_all
