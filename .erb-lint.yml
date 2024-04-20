@@ -1,4 +1,5 @@
 ---
+glob: "**/*.erb"
 linters:
   HardCodedString:
     enabled: false
@@ -9,6 +10,10 @@ linters:
     rubocop_config:
       inherit_from:
         - .rubocop.yml
+      Layout/ArgumentAlignment:
+        Enabled: false
+      Layout/FirstHashElementIndentation:
+        Enabled: false
       Layout/InitialIndentation:
         Enabled: false
       Layout/LeadingEmptyLines:
@@ -17,12 +22,13 @@ linters:
         Enabled: false
       Layout/TrailingWhitespace:
         Enabled: false
-      Naming/FileName:
-        Enabled: false
-      Style/FrozenStringLiteralComment:
-        Enabled: false
       Lint/UselessAssignment:
+        Enabled: false
+      Naming/FileName:
         Enabled: false
       Rails/OutputSafety:
         Enabled: false
+      Style/FrozenStringLiteralComment:
+        Enabled: false
+
 
