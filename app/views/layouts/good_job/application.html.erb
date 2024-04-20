@@ -12,13 +12,13 @@
       to reduce potential screen flickering during reloading of your site."
       https://getbootstrap.com/docs/5.3/customize/color-modes/#javascript
     %>
-    <%= tag.script "", nonce: content_security_policy_nonce do %>
+   <script nonce="<%= content_security_policy_nonce %>">
       let theme = localStorage.getItem('good_job-theme');
       if (!["light", "dark"].includes(theme)) {
         theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       }
       document.documentElement.setAttribute('data-bs-theme', theme);
-    <% end %>
+   </script>
 
     <%# Do not use asset tag helpers to avoid paths being overriden by config.asset_host %>
     <%= tag.link rel: "stylesheet", href: frontend_static_path(:bootstrap, format: :css, v: GoodJob::VERSION, locale: nil), nonce: content_security_policy_nonce %>

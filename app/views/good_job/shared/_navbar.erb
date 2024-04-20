@@ -23,7 +23,7 @@
         </li>
         <li class="nav-item">
           <%= link_to batches_path, class: ["nav-link", ("active" if controller_name == 'batches')] do %>
-            <%=t ".batches" %>
+            <%= t ".batches" %>
             <span data-async-values-target="value" data-async-values-key="batches_count" class="badge bg-secondary rounded-pill  d-none"></span>
           <% end %>
         </li>
