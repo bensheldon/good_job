@@ -181,12 +181,11 @@ RSpec.describe GoodJob::Execution do
     end
 
     context 'with multiple jobs' do
-      let!(:sched) { Time.current }
-
       def job_params
         { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" }, scheduled_at: sched }
       end
 
+      let!(:sched) { Time.current }
       let!(:older_job) { described_class.create!(job_params.merge(created_at: 10.minutes.ago)) }
       let!(:newer_job) { described_class.create!(job_params.merge(created_at: 5.minutes.ago)) }
       let!(:low_priority_job) { described_class.create!(job_params.merge(priority: 20)) }
@@ -206,12 +205,11 @@ RSpec.describe GoodJob::Execution do
     end
 
     context "with multiple jobs and ordered queues" do
-      let!(:sched) { Time.current }
-
       def job_params
         { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" }, scheduled_at: sched }
       end
 
+      let!(:sched) { Time.current }
       let(:parsed_queues) { { include: %w{one two}, ordered_queues: true } }
       let!(:queue_two_job) { described_class.create!(job_params.merge(queue_name: "two", created_at: 10.minutes.ago, priority: 100)) }
       let!(:queue_one_job) { described_class.create!(job_params.merge(queue_name: "one", created_at: 1.minute.ago, priority: 1)) }
