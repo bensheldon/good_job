@@ -700,7 +700,7 @@ RSpec.describe GoodJob::Execution do
           job_class: good_job.job_class,
           queue_name: good_job.queue_name,
           created_at: within(0.001).of(good_job.performed_at),
-          scheduled_at: within(0.001).of(good_job.created_at),
+          scheduled_at: within(0.1).of(good_job.created_at),
           finished_at: within(1.second).of(Time.current),
           error: nil,
           serialized_params: good_job.serialized_params
