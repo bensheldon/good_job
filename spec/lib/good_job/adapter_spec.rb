@@ -56,7 +56,7 @@ RSpec.describe GoodJob::Adapter do
 
       expect(GoodJob::Execution).to have_received(:enqueue).with(
         active_job,
-        scheduled_at: nil
+        scheduled_at: be_within(1).of(Time.current)
       )
     end
 

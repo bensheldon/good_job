@@ -330,8 +330,9 @@ module GoodJob
           end
         else
           # Based on the discussion on github, I think the intent in current GJ versions is that scheduled_at is always set - need to confirm
-          execution = build_for_enqueue(active_job, { scheduled_at: scheduled_at || Time.current })
+          execution = build_for_enqueue(active_job, { scheduled_at: scheduled_at })
           execution.make_discrete if discrete_support?
+          execution.scheduled_at ||= Time.current # set after make_discrete so it can manage assigning both created_at and scheduled_at simultaneously
         end
 
         if create_with_advisory_lock

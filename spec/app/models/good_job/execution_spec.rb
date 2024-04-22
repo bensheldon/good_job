@@ -63,7 +63,7 @@ RSpec.describe GoodJob::Execution do
     context 'when NOT discrete' do
       before { allow(described_class).to receive(:discrete_support?).and_return(false) }
 
-      it 'does not assign id, scheduled_at' do
+      it 'does not assign id, does assign scheduled_at' do
         expect { described_class.enqueue(active_job) }.to change(described_class, :count).by(1)
 
         execution = described_class.last
@@ -71,7 +71,7 @@ RSpec.describe GoodJob::Execution do
         expect(execution).to have_attributes(
           is_discrete: nil,
           active_job_id: active_job.job_id,
-          scheduled_at: nil
+          scheduled_at: within(1).of(Time.current)
         )
       end
     end
@@ -88,7 +88,7 @@ RSpec.describe GoodJob::Execution do
         serialized_params: a_kind_of(Hash),
         queue_name: 'test',
         priority: 50,
-        scheduled_at: nil
+        scheduled_at: within(1).of(Time.current)
       )
     end
 
