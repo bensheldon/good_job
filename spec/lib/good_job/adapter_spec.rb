@@ -26,6 +26,29 @@ RSpec.describe GoodJob::Adapter do
   end
 
   describe '#enqueue' do
+    it 'sets default values' do
+      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(true)
+
+      active_job = ExampleJob.new
+      adapter.enqueue(active_job)
+
+      expect(GoodJob::Job.last).to have_attributes(
+        queue_name: 'default',
+        priority: 0,
+        scheduled_at: be_within(1.second).of(Time.current)
+      )
+
+      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(false)
+      active_job = ExampleJob.new
+      adapter.enqueue(active_job)
+
+      expect(GoodJob::Job.last).to have_attributes(
+        queue_name: 'default',
+        priority: 0
+        # scheduled_at: be_within(1.second).of(Time.current) # TODO: this should be expected
+      )
+    end
+
     it 'calls GoodJob::Execution.enqueue with parameters' do
       allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
 
@@ -104,6 +127,28 @@ RSpec.describe GoodJob::Adapter do
         scheduled_at: scheduled_at.change(usec: 0)
       )
     end
+
+    it 'sets default values' do
+      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(true)
+      active_job = ExampleJob.new
+      adapter.enqueue_at(active_job, nil)
+
+      expect(GoodJob::Job.last).to have_attributes(
+        queue_name: 'default',
+        priority: 0,
+        scheduled_at: be_within(1.second).of(Time.current)
+      )
+
+      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(false)
+      active_job = ExampleJob.new
+      adapter.enqueue_at(active_job, nil)
+
+      expect(GoodJob::Job.last).to have_attributes(
+        queue_name: 'default',
+        priority: 0
+        # scheduled_at: be_within(1.second).of(Time.current) # TODO: this should be expected
+      )
+    end
   end
 
   describe '#enqueue_all' do
@@ -132,6 +177,28 @@ RSpec.describe GoodJob::Adapter do
         queue_name: 'elephant',
         priority: -55,
         scheduled_at: be_within(1).of(10.minutes.from_now)
+      )
+    end
+
+    it 'sets default values' do
+      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(true)
+      active_job = ExampleJob.new
+      adapter.enqueue_all([active_job])
+
+      expect(GoodJob::Job.last).to have_attributes(
+        queue_name: 'default',
+        priority: 0,
+        scheduled_at: be_within(1.second).of(Time.current)
+      )
+
+      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(false)
+      active_job = ExampleJob.new
+      adapter.enqueue_at(active_job, nil)
+
+      expect(GoodJob::Job.last).to have_attributes(
+        queue_name: 'default',
+        priority: 0
+        # scheduled_at: be_within(1.second).of(Time.current) # TODO: this should be expected
       )
     end
 
