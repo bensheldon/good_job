@@ -6,7 +6,7 @@ module GoodJob
       extend ActiveSupport::Concern
 
       def batch
-        @_batch ||= CurrentThread.execution&.batch&.to_batch
+        @_batch ||= CurrentThread.execution&.batch&.to_batch if CurrentThread.execution.present? && CurrentThread.execution.active_job_id == job_id
       end
       alias batch? batch
     end
