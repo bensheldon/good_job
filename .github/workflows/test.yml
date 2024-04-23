@@ -146,13 +146,14 @@ jobs:
             echo "version=latest" >> $GITHUB_OUTPUT
           fi
       # Dependencies
+      - name: Remove Gemfile.lock
+        run: rm Gemfile.lock
       - name: Set up generic Ruby
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: false
-      - name: Delete and recreate Gemfile.lock
-        run: |
-          rm Gemfile.lock && bundle lock --update && cat Gemfile.lock
+      - name: Recreate Gemfile.lock
+        run: bundle lock --update && cat Gemfile.lock
       - name: Set up Ruby and bundle install
         uses: ruby/setup-ruby@v1
         with:
