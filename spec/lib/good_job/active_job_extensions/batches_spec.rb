@@ -12,7 +12,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Batches do
       include GoodJob::ActiveJobExtensions::Batches
 
       def perform
-        RESULTS << batch.properties[:some_property]
+        RESULTS << batch.properties[:some_property] if batch
       end
     end)
   end
@@ -30,6 +30,25 @@ RSpec.describe GoodJob::ActiveJobExtensions::Batches do
       expect(batch).to be_finished
 
       expect(RESULTS).to eq %w[Apple Apple]
+    end
+
+    it "does not leak batch into perform_now" do
+      stub_const("WrapperJob", Class.new(ActiveJob::Base) do
+        include GoodJob::ActiveJobExtensions::Batches
+
+        def perform
+          TestJob.perform_now
+        end
+      end)
+
+      batch = Rails.application.executor.wrap do
+        GoodJob::Batch.enqueue(some_property: "Apple") do
+          WrapperJob.perform_later
+        end
+      end
+
+      expect(batch).to be_finished
+      expect(RESULTS).to eq []
     end
   end
 end

@@ -75,7 +75,7 @@ module GoodJob
           key = job.good_job_concurrency_key
           next if key.blank?
 
-          if CurrentThread.execution.blank?
+          if CurrentThread.execution.blank? || CurrentThread.execution.active_job_id != job_id
             logger.debug("Ignoring concurrency limits because the job is executed with `perform_now`.")
             next
           end
