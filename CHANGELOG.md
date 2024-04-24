@@ -1,5 +1,26 @@
 # Changelog
 
+## [v3.28.1](https://github.com/bensheldon/good_job/tree/v3.28.1) (2024-04-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.0...v3.28.1)
+
+**Fixed bugs:**
+
+- Ensure job context does not leak into extensions when`perform_now` is called within another job [\#1336](https://github.com/bensheldon/good_job/pull/1336) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Executing perform\_now on a good\_job with GoodJobs::ActiveJobExtensions::Concurrency can run twice [\#1335](https://github.com/bensheldon/good_job/issues/1335)
+- `erb_lint` doesn't lint all files [\#1329](https://github.com/bensheldon/good_job/issues/1329)
+- Server hangs after \#1297 [\#1301](https://github.com/bensheldon/good_job/issues/1301)
+- Figure out how to use bind parameters for time queries [\#1285](https://github.com/bensheldon/good_job/issues/1285)
+
+**Merged pull requests:**
+
+- Upgrade development / demo Ruby to v3.3.1 [\#1333](https://github.com/bensheldon/good_job/pull/1333) ([bensheldon](https://github.com/bensheldon))
+- Exploratory testing for presence of scheduled\_at when enqueuing [\#1332](https://github.com/bensheldon/good_job/pull/1332) ([bensheldon](https://github.com/bensheldon))
+- Run `erb_lint` against all the views and partials [\#1331](https://github.com/bensheldon/good_job/pull/1331) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.28.0](https://github.com/bensheldon/good_job/tree/v3.28.0) (2024-04-19)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.4...v3.28.0)
