@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.28.2](https://github.com/bensheldon/good_job/tree/v3.28.2) (2024-04-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.1...v3.28.2)
+
+**Fixed bugs:**
+
+- Add debug warning message when a job is enqueued within a batch/bulk capture but not to the GoodJob Adapter [\#1339](https://github.com/bensheldon/good_job/pull/1339) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- How do I add jobs to an existing batch?  [\#1337](https://github.com/bensheldon/good_job/issues/1337)
+- Executing perform\_now on a good\_job with GoodJobs::ActiveJobExtensions::Concurrency can run twice [\#1335](https://github.com/bensheldon/good_job/issues/1335)
+
 ## [v3.28.1](https://github.com/bensheldon/good_job/tree/v3.28.1) (2024-04-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.0...v3.28.1)
@@ -10,7 +23,6 @@
 
 **Closed issues:**
 
-- Executing perform\_now on a good\_job with GoodJobs::ActiveJobExtensions::Concurrency can run twice [\#1335](https://github.com/bensheldon/good_job/issues/1335)
 - `erb_lint` doesn't lint all files [\#1329](https://github.com/bensheldon/good_job/issues/1329)
 - Server hangs after \#1297 [\#1301](https://github.com/bensheldon/good_job/issues/1301)
 - Figure out how to use bind parameters for time queries [\#1285](https://github.com/bensheldon/good_job/issues/1285)
