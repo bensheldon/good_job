@@ -21,6 +21,13 @@ module GoodJob # :nodoc:
       false
     end
 
+    def self.backtrace_migrated?
+      return true if columns_hash["error_backtrace"].present?
+
+      migration_pending_warning!
+      false
+    end
+
     def number
       serialized_params.fetch('executions', 0) + 1
     end
@@ -57,6 +64,10 @@ module GoodJob # :nodoc:
       serialized_params.merge({
                                 _good_job_execution: attributes.except('serialized_params'),
                               })
+    end
+
+    def filtered_error_backtrace
+      Rails.backtrace_cleaner.clean(error_backtrace || [])
     end
   end
 end

@@ -151,6 +151,18 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         TestJob.perform_now(name: "Alice")
         expect(JOB_PERFORMED).to be_true
       end
+
+      it 'is ignored when the job is executed inside another job' do
+        stub_const("WrapperJob", Class.new(ApplicationJob) do
+          def perform
+            TestJob.perform_now(name: "Alice")
+          end
+        end)
+
+        WrapperJob.perform_later
+        GoodJob.perform_inline
+        expect(JOB_PERFORMED).to be_true
+      end
     end
 
     describe '#enqueue_throttle' do

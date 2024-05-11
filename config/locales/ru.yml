@@ -148,6 +148,8 @@ ru:
       discard:
         notice: Задание было отменено
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: в очереди
         runtime: время выполнения
         title: Выполнение заданий

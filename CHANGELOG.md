@@ -1,5 +1,91 @@
 # Changelog
 
+## [v3.28.2](https://github.com/bensheldon/good_job/tree/v3.28.2) (2024-04-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.1...v3.28.2)
+
+**Fixed bugs:**
+
+- Add debug warning message when a job is enqueued within a batch/bulk capture but not to the GoodJob Adapter [\#1339](https://github.com/bensheldon/good_job/pull/1339) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- How do I add jobs to an existing batch?  [\#1337](https://github.com/bensheldon/good_job/issues/1337)
+- Executing perform\_now on a good\_job with GoodJobs::ActiveJobExtensions::Concurrency can run twice [\#1335](https://github.com/bensheldon/good_job/issues/1335)
+
+## [v3.28.1](https://github.com/bensheldon/good_job/tree/v3.28.1) (2024-04-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.0...v3.28.1)
+
+**Fixed bugs:**
+
+- Ensure job context does not leak into extensions when`perform_now` is called within another job [\#1336](https://github.com/bensheldon/good_job/pull/1336) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- `erb_lint` doesn't lint all files [\#1329](https://github.com/bensheldon/good_job/issues/1329)
+- Server hangs after \#1297 [\#1301](https://github.com/bensheldon/good_job/issues/1301)
+- Figure out how to use bind parameters for time queries [\#1285](https://github.com/bensheldon/good_job/issues/1285)
+
+**Merged pull requests:**
+
+- Upgrade development / demo Ruby to v3.3.1 [\#1333](https://github.com/bensheldon/good_job/pull/1333) ([bensheldon](https://github.com/bensheldon))
+- Exploratory testing for presence of scheduled\_at when enqueuing [\#1332](https://github.com/bensheldon/good_job/pull/1332) ([bensheldon](https://github.com/bensheldon))
+- Run `erb_lint` against all the views and partials [\#1331](https://github.com/bensheldon/good_job/pull/1331) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.28.0](https://github.com/bensheldon/good_job/tree/v3.28.0) (2024-04-19)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.4...v3.28.0)
+
+**Implemented enhancements:**
+
+- Store and optionally display the full execution backtrace [\#1328](https://github.com/bensheldon/good_job/pull/1328) ([Earlopain](https://github.com/Earlopain))
+- Store error backtraces on discrete executions [\#1325](https://github.com/bensheldon/good_job/pull/1325) ([Intrepidd](https://github.com/Intrepidd))
+
+**Fixed bugs:**
+
+- add missing dropdown-item class [\#1327](https://github.com/bensheldon/good_job/pull/1327) ([patriciomacadden](https://github.com/patriciomacadden))
+
+**Closed issues:**
+
+- Proposal: Migrating Documentation to a Separate Website [\#1324](https://github.com/bensheldon/good_job/issues/1324)
+- Potential documentation error in GoodJob::ActiveJobExtensions::NotifyOptions [\#1321](https://github.com/bensheldon/good_job/issues/1321)
+- ActiveSupport::CurrentAttributes reset after `perform_later` [\#1320](https://github.com/bensheldon/good_job/issues/1320)
+- Storing backtrace in database? [\#1162](https://github.com/bensheldon/good_job/issues/1162)
+- Potential locking race condition when using cron scheduler across multiple processes [\#731](https://github.com/bensheldon/good_job/issues/731)
+
+**Merged pull requests:**
+
+- docs: corrected a typo regarding the use of GoodJob::ActiveJobExtensions::NotifyOptions [\#1322](https://github.com/bensheldon/good_job/pull/1322) ([pgvsalamander](https://github.com/pgvsalamander))
+- Add "best practices" section to Readme [\#1318](https://github.com/bensheldon/good_job/pull/1318) ([bensheldon](https://github.com/bensheldon))
+- Change ApplicationRecord to ApplicationJob for label documentation. [\#1317](https://github.com/bensheldon/good_job/pull/1317) ([frans-k](https://github.com/frans-k))
+- Run test matrix against Ruby 3.3; remove pry [\#1315](https://github.com/bensheldon/good_job/pull/1315) ([bensheldon](https://github.com/bensheldon))
+- Add `Rails.application.load_server` to Demo `config.ru`; quiet puma web-concurrency warnings [\#1314](https://github.com/bensheldon/good_job/pull/1314) ([bensheldon](https://github.com/bensheldon))
+- Fix test leakage of configuration double [\#1312](https://github.com/bensheldon/good_job/pull/1312) ([bensheldon](https://github.com/bensheldon))
+- Rewrite queries to all use bind parameters and prepare: true [\#1308](https://github.com/bensheldon/good_job/pull/1308) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.27.4](https://github.com/bensheldon/good_job/tree/v3.27.4) (2024-04-04)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.3...v3.27.4)
+
+**Fixed bugs:**
+
+- Fix status tabs for Spanish translation [\#1307](https://github.com/bensheldon/good_job/pull/1307) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Adapter to implement `enqueue_after_transaction_commit` [\#1310](https://github.com/bensheldon/good_job/issues/1310)
+- PG::SyntaxError: ERROR from timestamp [\#1305](https://github.com/bensheldon/good_job/issues/1305)
+- Spanish translation while on the dashboard displays hashes instead of the job status name [\#1304](https://github.com/bensheldon/good_job/issues/1304)
+- Exception raised during asset precompilation when no `config/database.yml` [\#1302](https://github.com/bensheldon/good_job/issues/1302)
+- Good job is running with standalone action cable server [\#1299](https://github.com/bensheldon/good_job/issues/1299)
+- Growing memory usage [\#1276](https://github.com/bensheldon/good_job/issues/1276)
+
+**Merged pull requests:**
+
+- Implement enqueue\_after\_transaction\_commit? [\#1311](https://github.com/bensheldon/good_job/pull/1311) ([luizkowalski](https://github.com/luizkowalski))
+- Fix localization formatting of `confirm_force_discard` [\#1309](https://github.com/bensheldon/good_job/pull/1309) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.27.3](https://github.com/bensheldon/good_job/tree/v3.27.3) (2024-03-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.27.2...v3.27.3)

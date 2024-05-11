@@ -51,11 +51,9 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "railties", ">= 6.0.0"
   spec.add_runtime_dependency "thor", ">= 0.14.1"
 
-  spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "capybara"
   spec.add_development_dependency "kramdown"
   spec.add_development_dependency "kramdown-parser-gfm"
-  spec.add_development_dependency "pry-rails"
   spec.add_development_dependency "puma"
   spec.add_development_dependency "rspec-rails"
   spec.add_development_dependency "selenium-webdriver"

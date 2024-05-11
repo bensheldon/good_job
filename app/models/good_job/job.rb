@@ -44,14 +44,14 @@ module GoodJob
     # @!scope class
     # @param timestamp (DateTime, Time)
     # @return [ActiveRecord::Relation]
-    scope :finished_before, ->(timestamp) { where(arel_table['finished_at'].lteq(timestamp)) }
+    scope :finished_before, ->(timestamp) { where(arel_table['finished_at'].lteq(bind_value('finished_at', timestamp, ActiveRecord::Type::DateTime))) }
 
     # First execution will run in the future
-    scope :scheduled, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(DateTime.current)).where(params_execution_count.lt(2)) }
+    scope :scheduled, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).where(params_execution_count.lt(2)) }
     # Execution errored, will run in the future
-    scope :retried, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(DateTime.current)).where(params_execution_count.gt(1)) }
+    scope :retried, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).where(params_execution_count.gt(1)) }
     # Immediate/Scheduled time to run has passed, waiting for an available thread run
-    scope :queued, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.lteq(DateTime.current)).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
+    scope :queued, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.lteq(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
     # Advisory locked and executing
     scope :running, -> { where(finished_at: nil).joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
     # Finished executing (succeeded or discarded)

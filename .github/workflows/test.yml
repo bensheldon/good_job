@@ -91,16 +91,16 @@ jobs:
     timeout-minutes: 20
     strategy:
       matrix:
-        ruby: [2.6, 2.7, "3.0", 3.1, 3.2, jruby-9.3, jruby-9.4]
+        ruby: [2.6, 2.7, "3.0", 3.1, 3.2, 3.3, jruby-9.3, jruby-9.4]
         pg: [15]
         include:
-          - ruby: 3.2
+          - ruby: 3.3
             pg: 11
-          - ruby: 3.2
+          - ruby: 3.3
             pg: 12
-          - ruby: 3.2
+          - ruby: 3.3
             pg: 13
-          - ruby: 3.2
+          - ruby: 3.3
             pg: 14
           - ruby: jruby-9.4
             pg: 11
@@ -146,13 +146,14 @@ jobs:
             echo "version=latest" >> $GITHUB_OUTPUT
           fi
       # Dependencies
+      - name: Remove Gemfile.lock
+        run: rm Gemfile.lock
       - name: Set up generic Ruby
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: false
-      - name: Delete and recreate Gemfile.lock
-        run: |
-          rm Gemfile.lock && bundle lock --update && cat Gemfile.lock
+      - name: Recreate Gemfile.lock
+        run: bundle lock --update && cat Gemfile.lock
       - name: Set up Ruby and bundle install
         uses: ruby/setup-ruby@v1
         with:

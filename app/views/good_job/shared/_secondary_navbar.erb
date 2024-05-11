@@ -5,7 +5,7 @@
     </div>
     <div class="flex-fill text-end">
       <% last_updated_at = Time.current.utc.iso8601 %>
-      <%= t(".last_updated") %>&nbsp;<time id="page-updated-at" datetime="<%= last_updated_at %>"><%== last_updated_at %></time>
+      <%= t(".last_updated") %>&nbsp;<time id="page-updated-at" datetime="<%= last_updated_at %>"><%= last_updated_at %></time>
     </div>
   </div>
 </nav>

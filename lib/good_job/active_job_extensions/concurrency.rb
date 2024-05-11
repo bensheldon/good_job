@@ -75,7 +75,7 @@ module GoodJob
           key = job.good_job_concurrency_key
           next if key.blank?
 
-          if CurrentThread.execution.blank?
+          if CurrentThread.execution.blank? || CurrentThread.execution.active_job_id != job_id
             logger.debug("Ignoring concurrency limits because the job is executed with `perform_now`.")
             next
           end
@@ -96,7 +96,7 @@ module GoodJob
 
               query = DiscreteExecution.joins(:job)
                                        .where(GoodJob::Job.table_name => { concurrency_key: key })
-                                       .where(DiscreteExecution.arel_table[:created_at].gt(throttle_period.ago))
+                                       .where(DiscreteExecution.arel_table[:created_at].gt(DiscreteExecution.bind_value('created_at', throttle_period.ago, ActiveRecord::Type::DateTime)))
               allowed_active_job_ids = query.where(error: nil).or(query.where.not(error: "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError: GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"))
                                             .order(created_at: :asc)
                                             .limit(throttle_limit)

@@ -33,6 +33,8 @@ module GoodJob
     DEFAULT_DASHBOARD_DEFAULT_LOCALE = :en
     # Default Dashboard Live Poll button enabled
     DEFAULT_DASHBOARD_LIVE_POLL_ENABLED = true
+    # Default enqueue_after_transaction_commit
+    DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT = false
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
@@ -387,6 +389,14 @@ module GoodJob
       return rails_config[:dashboard_live_poll_enabled] unless rails_config[:dashboard_live_poll_enabled].nil?
 
       DEFAULT_DASHBOARD_LIVE_POLL_ENABLED
+    end
+
+    # Whether the Adapter should have Active Job enqueue jobs after the transaction has committed.
+    # @return [Boolean]
+    def enqueue_after_transaction_commit
+      return options[:enqueue_after_transaction_commit] unless options[:enqueue_after_transaction_commit].nil?
+
+      DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT
     end
 
     # Whether running in a web server process.

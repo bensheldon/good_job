@@ -18,6 +18,8 @@ module GoodJob
     scope :not_discarded, -> { where(discarded_at: nil) }
     scope :succeeded, -> { finished.not_discarded }
 
+    scope :finished_before, ->(timestamp) { where(arel_table['finished_at'].lteq(bind_value('finished_at', timestamp, ActiveRecord::Type::DateTime))) }
+
     alias_attribute :enqueued?, :enqueued_at
     alias_attribute :discarded?, :discarded_at
     alias_attribute :finished?, :finished_at
@@ -25,9 +27,13 @@ module GoodJob
     scope :display_all, (lambda do |after_created_at: nil, after_id: nil|
       query = order(created_at: :desc, id: :desc)
       if after_created_at.present? && after_id.present?
-        query = query.where(Arel.sql('(created_at, id) < (:after_created_at, :after_id)'), after_created_at: after_created_at, after_id: after_id)
+        query = if Gem::Version.new(Rails.version) < Gem::Version.new('7.0.0.a') || Concurrent.on_jruby?
+                  query.where(Arel.sql('(created_at, id) < (:after_created_at, :after_id)'), after_created_at: after_created_at, after_id: after_id)
+                else
+                  query.where Arel::Nodes::Grouping.new([arel_table["created_at"], arel_table["id"]]).lt(Arel::Nodes::Grouping.new([bind_value('created_at', after_created_at, ActiveRecord::Type::DateTime), bind_value('id', after_id, ActiveRecord::Type::String)]))
+                end
       elsif after_created_at.present?
-        query = query.where(Arel.sql('(after_created_at) < (:after_created_at)'), after_created_at: after_created_at)
+        query = query.where arel_table["created_at"].lt(bind_value('created_at', after_created_at, ActiveRecord::Type::DateTime))
       end
       query
     end)

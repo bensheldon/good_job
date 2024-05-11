@@ -33,7 +33,7 @@ nl:
         no_batches_found: Geen batches gevonden.
     cron_entries:
       actions:
-        confirm_disable: Weet u zeker dat u deze cron-vermelding wilt uitschakelen?
+        confirm_disable: Weet u zekerf dat u deze cron-vermelding wilt uitschakelen?
         confirm_enable: Weet u zeker dat u deze cron-invoer wilt inschakelen?
         confirm_enqueue: Weet u zeker dat u deze cron-vermelding in de wachtrij wilt plaatsen?
         disable: Schakel cron-invoer uit
@@ -111,9 +111,7 @@ nl:
       actions:
         confirm_destroy: Weet je zeker dat je de baan wilt vernietigen?
         confirm_discard: Wilt u de baan afwijzen?
-        confirm_force_discard: 'Weet u zeker dat u deze taak geforceerd wilt weggooien? De taak wordt gemarkeerd als verwijderd, maar de lopende taak wordt niet gestopt. Bij fouten wordt deze echter niet opnieuw geprobeerd.
-
-          '
+        confirm_force_discard: Weet u zeker dat u deze taak geforceerd wilt weggooien? De taak wordt gemarkeerd als verwijderd, maar de lopende taak wordt niet gestopt. Bij fouten wordt deze echter niet opnieuw geprobeerd.
         confirm_reschedule: Weet u zeker dat u de taak opnieuw wilt inplannen?
         confirm_retry: Weet u zeker dat u de taak opnieuw wilt proberen?
         destroy: Baan vernietigen
@@ -126,6 +124,8 @@ nl:
       discard:
         notice: Job is weggegooid
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: in de wachtrij
         runtime: looptijd
         title: Executies
