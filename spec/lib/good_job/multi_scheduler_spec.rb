@@ -26,6 +26,25 @@ RSpec.describe GoodJob::MultiScheduler do
           max_threads: 4
         )
       end
+
+      it "can handle spaces in the configuration" do
+        configuration = GoodJob::Configuration.new({ queues: ' +  mice , ferrets: 2 ; elephant : 4 ; ' })
+        multi_scheduler = described_class.from_configuration(configuration)
+
+        rodents_scheduler, elephants_scheduler = multi_scheduler.schedulers
+
+        expect(rodents_scheduler.stats).to include(
+          queues: '+  mice , ferrets',
+          max_threads: 2
+        )
+        expect(rodents_scheduler.send(:performer).send(:parsed_queues)).to eq({ include: %w[mice ferrets], ordered_queues: true })
+
+        expect(elephants_scheduler.stats).to include(
+          queues: 'elephant',
+          max_threads: 4
+        )
+        expect(elephants_scheduler.send(:performer).send(:parsed_queues)).to eq({ include: ["elephant"] })
+      end
     end
   end
 
