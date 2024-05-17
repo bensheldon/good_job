@@ -40,7 +40,7 @@ module GoodJob
     #   GoodJob::Execution.queue_parser('-queue1,queue2')
     #   => { exclude: [ 'queue1', 'queue2' ] }
     def self.queue_parser(string)
-      string = string.presence || '*'
+      string = string.strip.presence || '*'
 
       case string.first
       when '-'
