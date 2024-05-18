@@ -1383,7 +1383,7 @@ _Note: Rails `travel`/`travel_to` time helpers do not have millisecond precision
 
 GoodJob is not compatible with PgBouncer in _transaction_ mode, but is compatible with PgBouncer's _connection_ mode. GoodJob uses connection-based advisory locks and LISTEN/NOTIFY, both of which require full database connections.
 
-A workaround to this limitation is to make a direct database connection available to GoodJob. With Rails 6.0's support for [multiple databases](https://guides.rubyonrails.org/active_record_multiple_databases.html), a direct connection to the database can be configured:
+If you want to use PgBouncer with the rest of your Rails app you can workaround this limitation by making a direct database connection available to GoodJob. With Rails 6.0's support for [multiple databases](https://guides.rubyonrails.org/active_record_multiple_databases.html), a direct connection to the database can be configured by following the three steps below.
 
 1. Define a direct connection to your database that is not proxied through PgBouncer, for example:
 
