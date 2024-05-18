@@ -1,5 +1,25 @@
 # Changelog
 
+## [v3.28.3](https://github.com/bensheldon/good_job/tree/v3.28.3) (2024-05-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.2...v3.28.3)
+
+**Fixed bugs:**
+
+- Strip more whitespace when parsing queues string [\#1352](https://github.com/bensheldon/good_job/pull/1352) ([bensheldon](https://github.com/bensheldon))
+- Fix latest migration not affecting `GoodJob.migrated?` [\#1345](https://github.com/bensheldon/good_job/pull/1345) ([Earlopain](https://github.com/Earlopain))
+
+**Closed issues:**
+
+- Whitespace in `queues` configuration can cause issues. [\#1351](https://github.com/bensheldon/good_job/issues/1351)
+- How to properly handle interrupts [\#1343](https://github.com/bensheldon/good_job/issues/1343)
+- ActiveSupport::CurrentAttributes Compatibility [\#1341](https://github.com/bensheldon/good_job/issues/1341)
+
+**Merged pull requests:**
+
+- Don't abort CI jobs when a single one fails [\#1346](https://github.com/bensheldon/good_job/pull/1346) ([Earlopain](https://github.com/Earlopain))
+- Clarify PgBouncer Compatibility [\#1338](https://github.com/bensheldon/good_job/pull/1338) ([isaac](https://github.com/isaac))
+
 ## [v3.28.2](https://github.com/bensheldon/good_job/tree/v3.28.2) (2024-04-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.1...v3.28.2)
