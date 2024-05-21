@@ -147,7 +147,7 @@ describe GoodJob::Batch do
     before do
       stub_const 'CallbackJob', (Class.new(ActiveJob::Base) do
         def perform(_batch, _options)
-          puts "HERE"
+          nil
         end
       end)
     end

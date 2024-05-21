@@ -19,6 +19,7 @@ require_relative "good_job/overridable_connection"
 require_relative "good_job/bulk"
 require_relative "good_job/callable"
 require_relative "good_job/capsule"
+require_relative "good_job/capsule_tracker"
 require_relative "good_job/cleanup_tracker"
 require_relative "good_job/cli"
 require_relative "good_job/configuration"
@@ -169,11 +170,12 @@ module GoodJob
   end
 
   # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager})
-  # @param executables [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager>] Objects to shut down.
+  # @param executables [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager, SharedExecutor>] Objects to shut down.
   # @param method_name [:symbol] Method to call, e.g. +:shutdown+ or +:restart+.
   # @param timeout [nil,Numeric]
+  # @param after [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager, SharedExecutor>] Objects to shut down after initial executables shut down.
   # @return [void]
-  def self._shutdown_all(executables, method_name = :shutdown, timeout: -1)
+  def self._shutdown_all(executables, method_name = :shutdown, timeout: -1, after: [])
     if timeout.is_a?(Numeric) && timeout.positive?
       executables.each { |executable| executable.send(method_name, timeout: nil) }
 
@@ -181,6 +183,13 @@ module GoodJob
       executables.each { |executable| executable.send(method_name, timeout: [stop_at - Time.current, 0].max) }
     else
       executables.each { |executable| executable.send(method_name, timeout: timeout) }
+    end
+    return unless after.any? && !timeout.nil?
+
+    if stop_at
+      after.each { |executable| executable.shutdown(timeout: [stop_at - Time.current, 0].max) }
+    else
+      after.each { |executable| executable.shutdown(timeout: timeout) }
     end
   end
 
@@ -277,8 +286,8 @@ module GoodJob
   # @return [Boolean]
   def self.migrated?
     # Always update with the most recent migration check
-    GoodJob::DiscreteExecution.reset_column_information
-    GoodJob::DiscreteExecution.backtrace_migrated?
+    GoodJob::Execution.reset_column_information
+    GoodJob::Execution.process_lock_migrated?
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)

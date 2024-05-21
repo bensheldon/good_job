@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
+require 'concurrent/executor/executor_service'
+
 module GoodJob
   class SharedExecutor
+    # Allow posting tasks directly to instances
+    include Concurrent::ExecutorService
+
     MAX_THREADS = 2
 
     # @!attribute [r] instances
@@ -13,8 +18,21 @@ module GoodJob
     attr_reader :executor
 
     def initialize
+      @mutex = Mutex.new
+
       self.class.instances << self
-      create_executor
+    end
+
+    def post(*args, &task)
+      unless running?
+        @mutex.synchronize do
+          next if running?
+
+          create_executor
+        end
+      end
+
+      @executor&.post(*args, &task)
     end
 
     def running?

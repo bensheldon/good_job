@@ -84,6 +84,13 @@ module GoodJob
         migration_pending_warning!
         false
       end
+
+      def process_lock_migrated?
+        return true if connection.index_name_exists?(:good_job_executions, :index_good_job_executions_on_process_id_and_created_at)
+
+        migration_pending_warning!
+        false
+      end
     end
 
     # The ActiveJob job class, as a string

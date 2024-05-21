@@ -3,7 +3,7 @@
 require 'socket'
 
 module GoodJob # :nodoc:
-  # ActiveRecord model that represents an GoodJob process (either async or CLI).
+  # Active Record model that represents a GoodJob capsule/process (either async or CLI).
   class Process < BaseRecord
     include AdvisoryLockable
     include OverridableConnection
@@ -15,50 +15,74 @@ module GoodJob # :nodoc:
 
     self.table_name = 'good_job_processes'
     self.implicit_order_column = 'created_at'
+    LOCK_TYPES = [
+      LOCK_TYPE_ADVISORY = 'advisory',
+    ].freeze
 
-    cattr_reader :mutex, default: Mutex.new
-    cattr_accessor :_current_id, default: nil
-    cattr_accessor :_pid, default: nil
+    LOCK_TYPE_ENUMS = {
+      LOCK_TYPE_ADVISORY => 1,
+    }.freeze
+
+    self.table_name = 'good_job_processes'
+
+    has_many :locked_jobs, class_name: "GoodJob::Job", foreign_key: :locked_by_id, inverse_of: :locked_by_process, dependent: nil
+    after_destroy { locked_jobs.update_all(locked_by_id: nil) if GoodJob::Job.columns_hash.key?("locked_by_id") } # rubocop:disable Rails/SkipsModelValidations
 
     # Processes that are active and locked.
     # @!method active
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :active, -> { advisory_locked }
+    scope :active, (lambda do
+      if lock_type_migrated?
+        query = joins_advisory_locks
+        query.where(lock_type: LOCK_TYPE_ENUMS[LOCK_TYPE_ADVISORY]).advisory_locked
+          .or(query.where(lock_type: nil).where(arel_table[:updated_at].gt(EXPIRED_INTERVAL.ago)))
+      else
+        advisory_locked
+      end
+    end)
 
     # Processes that are inactive and unlocked (e.g. SIGKILLed)
     # @!method active
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :inactive, -> { advisory_unlocked }
-
-    # UUID that is unique to the current process and changes when forked.
-    # @return [String]
-    def self.current_id
-      mutex.synchronize { ns_current_id }
-    end
-
-    def self.ns_current_id
-      if _current_id.nil? || _pid != ::Process.pid
-        self._current_id = SecureRandom.uuid
-        self._pid = ::Process.pid
+    scope :inactive, (lambda do
+      if lock_type_migrated?
+        query = joins_advisory_locks
+        query.where(lock_type: LOCK_TYPE_ENUMS[LOCK_TYPE_ADVISORY]).advisory_unlocked
+          .or(query.where(lock_type: nil).where(arel_table[:updated_at].lt(EXPIRED_INTERVAL.ago)))
+      else
+        advisory_unlocked
       end
-      _current_id
+    end)
+
+    # Deletes all inactive process records.
+    def self.cleanup
+      inactive.find_each do |process|
+        GoodJob::Job.where(locked_by_id: process.id).update_all(locked_by_id: nil, locked_at: nil) if GoodJob::Job.columns_hash.key?("locked_by_id") # rubocop:disable Rails/SkipsModelValidations
+        process.delete
+      end
     end
 
-    # Hash representing metadata about the current process.
-    # @return [Hash]
-    def self.current_state
-      mutex.synchronize { ns_current_state }
+    # @return [Boolean]
+    def self.lock_type_migrated?
+      columns_hash["lock_type"].present?
     end
 
-    def self.ns_current_state
-      total_succeeded_executions_count = GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:succeeded_executions_count, 0) }
-      total_errored_executions_count = GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:errored_executions_count, 0) }
-      total_empty_executions_count = GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:empty_executions_count, 0) }
+    def self.create_record(id:, with_advisory_lock: false)
+      attributes = {
+        id: id,
+        state: process_state,
+      }
+      if with_advisory_lock
+        attributes[:create_with_advisory_lock] = true
+        attributes[:lock_type] = LOCK_TYPE_ADVISORY if lock_type_migrated?
+      end
+      create!(attributes)
+    end
 
+    def self.process_state
       {
-        id: ns_current_id,
         hostname: Socket.gethostname,
         pid: ::Process.pid,
         proctitle: $PROGRAM_NAME,
@@ -66,10 +90,8 @@ module GoodJob # :nodoc:
         retry_on_unhandled_error: GoodJob.retry_on_unhandled_error,
         schedulers: GoodJob::Scheduler.instances.map(&:stats),
         cron_enabled: GoodJob.configuration.enable_cron?,
-        total_succeeded_executions_count: total_succeeded_executions_count,
-        total_errored_executions_count: total_errored_executions_count,
-        total_executions_count: total_succeeded_executions_count + total_errored_executions_count,
-        total_empty_executions_count: total_empty_executions_count,
+        total_succeeded_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:succeeded_executions_count) },
+        total_errored_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:errored_executions_count) },
         database_connection_pool: {
           size: connection_pool.size,
           active: connection_pool.connections.count(&:in_use?),
@@ -77,51 +99,14 @@ module GoodJob # :nodoc:
       }
     end
 
-    # Deletes all inactive process records.
-    def self.cleanup
-      inactive.delete_all
-    end
-
-    # Registers the current process in the database
-    # @return [GoodJob::Process]
-    def self.register
-      mutex.synchronize do
-        process_state = ns_current_state
-        create(id: process_state[:id], state: process_state, create_with_advisory_lock: true)
-      rescue ActiveRecord::RecordNotUnique
-        find(ns_current_state[:id])
-      end
-    end
-
     def refresh
-      mutex.synchronize do
-        reload
-        update(state: self.class.ns_current_state, updated_at: Time.current)
-      rescue ActiveRecord::RecordNotFound
-        false
-      end
-    end
-
-    # Unregisters the instance.
-    def deregister
-      return unless owns_advisory_lock?
-
-      mutex.synchronize do
-        destroy!
-        advisory_unlock
-      end
-    end
-
-    def state
-      super || {}
-    end
-
-    def basename
-      File.basename(state.fetch("proctitle", ""))
-    end
-
-    def schedulers
-      state.fetch("schedulers", [])
+      self.state = self.class.process_state
+      reload.update(state: state, updated_at: Time.current)
+    rescue ActiveRecord::RecordNotFound
+      @new_record = true
+      self.created_at = self.updated_at = nil
+      state_will_change!
+      save
     end
 
     def refresh_if_stale(cleanup: false)
@@ -132,12 +117,40 @@ module GoodJob # :nodoc:
       result
     end
 
+    def state
+      super || {}
+    end
+
     def stale?
       updated_at < STALE_INTERVAL.ago
     end
 
     def expired?
       updated_at < EXPIRED_INTERVAL.ago
+    end
+
+    def basename
+      File.basename(state.fetch("proctitle", ""))
+    end
+
+    def schedulers
+      state.fetch("schedulers", [])
+    end
+
+    def lock_type
+      return unless self.class.columns_hash['lock_type']
+
+      enum = super
+      LOCK_TYPE_ENUMS.key(enum) if enum
+    end
+
+    def lock_type=(value)
+      return unless self.class.columns_hash['lock_type']
+
+      enum = LOCK_TYPE_ENUMS[value]
+      raise(ArgumentError, "Invalid error_event: #{value}") if value && !enum
+
+      super(enum)
     end
   end
 end
