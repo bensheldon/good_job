@@ -8,7 +8,7 @@ module GoodJob
       module Prepends
         def initialize(*arguments)
           super
-          self.good_job_labels = Array(self.class.good_job_labels)
+          self.good_job_labels = Array(self.class.good_job_labels.dup)
         end
 
         def enqueue(options = {})
