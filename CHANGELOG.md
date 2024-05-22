@@ -1,5 +1,13 @@
 # Changelog
 
+## [v3.29.0](https://github.com/bensheldon/good_job/tree/v3.29.0) (2024-05-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.3...v3.29.0)
+
+**Merged pull requests:**
+
+- Add association between Process and Jobs, and add a heartbeat to the Process record [\#999](https://github.com/bensheldon/good_job/pull/999) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.28.3](https://github.com/bensheldon/good_job/tree/v3.28.3) (2024-05-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.2...v3.28.3)
