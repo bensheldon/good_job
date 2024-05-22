@@ -33,7 +33,7 @@ module GoodJob
 
     def job_classes
       filtered_query(params.slice(:queue_name)).unscope(:select)
-                                               .group(GoodJob::BaseExecution.params_job_class).count
+                                               .group(GoodJob::Job.params_job_class).count
                                                .sort_by { |name, _count| name.to_s }
                                                .to_h
     end
