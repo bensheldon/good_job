@@ -286,8 +286,8 @@ module GoodJob
   # @return [Boolean]
   def self.migrated?
     # Always update with the most recent migration check
-    GoodJob::Execution.reset_column_information
-    GoodJob::Execution.process_lock_migrated?
+    GoodJob::Job.reset_column_information
+    GoodJob::Job.process_lock_migrated?
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)
