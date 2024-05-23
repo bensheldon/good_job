@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.29.1](https://github.com/bensheldon/good_job/tree/v3.29.1) (2024-05-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.0...v3.29.1)
+
+**Fixed bugs:**
+
+- Fix AdvisoryLockable using wrong `advisory_lockable_column` attribute when aborting `create_with_advisory_lock` [\#1360](https://github.com/bensheldon/good_job/pull/1360) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Warn on unapplied migrations [\#1361](https://github.com/bensheldon/good_job/issues/1361)
+- Undefined `GoodJob::Process.advisory_lockable_column` [\#1358](https://github.com/bensheldon/good_job/issues/1358)
+
 ## [v3.29.0](https://github.com/bensheldon/good_job/tree/v3.29.0) (2024-05-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.3...v3.29.0)
