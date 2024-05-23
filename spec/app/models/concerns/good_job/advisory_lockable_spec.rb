@@ -387,6 +387,16 @@ RSpec.describe GoodJob::AdvisoryLockable do
 
       execution.advisory_unlock
     end
+
+    it 'aborts when the lock already exists' do
+      existing = model_class.create!(active_job_id: SecureRandom.uuid, create_with_advisory_lock: true)
+
+      expect do
+        rails_promise { model_class.create!(active_job_id: existing.active_job_id, create_with_advisory_lock: true) }.value!
+      end.to raise_error(ActiveRecord::RecordInvalid)
+    ensure
+      existing.advisory_unlock
+    end
   end
 
   it 'is lockable' do
