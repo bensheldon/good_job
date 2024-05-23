@@ -1,5 +1,17 @@
 # Changelog
 
+## [v3.29.2](https://github.com/bensheldon/good_job/tree/v3.29.2) (2024-05-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.1...v3.29.2)
+
+**Fixed bugs:**
+
+- Fix label modifications on job instance polluting labels on job class [\#1355](https://github.com/bensheldon/good_job/pull/1355) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- `#good_job_labels` retains values across job instances [\#1354](https://github.com/bensheldon/good_job/issues/1354)
+
 ## [v3.29.1](https://github.com/bensheldon/good_job/tree/v3.29.1) (2024-05-23)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.0...v3.29.1)
