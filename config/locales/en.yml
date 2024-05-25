@@ -205,6 +205,14 @@ en:
         started: Started
         title: Processes
         updated: Updated
+    statistics:
+      index:
+        average_runtime: Average runtime
+        executions: Executions
+        job_class: Job class
+        maximum_runtime: Maximum runtime
+        minimum_runtime: Minimum runtime
+        title: Statistics
     shared:
       boolean:
         'false': 'No'

@@ -1,0 +1,34 @@
+<div class="border-bottom">
+  <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
+</div>
+
+<div class="my-3 card">
+  <div class="list-group list-group-flush text-nowrap" role="table">
+    <header class="list-group-item bg-body-tertiary">
+      <div class="row small text-muted text-uppercase align-items-center">
+        <div class="col-4"><%= t ".job_class" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t ".executions" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t ".minimum_runtime" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t ".maximum_runtime" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t ".average_runtime" %></div>
+      </div>
+    </header>
+
+    <% @job_classes.each do |job_class| %>
+      <%
+      count = GoodJob::Execution.where(job_class: job_class).finished.count
+      runtimes = GoodJob::Execution.where(job_class: job_class).finished.map { |execution| execution.runtime_latency }
+      %>
+      <div role="row" class="list-group-item py-3">
+        <div class="row align-items-center">
+          <div class="col-lg-4"><%= job_class %></div>
+          <div class="col-lg-2"><%= count %></div>
+          <div class="col-lg-2"><%= format_duration runtimes.min %></div>
+          <div class="col-lg-2"><%= format_duration runtimes.max %></div>
+          <div class="col-lg-2"><%= format_duration runtimes.sum.fdiv(runtimes.size) %></div>
+        </div>
+      </div>  
+    <% end %>
+  </div>
+</div>
+
