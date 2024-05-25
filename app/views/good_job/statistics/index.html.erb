@@ -8,9 +8,9 @@
       <div class="row small text-muted text-uppercase align-items-center">
         <div class="col-4"><%= t ".job_class" %></div>
         <div class="col-lg-2 d-none d-lg-block"><%= t ".executions" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t ".average_runtime" %></div>
         <div class="col-lg-2 d-none d-lg-block"><%= t ".minimum_runtime" %></div>
         <div class="col-lg-2 d-none d-lg-block"><%= t ".maximum_runtime" %></div>
-        <div class="col-lg-2 d-none d-lg-block"><%= t ".average_runtime" %></div>
       </div>
     </header>
 
@@ -24,11 +24,11 @@
       %>
       <div role="row" class="list-group-item py-3">
         <div class="row align-items-center">
-          <div class="col-lg-4"><%= link_to job_class, statistic_path(job_class) %></div>
+          <div class="col-lg-4"><%= link_to job_class, statistic_path(job_class), class: 'text-decoration-none' %></div>
           <div class="col-lg-2"><%= count %></div>
+          <div class="col-lg-2"><%= format_duration runtimes.sum.fdiv(runtimes.size) %></div>
           <div class="col-lg-2"><%= format_duration runtimes.min %></div>
           <div class="col-lg-2"><%= format_duration runtimes.max %></div>
-          <div class="col-lg-2"><%= format_duration runtimes.sum.fdiv(runtimes.size) %></div>
         </div>
       </div>  
     <% end %>
