@@ -19,15 +19,20 @@ module GoodJob
           responsive: true,
           maintainAspectRatio: false,
           scales: {
+            x: {
+              display: false
+            },
             y: {
-              beginAtZero: true,
-              title: 'Runtime'
+              beginAtZero: true
             }
           },
           plugins: {
             legend: {
               display: false
-            }
+            },
+            tooltip: {
+              enabled: false
+            },
           }
         }
       }
