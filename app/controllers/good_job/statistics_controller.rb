@@ -12,7 +12,10 @@ module GoodJob
       @chart_data = StatisticsJobClassChart.new(@job_class).data
       @count      = executions.count
       @runtimes   = executions.map { |execution| execution.runtime_latency }.compact
-      @longest_executions = executions.sort_by(&:runtime_latency).reverse.first(10)
+      @longest_executions = executions.reject { |execution| execution.runtime_latency.nil? }
+                                      .sort_by(&:runtime_latency)
+                                      .reverse
+                                      .first(10)
     end
 
     protected
