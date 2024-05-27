@@ -14,11 +14,11 @@
   </div>
 </div>
 
-<div class="chart-wrapper container-fluid">
+<div class="chart-wrapper container-fluid mb-3">
   <canvas class="chart" data-json="<%= @chart_data.to_json %>"></canvas>
 </div>
 
-<div class="my-3 card">
+<div class="mb-3 card">
   <div class="list-group list-group-flush text-nowrap" role="table">
     <header class="list-group-item bg-body-tertiary">
       <div class="row small text-muted text-uppercase align-items-center">
@@ -38,3 +38,5 @@
     </div>
   </div>
 </div>
+
+<%= render 'good_job/jobs/executions', executions: @longest_executions %>

@@ -10,13 +10,15 @@ module GoodJob
     def show
       @job_class  = params[:id]
       @chart_data = StatisticsJobClassChart.new(@job_class).data
-      @count      = GoodJob::Execution.where(job_class: @job_class)
-                                      .finished
-                                      .count
-      @runtimes   = GoodJob::Execution.where(job_class: @job_class)
-                                      .finished
-                                      .map { |execution| execution.runtime_latency }
-                                      .compact
+      @count      = executions.count
+      @runtimes   = executions.map { |execution| execution.runtime_latency }.compact
+      @longest_executions = executions.sort_by(&:runtime_latency).reverse.first(10)
+    end
+
+    protected
+
+    def executions
+      GoodJob::Execution.where(job_class: @job_class).finished
     end
   end
 end

@@ -44,18 +44,20 @@ module GoodJob
       [
         {
           label: job_class,
-          data: GoodJob::Execution.where(job_class: job_class)
-                                  .finished
-                                  .map { |execution|
-                                    [
-                                      # Unix timestamp
-                                      execution.finished_at.to_time.to_i,
-                                      # Latency
-                                      execution.runtime_latency
-                                    ]
-                                  }
+          data: executions.map { |execution|
+            [
+              # Unix timestamp
+              execution.finished_at.to_time.to_i,
+              # Latency
+              execution.runtime_latency
+            ]
+          }
         },
       ]
+    end
+
+    def executions
+      GoodJob::Execution.where(job_class: job_class).finished
     end
   end
 end
