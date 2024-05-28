@@ -203,7 +203,7 @@ en:
         job_class: Job class
         maximum_runtime: Maximum runtime
         minimum_runtime: Minimum runtime
-        title: Performances
+        title: Performance
     processes:
       index:
         cron_enabled: Cron enabled
@@ -233,6 +233,7 @@ en:
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
+        performances: Performance
         processes: Processes
         theme:
           auto: Auto
