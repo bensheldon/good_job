@@ -196,6 +196,14 @@ en:
             thousand: K
             trillion: T
             unit: ''
+    performance:
+      index:
+        average_runtime: Average runtime
+        executions: Executions
+        job_class: Job class
+        maximum_runtime: Maximum runtime
+        minimum_runtime: Minimum runtime
+        title: Performance
     processes:
       index:
         cron_enabled: Cron enabled
@@ -205,14 +213,6 @@ en:
         started: Started
         title: Processes
         updated: Updated
-    statistics:
-      index:
-        average_runtime: Average runtime
-        executions: Executions
-        job_class: Job class
-        maximum_runtime: Maximum runtime
-        minimum_runtime: Minimum runtime
-        title: Statistics
     shared:
       boolean:
         'false': 'No'
