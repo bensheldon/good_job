@@ -163,6 +163,16 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :finished, ->(timestamp = nil) { timestamp ? where(arel_table['finished_at'].lteq(bind_value('finished_at', timestamp, ActiveRecord::Type::DateTime))) : where.not(finished_at: nil) }
 
+    # Get completed jobs between start and end.
+    # @!method finished_between(start_time, end_time)
+    # @!scope class
+    # @param start_time (Time)
+    #   Executions from start time included.
+    # @param end_time (Time)
+    #   Executions to end time excluded.
+    # @return [ActiveRecord::Relation]
+    scope :finished_between, ->(start_time, end_time) { finished.where('finished_at >= ? AND finished_at < ?', start_time, end_time) }
+
     # Get Jobs that started but not finished yet.
     # @!method running
     # @!scope class

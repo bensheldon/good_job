@@ -4,6 +4,8 @@ module GoodJob
   class PerformancesJobClassChart
     attr_reader :job_class
 
+    PERIOD = 1.day
+
     def initialize(job_class)
       @job_class = job_class
     end
@@ -40,6 +42,14 @@ module GoodJob
 
     protected
 
+    def end_time
+      @end_time ||= Time.current
+    end
+
+    def start_time
+      @start_time ||= end_time - PERIOD
+    end
+
     def datasets
       [
         {
@@ -57,7 +67,8 @@ module GoodJob
     end
 
     def executions
-      GoodJob::Execution.where(job_class: job_class).finished
+      GoodJob::Execution.where(job_class: job_class)
+                        .finished_between(start_time, end_time)
     end
   end
 end
