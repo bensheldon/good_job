@@ -196,14 +196,14 @@ en:
             thousand: K
             trillion: T
             unit: ''
-    performance:
+    performances:
       index:
         average_runtime: Average runtime
         executions: Executions
         job_class: Job class
         maximum_runtime: Maximum runtime
         minimum_runtime: Minimum runtime
-        title: Performance
+        title: Performances
     processes:
       index:
         cron_enabled: Cron enabled

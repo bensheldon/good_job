@@ -9,7 +9,7 @@ module GoodJob
 
     def show
       @job_class  = params[:id]
-      @chart_data = StatisticsJobClassChart.new(@job_class).data
+      @chart_data = PerformancesJobClassChart.new(@job_class).data
       @count      = executions.count
       @runtimes   = executions.map { |execution| execution.runtime_latency }.compact
       @longest_executions = executions.reject { |execution| execution.runtime_latency.nil? }

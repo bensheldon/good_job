@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module GoodJob
-  class StatisticsJobClassChart
+  class PerformancesJobClassChart
     attr_reader :job_class
 
     def initialize(job_class)
