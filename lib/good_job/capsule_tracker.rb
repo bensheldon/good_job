@@ -143,8 +143,10 @@ module GoodJob # :nodoc:
     # @param silent [Boolean] Whether to silence logging.
     # @return [void]
     def renew(silent: false)
-      GoodJob::Process.with_logger_silenced(silent: silent) do
-        @record&.refresh_if_stale(cleanup: true)
+      synchronize do
+        GoodJob::Process.with_logger_silenced(silent: silent) do
+          @record&.refresh_if_stale(cleanup: true)
+        end
       end
     end
 

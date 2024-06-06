@@ -101,7 +101,8 @@ module GoodJob # :nodoc:
 
     def refresh
       self.state = self.class.process_state
-      reload.update(state: state, updated_at: Time.current)
+      reload # verify the record still exists in the database
+      update(state: state, updated_at: Time.current)
     rescue ActiveRecord::RecordNotFound
       @new_record = true
       self.created_at = self.updated_at = nil
