@@ -149,7 +149,7 @@ describe GoodJob::CapsuleTracker do
   end
 
   describe '#process_id' do
-    it 'is a UUID' do
+    it 'is a UUID the process has been locked' do
       expect(tracker.process_id).to be_a_uuid
     end
   end
