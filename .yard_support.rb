@@ -8,7 +8,7 @@ require 'kramdown-parser-gfm'
 class KramdownGfmDocument < Kramdown::Document
   def initialize(source, options = {})
     options[:input] = 'GFM' unless options.key?(:input)
-    super(source, options)
+    super
   end
 end
 

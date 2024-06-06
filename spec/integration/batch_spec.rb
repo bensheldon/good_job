@@ -328,7 +328,7 @@ RSpec.describe 'Batches' do
   end
 
   describe 'adding to an existing batch' do
-    it 'will add jobs to the existing batch' do
+    it 'adds jobs to the existing batch' do
       batch = GoodJob::Batch.new(metadata: 'foo')
       batch.enqueue { TestJob.perform_later }
 
