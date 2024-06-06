@@ -5,6 +5,7 @@ require:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
+  - rubocop-rspec_rails
 
 inherit_mode:
   merge:
@@ -28,6 +29,9 @@ AllCops:
     # Vendored dependencies
     - lib/good_job/sd_notify.rb
   NewCops: enable
+
+Capybara/ClickLinkOrButtonStyle:
+  Enabled: false
 
 Gemspec/DevelopmentDependencies:
   Enabled: false

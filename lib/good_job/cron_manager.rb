@@ -55,9 +55,7 @@ module GoodJob # :nodoc:
     # @param timeout [Numeric, nil] Unused but retained for compatibility
     def shutdown(timeout: nil) # rubocop:disable Lint/UnusedMethodArgument
       @running = false
-      @tasks.each do |_cron_key, task|
-        task.cancel
-      end
+      @tasks.each_value(&:cancel)
       @tasks.clear
     end
 

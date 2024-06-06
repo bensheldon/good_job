@@ -408,7 +408,7 @@ RSpec.describe GoodJob::Job do
   end
 
   describe '#force_discard_job' do
-    it 'will discard the job even when advisory locked' do
+    it 'discards the job even when advisory locked' do
       locked_event = Concurrent::Event.new
       done_event = Concurrent::Event.new
 

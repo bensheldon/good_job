@@ -7,7 +7,7 @@ ruby_version_path = File.join(File.dirname(__FILE__), '.ruby-version')
 if File.exist?(ruby_version_path)
   # .ruby-version may not always contain a complete/valid 3+ identifier Ruby version
   ruby_version_contents = File.read(ruby_version_path).strip
-  ruby(ruby_version_contents) if ruby_version_contents.match?(%r{\d+\.\d+\.\d+})
+  ruby(ruby_version_contents) if ruby_version_contents.match?(%r{\A\d+\.\d+\.\d+})
 end
 # Declare your gem's dependencies in good_job.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
@@ -26,6 +26,7 @@ gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 gem 'rack', '~> 2.2'
 gem 'rails'
+gem 'rspec-rails', github: "rspec/rspec-rails", branch: "main"
 
 platforms :ruby do
   gem "bootsnap"
@@ -48,16 +49,18 @@ platforms :ruby do
   end
 
   group :lint do
-    gem "easy_translate"
-    gem "erb_lint"
-    gem "i18n-tasks"
-    gem "mdl"
-    gem "rubocop"
-    gem "rubocop-performance"
-    gem "rubocop-rails"
-    gem "rubocop-rspec"
-    gem "sorbet"
-    gem "sorbet-runtime"
+    gem "easy_translate", require: false
+    gem "erb_lint", require: false
+    gem "i18n-tasks", require: false
+    gem "mdl", require: false
+    gem "rubocop", require: false
+    gem "rubocop-capybara", require: false
+    gem "rubocop-performance", require: false
+    gem "rubocop-rails", require: false
+    gem "rubocop-rspec", require: false
+    gem "rubocop-rspec_rails", require: false
+    gem "sorbet", require: false
+    gem "sorbet-runtime", require: false
     gem "spoom", require: false
     gem "tapioca", require: false
   end

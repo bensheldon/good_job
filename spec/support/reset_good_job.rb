@@ -126,7 +126,7 @@ module PostgresXidExtension
       self.class.send :register_class_with_limit, map, 'xid', ActiveRecord::Type::String # OID 28
     end
 
-    super(map)
+    super
   end
 end
 
