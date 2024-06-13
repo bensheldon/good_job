@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.29.3](https://github.com/bensheldon/good_job/tree/v3.29.3) (2024-06-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.2...v3.29.3)
+
+**Fixed bugs:**
+
+- Synchronize `CapsuleTracker#renew` [\#1369](https://github.com/bensheldon/good_job/pull/1369) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- docs: Basic auth route mount example improvement [\#1368](https://github.com/bensheldon/good_job/issues/1368)
+- Tips for debugging/optimizing slow dashboard? \(45 second response time\) [\#1366](https://github.com/bensheldon/good_job/issues/1366)
+
 ## [v3.29.2](https://github.com/bensheldon/good_job/tree/v3.29.2) (2024-05-23)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.1...v3.29.2)
