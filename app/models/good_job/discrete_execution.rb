@@ -37,14 +37,9 @@ module GoodJob # :nodoc:
       created_at - scheduled_at
     end
 
-    # Time between when this job started and finished
-    def runtime_latency
-      (finished_at || Time.current) - performed_at if performed_at
-    end
-
     # Monotonic time between when this job started and finished
-    def monotonic_runtime_latency
-      (duration_ms / 1000.0).round
+    def runtime_latency
+      (duration_ms / 1000.0).round if duration_ms.present?
     end
 
     def last_status_at
