@@ -7,21 +7,21 @@ function renderCharts(animate) {
 
     const ctx = chartEl.getContext('2d');
     const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: chartData.labels,
-            datasets: chartData.datasets
-        },
-        options: {
-            animation: animate,
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+      type: 'line',
+      data: {
+        labels: chartData.labels,
+        datasets: chartData.datasets
+      },
+      options: {
+        animation: animate,
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
         }
+      }
     });
   }
 }
