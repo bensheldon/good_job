@@ -7,17 +7,6 @@ module GoodJob
       @job_classes = GoodJob::Execution.pluck(:job_class).uniq.sort
     end
 
-    def show
-      @job_class  = params[:id]
-      @chart_data = PerformancesJobClassChart.new(@job_class).data
-      @count      = executions.count
-      @runtimes   = executions.map { |execution| execution.runtime_latency }.compact
-      @longest_executions = executions.reject { |execution| execution.runtime_latency.nil? }
-                                      .sort_by(&:runtime_latency)
-                                      .reverse
-                                      .first(10)
-    end
-
     protected
 
     def executions

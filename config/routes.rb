@@ -31,7 +31,7 @@ GoodJob::Engine.routes.draw do
 
   resources :processes, only: %i[index]
 
-  resources :performances, only: %i[index show]
+  resources :performances, only: %i[index]
 
   scope :frontend, controller: :frontends do
     get "modules/:name", action: :module, as: :frontend_module, constraints: { format: 'js' }
