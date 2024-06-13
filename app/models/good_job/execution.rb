@@ -372,7 +372,7 @@ module GoodJob
         raise PreviouslyPerformedError, 'Cannot perform a job that has already been performed' if finished_at
 
         job_performed_at = Time.current
-        monotonic_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        monotonic_start = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
         discrete_execution = nil
         result = GoodJob::CurrentThread.within do |current_thread|
           current_thread.reset
@@ -386,12 +386,15 @@ module GoodJob
               interrupt_error_string = self.class.format_error(GoodJob::InterruptError.new("Interrupted after starting perform at '#{existing_performed_at}'"))
               self.error = interrupt_error_string
               self.error_event = ERROR_EVENT_INTERRUPTED if self.class.error_event_migrated?
+              monotonic_duration = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - monotonic_start
+              monotonic_duration_ms = (monotonic_duration * 1000).to_i
 
               discrete_execution_attrs = {
                 error: interrupt_error_string,
                 finished_at: job_performed_at,
               }
               discrete_execution_attrs[:error_event] = GoodJob::ErrorEvents::ERROR_EVENT_ENUMS[GoodJob::ErrorEvents::ERROR_EVENT_INTERRUPTED] if self.class.error_event_migrated?
+              discrete_execution_attrs[:duration_ms] = monotonic_duration_ms if GoodJob::DiscreteExecution.monotonic_duration_migrated?
               discrete_executions.where(finished_at: nil).where.not(performed_at: nil).update_all(discrete_execution_attrs) # rubocop:disable Rails/SkipsModelValidations
             end
           end
@@ -495,7 +498,7 @@ module GoodJob
         job_attributes.delete(:error_event) unless self.class.error_event_migrated?
 
         job_finished_at = Time.current
-        monotonic_duration = Process.clock_gettime(Process::CLOCK_MONOTONIC) - monotonic_start
+        monotonic_duration = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - monotonic_start
         monotonic_duration_ms = (monotonic_duration * 1000).to_i
         job_attributes[:finished_at] = job_finished_at
         if discrete_execution
