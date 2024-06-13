@@ -372,6 +372,7 @@ module GoodJob
         raise PreviouslyPerformedError, 'Cannot perform a job that has already been performed' if finished_at
 
         job_performed_at = Time.current
+        monotonic_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         discrete_execution = nil
         result = GoodJob::CurrentThread.within do |current_thread|
           current_thread.reset
@@ -494,8 +495,12 @@ module GoodJob
         job_attributes.delete(:error_event) unless self.class.error_event_migrated?
 
         job_finished_at = Time.current
+        monotonic_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         job_attributes[:finished_at] = job_finished_at
-        discrete_execution.finished_at = job_finished_at if discrete_execution
+        discrete_execution.assign_attributes(
+          finished_at: job_finished_at,
+          duration_ms: ((monotonic_end - monotonic_start) * 1000).to_i,
+        ) if discrete_execution
 
         retry_unhandled_error = result.unhandled_error && GoodJob.retry_on_unhandled_error
         reenqueued = result.retried? || retried_good_job_id.present? || retry_unhandled_error
