@@ -495,12 +495,13 @@ module GoodJob
         job_attributes.delete(:error_event) unless self.class.error_event_migrated?
 
         job_finished_at = Time.current
-        monotonic_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        monotonic_duration = Process.clock_gettime(Process::CLOCK_MONOTONIC) - monotonic_start
+        monotonic_duration_ms = (monotonic_duration * 1000).to_i
         job_attributes[:finished_at] = job_finished_at
-        discrete_execution.assign_attributes(
-          finished_at: job_finished_at,
-          duration_ms: ((monotonic_end - monotonic_start) * 1000).to_i,
-        ) if discrete_execution
+        if discrete_execution
+          discrete_execution.finished_at = job_finished_at
+          discrete_execution.duration_ms = monotonic_duration_ms if GoodJob::DiscreteExecution.monotonic_duration_migrated?
+        end
 
         retry_unhandled_error = result.unhandled_error && GoodJob.retry_on_unhandled_error
         reenqueued = result.retried? || retried_good_job_id.present? || retry_unhandled_error
