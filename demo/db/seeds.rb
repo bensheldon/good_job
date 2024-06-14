@@ -29,6 +29,7 @@ loop do
     created_at: enqueued_at,
     updated_at: enqueued_at,
     queue_name: queue_name,
+    job_class: job_class,
     priority: 0,
     serialized_params: serialized_params,
     scheduled_at: nil,
