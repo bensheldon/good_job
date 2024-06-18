@@ -83,7 +83,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
         expect(initial_discrete_execution).to have_attributes(
           performed_at: be_present,
           finished_at: be_present,
-          duration_ms: be_present,
+          duration: be_present,
           error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
           error_event: GoodJob::Job::ERROR_EVENT_INTERRUPTED
         )
@@ -92,7 +92,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
         expect(retried_discrete_execution).to have_attributes(
           performed_at: be_present,
           finished_at: be_present,
-          duration_ms: be_present,
+          duration: be_present,
           error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
           error_event: GoodJob::Job::ERROR_EVENT_RETRIED
         )

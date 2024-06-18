@@ -61,7 +61,7 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       t.integer :error_event, limit: 2
       t.text :error_backtrace, array: true
       t.uuid :process_id
-      t.bigint :duration_ms
+      t.interval :duration
     end
 
     create_table :good_job_processes, id: :uuid do |t|

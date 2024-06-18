@@ -26,7 +26,7 @@ RSpec.describe GoodJob::Job do
         scheduled_at: 1.minute.ago,
         created_at: 1.minute.ago,
         finished_at: 1.minute.ago,
-        duration_ms: 60.seconds * 1000,
+        duration: 60.seconds,
         error: "TestJob::Error: TestJob::Error"
       )
     end
