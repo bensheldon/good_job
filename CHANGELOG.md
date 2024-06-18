@@ -1,5 +1,14 @@
 # Changelog
 
+## [v3.29.4](https://github.com/bensheldon/good_job/tree/v3.29.4) (2024-06-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.3...v3.29.4)
+
+**Fixed bugs:**
+
+- Fix display of empty array in flash messages [\#1377](https://github.com/bensheldon/good_job/pull/1377) ([andynu](https://github.com/andynu))
+- Fix counts in tab links with filters [\#1373](https://github.com/bensheldon/good_job/pull/1373) ([SebouChu](https://github.com/SebouChu))
+
 ## [v3.29.3](https://github.com/bensheldon/good_job/tree/v3.29.3) (2024-06-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.2...v3.29.3)
