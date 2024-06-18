@@ -233,6 +233,7 @@ GEM
     kramdown-parser-gfm (1.1.0)
       kramdown (~> 2.0)
     language_server-protocol (3.17.0.3)
+    logger (1.6.0)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -510,6 +511,7 @@ DEPENDENCIES
   i18n-tasks
   kramdown
   kramdown-parser-gfm
+  logger
   matrix
   mdl
   memory_profiler

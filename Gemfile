@@ -21,6 +21,7 @@ gemspec
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'appraisal'
+gem 'logger'
 gem 'matrix'
 gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
