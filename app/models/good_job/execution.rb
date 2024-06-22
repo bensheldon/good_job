@@ -378,6 +378,7 @@ module GoodJob
           current_thread.reset
           current_thread.execution = self
 
+          # Handle the case where the job was previously interrupted (SIGKILL) before it could finish
           existing_performed_at = performed_at
           if existing_performed_at
             current_thread.execution_interrupted = existing_performed_at
@@ -386,14 +387,15 @@ module GoodJob
               interrupt_error_string = self.class.format_error(GoodJob::InterruptError.new("Interrupted after starting perform at '#{existing_performed_at}'"))
               self.error = interrupt_error_string
               self.error_event = ERROR_EVENT_INTERRUPTED if self.class.error_event_migrated?
-              monotonic_duration = (::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - monotonic_start).seconds
 
               discrete_execution_attrs = {
                 error: interrupt_error_string,
                 finished_at: job_performed_at,
               }
               discrete_execution_attrs[:error_event] = GoodJob::ErrorEvents::ERROR_EVENT_ENUMS[GoodJob::ErrorEvents::ERROR_EVENT_INTERRUPTED] if self.class.error_event_migrated?
-              discrete_execution_attrs[:duration] = monotonic_duration if GoodJob::DiscreteExecution.monotonic_duration_migrated?
+              # We can't calculate the previous interrupted execution's duration, so leave it blank
+              discrete_execution_attrs[:duration] = nil if GoodJob::DiscreteExecution.monotonic_duration_migrated?
+
               discrete_executions.where(finished_at: nil).where.not(performed_at: nil).update_all(discrete_execution_attrs) # rubocop:disable Rails/SkipsModelValidations
             end
           end
