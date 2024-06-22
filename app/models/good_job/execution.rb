@@ -393,9 +393,6 @@ module GoodJob
                 finished_at: job_performed_at,
               }
               discrete_execution_attrs[:error_event] = GoodJob::ErrorEvents::ERROR_EVENT_ENUMS[GoodJob::ErrorEvents::ERROR_EVENT_INTERRUPTED] if self.class.error_event_migrated?
-              # We can't calculate the previous interrupted execution's duration, so leave it blank
-              discrete_execution_attrs[:duration] = nil if GoodJob::DiscreteExecution.monotonic_duration_migrated?
-
               discrete_executions.where(finished_at: nil).where.not(performed_at: nil).update_all(discrete_execution_attrs) # rubocop:disable Rails/SkipsModelValidations
             end
           end
