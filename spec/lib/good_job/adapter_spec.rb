@@ -27,7 +27,7 @@ RSpec.describe GoodJob::Adapter do
 
   describe '#enqueue' do
     it 'sets default values' do
-      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(true)
+      allow(GoodJob::Job).to receive(:discrete_support?).and_return(true)
 
       active_job = ExampleJob.new
       adapter.enqueue(active_job)
@@ -38,7 +38,7 @@ RSpec.describe GoodJob::Adapter do
         scheduled_at: be_within(1.second).of(Time.current)
       )
 
-      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(false)
+      allow(GoodJob::Job).to receive(:discrete_support?).and_return(false)
       active_job = ExampleJob.new
       adapter.enqueue(active_job)
 
@@ -129,7 +129,7 @@ RSpec.describe GoodJob::Adapter do
     end
 
     it 'sets default values' do
-      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(true)
+      allow(GoodJob::Job).to receive(:discrete_support?).and_return(true)
       active_job = ExampleJob.new
       adapter.enqueue_at(active_job, nil)
 
@@ -139,7 +139,7 @@ RSpec.describe GoodJob::Adapter do
         scheduled_at: be_within(1.second).of(Time.current)
       )
 
-      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(false)
+      allow(GoodJob::Job).to receive(:discrete_support?).and_return(false)
       active_job = ExampleJob.new
       adapter.enqueue_at(active_job, nil)
 
@@ -181,7 +181,7 @@ RSpec.describe GoodJob::Adapter do
     end
 
     it 'sets default values' do
-      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(true)
+      allow(GoodJob::Job).to receive(:discrete_support?).and_return(true)
       active_job = ExampleJob.new
       adapter.enqueue_all([active_job])
 
@@ -191,7 +191,7 @@ RSpec.describe GoodJob::Adapter do
         scheduled_at: be_within(1.second).of(Time.current)
       )
 
-      allow(GoodJob::BaseExecution).to receive(:discrete_support?).and_return(false)
+      allow(GoodJob::Job).to receive(:discrete_support?).and_return(false)
       active_job = ExampleJob.new
       adapter.enqueue_at(active_job, nil)
 

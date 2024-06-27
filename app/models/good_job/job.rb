@@ -201,7 +201,7 @@ module GoodJob
         active_job.executions = (active_job.executions || 0) + 1
 
         begin
-          error_class, error_message = execution.error.split(GoodJob::Execution::ERROR_MESSAGE_SEPARATOR).map(&:strip)
+          error_class, error_message = execution.error.split(ERROR_MESSAGE_SEPARATOR).map(&:strip)
           error = error_class.constantize.new(error_message)
         rescue StandardError
           error = StandardError.new(execution.error)

@@ -27,7 +27,7 @@ module GoodJob
     def error_event
       return unless self.class.columns_hash['error_event']
 
-      enum = super
+      enum = read_attribute(:error_event)
       return unless enum
 
       ERROR_EVENT_ENUMS.key(enum)
@@ -39,7 +39,7 @@ module GoodJob
       enum = ERROR_EVENT_ENUMS[event]
       raise(ArgumentError, "Invalid error_event: #{event}") if event && !enum
 
-      super(enum)
+      write_attribute(:error_event, enum)
     end
   end
 end
