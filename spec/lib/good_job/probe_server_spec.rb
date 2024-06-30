@@ -12,7 +12,7 @@ RSpec.describe GoodJob::ProbeServer do
 
     it "responds to the expected routes" do
       get "/"
-      expect(last_response.status).to eq 200
+      expect(last_response).to have_http_status :ok
       expect(last_response.body).to eq("OK")
 
       get "/status"
@@ -25,7 +25,7 @@ RSpec.describe GoodJob::ProbeServer do
       expect(last_response.body).to eq("Not connected")
 
       get "/unimplemented_url"
-      expect(last_response.status).to eq 404
+      expect(last_response).to have_http_status :not_found
     end
   end
 

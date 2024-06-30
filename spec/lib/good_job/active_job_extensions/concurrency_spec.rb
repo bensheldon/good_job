@@ -129,7 +129,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         )
       end
 
-      it "will error and retry jobs if concurrency is exceeded" do
+      it "errors and retry jobs if concurrency is exceeded" do
         active_job = TestJob.perform_later(name: "Alice")
 
         performer = GoodJob::JobPerformer.new('*')

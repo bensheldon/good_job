@@ -148,11 +148,10 @@ module GoodJob
     # poll (using this interval) for new queued jobs to execute.
     # @return [Integer]
     def poll_interval
-      interval = (
+      interval =
         options[:poll_interval] ||
-          rails_config[:poll_interval] ||
-          env['GOOD_JOB_POLL_INTERVAL']
-      )
+        rails_config[:poll_interval] ||
+        env['GOOD_JOB_POLL_INTERVAL']
 
       if interval
         interval.to_i

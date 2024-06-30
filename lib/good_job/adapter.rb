@@ -92,7 +92,7 @@ module GoodJob
           executions = executions.select(&:persisted?) # prune unpersisted executions
 
           if execute_inline?
-            inline_executions = executions.select { |execution| (execution.scheduled_at.nil? || execution.scheduled_at <= Time.current) }
+            inline_executions = executions.select { |execution| execution.scheduled_at.nil? || execution.scheduled_at <= Time.current }
             inline_executions.each(&:advisory_lock!)
           end
         end
