@@ -1,5 +1,18 @@
 # Changelog
 
+## [v3.29.5](https://github.com/bensheldon/good_job/tree/v3.29.5) (2024-06-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.4...v3.29.5)
+
+**Fixed bugs:**
+
+- fix: require rack/handler for rack \>= 3.1.x [\#1383](https://github.com/bensheldon/good_job/pull/1383) ([shouichi](https://github.com/shouichi))
+
+**Closed issues:**
+
+- Unexpected behavior of calling perform\_now inside another job [\#1379](https://github.com/bensheldon/good_job/issues/1379)
+- \[BUG\] \[Dashboard\] count isn't following by the filter [\#1376](https://github.com/bensheldon/good_job/issues/1376)
+
 ## [v3.29.4](https://github.com/bensheldon/good_job/tree/v3.29.4) (2024-06-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.3...v3.29.4)
