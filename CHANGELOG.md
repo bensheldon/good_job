@@ -1,5 +1,21 @@
 # Changelog
 
+## [v3.30.0](https://github.com/bensheldon/good_job/tree/v3.30.0) (2024-07-05)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.5...v3.30.0)
+
+**Implemented enhancements:**
+
+- Added GoodJob::DiscreteExecution\#duration column [\#1374](https://github.com/bensheldon/good_job/pull/1374) ([SebouChu](https://github.com/SebouChu))
+
+**Closed issues:**
+
+- Job retried infinitely  [\#1384](https://github.com/bensheldon/good_job/issues/1384)
+
+**Merged pull requests:**
+
+- Use newer syntax in documentation for `wait` config on `retry` [\#1380](https://github.com/bensheldon/good_job/pull/1380) ([benoittgt](https://github.com/benoittgt))
+
 ## [v3.29.5](https://github.com/bensheldon/good_job/tree/v3.29.5) (2024-06-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.4...v3.29.5)
