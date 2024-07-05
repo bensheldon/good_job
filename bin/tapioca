@@ -24,4 +24,5 @@ end
 require "rubygems"
 require "bundler/setup"
 
+ENV['BOOTSNAP_CACHE_DIR'] ||= File.expand_path("../demo/tmp/cache/bootsnap", __dir__)
 load Gem.bin_path("tapioca", "tapioca")

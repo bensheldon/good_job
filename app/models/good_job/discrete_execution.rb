@@ -28,6 +28,13 @@ module GoodJob # :nodoc:
       false
     end
 
+    def self.monotonic_duration_migrated?
+      return true if columns_hash["duration"].present?
+
+      migration_pending_warning!
+      false
+    end
+
     def number
       serialized_params.fetch('executions', 0) + 1
     end
@@ -37,9 +44,13 @@ module GoodJob # :nodoc:
       created_at - scheduled_at
     end
 
-    # Time between when this job started and finished
+    # Monotonic time between when this job started and finished
     def runtime_latency
-      (finished_at || Time.current) - performed_at if performed_at
+      if self.class.monotonic_duration_migrated?
+        duration
+      elsif performed_at
+        (finished_at || Time.current) - performed_at
+      end
     end
 
     def last_status_at
