@@ -198,11 +198,11 @@ en:
             unit: ''
     performances:
       index:
-        average_runtime: Average runtime
+        average_duration: Average duration
         executions: Executions
         job_class: Job class
-        maximum_runtime: Maximum runtime
-        minimum_runtime: Minimum runtime
+        maximum_duration: Maximum duration
+        minimum_duration: Minimum duration
         title: Performance
     processes:
       index:
@@ -250,3 +250,5 @@ en:
       running: Running
       scheduled: Scheduled
       succeeded: Succeeded
+  shared:
+    needs_migration: Please run GoodJob migrations.

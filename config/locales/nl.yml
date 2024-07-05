@@ -196,6 +196,14 @@ nl:
             thousand: K
             trillion: T
             unit: ''
+    performances:
+      index:
+        average_duration: Gemiddelde duur
+        executions: Executies
+        job_class: Functie klasse
+        maximum_duration: Maximale duur
+        minimum_duration: Minimale duur
+        title: Prestatie
     processes:
       index:
         cron_enabled: Cron ingeschakeld
@@ -225,6 +233,7 @@ nl:
         jobs: Taken
         live_poll: Live Poll
         name: "GoodJob 👍"
+        performances: Prestatie
         processes: Processen
         theme:
           auto: Auto
@@ -241,3 +250,5 @@ nl:
       running: Rennen
       scheduled: Gepland
       succeeded: Geslaagd
+  shared:
+    needs_migration: Voer GoodJob-migraties uit.
