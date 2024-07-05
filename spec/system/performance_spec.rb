@@ -12,7 +12,7 @@ describe 'Performance Page', :js do
   it 'renders properly' do
     visit good_job.root_path
     click_link 'Performance'
-    expect(page).to have_selector 'h2', text: 'Performance'
+    expect(page).to have_css 'h2', text: 'Performance'
 
     expect(page).to have_content 'ExampleJob'
   end
