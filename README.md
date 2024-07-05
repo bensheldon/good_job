@@ -848,7 +848,7 @@ Active Job can be configured to retry an infinite number of times, with a polyno
 
 ```ruby
 class ApplicationJob < ActiveJob::Base
-  retry_on StandardError, wait: ::polynomially_longer, attempts: Float::INFINITY
+  retry_on StandardError, wait: :polynomially_longer, attempts: Float::INFINITY
   # ...
 end
 ```
@@ -868,7 +868,7 @@ When using `retry_on` with an infinite number of retries, exceptions will never 
 
 ```ruby
 class ApplicationJob < ActiveJob::Base
-  retry_on StandardError, wait: ::polynomially_longer, attempts: Float::INFINITY
+  retry_on StandardError, wait: :polynomially_longer, attempts: Float::INFINITY
 
   retry_on SpecialError, attempts: 5 do |_job, exception|
     Rails.error.report(exception)
@@ -894,7 +894,7 @@ You can use an initializer to configure `ActionMailer::MailDeliveryJob`, for exa
 
 ```ruby
 # config/initializers/good_job.rb
-ActionMailer::MailDeliveryJob.retry_on StandardError, wait: ::polynomially_longer, attempts: Float::INFINITY
+ActionMailer::MailDeliveryJob.retry_on StandardError, wait: :polynomially_longer, attempts: Float::INFINITY
 
 # With Sentry (or Bugsnag, Airbrake, Honeybadger, etc.)
 ActionMailer::MailDeliveryJob.around_perform do |_job, block|
