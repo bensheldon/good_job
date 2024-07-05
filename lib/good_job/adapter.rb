@@ -62,6 +62,7 @@ module GoodJob
             if GoodJob::Execution.discrete_support?
               execution.make_discrete
               execution.scheduled_at = current_time if execution.scheduled_at == execution.created_at
+              execution.scheduled_at = nil if active_job.respond_to?(:good_job_paused) && active_job.good_job_paused
             end
 
             execution.created_at = current_time
@@ -92,7 +93,7 @@ module GoodJob
           executions = executions.select(&:persisted?) # prune unpersisted executions
 
           if execute_inline?
-            inline_executions = executions.select { |execution| (execution.scheduled_at.nil? || execution.scheduled_at <= Time.current) }
+            inline_executions = executions.select { |execution| execution.scheduled_at.present? && execution.scheduled_at <= Time.current }
             inline_executions.each(&:advisory_lock!)
           end
         end
@@ -148,14 +149,14 @@ module GoodJob
     # @param timestamp [Integer, nil] the epoch time to perform the job
     # @return [GoodJob::Execution]
     def enqueue_at(active_job, timestamp)
-      scheduled_at = timestamp ? Time.zone.at(timestamp) : nil
+      scheduled_at = timestamp ? Time.zone.at(timestamp) : Time.current
 
       # If there is a currently open Bulk in the current thread, direct the
       # job there to be enqueued using enqueue_all
       return if GoodJob::Bulk.capture(active_job, queue_adapter: self)
 
       Rails.application.executor.wrap do
-        will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
+        will_execute_inline = execute_inline? && (scheduled_at.present? && scheduled_at <= Time.current)
         will_retry_inline = will_execute_inline && CurrentThread.execution&.active_job_id == active_job.job_id && !CurrentThread.retry_now
 
         if will_retry_inline
@@ -173,7 +174,7 @@ module GoodJob
             result = @capsule.tracker.register { execution.perform(lock_id: @capsule.tracker.id_for_lock) }
 
             retried_execution = result.retried
-            while retried_execution && (retried_execution.scheduled_at.nil? || retried_execution.scheduled_at <= Time.current)
+            while retried_execution && (retried_execution.scheduled_at.present? && retried_execution.scheduled_at <= Time.current)
               execution = retried_execution
               result = @capsule.tracker.register { execution.perform(lock_id: @capsule.tracker.id_for_lock) }
               retried_execution = result.retried

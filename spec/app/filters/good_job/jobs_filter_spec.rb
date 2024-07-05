@@ -12,6 +12,7 @@ RSpec.describe GoodJob::JobsFilter do
 
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
     ExampleJob.set(queue: 'cron').perform_later
+
     GoodJob::Job.order(created_at: :asc).last.update!(cron_key: "frequent_cron")
 
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
@@ -20,6 +21,7 @@ RSpec.describe GoodJob::JobsFilter do
 
     Timecop.travel 1.hour.ago
     ExampleJob.set(queue: 'elephants').perform_later(ExampleJob::DEAD_TYPE)
+
     5.times do
       Timecop.travel 5.minutes
       GoodJob.perform_inline

@@ -722,7 +722,7 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
 - [`GoodJob::Batch`](app/models/good_job/batch.rb) has a number of assignable attributes and methods:
 
 ```ruby
-batch = GoodJob::Batch.new
+batch = GoodJob::Batch.new # or .new(paused: true) to pause all jobs added to the batch
 batch.description = "My batch"
 batch.on_finish = "MyBatchCallbackJob" # Callback job when all jobs have finished
 batch.on_success = "MyBatchCallbackJob" # Callback job when/if all jobs have succeeded
@@ -734,12 +734,14 @@ batch.add do
   MyJob.perform_later
 end
 batch.enqueue
+batch.unpause # Unpauses all jobs within the batch, allowing them to be executed
 
 batch.discarded? # => Boolean
 batch.discarded_at # => <DateTime>
 batch.finished? # => Boolean
 batch.finished_at # => <DateTime>
 batch.succeeded? # => Boolean
+batch.paused? # => Boolean // TODO: expand on what this method does
 batch.active_jobs # => Array of ActiveJob::Base-inherited jobs that are part of the batch
 
 batch = GoodJob::Batch.find(batch.id)
@@ -830,6 +832,10 @@ end
 
 GoodJob::Batch.enqueue(on_finish: BatchJob)
 ```
+
+#### Pausing batches
+
+// TODO: document how to pause/unpause a batch (potentially create as an entirely separate section about pausing things?)
 
 #### Other batch details
 

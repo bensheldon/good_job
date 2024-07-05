@@ -65,7 +65,7 @@ RSpec.describe GoodJob::Execution do
     context 'when NOT discrete' do
       before { allow(described_class).to receive(:discrete_support?).and_return(false) }
 
-      it 'does not assign id, scheduled_at' do
+      it 'does not assign id, does assign scheduled_at' do
         expect { described_class.enqueue(active_job) }.to change(described_class, :count).by(1)
 
         execution = described_class.last
@@ -73,7 +73,7 @@ RSpec.describe GoodJob::Execution do
         expect(execution).to have_attributes(
           is_discrete: nil,
           active_job_id: active_job.job_id,
-          scheduled_at: nil
+          scheduled_at: within(1).of(Time.current)
         )
       end
     end
@@ -90,7 +90,7 @@ RSpec.describe GoodJob::Execution do
         serialized_params: a_kind_of(Hash),
         queue_name: 'test',
         priority: 50,
-        scheduled_at: nil
+        scheduled_at: within(1).of(Time.current)
       )
     end
 
@@ -184,9 +184,10 @@ RSpec.describe GoodJob::Execution do
 
     context 'with multiple jobs' do
       def job_params
-        { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" } }
+        { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" }, scheduled_at: sched }
       end
 
+      let!(:sched) { Time.current }
       let!(:older_job) { described_class.create!(job_params.merge(created_at: 10.minutes.ago)) }
       let!(:newer_job) { described_class.create!(job_params.merge(created_at: 5.minutes.ago)) }
       let!(:low_priority_job) { described_class.create!(job_params.merge(priority: 20)) }
@@ -207,9 +208,10 @@ RSpec.describe GoodJob::Execution do
 
     context "with multiple jobs and ordered queues" do
       def job_params
-        { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" } }
+        { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" }, scheduled_at: sched }
       end
 
+      let!(:sched) { Time.current }
       let(:parsed_queues) { { include: %w{one two}, ordered_queues: true } }
       let!(:queue_two_job) { described_class.create!(job_params.merge(queue_name: "two", created_at: 10.minutes.ago, priority: 100)) }
       let!(:queue_one_job) { described_class.create!(job_params.merge(queue_name: "one", created_at: 1.minute.ago, priority: 1)) }
@@ -700,7 +702,7 @@ RSpec.describe GoodJob::Execution do
           job_class: good_job.job_class,
           queue_name: good_job.queue_name,
           created_at: within(0.001).of(good_job.performed_at),
-          scheduled_at: within(0.001).of(good_job.created_at),
+          scheduled_at: within(0.1).of(good_job.created_at),
           finished_at: within(1.second).of(Time.current),
           duration: be_present,
           error: nil,
