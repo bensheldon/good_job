@@ -16,29 +16,16 @@ module GoodJob
     # Raised when Active Job data cannot be deserialized
     ActiveJobDeserializationError = Class.new(StandardError)
 
-    class << self
-      delegate :table_name, to: GoodJob::Execution
-
-      def table_name=(_value)
-        raise NotImplementedError, 'Assign GoodJob::Execution.table_name directly'
-      end
-    end
-
-    self.primary_key = 'active_job_id'
-    self.advisory_lockable_column = 'active_job_id'
+    self.table_name = 'good_jobs'
+    self.advisory_lockable_column = 'id'
     self.implicit_order_column = 'created_at'
 
     belongs_to :batch, class_name: 'GoodJob::BatchRecord', inverse_of: :jobs, optional: true
     belongs_to :locked_by_process, class_name: "GoodJob::Process", foreign_key: :locked_by_id, inverse_of: :locked_jobs, optional: true
-    has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
-    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
+    has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job, dependent: :delete_all # rubocop:disable Rails/HasManyOrHasOneDependent
+    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job, dependent: :delete_all # rubocop:disable Rails/HasManyOrHasOneDependent
 
-    after_destroy lambda {
-      GoodJob::DiscreteExecution.where(active_job_id: active_job_id).delete_all if discrete? # TODO: move into association `dependent: :delete_all` after v4
-    }
-
-    # Only the most-recent unretried execution represents a "Job"
-    default_scope { where(retried_good_job_id: nil) }
+    before_create -> { self.id = active_job_id }, if: -> { active_job_id.present? }
 
     # Get Jobs finished before the given timestamp.
     # @!method finished_before(timestamp)
@@ -64,50 +51,9 @@ module GoodJob
 
     scope :unfinished_undiscrete, -> { where(finished_at: nil, retried_good_job_id: nil, is_discrete: [nil, false]) }
 
-    # The job's Active Job UUID
-    # @return [String]
-    def id
-      active_job_id
-    end
-
-    # Override #reload to add a custom scope to ensure the reloaded record is the head execution
-    # @return [Job]
-    def reload(options = nil)
-      self.class.connection.clear_query_cache
-
-      # override with the `where(retried_good_job_id: nil)` scope
-      override_query = self.class.where(retried_good_job_id: nil)
-      fresh_object =
-        if options && options[:lock]
-          self.class.unscoped { override_query.lock(options[:lock]).find(id) }
-        else
-          self.class.unscoped { override_query.find(id) }
-        end
-
-      @attributes = fresh_object.instance_variable_get(:@attributes)
-      @new_record = false
-      @previously_new_record = false
-      self
-    end
-
-    # This job's most recent {Execution}
-    # @param reload [Booelan] whether to reload executions
-    # @return [Execution]
-    def head_execution(reload: false)
-      executions.reload if reload
-      executions.load # memoize the results
-      executions.last
-    end
-
-    # This job's initial/oldest {Execution}
-    # @return [Execution]
-    def tail_execution
-      executions.first
-    end
-
     # The number of times this job has been executed, according to Active Job's serialized state.
     # @return [Numeric]
-    def executions_count
+    def active_job_executions_count
       aj_count = serialized_params.fetch('executions', 0)
       # The execution count within serialized_params is not updated
       # once the underlying execution has been executed.
@@ -189,33 +135,33 @@ module GoodJob
     # @return [ActiveJob::Base]
     def retry_job
       with_advisory_lock do
-        execution = head_execution(reload: true)
-        active_job = execution.active_job(ignore_deserialization_errors: true)
+        reload
+        active_job = self.active_job(ignore_deserialization_errors: true)
 
         raise ActiveJobDeserializationError if active_job.nil?
         raise AdapterNotGoodJobError unless active_job.class.queue_adapter.is_a? GoodJob::Adapter
-        raise ActionForStateMismatchError if execution.finished_at.blank? || execution.error.blank?
+        raise ActionForStateMismatchError if finished_at.blank? || error.blank?
 
         # Update the executions count because the previous execution will not have been preserved
         # Do not update `exception_executions` because that comes from rescue_from's arguments
         active_job.executions = (active_job.executions || 0) + 1
 
         begin
-          error_class, error_message = execution.error.split(ERROR_MESSAGE_SEPARATOR).map(&:strip)
+          error_class, error_message = error.split(ERROR_MESSAGE_SEPARATOR).map(&:strip)
           error = error_class.constantize.new(error_message)
         rescue StandardError
-          error = StandardError.new(execution.error)
+          error = StandardError.new(error)
         end
 
         new_active_job = nil
         GoodJob::CurrentThread.within do |current_thread|
-          current_thread.execution = execution
+          current_thread.job = self
           current_thread.retry_now = true
 
-          execution.class.transaction(joinable: false, requires_new: true) do
+          self.class.transaction(joinable: false, requires_new: true) do
             new_active_job = active_job.retry_job(wait: 0, error: error)
-            execution.error_event = ERROR_EVENT_RETRIED if execution.error && execution.class.error_event_migrated?
-            execution.save!
+            self.error_event = ERROR_EVENT_RETRIED if error && self.class.error_event_migrated?
+            save!
           end
         end
 
@@ -244,11 +190,10 @@ module GoodJob
     # @return [void]
     def reschedule_job(scheduled_at = Time.current)
       with_advisory_lock do
-        execution = head_execution(reload: true)
+        reload
+        raise ActionForStateMismatchError if finished_at.present?
 
-        raise ActionForStateMismatchError if execution.finished_at.present?
-
-        execution.update(scheduled_at: scheduled_at)
+        update(scheduled_at: scheduled_at)
       end
     end
 
@@ -256,9 +201,7 @@ module GoodJob
     # @return [void]
     def destroy_job
       with_advisory_lock do
-        execution = head_execution(reload: true)
-
-        raise ActionForStateMismatchError if execution.finished_at.blank?
+        raise ActionForStateMismatchError if finished_at.blank?
 
         destroy
       end
@@ -270,27 +213,20 @@ module GoodJob
       attributes['id']
     end
 
-    # Utility method to test whether this job's underlying attributes represents its most recent execution.
-    # @return [Boolean]
-    def _head?
-      _execution_id == head_execution(reload: true).id
-    end
-
     private
 
     def _discard_job(message)
-      execution = head_execution(reload: true)
-      active_job = execution.active_job(ignore_deserialization_errors: true)
+      active_job = self.active_job(ignore_deserialization_errors: true)
 
-      raise ActionForStateMismatchError if execution.finished_at.present?
+      raise ActionForStateMismatchError if finished_at.present?
 
       job_error = GoodJob::Job::DiscardJobError.new(message)
 
-      update_execution = proc do
-        execution.update(
+      update_record = proc do
+        update(
           {
             finished_at: Time.current,
-            error: GoodJob::Execution.format_error(job_error),
+            error: self.class.format_error(job_error),
           }.tap do |attrs|
             attrs[:error_event] = ERROR_EVENT_DISCARDED if self.class.error_event_migrated?
           end
@@ -298,9 +234,9 @@ module GoodJob
       end
 
       if active_job.respond_to?(:instrument)
-        active_job.send :instrument, :discard, error: job_error, &update_execution
+        active_job.send :instrument, :discard, error: job_error, &update_record
       else
-        update_execution.call
+        update_record.call
       end
     end
   end

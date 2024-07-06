@@ -75,14 +75,14 @@ module GoodJob
           key = job.good_job_concurrency_key
           next if key.blank?
 
-          if CurrentThread.execution.blank? || CurrentThread.execution.active_job_id != job_id
+          if CurrentThread.job.blank? || CurrentThread.job.active_job_id != job_id
             logger.debug("Ignoring concurrency limits because the job is executed with `perform_now`.")
             next
           end
 
-          GoodJob::Execution.advisory_lock_key(key, function: "pg_advisory_lock") do
+          GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_lock") do
             if limit
-              allowed_active_job_ids = GoodJob::Execution.unfinished.where(concurrency_key: key)
+              allowed_active_job_ids = GoodJob::Job.unfinished.where(concurrency_key: key)
                                                          .advisory_locked
                                                          .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
                                                          .limit(limit).pluck(:active_job_id)
@@ -172,12 +172,12 @@ module GoodJob
         throttle = enqueue_throttle
         return on_enqueue&.call unless limit || throttle
 
-        GoodJob::Execution.advisory_lock_key(key, function: "pg_advisory_lock") do
+        GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_lock") do
           if limit
             enqueue_concurrency = if enqueue_limit
-                                    GoodJob::Execution.where(concurrency_key: key).unfinished.advisory_unlocked.count
+                                    GoodJob::Job.where(concurrency_key: key).unfinished.advisory_unlocked.count
                                   else
-                                    GoodJob::Execution.where(concurrency_key: key).unfinished.count
+                                    GoodJob::Job.where(concurrency_key: key).unfinished.count
                                   end
 
             # The job has not yet been enqueued, so check if adding it will go over the limit
