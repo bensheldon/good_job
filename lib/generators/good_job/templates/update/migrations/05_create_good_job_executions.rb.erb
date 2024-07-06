@@ -10,24 +10,25 @@ class CreateGoodJobExecutions < ActiveRecord::Migration<%= migration_version %>
       end
     end
 
-    create_table :good_job_executions, id: :uuid do |t|
-      t.timestamps
+    unless connection.table_exists?(:good_job_executions)
+      create_table :good_job_executions, id: :uuid do |t|
+        t.timestamps
 
-      t.uuid :active_job_id, null: false
-      t.text :job_class
-      t.text :queue_name
-      t.jsonb :serialized_params
-      t.datetime :scheduled_at
-      t.datetime :finished_at
-      t.text :error
+        t.uuid :active_job_id, null: false
+        t.text :job_class
+        t.text :queue_name
+        t.jsonb :serialized_params
+        t.datetime :scheduled_at
+        t.datetime :finished_at
+        t.text :error
 
-      t.index [:active_job_id, :created_at], name: :index_good_job_executions_on_active_job_id_and_created_at
-    end
+        t.index [:active_job_id, :created_at], name: :index_good_job_executions_on_active_job_id_and_created_at
+      end
 
-    change_table :good_jobs do |t|
-      t.boolean :is_discrete
-      t.integer :executions_count
-      t.text :job_class
+      # good_jobs table changes
+      add_column :good_jobs, :is_discrete,      :boolean
+      add_column :good_jobs, :executions_count, :integer
+      add_column :good_jobs, :job_class,        :text
     end
   end
 end
