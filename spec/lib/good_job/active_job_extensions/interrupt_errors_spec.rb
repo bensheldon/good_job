@@ -31,10 +31,6 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
     end
 
     context 'when discrete execution is enabled' do
-      before do
-        allow(GoodJob::Execution).to receive(:discrete_support?).and_return(true)
-      end
-
       it 'does not create a new execution' do
         TestJob.retry_on GoodJob::InterruptError
 

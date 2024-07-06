@@ -55,12 +55,6 @@ module GoodJob
     #   @return [GoodJob::Job, nil]
     thread_mattr_accessor :job
 
-    # # @!attribute [rw] executions
-    # #   @!scope class
-    # #   Execution
-    # #   @return [GoodJob::Execution, nil]
-    # thread_mattr_accessor :execution
-
     # @!attribute [rw] execution_interrupted
     #   @!scope class
     #   Execution Interrupted
@@ -96,7 +90,7 @@ module GoodJob
       end
     end
 
-    # @return [String] UUID of the currently executing GoodJob::Execution
+    # @return [String] UUID of the currently executing GoodJob::Job
     def self.active_job_id
       job&.active_job_id
     end

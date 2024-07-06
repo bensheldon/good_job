@@ -216,7 +216,6 @@ RSpec.describe 'Batches' do
       GoodJob.perform_inline
 
       expect(GoodJob::Job.count).to eq 3
-      expect(GoodJob::Execution.count).to eq 3
       expect(GoodJob::DiscreteExecution.count).to eq 5
       expect(GoodJob::Job.where(batch_id: batch.id).count).to eq 1
       expect(GoodJob::Job.where(batch_callback_id: batch.id).count).to eq 2
@@ -232,7 +231,6 @@ RSpec.describe 'Batches' do
       GoodJob.perform_inline
 
       expect(GoodJob::Job.count).to eq 3
-      expect(GoodJob::Execution.count).to eq 3
       expect(GoodJob::DiscreteExecution.count).to eq 5
       expect(GoodJob::Job.where(batch_id: batch.id).count).to eq 1
       expect(GoodJob::Job.where(batch_callback_id: batch.id).count).to eq 2

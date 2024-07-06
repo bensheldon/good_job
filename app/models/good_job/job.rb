@@ -18,9 +18,9 @@ module GoodJob
 
     belongs_to :batch, class_name: 'GoodJob::BatchRecord', inverse_of: :jobs, optional: true
     belongs_to :locked_by_process, class_name: "GoodJob::Process", foreign_key: :locked_by_id, inverse_of: :locked_jobs, optional: true
-    has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job, dependent: :delete_all
+    has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job, dependent: :delete_all
     # TODO: rename callers of discrete_execution to executions, but after v4 has some time to bake for cleaner diffs/patches
-    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job, dependent: :delete_all
+    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job, dependent: :delete_all
 
     before_create -> { self.id = active_job_id }, if: -> { active_job_id.present? }
 

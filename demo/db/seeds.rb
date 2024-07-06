@@ -44,8 +44,8 @@ loop do
   break if start_date > Time.current
 end
 
-GoodJob::Execution.insert_all(jobs_data)
-puts "Inserted #{jobs_data.size} job records for a total of #{GoodJob::Execution.count} job records."
+GoodJob::Job.insert_all(jobs_data)
+puts "Inserted #{jobs_data.size} job records for a total of #{GoodJob::Job.count} job records."
 
 puts ActiveJob::Base.queue_adapter
 

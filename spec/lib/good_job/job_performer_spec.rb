@@ -24,8 +24,8 @@ RSpec.describe GoodJob::JobPerformer do
     it 'records the active job id for the duration of #next' do
       job_performer = described_class.new('*')
 
-      execution = instance_double(GoodJob::Execution, perform: nil, active_job_id: '123')
-      allow(GoodJob::Execution).to receive(:perform_with_advisory_lock) do |&block|
+      execution = instance_double(GoodJob::Job, perform: nil, active_job_id: '123')
+      allow(GoodJob::Job).to receive(:perform_with_advisory_lock) do |&block|
         block.call(execution)
         expect(job_performer.performing_active_job_ids).to include('123')
 

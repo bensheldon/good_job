@@ -11,7 +11,7 @@ module GoodJob
       start_time = end_time - 1.day
       table_name = GoodJob::Job.table_name
 
-      count_query = Arel.sql(GoodJob::Execution.pg_or_jdbc_query(<<~SQL.squish))
+      count_query = Arel.sql(GoodJob::Job.pg_or_jdbc_query(<<~SQL.squish))
         SELECT *
         FROM generate_series(
           date_trunc('hour', $1::timestamp),
@@ -35,7 +35,7 @@ module GoodJob
         ActiveRecord::Relation::QueryAttribute.new('start_time', start_time, ActiveRecord::Type::DateTime.new),
         ActiveRecord::Relation::QueryAttribute.new('end_time', end_time, ActiveRecord::Type::DateTime.new),
       ]
-      executions_data = GoodJob::Execution.connection.exec_query(GoodJob::Execution.pg_or_jdbc_query(count_query), "GoodJob Dashboard Chart", binds)
+      executions_data = GoodJob::Job.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(count_query), "GoodJob Dashboard Chart", binds)
 
       queue_names = executions_data.reject { |d| d['count'].nil? }.map { |d| d['queue_name'] || BaseFilter::EMPTY }.uniq
       labels = []
