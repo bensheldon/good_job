@@ -12,6 +12,7 @@ RSpec.describe GoodJob::Job do
       scheduled_at: 10.minutes.from_now,
       queue_name: 'mice',
       priority: 10,
+      job_class: "TestJob",
       serialized_params: {
         'job_id' => active_job_id,
         'job_class' => 'TestJob',
@@ -471,7 +472,14 @@ RSpec.describe GoodJob::Job do
 
       context 'with multiple jobs' do
         def job_params
-          { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" } }
+          {
+            active_job_id: SecureRandom.uuid,
+            queue_name: "default",
+            priority: 0,
+            job_class: "TestJob",
+            scheduled_at: Time.current,
+            serialized_params: { job_class: "TestJob" },
+          }
         end
 
         let!(:older_job) { described_class.create!(job_params.merge(created_at: 10.minutes.ago)) }

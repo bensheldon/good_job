@@ -48,6 +48,12 @@ module GoodJob
 
     scope :unfinished_undiscrete, -> { where(finished_at: nil, retried_good_job_id: nil, is_discrete: [nil, false]) }
 
+    # TODO: it would be nice to enforce these values at the model
+    # validates :active_job_id, presence: true
+    # validates :scheduled_at, presence: true
+    # validates :job_class, presence: true
+    # validates :error_event, presence: true, if: -> { error.present? }
+
     # The most recent error message.
     # If the job has been retried, the error will be fetched from the previous {Execution} record.
     # @return [String]
