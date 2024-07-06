@@ -4,6 +4,8 @@ module GoodJob
   # Active Record model to share behavior between {Job} and {Execution} models
   # which both read out of the same table.
   class BaseExecution < BaseRecord
+    self.abstract_class = true
+
     include AdvisoryLockable
     include ErrorEvents
     include Filterable
