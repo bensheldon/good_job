@@ -14,7 +14,7 @@ RSpec.describe GoodJob::PerformancesController, type: :controller do
 
   describe '#index' do
     it 'renders the index page' do
-      get :index
+      get :show
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Performance')
     end

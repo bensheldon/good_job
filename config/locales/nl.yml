@@ -197,7 +197,7 @@ nl:
             trillion: T
             unit: ''
     performances:
-      index:
+      show:
         average_duration: Gemiddelde duur
         executions: Executies
         job_class: Functie klasse

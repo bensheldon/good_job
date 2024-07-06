@@ -197,7 +197,7 @@ fr:
             trillion: J
             unit: ''
     performances:
-      index:
+      show:
         average_duration: Durée moyenne
         executions: Exécutions
         job_class: Catégorie d'emplois

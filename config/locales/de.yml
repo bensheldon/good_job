@@ -197,7 +197,7 @@ de:
             trillion: T
             unit: ''
     performances:
-      index:
+      show:
         average_duration: Durchschnittliche Dauer
         executions: Hinrichtungen
         job_class: Berufsklasse

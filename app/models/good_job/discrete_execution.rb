@@ -28,11 +28,15 @@ module GoodJob # :nodoc:
       false
     end
 
-    def self.monotonic_duration_migrated?
+    def self.duration_interval_migrated?
       return true if columns_hash["duration"].present?
 
       migration_pending_warning!
       false
+    end
+
+    def self.duration_interval_usable?
+      duration_interval_migrated? && Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0.a')
     end
 
     def number
@@ -47,7 +51,7 @@ module GoodJob # :nodoc:
     # Monotonic time between when this job started and finished
     def runtime_latency
       # migrated and Rails greater than 6.1
-      if self.class.monotonic_duration_migrated? && Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0.a')
+      if self.class.duration_interval_usable?
         duration
       elsif performed_at
         (finished_at || Time.current) - performed_at

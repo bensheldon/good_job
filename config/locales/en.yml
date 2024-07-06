@@ -197,7 +197,7 @@ en:
             trillion: T
             unit: ''
     performances:
-      index:
+      show:
         average_duration: Average duration
         executions: Executions
         job_class: Job class

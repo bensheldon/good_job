@@ -197,7 +197,7 @@ ja:
             trillion: T
             unit: ''
     performances:
-      index:
+      show:
         average_duration: 平均所要時間
         executions: 処刑
         job_class: 職種

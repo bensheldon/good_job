@@ -223,7 +223,7 @@ uk:
             trillion: Трлн
             unit: ''
     performances:
-      index:
+      show:
         average_duration: Середня тривалість
         executions: Страти
         job_class: Клас роботи

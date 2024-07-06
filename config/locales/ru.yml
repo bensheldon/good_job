@@ -223,7 +223,7 @@ ru:
             trillion: Т
             unit: ''
     performances:
-      index:
+      show:
         average_duration: Средняя продолжительность
         executions: Казни
         job_class: Класс работы
