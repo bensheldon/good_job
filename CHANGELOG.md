@@ -1,5 +1,81 @@
 # Changelog
 
+## [v3.30.0](https://github.com/bensheldon/good_job/tree/v3.30.0) (2024-07-05)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.5...v3.30.0)
+
+**Implemented enhancements:**
+
+- Added GoodJob::DiscreteExecution\#duration column [\#1374](https://github.com/bensheldon/good_job/pull/1374) ([SebouChu](https://github.com/SebouChu))
+
+**Closed issues:**
+
+- Job retried infinitely  [\#1384](https://github.com/bensheldon/good_job/issues/1384)
+
+**Merged pull requests:**
+
+- Use newer syntax in documentation for `wait` config on `retry` [\#1380](https://github.com/bensheldon/good_job/pull/1380) ([benoittgt](https://github.com/benoittgt))
+
+## [v3.29.5](https://github.com/bensheldon/good_job/tree/v3.29.5) (2024-06-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.4...v3.29.5)
+
+**Fixed bugs:**
+
+- fix: require rack/handler for rack \>= 3.1.x [\#1383](https://github.com/bensheldon/good_job/pull/1383) ([shouichi](https://github.com/shouichi))
+
+**Closed issues:**
+
+- Unexpected behavior of calling perform\_now inside another job [\#1379](https://github.com/bensheldon/good_job/issues/1379)
+- \[BUG\] \[Dashboard\] count isn't following by the filter [\#1376](https://github.com/bensheldon/good_job/issues/1376)
+
+## [v3.29.4](https://github.com/bensheldon/good_job/tree/v3.29.4) (2024-06-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.3...v3.29.4)
+
+**Fixed bugs:**
+
+- Fix display of empty array in flash messages [\#1377](https://github.com/bensheldon/good_job/pull/1377) ([andynu](https://github.com/andynu))
+- Fix counts in tab links with filters [\#1373](https://github.com/bensheldon/good_job/pull/1373) ([SebouChu](https://github.com/SebouChu))
+
+## [v3.29.3](https://github.com/bensheldon/good_job/tree/v3.29.3) (2024-06-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.2...v3.29.3)
+
+**Fixed bugs:**
+
+- Synchronize `CapsuleTracker#renew` [\#1369](https://github.com/bensheldon/good_job/pull/1369) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- docs: Basic auth route mount example improvement [\#1368](https://github.com/bensheldon/good_job/issues/1368)
+- Tips for debugging/optimizing slow dashboard? \(45 second response time\) [\#1366](https://github.com/bensheldon/good_job/issues/1366)
+
+## [v3.29.2](https://github.com/bensheldon/good_job/tree/v3.29.2) (2024-05-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.1...v3.29.2)
+
+**Fixed bugs:**
+
+- Fix label modifications on job instance polluting labels on job class [\#1355](https://github.com/bensheldon/good_job/pull/1355) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- `#good_job_labels` retains values across job instances [\#1354](https://github.com/bensheldon/good_job/issues/1354)
+
+## [v3.29.1](https://github.com/bensheldon/good_job/tree/v3.29.1) (2024-05-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.0...v3.29.1)
+
+**Fixed bugs:**
+
+- Fix AdvisoryLockable using wrong `advisory_lockable_column` attribute when aborting `create_with_advisory_lock` [\#1360](https://github.com/bensheldon/good_job/pull/1360) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Warn on unapplied migrations [\#1361](https://github.com/bensheldon/good_job/issues/1361)
+- Undefined `GoodJob::Process.advisory_lockable_column` [\#1358](https://github.com/bensheldon/good_job/issues/1358)
+
 ## [v3.29.0](https://github.com/bensheldon/good_job/tree/v3.29.0) (2024-05-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.3...v3.29.0)

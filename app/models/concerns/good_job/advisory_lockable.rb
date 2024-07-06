@@ -133,7 +133,7 @@ module GoodJob
 
       after_create lambda {
         advisory_lock || begin
-          errors.add(self.class.advisory_lockable_column, "Failed to acquire advisory lock: #{lockable_key}")
+          errors.add(self.class._advisory_lockable_column, "Failed to acquire advisory lock: #{lockable_key}")
           raise ActiveRecord::RecordInvalid # do not reference the record because it can cause I18n missing translation error
         end
       }, if: :create_with_advisory_lock
