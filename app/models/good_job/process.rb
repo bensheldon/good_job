@@ -33,13 +33,9 @@ module GoodJob # :nodoc:
     # @!scope class
     # @return [ActiveRecord::Relation]
     scope :active, (lambda do
-      if lock_type_migrated?
-        query = joins_advisory_locks
-        query.where(lock_type: LOCK_TYPE_ENUMS[LOCK_TYPE_ADVISORY]).advisory_locked
-          .or(query.where(lock_type: nil).where(arel_table[:updated_at].gt(EXPIRED_INTERVAL.ago)))
-      else
-        advisory_locked
-      end
+      query = joins_advisory_locks
+      query.where(lock_type: LOCK_TYPE_ENUMS[LOCK_TYPE_ADVISORY]).advisory_locked
+        .or(query.where(lock_type: nil).where(arel_table[:updated_at].gt(EXPIRED_INTERVAL.ago)))
     end)
 
     # Processes that are inactive and unlocked (e.g. SIGKILLed)
@@ -47,13 +43,9 @@ module GoodJob # :nodoc:
     # @!scope class
     # @return [ActiveRecord::Relation]
     scope :inactive, (lambda do
-      if lock_type_migrated?
-        query = joins_advisory_locks
-        query.where(lock_type: LOCK_TYPE_ENUMS[LOCK_TYPE_ADVISORY]).advisory_unlocked
-          .or(query.where(lock_type: nil).where(arel_table[:updated_at].lt(EXPIRED_INTERVAL.ago)))
-      else
-        advisory_unlocked
-      end
+      query = joins_advisory_locks
+      query.where(lock_type: LOCK_TYPE_ENUMS[LOCK_TYPE_ADVISORY]).advisory_unlocked
+        .or(query.where(lock_type: nil).where(arel_table[:updated_at].lt(EXPIRED_INTERVAL.ago)))
     end)
 
     # Deletes all inactive process records.
@@ -64,11 +56,6 @@ module GoodJob # :nodoc:
       end
     end
 
-    # @return [Boolean]
-    def self.lock_type_migrated?
-      columns_hash["lock_type"].present?
-    end
-
     def self.create_record(id:, with_advisory_lock: false)
       attributes = {
         id: id,
@@ -76,7 +63,7 @@ module GoodJob # :nodoc:
       }
       if with_advisory_lock
         attributes[:create_with_advisory_lock] = true
-        attributes[:lock_type] = LOCK_TYPE_ADVISORY if lock_type_migrated?
+        attributes[:lock_type] = LOCK_TYPE_ADVISORY
       end
       create!(attributes)
     end

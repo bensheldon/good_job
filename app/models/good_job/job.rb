@@ -2,10 +2,6 @@
 
 module GoodJob
   # Active Record model that represents an +ActiveJob+ job.
-  # There is not a table in the database whose discrete rows represents "Jobs".
-  # The +good_jobs+ table is a table of individual {GoodJob::Execution}s that share the same +active_job_id+.
-  # A single row from the +good_jobs+ table of executions is fetched to represent a Job.
-  #
   class Job < BaseExecution
     # Raised when an inappropriate action is applied to a Job based on its state.
     ActionForStateMismatchError = Class.new(StandardError)
@@ -22,8 +18,9 @@ module GoodJob
 
     belongs_to :batch, class_name: 'GoodJob::BatchRecord', inverse_of: :jobs, optional: true
     belongs_to :locked_by_process, class_name: "GoodJob::Process", foreign_key: :locked_by_id, inverse_of: :locked_jobs, optional: true
-    has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job, dependent: :delete_all # rubocop:disable Rails/HasManyOrHasOneDependent
-    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job, dependent: :delete_all # rubocop:disable Rails/HasManyOrHasOneDependent
+    has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job, dependent: :delete_all
+    # TODO: rename callers of discrete_execution to executions, but after v4 has some time to bake for cleaner diffs/patches
+    has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job, dependent: :delete_all
 
     before_create -> { self.id = active_job_id }, if: -> { active_job_id.present? }
 
@@ -50,25 +47,6 @@ module GoodJob
     scope :discarded, -> { finished.where.not(error: nil) }
 
     scope :unfinished_undiscrete, -> { where(finished_at: nil, retried_good_job_id: nil, is_discrete: [nil, false]) }
-
-    # The number of times this job has been executed, according to Active Job's serialized state.
-    # @return [Numeric]
-    def active_job_executions_count
-      aj_count = serialized_params.fetch('executions', 0)
-      # The execution count within serialized_params is not updated
-      # once the underlying execution has been executed.
-      if status.in? [:discarded, :succeeded, :running]
-        aj_count + 1
-      else
-        aj_count
-      end
-    end
-
-    # The number of times this job has been executed, according to the number of GoodJob {Execution} records.
-    # @return [Numeric]
-    def preserved_executions_count
-      executions.size
-    end
 
     # The most recent error message.
     # If the job has been retried, the error will be fetched from the previous {Execution} record.
@@ -99,6 +77,10 @@ module GoodJob
     # @return [String]
     def display_name
       job_class
+    end
+
+    def executions_count
+      super || 0
     end
 
     # Tests whether the job is being executed right now.
@@ -160,7 +142,7 @@ module GoodJob
 
           self.class.transaction(joinable: false, requires_new: true) do
             new_active_job = active_job.retry_job(wait: 0, error: error)
-            self.error_event = ERROR_EVENT_RETRIED if error && self.class.error_event_migrated?
+            self.error_event = ERROR_EVENT_RETRIED if error
             save!
           end
         end
@@ -224,12 +206,9 @@ module GoodJob
 
       update_record = proc do
         update(
-          {
-            finished_at: Time.current,
-            error: self.class.format_error(job_error),
-          }.tap do |attrs|
-            attrs[:error_event] = ERROR_EVENT_DISCARDED if self.class.error_event_migrated?
-          end
+          finished_at: Time.current,
+          error: self.class.format_error(job_error),
+          error_event: ERROR_EVENT_DISCARDED
         )
       end
 

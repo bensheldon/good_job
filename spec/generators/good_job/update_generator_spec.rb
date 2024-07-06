@@ -24,14 +24,15 @@ describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
         run_in_example_app 'rails db:migrate'
       end
 
+      # TODO: update this when a new migration exists in v4
       # Check that `GoodJob.migrated?` is updated
-      expect(GoodJob.migrated?).to be true
-      quiet do
-        run_in_example_app 'rails db:rollback'
-        expect(GoodJob.migrated?).to be false
-        run_in_example_app 'rails db:migrate'
-      end
-      expect(GoodJob.migrated?).to be true
+      # expect(GoodJob.migrated?).to be true
+      # quiet do
+      #   run_in_example_app 'rails db:rollback'
+      #   expect(GoodJob.migrated?).to be false
+      #   run_in_example_app 'rails db:migrate'
+      # end
+      # expect(GoodJob.migrated?).to be true
     end
   end
 

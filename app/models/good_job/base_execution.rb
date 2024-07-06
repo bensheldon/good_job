@@ -74,20 +74,12 @@ module GoodJob
       end
     end
 
-    belongs_to :batch, class_name: 'GoodJob::BatchRecord', optional: true, inverse_of: :executions
-    has_many :discrete_executions, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: 'active_job_id', inverse_of: :execution # rubocop:disable Rails/HasManyOrHasOneDependent
-
     # With a given class name
     # @!method job_class(name)
     # @!scope class
     # @param name [String] Job class name
     # @return [ActiveRecord::Relation]
     scope :job_class, ->(name) { where(params_job_class.eq(name)) }
-
-    after_destroy lambda {
-      GoodJob::DiscreteExecution.where(active_job_id: active_job_id).delete_all if discrete? # TODO: move into association `dependent: :delete_all` after v4
-      self.class.active_job_id(active_job_id).delete_all
-    }, if: -> { @_destroy_job }
 
     # Get jobs with given ActiveJob ID
     # @!method active_job_id(active_job_id)
@@ -228,65 +220,10 @@ module GoodJob
       def discrete_support?
         true
       end
-
-      def error_event_migrated?
-        return true if columns_hash["error_event"].present?
-
-        migration_pending_warning!
-        false
-      end
-
-      def cron_indices_migrated?
-        return true if connection.index_name_exists?(:good_jobs, :index_good_jobs_on_cron_key_and_created_at_cond)
-
-        migration_pending_warning!
-        false
-      end
-
-      def labels_migrated?
-        return true if columns_hash["labels"].present?
-
-        migration_pending_warning!
-        false
-      end
-
-      def labels_indices_migrated?
-        return true if connection.index_name_exists?(:good_jobs, :index_good_jobs_on_labels)
-
-        migration_pending_warning!
-        false
-      end
-
-      def active_job_id_index_removal_migrated?
-        return true unless connection.index_name_exists?(:good_jobs, :index_good_jobs_on_active_job_id)
-
-        migration_pending_warning!
-        false
-      end
-
-      def candidate_lookup_index_migrated?
-        return true if connection.index_name_exists?(:good_jobs, :index_good_job_jobs_for_candidate_lookup)
-
-        migration_pending_warning!
-        false
-      end
-
-      def process_lock_migrated?
-        return true if connection.index_name_exists?(:good_job_executions, :index_good_job_executions_on_process_id_and_created_at)
-
-        migration_pending_warning!
-        false
-      end
-    end
-
-    # The ActiveJob job class, as a string
-    # @return [String]
-    def job_class
-      discrete? ? attributes['job_class'] : serialized_params['job_class']
     end
 
     def discrete?
-      self.class.discrete_support? && is_discrete?
+      is_discrete?
     end
 
     # Build an ActiveJob instance and deserialize the arguments, using `#active_job_data`.
@@ -304,30 +241,33 @@ module GoodJob
       raise unless ignore_deserialization_errors
     end
 
-    def self.build_for_enqueue(active_job, overrides = {})
-      new(**enqueue_args(active_job, overrides))
+    def self.build_for_enqueue(active_job, scheduled_at: nil)
+      new(**enqueue_args(active_job, scheduled_at: scheduled_at))
     end
 
     # Construct arguments for GoodJob::Execution from an ActiveJob instance.
-    def self.enqueue_args(active_job, overrides = {})
-      if active_job.priority && GoodJob.configuration.smaller_number_is_higher_priority == false
-        GoodJob.deprecator.warn(<<~DEPRECATION)
-          The next major version of GoodJob (v4.0) will change job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority.
-            To opt-in to this behavior now, set `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or application.rb.
-        DEPRECATION
-      end
-
+    def self.enqueue_args(active_job, scheduled_at: nil)
       execution_args = {
         id: active_job.job_id,
         active_job_id: active_job.job_id,
+        job_class: active_job.class.name,
         queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
         priority: active_job.priority || DEFAULT_PRIORITY,
         serialized_params: active_job.serialize,
+        created_at: Time.current,
       }
-      execution_args[:scheduled_at] = Time.zone.at(active_job.scheduled_at) if active_job.scheduled_at
+
+      execution_args[:scheduled_at] = if scheduled_at
+                                        scheduled_at
+                                      elsif active_job.scheduled_at
+                                        Time.zone.at(active_job.scheduled_at)
+                                      else
+                                        execution_args[:created_at]
+                                      end
+
       execution_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
 
-      if active_job.respond_to?(:good_job_labels) && active_job.good_job_labels.any? && labels_migrated?
+      if active_job.respond_to?(:good_job_labels) && active_job.good_job_labels.any?
         labels = active_job.good_job_labels.dup
         labels.map! { |label| label.to_s.strip.presence }
         labels.tap(&:compact!).tap(&:uniq!)
@@ -338,21 +278,17 @@ module GoodJob
       current_job = CurrentThread.job
 
       if reenqueued_current_job
-        if GoodJob::BatchRecord.migrated?
-          execution_args[:batch_id] = current_job.batch_id
-          execution_args[:batch_callback_id] = current_job.batch_callback_id
-        end
+        execution_args[:batch_id] = current_job.batch_id
+        execution_args[:batch_callback_id] = current_job.batch_callback_id
         execution_args[:cron_key] = current_job.cron_key
       else
-        if GoodJob::BatchRecord.migrated?
-          execution_args[:batch_id] = GoodJob::Batch.current_batch_id
-          execution_args[:batch_callback_id] = GoodJob::Batch.current_batch_callback_id
-        end
+        execution_args[:batch_id] = GoodJob::Batch.current_batch_id
+        execution_args[:batch_callback_id] = GoodJob::Batch.current_batch_callback_id
         execution_args[:cron_key] = CurrentThread.cron_key
         execution_args[:cron_at] = CurrentThread.cron_at
       end
 
-      execution_args.merge(overrides)
+      execution_args
     end
 
     # Finds the next eligible Execution, acquire an advisory lock related to it, and
@@ -420,16 +356,15 @@ module GoodJob
 
         retried = current_job && current_job.active_job_id == active_job.job_id
         if retried
-            job = current_job
-            job.assign_attributes(enqueue_args(active_job, { scheduled_at: scheduled_at }))
-            job.scheduled_at ||= Time.current
-            # TODO: these values ideally shouldn't be persisted until the current_job is finished
-            #   which will require handling `retry_job` being called from outside the job context.
-            job.performed_at = nil
-            job.finished_at = nil
+          job = current_job
+          job.assign_attributes(enqueue_args(active_job, scheduled_at: scheduled_at))
+          job.scheduled_at ||= Time.current
+          # TODO: these values ideally shouldn't be persisted until the current_job is finished
+          #   which will require handling `retry_job` being called from outside the job context.
+          job.performed_at = nil
+          job.finished_at = nil
         else
-          job = build_for_enqueue(active_job, { scheduled_at: scheduled_at })
-          job.make_discrete if discrete_support?
+          job = build_for_enqueue(active_job, scheduled_at: scheduled_at)
         end
 
         if create_with_advisory_lock
@@ -443,14 +378,11 @@ module GoodJob
         instrument_payload[:job] = job
         job.save!
 
-        if retried
-          CurrentThread.execution_retried = job
-        else
-          CurrentThread.execution_retried = nil
-        end
+        CurrentThread.execution_retried = (job if retried)
 
         active_job.provider_job_id = job.id
         raise "These should be equal" if active_job.provider_job_id != active_job.job_id
+
         job
       end
     end
@@ -477,23 +409,21 @@ module GoodJob
           current_thread.reset
           current_thread.job = self
 
-
-
           existing_performed_at = performed_at
           if existing_performed_at
             current_thread.execution_interrupted = existing_performed_at
 
             interrupt_error_string = self.class.format_error(GoodJob::InterruptError.new("Interrupted after starting perform at '#{existing_performed_at}'"))
             self.error = interrupt_error_string
-            self.error_event = ERROR_EVENT_INTERRUPTED if self.class.error_event_migrated?
+            self.error_event = ERROR_EVENT_INTERRUPTED
             monotonic_duration = (::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - monotonic_start).seconds
 
             discrete_execution_attrs = {
               error: interrupt_error_string,
               finished_at: job_performed_at,
             }
-            discrete_execution_attrs[:error_event] = GoodJob::ErrorEvents::ERROR_EVENT_ENUMS[GoodJob::ErrorEvents::ERROR_EVENT_INTERRUPTED] if self.class.error_event_migrated?
-            discrete_execution_attrs[:duration] = monotonic_duration if GoodJob::DiscreteExecution.duration_interval_usable?
+            discrete_execution_attrs[:error_event] = GoodJob::ErrorEvents::ERROR_EVENT_ENUMS[GoodJob::ErrorEvents::ERROR_EVENT_INTERRUPTED]
+            discrete_execution_attrs[:duration] = monotonic_duration
             discrete_executions.where(finished_at: nil).where.not(performed_at: nil).update_all(discrete_execution_attrs) # rubocop:disable Rails/SkipsModelValidations
           end
 
@@ -504,23 +434,20 @@ module GoodJob
               serialized_params: serialized_params,
               scheduled_at: (scheduled_at || created_at),
               created_at: job_performed_at,
+              process_id: lock_id,
             }
-            discrete_execution_attrs[:process_id] = lock_id if GoodJob::DiscreteExecution.columns_hash.key?("process_id")
-
-            execution_attrs = {
+            job_attrs = {
               performed_at: job_performed_at,
               executions_count: ((executions_count || 0) + 1),
+              locked_by_id: lock_id,
+              locked_at: Time.current,
             }
-            if GoodJob::Execution.columns_hash.key?("locked_by_id")
-              execution_attrs[:locked_by_id] = lock_id
-              execution_attrs[:locked_at] = Time.current
-            end
 
             discrete_execution = discrete_executions.create!(discrete_execution_attrs)
-            update!(execution_attrs)
+            update!(job_attrs)
           end
 
-          ActiveSupport::Notifications.instrument("perform_job.good_job", { execution: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do |instrument_payload|
+          ActiveSupport::Notifications.instrument("perform_job.good_job", { job: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do |instrument_payload|
             value = ActiveJob::Base.execute(active_job_data)
 
             if value.is_a?(Exception)
@@ -571,23 +498,22 @@ module GoodJob
           error_string = self.class.format_error(job_error)
 
           job_attributes[:error] = error_string
-          job_attributes[:error_event] = result.error_event if self.class.error_event_migrated?
+          job_attributes[:error_event] = result.error_event
 
           discrete_execution.error = error_string
           discrete_execution.error_event = result.error_event
-          discrete_execution.error_backtrace = job_error.backtrace if discrete_execution.class.backtrace_migrated?
+          discrete_execution.error_backtrace = job_error.backtrace
         else
           job_attributes[:error] = nil
           job_attributes[:error_event] = nil
         end
-        job_attributes.delete(:error_event) unless self.class.error_event_migrated?
 
         job_finished_at = Time.current
         monotonic_duration = (::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - monotonic_start).seconds
         job_attributes[:finished_at] = job_finished_at
 
         discrete_execution.finished_at = job_finished_at
-        discrete_execution.duration = monotonic_duration if GoodJob::DiscreteExecution.duration_interval_usable?
+        discrete_execution.duration = monotonic_duration
 
         retry_unhandled_error = result.unhandled_error && GoodJob.retry_on_unhandled_error
         reenqueued = result.retried? || retried_good_job_id.present? || retry_unhandled_error
@@ -634,8 +560,8 @@ module GoodJob
     # @return [Hash]
     def display_serialized_params
       serialized_params.merge({
-        _good_job: attributes.except('serialized_params', 'locktype', 'owns_advisory_lock'),
-      })
+                                _good_job: attributes.except('serialized_params', 'locktype', 'owns_advisory_lock'),
+                              })
     end
 
     def running?
@@ -685,15 +611,15 @@ module GoodJob
     end
 
     def continue_discard_or_finish_batch
-      batch._continue_discard_or_finish(self) if GoodJob::BatchRecord.migrated? && batch.present?
+      batch._continue_discard_or_finish(self) if batch.present?
     end
 
     def active_job_data
       serialized_params.deep_dup
-        .tap do |job_data|
+                       .tap do |job_data|
         job_data["provider_job_id"] = id
         job_data["good_job_concurrency_key"] = concurrency_key if concurrency_key
-        job_data["good_job_labels"] = Array(labels) if self.class.labels_migrated? && labels.present?
+        job_data["good_job_labels"] = Array(labels) if labels.present?
       end
     end
   end

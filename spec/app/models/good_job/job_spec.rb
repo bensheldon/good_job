@@ -392,19 +392,15 @@ RSpec.describe GoodJob::Job do
       let(:active_job) { TestJob.new }
 
       context 'when discrete' do
-        before do
-          allow(described_class).to receive(:discrete_support?).and_return(true)
-        end
-
         it 'assigns is discrete, id, scheduled_at' do
           expect { described_class.enqueue(active_job) }.to change(described_class, :count).by(1)
 
-          execution = described_class.last
-          expect(execution).to have_attributes(
+          job = described_class.last
+          expect(job).to have_attributes(
             id: active_job.job_id,
             active_job_id: active_job.job_id,
-            created_at: execution.scheduled_at,
-            scheduled_at: execution.created_at
+            created_at: within(1.second).of(Time.current),
+            scheduled_at: job.created_at
           )
         end
       end
@@ -421,7 +417,7 @@ RSpec.describe GoodJob::Job do
           serialized_params: a_kind_of(Hash),
           queue_name: 'test',
           priority: 50,
-          scheduled_at: nil
+          scheduled_at: job.created_at
         )
       end
 
@@ -488,11 +484,11 @@ RSpec.describe GoodJob::Job do
             described_class.perform_with_advisory_lock(lock_id: process_id)
           end
           expect(described_class.order(finished_at: :asc).to_a).to eq([
-            high_priority_job,
-            older_job,
-            newer_job,
-            low_priority_job,
-          ])
+                                                                        high_priority_job,
+                                                                        older_job,
+                                                                        newer_job,
+                                                                        low_priority_job,
+                                                                      ])
         end
       end
 
@@ -520,23 +516,23 @@ RSpec.describe GoodJob::Job do
       it 'creates an intermediary hash' do
         result = described_class.queue_parser('first,second')
         expect(result).to eq({
-          include: %w[first second],
-        })
+                               include: %w[first second],
+                             })
 
         result = described_class.queue_parser('-first,second')
         expect(result).to eq({
-          exclude: %w[first second],
-        })
+                               exclude: %w[first second],
+                             })
 
         result = described_class.queue_parser('')
         expect(result).to eq({
-          all: true,
-        })
+                               all: true,
+                             })
         result = described_class.queue_parser('+first,second')
         expect(result).to eq({
-          include: %w[first second],
+                               include: %w[first second],
           ordered_queues: true,
-        })
+                             })
       end
     end
 
@@ -968,7 +964,7 @@ RSpec.describe GoodJob::Job do
             created_at: within(0.001).of(good_job.performed_at),
             scheduled_at: within(0.001).of(good_job.created_at),
             finished_at: within(1.second).of(Time.current),
-            duration: GoodJob::DiscreteExecution.duration_interval_usable? ? be_present : nil,
+            duration: be_present,
             error: nil,
             serialized_params: good_job.serialized_params
           )
@@ -988,9 +984,9 @@ RSpec.describe GoodJob::Job do
           it 'updates the existing Execution/Job record instead of creating a new one' do
             expect { good_job.perform(lock_id: process_id) }
               .to not_change(described_class, :count)
-                    .and change { good_job.reload.serialized_params["executions"] }.by(1)
-                           .and not_change { good_job.reload.id }
-                                  .and not_change { described_class.count }
+              .and change { good_job.reload.serialized_params["executions"] }.by(1)
+                                                                             .and not_change { good_job.reload.id }
+              .and not_change { described_class.count }
 
             expect(good_job.reload).to have_attributes(
               error: "TestJob::ExpectedError: Raised expected error",
@@ -1007,7 +1003,7 @@ RSpec.describe GoodJob::Job do
               created_at: within(1.second).of(Time.current),
               scheduled_at: within(1.second).of(Time.current),
               finished_at: within(1.second).of(Time.current),
-              duration: GoodJob::DiscreteExecution.duration_interval_usable? ? be_present : nil
+              duration: be_present
             )
           end
         end
@@ -1032,7 +1028,7 @@ RSpec.describe GoodJob::Job do
             expect(good_job.discrete_executions.first).to have_attributes(
               performed_at: within(1.second).of(Time.current),
               finished_at: within(1.second).of(Time.current),
-              duration: GoodJob::DiscreteExecution.duration_interval_usable? ? be_present : nil
+              duration: be_present
             )
           end
         end

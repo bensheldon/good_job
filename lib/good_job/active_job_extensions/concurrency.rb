@@ -66,7 +66,7 @@ module GoodJob
 
           perform_throttle = job.class.good_job_concurrency_config[:perform_throttle]
           perform_throttle = instance_exec(&perform_throttle) if perform_throttle.respond_to?(:call)
-          perform_throttle = nil unless GoodJob::DiscreteExecution.migrated? && perform_throttle.present? && perform_throttle.is_a?(Array) && perform_throttle.size == 2
+          perform_throttle = nil unless perform_throttle.present? && perform_throttle.is_a?(Array) && perform_throttle.size == 2
 
           limit = perform_limit || total_limit
           throttle = perform_throttle
@@ -83,9 +83,9 @@ module GoodJob
           GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_lock") do
             if limit
               allowed_active_job_ids = GoodJob::Job.unfinished.where(concurrency_key: key)
-                                                         .advisory_locked
-                                                         .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
-                                                         .limit(limit).pluck(:active_job_id)
+                                                   .advisory_locked
+                                                   .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
+                                                   .limit(limit).pluck(:active_job_id)
               # The current job has already been locked and will appear in the previous query
               raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include?(job.job_id)
             end

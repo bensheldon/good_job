@@ -133,6 +133,7 @@ module GoodJob
   def self.configure_active_record(&block)
     self._active_record_configuration = block
   end
+
   mattr_accessor :_active_record_configuration, default: nil
 
   # Stop executing jobs.
@@ -225,15 +226,13 @@ module GoodJob
         deleted_jobs_count += deleted_jobs
       end
 
-      if GoodJob::BatchRecord.migrated?
-        batches_query = GoodJob::BatchRecord.finished_before(timestamp).limit(in_batches_of)
-        batches_query = batches_query.succeeded unless include_discarded
-        loop do
-          deleted = batches_query.delete_all
-          break if deleted.zero?
+      batches_query = GoodJob::BatchRecord.finished_before(timestamp).limit(in_batches_of)
+      batches_query = batches_query.succeeded unless include_discarded
+      loop do
+        deleted = batches_query.delete_all
+        break if deleted.zero?
 
-          deleted_batches_count += deleted
-        end
+        deleted_batches_count += deleted
       end
 
       payload[:destroyed_batches_count] = deleted_batches_count
@@ -283,9 +282,7 @@ module GoodJob
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    # Always update with the most recent migration check
-    GoodJob::DiscreteExecution.reset_column_information
-    GoodJob::DiscreteExecution.duration_interval_migrated?
+    true
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)
