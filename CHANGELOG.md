@@ -1,5 +1,21 @@
 # Changelog
 
+## [v3.30.1](https://github.com/bensheldon/good_job/tree/v3.30.1) (2024-07-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.30.0...v3.30.1)
+
+**Fixed bugs:**
+
+- Fix Performance table formatting, change url from `performances` to singular `performance` [\#1393](https://github.com/bensheldon/good_job/pull/1393) ([bensheldon](https://github.com/bensheldon))
+- Add a version check for Rails whether to use pg interval or calculate float [\#1389](https://github.com/bensheldon/good_job/pull/1389) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Add missing newline after frozen string literal for migrations [\#1392](https://github.com/bensheldon/good_job/pull/1392) ([Earlopain](https://github.com/Earlopain))
+- Temporarily remove JRuby builds [\#1391](https://github.com/bensheldon/good_job/pull/1391) ([bensheldon](https://github.com/bensheldon))
+- Add initial Performance panel to dashboard [\#1388](https://github.com/bensheldon/good_job/pull/1388) ([bensheldon](https://github.com/bensheldon))
+- Move job execution logic from Execution to BaseExecution to simplify v4 changes [\#1357](https://github.com/bensheldon/good_job/pull/1357) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.30.0](https://github.com/bensheldon/good_job/tree/v3.30.0) (2024-07-05)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.5...v3.30.0)
