@@ -46,7 +46,8 @@ module GoodJob # :nodoc:
 
     # Monotonic time between when this job started and finished
     def runtime_latency
-      if self.class.monotonic_duration_migrated?
+      # migrated and Rails greater than 6.1
+      if self.class.monotonic_duration_migrated? && Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0.a')
         duration
       elsif performed_at
         (finished_at || Time.current) - performed_at

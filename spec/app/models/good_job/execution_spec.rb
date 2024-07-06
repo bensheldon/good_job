@@ -702,7 +702,7 @@ RSpec.describe GoodJob::Execution do
           created_at: within(0.001).of(good_job.performed_at),
           scheduled_at: within(0.001).of(good_job.created_at),
           finished_at: within(1.second).of(Time.current),
-          duration: be_present,
+          duration: Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0.a') ? be_present : nil,
           error: nil,
           serialized_params: good_job.serialized_params
         )
@@ -741,7 +741,7 @@ RSpec.describe GoodJob::Execution do
             created_at: within(1.second).of(Time.current),
             scheduled_at: within(1.second).of(Time.current),
             finished_at: within(1.second).of(Time.current),
-            duration: be_present
+            duration: Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0.a') ? be_present : nil
           )
         end
       end
@@ -766,7 +766,7 @@ RSpec.describe GoodJob::Execution do
           expect(good_job.discrete_executions.first).to have_attributes(
             performed_at: within(1.second).of(Time.current),
             finished_at: within(1.second).of(Time.current),
-            duration: be_present
+            duration: Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0.a') ? be_present : nil
           )
         end
       end
