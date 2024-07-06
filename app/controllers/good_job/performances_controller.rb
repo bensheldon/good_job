@@ -2,8 +2,8 @@
 
 module GoodJob
   class PerformancesController < ApplicationController
-    def index
-      if GoodJob::DiscreteExecution.monotonic_duration_migrated?
+    def show
+      if GoodJob::DiscreteExecution.duration_interval_migrated?
         @performances = GoodJob::DiscreteExecution
                         .where.not(job_class: nil)
                         .group(:job_class)

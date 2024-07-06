@@ -287,7 +287,7 @@ module GoodJob
   def self.migrated?
     # Always update with the most recent migration check
     GoodJob::DiscreteExecution.reset_column_information
-    GoodJob::DiscreteExecution.monotonic_duration_migrated?
+    GoodJob::DiscreteExecution.duration_interval_migrated?
   end
 
   ActiveSupport.run_load_hooks(:good_job, self)

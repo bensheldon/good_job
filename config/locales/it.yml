@@ -197,7 +197,7 @@ it:
             trillion: T
             unit: ''
     performances:
-      index:
+      show:
         average_duration: Durata media
         executions: Esecuzioni
         job_class: Classe di lavoro

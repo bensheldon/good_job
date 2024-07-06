@@ -197,7 +197,7 @@ ko:
             trillion: T
             unit: ''
     performances:
-      index:
+      show:
         average_duration: 평균 지속 시간
         executions: 처형
         job_class: 직업군

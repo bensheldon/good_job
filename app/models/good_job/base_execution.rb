@@ -494,7 +494,7 @@ module GoodJob
                 finished_at: job_performed_at,
               }
               discrete_execution_attrs[:error_event] = GoodJob::ErrorEvents::ERROR_EVENT_ENUMS[GoodJob::ErrorEvents::ERROR_EVENT_INTERRUPTED] if self.class.error_event_migrated?
-              discrete_execution_attrs[:duration] = monotonic_duration if GoodJob::DiscreteExecution.monotonic_duration_migrated? && Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0.a')
+              discrete_execution_attrs[:duration] = monotonic_duration if GoodJob::DiscreteExecution.duration_interval_usable?
               discrete_executions.where(finished_at: nil).where.not(performed_at: nil).update_all(discrete_execution_attrs) # rubocop:disable Rails/SkipsModelValidations
             end
           end
@@ -602,7 +602,7 @@ module GoodJob
         job_attributes[:finished_at] = job_finished_at
         if discrete_execution
           discrete_execution.finished_at = job_finished_at
-          discrete_execution.duration = monotonic_duration if GoodJob::DiscreteExecution.monotonic_duration_migrated? && Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0.a')
+          discrete_execution.duration = monotonic_duration if GoodJob::DiscreteExecution.duration_interval_usable?
         end
 
         retry_unhandled_error = result.unhandled_error && GoodJob.retry_on_unhandled_error

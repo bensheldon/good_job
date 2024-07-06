@@ -197,7 +197,7 @@ tr:
             trillion: Trilyon
             unit: ''
     performances:
-      index:
+      show:
         average_duration: Ortalama süre
         executions: İnfazlar
         job_class: İş sınıfı
