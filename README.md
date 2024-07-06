@@ -53,6 +53,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Batches](#batches)
     - [Updating](#updating)
         - [Upgrading minor versions](#upgrading-minor-versions)
+        - [Upgrading v3 to v4](#upgrading-v3-to-v4)
         - [Upgrading v2 to v3](#upgrading-v2-to-v3)
         - [Upgrading v1 to v2](#upgrading-v1-to-v2)
 - [Go deeper](#go-deeper)
@@ -872,6 +873,29 @@ To perform upgrades to the GoodJob database tables:
 
 1. Commit the migration files and resulting `db/schema.rb` changes.
 1. Deploy the code, run the migrations against the production database, and restart server/worker processes.
+
+#### Upgrading v3 to v4
+
+GoodJob v4 changes how job and job execution records are stored in the database; moving from job and executions being commingled in the `good_jobs` table to separately and discretely storing job executions in `good_job_executions`. To safely upgrade, all unfinished jobs must use the new format. This change was introduced in GoodJob [v3.15.4 (April 2023)](https://github.com/bensheldon/good_job/releases/tag/v3.15.4), so your application is likely ready-to-upgrade already if you have kept up with GoodJob updates.
+
+**⚠️GoodJob v4.0.0 and v3.99 have not yet been released, though you can still prepare for the upgrade.**
+
+To upgrade:
+
+1. ~~Upgrade to v3.99.x, following the minor version upgrade process, running any remaining database migrations (rails g good_job:update) and addressing deprecation warnings.~~ (Not yet released)
+1. Check if your application is safe to upgrade to the new job record format by running either:
+    - In a production console, run `GoodJob.v4_ready?` which should return `true` when safely upgradable.
+    - Or, when connected to the production database verify that `SELECT COUNT(*) FROM "good_jobs" WHERE finished_at IS NULL AND is_discrete IS NOT TRUE` returns `0`
+
+    If not all unfinished jobs are stored in the new format, either wait to upgrade until those jobs finish or discard them. Not waiting could prevent those jobs from successfully running when upgrading to v4.
+1. ~~Upgrade from v3.99.x to v4.x~~ (Not yet released)
+
+Notable changes:
+
+- Only supports Rails 6.1+, CRuby 3.0+ and JRuby 9.4+, Postgres 12+. Rails 6.0 is no longer supported. CRuby 2.6 and 2.7 are no longer supported. JRuby 9.3 is no longer supported.
+- Changes job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority.
+- Enqueues and executes jobs via the `GoodJob::Job` model instead of `GoodJob::Execution`
+- Setting `config.good_job.cleanup_interval_jobs`, `GOOD_JOB_CLEANUP_INTERVAL_JOBS`, `config.good_job.cleanup_interval_seconds`, or `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` to `nil` or `""` no longer disables count- or time-based cleanups. Set to `false` to disable, or `-1` to run a cleanup after every job execution.
 
 #### Upgrading v2 to v3
 
