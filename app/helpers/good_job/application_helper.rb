@@ -9,6 +9,7 @@ module GoodJob
 
     def format_duration(sec)
       return unless sec
+      return "" if sec.is_a?(String) # pg interval support added in Rails 6.1
 
       if sec < 1
         t 'good_job.duration.milliseconds', ms: (sec * 1000).floor

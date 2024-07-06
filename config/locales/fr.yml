@@ -196,6 +196,14 @@ fr:
             thousand: k
             trillion: J
             unit: ''
+    performances:
+      index:
+        average_duration: Durée moyenne
+        executions: Exécutions
+        job_class: Catégorie d'emplois
+        maximum_duration: Durée maximale
+        minimum_duration: Durée minimale
+        title: Performance
     processes:
       index:
         cron_enabled: Cron activé
@@ -225,6 +233,7 @@ fr:
         jobs: Jobs
         live_poll: En direct
         name: "GoodJob 👍"
+        performances: Performance
         processes: Processus
         theme:
           auto: Auto
@@ -241,3 +250,5 @@ fr:
       running: En cours
       scheduled: Planifiés
       succeeded: Réussis
+  shared:
+    needs_migration: Veuillez exécuter des migrations GoodJob.

@@ -222,6 +222,14 @@ uk:
             thousand: Тис
             trillion: Трлн
             unit: ''
+    performances:
+      index:
+        average_duration: Середня тривалість
+        executions: Страти
+        job_class: Клас роботи
+        maximum_duration: Максимальна тривалість
+        minimum_duration: Мінімальна тривалість
+        title: Продуктивність
     processes:
       index:
         cron_enabled: Cron увімкнено
@@ -251,6 +259,7 @@ uk:
         jobs: Задачі
         live_poll: Живе Опитування
         name: "GoodJob 👍"
+        performances: Продуктивність
         processes: Процеси
         theme:
           auto: Авто
@@ -267,3 +276,5 @@ uk:
       running: Виконується
       scheduled: Заплановано
       succeeded: Успішно виконано
+  shared:
+    needs_migration: Запустіть міграції GoodJob.
