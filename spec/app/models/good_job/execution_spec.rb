@@ -143,10 +143,10 @@ RSpec.describe GoodJob::Execution do
       context 'when smaller_number_higher_priority=false' do
         before { allow(Rails.application.config).to receive(:good_job).and_return(smaller_number_is_higher_priority: false) }
 
-        it 'does not warn' do
+        it 'warns to ensure the upgrade is obvious' do
           active_job.priority = 50
           described_class.enqueue(active_job)
-          expect(GoodJob.deprecator).not_to have_received(:warn)
+          expect(GoodJob.deprecator).to have_received(:warn)
         end
       end
     end
