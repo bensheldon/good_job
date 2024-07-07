@@ -1,5 +1,14 @@
 # Changelog
 
+## [v3.99.0](https://github.com/bensheldon/good_job/tree/v3.99.0) (2024-07-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.30.1...v3.99.0)
+
+**Merged pull requests:**
+
+- Remove deprecation silencers for v3.99 release [\#1395](https://github.com/bensheldon/good_job/pull/1395) ([bensheldon](https://github.com/bensheldon))
+- Add instructions and `GoodJob.v4_ready?` for upgrading to v4 [\#1356](https://github.com/bensheldon/good_job/pull/1356) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.30.1](https://github.com/bensheldon/good_job/tree/v3.30.1) (2024-07-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.30.0...v3.30.1)
