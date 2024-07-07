@@ -220,8 +220,8 @@ ru:
             thousand: К
             trillion: Т
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Средняя продолжительность
         executions: Казни
         job_class: Класс работы
@@ -257,7 +257,7 @@ ru:
         jobs: Задания
         live_poll: Обновления в реальном времени
         name: "GoodJob 👍"
-        performances: Производительность
+        performance: Производительность
         processes: Процессы
         theme:
           auto: Авто

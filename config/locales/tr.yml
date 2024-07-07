@@ -194,8 +194,8 @@ tr:
             thousand: Bin
             trillion: Trilyon
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Ortalama süre
         executions: İnfazlar
         job_class: İş sınıfı
@@ -231,7 +231,7 @@ tr:
         jobs: İşler
         live_poll: Anlık Güncelleme
         name: "GoodJob 👍"
-        performances: Verim
+        performance: Verim
         processes: Süreçler
         theme:
           auto: Oto

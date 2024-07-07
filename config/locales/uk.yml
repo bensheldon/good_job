@@ -220,8 +220,8 @@ uk:
             thousand: Тис
             trillion: Трлн
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Середня тривалість
         executions: Страти
         job_class: Клас роботи
@@ -257,7 +257,7 @@ uk:
         jobs: Задачі
         live_poll: Живе Опитування
         name: "GoodJob 👍"
-        performances: Продуктивність
+        performance: Продуктивність
         processes: Процеси
         theme:
           auto: Авто

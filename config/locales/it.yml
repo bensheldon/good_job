@@ -194,8 +194,8 @@ it:
             thousand: K
             trillion: T
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Durata media
         executions: Esecuzioni
         job_class: Classe di lavoro
@@ -231,7 +231,7 @@ it:
         jobs: Job
         live_poll: Live Poll
         name: "GoodJob 👍"
-        performances: Prestazione
+        performance: Prestazione
         processes: Processi
         theme:
           auto: Auto

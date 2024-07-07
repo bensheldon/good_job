@@ -194,8 +194,8 @@ ja:
             thousand: K
             trillion: T
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: 平均所要時間
         executions: 処刑
         job_class: 職種
@@ -231,7 +231,7 @@ ja:
         jobs: ジョブ
         live_poll: リアルタイム更新
         name: "GoodJob 👍"
-        performances: パフォーマンス
+        performance: パフォーマンス
         processes: プロセス
         theme:
           auto: 自動

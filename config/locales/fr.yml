@@ -194,8 +194,8 @@ fr:
             thousand: k
             trillion: J
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Durée moyenne
         executions: Exécutions
         job_class: Catégorie d'emplois
@@ -231,7 +231,7 @@ fr:
         jobs: Jobs
         live_poll: En direct
         name: "GoodJob 👍"
-        performances: Performance
+        performance: Performance
         processes: Processus
         theme:
           auto: Auto
