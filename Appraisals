@@ -1,16 +1,10 @@
 # frozen_string_literal: true
 
-ruby_27_or_higher = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.7')
+ruby_30_or_higher = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.0')
 ruby_31_or_higher = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1')
 jruby = RUBY_PLATFORM.include?('java')
 
 unless ruby_31_or_higher # https://github.com/rails/rails/issues/44090#issuecomment-1007686519
-  appraise "rails-6.0" do
-    gem "rails", "~> 6.0.0"
-    gem "traces", "~> 0.9.1"
-    gem "puma", "~> 5.6"
-  end
-
   appraise "rails-6.1" do
     gem "rails", "~> 6.1.0"
     gem "traces", "~> 0.9.1"
@@ -18,10 +12,7 @@ unless ruby_31_or_higher # https://github.com/rails/rails/issues/44090#issuecomm
   end
 end
 
-if ruby_27_or_higher && !ruby_31_or_higher && !jruby
-  # Rails HEAD requires MRI 2.7+
-  # activerecord-jdbcpostgresql-adapter does not have a compatible version
-
+if ruby_30_or_higher && !ruby_31_or_higher && !jruby
   appraise "rails-7.0" do
     gem "rails", "~> 7.0.0"
     gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498

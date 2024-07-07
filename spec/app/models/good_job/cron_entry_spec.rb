@@ -175,9 +175,9 @@ describe GoodJob::CronEntry do
       cron_at = 10.minutes.ago
       entry.enqueue(cron_at)
 
-      execution = GoodJob::Execution.last
-      expect(execution.cron_key).to eq 'test'
-      expect(execution.cron_at).to be_within(0.001.seconds).of(cron_at)
+      job = GoodJob::Job.last
+      expect(job.cron_key).to eq 'test'
+      expect(job.cron_at).to be_within(0.001.seconds).of(cron_at)
     end
   end
 

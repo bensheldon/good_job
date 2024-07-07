@@ -68,7 +68,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(TestJob.perform_later(name: "Alice")).to be_present
 
         Rails.application.executor.wrap do
-          GoodJob::Execution.all.with_advisory_lock do
+          GoodJob::Job.all.with_advisory_lock do
             expect(TestJob.perform_later(name: "Alice")).to be false
           end
         end
@@ -95,8 +95,8 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         # Usage of different key does enqueue
         expect(TestJob.perform_later(name: "Bob")).to be_present
 
-        expect(GoodJob::Execution.where(concurrency_key: "Alice").count).to eq 2
-        expect(GoodJob::Execution.where(concurrency_key: "Bob").count).to eq 1
+        expect(GoodJob::Job.where(concurrency_key: "Alice").count).to eq 2
+        expect(GoodJob::Job.where(concurrency_key: "Bob").count).to eq 1
 
         expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its enqueue limit of 2 jobs/)).exactly(:once)
         if ActiveJob.gem_version >= Gem::Version.new("6.1.0")
@@ -111,7 +111,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
 
         # Lock one of the jobs
         Rails.application.executor.wrap do
-          GoodJob::Execution.first.with_advisory_lock do
+          GoodJob::Job.first.with_advisory_lock do
             # Third usage does enqueue
             expect(TestJob.perform_later(name: "Alice")).to be_present
           end
@@ -244,8 +244,8 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
             nil
           end
 
-          expect(GoodJob::Execution.count).to eq 1
-          expect(GoodJob::Execution.first.concurrency_key).to be_present
+          expect(GoodJob::Job.count).to eq 1
+          expect(GoodJob::Job.first.concurrency_key).to be_present
           expect(GoodJob::Job.first).not_to be_finished
         end
 
@@ -254,15 +254,16 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
             TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
             GoodJob::Job.first.update!(is_discrete: false)
 
+            original_concurrency_key = GoodJob::Job.last.concurrency_key
+            expect(original_concurrency_key).to be_present
+
             begin
               GoodJob.perform_inline
             rescue StandardError
               nil
             end
 
-            expect(GoodJob::Execution.count).to eq 2
-            first_execution, retried_execution = GoodJob::Execution.order(created_at: :asc).to_a
-            expect(retried_execution.concurrency_key).to eq first_execution.concurrency_key
+            expect(GoodJob::Job.last.concurrency_key).to eq original_concurrency_key
           end
         end
       end

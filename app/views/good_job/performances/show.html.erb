@@ -2,49 +2,42 @@
   <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
 </div>
 
-<% if @needs_upgrade %>
-  <div class="alert alert-warning">
-    <%= t "shared.needs_migration" %>
-  </div>
-<% else %>
+<div class="my-3 card">
+  <div class="list-group list-group-flush text-nowrap" role="table">
+    <header class="list-group-item bg-body-tertiary">
+      <div class="row small text-muted text-uppercase align-items-center">
+        <div class="col-12 col-lg-4"><%= t ".job_class" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t ".executions" %></div>
 
-  <div class="my-3 card">
-    <div class="list-group list-group-flush text-nowrap" role="table">
-      <header class="list-group-item bg-body-tertiary">
-        <div class="row small text-muted text-uppercase align-items-center">
-          <div class="col-12 col-lg-4"><%= t ".job_class" %></div>
-          <div class="col-lg-2 d-none d-lg-block"><%= t ".executions" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t ".average_duration" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t ".minimum_duration" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t ".maximum_duration" %></div>
+      </div>
+    </header>
 
-          <div class="col-lg-2 d-none d-lg-block"><%= t ".average_duration" %></div>
-          <div class="col-lg-2 d-none d-lg-block"><%= t ".minimum_duration" %></div>
-          <div class="col-lg-2 d-none d-lg-block"><%= t ".maximum_duration" %></div>
-        </div>
-      </header>
+    <% @performances.each do |performance| %>
+      <div role="row" class="list-group-item py-3">
+        <div class="row align-items-center">
+          <div class="col-12 col-lg-4"><%= performance.job_class %></div>
+          <div class="col-6 col-lg-2 text-wrap">
+            <div class="d-lg-none small text-muted mt-1"><%= t ".executions" %></div>
+            <%= performance.executions_count %>
+          </div>
 
-      <% @performances.each do |performance| %>
-        <div role="row" class="list-group-item py-3">
-          <div class="row align-items-center">
-            <div class="col-12 col-lg-4"><%= performance.job_class %></div>
-            <div class="col-6 col-lg-2 text-wrap">
-              <div class="d-lg-none small text-muted mt-1"><%= t ".executions" %></div>
-              <%= performance.executions_count %>
-            </div>
-
-            <div class="col-6 col-lg-2 text-wrap">
-              <div class="d-lg-none small text-muted mt-1"><%= t ".average_duration" %></div>
-              <%= format_duration performance.avg_duration %>
-            </div>
-            <div class="col-6 col-lg-2 text-wrap">
-              <div class="d-lg-none small text-muted mt-1"><%= t ".minimum_duration" %></div>
-              <%= format_duration performance.min_duration %>
-            </div>
-            <div class="col-6 col-lg-2 text-wrap">
-              <div class="d-lg-none small text-muted mt-1"><%= t ".maximum_duration" %></div>
-              <%= format_duration performance.max_duration %>
-            </div>
+          <div class="col-6 col-lg-2 text-wrap">
+            <div class="d-lg-none small text-muted mt-1"><%= t ".average_duration" %></div>
+            <%= format_duration performance.avg_duration %>
+          </div>
+          <div class="col-6 col-lg-2 text-wrap">
+            <div class="d-lg-none small text-muted mt-1"><%= t ".minimum_duration" %></div>
+            <%= format_duration performance.min_duration %>
+          </div>
+          <div class="col-6 col-lg-2 text-wrap">
+            <div class="d-lg-none small text-muted mt-1"><%= t ".maximum_duration" %></div>
+            <%= format_duration performance.max_duration %>
           </div>
         </div>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
   </div>
-<% end %>
+</div>

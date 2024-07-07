@@ -11,7 +11,6 @@ tr:
     batches:
       index:
         older_batches: Daha eski toplu işlemler
-        pending_migrations: GoodJob'ın bekleyen veritabanı güncellemeleri bulunuyor.
         title: Toplu İşlemler
       jobs:
         actions:
@@ -48,7 +47,6 @@ tr:
       index:
         no_cron_schedules_found: Planlanmış Cron bulunamadı.
         title: Cron Planları
-      pending_migrations: Bekleyen GoodJob veritabanı güncellemesi var.
       show:
         cron_entry_key: Cron Giriş Anahtarı
     datetime:
@@ -240,6 +238,7 @@ tr:
           dark: Karanlık
           light: Işık
           theme: Tema
+      pending_migrations: GoodJob'ın bekleyen veritabanı güncellemeleri bulunuyor.
       secondary_navbar:
         inspiration: Unutmayın, siz de iyi bir iş yapıyorsunuz!
         last_updated: Son güncelleme
@@ -250,5 +249,3 @@ tr:
       running: Çalışıyor
       scheduled: Planlandı
       succeeded: Başarılı
-  shared:
-    needs_migration: Lütfen GoodJob geçişlerini çalıştırın.

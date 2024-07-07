@@ -11,7 +11,6 @@ en:
     batches:
       index:
         older_batches: Older batches
-        pending_migrations: GoodJob has pending database migrations.
         title: Batches
       jobs:
         actions:
@@ -48,7 +47,6 @@ en:
       index:
         no_cron_schedules_found: No cron schedules found.
         title: Cron Schedules
-      pending_migrations: Requires pending GoodJob database migration.
       show:
         cron_entry_key: Cron Entry Key
     datetime:
@@ -240,6 +238,7 @@ en:
           dark: Dark
           light: Light
           theme: Theme
+      pending_migrations: GoodJob has pending database migrations.
       secondary_navbar:
         inspiration: Remember, you're doing a Good Job too!
         last_updated: Last updated
@@ -250,5 +249,3 @@ en:
       running: Running
       scheduled: Scheduled
       succeeded: Succeeded
-  shared:
-    needs_migration: Please run GoodJob migrations.

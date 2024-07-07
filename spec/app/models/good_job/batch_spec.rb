@@ -129,7 +129,7 @@ describe GoodJob::Batch do
     end
 
     it 'can serialize GlobalId objects' do
-      globalid = GoodJob::Execution.create!
+      globalid = GoodJob::Job.create!
 
       batch = described_class.new
       batch.save

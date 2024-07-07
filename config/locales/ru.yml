@@ -11,7 +11,6 @@ ru:
     batches:
       index:
         older_batches: Старые группы заданий
-        pending_migrations: У GoodJob есть ожидающие миграции базы данных.
         title: Группы заданий
       jobs:
         actions:
@@ -48,7 +47,6 @@ ru:
       index:
         no_cron_schedules_found: Расписания cron не найдены.
         title: Расписания cron
-      pending_migrations: У GoodJob есть ожидающие миграции базы данных.
       show:
         cron_entry_key: Ключ cron-задания
     datetime:
@@ -266,6 +264,7 @@ ru:
           dark: Темный
           light: Светлая
           theme: Тема офрмдления
+      pending_migrations: У GoodJob есть ожидающие миграции базы данных.
       secondary_navbar:
         inspiration: Благодаря вам Good Job становится лучше! Спасибо!
         last_updated: Последнее обновление
@@ -276,5 +275,3 @@ ru:
       running: Исполняется
       scheduled: Запланировано
       succeeded: Успешно
-  shared:
-    needs_migration: Пожалуйста, запустите миграцию GoodJob.

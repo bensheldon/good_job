@@ -18,19 +18,20 @@ describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
 
       expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_jobs.rb")).not_to be_empty
       # TODO: remove/replace this when migrations are removed/re-added
-      expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_job_settings.rb")).not_to be_empty
+      # expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_job_settings.rb")).not_to be_empty
 
       quiet do
         run_in_example_app 'rails db:migrate'
       end
 
+      # TODO: update this when a new migration exists in v4
       # Check that `GoodJob.migrated?` is updated
-      expect(GoodJob.migrated?).to be true
-      quiet do
-        run_in_example_app 'rails db:rollback'
-        expect(GoodJob.migrated?).to be false
-        run_in_example_app 'rails db:migrate'
-      end
+      # expect(GoodJob.migrated?).to be true
+      # quiet do
+      #   run_in_example_app 'rails db:rollback'
+      #   expect(GoodJob.migrated?).to be false
+      #   run_in_example_app 'rails db:migrate'
+      # end
       expect(GoodJob.migrated?).to be true
     end
   end

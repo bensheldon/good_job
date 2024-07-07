@@ -12,8 +12,8 @@ describe ExampleJob do
     describe "SUCCESS_TYPE" do
       it 'completes successfully' do
         active_job = described_class.perform_later(described_class::SUCCESS_TYPE)
-        execution = GoodJob::Execution.find(active_job.provider_job_id)
-        expect(execution.error).to be_nil
+        job = GoodJob::Job.find(active_job.provider_job_id)
+        expect(job.error).to be_nil
       end
     end
 
@@ -72,8 +72,8 @@ describe ExampleJob do
 
         active_job = described_class.perform_later(described_class::SLOW_TYPE)
 
-        execution = GoodJob::Execution.find(active_job.provider_job_id)
-        expect(execution.error).to be_nil
+        job = GoodJob::Job.find(active_job.provider_job_id)
+        expect(job.error).to be_nil
       end
     end
   end

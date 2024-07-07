@@ -11,7 +11,6 @@ uk:
     batches:
       index:
         older_batches: Старі пакети
-        pending_migrations: GoodJob має невиконані міграції бази даних.
         title: Пакети
       jobs:
         actions:
@@ -48,7 +47,6 @@ uk:
       index:
         no_cron_schedules_found: Cron-розклади не знайдені.
         title: Cron-розклади
-      pending_migrations: Вимагає невиконаних міграцій бази даних GoodJob.
       show:
         cron_entry_key: Ключ cron-запису
     datetime:
@@ -266,6 +264,7 @@ uk:
           dark: Темний
           light: світло
           theme: Тема
+      pending_migrations: GoodJob має невиконані міграції бази даних.
       secondary_navbar:
         inspiration: Пам'ятайте, ви теж робите хорошу роботу!
         last_updated: Останнє оновлення
@@ -276,5 +275,3 @@ uk:
       running: Виконується
       scheduled: Заплановано
       succeeded: Успішно виконано
-  shared:
-    needs_migration: Запустіть міграції GoodJob.

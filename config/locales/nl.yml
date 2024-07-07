@@ -11,7 +11,6 @@ nl:
     batches:
       index:
         older_batches: Oudere partijen
-        pending_migrations: GoodJob heeft databasemigraties in behandeling.
         title: Partijen
       jobs:
         actions:
@@ -48,7 +47,6 @@ nl:
       index:
         no_cron_schedules_found: Geen cron-schema's gevonden.
         title: Cron-schema's
-      pending_migrations: Vereist GoodJob-databasemigratie in afwachting.
       show:
         cron_entry_key: Cron-invoersleutel
     datetime:
@@ -240,6 +238,7 @@ nl:
           dark: Donker
           light: Licht
           theme: Thema
+      pending_migrations: GoodJob heeft databasemigraties in behandeling.
       secondary_navbar:
         inspiration: 'Onthoud: jij levert ook goed werk!'
         last_updated: Laatst bijgewerkt
@@ -250,5 +249,3 @@ nl:
       running: Rennen
       scheduled: Gepland
       succeeded: Geslaagd
-  shared:
-    needs_migration: Voer GoodJob-migraties uit.

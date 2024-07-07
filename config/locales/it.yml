@@ -11,7 +11,6 @@ it:
     batches:
       index:
         older_batches: Batch più vecchi
-        pending_migrations: GoodJob ha migrazioni del database in sospeso.
         title: Batch
       jobs:
         actions:
@@ -48,7 +47,6 @@ it:
       index:
         no_cron_schedules_found: Nessuna pianificazione cron trovata.
         title: Pianificazioni cron
-      pending_migrations: Richiede migrazione del database GoodJob in sospeso.
       show:
         cron_entry_key: Chiave voce cron
     datetime:
@@ -240,6 +238,7 @@ it:
           dark: Scuro
           light: Chiaro
           theme: Tema
+      pending_migrations: GoodJob ha migrazioni del database in sospeso.
       secondary_navbar:
         inspiration: Ricorda, stai facendo anche tu un Buon Lavoro!
         last_updated: Ultimo aggiornamento
@@ -250,5 +249,3 @@ it:
       running: In esecuzione
       scheduled: Pianificato
       succeeded: Riuscito
-  shared:
-    needs_migration: Esegui le migrazioni GoodJob.

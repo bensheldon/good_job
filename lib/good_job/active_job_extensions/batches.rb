@@ -12,7 +12,7 @@ module GoodJob
       end
 
       def batch
-        @_batch ||= CurrentThread.execution&.batch&.to_batch if CurrentThread.execution.present? && CurrentThread.execution.active_job_id == job_id
+        @_batch ||= CurrentThread.job&.batch&.to_batch if CurrentThread.job.present? && CurrentThread.job.active_job_id == job_id
       end
       alias batch? batch
     end

@@ -72,8 +72,6 @@ module GoodJob # :nodoc:
     end
 
     def enabled?
-      return true unless GoodJob::Setting.migrated?
-
       GoodJob::Setting.cron_key_enabled?(key, default: enabled_by_default?)
     end
 

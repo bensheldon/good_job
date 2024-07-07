@@ -108,11 +108,11 @@ module GoodJob
     attr_reader :queue_string
 
     def job_query
-      @_job_query ||= GoodJob::Execution.queue_string(queue_string)
+      @_job_query ||= GoodJob::Job.queue_string(queue_string)
     end
 
     def parsed_queues
-      @_parsed_queues ||= GoodJob::Execution.queue_parser(queue_string)
+      @_parsed_queues ||= GoodJob::Job.queue_parser(queue_string)
     end
   end
 end
