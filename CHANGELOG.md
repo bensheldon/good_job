@@ -1,5 +1,13 @@
 # Changelog
 
+## [v4.0.0](https://github.com/bensheldon/good_job/tree/v4.0.0) (2024-07-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.99.0...v4.0.0)
+
+**Implemented enhancements:**
+
+- Release GoodJob v4 [\#1394](https://github.com/bensheldon/good_job/pull/1394) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.99.0](https://github.com/bensheldon/good_job/tree/v3.99.0) (2024-07-07)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.30.1...v3.99.0)
