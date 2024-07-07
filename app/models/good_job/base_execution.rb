@@ -447,7 +447,7 @@ module GoodJob
             update!(job_attrs)
           end
 
-          ActiveSupport::Notifications.instrument("perform_job.good_job", { job: self, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do |instrument_payload|
+          ActiveSupport::Notifications.instrument("perform_job.good_job", { job: self, execution: discrete_execution, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do |instrument_payload|
             value = ActiveJob::Base.execute(active_job_data)
 
             if value.is_a?(Exception)
