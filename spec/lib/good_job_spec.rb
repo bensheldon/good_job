@@ -165,7 +165,9 @@ describe GoodJob do
 
   describe '#v4_ready?' do
     it "is true" do
+      allow(described_class.deprecator).to receive(:warn)
       expect(described_class.v4_ready?).to eq true
+      expect(described_class.deprecator).to have_received(:warn)
     end
   end
 end
