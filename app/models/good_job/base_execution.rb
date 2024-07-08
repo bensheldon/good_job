@@ -25,6 +25,8 @@ module GoodJob
     self.advisory_lockable_column = 'active_job_id'
     self.implicit_order_column = 'created_at'
 
+    self.ignored_columns += ["is_discrete"]
+
     define_model_callbacks :perform
     define_model_callbacks :perform_unlocked, only: :after
 
@@ -216,14 +218,6 @@ module GoodJob
       def coalesce_scheduled_at_created_at
         arel_table.coalesce(arel_table['scheduled_at'], arel_table['created_at'])
       end
-
-      def discrete_support?
-        true
-      end
-    end
-
-    def discrete?
-      is_discrete?
     end
 
     # Build an ActiveJob instance and deserialize the arguments, using `#active_job_data`.
@@ -543,17 +537,6 @@ module GoodJob
       reload.finished_at.blank?
     rescue ActiveRecord::RecordNotFound
       false
-    end
-
-    def make_discrete
-      self.is_discrete = true
-      self.id = active_job_id
-      self.job_class = serialized_params['job_class']
-      self.executions_count ||= 0
-
-      current_time = Time.current
-      self.created_at ||= current_time
-      self.scheduled_at ||= current_time
     end
 
     # Return formatted serialized_params for display in the dashboard

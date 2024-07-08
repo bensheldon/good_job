@@ -269,7 +269,11 @@ module GoodJob
   # Tests whether GoodJob can be safely upgraded to v4
   # @return [Boolean]
   def self.v4_ready?
-    GoodJob::Job.discrete_support? && GoodJob::Job.where(finished_at: nil).where(is_discrete: [nil, false]).none?
+    GoodJob.deprecator.warn(<<~MSG)
+      Calling `GoodJob.v4_ready?` is deprecated and will be removed in GoodJob v5.
+      If you are reading this deprecation you are already on v4.
+    MSG
+    true
   end
 
   # Deprecator for providing deprecation warnings.

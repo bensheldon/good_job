@@ -359,8 +359,6 @@ RSpec.describe GoodJob::Job do
     end
 
     before do
-      allow(described_class).to receive(:discrete_support?).and_return(false)
-
       stub_const "RUN_JOBS", Concurrent::Array.new
       stub_const 'TestJob', (Class.new(ActiveJob::Base) do
         self.queue_name = 'test'
@@ -951,8 +949,6 @@ RSpec.describe GoodJob::Job do
       context 'when Discrete' do
         before do
           ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-          allow(described_class).to receive(:discrete_support?).and_return(true)
-          good_job.update!(is_discrete: true)
         end
 
         it 'updates the Execution record and creates a DiscreteExecution record' do
@@ -983,10 +979,8 @@ RSpec.describe GoodJob::Job do
           let!(:good_job) { described_class.enqueue(active_job) }
 
           before do
-            allow(described_class).to receive(:discrete_support?).and_return(true)
             allow(GoodJob).to receive(:preserve_job_records).and_return(true)
             TestJob.retry_on(StandardError, wait: 1.hour, attempts: 2) { nil }
-            good_job.update!(is_discrete: true)
           end
 
           it 'updates the existing Execution/Job record instead of creating a new one' do
