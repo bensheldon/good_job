@@ -972,7 +972,7 @@ RSpec.describe GoodJob::Job do
             created_at: within(0.001).of(good_job.performed_at),
             scheduled_at: within(0.001).of(good_job.created_at),
             finished_at: within(1.second).of(Time.current),
-            duration: be_present,
+            duration: be_a(ActiveSupport::Duration),
             error: nil,
             serialized_params: good_job.serialized_params
           )
@@ -1011,7 +1011,7 @@ RSpec.describe GoodJob::Job do
               created_at: within(1.second).of(Time.current),
               scheduled_at: within(1.second).of(Time.current),
               finished_at: within(1.second).of(Time.current),
-              duration: be_present
+              duration: be_a(ActiveSupport::Duration)
             )
           end
         end
@@ -1036,7 +1036,7 @@ RSpec.describe GoodJob::Job do
             expect(good_job.discrete_executions.first).to have_attributes(
               performed_at: within(1.second).of(Time.current),
               finished_at: within(1.second).of(Time.current),
-              duration: be_present
+              duration: be_a(ActiveSupport::Duration)
             )
           end
         end
