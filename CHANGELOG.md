@@ -1,5 +1,18 @@
 # Changelog
 
+## [v4.0.1](https://github.com/bensheldon/good_job/tree/v4.0.1) (2024-07-08)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.0.0...v4.0.1)
+
+**Fixed bugs:**
+
+- Actually change `smaller_number_is_higher_priority` for v4 [\#1402](https://github.com/bensheldon/good_job/pull/1402) ([Earlopain](https://github.com/Earlopain))
+
+**Merged pull requests:**
+
+- Bump prism/rbi dev dependency [\#1403](https://github.com/bensheldon/good_job/pull/1403) ([Earlopain](https://github.com/Earlopain))
+- Use index action for the performance controller [\#1398](https://github.com/bensheldon/good_job/pull/1398) ([Earlopain](https://github.com/Earlopain))
+
 ## [v4.0.0](https://github.com/bensheldon/good_job/tree/v4.0.0) (2024-07-07)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.99.0...v4.0.0)
