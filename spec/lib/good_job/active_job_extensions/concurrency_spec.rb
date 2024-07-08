@@ -248,24 +248,6 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
           expect(GoodJob::Job.first.concurrency_key).to be_present
           expect(GoodJob::Job.first).not_to be_finished
         end
-
-        context 'when not discrete' do
-          it 'preserves the key value across retries' do
-            TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
-            GoodJob::Job.first.update!(is_discrete: false)
-
-            original_concurrency_key = GoodJob::Job.last.concurrency_key
-            expect(original_concurrency_key).to be_present
-
-            begin
-              GoodJob.perform_inline
-            rescue StandardError
-              nil
-            end
-
-            expect(GoodJob::Job.last.concurrency_key).to eq original_concurrency_key
-          end
-        end
       end
     end
 

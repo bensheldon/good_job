@@ -46,8 +46,6 @@ module GoodJob
     # Errored but will not be retried
     scope :discarded, -> { finished.where.not(error: nil) }
 
-    scope :unfinished_undiscrete, -> { where(finished_at: nil, retried_good_job_id: nil, is_discrete: [nil, false]) }
-
     # TODO: it would be nice to enforce these values at the model
     # validates :active_job_id, presence: true
     # validates :scheduled_at, presence: true

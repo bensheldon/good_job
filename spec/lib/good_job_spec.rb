@@ -164,24 +164,8 @@ describe GoodJob do
   end
 
   describe '#v4_ready?' do
-    it "is true when all jobs are discrete" do
+    it "is true" do
       expect(described_class.v4_ready?).to eq true
-    end
-
-    it "is false when a job is not discrete" do
-      GoodJob::BaseRecord.uncached do
-        job = GoodJob::Job.create!(finished_at: nil, is_discrete: false)
-        expect(described_class.v4_ready?).to eq false
-
-        job.update! finished_at: nil, is_discrete: nil
-        expect(described_class.v4_ready?).to eq false
-
-        job.update! finished_at: nil, is_discrete: true
-        expect(described_class.v4_ready?).to eq true
-
-        job.update! finished_at: Time.current, is_discrete: nil
-        expect(described_class.v4_ready?).to eq true
-      end
     end
   end
 end
