@@ -579,14 +579,14 @@ RSpec.describe GoodJob::Job do
         expect(described_class.priority_ordered.pluck(:priority)).to eq([-50, 50])
       end
 
-      it 'smaller_number_is_higher_priority=false orders with smaller priority being LOWER priority' do
+      it 'smaller_number_is_higher_priority=false orders with smaller number being LOWER priority' do
         allow(Rails.application.config).to receive(:good_job).and_return({ smaller_number_is_higher_priority: false })
         expect(described_class.priority_ordered.pluck(:priority)).to eq([50, -50])
       end
 
-      it 'smaller_number_is_higher_priority=false orders with lower priority being LOWER priority' do
+      it 'smaller_number_is_higher_priority=nil orders with smaller number being HIGHER priority' do
         allow(Rails.application.config).to receive(:good_job).and_return({})
-        expect(described_class.priority_ordered.pluck(:priority)).to eq([50, -50])
+        expect(described_class.priority_ordered.pluck(:priority)).to eq([-50, 50])
       end
     end
 
