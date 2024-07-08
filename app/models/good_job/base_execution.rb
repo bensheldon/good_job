@@ -25,6 +25,8 @@ module GoodJob
     self.advisory_lockable_column = 'active_job_id'
     self.implicit_order_column = 'created_at'
 
+    self.ignored_columns += ["is_discrete"]
+
     define_model_callbacks :perform
     define_model_callbacks :perform_unlocked, only: :after
 
