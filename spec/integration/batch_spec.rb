@@ -242,7 +242,7 @@ RSpec.describe 'Batches' do
 
   describe 'aggressive async batching' do
     it 'can execute multiple jobs' do
-      allow(GoodJob.configuration).to receive(:max_threads).and_return(20)
+      allow(GoodJob.configuration).to receive(:max_threads).and_return(15)
       capsule = GoodJob::Capsule.new(configuration: GoodJob.configuration)
       adapter = GoodJob::Adapter.new(execution_mode: :async_all, _capsule: capsule)
 
