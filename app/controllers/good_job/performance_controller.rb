@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 module GoodJob
-  class PerformancesController < ApplicationController
-    def show
+  class PerformanceController < ApplicationController
+    def index
       @performances = GoodJob::DiscreteExecution
                       .where.not(job_class: nil)
                       .group(:job_class)

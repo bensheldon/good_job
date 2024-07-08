@@ -194,8 +194,8 @@ ko:
             thousand: K
             trillion: T
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: 평균 지속 시간
         executions: 처형
         job_class: 직업군
@@ -231,7 +231,7 @@ ko:
         jobs: 작업
         live_poll: 실시간 업데이트
         name: "GoodJob 👍"
-        performances: 성능
+        performance: 성능
         processes: 프로세스
         theme:
           auto: 자동

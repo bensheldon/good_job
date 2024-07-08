@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe GoodJob::PerformancesController, type: :controller do
+RSpec.describe GoodJob::PerformanceController, type: :controller do
   render_views # seems required for Rails HEAD
 
   before do
@@ -14,7 +14,7 @@ RSpec.describe GoodJob::PerformancesController, type: :controller do
 
   describe '#index' do
     it 'renders the index page' do
-      get :show
+      get :index
       expect(response).to have_http_status(:ok)
       expect(response.body).to include('Performance')
     end

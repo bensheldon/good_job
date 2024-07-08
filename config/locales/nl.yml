@@ -194,8 +194,8 @@ nl:
             thousand: K
             trillion: T
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Gemiddelde duur
         executions: Executies
         job_class: Functie klasse
@@ -231,7 +231,7 @@ nl:
         jobs: Taken
         live_poll: Live Poll
         name: "GoodJob 👍"
-        performances: Prestatie
+        performance: Prestatie
         processes: Processen
         theme:
           auto: Auto

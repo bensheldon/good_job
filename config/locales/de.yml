@@ -194,8 +194,8 @@ de:
             thousand: K
             trillion: T
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Durchschnittliche Dauer
         executions: Hinrichtungen
         job_class: Berufsklasse
@@ -231,7 +231,7 @@ de:
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
-        performances: Leistung
+        performance: Leistung
         processes: Prozesse
         theme:
           auto: Auto
