@@ -1,5 +1,25 @@
 # Changelog
 
+## [v4.0.2](https://github.com/bensheldon/good_job/tree/v4.0.2) (2024-07-08)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.0.1...v4.0.2)
+
+**Fixed bugs:**
+
+- Fix a rails 6.1 deprecation warning for the duration attribute [\#1408](https://github.com/bensheldon/good_job/pull/1408) ([Earlopain](https://github.com/Earlopain))
+- Actually remove deprecated configuration for `cleanup_interval_seconds`, `cleanup_interval_jobs`; remove deprecated `Lockable` [\#1406](https://github.com/bensheldon/good_job/pull/1406) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- PG::UndefinedColumn: ERROR:  column good\_job\_processes.lock\_type does not exist [\#1405](https://github.com/bensheldon/good_job/issues/1405)
+- undefined method `duration=' for an instance of GoodJob::Execution [\#1404](https://github.com/bensheldon/good_job/issues/1404)
+- v3 deprecations are still present [\#1399](https://github.com/bensheldon/good_job/issues/1399)
+
+**Merged pull requests:**
+
+- Fix Batch integration test to not exhaust database connection thread pool [\#1409](https://github.com/bensheldon/good_job/pull/1409) ([bensheldon](https://github.com/bensheldon))
+- Discrete cleanup [\#1401](https://github.com/bensheldon/good_job/pull/1401) ([Earlopain](https://github.com/Earlopain))
+
 ## [v4.0.1](https://github.com/bensheldon/good_job/tree/v4.0.1) (2024-07-08)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.0.0...v4.0.1)
