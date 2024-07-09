@@ -47,16 +47,26 @@ module GoodJob
       end
 
       {
-        labels: labels,
-        datasets: queues_data.map do |queue, data|
-          label = queue || '(none)'
-          {
-            label: label,
-            data: data,
-            backgroundColor: string_to_hsl(label),
-            borderColor: string_to_hsl(label),
-          }
-        end,
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: queues_data.map do |queue, data|
+            label = queue || '(none)'
+            {
+              label: label,
+              data: data,
+              backgroundColor: string_to_hsl(label),
+              borderColor: string_to_hsl(label),
+            }
+          end,
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
       }
     end
 
