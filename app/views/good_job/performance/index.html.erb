@@ -20,7 +20,7 @@
     <% @performances.each do |performance| %>
       <div role="row" class="list-group-item py-3">
         <div class="row align-items-center">
-          <div class="col-12 col-lg-4"><%= performance.job_class %></div>
+          <div class="col-12 col-lg-4"><%= link_to performance.job_class, performance_path(performance.job_class) %></div>
           <div class="col-6 col-lg-2 text-wrap">
             <div class="d-lg-none small text-muted mt-1"><%= t ".executions" %></div>
             <%= performance.executions_count %>

@@ -203,6 +203,9 @@ tr:
         maximum_duration: Maksimum süre
         minimum_duration: Minimum süre
         title: Verim
+      show:
+        slow: Yavaş
+        title: Verim
     processes:
       index:
         cron_enabled: Cron etkin

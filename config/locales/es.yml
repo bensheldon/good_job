@@ -203,6 +203,9 @@ es:
         maximum_duration: Duración máxima
         minimum_duration: Duración mínima
         title: Actuación
+      show:
+        slow: Lento
+        title: Actuación
     processes:
       index:
         cron_enabled: Cron habilitado

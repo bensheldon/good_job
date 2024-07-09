@@ -203,6 +203,9 @@ ko:
         maximum_duration: 최대 기간
         minimum_duration: 최소 기간
         title: 성능
+      show:
+        slow: 느림
+        title: 성능
     processes:
       index:
         cron_enabled: Cron이 활성화되어 있음

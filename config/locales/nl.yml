@@ -203,6 +203,9 @@ nl:
         maximum_duration: Maximale duur
         minimum_duration: Minimale duur
         title: Prestatie
+      show:
+        slow: Langzaam
+        title: Prestatie
     processes:
       index:
         cron_enabled: Cron ingeschakeld

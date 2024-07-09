@@ -15,5 +15,9 @@ module GoodJob
                           ")
                       .order("job_class")
     end
+
+    def show
+      @job_class = params[:id]
+    end
   end
 end

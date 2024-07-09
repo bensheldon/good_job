@@ -203,6 +203,9 @@ ja:
         maximum_duration: 最大持続時間
         minimum_duration: 最小期間
         title: パフォーマンス
+      show:
+        slow: 遅い
+        title: パフォーマンス
     processes:
       index:
         cron_enabled: Cron が有効になっている

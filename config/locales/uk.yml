@@ -229,6 +229,9 @@ uk:
         maximum_duration: Максимальна тривалість
         minimum_duration: Мінімальна тривалість
         title: Продуктивність
+      show:
+        slow: Повільно
+        title: Продуктивність
     processes:
       index:
         cron_enabled: Cron увімкнено

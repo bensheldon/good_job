@@ -203,6 +203,9 @@ pt-BR:
         maximum_duration: Duração máxima
         minimum_duration: Duração mínima
         title: Desempenho
+      show:
+        slow: Lento
+        title: Desempenho
     processes:
       index:
         cron_enabled: Agendamento ativado

@@ -203,6 +203,9 @@ en:
         maximum_duration: Maximum duration
         minimum_duration: Minimum duration
         title: Performance
+      show:
+        slow: Slow
+        title: Performance
     processes:
       index:
         cron_enabled: Cron enabled

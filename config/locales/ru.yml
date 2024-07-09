@@ -229,6 +229,9 @@ ru:
         maximum_duration: Максимальная продолжительность
         minimum_duration: Минимальная продолжительность
         title: Производительность
+      show:
+        slow: Медленный
+        title: Производительность
     processes:
       index:
         cron_enabled: Cron включен
