@@ -197,6 +197,7 @@ en:
     performance:
       index:
         average_duration: Average duration
+        chart_title: Total job execution time in seconds
         executions: Executions
         job_class: Job class
         maximum_duration: Maximum duration

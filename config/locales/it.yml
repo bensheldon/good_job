@@ -197,6 +197,7 @@ it:
     performance:
       index:
         average_duration: Durata media
+        chart_title: Tempo totale di esecuzione del lavoro in secondi
         executions: Esecuzioni
         job_class: Classe di lavoro
         maximum_duration: Durata massima

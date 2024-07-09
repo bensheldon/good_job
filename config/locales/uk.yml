@@ -223,6 +223,7 @@ uk:
     performance:
       index:
         average_duration: Середня тривалість
+        chart_title: Загальний час виконання завдання в секундах
         executions: Страти
         job_class: Клас роботи
         maximum_duration: Максимальна тривалість

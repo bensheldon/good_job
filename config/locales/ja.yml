@@ -197,6 +197,7 @@ ja:
     performance:
       index:
         average_duration: 平均所要時間
+        chart_title: ジョブの総実行時間（秒
         executions: 処刑
         job_class: 職種
         maximum_duration: 最大持続時間

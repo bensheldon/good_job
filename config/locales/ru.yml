@@ -223,6 +223,7 @@ ru:
     performance:
       index:
         average_duration: Средняя продолжительность
+        chart_title: Общее время выполнения задания в секундах
         executions: Казни
         job_class: Класс работы
         maximum_duration: Максимальная продолжительность
