@@ -15,7 +15,7 @@ module GoodJob # :nodoc:
     alias_attribute :performed_at, :created_at
 
     # TODO: Remove when support for Rails 6.1 is dropped
-    attribute :duration, :interval
+    attribute :duration, :interval if ActiveJob.version.canonical_segments.take(2) == [6, 1]
 
     def number
       serialized_params.fetch('executions', 0) + 1
