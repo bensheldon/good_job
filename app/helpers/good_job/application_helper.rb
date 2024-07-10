@@ -30,6 +30,14 @@ module GoodJob
       tag.time(text, datetime: timestamp, title: timestamp)
     end
 
+    def number_to_human(count)
+      super(count, **translate_hash("good_job.number.human.decimal_units"))
+    end
+
+    def number_with_delimiter(count)
+      super(count, **translate_hash('good_job.number.format'))
+    end
+
     def translate_hash(key, **options)
       translation_exists?(key, **options) ? translate(key, **options) : {}
     end
