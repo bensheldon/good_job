@@ -1,5 +1,25 @@
 # Changelog
 
+## [v4.0.3](https://github.com/bensheldon/good_job/tree/v4.0.3) (2024-07-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.0.2...v4.0.3)
+
+**Fixed bugs:**
+
+- Only set duration attribute to interval on Rails 6.1 [\#1412](https://github.com/bensheldon/good_job/pull/1412) ([bdewater-thatch](https://github.com/bdewater-thatch))
+
+**Closed issues:**
+
+- GoodJob error: TypeError: can't cast ActiveSupport::Duration \(on v4.0.0\) [\#1413](https://github.com/bensheldon/good_job/issues/1413)
+- Question: is it possible to clean a set of scheduled jobs \(by class name\) from console? [\#1410](https://github.com/bensheldon/good_job/issues/1410)
+- "Couldn't find GoodJob::BatchRecord" error [\#1387](https://github.com/bensheldon/good_job/issues/1387)
+- Empty alerts "\[\]"? [\#1372](https://github.com/bensheldon/good_job/issues/1372)
+- Release GoodJob 4.0 [\#764](https://github.com/bensheldon/good_job/issues/764)
+
+**Merged pull requests:**
+
+- Add Active Support load hooks for Job and \(Discrete\)Execution; move all outside class definition bodies [\#1414](https://github.com/bensheldon/good_job/pull/1414) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.0.2](https://github.com/bensheldon/good_job/tree/v4.0.2) (2024-07-08)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.0.1...v4.0.2)
