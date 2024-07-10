@@ -291,6 +291,6 @@ module GoodJob
   def self.migrated?
     true
   end
-
-  ActiveSupport.run_load_hooks(:good_job, self)
 end
+
+ActiveSupport.run_load_hooks(:good_job, GoodJob)
