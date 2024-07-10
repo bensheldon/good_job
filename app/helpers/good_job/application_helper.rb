@@ -14,7 +14,7 @@ module GoodJob
       if sec < 1
         t 'good_job.duration.milliseconds', ms: (sec * 1000).floor
       elsif sec < 10
-        t 'good_job.duration.less_than_10_seconds', sec: sec.floor
+        t 'good_job.duration.less_than_10_seconds', sec: number_with_delimiter(sec.floor(1))
       elsif sec < 60
         t 'good_job.duration.seconds', sec: sec.floor
       elsif sec < 3600
