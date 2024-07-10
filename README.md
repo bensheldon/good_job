@@ -876,7 +876,7 @@ To perform upgrades to the GoodJob database tables:
 
 #### Upgrading v3 to v4
 
-GoodJob v4 changes how job and job execution records are stored in the database; moving from job and executions being commingled in the `good_jobs` table to separately and discretely storing job executions in `good_job_executions`. To safely upgrade, all unfinished jobs must use the new format. This change was introduced in GoodJob [v3.15.4 (April 2023)](https://github.com/bensheldon/good_job/releases/tag/v3.15.4), so your application is likely ready-to-upgrade already if you have kept up with GoodJob updates.
+GoodJob v4 changes how job and job execution records are stored in the database; moving from job and executions being commingled in the `good_jobs` table to separately and discretely storing job executions in `good_job_executions`. To safely upgrade, all unfinished jobs must use the new format. This change was introduced in GoodJob [v3.15.4 (April 2023)](https://github.com/bensheldon/good_job/releases/tag/v3.15.4), so your application is likely ready-to-upgrade in this respect if you have kept up with GoodJob updates and applied migrations (`bin/rails g good_job:update`). _Please be sure to doublecheck you are not missing subsequent migrations or deprecations too by following the instructions below._
 
 To upgrade:
 
