@@ -146,7 +146,7 @@ module GoodJob
 
           self.class.transaction(joinable: false, requires_new: true) do
             new_active_job = active_job.retry_job(wait: 0, error: error)
-            self.error_event = ERROR_EVENT_RETRIED if error
+            self.error_event = :retried if error
             save!
           end
         end
@@ -212,7 +212,7 @@ module GoodJob
         update(
           finished_at: Time.current,
           error: self.class.format_error(job_error),
-          error_event: ERROR_EVENT_DISCARDED
+          error_event: :discarded
         )
       end
 
