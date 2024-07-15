@@ -27,9 +27,10 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
       expect(response.body).to include('Performance - ExampleJob')
     end
 
-    it "renders the show page when the job doesn't exist" do
-      get :show, params: { id: "Missing" }
-      expect(response).to have_http_status(:ok)
+    it "raises a 404 when the job doesn't exist" do
+      expect do
+        get :show, params: { id: "Missing" }
+      end.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 end
