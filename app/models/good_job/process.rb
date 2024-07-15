@@ -15,15 +15,15 @@ module GoodJob # :nodoc:
 
     self.table_name = 'good_job_processes'
     self.implicit_order_column = 'created_at'
-    LOCK_TYPES = [
-      LOCK_TYPE_ADVISORY = 'advisory',
-    ].freeze
 
-    LOCK_TYPE_ENUMS = {
-      LOCK_TYPE_ADVISORY => 1,
-    }.freeze
-
-    self.table_name = 'good_job_processes'
+    lock_type_enum = {
+      advisory: 0,
+    }
+    if Gem::Version.new(Rails.version) >= Gem::Version.new('7.1.0.a')
+      enum :lock_type, lock_type_enum, validate: { allow_nil: true }
+    else
+      enum lock_type: lock_type_enum
+    end
 
     has_many :locked_jobs, class_name: "GoodJob::Job", foreign_key: :locked_by_id, inverse_of: :locked_by_process, dependent: nil
     after_destroy { locked_jobs.update_all(locked_by_id: nil) if GoodJob::Job.columns_hash.key?("locked_by_id") } # rubocop:disable Rails/SkipsModelValidations
@@ -34,7 +34,7 @@ module GoodJob # :nodoc:
     # @return [ActiveRecord::Relation]
     scope :active, (lambda do
       query = joins_advisory_locks
-      query.where(lock_type: LOCK_TYPE_ENUMS[LOCK_TYPE_ADVISORY]).advisory_locked
+      query.where(lock_type: :advisory).advisory_locked
         .or(query.where(lock_type: nil).where(arel_table[:updated_at].gt(EXPIRED_INTERVAL.ago)))
     end)
 
@@ -44,7 +44,7 @@ module GoodJob # :nodoc:
     # @return [ActiveRecord::Relation]
     scope :inactive, (lambda do
       query = joins_advisory_locks
-      query.where(lock_type: LOCK_TYPE_ENUMS[LOCK_TYPE_ADVISORY]).advisory_unlocked
+      query.where(lock_type: :advisory).advisory_unlocked
         .or(query.where(lock_type: nil).where(arel_table[:updated_at].lt(EXPIRED_INTERVAL.ago)))
     end)
 
@@ -63,7 +63,7 @@ module GoodJob # :nodoc:
       }
       if with_advisory_lock
         attributes[:create_with_advisory_lock] = true
-        attributes[:lock_type] = LOCK_TYPE_ADVISORY
+        attributes[:lock_type] = :advisory
       end
       create!(attributes)
     end
@@ -123,22 +123,6 @@ module GoodJob # :nodoc:
 
     def schedulers
       state.fetch("schedulers", [])
-    end
-
-    def lock_type
-      return unless self.class.columns_hash['lock_type']
-
-      enum = super
-      LOCK_TYPE_ENUMS.key(enum) if enum
-    end
-
-    def lock_type=(value)
-      return unless self.class.columns_hash['lock_type']
-
-      enum = LOCK_TYPE_ENUMS[value]
-      raise(ArgumentError, "Invalid error_event: #{value}") if value && !enum
-
-      super(enum)
     end
   end
 end

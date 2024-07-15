@@ -84,7 +84,7 @@ module GoodJob # :nodoc:
             if !advisory_locked? || !advisory_locked_connection?
               @record.class.transaction do
                 @record.advisory_lock!
-                @record.update(lock_type: GoodJob::Process::LOCK_TYPE_ADVISORY)
+                @record.update(lock_type: :advisory)
               end
               @advisory_locked_connection = WeakRef.new(@record.class.connection)
             end
