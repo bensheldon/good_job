@@ -27,6 +27,8 @@ module GoodJob # :nodoc:
     RECONNECT_INTERVAL = 5
     # Number of consecutive connection errors before reporting an error
     CONNECTION_ERRORS_REPORTING_THRESHOLD = 6
+    # Interval for emitting a noop SQL query to keep the connection alive
+    KEEPALIVE_INTERVAL = 10
 
     # Connection errors that will wait {RECONNECT_INTERVAL} before reconnecting
     CONNECTION_ERRORS = %w[
@@ -78,6 +80,7 @@ module GoodJob # :nodoc:
       @enable_listening = enable_listening
       @task = nil
       @capsule = capsule
+      @last_keepalive_time = Time.current
 
       start
       self.class.instances << self
@@ -268,6 +271,10 @@ module GoodJob # :nodoc:
       if @enable_listening && raw_connection.respond_to?(:wait_for_notify)
         raw_connection.wait_for_notify(WAIT_INTERVAL) do |channel, _pid, payload|
           yield(channel, payload)
+        end
+        if Time.current - @last_keepalive_time >= KEEPALIVE_INTERVAL
+          raw_connection.async_exec("SELECT 1")
+          @last_keepalive_time = Time.current
         end
       elsif @enable_listening && raw_connection.respond_to?(:jdbc_connection)
         raw_connection.execute_query("SELECT 1")

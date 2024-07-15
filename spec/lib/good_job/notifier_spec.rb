@@ -134,6 +134,20 @@ RSpec.describe GoodJob::Notifier do
 
       notifier.shutdown
     end
+
+    it 'executes a noop SQL query every 10 seconds to keep the connection alive' do
+      stub_const("GoodJob::Notifier::KEEPALIVE_INTERVAL", 0.1)
+      stub_const("GoodJob::Notifier::WAIT_INTERVAL", 0.1)
+
+      notifier = described_class.new(enable_listening: true)
+      original_keepalive = notifier.instance_variable_get(:@last_keepalive_time)
+
+      expect(notifier).to be_listening(timeout: 2)
+      sleep 0.2
+      expect(notifier.instance_variable_get(:@last_keepalive_time)).to be > original_keepalive
+
+      notifier.shutdown
+    end
   end
 
   describe '#shutdown' do
