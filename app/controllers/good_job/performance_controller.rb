@@ -17,7 +17,8 @@ module GoodJob
     end
 
     def show
-      @job_class = params[:id]
+      representative_job = GoodJob::Job.find_by!(job_class: params[:id])
+      @job_class = representative_job.job_class
     end
   end
 end
