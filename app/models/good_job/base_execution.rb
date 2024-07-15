@@ -481,11 +481,7 @@ module GoodJob
           end
         end
 
-        job_attributes = if self.class.columns_hash.key?("locked_by_id")
-                           { locked_by_id: nil, locked_at: nil }
-                         else
-                           {}
-                         end
+        job_attributes = { locked_by_id: nil, locked_at: nil }
 
         job_error = result.handled_error || result.unhandled_error
         if job_error
