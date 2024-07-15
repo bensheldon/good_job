@@ -26,7 +26,7 @@ module GoodJob # :nodoc:
     self.table_name = 'good_job_processes'
 
     has_many :locked_jobs, class_name: "GoodJob::Job", foreign_key: :locked_by_id, inverse_of: :locked_by_process, dependent: nil
-    after_destroy { locked_jobs.update_all(locked_by_id: nil) if GoodJob::Job.columns_hash.key?("locked_by_id") } # rubocop:disable Rails/SkipsModelValidations
+    after_destroy { locked_jobs.update_all(locked_by_id: nil) } # rubocop:disable Rails/SkipsModelValidations
 
     # Processes that are active and locked.
     # @!method active
@@ -51,7 +51,7 @@ module GoodJob # :nodoc:
     # Deletes all inactive process records.
     def self.cleanup
       inactive.find_each do |process|
-        GoodJob::Job.where(locked_by_id: process.id).update_all(locked_by_id: nil, locked_at: nil) if GoodJob::Job.columns_hash.key?("locked_by_id") # rubocop:disable Rails/SkipsModelValidations
+        GoodJob::Job.where(locked_by_id: process.id).update_all(locked_by_id: nil, locked_at: nil) # rubocop:disable Rails/SkipsModelValidations
         process.delete
       end
     end
