@@ -2,6 +2,8 @@
   <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
 </div>
 
+<%= render 'good_job/shared/chart', chart_data: GoodJob::PerformanceIndexChart.new.data %>
+
 <div class="my-3 card">
   <div class="list-group list-group-flush text-nowrap" role="table">
     <header class="list-group-item bg-body-tertiary">
@@ -18,7 +20,7 @@
     <% @performances.each do |performance| %>
       <div role="row" class="list-group-item py-3">
         <div class="row align-items-center">
-          <div class="col-12 col-lg-4"><%= performance.job_class %></div>
+          <div class="col-12 col-lg-4"><%= link_to performance.job_class, performance_path(performance.job_class) %></div>
           <div class="col-6 col-lg-2 text-wrap">
             <div class="d-lg-none small text-muted mt-1"><%= t ".executions" %></div>
             <%= performance.executions_count %>

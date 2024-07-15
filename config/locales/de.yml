@@ -197,10 +197,14 @@ de:
     performance:
       index:
         average_duration: Durchschnittliche Dauer
+        chart_title: Gesamtdauer der Auftragsausführung in Sekunden
         executions: Hinrichtungen
         job_class: Berufsklasse
         maximum_duration: Maximale Dauer
         minimum_duration: Mindestdauer
+        title: Leistung
+      show:
+        slow: Langsam
         title: Leistung
     processes:
       index:

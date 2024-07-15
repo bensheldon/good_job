@@ -197,10 +197,14 @@ fr:
     performance:
       index:
         average_duration: Durée moyenne
+        chart_title: Durée totale d'exécution du travail en secondes
         executions: Exécutions
         job_class: Catégorie d'emplois
         maximum_duration: Durée maximale
         minimum_duration: Durée minimale
+        title: Performance
+      show:
+        slow: Lenteur
         title: Performance
     processes:
       index:

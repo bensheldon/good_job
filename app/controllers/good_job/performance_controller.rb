@@ -15,5 +15,10 @@ module GoodJob
                           ")
                       .order("job_class")
     end
+
+    def show
+      representative_job = GoodJob::Job.find_by!(job_class: params[:id])
+      @job_class = representative_job.job_class
+    end
   end
 end

@@ -197,10 +197,14 @@ tr:
     performance:
       index:
         average_duration: Ortalama süre
+        chart_title: Saniye cinsinden toplam iş yürütme süresi
         executions: İnfazlar
         job_class: İş sınıfı
         maximum_duration: Maksimum süre
         minimum_duration: Minimum süre
+        title: Verim
+      show:
+        slow: Yavaş
         title: Verim
     processes:
       index:

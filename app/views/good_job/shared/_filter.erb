@@ -15,7 +15,7 @@
             <option value="" <%= "selected='selected'" if params[:queue_name].blank? %>><%= t ".all_queues" %></option>
 
             <% filter.queues.each do |name, count| %>
-              <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:queue_name] == name %>><%= name %> (<%= number_with_delimiter(count, translate_hash('good_job.number.format')) %>)</option>
+              <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:queue_name] == name %>><%= name %> (<%= number_with_delimiter(count) %>)</option>
             <% end %>
           </select>
         </div>
@@ -26,7 +26,7 @@
             <option value="" <%= "selected='selected'" if params[:job_class].blank? %>><%= t ".all_jobs" %></option>
 
             <% filter.job_classes.each do |name, count| %>
-              <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:job_class] == name %>><%= name %> (<%= number_with_delimiter(count, translate_hash('good_job.number.format')) %>)</option>
+              <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:job_class] == name %>><%= name %> (<%= number_with_delimiter(count) %>)</option>
             <% end %>
           </select>
         </div>

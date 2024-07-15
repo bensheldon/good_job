@@ -9,27 +9,17 @@ module GoodJob
       processes_count = GoodJob::Process.active.count
 
       render json: {
-        jobs_count: number_to_human(jobs_count),
-        batches_count: number_to_human(batches_count),
-        cron_entries_count: number_to_human(cron_entries_count),
-        processes_count: number_to_human(processes_count),
+        jobs_count: helpers.number_to_human(jobs_count),
+        batches_count: helpers.number_to_human(batches_count),
+        cron_entries_count: helpers.number_to_human(cron_entries_count),
+        processes_count: helpers.number_to_human(processes_count),
       }
     end
 
     def job_status
       @filter = JobsFilter.new(params)
 
-      render json: @filter.states.transform_values { |count| number_with_delimiter(count) }
-    end
-
-    private
-
-    def number_to_human(count)
-      helpers.number_to_human(count, **helpers.translate_hash("good_job.number.human.decimal_units"))
-    end
-
-    def number_with_delimiter(count)
-      helpers.number_with_delimiter(count, **helpers.translate_hash('good_job.number.format'))
+      render json: @filter.states.transform_values { |count| helpers.number_with_delimiter(count) }
     end
   end
 end

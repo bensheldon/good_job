@@ -197,10 +197,14 @@ nl:
     performance:
       index:
         average_duration: Gemiddelde duur
+        chart_title: Totale uitvoeringstijd van de taak in seconden
         executions: Executies
         job_class: Functie klasse
         maximum_duration: Maximale duur
         minimum_duration: Minimale duur
+        title: Prestatie
+      show:
+        slow: Langzaam
         title: Prestatie
     processes:
       index:
