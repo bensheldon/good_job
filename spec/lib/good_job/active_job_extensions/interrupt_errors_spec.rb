@@ -26,7 +26,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
       expect { GoodJob.perform_inline }.to raise_error(GoodJob::InterruptError)
       expect(GoodJob::Job.last).to have_attributes(
         error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
-        error_event: GoodJob::Job::ERROR_EVENT_INTERRUPTED
+        error_event: "interrupted"
       )
     end
 
@@ -44,7 +44,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
           performed_at: be_blank,
           finished_at: be_blank,
           error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
-          error_event: GoodJob::Job::ERROR_EVENT_RETRIED
+          error_event: "retried"
         )
 
         initial_discrete_execution = job.discrete_executions.first
@@ -53,7 +53,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
           finished_at: be_present,
           duration: be_present,
           error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
-          error_event: GoodJob::Job::ERROR_EVENT_INTERRUPTED
+          error_event: "interrupted"
         )
 
         retried_discrete_execution = job.discrete_executions.last
@@ -62,7 +62,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
           finished_at: be_present,
           duration: be_present,
           error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
-          error_event: GoodJob::Job::ERROR_EVENT_RETRIED
+          error_event: "retried"
         )
       end
     end

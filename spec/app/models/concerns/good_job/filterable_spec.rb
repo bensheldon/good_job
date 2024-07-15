@@ -13,7 +13,7 @@ RSpec.describe GoodJob::Filterable do
       serialized_params: { example_key: 'example_value' },
       labels: %w[buffalo gopher],
       error: "ExampleJob::ExampleError: a message",
-      error_event: GoodJob::ErrorEvents::ERROR_EVENT_RETRIED
+      error_event: "retried"
     )
   end
 

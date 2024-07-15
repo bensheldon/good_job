@@ -409,15 +409,15 @@ module GoodJob
 
             interrupt_error_string = self.class.format_error(GoodJob::InterruptError.new("Interrupted after starting perform at '#{existing_performed_at}'"))
             self.error = interrupt_error_string
-            self.error_event = ERROR_EVENT_INTERRUPTED
+            self.error_event = :interrupted
             monotonic_duration = (::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - monotonic_start).seconds
 
             discrete_execution_attrs = {
               error: interrupt_error_string,
               finished_at: job_performed_at,
+              error_event: :interrupted,
+              duration: monotonic_duration,
             }
-            discrete_execution_attrs[:error_event] = GoodJob::ErrorEvents::ERROR_EVENT_ENUMS[GoodJob::ErrorEvents::ERROR_EVENT_INTERRUPTED]
-            discrete_execution_attrs[:duration] = monotonic_duration
             discrete_executions.where(finished_at: nil).where.not(performed_at: nil).update_all(discrete_execution_attrs) # rubocop:disable Rails/SkipsModelValidations
           end
 
@@ -451,13 +451,13 @@ module GoodJob
             handled_error ||= current_thread.error_on_retry || current_thread.error_on_discard
 
             error_event = if handled_error == current_thread.error_on_discard
-                            ERROR_EVENT_DISCARDED
+                            :discarded
                           elsif handled_error == current_thread.error_on_retry
-                            ERROR_EVENT_RETRIED
+                            :retried
                           elsif handled_error == current_thread.error_on_retry_stopped
-                            ERROR_EVENT_RETRY_STOPPED
+                            :retry_stopped
                           elsif handled_error
-                            ERROR_EVENT_HANDLED
+                            :handled
                           end
 
             instrument_payload.merge!(
@@ -469,11 +469,11 @@ module GoodJob
             ExecutionResult.new(value: value, handled_error: handled_error, error_event: error_event, retried: current_thread.execution_retried)
           rescue StandardError => e
             error_event = if e.is_a?(GoodJob::InterruptError)
-                            ERROR_EVENT_INTERRUPTED
+                            :interrupted
                           elsif e == current_thread.error_on_retry_stopped
-                            ERROR_EVENT_RETRY_STOPPED
+                            :retry_stopped
                           else
-                            ERROR_EVENT_UNHANDLED
+                            :unhandled
                           end
 
             instrument_payload[:unhandled_error] = e
