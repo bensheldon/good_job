@@ -53,7 +53,7 @@ module GoodJob
     end
 
     def _continue_discard_or_finish(execution = nil, lock: true)
-      execution_discarded = execution && execution.error.present? && execution.finished_at && execution.retried_good_job_id.nil?
+      execution_discarded = execution && execution.finished_at.present? && execution.error.present?
       take_advisory_lock(lock) do
         Batch.within_thread(batch_id: nil, batch_callback_id: id) do
           reload

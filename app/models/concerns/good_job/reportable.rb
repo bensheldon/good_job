@@ -16,27 +16,23 @@ module GoodJob
     # @return [Symbol]
     def status
       if finished_at.present?
-        if error.present? && retried_good_job_id.present?
-          :retried
-        elsif error.present? && retried_good_job_id.nil?
+        if error.present?
           :discarded
         else
           :succeeded
         end
-      elsif (scheduled_at || created_at) > DateTime.current
-        if serialized_params.fetch('executions', 0) > 1
-          :retried
-        else
-          :scheduled
-        end
-      elsif running?
+      elsif performed_at.present?
         :running
-      else
+      elsif (scheduled_at || created_at) <= DateTime.current
         :queued
+      elsif error.present?
+        :retried
+      else
+        :scheduled
       end
     end
 
-    # The last relevant timestamp for this execution
+    # The last relevant timestamp for this job
     def last_status_at
       finished_at || performed_at || scheduled_at || created_at
     end
