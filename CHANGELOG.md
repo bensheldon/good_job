@@ -1,5 +1,35 @@
 # Changelog
 
+## [v4.1.0](https://github.com/bensheldon/good_job/tree/v4.1.0) (2024-07-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.99.1...v4.1.0)
+
+**Implemented enhancements:**
+
+- Add keepalive SQL query to Notifier [\#1423](https://github.com/bensheldon/good_job/pull/1423) ([bensheldon](https://github.com/bensheldon))
+- Latency charts and histograms for individual job classes [\#1411](https://github.com/bensheldon/good_job/pull/1411) ([Earlopain](https://github.com/Earlopain))
+
+**Fixed bugs:**
+
+- Fix nonexistant association error between DiscreteExecution and Execution [\#1425](https://github.com/bensheldon/good_job/pull/1425) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Could not find the inverse association for execution \(:discrete\_executions in GoodJob::Execution\) [\#1424](https://github.com/bensheldon/good_job/issues/1424)
+- 3.99.1 is marked as the latest version, not 4.0.3 [\#1422](https://github.com/bensheldon/good_job/issues/1422)
+- How to maximise amount of jobs executed in parallel  [\#1418](https://github.com/bensheldon/good_job/issues/1418)
+- Performance Metrics for individual jobs [\#1397](https://github.com/bensheldon/good_job/issues/1397)
+
+**Merged pull requests:**
+
+- Remove some now unnecessary checks against `locked_by_id` existence [\#1421](https://github.com/bensheldon/good_job/pull/1421) ([Earlopain](https://github.com/Earlopain))
+- Use rails enum for `error_event` and `lock_type` [\#1420](https://github.com/bensheldon/good_job/pull/1420) ([Earlopain](https://github.com/Earlopain))
+- Add a little more wording to the v4 "ready to upgrade" instructions [\#1415](https://github.com/bensheldon/good_job/pull/1415) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.99.1](https://github.com/bensheldon/good_job/tree/v3.99.1) (2024-07-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.0.3...v3.99.1)
+
 ## [v4.0.3](https://github.com/bensheldon/good_job/tree/v4.0.3) (2024-07-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.0.2...v4.0.3)
