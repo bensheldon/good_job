@@ -1,0 +1,75 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "520db6b6cd19ef42def0ca6c3031065e3a1f485e47d20db1f4122153785437e3",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/controllers/good_job/frontends_controller.rb",
+      "line": 44,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(file => (self.class.js_modules[params[:name].to_sym] or raise(ActionController::RoutingError, \"Not Found\")), {})",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GoodJob::FrontendsController",
+        "method": "module"
+      },
+      "user_input": "params[:name].to_sym",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "Files are explicitly enumerated in the array"
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "c837568c590d9608a8bb9927b31b9597aaacc72053b6482e1a54bd02aa0dd2d7",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/good_job/job.rb",
+      "line": 140,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"(CASE #{queues.map.with_index do\n sanitize_sql_array([\"WHEN queue_name = ? THEN ?\", queue_name, index])\n end.join(\" \")} ELSE #{queues.size} END)\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Job",
+        "method": null
+      },
+      "user_input": "queues.map.with_index do\n sanitize_sql_array([\"WHEN queue_name = ? THEN ?\", queue_name, index])\n end.join(\" \")",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "Developer provided value, queue_name, is sanitized."
+    },
+    {
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "dd597dcd0c7443af75784ab306b35936be999bfe8b44e744ad0c6f9012262c6e",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/controllers/good_job/frontends_controller.rb",
+      "line": 38,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(file => ({ :css => ({ :bootstrap => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"bootstrap\", \"bootstrap.min.css\"), :style => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"style.css\") }), :js => ({ :bootstrap => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"bootstrap\", \"bootstrap.bundle.min.js\"), :chartjs => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"chartjs\", \"chart.min.js\"), :es_module_shims => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"es_module_shims.js\"), :rails_ujs => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"rails_ujs.js\") }) }.dig(params[:format].to_sym, params[:name].to_sym) or raise(ActionController::RoutingError, \"Not Found\")), {})",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GoodJob::FrontendsController",
+        "method": "static"
+      },
+      "user_input": "params[:name].to_sym",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "Files are explicitly enumerated in the array"
+    }
+  ],
+  "updated": "2024-07-16 11:28:03 -0700",
+  "brakeman_version": "6.1.2"
+}

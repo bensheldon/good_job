@@ -62,4 +62,7 @@ FileUtils.chdir GEM_ROOT do
 
   puts "\n== i18n-tasks health =="
   system! "bin/i18n-tasks health  "
+
+  puts "\n== Brakeman =="
+  system! "bundle exec brakeman"
 end

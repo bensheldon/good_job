@@ -2,6 +2,7 @@
 
 module GoodJob
   class FrontendsController < ActionController::Base # rubocop:disable Rails/ApplicationController
+    protect_from_forgery with: :exception
     skip_after_action :verify_same_origin_request, raise: false
 
     STATIC_ASSETS = {
