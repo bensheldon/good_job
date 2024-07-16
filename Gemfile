@@ -48,6 +48,7 @@ platforms :ruby do
   end
 
   group :lint do
+    gem "brakeman"
     gem "easy_translate"
     gem "erb_lint"
     gem "i18n-tasks"
