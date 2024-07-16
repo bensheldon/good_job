@@ -35,6 +35,6 @@ GoodJob::Engine.routes.draw do
 
   scope :frontend, controller: :frontends, defaults: { version: GoodJob::VERSION.tr(".", "-") } do
     get "modules/:version/:id", action: :module, as: :frontend_module, constraints: { format: 'js' }
-    get "static/:version/:id", action: :static, as: :frontend_static, constraints: { format: %w[css js] }
+    get "static/:version/:id", action: :static, as: :frontend_static, constraints: { format: %w[css js svg] }
   end
 end

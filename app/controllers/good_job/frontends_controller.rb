@@ -15,6 +15,9 @@ module GoodJob
         es_module_shims: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "es_module_shims.js"),
         rails_ujs: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "rails_ujs.js"),
       },
+      svg: {
+        icons: GoodJob::Engine.root.join("app", "frontend", "good_job", "icons.svg"),
+      },
     }.freeze
 
     MODULE_OVERRIDES = {
