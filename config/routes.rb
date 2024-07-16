@@ -33,8 +33,8 @@ GoodJob::Engine.routes.draw do
 
   resources :performance, only: %i[index show]
 
-  scope :frontend, controller: :frontends do
-    get "modules/:name", action: :module, as: :frontend_module, constraints: { format: 'js' }
-    get "static/:name", action: :static, as: :frontend_static, constraints: { format: %w[css js] }
+  scope :frontend, controller: :frontends, defaults: { version: GoodJob::VERSION.tr(".", "-") } do
+    get "modules/:version/:id", action: :module, as: :frontend_module, constraints: { format: 'js' }
+    get "static/:version/:id", action: :static, as: :frontend_static, constraints: { format: %w[css js] }
   end
 end
