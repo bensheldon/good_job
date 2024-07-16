@@ -372,7 +372,7 @@ module GoodJob
         instrument_payload[:job] = job
         job.save!
 
-        CurrentThread.execution_retried = (job if retried)
+        CurrentThread.retried_job = job if retried
 
         active_job.provider_job_id = job.id
         raise "These should be equal" if active_job.provider_job_id != active_job.job_id
@@ -463,10 +463,10 @@ module GoodJob
             instrument_payload.merge!(
               value: value,
               handled_error: handled_error,
-              retried: current_thread.execution_retried.present?,
+              retried: current_thread.retried_job.present?,
               error_event: error_event
             )
-            ExecutionResult.new(value: value, handled_error: handled_error, error_event: error_event, retried: current_thread.execution_retried)
+            ExecutionResult.new(value: value, handled_error: handled_error, error_event: error_event, retried_job: current_thread.retried_job)
           rescue StandardError => e
             error_event = if e.is_a?(GoodJob::InterruptError)
                             :interrupted

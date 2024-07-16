@@ -12,7 +12,7 @@ RSpec.describe GoodJob::CurrentThread do
     :error_on_retry,
     :error_on_retry_stopped,
     :execution_interrupted,
-    :execution_retried,
+    :retried_job,
     :job,
   ].each do |accessor|
     describe ".#{accessor}" do
@@ -63,7 +63,7 @@ RSpec.describe GoodJob::CurrentThread do
         error_on_retry_stopped: nil,
         job: instance_double(GoodJob::Job),
         execution_interrupted: nil,
-        execution_retried: nil,
+        retried_job: nil,
         retry_now: nil,
       }
 
