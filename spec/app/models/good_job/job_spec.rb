@@ -23,7 +23,7 @@ RSpec.describe GoodJob::Job do
         'arguments' => ['cat', { 'canine' => 'dog' }],
       }
     ).tap do |job|
-      job.discrete_executions.create!(
+      job.executions.create!(
         scheduled_at: 1.minute.ago,
         created_at: 1.minute.ago,
         finished_at: 1.minute.ago,
@@ -166,7 +166,7 @@ RSpec.describe GoodJob::Job do
 
           expect(job).to be_finished
 
-          executions = job.discrete_executions.order(created_at: :asc).to_a
+          executions = job.executions.order(created_at: :asc).to_a
           expect(executions.size).to eq 3 # initial execution isn't created in test
           expect(executions.map(&:error)).to eq ["TestJob::Error: TestJob::Error", "TestJob::Error: TestJob::Error", nil]
           expect(executions[0].finished_at).to be < executions[1].finished_at
@@ -341,7 +341,7 @@ RSpec.describe GoodJob::Job do
       job.destroy_job
 
       expect { job.reload }.to raise_error ActiveRecord::RecordNotFound
-      expect(GoodJob::DiscreteExecution.count).to eq 0
+      expect(GoodJob::Execution.count).to eq 0
     end
 
     context 'when a job is not finished' do
@@ -390,18 +390,16 @@ RSpec.describe GoodJob::Job do
     describe '.enqueue' do
       let(:active_job) { TestJob.new }
 
-      context 'when discrete' do
-        it 'assigns is discrete, id, scheduled_at' do
-          expect { described_class.enqueue(active_job) }.to change(described_class, :count).by(1)
+      it 'assigns id, scheduled_at' do
+        expect { described_class.enqueue(active_job) }.to change(described_class, :count).by(1)
 
-          job = described_class.last
-          expect(job).to have_attributes(
-            id: active_job.job_id,
-            active_job_id: active_job.job_id,
-            created_at: within(1.second).of(Time.current),
-            scheduled_at: job.created_at
-          )
-        end
+        job = described_class.last
+        expect(job).to have_attributes(
+          id: active_job.job_id,
+          active_job_id: active_job.job_id,
+          created_at: within(1.second).of(Time.current),
+          scheduled_at: job.created_at
+        )
       end
 
       it 'creates a new GoodJob record' do
@@ -951,7 +949,7 @@ RSpec.describe GoodJob::Job do
           ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
         end
 
-        it 'updates the Execution record and creates a DiscreteExecution record' do
+        it 'updates the Job record and creates a Execution record' do
           good_job.perform(lock_id: process_id)
 
           expect(good_job.reload).to have_attributes(
@@ -959,9 +957,9 @@ RSpec.describe GoodJob::Job do
             finished_at: within(1.second).of(Time.current)
           )
 
-          dexecution = good_job.discrete_executions.first
-          expect(dexecution).to be_present
-          expect(dexecution).to have_attributes(
+          execution = good_job.executions.first
+          expect(execution).to be_present
+          expect(execution).to have_attributes(
             active_job_id: good_job.active_job_id,
             job_class: good_job.job_class,
             queue_name: good_job.queue_name,
@@ -997,9 +995,9 @@ RSpec.describe GoodJob::Job do
               finished_at: nil,
               scheduled_at: within(10.minutes).of(1.hour.from_now) # interval because of retry jitter
             )
-            expect(GoodJob::DiscreteExecution.count).to eq(1)
-            discrete_execution = good_job.discrete_executions.first
-            expect(discrete_execution).to have_attributes(
+            expect(GoodJob::Execution.count).to eq(1)
+            execution = good_job.executions.first
+            expect(execution).to have_attributes(
               active_job_id: good_job.active_job_id,
               error: "TestJob::ExpectedError: Raised expected error",
               created_at: within(1.second).of(Time.current),
@@ -1026,8 +1024,8 @@ RSpec.describe GoodJob::Job do
               scheduled_at: within(0.5).of(1.second.from_now)
             )
 
-            expect(good_job.discrete_executions.size).to eq(1)
-            expect(good_job.discrete_executions.first).to have_attributes(
+            expect(good_job.executions.size).to eq(1)
+            expect(good_job.executions.first).to have_attributes(
               performed_at: within(1.second).of(Time.current),
               finished_at: within(1.second).of(Time.current),
               duration: be_a(ActiveSupport::Duration)

@@ -3,7 +3,7 @@
 module GoodJob
   class PerformanceIndexChart < BaseChart
     def data
-      table_name = GoodJob::DiscreteExecution.table_name
+      table_name = GoodJob::Execution.table_name
 
       sum_query = Arel.sql(GoodJob::Job.pg_or_jdbc_query(<<~SQL.squish))
         SELECT *

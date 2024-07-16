@@ -137,14 +137,14 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         5.times { scheduler.create_thread }
 
         sleep_until(max: 10, increments_of: 0.5) do
-          GoodJob::DiscreteExecution.where(active_job_id: active_job.job_id).finished.count >= 1
+          GoodJob::Execution.where(active_job_id: active_job.job_id).finished.count >= 1
         end
         scheduler.shutdown
 
         expect(GoodJob::Job.find_by(active_job_id: active_job.job_id).concurrency_key).to eq "Alice"
 
-        expect(GoodJob::DiscreteExecution.count).to be >= 1
-        expect(GoodJob::DiscreteExecution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
+        expect(GoodJob::Execution.count).to be >= 1
+        expect(GoodJob::Execution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
       end
 
       it 'is ignored with the job is executed via perform_now' do

@@ -55,9 +55,8 @@ module ExampleAppHelper
     ]
     models = [
       GoodJob::Job,
-      GoodJob::BatchRecord,
       GoodJob::Execution,
-      GoodJob::DiscreteExecution,
+      GoodJob::BatchRecord,
       GoodJob::Process,
       GoodJob::Setting,
     ]

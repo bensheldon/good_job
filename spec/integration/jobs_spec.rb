@@ -110,8 +110,8 @@ RSpec.describe 'Complex Jobs' do
         error: "StandardError: error",
         error_event: "discarded"
       )
-      expect(good_job.discrete_executions.size).to eq 1
-      expect(good_job.discrete_executions.last).to have_attributes(
+      expect(good_job.executions.size).to eq 1
+      expect(good_job.executions.last).to have_attributes(
         error: "StandardError: error",
         error_event: "discarded"
       )
@@ -142,8 +142,8 @@ RSpec.describe 'Complex Jobs' do
         error: nil,
         error_event: nil
       )
-      expect(good_job.discrete_executions.size).to eq 2
-      expect(good_job.discrete_executions.order(created_at: :asc).to_a).to contain_exactly(have_attributes(error: "StandardError: error", error_event: "handled"), have_attributes(error: nil, error_event: nil))
+      expect(good_job.executions.size).to eq 2
+      expect(good_job.executions.order(created_at: :asc).to_a).to contain_exactly(have_attributes(error: "StandardError: error", error_event: "handled"), have_attributes(error: nil, error_event: nil))
     end
   end
 
@@ -171,8 +171,8 @@ RSpec.describe 'Complex Jobs' do
         error: "TestError: error",
         error_event: "retry_stopped"
       )
-      expect(good_job.discrete_executions.size).to eq 2
-      expect(good_job.discrete_executions.order(created_at: :asc).to_a).to contain_exactly(have_attributes(error: "TestError: error", error_event: "retried"), have_attributes(error: "TestError: error", error_event: "retry_stopped"))
+      expect(good_job.executions.size).to eq 2
+      expect(good_job.executions.order(created_at: :asc).to_a).to contain_exactly(have_attributes(error: "TestError: error", error_event: "retried"), have_attributes(error: "TestError: error", error_event: "retry_stopped"))
 
       expect(THREAD_ERRORS.size).to eq 1
       THREAD_ERRORS.clear
@@ -197,7 +197,7 @@ RSpec.describe 'Complex Jobs' do
 
       expect(GoodJob::Job.count).to eq 1
       job = GoodJob::Job.order(:created_at).last
-      executions = job.discrete_executions.order(:created_at).to_a
+      executions = job.executions.order(:created_at).to_a
 
       expect(job.status).to eq :succeeded
       expect(job.performed_at).to be_present
