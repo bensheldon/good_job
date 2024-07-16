@@ -56,7 +56,7 @@ describe GoodJob do
     let!(:recent_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 12.hours.ago) }
     let!(:old_unfinished_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, scheduled_at: 15.days.ago, finished_at: nil) }
     let!(:old_finished_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago) }
-    let!(:old_finished_job_discrete_execution) { GoodJob::DiscreteExecution.create!(active_job_id: old_finished_job.active_job_id, finished_at: 16.days.ago) }
+    let!(:old_finished_job_execution) { GoodJob::Execution.create!(active_job_id: old_finished_job.active_job_id, finished_at: 16.days.ago) }
     let!(:old_discarded_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago, error: "Error") }
     let!(:old_batch) { GoodJob::BatchRecord.create!(finished_at: 15.days.ago) }
 
@@ -68,7 +68,7 @@ describe GoodJob do
       expect { recent_job.reload }.not_to raise_error
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
-      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
@@ -81,7 +81,7 @@ describe GoodJob do
       expect { recent_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
-      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
@@ -106,7 +106,7 @@ describe GoodJob do
       expect { recent_job.reload }.not_to raise_error
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
-      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.not_to raise_error
       expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end

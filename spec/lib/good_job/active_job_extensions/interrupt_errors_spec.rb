@@ -19,7 +19,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
       active_job = TestJob.perform_later
       good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
       good_job.update!(performed_at: Time.current, finished_at: nil)
-      good_job.discrete_executions.create!(performed_at: Time.current, finished_at: nil)
+      good_job.executions.create!(performed_at: Time.current, finished_at: nil)
     end
 
     it 'raises a GoodJob::InterruptError' do
@@ -30,41 +30,39 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
       )
     end
 
-    context 'when discrete execution is enabled' do
-      it 'does not create a new execution' do
-        TestJob.retry_on GoodJob::InterruptError
+    it 'does not create a new execution' do
+      TestJob.retry_on GoodJob::InterruptError
 
-        expect { GoodJob.perform_inline }.not_to raise_error
-        expect(GoodJob::Job.count).to eq(1)
-        expect(GoodJob::DiscreteExecution.count).to eq(2)
+      expect { GoodJob.perform_inline }.not_to raise_error
+      expect(GoodJob::Job.count).to eq(1)
+      expect(GoodJob::Execution.count).to eq(2)
 
-        job = GoodJob::Job.first
-        expect(job.discrete_executions.count).to eq(2)
-        expect(job).to have_attributes(
-          performed_at: be_blank,
-          finished_at: be_blank,
-          error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
-          error_event: "retried"
-        )
+      job = GoodJob::Job.first
+      expect(job.executions.count).to eq(2)
+      expect(job).to have_attributes(
+        performed_at: be_blank,
+        finished_at: be_blank,
+        error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
+        error_event: "retried"
+      )
 
-        initial_discrete_execution = job.discrete_executions.first
-        expect(initial_discrete_execution).to have_attributes(
-          performed_at: be_present,
-          finished_at: be_present,
-          duration: be_present,
-          error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
-          error_event: "interrupted"
-        )
+      initial_execution = job.executions.first
+      expect(initial_execution).to have_attributes(
+        performed_at: be_present,
+        finished_at: be_present,
+        duration: be_present,
+        error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
+        error_event: "interrupted"
+      )
 
-        retried_discrete_execution = job.discrete_executions.last
-        expect(retried_discrete_execution).to have_attributes(
-          performed_at: be_present,
-          finished_at: be_present,
-          duration: be_present,
-          error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
-          error_event: "retried"
-        )
-      end
+      retried_execution = job.executions.last
+      expect(retried_execution).to have_attributes(
+        performed_at: be_present,
+        finished_at: be_present,
+        duration: be_present,
+        error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
+        error_event: "retried"
+      )
     end
   end
 

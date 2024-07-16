@@ -93,7 +93,7 @@ describe GoodJob::JobsController do
     describe 'mass_action=retry' do
       before do
         job.update(error: "Error message")
-        job.discrete_executions.first.update(error: "Error message")
+        job.executions.first.update(error: "Error message")
       end
 
       it 'retries the job' do
@@ -108,7 +108,7 @@ describe GoodJob::JobsController do
         expect(flash[:notice]).to eq('Successfully retried 1 job')
 
         job.reload
-        expect(job.discrete_executions.count).to eq 2
+        expect(job.executions.count).to eq 2
       end
 
       context 'when Job is not deserializable' do

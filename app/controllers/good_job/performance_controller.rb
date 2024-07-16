@@ -3,7 +3,7 @@
 module GoodJob
   class PerformanceController < ApplicationController
     def index
-      @performances = GoodJob::DiscreteExecution
+      @performances = GoodJob::Execution
                       .where.not(job_class: nil)
                       .group(:job_class)
                       .select("

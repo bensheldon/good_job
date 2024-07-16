@@ -18,7 +18,7 @@ module GoodJob
     end
 
     def data
-      table_name = GoodJob::DiscreteExecution.table_name
+      table_name = GoodJob::Execution.table_name
 
       interval_entries = BUCKET_INTERVALS.map { "interval '#{_1}'" }.join(",")
       sum_query = Arel.sql(GoodJob::Job.pg_or_jdbc_query(<<~SQL.squish))

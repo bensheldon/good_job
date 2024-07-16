@@ -167,7 +167,7 @@ RSpec.describe 'Adapter Integration' do
         job = GoodJob::Job.first
 
         expect(job.status).to eq :succeeded
-        expect(job.discrete_executions.count).to eq 3
+        expect(job.executions.count).to eq 3
       end
 
       it 'retries immediately when bulk enqueued' do

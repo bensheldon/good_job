@@ -92,7 +92,7 @@ RSpec.describe 'Schedule Integration' do
 
         "Expected run jobs(#{RUN_JOBS.size}) to equal number of jobs (#{number_of_jobs}). Instead ran jobs multiple times:\n#{rerun_jobs.join("\n")}"
       }
-      expect(GoodJob::DiscreteExecution.count).to eq number_of_jobs
+      expect(GoodJob::Execution.count).to eq number_of_jobs
     end
   end
 
