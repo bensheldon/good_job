@@ -31,7 +31,7 @@ module GoodJob
     self.table_name = 'good_jobs'
     self.advisory_lockable_column = 'id'
     self.implicit_order_column = 'created_at'
-    self.ignored_columns += ["is_discrete"]
+    self.ignored_columns += %w[is_discrete retried_good_job_id]
 
     define_model_callbacks :perform
     define_model_callbacks :perform_unlocked, only: :after
@@ -61,7 +61,7 @@ module GoodJob
     # Advisory locked and executing
     scope :running, -> { where(finished_at: nil).joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
     # Finished executing (succeeded or discarded)
-    scope :finished, -> { where.not(finished_at: nil).where(retried_good_job_id: nil) }
+    scope :finished, -> { where.not(finished_at: nil) }
     # Completed executing successfully
     scope :succeeded, -> { finished.where(error: nil) }
     # Errored but will not be retried
@@ -461,7 +461,7 @@ module GoodJob
     # Tests whether the job has finished (succeeded or discarded).
     # @return [Boolean]
     def finished?
-      finished_at.present? && retried_good_job_id.nil?
+      finished_at.present?
     end
 
     # Tests whether the job has finished but with an error.
@@ -687,7 +687,7 @@ module GoodJob
         execution.duration = monotonic_duration
 
         retry_unhandled_error = result.unhandled_error && GoodJob.retry_on_unhandled_error
-        reenqueued = result.retried? || retried_good_job_id.present? || retry_unhandled_error
+        reenqueued = result.retried? || retry_unhandled_error
         if reenqueued
           job_attributes[:performed_at] = nil
           job_attributes[:finished_at] = nil

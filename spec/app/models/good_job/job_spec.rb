@@ -94,12 +94,8 @@ RSpec.describe GoodJob::Job do
   describe '#finished?' do
     it 'is true if the job has finished' do
       expect do
-        job.update(finished_at: Time.current, retried_good_job_id: nil)
+        job.update(finished_at: Time.current)
       end.to change(job, :finished?).from(false).to(true)
-
-      expect do
-        job.update(finished_at: Time.current, retried_good_job_id: SecureRandom.uuid)
-      end.to change(job, :finished?).from(true).to(false)
     end
   end
 
