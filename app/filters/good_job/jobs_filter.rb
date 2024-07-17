@@ -39,7 +39,7 @@ module GoodJob
         when 'scheduled'
           query = query.scheduled
         when 'running'
-          query = query.running.select("#{GoodJob::Job.table_name}.*", 'pg_locks.locktype')
+          query = query.running
         when 'queued'
           query = query.queued
         end

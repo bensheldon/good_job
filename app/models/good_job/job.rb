@@ -58,8 +58,10 @@ module GoodJob
     scope :retried, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).where(params_execution_count.gt(1)) }
     # Immediate/Scheduled time to run has passed, waiting for an available thread run
     scope :queued, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.lteq(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
+    # Get Jobs that started but not finished yet.
+    scope :running, -> { where.not(performed_at: nil).where(finished_at: nil) }
     # Advisory locked and executing
-    scope :running, -> { where(finished_at: nil).joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
+    scope :running_with_advisory_lock, -> { running.joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
     # Finished executing (succeeded or discarded)
     scope :finished, -> { where.not(finished_at: nil) }
     # Completed executing successfully
@@ -145,24 +147,6 @@ module GoodJob
     # @!scope class
     # @return [ActiveRecord::Relation]
     scope :schedule_ordered, -> { order(coalesce_scheduled_at_created_at.asc) }
-
-    # Get completed jobs before the given timestamp. If no timestamp is
-    # provided, get *all* completed jobs. By default, GoodJob
-    # destroys jobs after they're completed, meaning this returns no jobs.
-    # However, if you have changed {GoodJob.preserve_job_records}, this may
-    # find completed Jobs.
-    # @!method finished(timestamp = nil)
-    # @!scope class
-    # @param timestamp (Float)
-    #   Get jobs that finished before this time (in epoch time).
-    # @return [ActiveRecord::Relation]
-    scope :finished, ->(timestamp = nil) { timestamp ? where(arel_table['finished_at'].lteq(bind_value('finished_at', timestamp, ActiveRecord::Type::DateTime))) : where.not(finished_at: nil) }
-
-    # Get Jobs that started but not finished yet.
-    # @!method running
-    # @!scope class
-    # @return [ActiveRecord::Relation]
-    scope :running, -> { where.not(performed_at: nil).where(finished_at: nil) }
 
     # Get Jobs on queues that match the given queue string.
     # @!method queue_string(string)
@@ -447,6 +431,12 @@ module GoodJob
     # Tests whether the job is being executed right now.
     # @return [Boolean]
     def running?
+      performed_at.present? && finished_at.blank?
+    end
+
+    # Tests whether the job is advisory locked
+    # @return [Boolean]
+    def running_with_advisory_lock?
       # Avoid N+1 Query: `.includes_advisory_locks`
       if has_attribute?(:locktype)
         self['locktype'].present?
