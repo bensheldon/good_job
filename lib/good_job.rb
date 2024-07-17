@@ -7,6 +7,7 @@ require_relative "good_job/version"
 require_relative "good_job/engine"
 
 require_relative "good_job/adapter"
+require_relative "good_job/adapter/inline_buffer"
 require_relative "active_job/queue_adapters/good_job_adapter"
 require_relative "good_job/active_job_extensions/batches"
 require_relative "good_job/active_job_extensions/concurrency"

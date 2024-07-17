@@ -102,12 +102,17 @@ module GoodJob
       active_jobs = add(active_jobs, &block)
 
       Rails.application.executor.wrap do
-        record.with_advisory_lock(function: "pg_advisory_lock") do
-          record.update!(enqueued_at: Time.current)
+        buffer = GoodJob::Adapter::InlineBuffer.capture do
+          record.transaction do
+            record.with_advisory_lock(function: "pg_advisory_xact_lock") do
+              record.update!(enqueued_at: Time.current)
 
-          # During inline execution, this could enqueue and execute further jobs
-          record._continue_discard_or_finish(lock: false)
+              # During inline execution, this could enqueue and execute further jobs
+              record._continue_discard_or_finish(lock: false)
+            end
+          end
         end
+        buffer.call
       end
 
       active_jobs

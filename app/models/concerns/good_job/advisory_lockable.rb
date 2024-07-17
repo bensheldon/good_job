@@ -367,7 +367,8 @@ module GoodJob
       begin
         yield
       ensure
-        advisory_unlock(key: key, function: self.class.advisory_unlockable_function(function))
+        unlock_function = self.class.advisory_unlockable_function(function)
+        advisory_unlock(key: key, function: unlock_function) if unlock_function
       end
     end
 

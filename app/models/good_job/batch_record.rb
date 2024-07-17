@@ -54,21 +54,24 @@ module GoodJob
 
     def _continue_discard_or_finish(execution = nil, lock: true)
       execution_discarded = execution && execution.finished_at.present? && execution.error.present?
-      take_advisory_lock(lock) do
-        Batch.within_thread(batch_id: nil, batch_callback_id: id) do
-          reload
-          if execution_discarded && !discarded_at
-            update(discarded_at: Time.current)
-            on_discard.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :discard }) if on_discard.present?
-          end
+      buffer = GoodJob::Adapter::InlineBuffer.capture do
+        advisory_lock_maybe(lock) do
+          Batch.within_thread(batch_id: nil, batch_callback_id: id) do
+            reload
+            if execution_discarded && !discarded_at
+              update(discarded_at: Time.current)
+              on_discard.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :discard }) if on_discard.present?
+            end
 
-          if enqueued_at && !finished_at && jobs.where(finished_at: nil).count.zero?
-            update(finished_at: Time.current)
-            on_success.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :success }) if !discarded_at && on_success.present?
-            on_finish.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :finish }) if on_finish.present?
+            if enqueued_at && !finished_at && jobs.where(finished_at: nil).count.zero?
+              update(finished_at: Time.current)
+              on_success.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :success }) if !discarded_at && on_success.present?
+              on_finish.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :finish }) if on_finish.present?
+            end
           end
         end
       end
+      buffer.call
     end
 
     class PropertySerializer
@@ -100,9 +103,9 @@ module GoodJob
 
     private
 
-    def take_advisory_lock(value, &block)
+    def advisory_lock_maybe(value, &block)
       if value
-        with_advisory_lock(function: "pg_advisory_lock", &block)
+        transaction { with_advisory_lock(function: "pg_advisory_xact_lock", &block) }
       else
         yield
       end

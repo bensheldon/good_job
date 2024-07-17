@@ -33,6 +33,8 @@ module ::THREAD_HAS_RUN; end
 module ::THREAD_JOBS; end
 module ::TestError; end
 module ::TestJob; end
+module ::SuccessJob; end
+module ::ErrorJob; end
 module ::WAIT_EVENT; end
 module ::TestJob::Error; end
 module ::TestJob::ExpectedError; end

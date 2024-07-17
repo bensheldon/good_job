@@ -87,17 +87,24 @@ module GoodJob
         end
 
         if inline_jobs.any?
-          @capsule.tracker.register do
-            until inline_jobs.empty?
-              inline_job = inline_jobs.shift
-              perform_inline(inline_job, notify: false)
+          deferred = InlineBuffer.defer?
+          InlineBuffer.perform_now_or_defer do
+            @capsule.tracker.register do
+              until inline_jobs.empty?
+                inline_job = inline_jobs.shift
+                perform_inline(inline_job, notify: deferred ? send_notify?(inline_job) : false)
+              end
+            ensure
+              inline_jobs.each(&:advisory_unlock)
             end
-          ensure
-            inline_jobs.each(&:advisory_unlock)
           end
         end
 
-        non_inline_jobs = jobs.reject(&:finished_at)
+        non_inline_jobs = if InlineBuffer.defer?
+                            jobs - inline_jobs
+                          else
+                            jobs.reject(&:finished_at)
+                          end
         if non_inline_jobs.any?
           job_id_to_active_jobs = active_jobs.index_by(&:job_id)
           non_inline_jobs.group_by(&:queue_name).each do |queue_name, jobs_by_queue|
@@ -145,8 +152,10 @@ module GoodJob
             scheduled_at: scheduled_at,
             create_with_advisory_lock: true
           )
-          @capsule.tracker.register do
-            perform_inline(job, notify: send_notify?(active_job))
+          InlineBuffer.perform_now_or_defer do
+            @capsule.tracker.register do
+              perform_inline(job, notify: send_notify?(active_job))
+            end
           end
         else
           job = GoodJob::Job.enqueue(
@@ -240,6 +249,7 @@ module GoodJob
       end
 
       Notifier.notify(retried_job.job_state) if notify && retried_job&.scheduled_at && retried_job.scheduled_at > Time.current
+      result
     ensure
       job.advisory_unlock
       job.run_callbacks(:perform_unlocked)
