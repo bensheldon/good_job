@@ -4,6 +4,10 @@ class AddActiveJobIdIndexAndConcurrencyKeyIndexToGoodJobs < ActiveRecord::Migrat
 
   UPDATE_BATCH_SIZE = 1_000
 
+  class GoodJobJobs < ActiveRecord::Base
+    self.table_name = "good_jobs"
+  end
+
   def change
     reversible do |dir|
       dir.up do
@@ -24,7 +28,7 @@ class AddActiveJobIdIndexAndConcurrencyKeyIndexToGoodJobs < ActiveRecord::Migrat
         # Ensure that all `good_jobs` records have an active_job_id value
         start_time = Time.current
         loop do
-          break if GoodJob::Job.where(active_job_id: nil, finished_at: nil).where("created_at < ?", start_time).limit(UPDATE_BATCH_SIZE).update_all("active_job_id = (serialized_params->>'job_id')::uuid").zero?
+          break if GoodJobJobs.where(active_job_id: nil, finished_at: nil).where("created_at < ?", start_time).limit(UPDATE_BATCH_SIZE).update_all("active_job_id = (serialized_params->>'job_id')::uuid").zero?
         end
       end
     end
