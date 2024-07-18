@@ -451,33 +451,44 @@ RSpec.describe GoodJob::AdvisoryLockable do
       promise.value!
     end
 
-    it 'transaction-level locks only lock within transactions' do
-      locked_event = Concurrent::Event.new
-      commit_event = Concurrent::Event.new
-      committed_event = Concurrent::Event.new
-      done_event = Concurrent::Event.new
+    describe "transaction-level-locks" do
+      it 'only lock within transactions' do
+        locked_event = Concurrent::Event.new
+        commit_event = Concurrent::Event.new
+        committed_event = Concurrent::Event.new
+        done_event = Concurrent::Event.new
 
-      promise = rails_promise do
-        job.class.transaction do
-          job.advisory_lock(function: "pg_advisory_xact_lock")
-          locked_event.set
+        promise = rails_promise do
+          job.class.transaction do
+            job.advisory_lock(function: "pg_advisory_xact_lock")
+            locked_event.set
 
-          commit_event.wait(10)
+            commit_event.wait(10)
+          end
+          committed_event.set
+
+          done_event.wait(10)
         end
-        committed_event.set
 
-        done_event.wait(10)
+        locked_event.wait(10)
+        expect(job.advisory_locked?).to be true
+        commit_event.set
+
+        committed_event.wait(10)
+        expect(job.advisory_locked?).to be false
+
+        done_event.set
+        promise.value!
       end
 
-      locked_event.wait(10)
-      expect(job.advisory_locked?).to be true
-      commit_event.set
-
-      committed_event.wait(10)
-      expect(job.advisory_locked?).to be false
-
-      done_event.set
-      promise.value!
+      it "locks and unlocks" do
+        GoodJob::Job.transaction do
+          job.advisory_lock(function: "pg_advisory_xact_lock") do
+            expect(job.advisory_locked?).to be true
+          end
+        end
+        expect(job.advisory_locked?).to be false
+      end
     end
   end
 end

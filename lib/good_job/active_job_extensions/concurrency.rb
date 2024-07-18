@@ -69,34 +69,38 @@ module GoodJob
           throttle = enqueue_throttle
           next unless limit || throttle
 
-          GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_lock") do
-            if limit
-              enqueue_concurrency = if enqueue_limit
-                                      GoodJob::Job.where(concurrency_key: key).unfinished.advisory_unlocked.count
-                                    else
-                                      GoodJob::Job.where(concurrency_key: key).unfinished.count
-                                    end
+          result = GoodJob::Job.transaction(requires_new: true, joinable: false) do
+            GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
+              if limit
+                enqueue_concurrency = if enqueue_limit
+                                        GoodJob::Job.where(concurrency_key: key).unfinished.advisory_unlocked.count
+                                      else
+                                        GoodJob::Job.where(concurrency_key: key).unfinished.count
+                                      end
 
-              # The job has not yet been enqueued, so check if adding it will go over the limit
-              if (enqueue_concurrency + 1) > limit
-                logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its enqueue limit of #{limit} #{'job'.pluralize(limit)}"
-                throw :abort
+                # The job has not yet been enqueued, so check if adding it will go over the limit
+                if (enqueue_concurrency + 1) > limit
+                  logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its enqueue limit of #{limit} #{'job'.pluralize(limit)}"
+                  next :abort
+                end
               end
-            end
 
-            if throttle
-              throttle_limit = throttle[0]
-              throttle_period = throttle[1]
-              enqueued_within_period = GoodJob::Job.where(concurrency_key: key)
-                                                   .where(GoodJob::Job.arel_table[:created_at].gt(throttle_period.ago))
-                                                   .count
+              if throttle
+                throttle_limit = throttle[0]
+                throttle_period = throttle[1]
+                enqueued_within_period = GoodJob::Job.where(concurrency_key: key)
+                                                     .where(GoodJob::Job.arel_table[:created_at].gt(throttle_period.ago))
+                                                     .count
 
-              if (enqueued_within_period + 1) > throttle_limit
-                logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its throttle limit of #{limit} #{'job'.pluralize(limit)}"
-                throw :abort
+                if (enqueued_within_period + 1) > throttle_limit
+                  logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its throttle limit of #{limit} #{'job'.pluralize(limit)}"
+                  next :abort
+                end
               end
             end
           end
+
+          throw :abort if result == :abort
         end
 
         before_perform do |job|
@@ -129,29 +133,31 @@ module GoodJob
             next
           end
 
-          GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_lock") do
-            if limit
-              allowed_active_job_ids = GoodJob::Job.unfinished.where(concurrency_key: key)
-                                                   .advisory_locked
-                                                   .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
-                                                   .limit(limit).pluck(:active_job_id)
-              # The current job has already been locked and will appear in the previous query
-              raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include?(job.job_id)
-            end
+          GoodJob::Job.transaction(requires_new: true, joinable: false) do
+            GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
+              if limit
+                allowed_active_job_ids = GoodJob::Job.unfinished.where(concurrency_key: key)
+                                                     .advisory_locked
+                                                     .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
+                                                     .limit(limit).pluck(:active_job_id)
+                # The current job has already been locked and will appear in the previous query
+                raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include?(job.job_id)
+              end
 
-            if throttle
-              throttle_limit = throttle[0]
-              throttle_period = throttle[1]
+              if throttle
+                throttle_limit = throttle[0]
+                throttle_period = throttle[1]
 
-              query = Execution.joins(:job)
-                               .where(GoodJob::Job.table_name => { concurrency_key: key })
-                               .where(Execution.arel_table[:created_at].gt(Execution.bind_value('created_at', throttle_period.ago, ActiveRecord::Type::DateTime)))
-              allowed_active_job_ids = query.where(error: nil).or(query.where.not(error: "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError: GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"))
-                                            .order(created_at: :asc)
-                                            .limit(throttle_limit)
-                                            .pluck(:active_job_id)
+                query = Execution.joins(:job)
+                                 .where(GoodJob::Job.table_name => { concurrency_key: key })
+                                 .where(Execution.arel_table[:created_at].gt(Execution.bind_value('created_at', throttle_period.ago, ActiveRecord::Type::DateTime)))
+                allowed_active_job_ids = query.where(error: nil).or(query.where.not(error: "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError: GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"))
+                                              .order(created_at: :asc)
+                                              .limit(throttle_limit)
+                                              .pluck(:active_job_id)
 
-              raise ThrottleExceededError unless allowed_active_job_ids.include?(job.job_id)
+                raise ThrottleExceededError unless allowed_active_job_ids.include?(job.job_id)
+              end
             end
           end
         end
