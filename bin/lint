@@ -64,5 +64,5 @@ FileUtils.chdir GEM_ROOT do
   system! "bin/i18n-tasks health  "
 
   puts "\n== Brakeman =="
-  system! "bundle exec brakeman"
+  system! "bundle exec brakeman --no-pager"
 end

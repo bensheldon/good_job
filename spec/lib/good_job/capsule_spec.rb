@@ -28,7 +28,7 @@ describe GoodJob::Capsule do
       expect(GoodJob::Scheduler.instances.size).to eq 1
     end
 
-    it 'will not start if previously shutdown' do
+    it 'does not start if previously shutdown' do
       capsule = described_class.new
       capsule.shutdown
 
@@ -81,14 +81,14 @@ describe GoodJob::Capsule do
       expect(capsule).to be_idle
     end
 
-    it 'will return false if started in last N seconds' do
+    it 'returns false if started in last N seconds' do
       capsule = described_class.new
       capsule.start
       expect(capsule).not_to be_idle(10.seconds)
       capsule.shutdown
     end
 
-    it 'will return false if there is an active thread' do
+    it 'returns false if there is an active thread' do
       capsule = described_class.new
       capsule.start
 
@@ -135,7 +135,7 @@ describe GoodJob::Capsule do
       expect { capsule.create_thread }.to change(capsule, :running?).from(false).to(true)
     end
 
-    it 'will not start the capsule if it has been shutdown' do
+    it 'does not start the capsule if it has been shutdown' do
       capsule = described_class.new
       capsule.start
       capsule.shutdown

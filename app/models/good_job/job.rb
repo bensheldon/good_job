@@ -604,7 +604,7 @@ module GoodJob
               job_class: job_class,
               queue_name: queue_name,
               serialized_params: serialized_params,
-              scheduled_at: (scheduled_at || created_at),
+              scheduled_at: scheduled_at || created_at,
               created_at: job_performed_at,
               process_id: lock_id,
             }
@@ -691,7 +691,7 @@ module GoodJob
         end
 
         assign_attributes(job_attributes)
-        preserve_unhandled = (result.unhandled_error && (GoodJob.retry_on_unhandled_error || GoodJob.preserve_job_records == :on_unhandled_error))
+        preserve_unhandled = result.unhandled_error && (GoodJob.retry_on_unhandled_error || GoodJob.preserve_job_records == :on_unhandled_error)
         if finished_at.blank? || GoodJob.preserve_job_records == true || reenqueued || preserve_unhandled || cron_key.present?
           transaction do
             execution.save!

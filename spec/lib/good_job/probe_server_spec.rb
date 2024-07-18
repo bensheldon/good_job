@@ -12,7 +12,8 @@ RSpec.describe GoodJob::ProbeServer do
 
     it "responds to the expected routes" do
       get "/"
-      expect(last_response.status).to eq 200
+      # See https://github.com/rspec/rspec-rails/pull/2771 for why can't use have_http_status
+      expect(last_response.status).to eq 200 # rubocop:disable RSpecRails/HaveHttpStatus
       expect(last_response.body).to eq("OK")
 
       get "/status"
@@ -25,7 +26,7 @@ RSpec.describe GoodJob::ProbeServer do
       expect(last_response.body).to eq("Not connected")
 
       get "/unimplemented_url"
-      expect(last_response.status).to eq 404
+      expect(last_response.status).to eq 404 # rubocop:disable RSpecRails/HaveHttpStatus
     end
   end
 
