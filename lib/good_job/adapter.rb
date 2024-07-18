@@ -81,7 +81,7 @@ module GoodJob
           jobs = jobs.select(&:persisted?) # prune unpersisted jobs
 
           if execute_inline?
-            inline_jobs = jobs.select { |job| (job.scheduled_at.nil? || job.scheduled_at <= Time.current) }
+            inline_jobs = jobs.select { |job| job.scheduled_at.nil? || job.scheduled_at <= Time.current }
             inline_jobs.each(&:advisory_lock!)
           end
         end

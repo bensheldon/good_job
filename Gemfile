@@ -54,9 +54,11 @@ platforms :ruby do
     gem "i18n-tasks"
     gem "mdl"
     gem "rubocop"
+    gem "rubocop-capybara"
     gem "rubocop-performance"
     gem "rubocop-rails"
     gem "rubocop-rspec"
+    gem "rubocop-rspec_rails"
     gem "sorbet"
     gem "sorbet-runtime"
     gem "spoom", require: false
