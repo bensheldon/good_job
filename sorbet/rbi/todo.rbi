@@ -38,6 +38,9 @@ module ::TestJob::Error; end
 module ::TestJob::ExpectedError; end
 module ::TestJob::RunError; end
 module ::TestJob::SuccessCallbackJob; end
+module ::SuccessJob; end
+module ::ErrorJob; end
+module ::ErrorJob::Error; end
 module ::TestRecord; end
 module ::WrapperJob; end
 module GoodJob::Job::ERROR_EVENT_INTERRUPTED; end
