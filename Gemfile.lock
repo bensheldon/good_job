@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    good_job (1.99.1)
+    good_job (1.99.2)
       activejob (>= 5.2.0)
       activerecord (>= 5.2.0)
       concurrent-ruby (>= 1.0.2)
@@ -155,7 +155,7 @@ GEM
       rubocop
       smart_properties
     erubi (1.10.0)
-    et-orbi (1.2.4)
+    et-orbi (1.2.11)
       tzinfo
     faraday (1.5.1)
       faraday-em_http (~> 1.0)
@@ -180,8 +180,8 @@ GEM
     ffi (1.15.3-java)
     fiber-local (1.0.0)
     foreman (0.87.2)
-    fugit (1.5.1)
-      et-orbi (~> 1.1, >= 1.1.8)
+    fugit (1.11.0)
+      et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
     gem-release (2.2.2)
     github_changelog_generator (1.16.4)
