@@ -92,6 +92,8 @@ module GoodJob
               inline_job = inline_jobs.shift
               perform_inline(inline_job, notify: false)
             end
+          ensure
+            inline_jobs.each(&:advisory_unlock)
           end
         end
 
