@@ -10,17 +10,17 @@ de:
       retry: Wiederholen
     batches:
       index:
-        older_batches: Ältere Chargen
-        title: Chargen
+        older_batches: Ältere Batches
+        title: Batches
       jobs:
         actions:
-          confirm_destroy: Sind Sie sicher, dass Sie diesen Job zerstören wollen?
-          confirm_discard: Möchten Sie diesen Job wirklich verwerfen?
-          confirm_reschedule: Möchten Sie diesen Auftrag wirklich verschieben?
-          confirm_retry: Möchten Sie diesen Job wirklich wiederholen?
-          destroy: Zerstöre Job
-          discard: Auftrag verwerfen
-          reschedule: Auftrag neu planen
+          confirm_destroy: Bist du sicher, dass du diesen Job zerstören wilst?
+          confirm_discard: Bist du sicher, dass du diesen Job verwerfen willst?
+          confirm_reschedule: Bist du sicher, dass du diesen Job verschieben willst?
+          confirm_retry: Bist du sicher, dass du diesen Job erneut versuchen willst?
+          destroy: Job zerstören
+          discard: Job verwerfen
+          reschedule: Job neu planen
           retry: Job wiederholen
           title: Aktionen
         no_jobs_found: Keine Jobs gefunden.
@@ -29,12 +29,12 @@ de:
         batched_jobs: Batch-Jobs
         callback_jobs: Callback-Jobs
       table:
-        no_batches_found: Keine Chargen gefunden.
+        no_batches_found: Keine Batches gefunden.
     cron_entries:
       actions:
-        confirm_disable: Möchten Sie diesen Cron-Eintrag wirklich deaktivieren?
-        confirm_enable: Möchten Sie diesen Cron-Eintrag wirklich aktivieren?
-        confirm_enqueue: Möchten Sie diesen Cron-Eintrag wirklich in die Warteschlange stellen?
+        confirm_disable: Bist du sicher, dass du diesen Cron-Eintrag deaktivieren willst?
+        confirm_enable: Bist du sicher, dass du diesen Cron-Eintrag aktivieren willst?
+        confirm_enqueue: Bist du sicher, dass du diesen Cron-Eintrag in die Warteschlange stellen willst?
         disable: Cron-Eintrag deaktivieren
         enable: Cron-Eintrag aktivieren
         enqueue: Cron-Eintrag jetzt einreihen
@@ -48,7 +48,7 @@ de:
         no_cron_schedules_found: Keine Cron-Zeitpläne gefunden.
         title: Cron-Zeitpläne
       show:
-        cron_entry_key: Cron-Eingabetaste
+        cron_entry_key: Cron-Schlüssel
     datetime:
       distance_in_words:
         about_x_hours:
@@ -95,11 +95,11 @@ de:
       minutes: "%{min}m %{sec}s"
       seconds: "%{sec}s"
     error_event:
-      discarded: Weggeworfen
+      discarded: Verworfen
       handled: Abgewickelt
       interrupted: Unterbrochen
       retried: Wiederholt
-      retry_stopped: Der Wiederholungsversuch wurde gestoppt
+      retry_stopped: Wiederholung gestoppt
       unhandled: Unbehandelt
     helpers:
       relative_time:
@@ -107,20 +107,20 @@ de:
         past: Vor %{time}
     jobs:
       actions:
-        confirm_destroy: Sind Sie sicher, dass Sie den Job zerstören wollen?
-        confirm_discard: Sind Sie sicher, dass Sie den Job verwerfen wollen?
-        confirm_force_discard: Sind Sie sicher, dass Sie das Verwerfen dieses Jobs erzwingen möchten? Der Job wird als verworfen markiert, aber der laufende Job wird nicht gestoppt – er wird jedoch bei Fehlern nicht erneut versucht.
-        confirm_reschedule: Möchten Sie den Auftrag wirklich verschieben?
-        confirm_retry: Möchten Sie den Job wirklich wiederholen?
-        destroy: Arbeit vernichten
-        discard: Auftrag verwerfen
+        confirm_destroy: Bist du sicher, dass du diesen Job zerstören willst?
+        confirm_discard: Bist du sicher, dass du diesen Job verwerfen willst?
+        confirm_force_discard: Bist du sicher, dass du das Verwerfen dieses Jobs erzwingen möchten? Der Job wird als verworfen markiert, aber der laufende Job wird nicht gestoppt – er wird jedoch bei Fehlern nicht erneut versucht.
+        confirm_reschedule: Bist du sicher, dass du diesen Job verschieben willst?
+        confirm_retry: Bist du sicher, dass du diesen Job wiederholen willst?
+        destroy: Job zerstören
+        discard: Job verwerfen
         force_discard: Job verwerfen erzwingen
-        reschedule: Auftrag neu planen
+        reschedule: Job neu planen
         retry: Job wiederholen
       destroy:
         notice: Hiob wurde zerstört
       discard:
-        notice: Auftrag wurde verworfen
+        notice: Job wurde verworfen
       executions:
         application_trace: Application Trace
         full_trace: Full Trace
@@ -131,25 +131,25 @@ de:
         notice: Der Job wurde zwangsweise verworfen. Die Ausführung wird fortgesetzt, bei Fehlern wird der Vorgang jedoch nicht wiederholt
       index:
         job_pagination: Job-Paginierung
-        older_jobs: Ältere Berufe
+        older_jobs: Ältere Jobs
       reschedule:
-        notice: Auftrag wurde verschoben
+        notice: Job wurde neu planen
       retry:
-        notice: Auftrag wurde wiederholt
+        notice: Job wurde wiederholt
       show:
-        jobs: Arbeitsplätze
+        jobs: Jobs
       table:
         actions:
           apply_to_all:
-            one: Bewerben Sie sich auf alle 1 Stelle.
-            other: Bewerben Sie sich auf alle %{count} Stellen.
-          confirm_destroy_all: Möchten Sie die ausgewählten Jobs wirklich löschen?
-          confirm_discard_all: Möchten Sie die ausgewählten Jobs wirklich verwerfen?
-          confirm_reschedule_all: Möchten Sie die ausgewählten Jobs wirklich neu planen?
-          confirm_retry_all: Möchten Sie die ausgewählten Jobs wirklich wiederholen?
-          destroy_all: Zerstöre alle
+            one: Auf einen Job anwenden.
+            other: Auf alle %{count} Jobs anwenden.
+          confirm_destroy_all: Bist du sicher, dass du die ausgewählten Jobs löschen willst?
+          confirm_discard_all: Bist du sicher, dass du die ausgewählten Jobs verferfen willst?
+          confirm_reschedule_all: Bist du sicher, dass du die ausgewählten Jobs neu planen willst?
+          confirm_retry_all: Bist du sicher, dass du die ausgewählten Jobs wiederholen willst?
+          destroy_all: Alle zerstören
           discard_all: Alle verwerfen
-          reschedule_all: Alles neu planen
+          reschedule_all: Alle neu planen
           retry_all: Alle wiederholen
           title: Aktionen
         no_jobs_found: Keine Jobs gefunden.
@@ -165,7 +165,7 @@ de:
         enqueued_at: Eingereiht bei
         finished: Fertig
         finished_at: Fertig um
-        jobs: Arbeitsplätze
+        jobs: Jobs
         name: Name
       cron:
         class: Klasse
@@ -197,9 +197,9 @@ de:
     performance:
       index:
         average_duration: Durchschnittliche Dauer
-        chart_title: Gesamtdauer der Auftragsausführung in Sekunden
-        executions: Hinrichtungen
-        job_class: Berufsklasse
+        chart_title: Gesamtdauer der Jobs in Sekunden
+        executions: Ausführungen
+        job_class: Job-Klasse
         maximum_duration: Maximale Dauer
         minimum_duration: Mindestdauer
         title: Leistung
@@ -210,8 +210,8 @@ de:
       index:
         cron_enabled: Cron aktiviert
         no_good_job_processes_found: Keine GoodJob-Prozesse gefunden.
-        process: Verfahren
-        schedulers: Planer
+        process: Prozess
+        schedulers: Scheduler
         started: Gestartet
         title: Prozesse
         updated: Aktualisiert
@@ -224,9 +224,9 @@ de:
         all: Alle
         all_jobs: Alle Jobs
         all_queues: Alle Warteschlangen
-        clear: Klar
-        job_name: Berufsbezeichnung
-        placeholder: Suchen Sie nach Klasse, Job-ID, Jobparametern und Fehlertext.
+        clear: Löschen
+        job_name: Job-Name
+        placeholder: Suche nach Klasse, Job-ID, Jobparameter und Fehlertext.
         queue_name: Warteschlangenname
         search: Suchen
       navbar:
@@ -240,14 +240,14 @@ de:
         theme:
           auto: Auto
           dark: Dunkel
-          light: Licht
-          theme: Thema
+          light: Hell
+          theme: Theme
       pending_migrations: GoodJob hat ausstehende Datenbankmigrationen.
       secondary_navbar:
         inspiration: Denk daran, auch du machst einen guten Job!
         last_updated: Zuletzt aktualisiert
     status:
-      discarded: Ausrangiert
+      discarded: Verworfen
       queued: In der Warteschlange
       retried: Wiederholt
       running: Laufend
