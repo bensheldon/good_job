@@ -69,7 +69,8 @@ module GoodJob
           throttle = enqueue_throttle
           next unless limit || throttle
 
-          result = GoodJob::Job.transaction(requires_new: true, joinable: false) do
+          exceeded = nil
+          GoodJob::Job.transaction(requires_new: true, joinable: false) do
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
               if limit
                 enqueue_concurrency = if enqueue_limit
@@ -81,7 +82,8 @@ module GoodJob
                 # The job has not yet been enqueued, so check if adding it will go over the limit
                 if (enqueue_concurrency + 1) > limit
                   logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its enqueue limit of #{limit} #{'job'.pluralize(limit)}"
-                  next :abort
+                  exceeded = :limit
+                  next
                 end
               end
 
@@ -94,13 +96,18 @@ module GoodJob
 
                 if (enqueued_within_period + 1) > throttle_limit
                   logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its throttle limit of #{limit} #{'job'.pluralize(limit)}"
-                  next :abort
+                  exceeded = :throttle
+                  next
                 end
               end
             end
+
+            # Rollback the transaction because it's potentially less expensive than committing it
+            # even though nothing has been altered in the transaction.
+            raise ActiveRecord::Rollback
           end
 
-          throw :abort if result == :abort
+          throw :abort if exceeded
         end
 
         before_perform do |job|
@@ -133,6 +140,7 @@ module GoodJob
             next
           end
 
+          exceeded = nil
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
               if limit
@@ -141,7 +149,8 @@ module GoodJob
                                                      .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
                                                      .limit(limit).pluck(:active_job_id)
                 # The current job has already been locked and will appear in the previous query
-                raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError unless allowed_active_job_ids.include?(job.job_id)
+                exceeded = :limit unless allowed_active_job_ids.include?(job.job_id)
+                next
               end
 
               if throttle
@@ -156,9 +165,18 @@ module GoodJob
                                               .limit(throttle_limit)
                                               .pluck(:active_job_id)
 
-                raise ThrottleExceededError unless allowed_active_job_ids.include?(job.job_id)
+                exceeded = :throttle unless allowed_active_job_ids.include?(job.job_id)
+                next
               end
             end
+
+            raise ActiveRecord::Rollback
+          end
+
+          if exceeded == :limit
+            raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError
+          elsif exceeded == :throttle
+            raise GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError
           end
         end
       end
