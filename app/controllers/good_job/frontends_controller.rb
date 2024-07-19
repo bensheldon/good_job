@@ -38,13 +38,13 @@ module GoodJob
     end
 
     def static
-      render file: STATIC_ASSETS.dig(params[:format].to_sym, params[:id].to_sym) || raise(ActionController::RoutingError, 'Not Found')
+      render file: STATIC_ASSETS.dig(params[:format]&.to_sym, params[:id]&.to_sym) || raise(ActionController::RoutingError, 'Not Found')
     end
 
     def module
       raise(ActionController::RoutingError, 'Not Found') if params[:format] != "js"
 
-      render file: self.class.js_modules[params[:id].to_sym] || raise(ActionController::RoutingError, 'Not Found')
+      render file: self.class.js_modules[params[:id]&.to_sym] || raise(ActionController::RoutingError, 'Not Found')
     end
   end
 end
