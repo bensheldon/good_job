@@ -29,13 +29,9 @@ RSpec.describe GoodJob::JobsFilter do
     running_active_job = ExampleJob.perform_later('success')
     running_job = GoodJob::Job.find(running_active_job.provider_job_id)
     running_job.update!(
+      performed_at: 1.minute.ago,
       finished_at: nil
     )
-    running_job.advisory_lock
-  end
-
-  after do
-    GoodJob::Job.advisory_unlock_session
   end
 
   describe '#job_classes' do
