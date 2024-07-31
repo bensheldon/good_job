@@ -318,4 +318,35 @@ RSpec.describe GoodJob::Configuration do
       expect(configuration.dashboard_live_poll_enabled).to eq true
     end
   end
+
+  describe '#advisory_lock_heartbeat' do
+    it 'defaults to true in development' do
+      allow(Rails).to receive(:env) { "development".inquiry }
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be true
+    end
+
+    it 'defaults to false in other environments' do
+      allow(Rails).to receive(:env) { "production".inquiry }
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be false
+    end
+
+    it 'can be overridden by options' do
+      configuration = described_class.new({ advisory_lock_heartbeat: true })
+      expect(configuration.advisory_lock_heartbeat).to be true
+    end
+
+    it 'can be overridden by rails config' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ advisory_lock_heartbeat: true })
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be true
+    end
+
+    it 'can be overridden by environment variable' do
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_ADVISORY_LOCK_HEARTBEAT' => 'true' })
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be true
+    end
+  end
 end

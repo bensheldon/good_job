@@ -56,7 +56,7 @@ module GoodJob # :nodoc:
       end
     end
 
-    def self.create_record(id:, with_advisory_lock: false)
+    def self.find_or_create_record(id:, with_advisory_lock: false)
       attributes = {
         id: id,
         state: process_state,
@@ -66,6 +66,17 @@ module GoodJob # :nodoc:
         attributes[:lock_type] = :advisory
       end
       create!(attributes)
+    rescue ActiveRecord::RecordNotUnique
+      find_by(id: id).tap do |existing_record|
+        next unless existing_record
+
+        if with_advisory_lock
+          existing_record.advisory_lock!
+          existing_record.update(lock_type: :advisory, state: process_state, updated_at: Time.current)
+        else
+          existing_record.update(lock_type: nil, state: process_state, updated_at: Time.current)
+        end
+      end
     end
 
     def self.process_state
