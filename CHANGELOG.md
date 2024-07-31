@@ -1,5 +1,46 @@
 # Changelog
 
+## [v4.1.1](https://github.com/bensheldon/good_job/tree/v4.1.1) (2024-07-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v1.99.2...v4.1.1)
+
+**Implemented enhancements:**
+
+- Convert Concurrency extension to use transaction-level \(xact\) advisory locks [\#1439](https://github.com/bensheldon/good_job/pull/1439) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Fix N+1 on dashboard batches index page [\#1442](https://github.com/bensheldon/good_job/pull/1442) ([bensheldon](https://github.com/bensheldon))
+- Remove duplicate word on batches show page [\#1441](https://github.com/bensheldon/good_job/pull/1441) ([Earlopain](https://github.com/Earlopain))
+- Ensure remaining inline jobs are unlocked when one job raises in Adapter\#enqueue\_all [\#1438](https://github.com/bensheldon/good_job/pull/1438) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Using Good Job to track all ActiveJob executions, even those with `perform_now` [\#1448](https://github.com/bensheldon/good_job/issues/1448)
+- RuntimeError when running good\_job executable after updating v3 -\> v4 [\#1445](https://github.com/bensheldon/good_job/issues/1445)
+- 2.99 -\> 3.0.2 migration not applying cleanly from a fresh DB [\#1435](https://github.com/bensheldon/good_job/issues/1435)
+- \[Enhance\] Enhance performance via counter cache [\#1375](https://github.com/bensheldon/good_job/issues/1375)
+- Change how svg images are inserted into partials [\#1364](https://github.com/bensheldon/good_job/issues/1364)
+
+**Merged pull requests:**
+
+- Improve some Spanish transcriptions [\#1452](https://github.com/bensheldon/good_job/pull/1452) ([sebastian-cloudnonic](https://github.com/sebastian-cloudnonic))
+- All running jobs now have `performed_at` set so use that in status query; fix flaky test that took advisory lock in `before` block [\#1444](https://github.com/bensheldon/good_job/pull/1444) ([bensheldon](https://github.com/bensheldon))
+- Handle empty asset format in Frontends controller [\#1443](https://github.com/bensheldon/good_job/pull/1443) ([bensheldon](https://github.com/bensheldon))
+- Update development dependencies, Ruby 3.3.4 [\#1437](https://github.com/bensheldon/good_job/pull/1437) ([bensheldon](https://github.com/bensheldon))
+- Refactor inline adapter to enable deferred execution after enqueue to allow batch-callbacks to use transaction-based advisory lock [\#1433](https://github.com/bensheldon/good_job/pull/1433) ([bensheldon](https://github.com/bensheldon))
+- German translation pass [\#1432](https://github.com/bensheldon/good_job/pull/1432) ([Earlopain](https://github.com/Earlopain))
+- Add Brakeman to linters [\#1431](https://github.com/bensheldon/good_job/pull/1431) ([bensheldon](https://github.com/bensheldon))
+- Remove references to and ignore `good_jobs.retried_good_job_id` column [\#1430](https://github.com/bensheldon/good_job/pull/1430) ([bensheldon](https://github.com/bensheldon))
+- Refactor Concurrency extension for Rails 6.1+ compatibility [\#1429](https://github.com/bensheldon/good_job/pull/1429) ([bensheldon](https://github.com/bensheldon))
+- Use svg `use` for svg icons [\#1428](https://github.com/bensheldon/good_job/pull/1428) ([Earlopain](https://github.com/Earlopain))
+- Replace references to "Discrete" executions with simply Executions; deprecate `GoodJob::DiscreteExecution` [\#1427](https://github.com/bensheldon/good_job/pull/1427) ([bensheldon](https://github.com/bensheldon))
+- Refactor Adapter to reference jobs, not executions [\#1426](https://github.com/bensheldon/good_job/pull/1426) ([bensheldon](https://github.com/bensheldon))
+
+## [v1.99.2](https://github.com/bensheldon/good_job/tree/v1.99.2) (2024-07-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.1.0...v1.99.2)
+
 ## [v4.1.0](https://github.com/bensheldon/good_job/tree/v4.1.0) (2024-07-16)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.99.1...v4.1.0)
