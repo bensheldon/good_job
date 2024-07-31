@@ -10,8 +10,8 @@ es:
       retry: Reintentar
     batches:
       index:
-        older_batches: Batches anteriores
-        title: Batches
+        older_batches: Lotes anteriores
+        title: Lotes
       jobs:
         actions:
           confirm_destroy: "¿Estás seguro que querés eliminar esta tarea?"
@@ -26,10 +26,10 @@ es:
         no_jobs_found: No hay tareas.
       show:
         attributes: Atributos
-        batched_jobs: Batched Jobs
+        batched_jobs: Tareas en lote
         callback_jobs: Callback Jobs
       table:
-        no_batches_found: No hay batches.
+        no_batches_found: No hay lotes.
     cron_entries:
       actions:
         confirm_disable: "¿Estás seguro que querés deshabilitar esta tarea programada?"
@@ -109,12 +109,12 @@ es:
       actions:
         confirm_destroy: "¿Estás seguro que querés eliminar esta tarea?"
         confirm_discard: "¿Estás seguro que querés descartar esta tarea?"
-        confirm_force_discard: "¿Está seguro de que desea forzar el descarte de este trabajo? El trabajo se marcará como descartado, pero el trabajo en ejecución no se detendrá; sin embargo, no se volverá a intentar en caso de falla.\n"
+        confirm_force_discard: "¿Está seguro de que desea forzar el descarte de esta tarea? La tarea se marcará como descartada, pero la tarea en ejecución no se detendrá; sin embargo, no se volverá a intentar en caso de falla.\n"
         confirm_reschedule: "¿Estás seguro que querés reprogramar esta tarea?"
         confirm_retry: "¿Estás seguro que querés reintentar esta tarea?"
         destroy: Eliminar tarea
         discard: Descartar tarea
-        force_discard: Forzar el descarte del trabajo
+        force_discard: Forzar el descarte de la tarea
         reschedule: Reprogramar tarea
         retry: Reiuntentar tarea
       destroy:
@@ -122,13 +122,13 @@ es:
       discard:
         notice: La tarea ha sido descartada
       executions:
-        application_trace: Application Trace
-        full_trace: Full Trace
+        application_trace: Traza de la aplicación
+        full_trace: Traza completa
         in_queue: en cola
         runtime: en ejecución
         title: Ejecuciones
       force_discard:
-        notice: Job ha sido descartado a la fuerza. Continuará ejecutándose pero no se volverá a intentar en caso de fallas.
+        notice: La tarea ha sido descartada a la fuerza. Continuará ejecutándose pero no se volverá a intentar en caso de fallas.
       index:
         job_pagination: Paginación de tareas
         older_jobs: Tareas anteriores
@@ -197,12 +197,12 @@ es:
     performance:
       index:
         average_duration: Duración promedio
-        chart_title: Tiempo total de ejecución del trabajo en segundos
+        chart_title: Tiempo total de ejecución de la tarea en segundos
         executions: Ejecuciones
-        job_class: clase de trabajo
+        job_class: clase de tarea
         maximum_duration: Duración máxima
         minimum_duration: Duración mínima
-        title: Actuación
+        title: Rendimiento
       show:
         slow: Lento
         title: Actuación
@@ -230,12 +230,12 @@ es:
         queue_name: Nombre de la cola
         search: Buscar
       navbar:
-        batches: Batches
+        batches: Lotes
         cron_schedules: Cron
         jobs: Tareas
         live_poll: En vivo
         name: "GoodJob 👍"
-        performance: Actuación
+        performance: Rendimiento
         processes: Procesos
         theme:
           auto: Auto
