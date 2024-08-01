@@ -307,7 +307,6 @@ Available configuration options are:
 - `inline_execution_respects_schedule` (boolean) Opt-in to future behavior of inline execution respecting scheduled jobs. Defaults to `false`.
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
 - `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
-- `smaller_number_is_higher_priority` (boolean) allows you to specifiy that jobs should be run in ascending order of priority (smallest priority numbers first). This will be enabled by default in the next major version of GoodJob (v4.0), but jobs with the highest priority number are run first by default in all earlier versions of GoodJob.
 - `retry_on_unhandled_error` (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Be advised this may lead to jobs being repeated infinitely ([see below for more on retries](#retries)). Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `false`)
 - `on_thread_error` (proc, lambda, or callable) will be called when there is an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake. Example:
 
@@ -499,7 +498,9 @@ As a second example, you may wish to show a link to a log aggregator next to eac
 
 ### Job priority
 
-Higher priority numbers run first in all versions of GoodJob v3.x and below. GoodJob v4.x will change job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority (see #524). To opt-in to this behavior now, set `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or `application.rb`.
+Smaller `priority` values have higher priority and run first (default: `0`), in accordance with [Active Job's definition of priority](https://github.com/rails/rails/blob/e17faead4f2aff28da079d50f02ea5b015322d5b/activejob/lib/active_job/core.rb#L22).
+
+Prior to GoodJob v4, this was reversed: higher priority numbers ran first in all versions of GoodJob v3.x and below. When migrating from v3 to v4, new behavior can be opted into by setting `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or `application.rb`.
 
 ### Labelled jobs
 
