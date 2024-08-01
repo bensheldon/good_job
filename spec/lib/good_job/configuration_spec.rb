@@ -298,14 +298,6 @@ RSpec.describe GoodJob::Configuration do
     end
   end
 
-  describe '#smaller_number_is_higher_priority' do
-    it 'delegates to rails configuration' do
-      allow(Rails.application.config).to receive(:good_job).and_return({ smaller_number_is_higher_priority: true })
-      configuration = described_class.new({})
-      expect(configuration.smaller_number_is_higher_priority).to be true
-    end
-  end
-
   describe '#dashboard_default_locale' do
     it 'delegates to rails configuration' do
       allow(Rails.application.config).to receive(:good_job).and_return({ dashboard_default_locale: :de })

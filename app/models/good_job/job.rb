@@ -99,13 +99,7 @@ module GoodJob
     # @!method priority_ordered
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :priority_ordered, (lambda do
-      if GoodJob.configuration.smaller_number_is_higher_priority
-        order('priority ASC NULLS LAST')
-      else
-        order('priority DESC NULLS LAST')
-      end
-    end)
+    scope :priority_ordered, -> { order('priority ASC NULLS LAST') }
 
     # Order jobs by created_at, for first-in first-out
     # @!method creation_ordered
