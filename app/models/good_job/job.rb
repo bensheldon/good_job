@@ -40,6 +40,7 @@ module GoodJob
     set_callback :perform_unlocked, :after, :continue_discard_or_finish_batch
 
     belongs_to :batch, class_name: 'GoodJob::BatchRecord', inverse_of: :jobs, optional: true
+    belongs_to :callback_batch, class_name: 'GoodJob::BatchRecord', foreign_key: :batch_callback_id, inverse_of: :callback_jobs, optional: true
     belongs_to :locked_by_process, class_name: "GoodJob::Process", foreign_key: :locked_by_id, inverse_of: :locked_jobs, optional: true
     has_many :executions, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', primary_key: "id", inverse_of: :job, dependent: :delete_all
 
@@ -743,6 +744,7 @@ module GoodJob
 
     def continue_discard_or_finish_batch
       batch._continue_discard_or_finish(self) if batch.present?
+      callback_batch._continue_discard_or_finish if callback_batch.present?
     end
 
     def active_job_data

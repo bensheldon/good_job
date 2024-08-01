@@ -38,6 +38,10 @@ module GoodJob
       query
     end)
 
+    def self.jobs_finished_at_migrated?
+      column_names.include?('jobs_finished_at')
+    end
+
     # Whether the batch has finished and no jobs were discarded
     # @return [Boolean]
     def succeeded?
@@ -52,22 +56,26 @@ module GoodJob
       attributes.except('serialized_properties').merge(properties: properties)
     end
 
-    def _continue_discard_or_finish(execution = nil, lock: true)
-      execution_discarded = execution && execution.finished_at.present? && execution.error.present?
+    def _continue_discard_or_finish(job = nil, lock: true)
+      job_discarded = job && job.finished_at.present? && job.error.present?
       buffer = GoodJob::Adapter::InlineBuffer.capture do
         advisory_lock_maybe(lock) do
           Batch.within_thread(batch_id: nil, batch_callback_id: id) do
             reload
-            if execution_discarded && !discarded_at
+
+            if job_discarded && !discarded_at
               update(discarded_at: Time.current)
               on_discard.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :discard }) if on_discard.present?
             end
 
-            if enqueued_at && !finished_at && jobs.where(finished_at: nil).count.zero?
-              update(finished_at: Time.current)
+            if enqueued_at && !(self.class.jobs_finished_at_migrated? ? jobs_finished_at : finished_at) && jobs.where(finished_at: nil).count.zero?
+              self.class.jobs_finished_at_migrated? ? update(jobs_finished_at: Time.current) : update(finished_at: Time.current)
+
               on_success.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :success }) if !discarded_at && on_success.present?
               on_finish.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :finish }) if on_finish.present?
             end
+
+            update(finished_at: Time.current) if !finished_at && self.class.jobs_finished_at_migrated? && jobs_finished? && callback_jobs.where(finished_at: nil).count.zero?
           end
         end
       end
@@ -99,6 +107,14 @@ module GoodJob
       raise ArgumentError, "Properties must be a Hash" unless value.is_a?(Hash)
 
       self.serialized_properties = value
+    end
+
+    def jobs_finished?
+      self.class.jobs_finished_at_migrated? ? jobs_finished_at : finished_at
+    end
+
+    def jobs_finished_at
+      self.class.jobs_finished_at_migrated? ? self[:jobs_finished_at] : self[:finished_at]
     end
 
     private

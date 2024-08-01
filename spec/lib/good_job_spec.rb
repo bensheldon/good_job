@@ -58,7 +58,7 @@ describe GoodJob do
     let!(:old_finished_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago) }
     let!(:old_finished_job_execution) { GoodJob::Execution.create!(active_job_id: old_finished_job.active_job_id, finished_at: 16.days.ago) }
     let!(:old_discarded_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago, error: "Error") }
-    let!(:old_batch) { GoodJob::BatchRecord.create!(finished_at: 15.days.ago) }
+    let!(:old_batch) { GoodJob::BatchRecord.create!(jobs_finished_at: 14.days.ago, finished_at: 15.days.ago) }
 
     it 'deletes finished jobs' do
       destroyed_records_count = described_class.cleanup_preserved_jobs(in_batches_of: 1)
@@ -108,6 +108,16 @@ describe GoodJob do
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.not_to raise_error
+      expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+
+    it "does not delete batches until their callbacks have finished" do
+      old_batch.update!(finished_at: nil)
+      described_class.cleanup_preserved_jobs
+      expect { old_batch.reload }.not_to raise_error
+
+      old_batch.update!(finished_at: 15.days.ago)
+      described_class.cleanup_preserved_jobs
       expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
   end

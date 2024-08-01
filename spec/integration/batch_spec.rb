@@ -307,8 +307,10 @@ RSpec.describe 'Batches' do
 
       batch.reload
       expect(batch).to be_succeeded
+      expect(batch).to be_jobs_finished
       expect(batch.callback_active_jobs.count).to eq 1
       expect(batch.callback_active_jobs.first).to be_a TestJob::SuccessCallbackJob
+      expect(batch.finished_at).to be_present
 
       job, callback_job = GoodJob::Job.order(:created_at).to_a
       expect(job.status).to eq :succeeded
@@ -349,6 +351,22 @@ RSpec.describe 'Batches' do
       expect(batch).to be_discarded
 
       expect { batch.retry }.to change { GoodJob::Job.discarded.count }.by(-1)
+    end
+  end
+
+  describe 'batch deletion' do
+    it 'deletes batches only after their callback jobs have completed' do
+      batch = GoodJob::Batch.new
+      batch.on_finish = "BatchCallbackJob"
+      batch.enqueue do
+        TestJob.perform_later
+      end
+
+      GoodJob.perform_inline
+
+      batch.reload
+      expect(batch.jobs_finished_at).to be_present
+      expect(batch.finished_at).to be_within(1.second).of(Time.current)
     end
   end
 end

@@ -1,3 +1,5 @@
 --color
 --order random
 --require spec_helper
+--require ./spec/support/pre_documentation_formatter.rb \
+--format PreDocumentationFormatter
