@@ -9,6 +9,9 @@ pt-BR:
       reschedule: Reagendar
       retry: Tentar novamente
     batches:
+      actions:
+        confirm_retry: Tem certeza de que deseja tentar novamente este lote?
+        retry: Tentar novamente
       index:
         older_batches: Lotes antigos
         title: Lotes
@@ -24,6 +27,8 @@ pt-BR:
           retry: Tentar Tarefa Novamente
           title: Ações
         no_jobs_found: Nenhuma tarefa encontrada.
+      retry:
+        notice: O lote foi tentado novamente
       show:
         attributes: Atributos
         batched_jobs: Tarefas em Lote

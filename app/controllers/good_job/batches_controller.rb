@@ -9,5 +9,11 @@ module GoodJob
     def show
       @batch = GoodJob::BatchRecord.find(params[:id])
     end
+
+    def retry
+      @batch = GoodJob::Batch.find(params[:id])
+      @batch.retry
+      redirect_back(fallback_location: batches_path, notice: t(".notice"))
+    end
   end
 end

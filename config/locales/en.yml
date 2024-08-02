@@ -9,6 +9,9 @@ en:
       reschedule: Reschedule
       retry: Retry
     batches:
+      actions:
+        confirm_retry: Are you sure you want to retry this batch?
+        retry: Retry
       index:
         older_batches: Older batches
         title: Batches
@@ -24,6 +27,8 @@ en:
           retry: Retry Job
           title: Actions
         no_jobs_found: No jobs found.
+      retry:
+        notice: Batch has been retried
       show:
         attributes: Attributes
         batched_jobs: Batched Jobs

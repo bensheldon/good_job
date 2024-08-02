@@ -9,6 +9,9 @@ ja:
       reschedule: 再スケジュールする
       retry: 再試行する
     batches:
+      actions:
+        confirm_retry: このバッチを再試行してもよろしいですか？
+        retry: バッチを再試行する
       index:
         older_batches: より古いバッチ
         title: バッチ
@@ -24,6 +27,8 @@ ja:
           retry: ジョブを再試行する
           title: アクション
         no_jobs_found: ジョブが見つかりませんでした。
+      retry:
+        notice: バッチが再試行されました
       show:
         attributes: 属性
         batched_jobs: バッチ処理されたジョブ
@@ -122,9 +127,9 @@ ja:
       discard:
         notice: ジョブが破棄されました
       executions:
-        application_trace: Application Trace
-        full_trace: Full Trace
-        in_queue: 待機中
+        application_trace: アプリケーショントレース
+        full_trace: フルトレース
+        in_queue: キュー内
         runtime: 実行時間
         title: 実行
       force_discard:
@@ -198,8 +203,8 @@ ja:
       index:
         average_duration: 平均所要時間
         chart_title: ジョブの総実行時間（秒
-        executions: 処刑
-        job_class: 職種
+        executions: 実行
+        job_class: ジョブクラス
         maximum_duration: 最大持続時間
         minimum_duration: 最小期間
         title: パフォーマンス

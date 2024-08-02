@@ -13,6 +13,14 @@ describe GoodJob::Batch do
       def perform(batch, params)
       end
     end)
+
+    stub_const 'DiscardOnceJob', (Class.new(ActiveJob::Base) do
+      discard_on StandardError
+
+      def perform
+        raise StandardError if executions == 1
+      end
+    end)
   end
 
   it 'is a valid GlobalId' do
@@ -91,6 +99,29 @@ describe GoodJob::Batch do
       expect(batch.on_finish).to eq "TestJob"
       expect(batch.on_success).to eq "TestJob"
       expect(batch.on_discard).to eq "TestJob"
+    end
+  end
+
+  describe '#retry' do
+    let(:batch) { described_class.new }
+
+    it 'retries discarded jobs' do
+      batch.enqueue do
+        TestJob.perform_later
+        DiscardOnceJob.perform_later
+      end
+
+      GoodJob.perform_inline
+
+      expect(batch.reload).to be_discarded
+
+      batch.retry
+
+      expect(batch.reload).to be_enqueued
+
+      GoodJob.perform_inline
+
+      expect(batch.reload).to be_succeeded
     end
   end
 

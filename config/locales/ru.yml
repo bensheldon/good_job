@@ -9,6 +9,9 @@ ru:
       reschedule: Перенести
       retry: Повторить попытку
     batches:
+      actions:
+        confirm_retry: Вы уверены, что хотите повторить эту группу заданий?
+        retry: Повторить группу заданий
       index:
         older_batches: Старые группы заданий
         title: Группы заданий
@@ -24,6 +27,8 @@ ru:
           retry: Повторить задание
           title: Действия
         no_jobs_found: Заданий не найдено
+      retry:
+        notice: Группа заданий была повторена
       show:
         attributes: Атрибуты
         batched_jobs: Группы заданий

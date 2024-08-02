@@ -9,6 +9,7 @@ module ::CustomError; end
 module ::DONE; end
 module ::DiscardableError; end
 module ::DiscardedJob; end
+module ::DiscardOnceJob; end
 module ::ERROR_TRIGGERED; end
 module ::ErrorJob; end
 module ::ExpectedError; end

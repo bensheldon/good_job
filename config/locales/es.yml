@@ -9,6 +9,9 @@ es:
       reschedule: Reprogramar
       retry: Reintentar
     batches:
+      actions:
+        confirm_retry: "¿Estás seguro que querés reintentar este lote?"
+        retry: Reintentar
       index:
         older_batches: Lotes anteriores
         title: Lotes
@@ -24,6 +27,8 @@ es:
           retry: Reintentar tarea
           title: Acciones
         no_jobs_found: No hay tareas.
+      retry:
+        notice: El lote ha sido reintentado
       show:
         attributes: Atributos
         batched_jobs: Tareas en lote

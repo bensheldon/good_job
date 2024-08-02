@@ -9,6 +9,9 @@ nl:
       reschedule: Opnieuw plannen
       retry: Opnieuw proberen
     batches:
+      actions:
+        confirm_retry: Weet je zeker dat je deze batch opnieuw wilt proberen?
+        retry: Batch opnieuw proberen
       index:
         older_batches: Oudere partijen
         title: Partijen
@@ -24,6 +27,8 @@ nl:
           retry: Taak opnieuw
           title: Acties
         no_jobs_found: Geen vacatures gevonden.
+      retry:
+        notice: Batch is opnieuw geprobeerd
       show:
         attributes: attributen
         batched_jobs: Gegroepeerde banen

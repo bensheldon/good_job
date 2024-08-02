@@ -9,6 +9,9 @@ fr:
       reschedule: Reprogrammer
       retry: Recommencez
     batches:
+      actions:
+        confirm_retry: Voulez-vous vraiment réessayer ce lot ?
+        retry: Réessayer
       index:
         older_batches: Lots plus anciens
         title: Lots
@@ -24,6 +27,8 @@ fr:
           retry: Réessayer le job
           title: Actions
         no_jobs_found: Aucun job trouvé.
+      retry:
+        notice: Le lot a été réessayé
       show:
         attributes: Attributs
         batched_jobs: Jobs groupés
