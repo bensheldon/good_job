@@ -9,6 +9,9 @@ it:
       reschedule: Riprogramma
       retry: Riprova
     batches:
+      actions:
+        confirm_retry: Sei sicuro di voler riprovare questo batch?
+        retry: Riprova
       index:
         older_batches: Batch più vecchi
         title: Batch
@@ -24,6 +27,8 @@ it:
           retry: Riprova job
           title: Azioni
         no_jobs_found: Nessun job trovato.
+      retry:
+        notice: Il batch è stato riprovato
       show:
         attributes: Attributi
         batched_jobs: Job raggruppati

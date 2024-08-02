@@ -9,6 +9,9 @@ uk:
       reschedule: Перепланувати
       retry: Повторити
     batches:
+      actions:
+        confirm_retry: Ви впевнені, що хочете повторити цю групу завдань?
+        retry: Повторити групу завдань
       index:
         older_batches: Старі пакети
         title: Пакети
@@ -24,6 +27,8 @@ uk:
           retry: Повторити задачу
           title: Дії
         no_jobs_found: Задачі не знайдені.
+      retry:
+        notice: Групу завдань було повторено
       show:
         attributes: Атрибути
         batched_jobs: Задачі в пакеті
@@ -256,7 +261,7 @@ uk:
         queue_name: Назва черги
         search: Пошук
       navbar:
-        batches: Batches
+        batches: Пакети
         cron_schedules: Cron
         jobs: Задачі
         live_poll: Живе Опитування

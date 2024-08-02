@@ -92,10 +92,12 @@ module GoodJob
       if record.new_record?
         record.save!
       else
-        record.with_advisory_lock(function: "pg_advisory_lock") do
-          record.enqueued_at_will_change!
-          record.finished_at_will_change!
-          record.update!(enqueued_at: nil, finished_at: nil)
+        record.transaction do
+          record.with_advisory_lock(function: "pg_advisory_xact_lock") do
+            record.enqueued_at_will_change!
+            record.finished_at_will_change!
+            record.update!(enqueued_at: nil, finished_at: nil)
+          end
         end
       end
 
@@ -133,6 +135,21 @@ module GoodJob
       end
 
       buffer.active_jobs
+    end
+
+    def retry
+      Rails.application.executor.wrap do
+        buffer = GoodJob::Adapter::InlineBuffer.capture do
+          record.transaction do
+            record.with_advisory_lock(function: "pg_advisory_xact_lock") do
+              record.update!(discarded_at: nil, finished_at: nil)
+              record.jobs.discarded.each(&:retry_job)
+              record._continue_discard_or_finish(lock: false)
+            end
+          end
+        end
+        buffer.call
+      end
     end
 
     def active_jobs

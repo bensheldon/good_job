@@ -9,6 +9,9 @@ ko:
       reschedule: 재예약하기
       retry: 다시 시도하기
     batches:
+      actions:
+        confirm_retry: 이 배치를 다시 시도하시겠습니까?
+        retry: 배치 다시 시도
       index:
         older_batches: 더 오래된 배치
         title: 배치
@@ -24,6 +27,8 @@ ko:
           retry: 작업 다시 시도
           title: 작업 액션
         no_jobs_found: 작업이 없습니다.
+      retry:
+        notice: 배치가 다시 시도되었습니다.
       show:
         attributes: 속성
         batched_jobs: 배치된 작업
@@ -122,8 +127,8 @@ ko:
       discard:
         notice: 작업이 폐기되었습니다.
       executions:
-        application_trace: Application Trace
-        full_trace: Full Trace
+        application_trace: 애플리케이션 추적
+        full_trace: 전체 추적
         in_queue: 대기 중
         runtime: 실행 시간
         title: 실행
@@ -198,8 +203,8 @@ ko:
       index:
         average_duration: 평균 지속 시간
         chart_title: 총 작업 실행 시간(초)
-        executions: 처형
-        job_class: 직업군
+        executions: 실행
+        job_class: 작업 클래스
         maximum_duration: 최대 기간
         minimum_duration: 최소 기간
         title: 성능

@@ -336,4 +336,19 @@ RSpec.describe 'Batches' do
       expect(batch.active_jobs.count).to eq 2
     end
   end
+
+  describe 'retrying a discarded batch' do
+    it 'retries all discarded jobs in the batch' do
+      batch = GoodJob::Batch.enqueue do
+        TestJob.perform_later(error: true)
+      end
+
+      GoodJob.perform_inline
+
+      batch.reload
+      expect(batch).to be_discarded
+
+      expect { batch.retry }.to change { GoodJob::Job.discarded.count }.by(-1)
+    end
+  end
 end

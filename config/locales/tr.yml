@@ -9,6 +9,9 @@ tr:
       reschedule: Yeniden planla
       retry: Tekrar dene
     batches:
+      actions:
+        confirm_retry: Bu grubu yeniden denemek istediğinizden emin misiniz?
+        retry: Grubu yeniden dene
       index:
         older_batches: Daha eski toplu işlemler
         title: Toplu İşlemler
@@ -24,6 +27,8 @@ tr:
           retry: İşi Tekrar Dene
           title: İşlemler
         no_jobs_found: İş bulunamadı.
+      retry:
+        notice: Grup yeniden denendi
       show:
         attributes: Özellikler
         batched_jobs: Toplu İşlenmiş İşler

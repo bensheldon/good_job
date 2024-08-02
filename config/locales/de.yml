@@ -9,6 +9,9 @@ de:
       reschedule: Umplanen
       retry: Wiederholen
     batches:
+      actions:
+        confirm_retry: Bist du sicher, dass du diesen Batch wiederholen willst?
+        retry: Batch wiederholen
       index:
         older_batches: Ältere Batches
         title: Batches
@@ -24,6 +27,8 @@ de:
           retry: Job wiederholen
           title: Aktionen
         no_jobs_found: Keine Jobs gefunden.
+      retry:
+        notice: Batch wurde wiederholt
       show:
         attributes: Attribute
         batched_jobs: Batch-Jobs
