@@ -58,10 +58,6 @@ module GoodJob
     scope :retried, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).where(params_execution_count.gt(1)) }
     # Immediate/Scheduled time to run has passed, waiting for an available thread run
     scope :queued, -> { where(performed_at: nil, finished_at: nil).where(coalesce_scheduled_at_created_at.lteq(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
-    # Advisory locked and executing
-    scope :running, -> { where.not(performed_at: nil).where(finished_at: nil).joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
-    # Finished executing (succeeded or discarded)
-    scope :finished, -> { where.not(finished_at: nil) }
     # Completed executing successfully
     scope :succeeded, -> { finished.where(error: nil) }
     # Errored but will not be retried
