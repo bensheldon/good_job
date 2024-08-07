@@ -41,7 +41,7 @@ jobs:
       DISABLE_SPRING: 1
     services:
       postgres:
-        image: postgres:15
+        image: postgres:16
         env:
           POSTGRES_USER: good_job
           POSTGRES_DB: good_job_test
@@ -97,14 +97,7 @@ jobs:
         include:
           - ruby: 3.3
             pg: 11
-          - ruby: 3.3
-            pg: 12
-          - ruby: 3.3
-            pg: 13
-          - ruby: 3.3
-            pg: 14
-          - ruby: 3.3
-            pg: 15
+
     env:
       PGHOST: localhost
       PGUSER: good_job
