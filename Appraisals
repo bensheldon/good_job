@@ -33,6 +33,12 @@ if ruby_31_or_higher
       gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
     end
 
+    appraise "rails-7.2-ruby-3.1" do
+      gem "capybara", "~> 3.36" # For Ruby 3.1 support https://github.com/teamcapybara/capybara/pull/2468
+      gem "rails", "~> 7.2.0.a"
+      gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
+    end
+
     appraise "rails-head" do
       gem "capybara", "~> 3.36" # For Ruby 3.1 support https://github.com/teamcapybara/capybara/pull/24
       gem "rails", github: "rails/rails", branch: "main"
