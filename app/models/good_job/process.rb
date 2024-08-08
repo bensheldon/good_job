@@ -20,9 +20,9 @@ module GoodJob # :nodoc:
       advisory: 0,
     }
     if Gem::Version.new(Rails.version) >= Gem::Version.new('7.1.0.a')
-      enum :lock_type, lock_type_enum, validate: { allow_nil: true }
+      enum :lock_type, lock_type_enum, validate: { allow_nil: true }, scopes: false
     else
-      enum lock_type: lock_type_enum
+      enum lock_type: lock_type_enum, _scopes: false
     end
 
     has_many :locked_jobs, class_name: "GoodJob::Job", foreign_key: :locked_by_id, inverse_of: :locked_by_process, dependent: nil

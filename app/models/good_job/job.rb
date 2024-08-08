@@ -57,9 +57,9 @@ module GoodJob
     # Execution errored, will run in the future
     scope :retried, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).where(params_execution_count.gt(1)) }
     # Immediate/Scheduled time to run has passed, waiting for an available thread run
-    scope :queued, -> { where(performed_at: nil, finished_at: nil).where(coalesce_scheduled_at_created_at.lteq(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).joins_advisory_locks.where(pg_locks: { locktype: nil }) }
+    scope :queued, -> { where(performed_at: nil, finished_at: nil).where(coalesce_scheduled_at_created_at.lteq(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))) }
     # Advisory locked and executing
-    scope :running, -> { where.not(performed_at: nil).where(finished_at: nil).joins_advisory_locks.where.not(pg_locks: { locktype: nil }) }
+    scope :running, -> { where.not(performed_at: nil).where(finished_at: nil) }
     # Finished executing (succeeded or discarded)
     scope :finished, -> { where.not(finished_at: nil) }
     # Completed executing successfully
@@ -139,24 +139,6 @@ module GoodJob
     # @!scope class
     # @return [ActiveRecord::Relation]
     scope :schedule_ordered, -> { order(coalesce_scheduled_at_created_at.asc) }
-
-    # Get completed jobs before the given timestamp. If no timestamp is
-    # provided, get *all* completed jobs. By default, GoodJob
-    # destroys jobs after they're completed, meaning this returns no jobs.
-    # However, if you have changed {GoodJob.preserve_job_records}, this may
-    # find completed Jobs.
-    # @!method finished(timestamp = nil)
-    # @!scope class
-    # @param timestamp (Float)
-    #   Get jobs that finished before this time (in epoch time).
-    # @return [ActiveRecord::Relation]
-    scope :finished, ->(timestamp = nil) { timestamp ? where(arel_table['finished_at'].lteq(bind_value('finished_at', timestamp, ActiveRecord::Type::DateTime))) : where.not(finished_at: nil) }
-
-    # Get Jobs that started but not finished yet.
-    # @!method running
-    # @!scope class
-    # @return [ActiveRecord::Relation]
-    scope :running, -> { where.not(performed_at: nil).where(finished_at: nil) }
 
     # Get Jobs on queues that match the given queue string.
     # @!method queue_string(string)

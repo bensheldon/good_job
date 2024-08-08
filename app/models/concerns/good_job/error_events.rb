@@ -15,9 +15,9 @@ module GoodJob
         discarded: 5,
       }
       if Gem::Version.new(Rails.version) >= Gem::Version.new('7.1.0.a')
-        enum :error_event, error_event_enum, validate: { allow_nil: true }
+        enum :error_event, error_event_enum, validate: { allow_nil: true }, scopes: false
       else
-        enum error_event: error_event_enum
+        enum error_event: error_event_enum, _scopes: false
       end
     end
   end
