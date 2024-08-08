@@ -377,6 +377,16 @@ module GoodJob
       end || false
     end
 
+    # Whether to take an advisory lock on the process record in the notifier reactor.
+    # @return [Boolean]
+    def advisory_lock_heartbeat
+      return options[:advisory_lock_heartbeat] unless options[:advisory_lock_heartbeat].nil?
+      return rails_config[:advisory_lock_heartbeat] unless rails_config[:advisory_lock_heartbeat].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ADVISORY_LOCK_HEARTBEAT']) unless env['GOOD_JOB_ADVISORY_LOCK_HEARTBEAT'].nil?
+
+      Rails.env.development?
+    end
+
     private
 
     def rails_config

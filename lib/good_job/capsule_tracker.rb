@@ -57,7 +57,7 @@ module GoodJob # :nodoc:
         if @record
           @record.refresh_if_stale
         else
-          @record = GoodJob::Process.create_record(id: @record_id)
+          @record = GoodJob::Process.find_or_create_record(id: @record_id)
           create_refresh_task
         end
         value = @record&.id
@@ -89,7 +89,7 @@ module GoodJob # :nodoc:
               @advisory_locked_connection = WeakRef.new(@record.class.connection)
             end
           else
-            @record = GoodJob::Process.create_record(id: @record_id, with_advisory_lock: true)
+            @record = GoodJob::Process.find_or_create_record(id: @record_id, with_advisory_lock: true)
             @advisory_locked_connection = WeakRef.new(@record.class.connection)
             create_refresh_task
           end
