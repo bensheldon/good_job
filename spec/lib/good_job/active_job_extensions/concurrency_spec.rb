@@ -51,7 +51,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
   end
 
   describe '.good_job_control_concurrency_with' do
-    describe 'total_limit:', :skip_rails_5 do
+    describe 'total_limit:' do
       before do
         TestJob.good_job_control_concurrency_with(
           total_limit: -> { 1 },
@@ -75,7 +75,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
     end
 
-    describe 'enqueue_limit:', :skip_rails_5 do
+    describe 'enqueue_limit:' do
       before do
         TestJob.good_job_control_concurrency_with(
           enqueue_limit: -> { 2 },
@@ -99,10 +99,8 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(GoodJob::Job.where(concurrency_key: "Bob").count).to eq 1
 
         expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its enqueue limit of 2 jobs/)).exactly(:once)
-        if ActiveJob.gem_version >= Gem::Version.new("6.1.0")
-          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
-          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
-        end
+        expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
+        expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
       end
 
       it 'excludes jobs that are already executing/locked' do

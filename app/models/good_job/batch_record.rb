@@ -84,11 +84,7 @@ module GoodJob
       end
     end
 
-    if Rails.gem_version < Gem::Version.new('6.1.0.alpha')
-      # serialize does not yet take a default value, must set via Attributes API
-      attribute :serialized_properties, :json, default: -> { {} }
-      serialize :serialized_properties, PropertySerializer
-    elsif Rails.gem_version < Gem::Version.new('7.1.0.alpha')
+    if Rails.gem_version < Gem::Version.new('7.1.0.alpha')
       serialize :serialized_properties, PropertySerializer, default: -> { {} }
     else
       serialize :serialized_properties, coder: PropertySerializer, default: -> { {} }
