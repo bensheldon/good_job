@@ -6,12 +6,14 @@ module ActiveJob
   module TestHelper
     # Avoid calling #descendants because JRuby has trouble with it
     # https://github.com/jruby/jruby/issues/6896
+    silence_redefinition_of_method :queue_adapter_changed_jobs
     def queue_adapter_changed_jobs
       []
     end
 
     module TestQueueAdapter
       module ClassMethods
+        silence_redefinition_of_method :queue_adapter
         def queue_adapter # rubocop:disable Lint/UselessMethodDefinition
           super
         end

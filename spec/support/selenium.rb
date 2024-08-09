@@ -7,6 +7,7 @@ require "action_dispatch/system_testing/browser"
 module ActionDispatch
   module SystemTesting
     class Browser # :nodoc:
+      silence_redefinition_of_method :resolve_driver_path
       def resolve_driver_path(namespace)
         # The path method has been deprecated in 4.20.0
         namespace::Service.driver_path = if Gem::Version.new(::Selenium::WebDriver::VERSION) >= Gem::Version.new("4.20.0")
