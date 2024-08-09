@@ -96,7 +96,7 @@ jobs:
         pg: [16]
         include:
           - ruby: 3.3
-            pg: 11
+            pg: 12
 
     env:
       PGHOST: localhost

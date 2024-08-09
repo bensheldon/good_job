@@ -164,9 +164,9 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 
 ## Compatibility
 
-- **Ruby on Rails:** 6.0+
-- **Ruby:** Ruby 2.6+. JRuby 9.3+
-- **Postgres:** 10.0+
+- **Ruby on Rails:** 6.1+
+- **Ruby:** Ruby 3.0+. JRuby 9.4+
+- **Postgres:** 12.0+
 
 ## Configuration
 
