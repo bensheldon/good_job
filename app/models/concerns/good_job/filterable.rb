@@ -36,18 +36,9 @@ module GoodJob
 
         # TODO: turn this into proper bind parameters in Arel
         tsvector = "(to_tsvector('english', id::text) || to_tsvector('english', COALESCE(active_job_id::text, '')) || to_tsvector('english', serialized_params) || to_tsvector('english', COALESCE(error, '')) || to_tsvector('english', COALESCE(array_to_string(labels, ' '), '')))"
-        to_tsquery_function = database_supports_websearch_to_tsquery? ? 'websearch_to_tsquery' : 'plainto_tsquery'
-        where("#{tsvector} @@ #{to_tsquery_function}(?)", query)
-          .order(sanitize_sql_for_order([Arel.sql("ts_rank(#{tsvector}, #{to_tsquery_function}(?))"), query]) => 'DESC')
+        where("#{tsvector} @@ websearch_to_tsquery(?)", query)
+          .order(sanitize_sql_for_order([Arel.sql("ts_rank(#{tsvector}, websearch_to_tsquery(?))"), query]) => 'DESC')
       end)
-    end
-
-    class_methods do
-      def database_supports_websearch_to_tsquery?
-        return @_database_supports_websearch_to_tsquery if defined?(@_database_supports_websearch_to_tsquery)
-
-        @_database_supports_websearch_to_tsquery = connection.postgresql_version >= 110000
-      end
     end
   end
 end

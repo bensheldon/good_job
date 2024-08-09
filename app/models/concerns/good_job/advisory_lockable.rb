@@ -44,8 +44,7 @@ module GoodJob
         cte_table = Arel::Table.new(:rows)
         cte_query = original_query.select(primary_key, column).except(:limit)
         cte_query = cte_query.limit(select_limit) if select_limit
-        cte_type = supports_cte_materialization_specifiers? ? :MATERIALIZED : :""
-        composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(cte_type, cte_query.arel))
+        composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(:MATERIALIZED, cte_query.arel))
 
         lock_condition = "#{function}(('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)"
         query = cte_table.project(cte_table[:id])
@@ -279,12 +278,6 @@ module GoodJob
 
       def _advisory_lockable_column
         advisory_lockable_column || primary_key
-      end
-
-      def supports_cte_materialization_specifiers?
-        return @_supports_cte_materialization_specifiers if defined?(@_supports_cte_materialization_specifiers)
-
-        @_supports_cte_materialization_specifiers = connection.postgresql_version >= 120000
       end
 
       # Postgres advisory unlocking function for the class

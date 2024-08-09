@@ -50,7 +50,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
           SELECT "good_jobs".*
           FROM "good_jobs"
           WHERE "good_jobs"."id" IN (
-            WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
+            WITH "rows" AS MATERIALIZED (
               SELECT "good_jobs"."id", "good_jobs"."id"
               FROM "good_jobs"
               WHERE "good_jobs"."priority" = 99
@@ -73,7 +73,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
           SELECT "good_jobs".*
           FROM "good_jobs"
           WHERE "good_jobs"."id" IN (
-            WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
+            WITH "rows" AS MATERIALIZED (
               SELECT "good_jobs"."id", "good_jobs"."queue_name"
               FROM "good_jobs"
               ORDER BY "good_jobs"."priority" DESC
@@ -95,7 +95,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
           SELECT "good_jobs".*
           FROM "good_jobs"
           WHERE "good_jobs"."id" IN (
-            WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
+            WITH "rows" AS MATERIALIZED (
               SELECT "good_jobs"."id", "good_jobs"."active_job_id"
               FROM "good_jobs"
               LIMIT 1000
