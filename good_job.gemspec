@@ -47,7 +47,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activejob", ">= 6.1.0"
   spec.add_dependency "activerecord", ">= 6.1.0"
   spec.add_dependency "concurrent-ruby", ">= 1.3.1"
-  spec.add_dependency "fugit", ">= 1.11.0"
+  spec.add_dependency "fugit", "~> 1.11", ">= 1.11.1"
   spec.add_dependency "railties", ">= 6.1.0"
   spec.add_dependency "thor", ">= 1.0.0"
 
