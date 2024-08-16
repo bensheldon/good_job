@@ -167,8 +167,10 @@ module GoodJob
                                               .limit(throttle_limit)
                                               .pluck(:active_job_id)
 
-                exceeded = :throttle unless allowed_active_job_ids.include?(job.job_id)
-                next
+                unless allowed_active_job_ids.include?(job.job_id)
+                  exceeded = :throttle
+                  next
+                end
               end
             end
 
