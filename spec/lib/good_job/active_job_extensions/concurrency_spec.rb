@@ -214,6 +214,38 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(GoodJob::Job.finished.count).to eq 3
       end
     end
+
+    describe 'perform_limit: together with perform_throttle:' do
+      before do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+
+        TestJob.good_job_control_concurrency_with(
+          perform_limit: -> { 1 },
+          perform_throttle: -> { [1, 1.minute] },
+          key: -> { arguments.first[:name] }
+        )
+      end
+
+      it 'does not perform if throttle period has not passed' do
+        TestJob.perform_later(name: "Alice")
+        TestJob.perform_later(name: "Alice")
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 1
+
+        Timecop.travel(61.seconds)
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 2
+
+        Timecop.travel(61.seconds)
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 3
+      end
+    end
   end
 
   describe '#good_job_concurrency_key' do

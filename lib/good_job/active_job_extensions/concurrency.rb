@@ -149,8 +149,10 @@ module GoodJob
                                                      .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
                                                      .limit(limit).pluck(:active_job_id)
                 # The current job has already been locked and will appear in the previous query
-                exceeded = :limit unless allowed_active_job_ids.include?(job.job_id)
-                next
+                unless allowed_active_job_ids.include?(job.job_id)
+                  exceeded = :limit
+                  next
+                end
               end
 
               if throttle
