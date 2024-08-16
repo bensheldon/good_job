@@ -13,11 +13,7 @@ Rails.application.configure do
   config.active_job.queue_adapter = :test
 
   # Raises error for missing translations.
-  if Gem::Version.new(Rails.version) < Gem::Version.new('6.1')
-    config.action_view.raise_on_missing_translations = true
-  else
-    config.i18n.raise_on_missing_translations = true
-  end
+  config.i18n.raise_on_missing_translations = true
 
   config.colorize_logging = false if ENV["CI"]
   if ActiveModel::Type::Boolean.new.cast(ENV['RAILS_LOG_TO_STDOUT'])
