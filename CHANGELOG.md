@@ -1,5 +1,35 @@
 # Changelog
 
+## [v4.2.0](https://github.com/bensheldon/good_job/tree/v4.2.0) (2024-08-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.1.1...v4.2.0)
+
+**Implemented enhancements:**
+
+- Add retry functionality for batches [\#1456](https://github.com/bensheldon/good_job/pull/1456) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- respect perform\_throttle even if perform\_limit is provided [\#1470](https://github.com/bensheldon/good_job/pull/1470) ([doits](https://github.com/doits))
+- Do not use advisory lock on heartbeat in production  [\#1451](https://github.com/bensheldon/good_job/pull/1451) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- `perform_limit` and `perform_throttle` don't work both [\#1469](https://github.com/bensheldon/good_job/issues/1469)
+- Edge rails changes breaking binding commits [\#1466](https://github.com/bensheldon/good_job/issues/1466)
+- Dynamic creation of CronEntries [\#1457](https://github.com/bensheldon/good_job/issues/1457)
+- Batch callback job not enqueued after success of retried job [\#1450](https://github.com/bensheldon/good_job/issues/1450)
+
+**Merged pull requests:**
+
+- Update cron documentation to remove confusion about multiple processes [\#1467](https://github.com/bensheldon/good_job/pull/1467) ([bensheldon](https://github.com/bensheldon))
+- Update compatibility matrix, remove compatibility code [\#1465](https://github.com/bensheldon/good_job/pull/1465) ([Earlopain](https://github.com/Earlopain))
+- Run tests with warnings enabled [\#1462](https://github.com/bensheldon/good_job/pull/1462) ([Earlopain](https://github.com/Earlopain))
+- Add appraisal for Rails 7.2; bracket lowest PG version instead of enumerating all [\#1460](https://github.com/bensheldon/good_job/pull/1460) ([bensheldon](https://github.com/bensheldon))
+- Fix a few method redefinition warnings [\#1459](https://github.com/bensheldon/good_job/pull/1459) ([Earlopain](https://github.com/Earlopain))
+- Bump rexml from 3.3.2 to 3.3.3 [\#1455](https://github.com/bensheldon/good_job/pull/1455) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Remove `smaller_number_is_higher_priority` option from v4 [\#1453](https://github.com/bensheldon/good_job/pull/1453) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.1.1](https://github.com/bensheldon/good_job/tree/v4.1.1) (2024-07-31)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v1.99.2...v4.1.1)
