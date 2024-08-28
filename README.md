@@ -681,9 +681,9 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
       OtherJob.perform_later
     end
 
-    # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, options)`
+    # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, params)`
     class MyBatchCallbackJob < ApplicationJob
-      # Callback jobs must accept a `batch` and `options` argument
+      # Callback jobs must accept a `batch` and `params` argument
       def perform(batch, params)
         # The batch object will contain the Batch's properties, which are mutable
         batch.properties[:user] # => <User id: 1, ...>
