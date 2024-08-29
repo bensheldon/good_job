@@ -689,7 +689,7 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
         batch.properties[:user] # => <User id: 1, ...>
 
         # Context is a hash containing additional context (more may be added in the future)
-        params[:event] # => :finish, :success, :discard
+        context[:event] # => :finish, :success, :discard
       end
     end
     ```
@@ -769,7 +769,7 @@ class MyBatchCallbackJob < ApplicationJob
     batch.save
 
     # Context is a hash containing additional context (more may be added in the future)
-    params[:event] # => :finish, :success, :discard
+    context[:event] # => :finish, :success, :discard
   end
 end
 ```
