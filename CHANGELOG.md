@@ -1,5 +1,19 @@
 # Changelog
 
+## [v4.2.1](https://github.com/bensheldon/good_job/tree/v4.2.1) (2024-08-29)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.2.0...v4.2.1)
+
+**Closed issues:**
+
+- Issue with active\_record.strict\_loading\_by\_default [\#1474](https://github.com/bensheldon/good_job/issues/1474)
+
+**Merged pull requests:**
+
+- fix strict\_loading\_by\_default in BaseRecord [\#1475](https://github.com/bensheldon/good_job/pull/1475) ([emilsosa](https://github.com/emilsosa))
+- Bump rexml from 3.3.3 to 3.3.6 [\#1473](https://github.com/bensheldon/good_job/pull/1473) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump fugit from 1.11.0 to 1.11.1 [\#1471](https://github.com/bensheldon/good_job/pull/1471) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.2.0](https://github.com/bensheldon/good_job/tree/v4.2.0) (2024-08-16)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.1.1...v4.2.0)
