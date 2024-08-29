@@ -683,12 +683,12 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
 
     # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, params)`
     class MyBatchCallbackJob < ApplicationJob
-      # Callback jobs must accept a `batch` and `params` argument
-      def perform(batch, params)
+      # Callback jobs must accept a `batch` and `context` argument
+      def perform(batch, context)
         # The batch object will contain the Batch's properties, which are mutable
         batch.properties[:user] # => <User id: 1, ...>
 
-        # Params is a hash containing additional context (more may be added in the future)
+        # Context is a hash containing additional context (more may be added in the future)
         params[:event] # => :finish, :success, :discard
       end
     end
@@ -757,18 +757,18 @@ Batch callbacks are Active Job jobs that are enqueued at certain events during t
 - `:success` - Enqueued only when all jobs in the batch have finished and succeeded.
 - `:discard` - Enqueued immediately the first time a job in the batch is discarded.
 
-Callback jobs must accept a `batch` and `params` argument in their `perform` method:
+Callback jobs must accept a `batch` and `context` argument in their `perform` method:
 
 ```ruby
 class MyBatchCallbackJob < ApplicationJob
-  def perform(batch, params)
+  def perform(batch, context)
     # The batch object will contain the Batch's properties
     batch.properties[:user] # => <User id: 1, ...>
     # Batches are mutable
     batch.properties[:user] = User.find(2)
     batch.save
 
-    # Params is a hash containing additional context (more may be added in the future)
+    # Context is a hash containing additional context (more may be added in the future)
     params[:event] # => :finish, :success, :discard
   end
 end
@@ -811,7 +811,7 @@ class WorkJob < ApplicationJob
 end
 
 class BatchJob < ApplicationJob
-  def perform(batch, options)
+  def perform(batch, context)
     if batch.properties[:stage].nil?
       batch.enqueue(stage: 1) do
         WorkJob.perform_later('a')
