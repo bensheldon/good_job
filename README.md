@@ -681,7 +681,7 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
       OtherJob.perform_later
     end
 
-    # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, params)`
+    # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, context)`
     class MyBatchCallbackJob < ApplicationJob
       # Callback jobs must accept a `batch` and `context` argument
       def perform(batch, context)
