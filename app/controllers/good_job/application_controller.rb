@@ -25,6 +25,11 @@ module GoodJob
       request.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
     end
 
+    def index
+      # Redirect to the jobs page
+      redirect_to jobs_path
+    end
+
     private
 
     def default_url_options(options = {})
