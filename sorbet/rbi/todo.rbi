@@ -49,4 +49,5 @@ module ::WrapperJob; end
 module GoodJob::Job::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Job::ERROR_EVENT_RETRIED; end
 module Rails::Server; end
-
+module ::AutoloadModule; end
+module ::AutoloadModule::Error; end
