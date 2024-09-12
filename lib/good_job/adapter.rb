@@ -254,7 +254,7 @@ module GoodJob
       job.advisory_unlock
       job.run_callbacks(:perform_unlocked)
 
-      raise result.unhandled_error if result.unhandled_error
+      raise result.unhandled_error if result&.unhandled_error
     end
   end
 end
