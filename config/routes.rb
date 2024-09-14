@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 GoodJob::Engine.routes.draw do
-  root to: redirect(path: 'jobs')
+  root 'jobs#redirect_to_index'
 
   resources :jobs, only: %i[index show destroy] do
     collection do
