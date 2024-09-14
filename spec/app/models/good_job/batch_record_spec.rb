@@ -42,4 +42,35 @@ describe GoodJob::BatchRecord do
       expect(result.last).to eq last_job
     end
   end
+
+  describe 'finished_at' do
+    it 'is now set when all jobs in the batch are finished' do
+      batch = described_class.create!
+      batch.update(enqueued_at: Time.current, jobs_finished_at: Time.current)
+      batch.callback_jobs.create!(finished_at: nil)
+      batch.callback_jobs.create!(finished_at: Time.current)
+
+      batch._continue_discard_or_finish
+
+      expect(batch.reload.finished_at).to be_nil
+
+      batch.callback_jobs.update(finished_at: Time.current)
+      batch._continue_discard_or_finish
+
+      expect(batch.reload.finished_at).to be_within(1.second).of(Time.current)
+    end
+  end
+
+  describe 'deletion logic' do
+    it 'checks finished_at' do
+      batch = described_class.create!
+      batch.update(enqueued_at: Time.current, jobs_finished_at: Time.current, finished_at: nil)
+
+      expect { described_class.finished_before(Time.current).delete_all }.not_to change(described_class, :count)
+
+      batch.update(finished_at: Time.current)
+
+      expect { described_class.finished_before(Time.current).delete_all }.to change(described_class, :count).by(-1)
+    end
+  end
 end

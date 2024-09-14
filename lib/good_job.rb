@@ -171,10 +171,10 @@ module GoodJob
     _shutdown_all(Capsule.instances, :restart, timeout: timeout)
   end
 
-  # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager})
+  # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager}, {GoodJob::SharedExecutor})
   # @param executables [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager, SharedExecutor>] Objects to shut down.
-  # @param method_name [:symbol] Method to call, e.g. +:shutdown+ or +:restart+.
-  # @param timeout [nil,Numeric]
+  # @param method_name [Symbol] Method to call, e.g. +:shutdown+ or +:restart+.
+  # @param timeout [nil, Numeric] Seconds to wait for actively executing jobs to finish.
   # @param after [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager, SharedExecutor>] Objects to shut down after initial executables shut down.
   # @return [void]
   def self._shutdown_all(executables, method_name = :shutdown, timeout: -1, after: [])
@@ -290,7 +290,7 @@ module GoodJob
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    true
+    GoodJob::BatchRecord.jobs_finished_at_migrated?
   end
 end
 

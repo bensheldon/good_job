@@ -117,11 +117,15 @@ describe GoodJob::Batch do
 
       batch.retry
 
-      expect(batch.reload).to be_enqueued
+      batch.reload
+      expect(batch).to have_attributes(discarded_at: nil, jobs_finished_at: nil, finished_at: nil)
+      expect(batch).to be_enqueued
 
       GoodJob.perform_inline
 
-      expect(batch.reload).to be_succeeded
+      batch.reload
+      expect(batch).to have_attributes(discarded_at: nil, jobs_finished_at: be_present, finished_at: be_present)
+      expect(batch).to be_succeeded
     end
   end
 
