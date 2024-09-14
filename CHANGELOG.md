@@ -1,5 +1,25 @@
 # Changelog
 
+## [v4.3.0](https://github.com/bensheldon/good_job/tree/v4.3.0) (2024-09-14)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.2.1...v4.3.0)
+
+**Fixed bugs:**
+
+- Don't shadow gem loading errors during autoloading with the inline adapter [\#1486](https://github.com/bensheldon/good_job/pull/1486) ([Earlopain](https://github.com/Earlopain))
+- Ensure before actions run on root route [\#1482](https://github.com/bensheldon/good_job/pull/1482) ([ebiven](https://github.com/ebiven))
+
+**Closed issues:**
+
+- Undefined method `unhandled_error` for nil [\#1485](https://github.com/bensheldon/good_job/issues/1485)
+- bin/rails g good\_job:install fails [\#1481](https://github.com/bensheldon/good_job/issues/1481)
+- Rails 7.2.1 breaks enqueuing without enqueue\_after\_transaction\_commit? method on queue adapter [\#1477](https://github.com/bensheldon/good_job/issues/1477)
+
+**Merged pull requests:**
+
+- Fix documentation for 2nd Batch callback parameter: consistently call it `context` [\#1476](https://github.com/bensheldon/good_job/pull/1476) ([martijnversluis](https://github.com/martijnversluis))
+- Redefine `Batch#finished_at` to mean all callback jobs have finished too; add `Batch#jobs_finished_at` to allow not deleting batches until all their callback jobs complete [\#1454](https://github.com/bensheldon/good_job/pull/1454) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.2.1](https://github.com/bensheldon/good_job/tree/v4.2.1) (2024-08-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.2.0...v4.2.1)
