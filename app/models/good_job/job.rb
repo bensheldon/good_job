@@ -478,7 +478,7 @@ module GoodJob
           current_thread.job = self
           current_thread.retry_now = true
 
-          self.class.transaction(joinable: false, requires_new: true) do
+          transaction do
             new_active_job = active_job.retry_job(wait: 0, error: error)
             self.error_event = :retried if error
             save!
