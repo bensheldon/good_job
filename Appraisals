@@ -2,6 +2,7 @@
 
 ruby_30_or_higher = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.0')
 ruby_31_or_higher = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.1')
+ruby_32_or_higher = Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('3.2')
 jruby = RUBY_PLATFORM.include?('java')
 
 unless ruby_31_or_higher # https://github.com/rails/rails/issues/44090#issuecomment-1007686519
@@ -38,11 +39,13 @@ if ruby_31_or_higher
       gem "rails", "~> 7.2.0.a"
       gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
     end
+  end
+end
 
-    appraise "rails-head" do
-      gem "capybara", "~> 3.36" # For Ruby 3.1 support https://github.com/teamcapybara/capybara/pull/24
-      gem "rails", github: "rails/rails", branch: "main"
-      gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
-    end
+if ruby_32_or_higher && !jruby
+  appraise "rails-head" do
+    gem "capybara", "~> 3.36" # For Ruby 3.1 support https://github.com/teamcapybara/capybara/pull/24
+    gem "rails", github: "rails/rails", branch: "main"
+    gem "selenium-webdriver", "~> 4.0" # https://github.com/rails/rails/pull/43498
   end
 end
