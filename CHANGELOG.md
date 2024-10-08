@@ -1,5 +1,30 @@
 # Changelog
 
+## [v4.4.0](https://github.com/bensheldon/good_job/tree/v4.4.0) (2024-10-08)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.3.0...v4.4.0)
+
+**Fixed bugs:**
+
+- fix: unable to use keyword args when including the `Labels` extension [\#1500](https://github.com/bensheldon/good_job/pull/1500) ([ElMassimo](https://github.com/ElMassimo))
+- Fix GoodJob::Setting duplicate keys [\#1498](https://github.com/bensheldon/good_job/pull/1498) ([mohammednasser-32](https://github.com/mohammednasser-32))
+- Allow `GoodJob::Job#retry_job`'s transaction to be joinable \(fix CI for current `rails-head`\) [\#1496](https://github.com/bensheldon/good_job/pull/1496) ([Earlopain](https://github.com/Earlopain))
+
+**Closed issues:**
+
+- Inline adapter doesn't retry jobs that throw a retryable error [\#1497](https://github.com/bensheldon/good_job/issues/1497)
+- scheduled\_at not respecting given timezone [\#1491](https://github.com/bensheldon/good_job/issues/1491)
+- Multiple same values in cron\_keys\_disabled, cron\_keys\_enabled in good\_job\_settings table [\#1490](https://github.com/bensheldon/good_job/issues/1490)
+- Cron jobs can be missed if deploys are timed just right [\#1484](https://github.com/bensheldon/good_job/issues/1484)
+- Configuring connection pool in external mode [\#1483](https://github.com/bensheldon/good_job/issues/1483)
+- GoodJob Timezone Day Light Savings [\#1480](https://github.com/bensheldon/good_job/issues/1480)
+- Unable to use labels with kwargs in job initializer  [\#1350](https://github.com/bensheldon/good_job/issues/1350)
+
+**Merged pull requests:**
+
+- Bump puma from 6.4.2 to 6.4.3 [\#1492](https://github.com/bensheldon/good_job/pull/1492) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add `cron_graceful_restart_period` to avoid missing recurring jobs that occurred during deployment downtime [\#1488](https://github.com/bensheldon/good_job/pull/1488) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.3.0](https://github.com/bensheldon/good_job/tree/v4.3.0) (2024-09-14)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.2.1...v4.3.0)
