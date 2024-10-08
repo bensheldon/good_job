@@ -24,7 +24,7 @@ gem 'appraisal'
 gem 'matrix'
 gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
-gem 'rack', '~> 2.2'
+gem 'rack', '~> 3.1'
 gem 'rails'
 
 platforms :ruby do
