@@ -108,4 +108,35 @@ RSpec.describe GoodJob::CronManager do
       end
     end
   end
+
+  describe 'graceful restarts' do
+    let(:cron_entries) do
+      [
+        GoodJob::CronEntry.new(
+          key: 'example',
+          cron: "0 * * * * *",
+          class: "TestJob"
+        ),
+      ]
+    end
+
+    before do
+      stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+        def perform
+        end
+      end)
+
+      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+    end
+
+    it "reenqueues jobs scheduled for the previous period" do
+      cron_manager = described_class.new(cron_entries, start_on_initialize: false, graceful_restart_period: 5.minutes)
+      cron_manager.start
+      cron_manager.shutdown
+
+      wait_until(max: 5) do
+        expect(GoodJob::Job.count).to eq 5
+      end
+    end
+  end
 end

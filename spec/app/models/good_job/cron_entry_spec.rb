@@ -70,6 +70,12 @@ describe GoodJob::CronEntry do
     end
   end
 
+  describe '#within' do
+    it 'returns an array of timestamps for the time period' do
+      expect(entry.within(2.minutes.ago..Time.current)).to eq([Time.current.at_beginning_of_minute - 1.minute, Time.current.at_beginning_of_minute])
+    end
+  end
+
   describe '#enabled' do
     it 'is enabled by default' do
       expect(entry).to be_enabled

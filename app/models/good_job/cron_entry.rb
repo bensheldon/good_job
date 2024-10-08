@@ -71,6 +71,19 @@ module GoodJob # :nodoc:
       end
     end
 
+    def within(period, previously_at: nil)
+      if cron_proc?
+        result = Rails.application.executor.wrap { cron.call(previously_at || last_job_at) }
+        if result.is_a?(String)
+          Fugit.parse(result).within(period).map(&:to_t)
+        else
+          result
+        end
+      else
+        fugit.within(period).map(&:to_t)
+      end
+    end
+
     def enabled?
       GoodJob::Setting.cron_key_enabled?(key, default: enabled_by_default?)
     end

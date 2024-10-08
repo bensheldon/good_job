@@ -219,6 +219,12 @@ module GoodJob
       cron.map { |cron_key, params| GoodJob::CronEntry.new(params.merge(key: cron_key)) }
     end
 
+    def cron_graceful_restart_period
+      options[:cron_graceful_restart_period] ||
+        rails_config[:cron_graceful_restart_period] ||
+        env['GOOD_JOB_CRON_GRACEFUL_RESTART_PERIOD']
+    end
+
     # The number of queued jobs to select when polling for a job to run.
     # This limit is intended to avoid locking a large number of rows when selecting eligible jobs
     # from the queue. This value should be higher than the total number of threads across all good_job

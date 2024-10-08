@@ -31,11 +31,12 @@ module GoodJob # :nodoc:
 
     # @param cron_entries [Array<CronEntry>]
     # @param start_on_initialize [Boolean]
-    def initialize(cron_entries = [], start_on_initialize: false, executor: Concurrent.global_io_executor)
+    def initialize(cron_entries = [], start_on_initialize: false, graceful_restart_period: nil, executor: Concurrent.global_io_executor)
       @executor = executor
       @running = false
       @cron_entries = cron_entries
       @tasks = Concurrent::Hash.new
+      @graceful_restart_period = graceful_restart_period
 
       start if start_on_initialize
       self.class.instances << self
@@ -47,6 +48,7 @@ module GoodJob # :nodoc:
         @running = true
         cron_entries.each do |cron_entry|
           create_task(cron_entry)
+          create_graceful_tasks(cron_entry) if @graceful_restart_period
         end
       end
     end
@@ -96,6 +98,25 @@ module GoodJob # :nodoc:
       @tasks[cron_entry.key] = future
       future.add_observer(self.class, :task_observer)
       future.execute
+    end
+
+    # Uses the graceful restart period to re-enqueue jobs that were scheduled to run during the period.
+    # The existing uniqueness logic should ensure this does not create duplicate jobs.
+    # @param cron_entry [CronEntry] the CronEntry object to schedule
+    def create_graceful_tasks(cron_entry)
+      return unless @graceful_restart_period
+
+      time_period = @graceful_restart_period.ago..Time.current
+      cron_entry.within(time_period).each do |cron_at|
+        future = Concurrent::Future.new(args: [self, cron_entry, cron_at], executor: @executor) do |_thr_scheduler, thr_cron_entry, thr_cron_at|
+          Rails.application.executor.wrap do
+            cron_entry.enqueue(thr_cron_at) if thr_cron_entry.enabled?
+          end
+        end
+
+        future.add_observer(self.class, :task_observer)
+        future.execute
+      end
     end
   end
 end

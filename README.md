@@ -257,6 +257,7 @@ Rails.application.configure do
   config.good_job.shutdown_timeout = 25 # seconds
   config.good_job.enable_cron = true
   config.good_job.cron = { example: { cron: '0 * * * *', class: 'ExampleJob'  } }
+  config.good_job.cron_graceful_restart_period = 5.minutes
   config.good_job.dashboard_default_locale = :en
 
   # ...or all at once.
@@ -298,6 +299,7 @@ Available configuration options are:
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
 - `shutdown_timeout` (integer) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 - `enable_cron` (boolean) whether to run cron process. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_CRON`.
+- `cron_graceful_restart_period` (integer) when restarting cron, attempt to re-enqueue jobs that would have been enqueued by cron within this time period (e.g. `1.minute`). This should match the expected downtime during deploys.
 - `enable_listen_notify` (boolean) whether to enqueue and read jobs with Postgres LISTEN/NOTIFY. Defaults to `true`. You can also set this with the environment variable `GOOD_JOB_ENABLE_LISTEN_NOTIFY`.
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
 - `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`. _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
@@ -624,6 +626,9 @@ If you use the [Dashboard](#dashboard) the scheduled tasks can be viewed in the 
 
 # Enable cron enqueuing in this process
 config.good_job.enable_cron = true
+
+# Without zero-downtime deploys, re-attempt previous schedules after a deploy
+config.good_job.cron_graceful_restart_period = 1.minute
 
 # Configure cron with a hash that has a unique key for each recurring job
 config.good_job.cron = {
