@@ -24,21 +24,26 @@ platforms :ruby do
 
   group :debug do
     gem "activerecord-explain-analyze", require: false
-    gem "pry-byebug"
+    gem "benchmark-ips"
+    gem "debug"
+    gem "memory_profiler"
     gem "rack-mini-profiler"
     gem "rbtrace"
     gem "stackprof"
   end
 
   group :lint do
+    gem "brakeman"
     gem "easy_translate"
     gem "erb_lint"
     gem "i18n-tasks"
     gem "mdl"
     gem "rubocop"
+    gem "rubocop-capybara"
     gem "rubocop-performance"
     gem "rubocop-rails"
     gem "rubocop-rspec"
+    gem "rubocop-rspec_rails"
     gem "sorbet"
     gem "sorbet-runtime"
     gem "spoom", require: false

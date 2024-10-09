@@ -8,7 +8,7 @@ gem "matrix"
 gem "nokogiri"
 gem "pg", platforms: [:mri, :mingw, :x64_mingw]
 gem "rack", "~> 2.2"
-gem "rails", branch: "main", git: "https://github.com/rails/rails.git"
+gem "rails", "~> 8.0.0.a"
 
 platforms :ruby do
   gem "bootsnap"
