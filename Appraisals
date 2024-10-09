@@ -36,6 +36,10 @@ if ruby_31_or_higher
 end
 
 if ruby_32_or_higher && !jruby
+  appraise "rails-8.0-ruby-3.2" do
+    gem "rails", "~> 8.0.0.a"
+  end
+
   appraise "rails-head" do
     gem "rails", github: "rails/rails", branch: "main"
   end
