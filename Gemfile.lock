@@ -96,10 +96,6 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
-    appraisal (2.5.0)
-      bundler
-      rake
-      thor (>= 0.14.0)
     ast (2.4.2)
     async (2.14.2)
       console (~> 1.25, >= 1.25.2)
@@ -505,7 +501,6 @@ PLATFORMS
 DEPENDENCIES
   activerecord-explain-analyze
   activerecord-jdbcpostgresql-adapter
-  appraisal
   benchmark-ips
   bootsnap
   brakeman

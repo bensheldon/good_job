@@ -1715,14 +1715,14 @@ Environment variables that may help with debugging:
 - `LOUD=1`: display all stdout/stderr output from all sources. This is helpful because GoodJob wraps some tests with `quiet { }` for cleaner test output, but it can hinder debugging.
 - `SHOW_BROWSER=1`: Run system tests headfully with Chrome/Chromedriver. Use `binding.irb` in the system tests to pause.
 
-Appraisal can be used to run a test matrix of multiple versions of Rails:
+The gemfiles in `gemfiles/` can be used to run tests against different rails versions:
 
 ```bash
-# Install Appraisal matrix of gemfiles
-bin/appraisal
+# Install dependencies
+BUNDLE_GEMFILE=gemfiles/rails_6.1.gemfile bundle install
 
-# Run tests against matrix
-bin/appraisal bin/rspec
+# Run the tests
+BUNDLE_GEMFILE=gemfiles/rails_6.1.gemfile bin/rspec
 ```
 
 ### Release
