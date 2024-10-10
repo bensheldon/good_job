@@ -148,6 +148,8 @@ jobs:
         with:
           bundler-cache: true
           rubygems: latest
+      -  name: Print Lockfile
+         run: cat ${{ env.BUNDLE_GEMFILE }}.lock
 
       # Test
       - name: Set up test database
