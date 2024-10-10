@@ -1,5 +1,22 @@
 # Changelog
 
+## [v4.4.1](https://github.com/bensheldon/good_job/tree/v4.4.1) (2024-10-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.4.0...v4.4.1)
+
+**Fixed bugs:**
+
+- Better search job arguments \(including integers\) by adding `serialized_params->>arguments` explicitly [\#1504](https://github.com/bensheldon/good_job/pull/1504) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Searching for an integer type argument \(on the dashboard\) does not yeild any results [\#1458](https://github.com/bensheldon/good_job/issues/1458)
+
+**Merged pull requests:**
+
+- Clean up appraisals, add rails 8, use postgres 17 [\#1505](https://github.com/bensheldon/good_job/pull/1505) ([Earlopain](https://github.com/Earlopain))
+- Bump the bundler-lint group across 1 directory with 5 updates [\#1501](https://github.com/bensheldon/good_job/pull/1501) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.4.0](https://github.com/bensheldon/good_job/tree/v4.4.0) (2024-10-08)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.3.0...v4.4.0)
