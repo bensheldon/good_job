@@ -517,7 +517,6 @@ DEPENDENCIES
   memory_profiler
   pg
   puma
-  rack (~> 2.2)
   rack-mini-profiler
   rails
   rbtrace
