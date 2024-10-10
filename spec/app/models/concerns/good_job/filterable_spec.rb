@@ -10,7 +10,7 @@ RSpec.describe GoodJob::Filterable do
       queue_name: "default",
       job_class: "ExampleJob",
       scheduled_at: Time.current,
-      serialized_params: { example_key: 'example_value' },
+      serialized_params: { example_key: 'example_value', arguments: ["hello-arg", 998899] },
       labels: %w[buffalo gopher],
       error: "ExampleJob::ExampleError: a message",
       error_event: "retried"
@@ -38,6 +38,11 @@ RSpec.describe GoodJob::Filterable do
 
     it 'searches errors' do
       expect(model_class.search_text('ExampleError')).to include(job)
+    end
+
+    it 'searches arguments, including numeric arguments' do
+      expect(model_class.search_text('hello-arg')).to include(job)
+      expect(model_class.search_text('998899')).to include(job)
     end
 
     it 'searches strings with colons' do
