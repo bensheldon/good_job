@@ -18,7 +18,7 @@ updates:
           - puma
           - brakeman
           - erb_lint
-          - rubocop"
+          - rubocop
           - rubocop-*
   - package-ecosystem: github-actions
     directory: "/"
