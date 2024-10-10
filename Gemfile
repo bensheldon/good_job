@@ -21,8 +21,6 @@ gemspec
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'appraisal'
-gem 'matrix'
-gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 gem 'rack', '~> 2.2'
 gem 'rails'
@@ -33,9 +31,6 @@ platforms :ruby do
   gem "foreman"
   gem "gem-release"
   gem "github_changelog_generator", require: false
-  gem "net-imap", require: false
-  gem "net-pop", require: false
-  gem "net-smtp", require: false
 
   group :debug do
     gem "activerecord-explain-analyze", require: false

@@ -521,13 +521,8 @@ DEPENDENCIES
   i18n-tasks
   kramdown
   kramdown-parser-gfm
-  matrix
   mdl
   memory_profiler
-  net-imap
-  net-pop
-  net-smtp
-  nokogiri
   pg
   puma
   rack (~> 2.2)
