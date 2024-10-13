@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'socket'
+require 'get_process_mem'
 
 module GoodJob # :nodoc:
   # Active Record model that represents a GoodJob capsule/process (either async or CLI).
@@ -83,6 +84,7 @@ module GoodJob # :nodoc:
       {
         hostname: Socket.gethostname,
         pid: ::Process.pid,
+        memory: GetProcessMem.new.mb.to_i,
         proctitle: $PROGRAM_NAME,
         preserve_job_records: GoodJob.preserve_job_records,
         retry_on_unhandled_error: GoodJob.retry_on_unhandled_error,
@@ -98,8 +100,8 @@ module GoodJob # :nodoc:
     end
 
     def refresh
-      self.state = self.class.process_state
       reload # verify the record still exists in the database
+      self.state = self.class.process_state
       update(state: state, updated_at: Time.current)
     rescue ActiveRecord::RecordNotFound
       @new_record = true
