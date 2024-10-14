@@ -15,11 +15,19 @@ module GoodJob # :nodoc:
     PROCESS_MEMORY = case RUBY_PLATFORM
                      when /linux/
                        ->(pid) {
-                         File.readlines("/proc/#{pid}/status").each do |line|
-                           next unless line.start_with?('VmRSS:')
+                        begin
+                          File.readlines("/proc/#{pid}/smaps_rollup").each do |line|
+                            next unless line.start_with?('Pss:')
 
-                           break line.split[1].to_i
-                         end
+                            break line.split[1].to_i
+                          end
+                        rescue Errno::ENOENT
+                          File.readlines("/proc/#{pid}/status").each do |line|
+                            next unless line.start_with?('VmRSS:')
+
+                            break line.split[1].to_i
+                          end
+                        end
                        }
                      when /darwin|bsd/
                        ->(pid) {
