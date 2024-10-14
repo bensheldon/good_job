@@ -1,5 +1,5 @@
 <%= render 'good_job/shared/filter', title: t("good_job.shared.navbar.jobs"), filter: @filter %>
-<%= render 'good_job/shared/chart', chart_data: GoodJob::ScheduledByQueueChart.new(@filter).data %>
+<%= render 'good_job/shared/chart_container', chart_data: GoodJob::ScheduledByQueueChart.new(@filter).data %>
 
 <div data-live-poll-region="jobs-table">
   <%= render 'good_job/jobs/table', jobs: @filter.records, filter: @filter %>

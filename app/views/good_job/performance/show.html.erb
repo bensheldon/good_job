@@ -2,4 +2,4 @@
   <h2 class="pt-3 pb-2"><%= t ".title" %> - <%= @job_class %></h2>
 </div>
 
-<%= render 'good_job/shared/chart', chart_data: GoodJob::PerformanceShowChart.new(@job_class).data %>
+<%= render 'good_job/shared/chart_container', chart_data: GoodJob::PerformanceShowChart.new(@job_class).data %>
