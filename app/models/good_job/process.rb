@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'socket'
-require 'get_process_mem'
 
 module GoodJob # :nodoc:
   # Active Record model that represents a GoodJob capsule/process (either async or CLI).
@@ -13,6 +12,22 @@ module GoodJob # :nodoc:
     STALE_INTERVAL = 30.seconds
     # Interval until the process record is treated as expired
     EXPIRED_INTERVAL = 5.minutes
+    PROCESS_MEMORY = case RUBY_PLATFORM
+                     when /linux/
+                       ->(pid) {
+                         File.readlines("/proc/#{pid}/status").each do |line|
+                           next unless line.start_with?('VmRSS:')
+
+                           break line.split[1].to_i
+                         end
+                       }
+                     when /darwin|bsd/
+                       ->(pid) {
+                         `ps -o pid,rss -p #{pid}`.lines.last.split.last.to_i
+                       }
+                     else
+                       ->(_pid) { 0 }
+                     end
 
     self.table_name = 'good_job_processes'
     self.implicit_order_column = 'created_at'
@@ -57,6 +72,10 @@ module GoodJob # :nodoc:
       end
     end
 
+    def self.memory_usage(pid)
+      (PROCESS_MEMORY.call(pid) / 1024).to_i
+    end
+
     def self.find_or_create_record(id:, with_advisory_lock: false)
       attributes = {
         id: id,
@@ -84,7 +103,7 @@ module GoodJob # :nodoc:
       {
         hostname: Socket.gethostname,
         pid: ::Process.pid,
-        memory: GetProcessMem.new.mb.to_i,
+        memory: memory_usage(::Process.pid),
         proctitle: $PROGRAM_NAME,
         preserve_job_records: GoodJob.preserve_job_records,
         retry_on_unhandled_error: GoodJob.retry_on_unhandled_error,

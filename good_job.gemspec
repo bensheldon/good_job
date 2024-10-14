@@ -50,7 +50,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "fugit", ">= 1.11.0"
   spec.add_dependency "railties", ">= 6.1.0"
   spec.add_dependency "thor", ">= 1.0.0"
-  spec.add_dependency "get_process_mem", ">= 1.0.0"
 
   spec.add_development_dependency "capybara"
   spec.add_development_dependency "kramdown"
