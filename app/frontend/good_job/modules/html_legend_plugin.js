@@ -1,4 +1,3 @@
-
 const generateListItem = (item) => {
   const li = document.createElement('li');
   li.className = 'd-flex align-items-center text-nowrap mb-2';
@@ -19,38 +18,38 @@ const generateListItem = (item) => {
 
   li.appendChild(boxSpan);
   li.appendChild(textContainer);
-  
+
   return li;
 }
 
 const htmlLegendPlugin = {
   id: 'htmlLegend',
   afterUpdate(chart, _args, _options) {
-      const { type } = chart.config;
-      const ul = document.getElementById('legend-ul');
+    const {type} = chart.config;
+    const ul = document.getElementById('chart-legend-ul');
 
-      // Remove old legend items
-      while (ul.firstChild) {
-        ul.firstChild.remove();
-      }
+    // Remove old legend items
+    while (ul.firstChild) {
+      ul.firstChild.remove();
+    }
 
-      // Reuse the built-in legendItems generator
-      const items = chart.options.plugins.legend.labels.generateLabels(chart);
+    // Reuse the built-in legendItems generator
+    const items = chart.options.plugins.legend.labels.generateLabels(chart);
 
-      items.forEach(item => {
-        const li = generateListItem(item);
-        ul.appendChild(li);
+    items.forEach(item => {
+      const li = generateListItem(item);
+      ul.appendChild(li);
 
-        li.onclick = () => {
-          if (type === 'pie' || type === 'doughnut') {
-            // Pie and doughnut charts only have a single dataset and visibility is per item
-            chart.toggleDataVisibility(item.index);
-          } else {
-            chart.setDatasetVisibility(item.datasetIndex, !chart.isDatasetVisible(item.datasetIndex));
-          }
-          chart.update();
-        };
-      });
+      li.onclick = () => {
+        if (type === 'pie' || type === 'doughnut') {
+          // Pie and doughnut charts only have a single dataset and visibility is per item
+          chart.toggleDataVisibility(item.index);
+        } else {
+          chart.setDatasetVisibility(item.datasetIndex, !chart.isDatasetVisible(item.datasetIndex));
+        }
+        chart.update();
+      };
+    });
   }
 };
 
