@@ -32,15 +32,7 @@ module GoodJob # :nodoc:
       @record = nil
       @refresh_task = nil
 
-      # AS::ForkTracker is only present on Rails v6.1+.
-      # Fall back to PID checking if ForkTracker is not available
-      if defined?(ActiveSupport::ForkTracker)
-        ActiveSupport::ForkTracker.after_fork { reset }
-        @forktracker = true
-      else
-        @ruby_pid = ::Process.pid
-        @forktracker = false
-      end
+      ActiveSupport::ForkTracker.after_fork { reset }
 
       self.class.instances << self
     end
@@ -53,7 +45,6 @@ module GoodJob # :nodoc:
       synchronize do
         next if @locks.zero?
 
-        reset_on_fork
         if @record
           @record.refresh_if_stale
         else
@@ -202,14 +193,6 @@ module GoodJob # :nodoc:
 
     def reset
       synchronize { ns_reset }
-    end
-
-    def reset_on_fork
-      return if Concurrent.on_jruby?
-      return if @forktracker || ::Process.pid == @ruby_pid
-
-      @ruby_pid = ::Process.pid
-      ns_reset
     end
 
     def ns_reset

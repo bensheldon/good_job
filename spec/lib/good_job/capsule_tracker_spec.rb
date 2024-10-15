@@ -169,8 +169,6 @@ describe GoodJob::CapsuleTracker do
 
     describe "on fork" do
       it 'when reset via ForkTracker' do
-        skip("AS::ForkTracker is not defined") unless defined?(ActiveSupport::ForkTracker)
-
         tracker.register do
           original_value = tracker.id_for_lock
 
