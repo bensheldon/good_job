@@ -2,7 +2,7 @@
   <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
 </div>
 
-<%= render 'good_job/shared/chart', chart_data: GoodJob::PerformanceIndexChart.new.data %>
+<%= render 'good_job/shared/chart_container', chart_data: GoodJob::PerformanceIndexChart.new.data %>
 
 <div class="my-3 card">
   <div class="list-group list-group-flush text-nowrap" role="table">
