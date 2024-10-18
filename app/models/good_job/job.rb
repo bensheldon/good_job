@@ -392,7 +392,7 @@ module GoodJob
     def recent_error
       GoodJob.deprecator.warn(<<~DEPRECATION)
         The `GoodJob::Job#recent_error` method is deprecated and will be removed in the next major release.
-        
+
         Replace usage of GoodJob::Job#recent_error with `GoodJob::Job#error`.
       DEPRECATION
       error
