@@ -35,13 +35,13 @@
               </div>
               <div class="col-4 col-lg-1 text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.attempts" %></div>
-                <% if job.executions_count > 0 && job.status != :finished %>
+                <% if job.error && job.status != :finished %>
                   <%= tag.span job.executions_count, class: "badge rounded-pill bg-danger",
                     data: {
                       bs_toggle: "popover",
                       bs_trigger: "hover focus click",
                       bs_placement: "bottom",
-                      bs_content: job.recent_error,
+                      bs_content: job.display_error,
                     }
                   %>
                 <% else %>
