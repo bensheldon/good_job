@@ -56,6 +56,9 @@ module GoodJob
               display: true,
               text: I18n.t("good_job.performance.index.chart_title"),
             },
+            legend: {
+              vertical: true,
+            },
           },
           scales: {
             y: {

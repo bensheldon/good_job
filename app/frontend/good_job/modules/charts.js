@@ -1,3 +1,5 @@
+import htmlLegendPlugin from "html_legend_plugin";
+
 function renderCharts(animate) {
   const charts = document.querySelectorAll('.chart');
 
@@ -5,6 +7,16 @@ function renderCharts(animate) {
     const chartEl = charts[i];
     const chartData = JSON.parse(chartEl.dataset.json);
     chartData.options ||= {};
+
+    if (chartData.options.plugins?.legend?.vertical) {
+      chartData.plugins = [htmlLegendPlugin];
+      chartData.options.plugins = {
+        ...chartData.options.plugins,
+        legend: {
+          display: false,
+        }
+      }
+    }
     chartData.options.animation = animate;
     chartData.options.responsive = true;
     chartData.options.maintainAspectRatio = false;

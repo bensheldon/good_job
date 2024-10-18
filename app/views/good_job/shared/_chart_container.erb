@@ -1,0 +1,21 @@
+<% vertical_legend = chart_data.dig(:options, :plugins, :legend, :vertical) %>
+
+<div class="container-fluid">
+  <div class="row d-flex">
+    <% if vertical_legend %>
+      <div class="row d-flex">
+        <div class="col-md-10">
+          <%= render 'good_job/shared/chart', chart_data: chart_data %>
+        </div>
+        <div class="col-md-2 d-flex flex-column">
+          <div id="chart-legend-container" class="flex-fill overflow-auto">
+            <ul id="chart-legend-ul" class="list-unstyled p-0 mx-0 py-2">
+            </ul>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <%= render 'good_job/shared/chart', chart_data: chart_data %>
+    <% end %>
+  </div>
+</div>

@@ -24,6 +24,19 @@
   height: 200px;
 }
 
+.legend-item-color-box {
+  display: inline-block;
+  flex-shrink: 0;
+  height: 20px;
+  width: 20px;
+  border-style: solid;
+  margin-right: 3px;
+}
+
+#chart-legend-container {
+  height: 200px;
+}
+
 /* Break out of a container */
 .break-out {
   width:100vw;
