@@ -390,7 +390,12 @@ module GoodJob
     # If the job has been retried, the error will be fetched from the previous {Execution} record.
     # @return [String]
     def recent_error
-      error || executions[-2]&.error
+      GoodJob.deprecator.warn(<<~DEPRECATION)
+        The `GoodJob::Job#recent_error` method is deprecated and will be removed in the next major release.
+        
+        Replace usage of GoodJob::Job#recent_error with `GoodJob::Job#error`.
+      DEPRECATION
+      error
     end
 
     # Errors for the job to be displayed in the Dashboard.
