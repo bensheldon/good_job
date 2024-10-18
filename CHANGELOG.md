@@ -1,5 +1,21 @@
 # Changelog
 
+## [v4.4.2](https://github.com/bensheldon/good_job/tree/v4.4.2) (2024-10-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.4.1...v4.4.2)
+
+**Merged pull requests:**
+
+- Bump rails from 7.1.4 to 7.1.4.1 [\#1524](https://github.com/bensheldon/good_job/pull/1524) ([Earlopain](https://github.com/Earlopain))
+- Drop compatibility code for `ForkTracker` [\#1519](https://github.com/bensheldon/good_job/pull/1519) ([Earlopain](https://github.com/Earlopain))
+- Add vertical legend to performance dashboard [\#1517](https://github.com/bensheldon/good_job/pull/1517) ([Wittiest](https://github.com/Wittiest))
+- Bump the bundler-dependencies group across 1 directory with 10 updates [\#1515](https://github.com/bensheldon/good_job/pull/1515) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Manually bump tapioca / regenerate rbi [\#1514](https://github.com/bensheldon/good_job/pull/1514) ([Earlopain](https://github.com/Earlopain))
+- Remove rack from the gemfile [\#1512](https://github.com/bensheldon/good_job/pull/1512) ([Earlopain](https://github.com/Earlopain))
+- Add regression test for searchable numeric arguments [\#1510](https://github.com/bensheldon/good_job/pull/1510) ([bensheldon](https://github.com/bensheldon))
+- Better parallelize CI jobs [\#1507](https://github.com/bensheldon/good_job/pull/1507) ([Earlopain](https://github.com/Earlopain))
+- Bump webrick from 1.8.1 to 1.8.2 [\#1503](https://github.com/bensheldon/good_job/pull/1503) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.4.1](https://github.com/bensheldon/good_job/tree/v4.4.1) (2024-10-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.4.0...v4.4.1)
