@@ -35,6 +35,19 @@ pt-BR:
         callback_jobs: Tarefas de Callback
       table:
         no_batches_found: Nenhum lote encontrado.
+    cleaner:
+      index:
+        title: Cleaner
+        grouped_by_class: Grouped By Class
+        grouped_by_exception: Grouped By Exception
+        class: Class
+        exception: Exception
+        total: Total
+        last_1_hour: Last 1 hour
+        last_3_hours: Last 3 hours
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_7_days: Last 7 days
     cron_entries:
       actions:
         confirm_disable: Tem certeza de que deseja desativar esta tarefa programada?
@@ -242,6 +255,7 @@ pt-BR:
         name: "GoodJob 👍"
         performance: Desempenho
         processes: Processos
+        cleaner: Cleaner
         theme:
           auto: Automático
           dark: Escuro

@@ -54,6 +54,7 @@ module GoodJob
         query: params[:query],
         state: params[:state],
         cron_key: params[:cron_key],
+        finished_since: params[:finished_since],
       }.merge(override).delete_if { |_, v| v.blank? }
     end
 

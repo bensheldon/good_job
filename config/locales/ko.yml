@@ -35,6 +35,19 @@ ko:
         callback_jobs: 콜백 작업
       table:
         no_batches_found: 배치를 찾을 수 없습니다.
+    cleaner:
+      index:
+        title: Cleaner
+        grouped_by_class: Grouped By Class
+        grouped_by_exception: Grouped By Exception
+        class: Class
+        exception: Exception
+        total: Total
+        last_1_hour: Last 1 hour
+        last_3_hours: Last 3 hours
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_7_days: Last 7 days
     cron_entries:
       actions:
         confirm_disable: 이 cron 엔트리를 비활성화하시겠습니까?
@@ -242,6 +255,7 @@ ko:
         name: "GoodJob 👍"
         performance: 성능
         processes: 프로세스
+        cleaner: Cleaner
         theme:
           auto: 자동
           dark: 어두운

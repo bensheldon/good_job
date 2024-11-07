@@ -35,6 +35,8 @@ GoodJob::Engine.routes.draw do
 
   resources :processes, only: %i[index]
 
+  resources :cleaner, only: %i[index]
+
   resources :performance, only: %i[index show]
 
   scope :frontend, controller: :frontends, defaults: { version: GoodJob::VERSION.tr(".", "-") } do

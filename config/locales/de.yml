@@ -35,6 +35,19 @@ de:
         callback_jobs: Callback-Jobs
       table:
         no_batches_found: Keine Batches gefunden.
+    cleaner:
+      index:
+        title: Cleaner
+        grouped_by_class: Grouped By Class
+        grouped_by_exception: Grouped By Exception
+        class: Class
+        exception: Exception
+        total: Total
+        last_1_hour: Last 1 hour
+        last_3_hours: Last 3 hours
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_7_days: Last 7 days
     cron_entries:
       actions:
         confirm_disable: Bist du sicher, dass du diesen Cron-Eintrag deaktivieren willst?
@@ -242,6 +255,7 @@ de:
         name: "GoodJob 👍"
         performance: Leistung
         processes: Prozesse
+        cleaner: Cleaner
         theme:
           auto: Auto
           dark: Dunkel

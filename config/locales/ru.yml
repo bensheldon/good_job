@@ -35,6 +35,19 @@ ru:
         callback_jobs: Коллбеки
       table:
         no_batches_found: Группы заданий не найдены.
+    cleaner:
+      index:
+        title: Cleaner
+        grouped_by_class: Grouped By Class
+        grouped_by_exception: Grouped By Exception
+        class: Class
+        exception: Exception
+        total: Total
+        last_1_hour: Last 1 hour
+        last_3_hours: Last 3 hours
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_7_days: Last 7 days
     cron_entries:
       actions:
         confirm_disable: Вы уверены, что хотите отключить эту задачу cron?
@@ -268,6 +281,7 @@ ru:
         name: "GoodJob 👍"
         performance: Производительность
         processes: Процессы
+        cleaner: Cleaner
         theme:
           auto: Авто
           dark: Темный

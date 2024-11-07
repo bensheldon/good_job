@@ -114,6 +114,18 @@ RSpec.describe GoodJob::JobsFilter do
         expect(filter.records.size).to eq 1
       end
     end
+
+    context 'when filtered by finished_since' do
+      before do
+        GoodJob::Job.all.each { |job| job.update!(finished_at: 6.hours.ago) }
+        GoodJob::Job.take.update!(finished_at: 30.minutes.ago)
+        params[:finished_since] = '1_hour_ago'
+      end
+
+      it 'filters results' do
+        expect(filter.records.size).to eq 1
+      end
+    end
   end
 
   describe '#filtered_count' do
