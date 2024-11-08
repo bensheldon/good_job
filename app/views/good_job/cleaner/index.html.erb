@@ -48,7 +48,7 @@
   <table class="table align-middle" id="by-exception">
     <thead>
       <tr>
-        <th scope="col" class="col-3 text-break"><%= t ".exception" %></th>
+        <th scope="col" class="col-3"><%= t ".exception" %></th>
         <th scope="col" class="text-center"><%= t "good_job.models.batch.discarded" %></th>
         <th scope="col" class="text-center"><%= t ".last_1_hour" %></th>
         <th scope="col" class="text-center"><%= t ".last_3_hours" %></th>
@@ -60,7 +60,7 @@
     <tbody>
       <% @discarded_jobs_grouped_by_exception.each do |discard_job| %>
         <tr>
-          <td scope="row" class="col-3"><%= discard_job.exception_class %></td>
+          <td scope="row" class="col-3 text-break"><%= discard_job.exception_class %></td>
           <td class="text-center"><%= link_to discard_job.failed, jobs_path(@filter.to_params(state: 'discarded', query: discard_job.exception_class))  %></td>
           <td class="text-center"><%= link_to discard_job.last_1_hour, jobs_path(@filter.to_params(state: 'discarded', query: discard_job.exception_class, finished_since: '1_hour_ago')) %></td>
           <td class="text-center"><%= link_to discard_job.last_3_hours, jobs_path(@filter.to_params(state: 'discarded', query: discard_job.exception_class, finished_since: '3_hours_ago')) %></td>
