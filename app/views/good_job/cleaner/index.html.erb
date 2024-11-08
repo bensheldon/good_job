@@ -4,7 +4,7 @@
 
 <div>
   <h4 class="pt-3 pb-2"><%= t ".grouped_by_class" %></h4>
-  <table class="table" id="by-job-class">
+  <table class="table align-middle" id="by-job-class">
     <thead>
       <tr>
         <th scope="col" class="col-3"><%= t ".class" %></th>
@@ -19,7 +19,7 @@
     <tbody>
       <% @discarded_jobs_grouped_by_class.each do |discard_job| %>
         <tr>
-          <td scope="row" class="col-3"><%= discard_job.job_class %></td>
+          <td scope="row" class="col-3 text-break"><%= discard_job.job_class %></td>
           <td class="text-center "><%= link_to discard_job.failed, jobs_path(@filter.to_params(job_class: discard_job.job_class, state: 'discarded'))  %></td>
           <td class="text-center"><%= link_to discard_job.last_1_hour, jobs_path(@filter.to_params(job_class: discard_job.job_class, state: 'discarded', finished_since: '1_hour_ago')) %></td>
           <td class="text-center"><%= link_to discard_job.last_3_hours, jobs_path(@filter.to_params(job_class: discard_job.job_class, state: 'discarded', finished_since: '3_hours_ago')) %></td>
@@ -45,10 +45,10 @@
 
 <div>
   <h4 class="pt-3 pb-2"><%= t ".grouped_by_exception" %></h4>
-  <table class="table" id="by-exception">
+  <table class="table align-middle" id="by-exception">
     <thead>
       <tr>
-        <th scope="col" class="col-3"><%= t ".exception" %></th>
+        <th scope="col" class="col-3 text-break"><%= t ".exception" %></th>
         <th scope="col" class="text-center"><%= t "good_job.models.batch.discarded" %></th>
         <th scope="col" class="text-center"><%= t ".last_1_hour" %></th>
         <th scope="col" class="text-center"><%= t ".last_3_hours" %></th>
