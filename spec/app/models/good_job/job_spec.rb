@@ -732,8 +732,6 @@ RSpec.describe GoodJob::Job do
                 next if rescue_with_handler(e)
 
                 raise e
-              ensure
-                nil
               end
             end
 
