@@ -27,7 +27,7 @@ rails_versions = {
   "7.0" => "~> 7.0.1", # Ruby 3.1 requires Rails 7.0.1+
   "7.1" => "~> 7.1.0",
   "7.2" => "~> 7.2.0",
-  "8.0" => "~> 8.0.0.a",
+  "8.0" => "~> 8.0.0",
   "head" => { github: "rails/rails", branch: "main" },
 }
 gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", nil)]

@@ -46,15 +46,15 @@ FileUtils.chdir GEM_ROOT do
 
   puts "\n== ERB Lint =="
   if options[:nofix]
-    system!("bundle exec erblint app/views")
+    system!("bundle exec erb_lint app/views")
   else
     # Must run twice to run all linters
     # https://github.com/Shopify/erb-lint/issues/145
     puts "Running ERB Lint with autocorrectable linters"
-    system!("bundle exec erblint --autocorrect app/views")
+    system!("bundle exec erb_lint --autocorrect app/views")
 
     puts "\nRunning ERB Lint with all linters"
-    system!("bundle exec erblint app/views")
+    system!("bundle exec erb_lint app/views")
   end
 
   puts "\n== Markdown Lint =="
