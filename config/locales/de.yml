@@ -37,17 +37,18 @@ de:
         no_batches_found: Keine Batches gefunden.
     cleaner:
       index:
-        title: Cleaner
-        grouped_by_class: Grouped By Class
-        grouped_by_exception: Grouped By Exception
+        all: All
         class: Class
         exception: Exception
-        total: Total
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
         last_1_hour: Last 1 hour
-        last_3_hours: Last 3 hours
         last_24_hours: Last 24 hours
         last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
         last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Bist du sicher, dass du diesen Cron-Eintrag deaktivieren willst?
@@ -249,13 +250,13 @@ de:
         search: Suchen
       navbar:
         batches: Batches
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
         performance: Leistung
         processes: Prozesse
-        cleaner: Cleaner
         theme:
           auto: Auto
           dark: Dunkel

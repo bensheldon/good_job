@@ -37,17 +37,18 @@ ja:
         no_batches_found: バッチが見つかりませんでした。
     cleaner:
       index:
-        title: Cleaner
-        grouped_by_class: Grouped By Class
-        grouped_by_exception: Grouped By Exception
+        all: All
         class: Class
         exception: Exception
-        total: Total
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
         last_1_hour: Last 1 hour
-        last_3_hours: Last 3 hours
         last_24_hours: Last 24 hours
         last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
         last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: このcronエントリを無効化してもよろしいですか？
@@ -249,13 +250,13 @@ ja:
         search: 検索
       navbar:
         batches: バッチ
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: ジョブ
         live_poll: リアルタイム更新
         name: "GoodJob 👍"
         performance: パフォーマンス
         processes: プロセス
-        cleaner: Cleaner
         theme:
           auto: 自動
           dark: 暗い
