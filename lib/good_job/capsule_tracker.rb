@@ -144,7 +144,7 @@ module GoodJob # :nodoc:
     # Tests whether an active advisory lock has been taken on the record.
     # @return [Boolean]
     def advisory_locked?
-      @advisory_locked_connection&.weakref_alive? && @advisory_locked_connection&.active?
+      @advisory_locked_connection&.weakref_alive? && @advisory_locked_connection.active?
     end
 
     # @!visibility private
