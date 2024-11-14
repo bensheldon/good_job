@@ -39,7 +39,7 @@ module GoodJob
         when 'scheduled'
           query = query.scheduled
         when 'running'
-          query = query.running.select("#{GoodJob::Job.table_name}.*", 'pg_locks.locktype')
+          query = query.running
         when 'queued'
           query = query.queued
         end
@@ -55,7 +55,7 @@ module GoodJob
     private
 
     def query_for_records
-      filtered_query.includes_advisory_locks
+      filtered_query
     end
 
     def default_base_query
