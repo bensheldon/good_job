@@ -86,18 +86,20 @@ module GoodJob # :nodoc:
     def create_task(cron_entry, previously_at: nil)
       cron_at = cron_entry.next_at(previously_at: previously_at)
       delay = [(cron_at - Time.current).to_f, 0].max
-      future = Concurrent::ScheduledTask.new(delay, args: [self, cron_entry, cron_at], executor: @executor) do |thr_scheduler, thr_cron_entry, thr_cron_at|
-        # Re-schedule the next cron task before executing the current task
-        thr_scheduler.create_task(thr_cron_entry, previously_at: thr_cron_at)
+      if !cron_entry.enqueued_at_least_one_time || delay >= 0.01 #case of clock drift and delay close to 0.001
+        future = Concurrent::ScheduledTask.new(delay, args: [self, cron_entry, cron_at], executor: @executor) do |thr_scheduler, thr_cron_entry, thr_cron_at|
+          # Re-schedule the next cron task before executing the current task
+          thr_scheduler.create_task(thr_cron_entry, previously_at: thr_cron_at)
 
-        Rails.application.executor.wrap do
-          cron_entry.enqueue(thr_cron_at) if thr_cron_entry.enabled?
+          Rails.application.executor.wrap do
+            cron_entry.enqueue(thr_cron_at) if thr_cron_entry.enabled?
+          end
         end
-      end
 
-      @tasks[cron_entry.key] = future
-      future.add_observer(self.class, :task_observer)
-      future.execute
+        @tasks[cron_entry.key] = future
+        future.add_observer(self.class, :task_observer)
+        future.execute
+      end
     end
 
     # Uses the graceful restart period to re-enqueue jobs that were scheduled to run during the period.
