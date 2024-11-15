@@ -12,7 +12,6 @@ module GoodJob # :nodoc:
     include ActiveModel::Model
 
     attr_reader :params
-    attr_reader :enqueued_at_least_one_time
 
     def self.all(configuration: nil)
       configuration ||= GoodJob.configuration
@@ -27,7 +26,7 @@ module GoodJob # :nodoc:
 
     def initialize(params = {})
       @params = params
-      @enqueued_at_least_one_time = false
+
       return if cron_proc?
       raise ArgumentError, "Invalid cron format: '#{cron}'" unless fugit.instance_of?(Fugit::Cron)
     end
@@ -99,7 +98,6 @@ module GoodJob # :nodoc:
 
     def enqueue(cron_at = nil)
       GoodJob::CurrentThread.within do |current_thread|
-        @enqueued_at_least_one_time = true
         current_thread.cron_key = key
         current_thread.cron_at = cron_at
 

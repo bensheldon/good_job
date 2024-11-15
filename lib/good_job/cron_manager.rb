@@ -26,11 +26,13 @@ module GoodJob # :nodoc:
     end
 
     # Execution configuration to be scheduled
-    # @return [Hash]
+    # @return [Array<CronEntry>]
     attr_reader :cron_entries
 
     # @param cron_entries [Array<CronEntry>]
     # @param start_on_initialize [Boolean]
+    # @param graceful_restart_period [ActiveSupport::Duration, nil]
+    # @param executor [Concurrent::Executor]
     def initialize(cron_entries = [], start_on_initialize: false, graceful_restart_period: nil, executor: Concurrent.global_io_executor)
       @executor = executor
       @running = false
@@ -82,24 +84,32 @@ module GoodJob # :nodoc:
 
     # Enqueues a scheduled task
     # @param cron_entry [CronEntry] the CronEntry object to schedule
-    # @param previously_at [Date, Time, ActiveSupport::TimeWithZone, nil] the last, +in-memory+, scheduled time the cron task was intended to run
-    def create_task(cron_entry, previously_at: nil)
-      cron_at = cron_entry.next_at(previously_at: previously_at)
-      delay = [(cron_at - Time.current).to_f, 0].max
-      if !cron_entry.enqueued_at_least_one_time || delay >= 0.01 #case of clock drift and delay close to 0.001
-        future = Concurrent::ScheduledTask.new(delay, args: [self, cron_entry, cron_at], executor: @executor) do |thr_scheduler, thr_cron_entry, thr_cron_at|
+    # #param at [Time, nil] When a task needs to optionally be rescheduled because of clock-drift or other inaccuracy
+    # @param previously_at [Time, nil] the last +in-memory+ scheduled time the cron task was intended to run
+    def create_task(cron_entry, at: nil, previously_at: nil)
+      cron_at = at || cron_entry.next_at(previously_at: previously_at)
+
+      # ScheduledTask runs immediately if delay is <= 0.01. Prevent that.
+      # https://github.com/ruby-concurrency/concurrent-ruby/blob/56227a4c3ebdd53b8b0976eb8296ceb7a093496f/lib/concurrent-ruby/concurrent/executor/timer_set.rb#L97
+      delay = [(cron_at - Time.current).to_f, 0.02].max
+
+      future = Concurrent::ScheduledTask.new(delay, args: [self, cron_entry, cron_at, previously_at], executor: @executor) do |thr_manager, thr_cron_entry, thr_cron_at|
+        if thr_cron_at && thr_cron_at > Time.current
+          # If clock drift or other inaccuracy, reschedule the task again
+          thr_manager.create_task(thr_cron_entry, at: thr_cron_at, previously_at: previously_at)
+        else
           # Re-schedule the next cron task before executing the current task
-          thr_scheduler.create_task(thr_cron_entry, previously_at: thr_cron_at)
+          thr_manager.create_task(thr_cron_entry, previously_at: thr_cron_at)
 
           Rails.application.executor.wrap do
             cron_entry.enqueue(thr_cron_at) if thr_cron_entry.enabled?
           end
         end
-
-        @tasks[cron_entry.key] = future
-        future.add_observer(self.class, :task_observer)
-        future.execute
       end
+
+      @tasks[cron_entry.key] = future
+      future.add_observer(self.class, :task_observer)
+      future.execute
     end
 
     # Uses the graceful restart period to re-enqueue jobs that were scheduled to run during the period.
@@ -110,7 +120,7 @@ module GoodJob # :nodoc:
 
       time_period = @graceful_restart_period.ago..Time.current
       cron_entry.within(time_period).each do |cron_at|
-        future = Concurrent::Future.new(args: [self, cron_entry, cron_at], executor: @executor) do |_thr_scheduler, thr_cron_entry, thr_cron_at|
+        future = Concurrent::Future.new(args: [self, cron_entry, cron_at], executor: @executor) do |_thr_manager, thr_cron_entry, thr_cron_at|
           Rails.application.executor.wrap do
             cron_entry.enqueue(thr_cron_at) if thr_cron_entry.enabled?
           end
