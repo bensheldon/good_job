@@ -89,9 +89,9 @@ module GoodJob # :nodoc:
     def create_task(cron_entry, at: nil, previously_at: nil)
       cron_at = at || cron_entry.next_at(previously_at: previously_at)
 
-      # ScheduledTask runs immediately if delay is <= 0.01. Prevent that.
+      # ScheduledTask runs immediately if delay is <= 0.01; avoid ever scheduling the task before the intended time
       # https://github.com/ruby-concurrency/concurrent-ruby/blob/56227a4c3ebdd53b8b0976eb8296ceb7a093496f/lib/concurrent-ruby/concurrent/executor/timer_set.rb#L97
-      delay = [(cron_at - Time.current).to_f, 0.02].max
+      delay = cron_at <= Time.current ? 0.0 : [(cron_at - Time.current).to_f, 0.02].max
 
       future = Concurrent::ScheduledTask.new(delay, args: [self, cron_entry, cron_at, previously_at], executor: @executor) do |thr_manager, thr_cron_entry, thr_cron_at|
         if thr_cron_at && thr_cron_at > Time.current
