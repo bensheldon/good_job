@@ -84,7 +84,7 @@ module GoodJob # :nodoc:
 
     # Enqueues a scheduled task
     # @param cron_entry [CronEntry] the CronEntry object to schedule
-    # #param at [Time, nil] When a task needs to optionally be rescheduled because of clock-drift or other inaccuracy
+    # @param at [Time, nil] When a task needs to optionally be rescheduled because of clock-drift or other inaccuracy
     # @param previously_at [Time, nil] the last +in-memory+ scheduled time the cron task was intended to run
     def create_task(cron_entry, at: nil, previously_at: nil)
       cron_at = at || cron_entry.next_at(previously_at: previously_at)
