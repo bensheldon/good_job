@@ -38,7 +38,7 @@
               <span class="badge rounded-pill bg-body-secondary text-secondary"><%= process.state["pid"] %></span>
               <span class="text-muted small">@</span>
               <span class="badge rounded-pill bg-body-secondary text-secondary"><%= process.state["hostname"] %></span>
-              <span class="badge rounded-pill bg-body-secondary text-secondary"><%= process.state["memory"] %>mb</span>
+              <span class="badge rounded-pill bg-body-secondary text-secondary"><%= (process.state["memory"] / 1024).to_i %> MB</span>
             </div>
           </div>
           <div class="col">

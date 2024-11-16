@@ -14,25 +14,23 @@ module GoodJob # :nodoc:
     EXPIRED_INTERVAL = 5.minutes
     PROCESS_MEMORY = case RUBY_PLATFORM
                      when /linux/
-                       ->(pid) {
-                        begin
-                          File.readlines("/proc/#{pid}/smaps_rollup").each do |line|
-                            next unless line.start_with?('Pss:')
+                       lambda do |pid|
+                         File.readlines("/proc/#{pid}/smaps_rollup").each do |line|
+                           next unless line.start_with?('Pss:')
 
-                            break line.split[1].to_i
-                          end
-                        rescue Errno::ENOENT
-                          File.readlines("/proc/#{pid}/status").each do |line|
-                            next unless line.start_with?('VmRSS:')
+                           break line.split[1].to_i
+                         end
+                       rescue Errno::ENOENT
+                         File.readlines("/proc/#{pid}/status").each do |line|
+                           next unless line.start_with?('VmRSS:')
 
-                            break line.split[1].to_i
-                          end
-                        end
-                       }
+                           break line.split[1].to_i
+                         end
+                       end
                      when /darwin|bsd/
-                       ->(pid) {
-                         `ps -o pid,rss -p #{pid}`.lines.last.split.last.to_i
-                       }
+                       lambda do |pid|
+                         `ps -o pid,rss -p #{pid.to_i}`.lines.last.split.last.to_i
+                       end
                      else
                        ->(_pid) { 0 }
                      end
@@ -81,7 +79,7 @@ module GoodJob # :nodoc:
     end
 
     def self.memory_usage(pid)
-      (PROCESS_MEMORY.call(pid) / 1024).to_i
+      PROCESS_MEMORY.call(pid)
     end
 
     def self.find_or_create_record(id:, with_advisory_lock: false)
