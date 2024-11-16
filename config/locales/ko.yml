@@ -35,6 +35,20 @@ ko:
         callback_jobs: 콜백 작업
       table:
         no_batches_found: 배치를 찾을 수 없습니다.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: 이 cron 엔트리를 비활성화하시겠습니까?
@@ -236,6 +250,7 @@ ko:
         search: 검색
       navbar:
         batches: 배치
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: 작업
         live_poll: 실시간 업데이트

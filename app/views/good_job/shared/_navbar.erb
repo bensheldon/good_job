@@ -44,6 +44,12 @@
             <%= t(".performance") %>
           <% end %>
         </li>
+        <li class="nav-item">
+          <%= link_to cleaner_index_path, class: ["nav-link", ("active" if controller_name == 'cleaner')] do %>
+            <%= t(".cleaner") %>
+            <span data-async-values-target="value" data-async-values-key="discarded_count" class="badge bg-secondary rounded-pill d-none"></span>
+          <% end %>
+        </li>
       </ul>
 
       <ul class="navbar-nav">

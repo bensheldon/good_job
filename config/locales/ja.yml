@@ -35,6 +35,20 @@ ja:
         callback_jobs: コールバックジョブ
       table:
         no_batches_found: バッチが見つかりませんでした。
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: このcronエントリを無効化してもよろしいですか？
@@ -236,6 +250,7 @@ ja:
         search: 検索
       navbar:
         batches: バッチ
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: ジョブ
         live_poll: リアルタイム更新

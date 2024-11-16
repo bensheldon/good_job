@@ -35,6 +35,20 @@ pt-BR:
         callback_jobs: Tarefas de Callback
       table:
         no_batches_found: Nenhum lote encontrado.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Tem certeza de que deseja desativar esta tarefa programada?
@@ -236,6 +250,7 @@ pt-BR:
         search: Pesquisar
       navbar:
         batches: Lotes
+        cleaner: Discard Cleaner
         cron_schedules: Agendamentos
         jobs: Tarefas
         live_poll: Acompanhamento ao Vivo

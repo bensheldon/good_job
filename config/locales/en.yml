@@ -35,6 +35,20 @@ en:
         callback_jobs: Callback Jobs
       table:
         no_batches_found: No batches found.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Are you sure you want to disable this cron entry?
@@ -236,6 +250,7 @@ en:
         search: Search
       navbar:
         batches: Batches
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Jobs
         live_poll: Live Poll

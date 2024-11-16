@@ -27,6 +27,7 @@ module GoodJob
       query = query.where(queue_name: filter_params[:queue_name]) if filter_params[:queue_name].present?
       query = query.search_text(filter_params[:query]) if filter_params[:query].present?
       query = query.where(cron_key: filter_params[:cron_key]) if filter_params[:cron_key].present?
+      query = query.where(finished_at: finished_since(filter_params[:finished_since])..) if filter_params[:finished_since].present?
 
       if filter_params[:state]
         case filter_params[:state]
@@ -60,6 +61,21 @@ module GoodJob
 
     def default_base_query
       GoodJob::Job.all
+    end
+
+    def finished_since(finished_since)
+      case finished_since
+      when '1_hour_ago'
+        1.hour.ago
+      when '3_hours_ago'
+        3.hours.ago
+      when '24_hours_ago'
+        24.hours.ago
+      when '3_days_ago'
+        3.days.ago
+      when '7_days_ago'
+        7.days.ago
+      end
     end
   end
 end

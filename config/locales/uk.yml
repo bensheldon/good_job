@@ -35,6 +35,20 @@ uk:
         callback_jobs: Задачі з зворотнім викликом
       table:
         no_batches_found: Пакети не знайдені.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Ви впевнені, що хочете вимкнути цю cron-запис?
@@ -262,6 +276,7 @@ uk:
         search: Пошук
       navbar:
         batches: Пакети
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Задачі
         live_poll: Живе Опитування

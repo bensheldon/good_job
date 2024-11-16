@@ -35,6 +35,20 @@ tr:
         callback_jobs: Geri Çağırma İşleri
       table:
         no_batches_found: Toplu İşlem bulunamadı.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Bu cron girişini devre dışı bırakmak istediğinizden emin misiniz?
@@ -236,6 +250,7 @@ tr:
         search: Ara
       navbar:
         batches: Toplu İşler
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: İşler
         live_poll: Anlık Güncelleme

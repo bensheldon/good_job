@@ -34,8 +34,8 @@ GoodJob::Engine.routes.draw do
   end
 
   resources :processes, only: %i[index]
-
   resources :performance, only: %i[index show]
+  resources :cleaner, only: %i[index]
 
   scope :frontend, controller: :frontends, defaults: { version: GoodJob::VERSION.tr(".", "-") } do
     get "modules/:version/:id", action: :module, as: :frontend_module, constraints: { format: 'js' }
