@@ -38,6 +38,7 @@ platforms :ruby do
   gem "foreman"
   gem "gem-release"
   gem "github_changelog_generator", require: false
+  gem "warning"
 
   group :debug do
     gem "activerecord-explain-analyze", require: false
