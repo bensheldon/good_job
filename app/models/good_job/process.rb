@@ -78,7 +78,6 @@ module GoodJob # :nodoc:
       end
     end
 
-
     # @return [Integer]
     def self.memory_usage(pid)
       PROCESS_MEMORY.call(pid)
