@@ -12,6 +12,28 @@ module GoodJob # :nodoc:
     STALE_INTERVAL = 30.seconds
     # Interval until the process record is treated as expired
     EXPIRED_INTERVAL = 5.minutes
+    PROCESS_MEMORY = case RUBY_PLATFORM
+                     when /linux/
+                       lambda do |pid|
+                         File.readlines("/proc/#{pid}/smaps_rollup").each do |line|
+                           next unless line.start_with?('Pss:')
+
+                           break line.split[1].to_i
+                         end
+                       rescue Errno::ENOENT
+                         File.readlines("/proc/#{pid}/status").each do |line|
+                           next unless line.start_with?('VmRSS:')
+
+                           break line.split[1].to_i
+                         end
+                       end
+                     when /darwin|bsd/
+                       lambda do |pid|
+                         `ps -o pid,rss -p #{pid.to_i}`.lines.last.split.last.to_i
+                       end
+                     else
+                       ->(_pid) { 0 }
+                     end
 
     self.table_name = 'good_job_processes'
     self.implicit_order_column = 'created_at'
@@ -56,6 +78,13 @@ module GoodJob # :nodoc:
       end
     end
 
+    # @return [Integer]
+    def self.memory_usage(pid)
+      PROCESS_MEMORY.call(pid)
+    rescue StandardError
+      0
+    end
+
     def self.find_or_create_record(id:, with_advisory_lock: false)
       attributes = {
         id: id,
@@ -83,6 +112,7 @@ module GoodJob # :nodoc:
       {
         hostname: Socket.gethostname,
         pid: ::Process.pid,
+        memory: memory_usage(::Process.pid),
         proctitle: $PROGRAM_NAME,
         preserve_job_records: GoodJob.preserve_job_records,
         retry_on_unhandled_error: GoodJob.retry_on_unhandled_error,
@@ -98,8 +128,8 @@ module GoodJob # :nodoc:
     end
 
     def refresh
-      self.state = self.class.process_state
       reload # verify the record still exists in the database
+      self.state = self.class.process_state
       update(state: state, updated_at: Time.current)
     rescue ActiveRecord::RecordNotFound
       @new_record = true

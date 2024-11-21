@@ -77,7 +77,8 @@ RSpec.describe GoodJob::Process do
       process = described_class.create! state: {}, updated_at: 1.day.ago
       expect do
         expect(process.refresh).to be true
-      end.to change(process, :updated_at).to within(1.second).of(Time.current)
+      end.to change(process, :state)
+         .and change(process, :updated_at).to within(1.second).of(Time.current)
     end
 
     context 'when the record has been deleted elsewhere' do

@@ -53,7 +53,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/good_job/job.rb",
-      "line": 140,
+      "line": 135,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql(\"(CASE #{queues.map.with_index do\n sanitize_sql_array([\"WHEN queue_name = ? THEN ?\", queue_name, index])\n end.join(\" \")} ELSE #{queues.size} END)\")",
       "render_path": null,
@@ -68,8 +68,31 @@
         89
       ],
       "note": "Developer provided value, queue_name, is sanitized."
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "dbb80167f57edebfd9da72e1278d425095a0329755e24d3c50e0fda6bb21c097",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "app/models/good_job/process.rb",
+      "line": 32,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`ps -o pid,rss -p #{pid.to_i}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Process",
+        "method": null
+      },
+      "user_input": "pid.to_i",
+      "confidence": "Medium",
+      "cwe_id": [
+        77
+      ],
+      "note": ""
     }
   ],
-  "updated": "2024-07-18 18:05:56 -0700",
-  "brakeman_version": "6.1.2"
+  "updated": "2024-11-16 17:00:20 -0600",
+  "brakeman_version": "6.2.1"
 }
