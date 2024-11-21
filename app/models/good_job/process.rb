@@ -78,8 +78,12 @@ module GoodJob # :nodoc:
       end
     end
 
+
+    # @return [Integer]
     def self.memory_usage(pid)
       PROCESS_MEMORY.call(pid)
+    rescue StandardError
+      0
     end
 
     def self.find_or_create_record(id:, with_advisory_lock: false)
