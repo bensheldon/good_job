@@ -1,5 +1,37 @@
 # Changelog
 
+## [v4.5.0](https://github.com/bensheldon/good_job/tree/v4.5.0) (2024-11-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.4.2...v4.5.0)
+
+**Implemented enhancements:**
+
+- Add "Discard Cleaner" page to dashboard UI [\#1538](https://github.com/bensheldon/good_job/pull/1538) ([lucasfcunha](https://github.com/lucasfcunha))
+- Add Process memory usage and fix process state update  [\#1516](https://github.com/bensheldon/good_job/pull/1516) ([noma4i](https://github.com/noma4i))
+
+**Fixed bugs:**
+
+- Fix cron double-enqueue because delay close to 0.01 and possibly clock-drift [\#1543](https://github.com/bensheldon/good_job/pull/1543) ([ccouton](https://github.com/ccouton))
+- Fix badge color for running jobs [\#1525](https://github.com/bensheldon/good_job/pull/1525) ([Wittiest](https://github.com/Wittiest))
+
+**Closed issues:**
+
+- Can't load Dashboard [\#1532](https://github.com/bensheldon/good_job/issues/1532)
+- Should we clean up batches if discarded callback jobs exist? [\#1528](https://github.com/bensheldon/good_job/issues/1528)
+- Modify error color for Running tab when a job has 1 attempt [\#1518](https://github.com/bensheldon/good_job/issues/1518)
+- Silence development warning output [\#1509](https://github.com/bensheldon/good_job/issues/1509)
+- Proposal - A better way of managing errors through the GoodJob UI [\#1464](https://github.com/bensheldon/good_job/issues/1464)
+
+**Merged pull requests:**
+
+- Ignore some warnings with the `warning` gem [\#1545](https://github.com/bensheldon/good_job/pull/1545) ([Earlopain](https://github.com/Earlopain))
+- Remove unneeded include of pg\_locks in query when displaying jobs table [\#1541](https://github.com/bensheldon/good_job/pull/1541) ([jgrau](https://github.com/jgrau))
+- Update development environment to Rails 8 [\#1539](https://github.com/bensheldon/good_job/pull/1539) ([bensheldon](https://github.com/bensheldon))
+- Bump the bundler-dependencies group with 9 updates [\#1534](https://github.com/bensheldon/good_job/pull/1534) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump the bundler-lint group with 5 updates [\#1533](https://github.com/bensheldon/good_job/pull/1533) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump rexml from 3.3.8 to 3.3.9 [\#1530](https://github.com/bensheldon/good_job/pull/1530) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Deprecate GoodJob::Job\#recent\_error [\#1526](https://github.com/bensheldon/good_job/pull/1526) ([Wittiest](https://github.com/Wittiest))
+
 ## [v4.4.2](https://github.com/bensheldon/good_job/tree/v4.4.2) (2024-10-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.4.1...v4.4.2)
