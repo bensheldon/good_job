@@ -203,11 +203,11 @@ module GoodJob
   # If you are preserving job records this way, use this method regularly to
   # destroy old records and preserve space in your database.
   # @param older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
+  # @param include_discarded [Boolean] Whether or not to destroy discarded jobs (default: per +cleanup_discarded_jobs+ config option)
   # @return [Integer] Number of job execution records and batches that were destroyed.
-  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000)
+  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000, include_discarded: GoodJob.configuration.cleanup_discarded_jobs?)
     older_than ||= GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
-    include_discarded = GoodJob.configuration.cleanup_discarded_jobs?
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
       deleted_jobs_count = 0

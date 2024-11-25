@@ -111,6 +111,20 @@ describe GoodJob do
       expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
+    it "can override cleanup_discarded_jobs? configuration" do
+      allow(described_class.configuration).to receive(:env).and_return ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_DISCARDED_JOBS' => 'false' })
+      destroyed_records_count = described_class.cleanup_preserved_jobs(include_discarded: true)
+
+      expect(destroyed_records_count).to eq 4
+
+      expect { recent_job.reload }.not_to raise_error
+      expect { old_unfinished_job.reload }.not_to raise_error
+      expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+
     it "does not delete batches until their callbacks have finished" do
       old_batch.update!(finished_at: nil)
       described_class.cleanup_preserved_jobs
