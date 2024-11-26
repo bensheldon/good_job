@@ -51,7 +51,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
           FROM "good_jobs"
           WHERE "good_jobs"."id" IN (
             WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
-              SELECT "good_jobs"."id", "good_jobs"."id"
+              SELECT "good_jobs"."id"
               FROM "good_jobs"
               WHERE "good_jobs"."priority" = 99
               ORDER BY "good_jobs"."priority" DESC

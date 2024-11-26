@@ -42,7 +42,7 @@ module GoodJob
         original_query = self
 
         cte_table = Arel::Table.new(:rows)
-        cte_query = original_query.select(primary_key, column).except(:limit)
+        cte_query = original_query.select(*[primary_key.to_sym, column.to_sym].uniq).except(:limit)
         cte_query = cte_query.limit(select_limit) if select_limit
         cte_type = supports_cte_materialization_specifiers? ? :MATERIALIZED : :""
         composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(cte_type, cte_query.arel))
