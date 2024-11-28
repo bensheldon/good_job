@@ -10,22 +10,7 @@ module GoodJob
     def data
       table_name = GoodJob::Job.table_name
 
-      scheduled_query = @filter.filtered_query
-                               .except(:select, :order)
-                               .select(
-                                 :queue_name,
-                                 Arel::Nodes::NamedFunction.new(
-                                   'CAST',
-                                   [
-                                     Arel::Nodes::NamedFunction.new(
-                                       'COALESCE',
-                                       [Arel::Nodes::SqlLiteral.new("#{table_name}.scheduled_at"), Arel::Nodes::SqlLiteral.new("#{table_name}.created_at")]
-                                     ).as('timestamp'),
-                                   ]
-                                 ).as('scheduled_at')
-                               ).to_sql
-
-      count_query = Arel.sql(GoodJob::Execution.pg_or_jdbc_query(<<~SQL.squish))
+      count_query = <<~SQL.squish
         SELECT *
         FROM generate_series(
           date_trunc('hour', $1::timestamp),
@@ -38,7 +23,7 @@ module GoodJob
               queue_name,
               count(*) AS count
             FROM (
-              #{scheduled_query}
+              #{@filter.filtered_query.except(:select, :order).select(:queue_name, :scheduled_at).to_sql}
             ) sources
             GROUP BY date_trunc('hour', scheduled_at), queue_name
         ) sources ON sources.scheduled_at = timestamp

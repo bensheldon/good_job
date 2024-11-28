@@ -21,7 +21,7 @@ module GoodJob
       table_name = GoodJob::Execution.table_name
 
       interval_entries = BUCKET_INTERVALS.map { "interval '#{_1}'" }.join(",")
-      sum_query = Arel.sql(GoodJob::Job.pg_or_jdbc_query(<<~SQL.squish))
+      sum_query = <<~SQL.squish
         SELECT
           WIDTH_BUCKET(duration, ARRAY[#{interval_entries}]) as bucket_index,
           COUNT(WIDTH_BUCKET(duration, ARRAY[#{interval_entries}])) AS count
