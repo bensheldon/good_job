@@ -9,10 +9,12 @@ es:
       reschedule: Reprogramar
       retry: Reintentar
     batches:
+      actions:
+        confirm_retry: "¿Estás seguro que querés reintentar este lote?"
+        retry: Reintentar
       index:
-        older_batches: Batches anteriores
-        pending_migrations: GoodJob tiene migraciones pendientes.
-        title: Batches
+        older_batches: Lotes anteriores
+        title: Lotes
       jobs:
         actions:
           confirm_destroy: "¿Estás seguro que querés eliminar esta tarea?"
@@ -25,12 +27,28 @@ es:
           retry: Reintentar tarea
           title: Acciones
         no_jobs_found: No hay tareas.
+      retry:
+        notice: El lote ha sido reintentado
       show:
         attributes: Atributos
-        batched_jobs: Batched Jobs
+        batched_jobs: Tareas en lote
         callback_jobs: Callback Jobs
       table:
-        no_batches_found: No hay batches.
+        no_batches_found: No hay lotes.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: "¿Estás seguro que querés deshabilitar esta tarea programada?"
@@ -48,7 +66,6 @@ es:
       index:
         no_cron_schedules_found: No hay tareas programadas.
         title: Tareas Programadas
-      pending_migrations: Require las migraciones de GoodJob pendientes.
       show:
         cron_entry_key: Cron Entry Key
     datetime:
@@ -111,12 +128,12 @@ es:
       actions:
         confirm_destroy: "¿Estás seguro que querés eliminar esta tarea?"
         confirm_discard: "¿Estás seguro que querés descartar esta tarea?"
-        confirm_force_discard: "¿Está seguro de que desea forzar el descarte de este trabajo? El trabajo se marcará como descartado, pero el trabajo en ejecución no se detendrá; sin embargo, no se volverá a intentar en caso de falla.\n"
+        confirm_force_discard: "¿Está seguro de que desea forzar el descarte de esta tarea? La tarea se marcará como descartada, pero la tarea en ejecución no se detendrá; sin embargo, no se volverá a intentar en caso de falla.\n"
         confirm_reschedule: "¿Estás seguro que querés reprogramar esta tarea?"
         confirm_retry: "¿Estás seguro que querés reintentar esta tarea?"
         destroy: Eliminar tarea
         discard: Descartar tarea
-        force_discard: Forzar el descarte del trabajo
+        force_discard: Forzar el descarte de la tarea
         reschedule: Reprogramar tarea
         retry: Reiuntentar tarea
       destroy:
@@ -124,11 +141,13 @@ es:
       discard:
         notice: La tarea ha sido descartada
       executions:
+        application_trace: Traza de la aplicación
+        full_trace: Traza completa
         in_queue: en cola
         runtime: en ejecución
         title: Ejecuciones
       force_discard:
-        notice: Job ha sido descartado a la fuerza. Continuará ejecutándose pero no se volverá a intentar en caso de fallas.
+        notice: La tarea ha sido descartada a la fuerza. Continuará ejecutándose pero no se volverá a intentar en caso de fallas.
       index:
         job_pagination: Paginación de tareas
         older_jobs: Tareas anteriores
@@ -194,6 +213,18 @@ es:
             thousand: k
             trillion: T
             unit: ''
+    performance:
+      index:
+        average_duration: Duración promedio
+        chart_title: Tiempo total de ejecución de la tarea en segundos
+        executions: Ejecuciones
+        job_class: clase de tarea
+        maximum_duration: Duración máxima
+        minimum_duration: Duración mínima
+        title: Rendimiento
+      show:
+        slow: Lento
+        title: Actuación
     processes:
       index:
         cron_enabled: Cron habilitado
@@ -218,34 +249,27 @@ es:
         queue_name: Nombre de la cola
         search: Buscar
       navbar:
-        batches: Batches
+        batches: Lotes
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Tareas
         live_poll: En vivo
         name: "GoodJob 👍"
+        performance: Rendimiento
         processes: Procesos
         theme:
           auto: Auto
           dark: Oscuro
           light: Luz
           theme: Tema
+      pending_migrations: GoodJob tiene migraciones pendientes.
       secondary_navbar:
         inspiration: "¡Recuerda, también tú estás haciendo un buen trabajo!"
         last_updated: Última actualización
     status:
-      discarded:
-        one: Descartada
-        other: Descartadas
-      queued:
-        one: Encolada
-        other: Encoladas
-      retried:
-        one: Reintentada
-        other: Reintentadas
-      running: Corriendo
-      scheduled:
-        one: Programada
-        other: Programadas
-      succeeded:
-        one: Exitosa
-        other: Exitosas
+      discarded: Descartado
+      queued: Encolado
+      retried: Reintentado
+      running: Ejecutando
+      scheduled: Programado
+      succeeded: Exitoso

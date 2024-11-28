@@ -23,7 +23,7 @@ RSpec.describe GoodJob::SharedExecutor do
 
       expect do
         shared_executor.restart
-      end.to change(shared_executor, :running?).from(false).to(true)
+      end.to change(shared_executor, :running?).from(nil).to(true)
     end
   end
 end

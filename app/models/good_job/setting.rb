@@ -19,30 +19,32 @@ module GoodJob
     end
 
     def self.cron_key_enable(key)
+      key_string = key.to_s
       enabled_setting = find_or_initialize_by(key: CRON_KEYS_ENABLED) do |record|
         record.value = []
       end
-      enabled_setting.value << key unless enabled_setting.value.include?(key)
+      enabled_setting.value << key unless enabled_setting.value.include?(key_string)
       enabled_setting.save!
 
       disabled_setting = GoodJob::Setting.find_by(key: CRON_KEYS_DISABLED)
-      return unless disabled_setting&.value&.include?(key.to_s)
+      return unless disabled_setting&.value&.include?(key_string)
 
-      disabled_setting.value.delete(key.to_s)
+      disabled_setting.value.delete(key_string)
       disabled_setting.save!
     end
 
     def self.cron_key_disable(key)
       enabled_setting = GoodJob::Setting.find_by(key: CRON_KEYS_ENABLED)
-      if enabled_setting&.value&.include?(key.to_s)
-        enabled_setting.value.delete(key.to_s)
+      key_string = key.to_s
+      if enabled_setting&.value&.include?(key_string)
+        enabled_setting.value.delete(key_string)
         enabled_setting.save!
       end
 
       disabled_setting = find_or_initialize_by(key: CRON_KEYS_DISABLED) do |record|
         record.value = []
       end
-      disabled_setting.value << key unless disabled_setting.value.include?(key)
+      disabled_setting.value << key unless disabled_setting.value.include?(key_string)
       disabled_setting.save!
     end
   end

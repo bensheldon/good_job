@@ -1,7 +1,4 @@
 Rails.application.configure do
-  # TODO: Remove on GoodJob 4.0 release
-  config.good_job.smaller_number_is_higher_priority = true
-
   config.good_job.cron = {
     example: {
       cron: '*/5 * * * * *', # every 5 seconds

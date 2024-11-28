@@ -14,12 +14,19 @@ end
 
 require "timecop"
 
+require "warning"
+# https://github.com/mikel/mail/pull/1557
+Warning.ignore(%r{/lib/mail/parsers/})
+# https://github.com/SeleniumHQ/selenium/pull/14770
+Warning.ignore(%r{/lib/selenium/.*URI::RFC3986_PARSER.escape is obsolete})
+# https://github.com/teamcapybara/capybara/pull/2781
+Warning.ignore(%r{/lib/capybara/.*URI::RFC3986_PARSER.make_regexp is obsolete})
+
 require File.expand_path('../demo/config/environment', __dir__)
 
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'rspec/rails'
-require 'pry'
 # Add additional requires below this line. Rails is not loaded until this point!
 
 # Requires supporting ruby files with custom matchers and macros, etc, in

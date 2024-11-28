@@ -9,9 +9,11 @@ en:
       reschedule: Reschedule
       retry: Retry
     batches:
+      actions:
+        confirm_retry: Are you sure you want to retry this batch?
+        retry: Retry
       index:
         older_batches: Older batches
-        pending_migrations: GoodJob has pending database migrations.
         title: Batches
       jobs:
         actions:
@@ -25,12 +27,28 @@ en:
           retry: Retry Job
           title: Actions
         no_jobs_found: No jobs found.
+      retry:
+        notice: Batch has been retried
       show:
         attributes: Attributes
         batched_jobs: Batched Jobs
         callback_jobs: Callback Jobs
       table:
         no_batches_found: No batches found.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Are you sure you want to disable this cron entry?
@@ -48,7 +66,6 @@ en:
       index:
         no_cron_schedules_found: No cron schedules found.
         title: Cron Schedules
-      pending_migrations: Requires pending GoodJob database migration.
       show:
         cron_entry_key: Cron Entry Key
     datetime:
@@ -111,9 +128,7 @@ en:
       actions:
         confirm_destroy: Are you sure you want to destroy the job?
         confirm_discard: Are you usure you want to discard the job?
-        confirm_force_discard: 'Are you sure you want to force discard this job? The job will be marked as discarded but the running job will not be stopped - it will, however, not be retried on failures.
-
-          '
+        confirm_force_discard: Are you sure you want to force discard this job? The job will be marked as discarded but the running job will not be stopped - it will, however, not be retried on failures.
         confirm_reschedule: Are you sure you want to reschedule the job?
         confirm_retry: Are you sure you want to retry the job?
         destroy: Destroy job
@@ -126,6 +141,8 @@ en:
       discard:
         notice: Job has been discarded
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: in queue
         runtime: runtime
         title: Executions
@@ -196,6 +213,18 @@ en:
             thousand: K
             trillion: T
             unit: ''
+    performance:
+      index:
+        average_duration: Average duration
+        chart_title: Total job execution time in seconds
+        executions: Executions
+        job_class: Job class
+        maximum_duration: Maximum duration
+        minimum_duration: Minimum duration
+        title: Performance
+      show:
+        slow: Slow
+        title: Performance
     processes:
       index:
         cron_enabled: Cron enabled
@@ -221,16 +250,19 @@ en:
         search: Search
       navbar:
         batches: Batches
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
+        performance: Performance
         processes: Processes
         theme:
           auto: Auto
           dark: Dark
           light: Light
           theme: Theme
+      pending_migrations: GoodJob has pending database migrations.
       secondary_navbar:
         inspiration: Remember, you're doing a Good Job too!
         last_updated: Last updated

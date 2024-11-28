@@ -1,5 +1,5 @@
 <div class="toast-container position-fixed p-3 start-50 translate-middle-x">
-  <% if notice %>
+  <% if notice.present? %>
     <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-body d-flex align-items-center gap-2">
         <%= render_icon "check", class: "flex-shrink-0 text-success" %>
@@ -8,7 +8,7 @@
       </div>
     </div>
   <% end %>
-  <% if alert %>
+  <% if alert.present? %>
     <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-body d-flex align-items-center gap-2">
         <%= render_icon "exclamation", class: "flex-shrink-0 text-danger" %>

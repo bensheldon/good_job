@@ -7,6 +7,7 @@ require_relative "good_job/version"
 require_relative "good_job/engine"
 
 require_relative "good_job/adapter"
+require_relative "good_job/adapter/inline_buffer"
 require_relative "active_job/queue_adapters/good_job_adapter"
 require_relative "good_job/active_job_extensions/batches"
 require_relative "good_job/active_job_extensions/concurrency"
@@ -19,12 +20,14 @@ require_relative "good_job/overridable_connection"
 require_relative "good_job/bulk"
 require_relative "good_job/callable"
 require_relative "good_job/capsule"
+require_relative "good_job/capsule_tracker"
 require_relative "good_job/cleanup_tracker"
 require_relative "good_job/cli"
 require_relative "good_job/configuration"
 require_relative "good_job/cron_manager"
 require_relative "good_job/current_thread"
 require_relative "good_job/daemon"
+require_relative "good_job/dependencies"
 require_relative "good_job/job_performer"
 require_relative "good_job/job_performer/metrics"
 require_relative "good_job/log_subscriber"
@@ -45,6 +48,7 @@ require_relative "good_job/thread_status"
 #
 # +GoodJob+ is the top-level namespace and exposes configuration attributes.
 module GoodJob
+  include GoodJob::Dependencies
   include GoodJob::ThreadStatus
 
   # Default, null, blank value placeholder.
@@ -55,7 +59,7 @@ module GoodJob
 
   # @!attribute [rw] active_record_parent_class
   #   @!scope class
-  #   The ActiveRecord parent class inherited by +GoodJob::Execution+ (default: +ActiveRecord::Base+).
+  #   The ActiveRecord parent class inherited by +GoodJob::Job+ (default: +ActiveRecord::Base+).
   #   Use this when using multiple databases or other custom ActiveRecord configuration.
   #   @return [ActiveRecord::Base]
   #   @example Change the base class:
@@ -112,11 +116,6 @@ module GoodJob
   #   @return [GoodJob::Capsule, nil]
   mattr_accessor :capsule, default: GoodJob::Capsule.new(configuration: configuration)
 
-  mattr_accessor :_async_ready, default: false
-  def self._async_ready?
-    _async_ready
-  end
-
   # Called with exception when a GoodJob thread raises an exception
   # @param exception [Exception] Exception that was raised
   # @return [void]
@@ -135,6 +134,7 @@ module GoodJob
   def self.configure_active_record(&block)
     self._active_record_configuration = block
   end
+
   mattr_accessor :_active_record_configuration, default: nil
 
   # Stop executing jobs.
@@ -171,12 +171,13 @@ module GoodJob
     _shutdown_all(Capsule.instances, :restart, timeout: timeout)
   end
 
-  # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager})
-  # @param executables [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager>] Objects to shut down.
-  # @param method_name [:symbol] Method to call, e.g. +:shutdown+ or +:restart+.
-  # @param timeout [nil,Numeric]
+  # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager}, {GoodJob::SharedExecutor})
+  # @param executables [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager, SharedExecutor>] Objects to shut down.
+  # @param method_name [Symbol] Method to call, e.g. +:shutdown+ or +:restart+.
+  # @param timeout [nil, Numeric] Seconds to wait for actively executing jobs to finish.
+  # @param after [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager, SharedExecutor>] Objects to shut down after initial executables shut down.
   # @return [void]
-  def self._shutdown_all(executables, method_name = :shutdown, timeout: -1)
+  def self._shutdown_all(executables, method_name = :shutdown, timeout: -1, after: [])
     if timeout.is_a?(Numeric) && timeout.positive?
       executables.each { |executable| executable.send(method_name, timeout: nil) }
 
@@ -184,6 +185,13 @@ module GoodJob
       executables.each { |executable| executable.send(method_name, timeout: [stop_at - Time.current, 0].max) }
     else
       executables.each { |executable| executable.send(method_name, timeout: timeout) }
+    end
+    return unless after.any? && !timeout.nil?
+
+    if stop_at
+      after.each { |executable| executable.shutdown(timeout: [stop_at - Time.current, 0].max) }
+    else
+      after.each { |executable| executable.shutdown(timeout: timeout) }
     end
   end
 
@@ -195,48 +203,44 @@ module GoodJob
   # If you are preserving job records this way, use this method regularly to
   # destroy old records and preserve space in your database.
   # @param older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
+  # @param include_discarded [Boolean] Whether or not to destroy discarded jobs (default: per +cleanup_discarded_jobs+ config option)
   # @return [Integer] Number of job execution records and batches that were destroyed.
-  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000)
+  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000, include_discarded: GoodJob.configuration.cleanup_discarded_jobs?)
     older_than ||= GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
-    include_discarded = GoodJob.configuration.cleanup_discarded_jobs?
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
-      deleted_executions_count = 0
+      deleted_jobs_count = 0
       deleted_batches_count = 0
-      deleted_discrete_executions_count = 0
+      deleted_executions_count = 0
 
-      jobs_query = GoodJob::Job.where('finished_at <= ?', timestamp).order(finished_at: :asc).limit(in_batches_of)
+      jobs_query = GoodJob::Job.finished_before(timestamp).order(finished_at: :asc).limit(in_batches_of)
       jobs_query = jobs_query.succeeded unless include_discarded
       loop do
         active_job_ids = jobs_query.pluck(:active_job_id)
         break if active_job_ids.empty?
 
-        if GoodJob::Execution.discrete_support?
-          deleted_discrete_executions = GoodJob::DiscreteExecution.where(active_job_id: active_job_ids).delete_all
-          deleted_discrete_executions_count += deleted_discrete_executions
-        end
-
         deleted_executions = GoodJob::Execution.where(active_job_id: active_job_ids).delete_all
         deleted_executions_count += deleted_executions
+
+        deleted_jobs = GoodJob::Job.where(active_job_id: active_job_ids).delete_all
+        deleted_jobs_count += deleted_jobs
       end
 
-      if GoodJob::BatchRecord.migrated?
-        batches_query = GoodJob::BatchRecord.where('finished_at <= ?', timestamp).limit(in_batches_of)
-        batches_query = batches_query.succeeded unless include_discarded
-        loop do
-          deleted = batches_query.delete_all
-          break if deleted.zero?
+      batches_query = GoodJob::BatchRecord.finished_before(timestamp).limit(in_batches_of)
+      batches_query = batches_query.succeeded unless include_discarded
+      loop do
+        deleted = batches_query.delete_all
+        break if deleted.zero?
 
-          deleted_batches_count += deleted
-        end
+        deleted_batches_count += deleted
       end
 
       payload[:destroyed_batches_count] = deleted_batches_count
-      payload[:destroyed_discrete_executions_count] = deleted_discrete_executions_count
       payload[:destroyed_executions_count] = deleted_executions_count
+      payload[:destroyed_jobs_count] = deleted_jobs_count
 
-      destroyed_records_count = deleted_batches_count + deleted_discrete_executions_count + deleted_executions_count
+      destroyed_records_count = deleted_batches_count + deleted_executions_count + deleted_jobs_count
       payload[:destroyed_records_count] = destroyed_records_count
 
       destroyed_records_count
@@ -263,6 +267,16 @@ module GoodJob
     end
   end
 
+  # Tests whether GoodJob can be safely upgraded to v4
+  # @return [Boolean]
+  def self.v4_ready?
+    GoodJob.deprecator.warn(<<~MSG)
+      Calling `GoodJob.v4_ready?` is deprecated and will be removed in GoodJob v5.
+      If you are reading this deprecation you are already on v4.
+    MSG
+    true
+  end
+
   # Deprecator for providing deprecation warnings.
   # @return [ActiveSupport::Deprecation]
   def self.deprecator
@@ -272,17 +286,12 @@ module GoodJob
     end
   end
 
-  include ActiveSupport::Deprecation::DeprecatedConstantAccessor
-  deprecate_constant :Lockable, 'GoodJob::AdvisoryLockable', deprecator: deprecator
-
   # Whether all GoodJob migrations have been applied.
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    # Always update with the most recent migration check
-    GoodJob::Execution.reset_column_information
-    GoodJob::Execution.candidate_lookup_index_migrated?
+    GoodJob::BatchRecord.jobs_finished_at_migrated?
   end
-
-  ActiveSupport.run_load_hooks(:good_job, self)
 end
+
+ActiveSupport.run_load_hooks(:good_job, GoodJob)

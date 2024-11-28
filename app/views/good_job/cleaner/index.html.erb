@@ -1,0 +1,85 @@
+<div class="border-bottom">
+  <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
+</div>
+
+<div>
+  <h4 class="pt-3 pb-2"><%= t ".grouped_by_class" %></h4>
+  <table class="table align-middle" id="by-job-class">
+    <thead>
+      <tr>
+        <th scope="col" class="col-3"><%= t ".class" %></th>
+        <th scope="col" class="text-center"><%= t ".all" %></th>
+        <th scope="col" class="text-center"><%= t ".last_1_hour" %></th>
+        <th scope="col" class="text-center"><%= t ".last_3_hours" %></th>
+        <th scope="col" class="text-center"><%= t ".last_24_hours" %></th>
+        <th scope="col" class="text-center"><%= t ".last_3_days" %></th>
+        <th scope="col" class="text-center"><%= t ".last_7_days" %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @discarded_jobs_grouped_by_class.each do |discard_job| %>
+        <tr>
+          <td scope="row" class="col-3 text-break"><%= discard_job.job_class %></td>
+          <td class="text-center "><%= link_to discard_job.failed, jobs_path(@filter.to_params(job_class: discard_job.job_class, state: 'discarded')) %></td>
+          <td class="text-center"><%= link_to discard_job.last_1_hour, jobs_path(@filter.to_params(job_class: discard_job.job_class, state: 'discarded', finished_since: '1_hour_ago')) %></td>
+          <td class="text-center"><%= link_to discard_job.last_3_hours, jobs_path(@filter.to_params(job_class: discard_job.job_class, state: 'discarded', finished_since: '3_hours_ago')) %></td>
+          <td class="text-center"><%= link_to discard_job.last_24_hours, jobs_path(@filter.to_params(job_class: discard_job.job_class, state: 'discarded', finished_since: '24_hours_ago')) %></td>
+          <td class="text-center"><%= link_to discard_job.last_3_days, jobs_path(@filter.to_params(job_class: discard_job.job_class, state: 'discarded', finished_since: '3_days_ago')) %></td>
+          <td class="text-center"><%= link_to discard_job.last_7_days, jobs_path(@filter.to_params(job_class: discard_job.job_class, state: 'discarded', finished_since: '7_days_ago')) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td scope="row" class="col-3 fw-bold"><%= t ".total" %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_class.sum(&:failed), jobs_path(@filter.to_params(state: 'discarded')) %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_class.sum(&:last_1_hour), jobs_path(@filter.to_params(state: 'discarded', finished_since: '1_hour_ago')) %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_class.sum(&:last_3_hours), jobs_path(@filter.to_params(state: 'discarded', finished_since: '3_hours_ago')) %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_class.sum(&:last_24_hours), jobs_path(@filter.to_params(state: 'discarded', finished_since: '24_hours_ago')) %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_class.sum(&:last_3_days), jobs_path(@filter.to_params(state: 'discarded', finished_since: '3_days_ago')) %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_class.sum(&:last_7_days), jobs_path(@filter.to_params(state: 'discarded', finished_since: '7_days_ago')) %></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+<div>
+  <h4 class="pt-3 pb-2"><%= t ".grouped_by_exception" %></h4>
+  <table class="table align-middle" id="by-exception">
+    <thead>
+      <tr>
+        <th scope="col" class="col-3"><%= t ".exception" %></th>
+        <th scope="col" class="text-center"><%= t ".all" %></th>
+        <th scope="col" class="text-center"><%= t ".last_1_hour" %></th>
+        <th scope="col" class="text-center"><%= t ".last_3_hours" %></th>
+        <th scope="col" class="text-center"><%= t ".last_24_hours" %></th>
+        <th scope="col" class="text-center"><%= t ".last_3_days" %></th>
+        <th scope="col" class="text-center"><%= t ".last_7_days" %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @discarded_jobs_grouped_by_exception.each do |discard_job| %>
+        <tr>
+          <td scope="row" class="col-3 text-break"><%= discard_job.exception_class %></td>
+          <td class="text-center"><%= link_to discard_job.failed, jobs_path(@filter.to_params(state: 'discarded', query: discard_job.exception_class)) %></td>
+          <td class="text-center"><%= link_to discard_job.last_1_hour, jobs_path(@filter.to_params(state: 'discarded', query: discard_job.exception_class, finished_since: '1_hour_ago')) %></td>
+          <td class="text-center"><%= link_to discard_job.last_3_hours, jobs_path(@filter.to_params(state: 'discarded', query: discard_job.exception_class, finished_since: '3_hours_ago')) %></td>
+          <td class="text-center"><%= link_to discard_job.last_24_hours, jobs_path(@filter.to_params(state: 'discarded', query: discard_job.exception_class, finished_since: '24_hours_ago')) %></td>
+          <td class="text-center"><%= link_to discard_job.last_3_days, jobs_path(@filter.to_params(state: 'discarded', query: discard_job.exception_class, finished_since: '3_days_ago')) %></td>
+          <td class="text-center"><%= link_to discard_job.last_7_days, jobs_path(@filter.to_params(state: 'discarded', query: discard_job.exception_class, finished_since: '7_days_ago')) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td scope="row" class="col-3 fw-bold"><%= t ".total" %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_exception.sum(&:failed), jobs_path(@filter.to_params(state: 'discarded')) %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_exception.sum(&:last_1_hour), jobs_path(@filter.to_params(state: 'discarded', finished_since: '1_hour_ago')) %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_exception.sum(&:last_3_hours), jobs_path(@filter.to_params(state: 'discarded', finished_since: '3_hours_ago')) %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_exception.sum(&:last_24_hours), jobs_path(@filter.to_params(state: 'discarded', finished_since: '24_hours_ago')) %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_exception.sum(&:last_3_days), jobs_path(@filter.to_params(state: 'discarded', finished_since: '3_days_ago')) %></td>
+        <td class="text-center fw-bold"><%= link_to @discarded_jobs_grouped_by_exception.sum(&:last_7_days), jobs_path(@filter.to_params(state: 'discarded', finished_since: '7_days_ago')) %></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>

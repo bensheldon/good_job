@@ -18,19 +18,20 @@ describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
 
       expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_jobs.rb")).not_to be_empty
       # TODO: remove/replace this when migrations are removed/re-added
-      expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_job_settings.rb")).not_to be_empty
+      # expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_job_settings.rb")).not_to be_empty
 
       quiet do
         run_in_example_app 'rails db:migrate'
       end
 
+      # TODO: update this when a new migration exists in v4
       # Check that `GoodJob.migrated?` is updated
-      expect(GoodJob.migrated?).to be true
-      quiet do
-        run_in_example_app 'rails db:rollback'
-        expect(GoodJob.migrated?).to be false
-        run_in_example_app 'rails db:migrate'
-      end
+      # expect(GoodJob.migrated?).to be true
+      # quiet do
+      #   run_in_example_app 'rails db:rollback'
+      #   expect(GoodJob.migrated?).to be false
+      #   run_in_example_app 'rails db:migrate'
+      # end
       expect(GoodJob.migrated?).to be true
     end
   end
@@ -56,6 +57,16 @@ describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
     end
 
     expect(normalize_schema(only_update_schema)).to eq normalize_schema(install_schema)
+  end
+
+  it 'has files with unique number prefixes' do
+    update_path = "lib/generators/good_job/templates/update/migrations"
+    expect(File).to exist(update_path)
+
+    migrations = Dir.glob("#{update_path}/*")
+    prefixes = migrations.map { |path| File.basename(path).split("_", 2).first }
+
+    expect(prefixes.map(&:to_i).sort).to eq(1.upto(prefixes.size).to_a)
   end
 
   def normalize_schema(text)

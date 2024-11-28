@@ -134,22 +134,18 @@ RSpec.describe GoodJob::Configuration do
         expect(configuration.cleanup_interval_jobs).to be false
       end
 
-      it 'accepts 0, with deprecation' do
+      it 'coerces 0 to false' do
         allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_interval_jobs: 0 })
-        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
-        expect(configuration.cleanup_interval_jobs).to eq(-1)
-        expect(GoodJob.deprecator).to have_received(:warn)
+        expect(configuration.cleanup_interval_jobs).to eq false
       end
 
-      it 'accepts nil, with deprecation' do
+      it 'coerces nil to default' do
         allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_interval_jobs: nil })
-        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
-        expect(configuration.cleanup_interval_jobs).to be false
-        expect(GoodJob.deprecator).to have_received(:warn)
+        expect(configuration.cleanup_interval_jobs).to be described_class::DEFAULT_CLEANUP_INTERVAL_JOBS
       end
     end
 
@@ -168,20 +164,18 @@ RSpec.describe GoodJob::Configuration do
         expect(configuration.cleanup_interval_jobs).to eq(-1)
       end
 
-      it 'accepts 0, without deprecation' do
+      it 'coerces 0 to false' do
         stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_INTERVAL_JOBS' => '0' })
 
         configuration = described_class.new({})
         expect(configuration.cleanup_interval_jobs).to be false
       end
 
-      it 'accepts an empty value, with deprecation' do
+      it 'coerces empty value to default' do
         stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_INTERVAL_JOBS' => '' })
-        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
-        expect(configuration.cleanup_interval_jobs).to be false
-        expect(GoodJob.deprecator).to have_received(:warn)
+        expect(configuration.cleanup_interval_jobs).to be described_class::DEFAULT_CLEANUP_INTERVAL_JOBS
       end
     end
   end
@@ -207,22 +201,18 @@ RSpec.describe GoodJob::Configuration do
         expect(configuration.cleanup_interval_seconds).to be false
       end
 
-      it 'accepts 0, with deprecation' do
+      it 'coerces 0 to false' do
         allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_interval_seconds: 0 })
-        allow(GoodJob.deprecator).to receive(:warn)
-
-        configuration = described_class.new({})
-        expect(configuration.cleanup_interval_seconds).to be(-1)
-        expect(GoodJob.deprecator).to have_received(:warn)
-      end
-
-      it 'accepts nil, with deprecation' do
-        allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_interval_seconds: nil })
-        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
         expect(configuration.cleanup_interval_seconds).to be false
-        expect(GoodJob.deprecator).to have_received(:warn)
+      end
+
+      it 'coerces nil to default value' do
+        allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_interval_seconds: nil })
+
+        configuration = described_class.new({})
+        expect(configuration.cleanup_interval_seconds).to be described_class::DEFAULT_CLEANUP_INTERVAL_SECONDS
       end
     end
 
@@ -241,20 +231,18 @@ RSpec.describe GoodJob::Configuration do
         expect(configuration.cleanup_interval_seconds).to eq(-1)
       end
 
-      it 'accepts 0, with deprecation' do
+      it 'coerces 0 to false' do
         stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_INTERVAL_SECONDS' => '0' })
 
         configuration = described_class.new({})
         expect(configuration.cleanup_interval_seconds).to be false
       end
 
-      it 'accepts an empty value, with deprecation' do
+      it 'coerces empty value to default' do
         stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_INTERVAL_SECONDS' => '' })
-        allow(GoodJob.deprecator).to receive(:warn)
 
         configuration = described_class.new({})
-        expect(configuration.cleanup_interval_seconds).to be false
-        expect(GoodJob.deprecator).to have_received(:warn)
+        expect(configuration.cleanup_interval_seconds).to be described_class::DEFAULT_CLEANUP_INTERVAL_SECONDS
       end
     end
   end
@@ -294,6 +282,11 @@ RSpec.describe GoodJob::Configuration do
 
       expect(configuration.cron).to eq({})
     end
+
+    it 'has a graceful restart period' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ cron_graceful_restart_period: 5.minutes })
+      expect(described_class.new({}).cron_graceful_restart_period).to eq 5.minutes
+    end
   end
 
   describe '#enable_listen_notify' do
@@ -307,14 +300,6 @@ RSpec.describe GoodJob::Configuration do
 
       configuration = described_class.new({})
       expect(configuration.enable_listen_notify).to be false
-    end
-  end
-
-  describe '#smaller_number_is_higher_priority' do
-    it 'delegates to rails configuration' do
-      allow(Rails.application.config).to receive(:good_job).and_return({ smaller_number_is_higher_priority: true })
-      configuration = described_class.new({})
-      expect(configuration.smaller_number_is_higher_priority).to be true
     end
   end
 
@@ -336,6 +321,37 @@ RSpec.describe GoodJob::Configuration do
     it 'has a "true" default value' do
       configuration = described_class.new({})
       expect(configuration.dashboard_live_poll_enabled).to eq true
+    end
+  end
+
+  describe '#advisory_lock_heartbeat' do
+    it 'defaults to true in development' do
+      allow(Rails).to receive(:env) { "development".inquiry }
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be true
+    end
+
+    it 'defaults to false in other environments' do
+      allow(Rails).to receive(:env) { "production".inquiry }
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be false
+    end
+
+    it 'can be overridden by options' do
+      configuration = described_class.new({ advisory_lock_heartbeat: true })
+      expect(configuration.advisory_lock_heartbeat).to be true
+    end
+
+    it 'can be overridden by rails config' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ advisory_lock_heartbeat: true })
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be true
+    end
+
+    it 'can be overridden by environment variable' do
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_ADVISORY_LOCK_HEARTBEAT' => 'true' })
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be true
     end
   end
 end

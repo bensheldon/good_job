@@ -86,7 +86,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::NotifyOptions do
         scheduler = GoodJob::Scheduler.new(performer, max_threads: 5)
         scheduler.create_thread
 
-        sleep_until(max: 5, increments_of: 0.5) { GoodJob::DiscreteExecution.count >= 2 }
+        sleep_until(max: 5, increments_of: 0.5) { GoodJob::Execution.count >= 2 }
         scheduler.shutdown
 
         expect(GoodJob::Notifier).not_to have_received(:notify)

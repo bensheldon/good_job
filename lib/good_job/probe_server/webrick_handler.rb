@@ -7,7 +7,17 @@ module GoodJob
         @app    = app
         @port   = options[:port]
         @logger = options[:logger]
-        @handler = ::Rack::Handler.get('webrick')
+
+        # Workaround for rack >= 3.1.x as auto-loading of rack/handler was removed.
+        # We should move to rackup in the long run.
+        # See https://github.com/rack/rack/pull/1937.
+        @handler = begin
+          require 'rackup/handler'
+          ::Rackup::Handler.get('webrick')
+        rescue LoadError
+          require "rack/handler"
+          ::Rack::Handler.get('webrick')
+        end
       end
 
       def stop

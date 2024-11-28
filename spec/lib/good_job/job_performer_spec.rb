@@ -13,19 +13,19 @@ RSpec.describe GoodJob::JobPerformer do
 
   describe '#next' do
     it 'calls GoodJob.perform_with_advisory_lock' do
-      allow(GoodJob::Execution).to receive(:perform_with_advisory_lock)
+      allow(GoodJob::Job).to receive(:perform_with_advisory_lock)
 
       job_performer = described_class.new('*')
       job_performer.next
 
-      expect(GoodJob::Execution).to have_received(:perform_with_advisory_lock)
+      expect(GoodJob::Job).to have_received(:perform_with_advisory_lock)
     end
 
     it 'records the active job id for the duration of #next' do
       job_performer = described_class.new('*')
 
-      execution = instance_double(GoodJob::Execution, perform: nil, active_job_id: '123')
-      allow(GoodJob::Execution).to receive(:perform_with_advisory_lock) do |&block|
+      execution = instance_double(GoodJob::Job, perform: nil, active_job_id: '123')
+      allow(GoodJob::Job).to receive(:perform_with_advisory_lock) do |&block|
         block.call(execution)
         expect(job_performer.performing_active_job_ids).to include('123')
 

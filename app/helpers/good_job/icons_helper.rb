@@ -31,11 +31,14 @@ module GoodJob
       content_tag :span, icon, **options
     end
 
-    def render_icon(name, **options)
-      # workaround to render svg icons without all of the log messages
-      partial = lookup_context.find_template("good_job/shared/icons/#{name}", [], true)
-      options[:class] = Array(options[:class]).join(" ")
-      partial.render(self, { class: options[:class] })
+    def render_icon(name, class: nil, **options)
+      tag.svg(viewBox: "0 0 16 16", class: "svg-icon #{binding.local_variable_get(:class)}", **options) do
+        tag.use(fill: "currentColor", href: "#{icons_path}##{name}")
+      end
+    end
+
+    def icons_path
+      @_icons_path ||= frontend_static_path(:icons, format: :svg, locale: nil)
     end
   end
 end

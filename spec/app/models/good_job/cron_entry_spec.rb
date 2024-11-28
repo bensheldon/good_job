@@ -70,6 +70,12 @@ describe GoodJob::CronEntry do
     end
   end
 
+  describe '#within' do
+    it 'returns an array of timestamps for the time period' do
+      expect(entry.within(2.minutes.ago..Time.current)).to eq([Time.current.at_beginning_of_minute - 1.minute, Time.current.at_beginning_of_minute])
+    end
+  end
+
   describe '#enabled' do
     it 'is enabled by default' do
       expect(entry).to be_enabled
@@ -175,9 +181,9 @@ describe GoodJob::CronEntry do
       cron_at = 10.minutes.ago
       entry.enqueue(cron_at)
 
-      execution = GoodJob::Execution.last
-      expect(execution.cron_key).to eq 'test'
-      expect(execution.cron_at).to be_within(0.001.seconds).of(cron_at)
+      job = GoodJob::Job.last
+      expect(job.cron_key).to eq 'test'
+      expect(job.cron_at).to be_within(0.001.seconds).of(cron_at)
     end
   end
 

@@ -26,7 +26,7 @@ RSpec.describe 'Schedule Integration' do
           puts "Thread #{thread_name} owns #{locks_count} locks."
 
           puts "GoodJobs locked by this connection:"
-          GoodJob::Execution.owns_advisory_locked.select('good_jobs.id', 'good_jobs.active_job_id', 'pg_locks.*').each do |execution|
+          GoodJob::Job.owns_advisory_locked.select('good_jobs.id', 'good_jobs.active_job_id', 'pg_locks.*').each do |execution|
             puts "  - GoodJob #{execution.id} / ActiveJob #{execution.active_job_id} / #{execution.attributes.to_json}"
           end
 
@@ -78,10 +78,10 @@ RSpec.describe 'Schedule Integration' do
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       max_threads.times { scheduler.create_thread }
 
-      wait_until(max: 60, increments_of: 0.5) { expect(GoodJob::Execution.unfinished.count).to be_zero }
+      wait_until(max: 60, increments_of: 0.5) { expect(GoodJob::Job.unfinished.count).to be_zero }
       scheduler.shutdown
 
-      expect(GoodJob::Execution.unfinished.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Execution.unfinished.map(&:id)}" }
+      expect(GoodJob::Job.unfinished.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Job.unfinished.map(&:id)}" }
       expect(RUN_JOBS.size).to eq(number_of_jobs), lambda {
         jobs_tally = RUN_JOBS.each_with_object(Hash.new(0)) do |(provider_job_id, _job_id, _thread_name), hash|
           hash[provider_job_id] += 1
@@ -92,7 +92,7 @@ RSpec.describe 'Schedule Integration' do
 
         "Expected run jobs(#{RUN_JOBS.size}) to equal number of jobs (#{number_of_jobs}). Instead ran jobs multiple times:\n#{rerun_jobs.join("\n")}"
       }
-      expect(GoodJob::DiscreteExecution.count).to eq number_of_jobs
+      expect(GoodJob::Execution.count).to eq number_of_jobs
     end
   end
 
@@ -113,7 +113,7 @@ RSpec.describe 'Schedule Integration' do
       scheduler.create_thread
 
       sleep_until(max: 10, increments_of: 0.5) do
-        GoodJob::Execution.unfinished.count.zero?
+        GoodJob::Job.unfinished.count.zero?
       end
       scheduler.shutdown
       expect(scheduler).to be_shutdown
@@ -129,7 +129,7 @@ RSpec.describe 'Schedule Integration' do
       scheduler.create_thread
 
       wait_until(max: 5, increments_of: 0.5) do
-        expect(GoodJob::Execution.unfinished.count).to eq 0
+        expect(GoodJob::Job.unfinished.count).to eq 0
       end
 
       scheduler.shutdown
@@ -146,7 +146,7 @@ RSpec.describe 'Schedule Integration' do
       performer = GoodJob::JobPerformer.new('*')
       scheduler = GoodJob::Scheduler.new(performer, max_threads: 5, max_cache: 5)
       scheduler.warm_cache
-      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Execution.unfinished.count.zero? }
+      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.unfinished.count.zero? }
       scheduler.shutdown
       expect(scheduler).to be_shutdown
     end

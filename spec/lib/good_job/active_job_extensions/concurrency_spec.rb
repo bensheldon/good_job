@@ -51,7 +51,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
   end
 
   describe '.good_job_control_concurrency_with' do
-    describe 'total_limit:', :skip_rails_5 do
+    describe 'total_limit:' do
       before do
         TestJob.good_job_control_concurrency_with(
           total_limit: -> { 1 },
@@ -68,14 +68,14 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(TestJob.perform_later(name: "Alice")).to be_present
 
         Rails.application.executor.wrap do
-          GoodJob::Execution.all.with_advisory_lock do
+          GoodJob::Job.all.with_advisory_lock do
             expect(TestJob.perform_later(name: "Alice")).to be false
           end
         end
       end
     end
 
-    describe 'enqueue_limit:', :skip_rails_5 do
+    describe 'enqueue_limit:' do
       before do
         TestJob.good_job_control_concurrency_with(
           enqueue_limit: -> { 2 },
@@ -95,14 +95,12 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         # Usage of different key does enqueue
         expect(TestJob.perform_later(name: "Bob")).to be_present
 
-        expect(GoodJob::Execution.where(concurrency_key: "Alice").count).to eq 2
-        expect(GoodJob::Execution.where(concurrency_key: "Bob").count).to eq 1
+        expect(GoodJob::Job.where(concurrency_key: "Alice").count).to eq 2
+        expect(GoodJob::Job.where(concurrency_key: "Bob").count).to eq 1
 
         expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its enqueue limit of 2 jobs/)).exactly(:once)
-        if ActiveJob.gem_version >= Gem::Version.new("6.1.0")
-          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
-          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
-        end
+        expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
+        expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
       end
 
       it 'excludes jobs that are already executing/locked' do
@@ -111,7 +109,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
 
         # Lock one of the jobs
         Rails.application.executor.wrap do
-          GoodJob::Execution.first.with_advisory_lock do
+          GoodJob::Job.first.with_advisory_lock do
             # Third usage does enqueue
             expect(TestJob.perform_later(name: "Alice")).to be_present
           end
@@ -129,7 +127,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         )
       end
 
-      it "will error and retry jobs if concurrency is exceeded" do
+      it "errors and retry jobs if concurrency is exceeded" do
         active_job = TestJob.perform_later(name: "Alice")
 
         performer = GoodJob::JobPerformer.new('*')
@@ -137,18 +135,30 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         5.times { scheduler.create_thread }
 
         sleep_until(max: 10, increments_of: 0.5) do
-          GoodJob::DiscreteExecution.where(active_job_id: active_job.job_id).finished.count >= 1
+          GoodJob::Execution.where(active_job_id: active_job.job_id).finished.count >= 1
         end
         scheduler.shutdown
 
         expect(GoodJob::Job.find_by(active_job_id: active_job.job_id).concurrency_key).to eq "Alice"
 
-        expect(GoodJob::DiscreteExecution.count).to be >= 1
-        expect(GoodJob::DiscreteExecution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
+        expect(GoodJob::Execution.count).to be >= 1
+        expect(GoodJob::Execution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
       end
 
       it 'is ignored with the job is executed via perform_now' do
         TestJob.perform_now(name: "Alice")
+        expect(JOB_PERFORMED).to be_true
+      end
+
+      it 'is ignored when the job is executed inside another job' do
+        stub_const("WrapperJob", Class.new(ApplicationJob) do
+          def perform
+            TestJob.perform_now(name: "Alice")
+          end
+        end)
+
+        WrapperJob.perform_later
+        GoodJob.perform_inline
         expect(JOB_PERFORMED).to be_true
       end
     end
@@ -177,6 +187,38 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
         TestJob.good_job_control_concurrency_with(
+          perform_throttle: -> { [1, 1.minute] },
+          key: -> { arguments.first[:name] }
+        )
+      end
+
+      it 'does not perform if throttle period has not passed' do
+        TestJob.perform_later(name: "Alice")
+        TestJob.perform_later(name: "Alice")
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 1
+
+        Timecop.travel(61.seconds)
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 2
+
+        Timecop.travel(61.seconds)
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 3
+      end
+    end
+
+    describe 'perform_limit: together with perform_throttle:' do
+      before do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+
+        TestJob.good_job_control_concurrency_with(
+          perform_limit: -> { 1 },
           perform_throttle: -> { [1, 1.minute] },
           key: -> { arguments.first[:name] }
         )
@@ -232,26 +274,9 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
             nil
           end
 
-          expect(GoodJob::Execution.count).to eq 1
-          expect(GoodJob::Execution.first.concurrency_key).to be_present
+          expect(GoodJob::Job.count).to eq 1
+          expect(GoodJob::Job.first.concurrency_key).to be_present
           expect(GoodJob::Job.first).not_to be_finished
-        end
-
-        context 'when not discrete' do
-          it 'preserves the key value across retries' do
-            TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
-            GoodJob::Job.first.update!(is_discrete: false)
-
-            begin
-              GoodJob.perform_inline
-            rescue StandardError
-              nil
-            end
-
-            expect(GoodJob::Execution.count).to eq 2
-            first_execution, retried_execution = GoodJob::Execution.order(created_at: :asc).to_a
-            expect(retried_execution.concurrency_key).to eq first_execution.concurrency_key
-          end
         end
       end
     end

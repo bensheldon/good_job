@@ -9,9 +9,11 @@ pt-BR:
       reschedule: Reagendar
       retry: Tentar novamente
     batches:
+      actions:
+        confirm_retry: Tem certeza de que deseja tentar novamente este lote?
+        retry: Tentar novamente
       index:
         older_batches: Lotes antigos
-        pending_migrations: O GoodJob tem migrações pendentes no banco de dados.
         title: Lotes
       jobs:
         actions:
@@ -25,12 +27,28 @@ pt-BR:
           retry: Tentar Tarefa Novamente
           title: Ações
         no_jobs_found: Nenhuma tarefa encontrada.
+      retry:
+        notice: O lote foi tentado novamente
       show:
         attributes: Atributos
         batched_jobs: Tarefas em Lote
         callback_jobs: Tarefas de Callback
       table:
         no_batches_found: Nenhum lote encontrado.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Tem certeza de que deseja desativar esta tarefa programada?
@@ -48,7 +66,6 @@ pt-BR:
       index:
         no_cron_schedules_found: Nenhuma tarefa programada encontrada.
         title: Tarefas Programadas
-      pending_migrations: Requer migração pendente do GoodJob no banco de dados.
       show:
         cron_entry_key: Chave da Tarefa Programada
     datetime:
@@ -111,9 +128,7 @@ pt-BR:
       actions:
         confirm_destroy: Tem certeza de que deseja excluir a tarefa?
         confirm_discard: Tem certeza de que deseja descartar a tarefa?
-        confirm_force_discard: 'Tem certeza de que deseja forçar o descarte desta tarefa? A tarefa será marcada como descartada, mas a tarefa em execução não será interrompida - no entanto, ela não será tentada novamente em falhas.
-
-          '
+        confirm_force_discard: Tem certeza de que deseja forçar o descarte desta tarefa? A tarefa será marcada como descartada, mas a tarefa em execução não será interrompida - no entanto, ela não será tentada novamente em falhas.
         confirm_reschedule: Tem certeza de que deseja reagendar a tarefa?
         confirm_retry: Tem certeza de que deseja tentar novamente a tarefa?
         destroy: Excluir tarefa
@@ -126,6 +141,8 @@ pt-BR:
       discard:
         notice: A tarefa foi descartada.
       executions:
+        application_trace: Application Trace
+        full_trace: Full Trace
         in_queue: na fila
         runtime: tempo de execução
         title: Execuções
@@ -196,6 +213,18 @@ pt-BR:
             thousand: K
             trillion: T
             unit: ''
+    performance:
+      index:
+        average_duration: Duração média
+        chart_title: Tempo total de execução do trabalho em segundos
+        executions: Execuções
+        job_class: Classe de trabalho
+        maximum_duration: Duração máxima
+        minimum_duration: Duração mínima
+        title: Desempenho
+      show:
+        slow: Lento
+        title: Desempenho
     processes:
       index:
         cron_enabled: Agendamento ativado
@@ -221,16 +250,19 @@ pt-BR:
         search: Pesquisar
       navbar:
         batches: Lotes
+        cleaner: Discard Cleaner
         cron_schedules: Agendamentos
         jobs: Tarefas
         live_poll: Acompanhamento ao Vivo
         name: "GoodJob 👍"
+        performance: Desempenho
         processes: Processos
         theme:
           auto: Automático
           dark: Escuro
           light: Claro
           theme: Tema
+      pending_migrations: O GoodJob tem migrações pendentes no banco de dados.
       secondary_navbar:
         inspiration: Lembre-se, você também está fazendo uma Boa Tarefa!
         last_updated: Última atualização

@@ -1,5 +1,5 @@
 <%= render 'good_job/shared/filter', title: t("good_job.shared.navbar.jobs"), filter: @filter %>
-<%= render 'good_job/shared/chart', chart_data: GoodJob::ScheduledByQueueChart.new(@filter).data %>
+<%= render 'good_job/shared/chart_container', chart_data: GoodJob::ScheduledByQueueChart.new(@filter).data %>
 
 <div data-live-poll-region="jobs-table">
   <%= render 'good_job/jobs/table', jobs: @filter.records, filter: @filter %>
@@ -7,7 +7,7 @@
     <nav aria-label="<%= t ".job_pagination" %>" class="mt-3">
       <ul class="pagination">
         <li class="page-item">
-          <%= link_to(@filter.to_params(after_scheduled_at: (@filter.last.scheduled_at || @filter.last.created_at), after_id: @filter.last.id), class: "page-link") do %>
+          <%= link_to(@filter.to_params(after_scheduled_at: @filter.last.scheduled_at || @filter.last.created_at, after_id: @filter.last.id), class: "page-link") do %>
             <%= t ".older_jobs" %> <span aria-hidden="true">&raquo;</span>
           <% end %>
         </li>

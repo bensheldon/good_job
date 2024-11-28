@@ -9,9 +9,11 @@ ja:
       reschedule: 再スケジュールする
       retry: 再試行する
     batches:
+      actions:
+        confirm_retry: このバッチを再試行してもよろしいですか？
+        retry: バッチを再試行する
       index:
         older_batches: より古いバッチ
-        pending_migrations: GoodJobに保留中のデータベースマイグレーションがあります。
         title: バッチ
       jobs:
         actions:
@@ -25,12 +27,28 @@ ja:
           retry: ジョブを再試行する
           title: アクション
         no_jobs_found: ジョブが見つかりませんでした。
+      retry:
+        notice: バッチが再試行されました
       show:
         attributes: 属性
         batched_jobs: バッチ処理されたジョブ
         callback_jobs: コールバックジョブ
       table:
         no_batches_found: バッチが見つかりませんでした。
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: このcronエントリを無効化してもよろしいですか？
@@ -48,7 +66,6 @@ ja:
       index:
         no_cron_schedules_found: cronスケジュールが見つかりませんでした。
         title: cronスケジュール
-      pending_migrations: GoodJobの保留中のデータベースマイグレーションが必要です。
       show:
         cron_entry_key: cronエントリキー
     datetime:
@@ -111,9 +128,7 @@ ja:
       actions:
         confirm_destroy: ジョブを削除してもよろしいですか？
         confirm_discard: ジョブを破棄してもよろしいですか？
-        confirm_force_discard: 'このジョブを強制的に破棄してもよろしいですか?ジョブは破棄済みとしてマークされますが、実行中のジョブは停止されません。ただし、失敗した場合は再試行されません。
-
-          '
+        confirm_force_discard: このジョブを強制的に破棄してもよろしいですか?ジョブは破棄済みとしてマークされますが、実行中のジョブは停止されません。ただし、失敗した場合は再試行されません。
         confirm_reschedule: ジョブを再スケジュールしてもよろしいですか？
         confirm_retry: ジョブを再試行してもよろしいですか？
         destroy: ジョブを削除
@@ -126,7 +141,9 @@ ja:
       discard:
         notice: ジョブが破棄されました
       executions:
-        in_queue: 待機中
+        application_trace: アプリケーショントレース
+        full_trace: フルトレース
+        in_queue: キュー内
         runtime: 実行時間
         title: 実行
       force_discard:
@@ -196,6 +213,18 @@ ja:
             thousand: K
             trillion: T
             unit: ''
+    performance:
+      index:
+        average_duration: 平均所要時間
+        chart_title: ジョブの総実行時間（秒
+        executions: 実行
+        job_class: ジョブクラス
+        maximum_duration: 最大持続時間
+        minimum_duration: 最小期間
+        title: パフォーマンス
+      show:
+        slow: 遅い
+        title: パフォーマンス
     processes:
       index:
         cron_enabled: Cron が有効になっている
@@ -221,16 +250,19 @@ ja:
         search: 検索
       navbar:
         batches: バッチ
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: ジョブ
         live_poll: リアルタイム更新
         name: "GoodJob 👍"
+        performance: パフォーマンス
         processes: プロセス
         theme:
           auto: 自動
           dark: 暗い
           light: ライト
           theme: テーマ
+      pending_migrations: GoodJobに保留中のデータベースマイグレーションがあります。
       secondary_navbar:
         inspiration: 覚えておいてください、あなたも良い仕事をしています！
         last_updated: 最終更新

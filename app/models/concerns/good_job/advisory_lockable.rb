@@ -41,19 +41,32 @@ module GoodJob
       scope :advisory_lock, (lambda do |column: _advisory_lockable_column, function: advisory_lockable_function, select_limit: nil|
         original_query = self
 
+        primary_key_for_select = primary_key.to_sym
+        column_for_select = column.to_sym
+
         cte_table = Arel::Table.new(:rows)
-        cte_query = original_query.select(primary_key, column).except(:limit)
+        cte_query = original_query.except(:limit)
+        cte_query = if primary_key_for_select == column_for_select
+                      cte_query.select(primary_key_for_select)
+                    else
+                      cte_query.select(primary_key_for_select, column_for_select)
+                    end
         cte_query = cte_query.limit(select_limit) if select_limit
         cte_type = supports_cte_materialization_specifiers? ? :MATERIALIZED : :""
         composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(cte_type, cte_query.arel))
+
+        lock_condition = "#{function}(('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)"
         query = cte_table.project(cte_table[:id])
-                         .with(composed_cte)
-                         .where(Arel.sql("#{function}(('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)"))
+                  .with(composed_cte)
+                  .where(defined?(Arel::Nodes::BoundSqlLiteral) ? Arel::Nodes::BoundSqlLiteral.new(lock_condition, [], {}) : Arel::Nodes::SqlLiteral.new(lock_condition))
 
         limit = original_query.arel.ast.limit
         query.limit = limit.value if limit.present?
 
-        unscoped.where(arel_table[primary_key].in(query)).merge(original_query.only(:order))
+        # Arel.sql and the IN clause prevent this from being preparable
+        # That's why this is manually composed of BoundSqlLiteral's and an InfixOperation
+        # to sidestep anywhere in Arel where the `collector.preparable = false` is set
+        unscoped.where(Arel::Nodes::InfixOperation.new("IN", arel_table[primary_key], query)).merge(original_query.only(:order))
       end)
 
       # Joins the current query with Postgres's +pg_locks+ table (it provides
@@ -128,7 +141,7 @@ module GoodJob
 
       after_create lambda {
         advisory_lock || begin
-          errors.add(self.class.advisory_lockable_column, "Failed to acquire advisory lock: #{lockable_key}")
+          errors.add(self.class._advisory_lockable_column, "Failed to acquire advisory lock: #{lockable_key}")
           raise ActiveRecord::RecordInvalid # do not reference the record because it can cause I18n missing translation error
         end
       }, if: :create_with_advisory_lock
@@ -169,8 +182,11 @@ module GoodJob
           if unlock_session
             advisory_unlock_session
           else
-            records.each do |record|
-              record.advisory_unlock(key: record.lockable_column_key(column: column), function: advisory_unlockable_function(function))
+            unlock_function = advisory_unlockable_function(function)
+            if unlock_function
+              records.each do |record|
+                record.advisory_unlock(key: record.lockable_column_key(column: column), function: unlock_function)
+              end
             end
           end
         end
@@ -204,7 +220,8 @@ module GoodJob
         begin
           yield
         ensure
-          advisory_unlock_key(key, function: advisory_unlockable_function(function))
+          unlock_function = advisory_unlockable_function(function)
+          advisory_unlock_key(key, function: unlock_function) if unlock_function
         end
       end
 
@@ -215,6 +232,9 @@ module GoodJob
       # @param function [String, Symbol] Postgres Advisory Lock function name to use
       # @return [Boolean] whether the lock was released.
       def advisory_unlock_key(key, function: advisory_unlockable_function)
+        raise ArgumentError, "Cannot unlock transactional locks" if function.include? "_xact_"
+        raise ArgumentError, "No unlock function provide" if function.blank?
+
         query = <<~SQL.squish
           SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint) AS unlocked
         SQL
@@ -279,6 +299,8 @@ module GoodJob
       # @param function [String, Symbol] name of advisory lock or unlock function
       # @return [Boolean]
       def advisory_unlockable_function(function = advisory_lockable_function)
+        return nil if function.include? "_xact_" # Cannot unlock transactional locks
+
         function.to_s.sub("_lock", "_unlock").sub("_try_", "_")
       end
 
@@ -353,7 +375,8 @@ module GoodJob
       begin
         yield
       ensure
-        advisory_unlock(key: key, function: self.class.advisory_unlockable_function(function))
+        unlock_function = self.class.advisory_unlockable_function(function)
+        advisory_unlock(key: key, function: unlock_function) if unlock_function
       end
     end
 
@@ -398,7 +421,7 @@ module GoodJob
     # @param key [String, Symbol] Key to lock against
     # @param function [String, Symbol] Postgres Advisory Lock function name to use
     # @return [void]
-    def advisory_unlock!(key: lockable_key, function: self.class.advisory_unlockable_function(advisory_lockable_function))
+    def advisory_unlock!(key: lockable_key, function: self.class.advisory_unlockable_function)
       advisory_unlock(key: key, function: function) while advisory_locked?
     end
 

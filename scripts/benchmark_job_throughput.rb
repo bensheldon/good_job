@@ -7,7 +7,6 @@ ENV['GOOD_JOB_EXECUTION_MODE'] = 'external'
 require_relative '../demo/config/environment'
 require_relative '../lib/good_job'
 require 'benchmark/ips'
-require 'pry'
 
 booleans = [true, false]
 priorities = (1..10).to_a

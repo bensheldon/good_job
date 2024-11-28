@@ -216,12 +216,11 @@ RSpec.describe 'Batches' do
       GoodJob.perform_inline
 
       expect(GoodJob::Job.count).to eq 3
-      expect(GoodJob::Execution.count).to eq 3
-      expect(GoodJob::DiscreteExecution.count).to eq 5
+      expect(GoodJob::Execution.count).to eq 5
       expect(GoodJob::Job.where(batch_id: batch.id).count).to eq 1
       expect(GoodJob::Job.where(batch_callback_id: batch.id).count).to eq 2
 
-      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map { |job| job.head_execution.active_job.arguments.second }
+      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map { |job| job.active_job.arguments.second }
       expect(callback_arguments).to contain_exactly({ event: :discard }, { event: :finish })
     end
 
@@ -232,19 +231,18 @@ RSpec.describe 'Batches' do
       GoodJob.perform_inline
 
       expect(GoodJob::Job.count).to eq 3
-      expect(GoodJob::Execution.count).to eq 3
-      expect(GoodJob::DiscreteExecution.count).to eq 5
+      expect(GoodJob::Execution.count).to eq 5
       expect(GoodJob::Job.where(batch_id: batch.id).count).to eq 1
       expect(GoodJob::Job.where(batch_callback_id: batch.id).count).to eq 2
 
-      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map { |job| job.head_execution.active_job.arguments.second }
+      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map { |job| job.active_job.arguments.second }
       expect(callback_arguments).to contain_exactly({ event: :success }, { event: :finish })
     end
   end
 
   describe 'aggressive async batching' do
     it 'can execute multiple jobs' do
-      allow(GoodJob.configuration).to receive(:max_threads).and_return(20)
+      allow(GoodJob.configuration).to receive(:max_threads).and_return(15)
       capsule = GoodJob::Capsule.new(configuration: GoodJob.configuration)
       adapter = GoodJob::Adapter.new(execution_mode: :async_all, _capsule: capsule)
 
@@ -309,21 +307,66 @@ RSpec.describe 'Batches' do
 
       batch.reload
       expect(batch).to be_succeeded
+      expect(batch).to be_jobs_finished
       expect(batch.callback_active_jobs.count).to eq 1
       expect(batch.callback_active_jobs.first).to be_a TestJob::SuccessCallbackJob
+      expect(batch.finished_at).to be_present
 
       job, callback_job = GoodJob::Job.order(:created_at).to_a
       expect(job.status).to eq :succeeded
       expect(job.performed_at).to be_present
       expect(job.finished_at).to be_present
 
-      job_executions = job.discrete_executions.order(:created_at).to_a
+      job_executions = job.executions.order(:created_at).to_a
       expect(job_executions.size).to eq 2
       expect(job_executions.first.status).to eq :discarded
       expect(job_executions.last.status).to eq :succeeded
 
       expect(callback_job.job_class).to eq 'TestJob::SuccessCallbackJob'
       expect(callback_job.status).to eq :succeeded
+    end
+  end
+
+  describe 'adding to an existing batch' do
+    it 'adds jobs to the existing batch' do
+      batch = GoodJob::Batch.new(metadata: 'foo')
+      batch.enqueue { TestJob.perform_later }
+
+      GoodJob::Batch.find(batch.id).enqueue { TestJob.perform_later }
+
+      batch = GoodJob::Batch.find(batch.id)
+      expect(batch.active_jobs.count).to eq 2
+    end
+  end
+
+  describe 'retrying a discarded batch' do
+    it 'retries all discarded jobs in the batch' do
+      batch = GoodJob::Batch.enqueue do
+        TestJob.perform_later(error: true)
+      end
+
+      GoodJob.perform_inline
+
+      batch.reload
+      expect(batch).to be_discarded
+
+      expect { batch.retry }.to change { GoodJob::Job.discarded.count }.by(-1)
+    end
+  end
+
+  describe 'batch deletion' do
+    it 'deletes batches only after their callback jobs have completed' do
+      batch = GoodJob::Batch.new
+      batch.on_finish = "BatchCallbackJob"
+      batch.enqueue do
+        TestJob.perform_later
+      end
+
+      GoodJob.perform_inline
+
+      batch.reload
+      expect(batch.jobs_finished_at).to be_present
+      expect(batch.finished_at).to be_within(1.second).of(Time.current)
     end
   end
 end

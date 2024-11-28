@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+
+ENV["RAILS_VERSION"] = "7.1"
+
+eval_gemfile "../Gemfile"

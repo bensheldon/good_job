@@ -13,7 +13,7 @@ RSpec.describe 'Custom partials' do
     visit good_job.job_path(job.id)
     expect(page).to have_content 'ExampleJob'
     expect(page).to have_css ".custom-job-details-for-demo"
-    expect(page).not_to have_css ".custom-execution-details-for-demo"
+    expect(page).to have_no_css ".custom-execution-details-for-demo"
 
     GoodJob.perform_inline
     visit good_job.job_path(job.id)

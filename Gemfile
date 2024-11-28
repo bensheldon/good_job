@@ -20,15 +20,20 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
-gem 'appraisal'
-gem 'matrix'
-gem 'nokogiri'
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
-gem 'rack', '~> 2.2'
-gem 'rails'
+gem "pghero"
+
+rails_versions = {
+  "6.1" => { github: "rails/rails", branch: "6-1-stable" }, # https://github.com/bensheldon/good_job/issues/1280
+  "7.0" => "~> 7.0.1", # Ruby 3.1 requires Rails 7.0.1+
+  "7.1" => "~> 7.1.0",
+  "7.2" => "~> 7.2.0",
+  "8.0" => "~> 8.0.0",
+  "head" => { github: "rails/rails", branch: "main" },
+}
+gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", nil)]
+
 gem "sprockets-rails"
-# PGHero for the demo app
-gem 'pghero'
 
 platforms :ruby do
   gem "bootsnap"
@@ -36,28 +41,30 @@ platforms :ruby do
   gem "foreman"
   gem "gem-release"
   gem "github_changelog_generator", require: false
-  gem "net-imap", require: false
-  gem "net-pop", require: false
-  gem "net-smtp", require: false
+  gem "warning"
 
   group :debug do
     gem "activerecord-explain-analyze", require: false
+    gem "benchmark-ips"
+    gem "debug"
     gem "memory_profiler"
-    gem "pry-byebug"
     gem "rack-mini-profiler"
     gem "rbtrace"
     gem "stackprof"
   end
 
   group :lint do
+    gem "brakeman"
     gem "easy_translate"
     gem "erb_lint"
     gem "i18n-tasks"
     gem "mdl"
     gem "rubocop"
+    gem "rubocop-capybara"
     gem "rubocop-performance"
     gem "rubocop-rails"
     gem "rubocop-rspec"
+    gem "rubocop-rspec_rails"
     gem "sorbet"
     gem "sorbet-runtime"
     gem "spoom", require: false
