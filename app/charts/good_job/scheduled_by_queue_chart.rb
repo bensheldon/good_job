@@ -8,8 +8,6 @@ module GoodJob
     end
 
     def data
-      table_name = GoodJob::Job.table_name
-
       count_query = <<~SQL.squish
         SELECT *
         FROM generate_series(
