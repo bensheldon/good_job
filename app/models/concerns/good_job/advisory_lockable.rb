@@ -41,8 +41,16 @@ module GoodJob
       scope :advisory_lock, (lambda do |column: _advisory_lockable_column, function: advisory_lockable_function, select_limit: nil|
         original_query = self
 
+        primary_key_for_select = primary_key.to_sym
+        column_for_select = column.to_sym
+
         cte_table = Arel::Table.new(:rows)
-        cte_query = original_query.select(primary_key, column).except(:limit)
+        cte_query = original_query.except(:limit)
+        cte_query = if primary_key_for_select == column_for_select
+                      cte_query.select(primary_key_for_select)
+                    else
+                      cte_query.select(primary_key_for_select, column_for_select)
+                    end
         cte_query = cte_query.limit(select_limit) if select_limit
         cte_type = supports_cte_materialization_specifiers? ? :MATERIALIZED : :""
         composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(cte_type, cte_query.arel))
