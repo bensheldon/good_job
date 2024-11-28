@@ -39,7 +39,6 @@ jobs:
       BUNDLE_RETRY: 3
       BUNDLE_PATH: vendor/bundle
       DISABLE_SPRING: 1
-      TEST_DEMO: 1
     services:
       postgres:
         image: postgres:17
