@@ -115,5 +115,4 @@ ActiveRecord::Schema.define(version: 2024_08_01_143343) do
     t.datetime "captured_at", precision: nil
     t.index ["database", "captured_at"], name: "index_pghero_query_stats_on_database_and_captured_at"
   end
-
 end
