@@ -4,32 +4,24 @@ module GoodJob
   class MetricsController < ApplicationController
     def primary_nav
       jobs_count = GoodJob::Job.count
-      batches_count = GoodJob::BatchRecord.migrated? ? GoodJob::BatchRecord.all.size : 0
+      batches_count = GoodJob::BatchRecord.all.size
       cron_entries_count = GoodJob::CronEntry.all.size
       processes_count = GoodJob::Process.active.count
+      discarded_count = GoodJob::Job.discarded.count
 
       render json: {
-        jobs_count: number_to_human(jobs_count),
-        batches_count: number_to_human(batches_count),
-        cron_entries_count: number_to_human(cron_entries_count),
-        processes_count: number_to_human(processes_count),
+        jobs_count: helpers.number_to_human(jobs_count),
+        batches_count: helpers.number_to_human(batches_count),
+        cron_entries_count: helpers.number_to_human(cron_entries_count),
+        processes_count: helpers.number_to_human(processes_count),
+        discarded_count: helpers.number_to_human(discarded_count),
       }
     end
 
     def job_status
       @filter = JobsFilter.new(params)
 
-      render json: @filter.states.transform_values { |count| number_with_delimiter(count) }
-    end
-
-    private
-
-    def number_to_human(count)
-      helpers.number_to_human(count, **helpers.translate_hash("good_job.number.human.decimal_units"))
-    end
-
-    def number_with_delimiter(count)
-      helpers.number_with_delimiter(count, **helpers.translate_hash('good_job.number.format'))
+      render json: @filter.states.transform_values { |count| helpers.number_with_delimiter(count) }
     end
   end
 end

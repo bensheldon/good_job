@@ -148,11 +148,10 @@ module GoodJob
     # poll (using this interval) for new queued jobs to execute.
     # @return [Integer]
     def poll_interval
-      interval = (
+      interval =
         options[:poll_interval] ||
-          rails_config[:poll_interval] ||
-          env['GOOD_JOB_POLL_INTERVAL']
-      )
+        rails_config[:poll_interval] ||
+        env['GOOD_JOB_POLL_INTERVAL']
 
       if interval
         interval.to_i
@@ -220,6 +219,12 @@ module GoodJob
       cron.map { |cron_key, params| GoodJob::CronEntry.new(params.merge(key: cron_key)) }
     end
 
+    def cron_graceful_restart_period
+      options[:cron_graceful_restart_period] ||
+        rails_config[:cron_graceful_restart_period] ||
+        env['GOOD_JOB_CRON_GRACEFUL_RESTART_PERIOD']
+    end
+
     # The number of queued jobs to select when polling for a job to run.
     # This limit is intended to avoid locking a large number of rows when selecting eligible jobs
     # from the queue. This value should be higher than the total number of threads across all good_job
@@ -228,8 +233,8 @@ module GoodJob
     def queue_select_limit
       (
         options[:queue_select_limit] ||
-        rails_config[:queue_select_limit] ||
-        env['GOOD_JOB_QUEUE_SELECT_LIMIT']
+          rails_config[:queue_select_limit] ||
+          env['GOOD_JOB_QUEUE_SELECT_LIMIT']
       )&.to_i
     end
 
@@ -238,8 +243,8 @@ module GoodJob
     def idle_timeout
       (
         options[:idle_timeout] ||
-        rails_config[:idle_timeout] ||
-        env['GOOD_JOB_IDLE_TIMEOUT']
+          rails_config[:idle_timeout] ||
+          env['GOOD_JOB_IDLE_TIMEOUT']
       )&.to_i || nil
     end
 
@@ -267,69 +272,38 @@ module GoodJob
     # Positive values will clean up after that many jobs have run, false or 0 will disable, and -1 will clean up after every job.
     # @return [Integer, Boolean, nil]
     def cleanup_interval_jobs
-      if rails_config.key?(:cleanup_interval_jobs)
-        value = rails_config[:cleanup_interval_jobs]
-        if value.nil?
-          GoodJob.deprecator.warn(
-            %(Setting `config.good_job.cleanup_interval_jobs` to `nil` will no longer disable count-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
-          )
-          value = false
-        elsif value == 0 # rubocop:disable Style/NumericPredicate
-          GoodJob.deprecator.warn(
-            %(Setting `config.good_job.cleanup_interval_jobs` to `0` will disable count-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
-          )
-          value = -1
-        end
-      elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_JOBS')
-        value = env['GOOD_JOB_CLEANUP_INTERVAL_JOBS']
-        if value.blank?
-          GoodJob.deprecator.warn(
-            %(Setting `GOOD_JOB_CLEANUP_INTERVAL_JOBS` to `""` will no longer disable count-based cleanups in GoodJob v4. Set to `0` to disable, or `-1` to run every time.)
-          )
-          value = false
-        elsif value == '0'
-          value = false
-        end
-      else
-        value = DEFAULT_CLEANUP_INTERVAL_JOBS
-      end
+      value = if rails_config.key?(:cleanup_interval_jobs)
+                rails_config[:cleanup_interval_jobs]
+              elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_JOBS')
+                env['GOOD_JOB_CLEANUP_INTERVAL_JOBS']
+              end
 
-      value ? value.to_i : false
+      if value.in? [nil, "", true]
+        DEFAULT_CLEANUP_INTERVAL_JOBS
+      elsif value.in? [0, "0", false, "false"]
+        false
+      else
+        value ? value.to_i : false
+      end
     end
 
     # Number of seconds a {Scheduler} will wait before automatically cleaning up preserved jobs.
     # Positive values will clean up after that many jobs have run, false or 0 will disable, and -1 will clean up after every job.
-    # @return [Integer, nil]
+    # @return [Integer, Boolean, nil]
     def cleanup_interval_seconds
-      if rails_config.key?(:cleanup_interval_seconds)
-        value = rails_config[:cleanup_interval_seconds]
+      value = if rails_config.key?(:cleanup_interval_seconds)
+                rails_config[:cleanup_interval_seconds]
+              elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_SECONDS')
+                env['GOOD_JOB_CLEANUP_INTERVAL_SECONDS']
+              end
 
-        if value.nil?
-          GoodJob.deprecator.warn(
-            %(Setting `config.good_job.cleanup_interval_seconds` to `nil` will no longer disable time-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
-          )
-          value = false
-        elsif value == 0 # rubocop:disable Style/NumericPredicate
-          GoodJob.deprecator.warn(
-            %(Setting `config.good_job.cleanup_interval_seconds` to `0` will disable time-based cleanups in GoodJob v4. Set to `false` to disable, or `-1` to run every time.)
-          )
-          value = -1
-        end
-      elsif env.key?('GOOD_JOB_CLEANUP_INTERVAL_SECONDS')
-        value = env['GOOD_JOB_CLEANUP_INTERVAL_SECONDS']
-        if value.blank?
-          GoodJob.deprecator.warn(
-            %(Setting `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` to `""` will no longer disable time-based cleanups in GoodJob v4. Set to `0` to disable, or `-1` to run every time.)
-          )
-          value = false
-        elsif value == '0'
-          value = false
-        end
+      if value.nil? || value == "" || value == true
+        DEFAULT_CLEANUP_INTERVAL_SECONDS
+      elsif value.in? [0, "0", false, "false"]
+        false
       else
-        value = DEFAULT_CLEANUP_INTERVAL_SECONDS
+        value ? value.to_i : false
       end
-
-      value ? value.to_i : false
     end
 
     # Tests whether to daemonize the process.
@@ -377,10 +351,6 @@ module GoodJob
       DEFAULT_ENABLE_LISTEN_NOTIFY
     end
 
-    def smaller_number_is_higher_priority
-      rails_config[:smaller_number_is_higher_priority]
-    end
-
     def dashboard_default_locale
       rails_config[:dashboard_default_locale] || DEFAULT_DASHBOARD_DEFAULT_LOCALE
     end
@@ -411,6 +381,16 @@ module GoodJob
           self_caller.grep(%{/rack/handler/}).any? || # EXAMPLE: iodine-0.7.44/lib/rack/handler/iodine.rb:13:in `start'
           (Concurrent.on_jruby? && self_caller.grep(%r{jruby/rack/rails_booter}).any?) # EXAMPLE: uri:classloader:/jruby/rack/rails_booter.rb:83:in `load_environment'
       end || false
+    end
+
+    # Whether to take an advisory lock on the process record in the notifier reactor.
+    # @return [Boolean]
+    def advisory_lock_heartbeat
+      return options[:advisory_lock_heartbeat] unless options[:advisory_lock_heartbeat].nil?
+      return rails_config[:advisory_lock_heartbeat] unless rails_config[:advisory_lock_heartbeat].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ADVISORY_LOCK_HEARTBEAT']) unless env['GOOD_JOB_ADVISORY_LOCK_HEARTBEAT'].nil?
+
+      Rails.env.development?
     end
 
     private

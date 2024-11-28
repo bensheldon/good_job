@@ -159,9 +159,9 @@ RSpec.describe GoodJob::CLI do
   end
 
   describe '#cleanup_preserved_jobs' do
-    let!(:recent_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 12.hours.ago) }
-    let!(:old_unfinished_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, scheduled_at: 2.days.ago, finished_at: nil) }
-    let!(:old_finished_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 36.hours.ago) }
+    let!(:recent_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 12.hours.ago) }
+    let!(:old_unfinished_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, scheduled_at: 2.days.ago, finished_at: nil) }
+    let!(:old_finished_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 36.hours.ago) }
 
     it 'destroys finished jobs' do
       cli = described_class.new([], { before_seconds_ago: 24.hours.to_i }, {})

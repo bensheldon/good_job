@@ -8,13 +8,12 @@ RSpec.describe GoodJob::CurrentThread do
   [
     :cron_at,
     :cron_key,
-    :execution,
     :error_on_discard,
     :error_on_retry,
     :error_on_retry_stopped,
-    :execution,
     :execution_interrupted,
-    :execution_retried,
+    :retried_job,
+    :job,
   ].each do |accessor|
     describe ".#{accessor}" do
       it 'maintains value across threads' do
@@ -44,13 +43,13 @@ RSpec.describe GoodJob::CurrentThread do
   end
 
   describe '.active_job_id' do
-    let!(:execution) { GoodJob::Execution.create! active_job_id: SecureRandom.uuid }
+    let!(:job) { GoodJob::Job.create! active_job_id: SecureRandom.uuid }
 
     it 'delegates to good_job' do
       expect(described_class.active_job_id).to be_nil
 
-      described_class.execution = execution
-      expect(described_class.active_job_id).to eq execution.active_job_id
+      described_class.job = job
+      expect(described_class.active_job_id).to eq job.active_job_id
     end
   end
 
@@ -62,9 +61,9 @@ RSpec.describe GoodJob::CurrentThread do
         error_on_discard: false,
         error_on_retry: false,
         error_on_retry_stopped: nil,
-        execution: instance_double(GoodJob::Execution),
+        job: instance_double(GoodJob::Job),
         execution_interrupted: nil,
-        execution_retried: nil,
+        retried_job: nil,
         retry_now: nil,
       }
 

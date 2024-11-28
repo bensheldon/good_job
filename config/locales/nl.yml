@@ -9,9 +9,11 @@ nl:
       reschedule: Opnieuw plannen
       retry: Opnieuw proberen
     batches:
+      actions:
+        confirm_retry: Weet je zeker dat je deze batch opnieuw wilt proberen?
+        retry: Batch opnieuw proberen
       index:
         older_batches: Oudere partijen
-        pending_migrations: GoodJob heeft databasemigraties in behandeling.
         title: Partijen
       jobs:
         actions:
@@ -25,12 +27,28 @@ nl:
           retry: Taak opnieuw
           title: Acties
         no_jobs_found: Geen vacatures gevonden.
+      retry:
+        notice: Batch is opnieuw geprobeerd
       show:
         attributes: attributen
         batched_jobs: Gegroepeerde banen
         callback_jobs: Terugbelopdrachten
       table:
         no_batches_found: Geen batches gevonden.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Weet u zekerf dat u deze cron-vermelding wilt uitschakelen?
@@ -48,7 +66,6 @@ nl:
       index:
         no_cron_schedules_found: Geen cron-schema's gevonden.
         title: Cron-schema's
-      pending_migrations: Vereist GoodJob-databasemigratie in afwachting.
       show:
         cron_entry_key: Cron-invoersleutel
     datetime:
@@ -196,6 +213,18 @@ nl:
             thousand: K
             trillion: T
             unit: ''
+    performance:
+      index:
+        average_duration: Gemiddelde duur
+        chart_title: Totale uitvoeringstijd van de taak in seconden
+        executions: Executies
+        job_class: Functie klasse
+        maximum_duration: Maximale duur
+        minimum_duration: Minimale duur
+        title: Prestatie
+      show:
+        slow: Langzaam
+        title: Prestatie
     processes:
       index:
         cron_enabled: Cron ingeschakeld
@@ -221,16 +250,19 @@ nl:
         search: Zoekopdracht
       navbar:
         batches: Batches
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Taken
         live_poll: Live Poll
         name: "GoodJob 👍"
+        performance: Prestatie
         processes: Processen
         theme:
           auto: Auto
           dark: Donker
           light: Licht
           theme: Thema
+      pending_migrations: GoodJob heeft databasemigraties in behandeling.
       secondary_navbar:
         inspiration: 'Onthoud: jij levert ook goed werk!'
         last_updated: Laatst bijgewerkt

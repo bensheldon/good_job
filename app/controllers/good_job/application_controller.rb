@@ -7,7 +7,7 @@ module GoodJob
     around_action :use_good_job_locale
 
     content_security_policy do |policy|
-      policy.default_src(:none) if policy.default_src(*policy.default_src).blank?
+      policy.default_src(:self) if policy.default_src(*policy.default_src).blank?
       policy.connect_src(:self) if policy.connect_src(*policy.connect_src).blank?
       policy.base_uri(:none) if policy.base_uri(*policy.base_uri).blank?
       policy.font_src(:self) if policy.font_src(*policy.font_src).blank?
@@ -57,7 +57,7 @@ module GoodJob
         I18n.default_locale
       end
     end
-
-    ActiveSupport.run_load_hooks(:good_job_application_controller, self)
   end
 end
+
+ActiveSupport.run_load_hooks(:good_job_application_controller, GoodJob::ApplicationController)

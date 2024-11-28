@@ -2,6 +2,7 @@
 
 module GoodJob
   class FrontendsController < ActionController::Base # rubocop:disable Rails/ApplicationController
+    protect_from_forgery with: :exception
     skip_after_action :verify_same_origin_request, raise: false
 
     STATIC_ASSETS = {
@@ -14,6 +15,9 @@ module GoodJob
         chartjs: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "chartjs", "chart.min.js"),
         es_module_shims: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "es_module_shims.js"),
         rails_ujs: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "rails_ujs.js"),
+      },
+      svg: {
+        icons: GoodJob::Engine.root.join("app", "frontend", "good_job", "icons.svg"),
       },
     }.freeze
 
@@ -34,13 +38,13 @@ module GoodJob
     end
 
     def static
-      render file: STATIC_ASSETS.dig(params[:format].to_sym, params[:name].to_sym) || raise(ActionController::RoutingError, 'Not Found')
+      render file: STATIC_ASSETS.dig(params[:format]&.to_sym, params[:id]&.to_sym) || raise(ActionController::RoutingError, 'Not Found')
     end
 
     def module
       raise(ActionController::RoutingError, 'Not Found') if params[:format] != "js"
 
-      render file: self.class.js_modules[params[:name].to_sym] || raise(ActionController::RoutingError, 'Not Found')
+      render file: self.class.js_modules[params[:id]&.to_sym] || raise(ActionController::RoutingError, 'Not Found')
     end
   end
 end

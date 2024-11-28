@@ -13,6 +13,14 @@ describe GoodJob::Batch do
       def perform(batch, params)
       end
     end)
+
+    stub_const 'DiscardOnceJob', (Class.new(ActiveJob::Base) do
+      discard_on StandardError
+
+      def perform
+        raise StandardError if executions == 1
+      end
+    end)
   end
 
   it 'is a valid GlobalId' do
@@ -94,6 +102,33 @@ describe GoodJob::Batch do
     end
   end
 
+  describe '#retry' do
+    let(:batch) { described_class.new }
+
+    it 'retries discarded jobs' do
+      batch.enqueue do
+        TestJob.perform_later
+        DiscardOnceJob.perform_later
+      end
+
+      GoodJob.perform_inline
+
+      expect(batch.reload).to be_discarded
+
+      batch.retry
+
+      batch.reload
+      expect(batch).to have_attributes(discarded_at: nil, jobs_finished_at: nil, finished_at: nil)
+      expect(batch).to be_enqueued
+
+      GoodJob.perform_inline
+
+      batch.reload
+      expect(batch).to have_attributes(discarded_at: nil, jobs_finished_at: be_present, finished_at: be_present)
+      expect(batch).to be_succeeded
+    end
+  end
+
   describe '#properties' do
     it 'defaults to an empty hash' do
       batch = described_class.new
@@ -129,7 +164,7 @@ describe GoodJob::Batch do
     end
 
     it 'can serialize GlobalId objects' do
-      globalid = GoodJob::Execution.create!
+      globalid = GoodJob::Job.create!
 
       batch = described_class.new
       batch.save
@@ -147,7 +182,7 @@ describe GoodJob::Batch do
     before do
       stub_const 'CallbackJob', (Class.new(ActiveJob::Base) do
         def perform(_batch, _options)
-          puts "HERE"
+          nil
         end
       end)
     end

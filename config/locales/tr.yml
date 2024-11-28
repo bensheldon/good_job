@@ -9,9 +9,11 @@ tr:
       reschedule: Yeniden planla
       retry: Tekrar dene
     batches:
+      actions:
+        confirm_retry: Bu grubu yeniden denemek istediğinizden emin misiniz?
+        retry: Grubu yeniden dene
       index:
         older_batches: Daha eski toplu işlemler
-        pending_migrations: GoodJob'ın bekleyen veritabanı güncellemeleri bulunuyor.
         title: Toplu İşlemler
       jobs:
         actions:
@@ -25,12 +27,28 @@ tr:
           retry: İşi Tekrar Dene
           title: İşlemler
         no_jobs_found: İş bulunamadı.
+      retry:
+        notice: Grup yeniden denendi
       show:
         attributes: Özellikler
         batched_jobs: Toplu İşlenmiş İşler
         callback_jobs: Geri Çağırma İşleri
       table:
         no_batches_found: Toplu İşlem bulunamadı.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Bu cron girişini devre dışı bırakmak istediğinizden emin misiniz?
@@ -48,7 +66,6 @@ tr:
       index:
         no_cron_schedules_found: Planlanmış Cron bulunamadı.
         title: Cron Planları
-      pending_migrations: Bekleyen GoodJob veritabanı güncellemesi var.
       show:
         cron_entry_key: Cron Giriş Anahtarı
     datetime:
@@ -196,6 +213,18 @@ tr:
             thousand: Bin
             trillion: Trilyon
             unit: ''
+    performance:
+      index:
+        average_duration: Ortalama süre
+        chart_title: Saniye cinsinden toplam iş yürütme süresi
+        executions: İnfazlar
+        job_class: İş sınıfı
+        maximum_duration: Maksimum süre
+        minimum_duration: Minimum süre
+        title: Verim
+      show:
+        slow: Yavaş
+        title: Verim
     processes:
       index:
         cron_enabled: Cron etkin
@@ -221,16 +250,19 @@ tr:
         search: Ara
       navbar:
         batches: Toplu İşler
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: İşler
         live_poll: Anlık Güncelleme
         name: "GoodJob 👍"
+        performance: Verim
         processes: Süreçler
         theme:
           auto: Oto
           dark: Karanlık
           light: Işık
           theme: Tema
+      pending_migrations: GoodJob'ın bekleyen veritabanı güncellemeleri bulunuyor.
       secondary_navbar:
         inspiration: Unutmayın, siz de iyi bir iş yapıyorsunuz!
         last_updated: Son güncelleme

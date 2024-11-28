@@ -99,6 +99,7 @@ ignore_unused:
  - "good_job.error_event.*"
  - "good_job.number.*"
  - "good_job.shared.boolean.*"
+ - "good_job.shared.pending_migrations"
 
 ## Exclude these keys from the `i18n-tasks eq-base' report:
 # ignore_eq_base:

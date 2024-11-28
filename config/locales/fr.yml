@@ -9,9 +9,11 @@ fr:
       reschedule: Reprogrammer
       retry: Recommencez
     batches:
+      actions:
+        confirm_retry: Voulez-vous vraiment réessayer ce lot ?
+        retry: Réessayer
       index:
         older_batches: Lots plus anciens
-        pending_migrations: GoodJob a des migrations de bases de données en attente.
         title: Lots
       jobs:
         actions:
@@ -25,12 +27,28 @@ fr:
           retry: Réessayer le job
           title: Actions
         no_jobs_found: Aucun job trouvé.
+      retry:
+        notice: Le lot a été réessayé
       show:
         attributes: Attributs
         batched_jobs: Jobs groupés
         callback_jobs: Jobs de rappel
       table:
         no_batches_found: Aucun lot trouvé.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Voulez-vous vraiment désactiver cette entrée cron ?
@@ -48,7 +66,6 @@ fr:
       index:
         no_cron_schedules_found: Aucune planification cron trouvée.
         title: Entrées Cron
-      pending_migrations: Nécessite une migration de la base de données GoodJob en attente.
       show:
         cron_entry_key: Clé d'entrée Cron
     datetime:
@@ -196,6 +213,18 @@ fr:
             thousand: k
             trillion: J
             unit: ''
+    performance:
+      index:
+        average_duration: Durée moyenne
+        chart_title: Durée totale d'exécution du travail en secondes
+        executions: Exécutions
+        job_class: Catégorie d'emplois
+        maximum_duration: Durée maximale
+        minimum_duration: Durée minimale
+        title: Performance
+      show:
+        slow: Lenteur
+        title: Performance
     processes:
       index:
         cron_enabled: Cron activé
@@ -221,16 +250,19 @@ fr:
         search: Rechercher
       navbar:
         batches: Lots
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Jobs
         live_poll: En direct
         name: "GoodJob 👍"
+        performance: Performance
         processes: Processus
         theme:
           auto: Auto
           dark: Sombre
           light: Lumière
           theme: Thème
+      pending_migrations: GoodJob a des migrations de bases de données en attente.
       secondary_navbar:
         inspiration: N'oublie pas, toi aussi tu fais du bon boulot !
         last_updated: Dernière mise à jour

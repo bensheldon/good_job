@@ -3,9 +3,17 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::AdvisoryLockable do
-  let(:model_class) { GoodJob::Execution }
-  let!(:execution) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default") }
-  let!(:another_execution) { model_class.create(active_job_id: SecureRandom.uuid, queue_name: "default") }
+  before do
+    stub_const "TestRecord", (Class.new(GoodJob::BaseRecord) do
+      include GoodJob::AdvisoryLockable
+      self.table_name = "good_jobs"
+      self.advisory_lockable_column = "active_job_id"
+    end)
+  end
+
+  let(:model_class) { TestRecord }
+  let!(:job) { model_class.create!(active_job_id: SecureRandom.uuid, queue_name: "default") }
+  let!(:another_job) { model_class.create!(active_job_id: SecureRandom.uuid, queue_name: "default") }
 
   describe '.advisory_lock' do
     around do |example|
@@ -43,7 +51,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
           FROM "good_jobs"
           WHERE "good_jobs"."id" IN (
             WITH "rows" AS #{'MATERIALIZED' if model_class.supports_cte_materialization_specifiers?} (
-              SELECT "good_jobs"."id", "good_jobs"."id"
+              SELECT "good_jobs"."id"
               FROM "good_jobs"
               WHERE "good_jobs"."priority" = 99
               ORDER BY "good_jobs"."priority" DESC
@@ -101,53 +109,53 @@ RSpec.describe GoodJob::AdvisoryLockable do
     end
 
     it 'returns first row of the query with a lock' do
-      execution.update!(queue_name: "aaaaaa")
-      another_execution.update!(queue_name: "bbbbbb")
+      job.update!(queue_name: "aaaaaa")
+      another_job.update!(queue_name: "bbbbbb")
 
-      expect(execution).not_to be_advisory_locked
-      result_execution = model_class.order(queue_name: :asc).limit(1).advisory_lock.first
-      expect(result_execution).to eq execution
-      expect(execution).to be_advisory_locked
-      expect(another_execution).not_to be_advisory_locked
+      expect(job).not_to be_advisory_locked
+      result_job = model_class.order(queue_name: :asc).limit(1).advisory_lock.first
+      expect(result_job).to eq job
+      expect(job).to be_advisory_locked
+      expect(another_job).not_to be_advisory_locked
 
-      execution.advisory_unlock
+      job.advisory_unlock
     end
 
     it 'can lock an alternative column' do
-      expect(execution).not_to be_advisory_locked
-      result_execution = model_class.order(created_at: :asc).limit(1).advisory_lock(column: :queue_name).first
-      expect(result_execution).to eq execution
-      expect(execution).to be_advisory_locked(key: "good_jobs-default")
-      expect(execution).not_to be_advisory_locked # on default key
+      expect(job).not_to be_advisory_locked
+      result_job = model_class.order(created_at: :asc).limit(1).advisory_lock(column: :queue_name).first
+      expect(result_job).to eq job
+      expect(job).to be_advisory_locked(key: "good_jobs-default")
+      expect(job).not_to be_advisory_locked # on default key
 
-      execution.advisory_unlock(key: "good_jobs-default")
+      job.advisory_unlock(key: "good_jobs-default")
     end
   end
 
   describe '.advisory_lock_key' do
     it 'locks a key' do
-      model_class.advisory_lock_key(execution.lockable_key)
-      expect(execution).to be_advisory_locked
-      expect(model_class.advisory_locked_key?(execution.lockable_key)).to be true
-      model_class.advisory_unlock_key(execution.lockable_key)
+      model_class.advisory_lock_key(job.lockable_key)
+      expect(job).to be_advisory_locked
+      expect(model_class.advisory_locked_key?(job.lockable_key)).to be true
+      model_class.advisory_unlock_key(job.lockable_key)
     end
 
     context 'when a block is passed' do
       it 'locks that key for the bloc and then unlocks it' do
-        model_class.advisory_lock_key(execution.lockable_key) do
-          expect(execution.advisory_locked?).to be true
-          expect(execution.owns_advisory_lock?).to be true
+        model_class.advisory_lock_key(job.lockable_key) do
+          expect(job.advisory_locked?).to be true
+          expect(job.owns_advisory_lock?).to be true
           expect(PgLock.current_database.advisory_lock.count).to eq 1
         end
 
-        expect(execution.advisory_locked?).to be false
-        expect(execution.owns_advisory_lock?).to be false
+        expect(job.advisory_locked?).to be false
+        expect(job.owns_advisory_lock?).to be false
       end
 
       it 'does not invoke the block if the key is already locked' do
-        model_class.advisory_lock_key(execution.lockable_key) do
+        model_class.advisory_lock_key(job.lockable_key) do
           promise = rails_promise do
-            result = model_class.advisory_lock_key(execution.lockable_key) { raise }
+            result = model_class.advisory_lock_key(job.lockable_key) { raise }
             expect(result).to be_nil
           end
           expect { promise.value! }.not_to raise_error
@@ -175,8 +183,8 @@ RSpec.describe GoodJob::AdvisoryLockable do
       done_event = Concurrent::Event.new
 
       promise = rails_promise do
-        model_class.advisory_lock_key(execution.lockable_key) do
-          expect(execution.owns_advisory_lock?).to be true
+        model_class.advisory_lock_key(job.lockable_key) do
+          expect(job.owns_advisory_lock?).to be true
 
           locked_event.set
           done_event.wait(5)
@@ -184,7 +192,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
       end
 
       locked_event.wait(5)
-      expect(execution.owns_advisory_lock?).to be false
+      expect(job.owns_advisory_lock?).to be false
     ensure
       locked_event.set
       done_event.set
@@ -198,7 +206,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
       model_class.limit(2).with_advisory_lock do |results|
         records = results
 
-        expect(records).to include(execution)
+        expect(records).to include(job)
         expect(records).to all be_advisory_locked
       end
 
@@ -250,85 +258,85 @@ RSpec.describe GoodJob::AdvisoryLockable do
 
   describe '.includes_advisory_locks' do
     it 'includes the locktable data' do
-      execution.advisory_lock!
+      job.advisory_lock!
 
-      record = model_class.where(id: execution.id).includes_advisory_locks.first
+      record = model_class.where(id: job.id).includes_advisory_locks.first
       expect(record['locktype']).to eq "advisory"
       expect(record['owns_advisory_lock']).to be true
 
-      execution.advisory_unlock
+      job.advisory_unlock
     end
   end
 
   describe '#advisory_lock' do
     it 'results in a locked record' do
-      execution.advisory_lock!
-      expect(execution.advisory_locked?).to be true
-      expect(execution.owns_advisory_lock?).to be true
+      job.advisory_lock!
+      expect(job.advisory_locked?).to be true
+      expect(job.owns_advisory_lock?).to be true
 
-      other_thread_owns_advisory_lock = rails_promise(execution, &:owns_advisory_lock?).value!
+      other_thread_owns_advisory_lock = rails_promise(job, &:owns_advisory_lock?).value!
       expect(other_thread_owns_advisory_lock).to be false
 
-      execution.advisory_unlock
+      job.advisory_unlock
     end
 
     it 'returns true or false if the lock is acquired' do
-      expect(execution.advisory_lock).to be true
+      expect(job.advisory_lock).to be true
 
-      expect(rails_promise(execution, &:advisory_lock).value!).to be false
+      expect(rails_promise(job, &:advisory_lock).value!).to be false
 
-      execution.advisory_unlock
+      job.advisory_unlock
     end
 
     it 'can lock alternative values' do
-      execution.advisory_lock!(key: "alternative")
-      expect(execution.advisory_locked?(key: "alternative")).to be true
-      expect(execution.advisory_locked?).to be false
+      job.advisory_lock!(key: "alternative")
+      expect(job.advisory_locked?(key: "alternative")).to be true
+      expect(job.advisory_locked?).to be false
 
-      execution.advisory_unlock(key: "alternative")
+      job.advisory_unlock(key: "alternative")
     end
 
     it 'can lock alternative postgres functions' do
-      execution.advisory_lock!(function: "pg_advisory_lock")
-      expect(execution.advisory_locked?).to be true
-      execution.advisory_unlock
+      job.advisory_lock!(function: "pg_advisory_lock")
+      expect(job.advisory_locked?).to be true
+      job.advisory_unlock
     end
   end
 
   describe '#advisory_unlock' do
     it 'unlocks the record' do
-      execution.advisory_lock!
+      job.advisory_lock!
 
       expect do
-        execution.advisory_unlock
-      end.to change(execution, :advisory_locked?).from(true).to(false)
+        job.advisory_unlock
+      end.to change(job, :advisory_locked?).from(true).to(false)
     end
 
     it 'unlocks the record only once' do
-      execution.advisory_lock!
-      execution.advisory_lock!
+      job.advisory_lock!
+      job.advisory_lock!
 
       expect do
-        execution.advisory_unlock
-      end.not_to change(execution, :advisory_locked?).from(true)
+        job.advisory_unlock
+      end.not_to change(job, :advisory_locked?).from(true)
 
-      execution.advisory_unlock
+      job.advisory_unlock
     end
 
     it 'unlocks the record even after the record is destroyed' do
-      execution.advisory_lock!
-      execution.destroy!
+      job.advisory_lock!
+      job.destroy!
 
       expect do
-        execution.advisory_unlock
-      end.to change(execution, :advisory_locked?).from(true).to(false)
+        job.advisory_unlock
+      end.to change(job, :advisory_locked?).from(true).to(false)
     end
 
     it 'returns true or false if the unlock operation is successful' do
-      execution.advisory_lock
+      job.advisory_lock
 
-      expect(rails_promise(execution, &:advisory_unlock).value!).to be false
-      expect(execution.advisory_unlock).to be true
+      expect(rails_promise(job, &:advisory_unlock).value!).to be false
+      expect(job.advisory_unlock).to be true
 
       unless RUBY_PLATFORM.include?('java')
         expect(POSTGRES_NOTICES.first).to include "you don't own a lock of type ExclusiveLock"
@@ -339,65 +347,75 @@ RSpec.describe GoodJob::AdvisoryLockable do
 
   describe '#advisory_locked?' do
     it 'reflects whether the record is locked' do
-      expect(execution.advisory_locked?).to be false
-      execution.advisory_lock
-      expect(execution.advisory_locked?).to be true
-      execution.advisory_unlock
-      expect(execution.advisory_locked?).to be false
+      expect(job.advisory_locked?).to be false
+      job.advisory_lock
+      expect(job.advisory_locked?).to be true
+      job.advisory_unlock
+      expect(job.advisory_locked?).to be false
     end
 
-    it 'is accurate even if the execution has been destroyed' do
-      execution.advisory_lock
-      expect(execution.advisory_locked?).to be true
-      execution.destroy!
-      expect(execution.advisory_locked?).to be true
-      execution.advisory_unlock
-      expect(execution.advisory_locked?).to be false
+    it 'is accurate even if the job has been destroyed' do
+      job.advisory_lock
+      expect(job.advisory_locked?).to be true
+      job.destroy!
+      expect(job.advisory_locked?).to be true
+      job.advisory_unlock
+      expect(job.advisory_locked?).to be false
     end
   end
 
   describe '#advisory_unlock!' do
     it 'unlocks the record entirely' do
-      execution.advisory_lock!
-      execution.advisory_lock!
+      job.advisory_lock!
+      job.advisory_lock!
 
       expect do
-        execution.advisory_unlock!
-      end.to change(execution, :advisory_locked?).from(true).to(false)
+        job.advisory_unlock!
+      end.to change(job, :advisory_locked?).from(true).to(false)
     end
   end
 
   describe '.advisory_unlock_session' do
     it 'unlocks all locks in the session' do
-      execution.advisory_lock!
+      job.advisory_lock!
 
       model_class.advisory_unlock_session
 
-      expect(execution.advisory_locked?).to be false
+      expect(job.advisory_locked?).to be false
     end
   end
 
   describe 'create_with_advisory_lock' do
-    it 'causes the execution to be saved and locked' do
-      execution = model_class.new
-      execution.create_with_advisory_lock = true
-      execution.save!
+    it 'causes the job to be saved and locked' do
+      job = model_class.new
+      job.create_with_advisory_lock = true
+      job.save!
 
-      expect(execution).to be_advisory_locked
+      expect(job).to be_advisory_locked
 
-      execution.advisory_unlock
+      job.advisory_unlock
+    end
+
+    it 'aborts when the lock already exists' do
+      existing = model_class.create!(active_job_id: SecureRandom.uuid, create_with_advisory_lock: true)
+
+      expect do
+        rails_promise { model_class.create!(active_job_id: existing.active_job_id, create_with_advisory_lock: true) }.value!
+      end.to raise_error(ActiveRecord::RecordInvalid)
+    ensure
+      existing.advisory_unlock
     end
   end
 
   it 'is lockable' do
     ActiveRecord::Base.connection_handler.clear_active_connections!
-    execution.advisory_lock!
+    job.advisory_lock!
 
     expect do
-      rails_promise(execution, &:advisory_lock!).value!
+      rails_promise(job, &:advisory_lock!).value!
     end.to raise_error GoodJob::AdvisoryLockable::RecordAlreadyAdvisoryLockedError
 
-    execution.advisory_unlock
+    job.advisory_unlock
   end
 
   describe 'Advisory Lock behavior' do
@@ -408,10 +426,10 @@ RSpec.describe GoodJob::AdvisoryLockable do
       done_event = Concurrent::Event.new
 
       promise = rails_promise do
-        execution.class.connection # <= This is necessary to fixate the connection in the thread
+        job.class.connection # <= This is necessary to fixate the connection in the thread
 
-        execution.class.transaction do
-          execution.advisory_lock
+        job.class.transaction do
+          job.advisory_lock
           locked_event.set
 
           commit_event.wait(10)
@@ -419,47 +437,58 @@ RSpec.describe GoodJob::AdvisoryLockable do
         committed_event.set
 
         done_event.wait(10)
-        execution.advisory_unlock
+        job.advisory_unlock
       end
 
       locked_event.wait(10)
-      expect(execution.advisory_locked?).to be true
+      expect(job.advisory_locked?).to be true
       commit_event.set
 
       committed_event.wait(10)
-      expect(execution.advisory_locked?).to be true
+      expect(job.advisory_locked?).to be true
 
       done_event.set
       promise.value!
     end
 
-    it 'transaction-level locks only lock within transactions' do
-      locked_event = Concurrent::Event.new
-      commit_event = Concurrent::Event.new
-      committed_event = Concurrent::Event.new
-      done_event = Concurrent::Event.new
+    describe "transaction-level-locks" do
+      it 'only lock within transactions' do
+        locked_event = Concurrent::Event.new
+        commit_event = Concurrent::Event.new
+        committed_event = Concurrent::Event.new
+        done_event = Concurrent::Event.new
 
-      promise = rails_promise do
-        execution.class.transaction do
-          execution.advisory_lock(function: "pg_advisory_xact_lock")
-          locked_event.set
+        promise = rails_promise do
+          job.class.transaction do
+            job.advisory_lock(function: "pg_advisory_xact_lock")
+            locked_event.set
 
-          commit_event.wait(10)
+            commit_event.wait(10)
+          end
+          committed_event.set
+
+          done_event.wait(10)
         end
-        committed_event.set
 
-        done_event.wait(10)
+        locked_event.wait(10)
+        expect(job.advisory_locked?).to be true
+        commit_event.set
+
+        committed_event.wait(10)
+        expect(job.advisory_locked?).to be false
+
+        done_event.set
+        promise.value!
       end
 
-      locked_event.wait(10)
-      expect(execution.advisory_locked?).to be true
-      commit_event.set
-
-      committed_event.wait(10)
-      expect(execution.advisory_locked?).to be false
-
-      done_event.set
-      promise.value!
+      it "locks and unlocks" do
+        GoodJob::Job.transaction do
+          job.advisory_lock(function: "pg_advisory_xact_lock") do
+            expect(job.advisory_locked?).to be true
+          end
+        end
+        expect(job.advisory_locked?).to be false
+      end
     end
   end
 end

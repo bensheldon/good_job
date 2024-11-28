@@ -3,23 +3,17 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Process do
-  describe '.current_id' do
-    it 'returns a uuid that does not change' do
-      value = described_class.current_id
-      expect(value).to be_present
-
-      expect(described_class.current_id).to eq value
+  describe 'Scopes' do
+    describe '.active' do
+      it 'returns active processes' do
+        expect(described_class.active.count).to eq 0
+      end
     end
 
-    it 'changes when the PID changes' do
-      allow(Process).to receive(:pid).and_return(1)
-      original_value = described_class.current_id
-
-      allow(Process).to receive(:pid).and_return(2)
-      expect(described_class.current_id).not_to eq original_value
-
-      # Unstub the pid or RSpec/DatabaseCleaner may fail
-      RSpec::Mocks.space.proxy_for(Process).reset
+    describe '.inactive' do
+      it 'returns inactive processes' do
+        expect(described_class.inactive.count).to eq 0
+      end
     end
   end
 
@@ -38,7 +32,7 @@ RSpec.describe GoodJob::Process do
 
   describe '.ns_current_state' do
     it 'contains information about the process' do
-      expect(described_class.ns_current_state).to include(
+      expect(described_class.process_state).to include(
         database_connection_pool: include(
           size: be_an(Integer),
           active: be_an(Integer)
@@ -47,28 +41,20 @@ RSpec.describe GoodJob::Process do
     end
   end
 
-  describe '.register' do
-    it 'registers the process' do
-      process = nil
-      expect do
-        process = described_class.register
-      end.to change(described_class, :count).by(1)
+  describe 'find_or_create_record' do
+    let(:record_id) { '67160140-1bec-4c3b-bc34-1a8b36f87b21' }
 
-      process.deregister
+    it 'creates a new record' do
+      record = described_class.find_or_create_record(id: record_id)
+      expect(record).to be_a(described_class)
     end
 
-    context 'when there is already an existing record' do
-      it 'returns the existing record' do
-        described_class.create!(id: described_class.current_id)
-        expect(described_class.register).to be_a described_class
-      end
-    end
-  end
-
-  describe '#deregister' do
-    it 'deregisters the record' do
-      process = described_class.register
-      expect { process.deregister }.to change(described_class, :count).by(-1)
+    it 'updates an existing record' do
+      record = described_class.find_or_create_record(id: record_id)
+      record.update!(updated_at: 1.day.ago)
+      updated_record = described_class.find_or_create_record(id: record_id)
+      expect(updated_record).to eq(record)
+      expect(updated_record.updated_at).to be_within(1.second).of(Time.current)
     end
   end
 
@@ -91,15 +77,16 @@ RSpec.describe GoodJob::Process do
       process = described_class.create! state: {}, updated_at: 1.day.ago
       expect do
         expect(process.refresh).to be true
-      end.to change(process, :updated_at).to within(1.second).of(Time.current)
+      end.to change(process, :state)
+         .and change(process, :updated_at).to within(1.second).of(Time.current)
     end
 
     context 'when the record has been deleted elsewhere' do
-      it 'returns false' do
+      it 'creates a new record' do
         process = described_class.create! state: {}, updated_at: 1.day.ago
         described_class.where(id: process.id).delete_all
 
-        expect(process.refresh).to be false
+        expect { process.refresh }.to change(described_class, :count).from(0).to(1)
       end
     end
   end

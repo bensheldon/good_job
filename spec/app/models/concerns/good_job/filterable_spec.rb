@@ -5,12 +5,15 @@ require 'rails_helper'
 RSpec.describe GoodJob::Filterable do
   let(:model_class) { GoodJob::Job }
   let!(:job) do
-    model_class.create(
+    model_class.create!(
       active_job_id: SecureRandom.uuid,
       queue_name: "default",
-      serialized_params: { example_key: 'example_value' },
+      job_class: "ExampleJob",
+      scheduled_at: Time.current,
+      serialized_params: { example_key: 'example_value', arguments: ["hello-arg", 998899] },
       labels: %w[buffalo gopher],
-      error: "ExampleJob::ExampleError: a message"
+      error: "ExampleJob::ExampleError: a message",
+      error_event: "retried"
     )
   end
 
@@ -35,6 +38,11 @@ RSpec.describe GoodJob::Filterable do
 
     it 'searches errors' do
       expect(model_class.search_text('ExampleError')).to include(job)
+    end
+
+    it 'searches arguments, including numeric arguments' do
+      expect(model_class.search_text('hello-arg')).to include(job)
+      expect(model_class.search_text('998899')).to include(job)
     end
 
     it 'searches strings with colons' do

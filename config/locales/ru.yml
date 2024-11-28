@@ -9,9 +9,11 @@ ru:
       reschedule: Перенести
       retry: Повторить попытку
     batches:
+      actions:
+        confirm_retry: Вы уверены, что хотите повторить эту группу заданий?
+        retry: Повторить группу заданий
       index:
         older_batches: Старые группы заданий
-        pending_migrations: У GoodJob есть ожидающие миграции базы данных.
         title: Группы заданий
       jobs:
         actions:
@@ -25,12 +27,28 @@ ru:
           retry: Повторить задание
           title: Действия
         no_jobs_found: Заданий не найдено
+      retry:
+        notice: Группа заданий была повторена
       show:
         attributes: Атрибуты
         batched_jobs: Группы заданий
         callback_jobs: Коллбеки
       table:
         no_batches_found: Группы заданий не найдены.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Вы уверены, что хотите отключить эту задачу cron?
@@ -48,7 +66,6 @@ ru:
       index:
         no_cron_schedules_found: Расписания cron не найдены.
         title: Расписания cron
-      pending_migrations: У GoodJob есть ожидающие миграции базы данных.
       show:
         cron_entry_key: Ключ cron-задания
     datetime:
@@ -222,6 +239,18 @@ ru:
             thousand: К
             trillion: Т
             unit: ''
+    performance:
+      index:
+        average_duration: Средняя продолжительность
+        chart_title: Общее время выполнения задания в секундах
+        executions: Казни
+        job_class: Класс работы
+        maximum_duration: Максимальная продолжительность
+        minimum_duration: Минимальная продолжительность
+        title: Производительность
+      show:
+        slow: Медленный
+        title: Производительность
     processes:
       index:
         cron_enabled: Cron включен
@@ -247,16 +276,19 @@ ru:
         search: Поиск
       navbar:
         batches: Пакетные задания
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Задания
         live_poll: Обновления в реальном времени
         name: "GoodJob 👍"
+        performance: Производительность
         processes: Процессы
         theme:
           auto: Авто
           dark: Темный
           light: Светлая
           theme: Тема офрмдления
+      pending_migrations: У GoodJob есть ожидающие миграции базы данных.
       secondary_navbar:
         inspiration: Благодаря вам Good Job становится лучше! Спасибо!
         last_updated: Последнее обновление

@@ -45,6 +45,11 @@ RSpec.configure do |config|
     )
     GoodJob._shutdown_all(executables, timeout: -1)
 
+    GoodJob::CapsuleTracker.instances.each do |tracker|
+      expect(tracker.locks).to eq 0
+    end
+    GoodJob::CapsuleTracker.instances.clear
+
     expect(GoodJob::Notifier.instances).to all be_shutdown
     GoodJob::Notifier.instances.clear
 
@@ -69,7 +74,7 @@ RSpec.configure do |config|
       puts "There are #{own_locks.count} advisory locks still open by the current database connection AFTER test run."
 
       puts "\nAdvisory locked executions:"
-      GoodJob::Execution.advisory_locked.owns_advisory_locked.each do |execution|
+      GoodJob::Job.advisory_locked.owns_advisory_locked.each do |execution|
         puts "  - Execution ID: #{execution.id} / Active Job ID: #{execution.active_job_id}"
       end
 
@@ -91,7 +96,7 @@ RSpec.configure do |config|
       puts "There are #{other_locks.count} advisory locks owned by other connections still open AFTER test run."
 
       puts "\nAdvisory locked executions:"
-      GoodJob::Execution.advisory_locked.each do |execution|
+      GoodJob::Job.advisory_locked.each do |execution|
         puts "  - Execution ID: #{execution.id} / Active Job ID: #{execution.active_job_id} / Locked by: #{execution[:pid]}"
       end
 
@@ -121,7 +126,7 @@ module PostgresXidExtension
       self.class.send :register_class_with_limit, map, 'xid', ActiveRecord::Type::String # OID 28
     end
 
-    super(map)
+    super
   end
 end
 
@@ -168,11 +173,11 @@ class PgLock < ActiveRecord::Base
 
     output = []
     output << "There are #{count} advisory locks still open by the current database connection."
-    GoodJob::Execution.include(GoodJob::OverridableConnection)
-    GoodJob::Execution.override_connection(connection) do
-      GoodJob::Execution.owns_advisory_locked.each.with_index do |execution, index|
-        output << "\nAdvisory locked GoodJob::Execution:" if index.zero?
-        output << "  - Execution ID: #{execution.id} / Active Job ID: #{execution.active_job_id}"
+    GoodJob::Job.include(GoodJob::OverridableConnection)
+    GoodJob::Job.override_connection(connection) do
+      GoodJob::Job.owns_advisory_locked.each.with_index do |job, index|
+        output << "\nAdvisory locked GoodJob::Job:" if index.zero?
+        output << "  - Job ID: #{job.id} / Active Job ID: #{job.active_job_id}"
       end
     end
 
@@ -209,13 +214,13 @@ class PgLock < ActiveRecord::Base
       ActiveRecord::Relation::QueryAttribute.new('classid', classid, ActiveRecord::Type::String.new),
       ActiveRecord::Relation::QueryAttribute.new('objid', objid, ActiveRecord::Type::String.new),
     ]
-    self.class.connection.exec_query(GoodJob::Execution.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', binds).first['unlocked']
+    self.class.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', binds).first['unlocked']
   end
 
   def unlock!
     query = <<~SQL.squish
       SELECT pg_terminate_backend(#{self[:pid]}) AS terminated
     SQL
-    self.class.connection.exec_query(GoodJob::Execution.pg_or_jdbc_query(query), 'PgLock Terminate Backend Lock', []).first['terminated']
+    self.class.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Terminate Backend Lock', []).first['terminated']
   end
 end

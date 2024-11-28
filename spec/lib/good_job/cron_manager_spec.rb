@@ -46,12 +46,12 @@ RSpec.describe GoodJob::CronManager do
       cron_manager = described_class.new(cron_entries, start_on_initialize: true)
 
       wait_until(max: 5) do
-        expect(GoodJob::Execution.count).to be > 3
+        expect(GoodJob::Job.count).to be > 3
       end
       cron_manager.shutdown
 
-      execution = GoodJob::Execution.first
-      expect(execution).to have_attributes(
+      job = GoodJob::Job.first
+      expect(job).to have_attributes(
         cron_key: 'example',
         priority: -10
       )
@@ -62,14 +62,14 @@ RSpec.describe GoodJob::CronManager do
       other_cron_manager = described_class.new(cron_entries, start_on_initialize: true)
 
       wait_until(max: 5) do
-        expect(GoodJob::Execution.count).to be > 3
+        expect(GoodJob::Job.count).to be > 3
       end
 
       cron_manager.shutdown
       other_cron_manager.shutdown
 
-      executions = GoodJob::Execution.all.to_a
-      expect(executions.size).to eq executions.map(&:cron_at).uniq.size
+      jobs = GoodJob::Job.all.to_a
+      expect(jobs.size).to eq jobs.map(&:cron_at).uniq.size
     end
 
     it 'respects the disabled setting' do
@@ -79,7 +79,7 @@ RSpec.describe GoodJob::CronManager do
       sleep 2
       cron_manager.shutdown
 
-      expect(GoodJob::Execution.count).to eq 0
+      expect(GoodJob::Job.count).to eq 0
     end
 
     context 'when schedule is a proc' do
@@ -105,6 +105,37 @@ RSpec.describe GoodJob::CronManager do
 
         expect(my_proc).to have_received(:call).with(nil).once
         expect(my_proc).to have_received(:call).with(an_instance_of(ActiveSupport::TimeWithZone)).at_least(2).times
+      end
+    end
+  end
+
+  describe 'graceful restarts' do
+    let(:cron_entries) do
+      [
+        GoodJob::CronEntry.new(
+          key: 'example',
+          cron: "0 * * * * *",
+          class: "TestJob"
+        ),
+      ]
+    end
+
+    before do
+      stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+        def perform
+        end
+      end)
+
+      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+    end
+
+    it "reenqueues jobs scheduled for the previous period" do
+      cron_manager = described_class.new(cron_entries, start_on_initialize: false, graceful_restart_period: 5.minutes)
+      cron_manager.start
+      cron_manager.shutdown
+
+      wait_until(max: 5) do
+        expect(GoodJob::Job.count).to eq 5
       end
     end
   end

@@ -13,6 +13,7 @@ describe GoodJob::MetricsController do
           batches_count: '0',
           cron_entries_count: '1',
           processes_count: '0',
+          discarded_count: '0',
         }.to_json
       )
     end

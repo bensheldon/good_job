@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 module GoodJob
-  class ScheduledByQueueChart
+  class ScheduledByQueueChart < BaseChart
     def initialize(filter)
+      super()
       @filter = filter
     end
 
     def data
-      end_time = Time.current
-      start_time = end_time - 1.day
       table_name = GoodJob::Job.table_name
 
       scheduled_query = @filter.filtered_query
@@ -46,11 +45,7 @@ module GoodJob
         ORDER BY timestamp ASC
       SQL
 
-      binds = [
-        ActiveRecord::Relation::QueryAttribute.new('start_time', start_time, ActiveRecord::Type::DateTime.new),
-        ActiveRecord::Relation::QueryAttribute.new('end_time', end_time, ActiveRecord::Type::DateTime.new),
-      ]
-      executions_data = GoodJob::Execution.connection.exec_query(GoodJob::Execution.pg_or_jdbc_query(count_query), "GoodJob Dashboard Chart", binds)
+      executions_data = GoodJob::Job.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(count_query), "GoodJob Dashboard Chart", start_end_binds)
 
       queue_names = executions_data.reject { |d| d['count'].nil? }.map { |d| d['queue_name'] || BaseFilter::EMPTY }.uniq
       labels = []
@@ -62,27 +57,27 @@ module GoodJob
       end
 
       {
-        labels: labels,
-        datasets: queues_data.map do |queue, data|
-          label = queue || '(none)'
-          {
-            label: label,
-            data: data,
-            backgroundColor: string_to_hsl(label),
-            borderColor: string_to_hsl(label),
-          }
-        end,
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: queues_data.map do |queue, data|
+            label = queue || '(none)'
+            {
+              label: label,
+              data: data,
+              backgroundColor: string_to_hsl(label),
+              borderColor: string_to_hsl(label),
+            }
+          end,
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
       }
-    end
-
-    def string_to_hsl(string)
-      hash_value = string.sum
-
-      hue = hash_value % 360
-      saturation = (hash_value % 50) + 50
-      lightness = '50'
-
-      "hsl(#{hue}, #{saturation}%, #{lightness}%)"
     end
   end
 end

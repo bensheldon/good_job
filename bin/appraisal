@@ -1,3 +1,0 @@
-#!/usr/bin/env ruby
-require 'bundler/setup'
-load Gem.bin_path('appraisal', 'appraisal')

@@ -53,24 +53,22 @@ describe GoodJob do
   end
 
   describe '.cleanup_preserved_jobs' do
-    let!(:recent_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 12.hours.ago) }
-    let!(:old_unfinished_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, scheduled_at: 15.days.ago, finished_at: nil) }
-    let!(:old_finished_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago) }
-    let!(:old_finished_job_execution) { GoodJob::Execution.create!(active_job_id: old_finished_job.active_job_id, retried_good_job_id: old_finished_job.id, finished_at: 16.days.ago) }
-    let!(:old_finished_job_discrete_execution) { GoodJob::DiscreteExecution.create!(active_job_id: old_finished_job.active_job_id, finished_at: 16.days.ago) }
-    let!(:old_discarded_job) { GoodJob::Execution.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago, error: "Error") }
-    let!(:old_batch) { GoodJob::BatchRecord.create!(finished_at: 15.days.ago) }
+    let!(:recent_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 12.hours.ago) }
+    let!(:old_unfinished_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, scheduled_at: 15.days.ago, finished_at: nil) }
+    let!(:old_finished_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago) }
+    let!(:old_finished_job_execution) { GoodJob::Execution.create!(active_job_id: old_finished_job.active_job_id, finished_at: 16.days.ago) }
+    let!(:old_discarded_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 15.days.ago, error: "Error") }
+    let!(:old_batch) { GoodJob::BatchRecord.create!(jobs_finished_at: 14.days.ago, finished_at: 15.days.ago) }
 
     it 'deletes finished jobs' do
       destroyed_records_count = described_class.cleanup_preserved_jobs(in_batches_of: 1)
 
-      expect(destroyed_records_count).to eq 5
+      expect(destroyed_records_count).to eq 4
 
       expect { recent_job.reload }.not_to raise_error
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
-      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
@@ -78,13 +76,12 @@ describe GoodJob do
     it 'takes arguments' do
       destroyed_records_count = described_class.cleanup_preserved_jobs(older_than: 10.seconds)
 
-      expect(destroyed_records_count).to eq 6
+      expect(destroyed_records_count).to eq 5
 
       expect { recent_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
-      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
@@ -104,14 +101,37 @@ describe GoodJob do
       allow(described_class.configuration).to receive(:env).and_return ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_DISCARDED_JOBS' => 'false' })
       destroyed_records_count = described_class.cleanup_preserved_jobs
 
+      expect(destroyed_records_count).to eq 3
+
+      expect { recent_job.reload }.not_to raise_error
+      expect { old_unfinished_job.reload }.not_to raise_error
+      expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_discarded_job.reload }.not_to raise_error
+      expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+
+    it "can override cleanup_discarded_jobs? configuration" do
+      allow(described_class.configuration).to receive(:env).and_return ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_DISCARDED_JOBS' => 'false' })
+      destroyed_records_count = described_class.cleanup_preserved_jobs(include_discarded: true)
+
       expect(destroyed_records_count).to eq 4
 
       expect { recent_job.reload }.not_to raise_error
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
       expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
-      expect { old_finished_job_discrete_execution.reload }.to raise_error ActiveRecord::RecordNotFound
-      expect { old_discarded_job.reload }.not_to raise_error
+      expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+
+    it "does not delete batches until their callbacks have finished" do
+      old_batch.update!(finished_at: nil)
+      described_class.cleanup_preserved_jobs
+      expect { old_batch.reload }.not_to raise_error
+
+      old_batch.update!(finished_at: 15.days.ago)
+      described_class.cleanup_preserved_jobs
       expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
   end
@@ -164,6 +184,14 @@ describe GoodJob do
       described_class.perform_inline(limit: 1)
 
       expect(PERFORMED.size).to eq 1
+    end
+  end
+
+  describe '#v4_ready?' do
+    it "is true" do
+      allow(described_class.deprecator).to receive(:warn)
+      expect(described_class.v4_ready?).to eq true
+      expect(described_class.deprecator).to have_received(:warn)
     end
   end
 end

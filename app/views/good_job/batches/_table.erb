@@ -56,9 +56,15 @@
               </div>
               <div class="col-6 col-lg-1">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.batch.jobs" %></div>
-                <%= batch.jobs.count %>
+                <%= batch.jobs.size %>
               </div>
               <div class="col text-end">
+                <% if batch.discarded? %>
+                  <%= link_to retry_batch_path(batch), method: :put, class: "btn btn-sm btn-outline-primary", title: t("good_job.batches.actions.retry"), data: { confirm: t("good_job.batches.actions.confirm_retry") } do %>
+                    <%= render_icon "arrow_clockwise" %>
+                    <%= t "good_job.batches.actions.retry" %>
+                  <% end %>
+                <% end %>
                 <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                                title: t("good_job.actions.inspect"),
                                data: { bs_toggle: "collapse", bs_target: "##{dom_id(batch, 'properties')}" },

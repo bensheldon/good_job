@@ -26,16 +26,12 @@ RSpec.describe GoodJob::JobsFilter do
     end
     Timecop.return
 
-    running_job = ExampleJob.perform_later('success')
-    running_execution = GoodJob::Execution.find(running_job.provider_job_id)
-    running_execution.update!(
+    running_active_job = ExampleJob.perform_later('success')
+    running_job = GoodJob::Job.find(running_active_job.provider_job_id)
+    running_job.update!(
+      performed_at: 1.minute.ago,
       finished_at: nil
     )
-    running_execution.advisory_lock
-  end
-
-  after do
-    GoodJob::Execution.advisory_unlock_session
   end
 
   describe '#job_classes' do
@@ -112,6 +108,18 @@ RSpec.describe GoodJob::JobsFilter do
     context 'when filtered by cron_key' do
       before do
         params[:cron_key] = 'frequent_cron'
+      end
+
+      it 'filters results' do
+        expect(filter.records.size).to eq 1
+      end
+    end
+
+    context 'when filtered by finished_since' do
+      before do
+        GoodJob::Job.find_each { |job| job.update!(finished_at: 6.hours.ago) }
+        GoodJob::Job.take.update!(finished_at: 30.minutes.ago)
+        params[:finished_since] = '1_hour_ago'
       end
 
       it 'filters results' do

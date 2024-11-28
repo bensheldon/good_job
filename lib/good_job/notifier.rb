@@ -2,6 +2,7 @@
 
 require 'active_support/core_ext/module/attribute_accessors_per_thread'
 require 'concurrent/atomic/atomic_boolean'
+require "concurrent/scheduled_task"
 require "good_job/notifier/process_heartbeat"
 
 module GoodJob # :nodoc:
@@ -26,6 +27,8 @@ module GoodJob # :nodoc:
     RECONNECT_INTERVAL = 5
     # Number of consecutive connection errors before reporting an error
     CONNECTION_ERRORS_REPORTING_THRESHOLD = 6
+    # Interval for emitting a noop SQL query to keep the connection alive
+    KEEPALIVE_INTERVAL = 10
 
     # Connection errors that will wait {RECONNECT_INTERVAL} before reconnecting
     CONNECTION_ERRORS = %w[
@@ -50,7 +53,7 @@ module GoodJob # :nodoc:
     # Send a message via Postgres NOTIFY
     # @param message [#to_json]
     def self.notify(message)
-      connection = ::GoodJob::Execution.connection
+      connection = ::GoodJob::Job.connection
       connection.exec_query <<~SQL.squish
         NOTIFY #{CHANNEL}, #{connection.quote(message.to_json)}
       SQL
@@ -62,13 +65,12 @@ module GoodJob # :nodoc:
 
     # @param recipients [Array<#call, Array(Object, Symbol)>]
     # @param enable_listening [true, false]
-    # @param executor [Concurrent::ExecutorService]
-    def initialize(*recipients, enable_listening: true, executor: Concurrent.global_io_executor)
+    def initialize(*recipients, enable_listening: true, capsule: GoodJob.capsule, executor: Concurrent.global_io_executor)
       @recipients = Concurrent::Array.new(recipients)
       @enable_listening = enable_listening
       @executor = executor
 
-      @mutex = Mutex.new
+      @monitor = Monitor.new
       @shutdown_event = Concurrent::Event.new.tap(&:set)
       @running = Concurrent::AtomicBoolean.new(false)
       @connected = Concurrent::Event.new
@@ -77,6 +79,8 @@ module GoodJob # :nodoc:
       @connection_errors_reported = Concurrent::AtomicBoolean.new(false)
       @enable_listening = enable_listening
       @task = nil
+      @capsule = capsule
+      @last_keepalive_time = Time.current
 
       start
       self.class.instances << self
@@ -183,6 +187,8 @@ module GoodJob # :nodoc:
 
     private
 
+    delegate :synchronize, to: :@monitor
+
     def start
       synchronize do
         return if @running.true?
@@ -211,20 +217,20 @@ module GoodJob # :nodoc:
             end
 
             while thr_executor.running? && thr_running.true?
-              run_callbacks :tick do
-                wait_for_notify do |channel, payload|
-                  next unless channel == CHANNEL
+              Rails.application.executor.wrap { run_callbacks(:tick) }
 
-                  ActiveSupport::Notifications.instrument("notifier_notified.good_job", { payload: payload })
-                  parsed_payload = JSON.parse(payload, symbolize_names: true)
-                  thr_recipients.each do |recipient|
-                    target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
-                    target.send(method_name, parsed_payload)
-                  end
+              wait_for_notify do |channel, payload|
+                next unless channel == CHANNEL
+
+                ActiveSupport::Notifications.instrument("notifier_notified.good_job", { payload: payload })
+                parsed_payload = JSON.parse(payload, symbolize_names: true)
+                thr_recipients.each do |recipient|
+                  target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
+                  target.send(method_name, parsed_payload)
                 end
-
-                reset_connection_errors
               end
+
+              reset_connection_errors
             end
           end
         ensure
@@ -248,8 +254,8 @@ module GoodJob # :nodoc:
 
     def with_connection
       Rails.application.executor.wrap do
-        self.connection = ::GoodJob::Execution.connection_pool.checkout.tap do |conn|
-          ::GoodJob::Execution.connection_pool.remove(conn)
+        self.connection = ::GoodJob::Job.connection_pool.checkout.tap do |conn|
+          ::GoodJob::Job.connection_pool.remove(conn)
         end
       end
       connection.execute("SET application_name = #{connection.quote(self.class.name)}")
@@ -265,6 +271,10 @@ module GoodJob # :nodoc:
       if @enable_listening && raw_connection.respond_to?(:wait_for_notify)
         raw_connection.wait_for_notify(WAIT_INTERVAL) do |channel, _pid, payload|
           yield(channel, payload)
+        end
+        if Time.current - @last_keepalive_time >= KEEPALIVE_INTERVAL
+          raw_connection.async_exec("SELECT 1")
+          @last_keepalive_time = Time.current
         end
       elsif @enable_listening && raw_connection.respond_to?(:jdbc_connection)
         raw_connection.execute_query("SELECT 1")
@@ -283,14 +293,6 @@ module GoodJob # :nodoc:
     def reset_connection_errors
       @connection_errors_count.value = 0
       @connection_errors_reported.make_false
-    end
-
-    def synchronize(&block)
-      if @mutex.owned?
-        yield
-      else
-        @mutex.synchronize(&block)
-      end
     end
   end
 end

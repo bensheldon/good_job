@@ -13,9 +13,9 @@ module GoodJob
       error_on_discard
       error_on_retry
       error_on_retry_stopped
-      execution
+      job
       execution_interrupted
-      execution_retried
+      retried_job
       retry_now
     ].freeze
 
@@ -49,11 +49,11 @@ module GoodJob
     #   @return [Exception, nil]
     thread_mattr_accessor :error_on_retry_stopped
 
-    # @!attribute [rw] executions
+    # @!attribute [rw] jobs
     #   @!scope class
     #   Execution
-    #   @return [GoodJob::Execution, nil]
-    thread_mattr_accessor :execution
+    #   @return [GoodJob::Job, nil]
+    thread_mattr_accessor :job
 
     # @!attribute [rw] execution_interrupted
     #   @!scope class
@@ -61,11 +61,11 @@ module GoodJob
     #   @return [Boolean, nil]
     thread_mattr_accessor :execution_interrupted
 
-    # @!attribute [rw] execution_retried
+    # @!attribute [rw] retried_job
     #   @!scope class
     #   Execution Retried
-    #   @return [Boolean, nil]
-    thread_mattr_accessor :execution_retried
+    #   @return [GoodJob::Job, nil]
+    thread_mattr_accessor :retried_job
 
     # @!attribute [rw] retry_now
     #   @!scope class
@@ -90,9 +90,9 @@ module GoodJob
       end
     end
 
-    # @return [String] UUID of the currently executing GoodJob::Execution
+    # @return [String] UUID of the currently executing GoodJob::Job
     def self.active_job_id
-      execution&.active_job_id
+      job&.active_job_id
     end
 
     # @return [Integer] Current process ID
