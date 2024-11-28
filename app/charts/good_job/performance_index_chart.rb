@@ -5,7 +5,7 @@ module GoodJob
     def data
       table_name = GoodJob::Execution.table_name
 
-      sum_query = Arel.sql(GoodJob::Job.pg_or_jdbc_query(<<~SQL.squish))
+      sum_query = <<~SQL.squish
         SELECT *
         FROM generate_series(
           date_trunc('hour', $1::timestamp),
