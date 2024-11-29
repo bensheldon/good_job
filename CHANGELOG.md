@@ -1,5 +1,25 @@
 # Changelog
 
+## [v4.5.1](https://github.com/bensheldon/good_job/tree/v4.5.1) (2024-11-29)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.5.0...v4.5.1)
+
+**Implemented enhancements:**
+
+- GoodJob.cleanup\_preserved\_jobs: add :include\_discarded option [\#1550](https://github.com/bensheldon/good_job/pull/1550) ([jonleighton](https://github.com/jonleighton))
+
+**Fixed bugs:**
+
+- Fix compatibility with `rails-head` when duplicated advisory lockable column [\#1553](https://github.com/bensheldon/good_job/pull/1553) ([Earlopain](https://github.com/Earlopain))
+
+**Closed issues:**
+
+- `PG::AmbiguousColumn` after upgrade to 4.5.0 [\#1551](https://github.com/bensheldon/good_job/issues/1551)
+
+**Merged pull requests:**
+
+- Remove usage of COALESCE from dashboard chart [\#1306](https://github.com/bensheldon/good_job/pull/1306) ([bananatron](https://github.com/bananatron))
+
 ## [v4.5.0](https://github.com/bensheldon/good_job/tree/v4.5.0) (2024-11-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.4.2...v4.5.0)
