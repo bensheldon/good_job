@@ -8,6 +8,12 @@ Rails.application.configure do
   }
 end
 
+Rails.configuration.after_initialize do
+  # TODO: It should not be necessary to manually initialize Active Record base
+  #   This seemed to be introduced when PG Hero was added.
+  ActiveJob::Base
+end
+
 case Rails.env
 when 'development'
   GoodJob.on_thread_error = -> (error) { Rails.logger.warn("#{error}\n#{error.backtrace}") }
