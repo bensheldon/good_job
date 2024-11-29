@@ -4,5 +4,5 @@ Rails.application.routes.draw do
 
   get :create_job, to: 'application#create_job'
 
-  mount PgHero::Engine, at: "pghero"
+  mount PgHero::Engine, at: "pghero" if defined?(PgHero)
 end

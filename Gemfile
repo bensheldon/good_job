@@ -21,7 +21,6 @@ gemspec
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
-gem "pghero"
 
 rails_versions = {
   "6.1" => { github: "rails/rails", branch: "6-1-stable" }, # https://github.com/bensheldon/good_job/issues/1280
@@ -32,8 +31,6 @@ rails_versions = {
   "head" => { github: "rails/rails", branch: "main" },
 }
 gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", nil)]
-
-gem "sprockets-rails"
 
 platforms :ruby do
   gem "bootsnap"
@@ -69,6 +66,11 @@ platforms :ruby do
     gem "sorbet-runtime"
     gem "spoom", require: false
     gem "tapioca", require: false
+  end
+
+  group :development, :demo, :production do
+    gem "pghero"
+    gem "sprockets-rails"
   end
 
   group :demo, :production do
