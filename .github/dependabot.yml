@@ -4,22 +4,12 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    allow:
+      - dependency-type: "all"
     groups:
-      bundler-lint:
-        patterns:
-          - brakeman
-          - erb_lint
-          - rubocop
-          - rubocop-*
-      bundler-dependencies:
+      all:
         patterns:
           - "*"
-        exclude-patterns:
-          - puma
-          - brakeman
-          - erb_lint
-          - rubocop
-          - rubocop-*
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
