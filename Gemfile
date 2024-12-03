@@ -68,6 +68,11 @@ platforms :ruby do
     gem "tapioca", require: false
   end
 
+  group :development, :demo, :production do
+    gem "pghero"
+    gem "sprockets-rails"
+  end
+
   group :demo, :production do
     gem "skylight"
   end

@@ -296,6 +296,8 @@ GEM
       ast (~> 2.4.1)
       racc
     pg (1.5.9)
+    pghero (3.6.1)
+      activerecord (>= 6.1)
     prism (1.2.0)
     protocol-hpack (1.5.1)
     protocol-http (0.43.0)
@@ -445,6 +447,13 @@ GEM
       prism (>= 0.28.0)
       sorbet-static-and-runtime (>= 0.5.10187)
       thor (>= 0.19.2)
+    sprockets (4.2.1)
+      concurrent-ruby (~> 1.0)
+      rack (>= 2.2.4, < 4)
+    sprockets-rails (3.5.2)
+      actionpack (>= 6.1)
+      activesupport (>= 6.1)
+      sprockets (>= 3.0.0)
     stackprof (0.2.26)
     stringio (3.1.2)
     tapioca (0.16.4)
@@ -518,6 +527,7 @@ DEPENDENCIES
   mdl
   memory_profiler
   pg
+  pghero
   puma
   rack-mini-profiler
   rails
@@ -534,6 +544,7 @@ DEPENDENCIES
   sorbet
   sorbet-runtime
   spoom
+  sprockets-rails
   stackprof
   tapioca
   timecop

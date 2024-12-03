@@ -8,6 +8,12 @@ Rails.application.configure do
   }
 end
 
+Rails.configuration.after_initialize do
+  # TODO: It should not be necessary to manually initialize Active Record base
+  #   This seemed to be introduced when PG Hero was added.
+  ActiveJob::Base
+end
+
 case Rails.env
 when 'development'
   GoodJob.on_thread_error = -> (error) { Rails.logger.warn("#{error}\n#{error.backtrace}") }
@@ -79,6 +85,11 @@ when 'demo'
       complex_schedule: {
         cron: -> (last_ran) { last_ran ? last_ran + 17.hours : Time.now},
         class: "OtherJob",
+      },
+      pg_hero_maintenance: {
+        cron: "*/10 * * * *", # Every 10 minutes
+        class: "PgHeroMaintenanceJob",
+        description: "Runs PG Hero maintenance",
       }
     }
   end
