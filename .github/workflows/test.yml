@@ -102,6 +102,7 @@ jobs:
           # JRuby 9.4 targets Ruby 3.1
           - ruby: jruby-9.4
             gemfile: rails_7.2
+            pg: 17
         exclude:
           # Rails 7.2 is >= 3.1
           - ruby: "3.0"
