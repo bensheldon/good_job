@@ -216,6 +216,7 @@ module GoodJob
       return unless execute_async?
 
       @capsule.start
+      @capsule.lower_thread_priority = true if GoodJob.configuration.lower_thread_priority.in?([true, nil])
       @_async_started = true
     end
 
