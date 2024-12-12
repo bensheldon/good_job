@@ -15,8 +15,8 @@ RSpec.describe GoodJob::JobsFilter do
     GoodJob::Job.order(created_at: :asc).last.update!(cron_key: "frequent_cron")
 
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-    ExampleJob.set(queue: 'default').perform_later(ExampleJob::SUCCESS_TYPE)
-    ExampleJob.set(queue: 'mice').perform_later(ExampleJob::ERROR_ONCE_TYPE)
+    ExampleJob.set(queue: 'default', good_job_labels: ["label1", "label 2"]).perform_later(ExampleJob::SUCCESS_TYPE)
+    ExampleJob.set(queue: 'mice', good_job_labels: ["label 2"]).perform_later(ExampleJob::ERROR_ONCE_TYPE)
 
     Timecop.travel 1.hour.ago
     ExampleJob.set(queue: 'elephants').perform_later(ExampleJob::DEAD_TYPE)
@@ -49,6 +49,15 @@ RSpec.describe GoodJob::JobsFilter do
                                     "default" => 2,
                                     "elephants" => 1,
                                     "mice" => 1,
+                                  })
+    end
+  end
+
+  describe '#labels' do
+    it 'is a valid result' do
+      expect(filter.labels).to eq({
+                                    "label1" => 1,
+                                    "label 2" => 2,
                                   })
     end
   end

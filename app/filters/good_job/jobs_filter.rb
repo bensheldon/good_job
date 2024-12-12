@@ -27,6 +27,7 @@ module GoodJob
       query = query.where(queue_name: filter_params[:queue_name]) if filter_params[:queue_name].present?
       query = query.search_text(filter_params[:query]) if filter_params[:query].present?
       query = query.where(cron_key: filter_params[:cron_key]) if filter_params[:cron_key].present?
+      query = query.where("labels && ARRAY[?]::text[]", filter_params[:labels]) if filter_params[:labels].present?
       query = query.where(finished_at: finished_since(filter_params[:finished_since])..) if filter_params[:finished_since].present?
 
       if filter_params[:state]

@@ -243,6 +243,7 @@ en:
       filter:
         all: All
         all_jobs: All jobs
+        all_labels: All labels
         all_queues: All queues
         clear: Clear
         job_name: Job name
