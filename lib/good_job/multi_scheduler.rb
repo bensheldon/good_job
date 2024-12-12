@@ -19,7 +19,8 @@ module GoodJob
           max_cache: configuration.max_cache,
           warm_cache_on_initialize: warm_cache_on_initialize,
           cleanup_interval_seconds: configuration.cleanup_interval_seconds,
-          cleanup_interval_jobs: configuration.cleanup_interval_jobs
+          cleanup_interval_jobs: configuration.cleanup_interval_jobs,
+          lower_thread_priority: configuration.lower_thread_priority
         )
       end
 
@@ -82,6 +83,12 @@ module GoodJob
         false
       else # rubocop:disable Style/EmptyElse
         nil
+      end
+    end
+
+    def lower_thread_priority=(value)
+      schedulers.each do |scheduler|
+        scheduler.lower_thread_priority = value
       end
     end
 
