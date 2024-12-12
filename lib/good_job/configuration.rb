@@ -383,6 +383,14 @@ module GoodJob
       end || false
     end
 
+    def lower_thread_priority
+      return options[:lower_thread_priority] unless options[:lower_thread_priority].nil?
+      return rails_config[:lower_thread_priority] unless rails_config[:lower_thread_priority].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_LOWER_THREAD_PRIORITY']) unless env['GOOD_JOB_LOWER_THREAD_PRIORITY'].nil?
+
+      nil
+    end
+
     # Whether to take an advisory lock on the process record in the notifier reactor.
     # @return [Boolean]
     def advisory_lock_heartbeat
