@@ -1,5 +1,25 @@
 # Changelog
 
+## [v4.6.0](https://github.com/bensheldon/good_job/tree/v4.6.0) (2024-12-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.5.1...v4.6.0)
+
+**Implemented enhancements:**
+
+- Set job execution thread priority to `-3` when in async mode [\#1560](https://github.com/bensheldon/good_job/pull/1560) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Attaching metadata to jobs [\#1558](https://github.com/bensheldon/good_job/issues/1558)
+- Lower Ruby Thread priority for jobs by default when running in Async mode [\#1554](https://github.com/bensheldon/good_job/issues/1554)
+- NoMethodError:  undefined method `\<' for nil \(process.rb:125 in stale?\) [\#1363](https://github.com/bensheldon/good_job/issues/1363)
+- Install PgHero on the Demo app [\#1166](https://github.com/bensheldon/good_job/issues/1166)
+
+**Merged pull requests:**
+
+- Bump rails-html-sanitizer from 1.6.0 to 1.6.1 [\#1557](https://github.com/bensheldon/good_job/pull/1557) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add PGHero to the demo app [\#1294](https://github.com/bensheldon/good_job/pull/1294) ([mec](https://github.com/mec))
+
 ## [v4.5.1](https://github.com/bensheldon/good_job/tree/v4.5.1) (2024-11-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.5.0...v4.5.1)
