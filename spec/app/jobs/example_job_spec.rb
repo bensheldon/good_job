@@ -62,7 +62,7 @@ describe ExampleJob do
         execution = good_job.executions.last
         expect(execution.error).to be_present
         expect(execution.error_backtrace.count).to be > 100
-        expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:41:in `perform'"])
+        expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:42:in `perform'"])
       end
     end
 
