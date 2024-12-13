@@ -194,8 +194,8 @@ en:
       job:
         arguments: Arguments
         attempts: Attempts
-        priority: Priority
         labels: Labels
+        priority: Priority
         queue: Queue
     number:
       format:
@@ -246,8 +246,8 @@ en:
         all_labels: All labels
         all_queues: All queues
         clear: Clear
-        job_name: Job name
         job_labels: Job labels
+        job_name: Job name
         placeholder: Search by class, job id, job params, and error text.
         queue_name: Queue name
         search: Search
