@@ -247,6 +247,7 @@ en:
         all_queues: All queues
         clear: Clear
         job_name: Job name
+        job_labels: Job labels
         placeholder: Search by class, job id, job params, and error text.
         queue_name: Queue name
         search: Search

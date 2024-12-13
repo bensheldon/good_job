@@ -32,9 +32,9 @@
         </div>
 
         <div class="me-md-2 mb-2 mb-md-0">
-          <%= label_tag "label_filter", t(".job_name"), class: "visually-hidden" %>
-          <select name="labels[]" id="label_filter" class="form-select form-select-sm" size="2" multiple>
-            <option value="_all" <%= "selected='selected'" if params[:labels].blank? %>><%= t ".all_labels" %></option>
+          <%= label_tag "job_label_filter", t(".job_labels"), class: "visually-hidden" %>
+          <select id="job_label_filter" class="form-select form-select-sm" size="2" multiple>
+            <option value="*" <%= "selected='selected'" if params[:labels].blank? %>><%= t ".all_labels" %></option>
 
             <% filter.labels.each do |name, count| %>
               <option value="<%= name.to_param %>" <%= "selected='selected'" if params[:labels]&.include?(name.to_param) %>><%= name %> (<%= number_with_delimiter(count) %>)</option>
@@ -83,28 +83,25 @@
       })
     })
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const labelFilter = document.getElementById('label_filter');
+    const labelFilter = document.getElementById('job_label_filter');
+    labelFilter.addEventListener('change', () => {
+      const selectedValues = Array.from(labelFilter.selectedOptions).map(option => option.value);
+      const allLabelsOption = labelFilter.querySelector('option[value="_all"]');
 
-      labelFilter.addEventListener('change', () => {
-        const selectedValues = Array.from(labelFilter.selectedOptions).map(option => option.value);
-        const allLabelsOption = labelFilter.querySelector('option[value="_all"]');
+      if (selectedValues.includes('_all')) {
+        // If "All labels" is selected, remove the name attribute so as not to pass params[:labels]
+        // & deselect other options
+        labelFilter.removeAttribute('name');
 
-        if (selectedValues.includes('_all')) {
-          // If "All labels" is selected, remove the name attribute so as not to pass params[:labels]
-          // & deselect other options
-          labelFilter.removeAttribute('name');
+        Array.from(labelFilter.options).forEach(option => {
+          if (option.value !== '_all') { option.selected = false; }
+        });
+      } else {
+        // Restore the name attribute & deselect "All labels" if other options are selected
+        labelFilter.setAttribute('name', 'labels[]');
 
-          Array.from(labelFilter.options).forEach(option => {
-            if (option.value !== '_all') { option.selected = false; }
-          });
-        } else {
-          // Restore the name attribute & deselect "All labels" if other options are selected
-          labelFilter.setAttribute('name', 'labels[]');
-
-          if (allLabelsOption.selected) { allLabelsOption.selected = false; }
-        }
-      });
+        if (allLabelsOption.selected) { allLabelsOption.selected = false; }
+      }
     });
   </script>
 </div>
