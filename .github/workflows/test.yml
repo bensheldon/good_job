@@ -22,7 +22,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          rubygems: latest
 
       # Lint
       - name: Run linter
@@ -62,7 +61,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          rubygems: latest
 
       # Validate Development Environment
       - name: bin/setup
@@ -147,7 +145,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          rubygems: latest
       -  name: Print Lockfile
          run: cat ${{ env.BUNDLE_GEMFILE }}.lock
 
