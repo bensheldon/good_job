@@ -195,6 +195,7 @@ pt-BR:
         arguments: Argumentos
         attempts: Tentativas
         priority: Prioridade
+        labels: Rótulos
         queue: Fila
     number:
       format:

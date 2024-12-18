@@ -195,6 +195,7 @@ it:
         arguments: Argomenti
         attempts: Tentativi
         priority: Priorità
+        labels: Etichette
         queue: Coda
     number:
       format:

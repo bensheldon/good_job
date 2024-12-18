@@ -195,6 +195,7 @@ fr:
         arguments: Paramètres
         attempts: Tentatives
         priority: Priorité
+        labels: Étiquettes
         queue: File d'attente
     number:
       format:

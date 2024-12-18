@@ -195,6 +195,7 @@ de:
         arguments: Argumente
         attempts: Versuche
         priority: Priorität
+        labels: Etiketten
         queue: Warteschlange
     number:
       format:

@@ -195,6 +195,7 @@ nl:
         arguments: Argumenten
         attempts: Pogingen
         priority: Prioriteit
+        labels: Labels
         queue: Wachtrij
     number:
       format:

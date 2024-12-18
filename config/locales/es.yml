@@ -195,6 +195,7 @@ es:
         arguments: Argumentos
         attempts: Intentos
         priority: Prioridad
+        labels: Etiquetas
         queue: Cola
     number:
       format:

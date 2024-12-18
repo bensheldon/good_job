@@ -195,6 +195,7 @@ en:
         arguments: Arguments
         attempts: Attempts
         priority: Priority
+        labels: Labels
         queue: Queue
     number:
       format:
