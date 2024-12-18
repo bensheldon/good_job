@@ -221,6 +221,7 @@ ru:
         arguments: Параметры
         attempts: Попытки
         priority: Приоритет
+        labels: Метки
         queue: Очередь исполнения
     number:
       format:

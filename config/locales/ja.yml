@@ -195,6 +195,7 @@ ja:
         arguments: 引数
         attempts: 試行回数
         priority: 優先度
+        labels: ラベル
         queue: キュー
     number:
       format:

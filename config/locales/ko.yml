@@ -195,6 +195,7 @@ ko:
         arguments: 인수
         attempts: 시도 횟수
         priority: 우선순위
+        labels: 레이블
         queue: 큐
     number:
       format:

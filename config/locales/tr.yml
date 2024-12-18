@@ -195,6 +195,7 @@ tr:
         arguments: Argümanlar
         attempts: Denemeler
         priority: Öncelik
+        labels: Etiketler
         queue: Kuyruk
     number:
       format:

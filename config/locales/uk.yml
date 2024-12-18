@@ -221,6 +221,7 @@ uk:
         arguments: Аргументи
         attempts: Спроби
         priority: Пріоритет
+        labels: Мітки
         queue: Черга
     number:
       format:
