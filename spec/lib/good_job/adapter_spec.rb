@@ -88,7 +88,7 @@ RSpec.describe GoodJob::Adapter do
         allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
         allow(GoodJob::Notifier).to receive(:notify)
 
-        capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil)
+        capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil, "lower_thread_priority=": nil)
         allow(GoodJob).to receive(:capsule).and_return(capsule)
         allow(capsule).to receive(:start)
 
@@ -98,6 +98,16 @@ RSpec.describe GoodJob::Adapter do
         expect(capsule).to have_received(:start)
         expect(capsule).to have_received(:create_thread)
         expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default' })
+      end
+
+      it 'lowers the thread priority of the capsule' do
+        capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil, "lower_thread_priority=": nil)
+        allow(GoodJob).to receive(:capsule).and_return(capsule)
+        allow(capsule).to receive(:start)
+
+        described_class.new(execution_mode: :async_all)
+
+        expect(capsule).to have_received(:lower_thread_priority=).with(true)
       end
     end
   end
