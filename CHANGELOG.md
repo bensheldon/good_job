@@ -1,5 +1,18 @@
 # Changelog
 
+## [v4.7.0](https://github.com/bensheldon/good_job/tree/v4.7.0) (2024-12-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.6.0...v4.7.0)
+
+**Implemented enhancements:**
+
+- Expose good job labels in dashboard [\#1561](https://github.com/bensheldon/good_job/pull/1561) ([BClark88](https://github.com/BClark88))
+
+**Merged pull requests:**
+
+- Allow cron configuration `class` value to be a proc [\#1566](https://github.com/bensheldon/good_job/pull/1566) ([bensheldon](https://github.com/bensheldon))
+- Add Ruby 3.4 to CI [\#1565](https://github.com/bensheldon/good_job/pull/1565) ([Earlopain](https://github.com/Earlopain))
+
 ## [v4.6.0](https://github.com/bensheldon/good_job/tree/v4.6.0) (2024-12-12)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.5.1...v4.6.0)
