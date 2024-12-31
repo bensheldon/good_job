@@ -194,6 +194,7 @@ en:
       job:
         arguments: Arguments
         attempts: Attempts
+        labels: Labels
         priority: Priority
         queue: Queue
     number:

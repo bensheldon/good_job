@@ -194,6 +194,7 @@ ko:
       job:
         arguments: 인수
         attempts: 시도 횟수
+        labels: 레이블
         priority: 우선순위
         queue: 큐
     number:

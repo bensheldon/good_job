@@ -194,6 +194,7 @@ nl:
       job:
         arguments: Argumenten
         attempts: Pogingen
+        labels: Labels
         priority: Prioriteit
         queue: Wachtrij
     number:

@@ -19,7 +19,10 @@ class ExampleJob < ApplicationJob
     end
     def perform
       GoodJob::Batch.enqueue(on_finish: CallbackJob, description: "Example batch", foo: "bar") do
-        3.times { ExampleJob.perform_later(TYPES.sample) }
+        3.times do
+          job_type = TYPES.sample
+          ExampleJob.set(good_job_labels: [job_type]).perform_later(job_type)
+        end
       end
     end
   end
