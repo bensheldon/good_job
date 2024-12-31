@@ -194,8 +194,8 @@ it:
       job:
         arguments: Argomenti
         attempts: Tentativi
-        priority: Priorità
         labels: Etichette
+        priority: Priorità
         queue: Coda
     number:
       format:

@@ -194,8 +194,8 @@ tr:
       job:
         arguments: Argümanlar
         attempts: Denemeler
-        priority: Öncelik
         labels: Etiketler
+        priority: Öncelik
         queue: Kuyruk
     number:
       format:

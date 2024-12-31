@@ -194,8 +194,8 @@ fr:
       job:
         arguments: Paramètres
         attempts: Tentatives
-        priority: Priorité
         labels: Étiquettes
+        priority: Priorité
         queue: File d'attente
     number:
       format:

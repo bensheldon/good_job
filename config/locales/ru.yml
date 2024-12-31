@@ -220,8 +220,8 @@ ru:
       job:
         arguments: Параметры
         attempts: Попытки
-        priority: Приоритет
         labels: Метки
+        priority: Приоритет
         queue: Очередь исполнения
     number:
       format:

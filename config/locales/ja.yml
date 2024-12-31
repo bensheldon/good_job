@@ -194,8 +194,8 @@ ja:
       job:
         arguments: 引数
         attempts: 試行回数
-        priority: 優先度
         labels: ラベル
+        priority: 優先度
         queue: キュー
     number:
       format:

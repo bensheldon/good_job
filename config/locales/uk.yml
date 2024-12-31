@@ -220,8 +220,8 @@ uk:
       job:
         arguments: Аргументи
         attempts: Спроби
-        priority: Пріоритет
         labels: Мітки
+        priority: Пріоритет
         queue: Черга
     number:
       format:

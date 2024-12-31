@@ -194,8 +194,8 @@ pt-BR:
       job:
         arguments: Argumentos
         attempts: Tentativas
-        priority: Prioridade
         labels: Rótulos
+        priority: Prioridade
         queue: Fila
     number:
       format:
