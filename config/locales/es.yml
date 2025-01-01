@@ -194,6 +194,7 @@ es:
       job:
         arguments: Argumentos
         attempts: Intentos
+        labels: Etiquetas
         priority: Prioridad
         queue: Cola
     number:

@@ -194,6 +194,7 @@ de:
       job:
         arguments: Argumente
         attempts: Versuche
+        labels: Etiketten
         priority: Priorität
         queue: Warteschlange
     number:
