@@ -127,7 +127,7 @@ en:
     jobs:
       actions:
         confirm_destroy: Are you sure you want to destroy the job?
-        confirm_discard: Are you usure you want to discard the job?
+        confirm_discard: Are you sure you want to discard the job?
         confirm_force_discard: Are you sure you want to force discard this job? The job will be marked as discarded but the running job will not be stopped - it will, however, not be retried on failures.
         confirm_reschedule: Are you sure you want to reschedule the job?
         confirm_retry: Are you sure you want to retry the job?
@@ -163,7 +163,7 @@ en:
             one: Apply to all 1 job.
             other: Apply to all %{count} jobs.
           confirm_destroy_all: Are you sure you want to destroy the selected jobs?
-          confirm_discard_all: Are you usure you want to discard the selected jobs?
+          confirm_discard_all: Are you sure you want to discard the selected jobs?
           confirm_reschedule_all: Are you sure you want to reschedule the selected jobs?
           confirm_retry_all: Are you sure you want to retry the selected jobs?
           destroy_all: Destroy all
