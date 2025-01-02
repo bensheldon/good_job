@@ -1,4 +1,5 @@
 class ExampleJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Labels
   ExpectedError = Class.new(StandardError)
   DeadError = Class.new(StandardError)
 
