@@ -30,7 +30,7 @@ rails_versions = {
   "8.0" => "~> 8.0.0",
   "head" => { github: "rails/rails", branch: "main" },
 }
-gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", nil)]
+gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", "8.0")]
 
 platforms :ruby do
   gem "bootsnap"
