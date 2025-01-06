@@ -18,7 +18,7 @@ module ExampleAppHelper
     FileUtils.cp(::Rails.root.join('config/database.yml'), "#{example_app_path}/config/database.yml")
 
     File.open("#{example_app_path}/Gemfile", 'a') do |f|
-      f.puts 'gem "good_job", path: "#{File.dirname(__FILE__)}/../../../"' # rubocop:disable Lint/InterpolationCheck
+      f.puts 'gem "good_job", path: "#{File.dirname(__FILE__)}/../../../"'
     end
   end
 
