@@ -19,8 +19,9 @@ module GoodJob
         MAX(duration) AS max_duration
       ").order(:queue_name)
 
-      @paused_job_classes = Array(GoodJob::Setting.where(key: :paused_job_classes).pick(:value))
-      @paused_queues = Array(GoodJob::Setting.where(key: :paused_queues).pick(:value))
+      @paused = GoodJob::Setting.paused
+      @paused_job_classes = @paused[:job_classes]
+      @paused_queues = @paused[:queues]
     end
 
     def show

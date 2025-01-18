@@ -4,8 +4,7 @@ module GoodJob
   class Setting < BaseRecord
     CRON_KEYS_ENABLED = "cron_keys_enabled"
     CRON_KEYS_DISABLED = "cron_keys_disabled"
-    PAUSED_QUEUES = "paused_queues"
-    PAUSED_JOB_CLASSES = "paused_job_classes"
+    PAUSES = "pauses"
 
     self.table_name = 'good_job_settings'
     self.implicit_order_column = 'created_at'
@@ -53,16 +52,16 @@ module GoodJob
     def self.pause(queue: nil, job_class: nil)
       raise ArgumentError, "Must provide either queue or job_class, but not both" if queue.nil? == job_class.nil?
 
+      setting = find_or_initialize_by(key: PAUSES) do |record|
+        record.value = { "queues" => [], "job_classes" => [] }
+      end
+
       if queue
-        setting = find_or_initialize_by(key: PAUSED_QUEUES) do |record|
-          record.value = []
-        end
-        setting.value << queue.to_s unless setting.value.include?(queue.to_s)
+        setting.value["queues"] ||= []
+        setting.value["queues"] << queue.to_s unless setting.value["queues"].include?(queue.to_s)
       else
-        setting = find_or_initialize_by(key: PAUSED_JOB_CLASSES) do |record|
-          record.value = []
-        end
-        setting.value << job_class.to_s unless setting.value.include?(job_class.to_s)
+        setting.value["job_classes"] ||= []
+        setting.value["job_classes"] << job_class.to_s unless setting.value["job_classes"].include?(job_class.to_s)
       end
       setting.save!
     end
@@ -70,16 +69,17 @@ module GoodJob
     def self.unpause(queue: nil, job_class: nil)
       raise ArgumentError, "Must provide either queue or job_class, but not both" if queue.nil? == job_class.nil?
 
+      setting = find_by(key: PAUSES)
+      return unless setting
+
       if queue
-        setting = find_by(key: PAUSED_QUEUES)
-        return unless setting&.value&.include?(queue.to_s)
+        return unless setting.value["queues"]&.include?(queue.to_s)
 
-        setting.value.delete(queue.to_s)
+        setting.value["queues"].delete(queue.to_s)
       else
-        setting = find_by(key: PAUSED_JOB_CLASSES)
-        return unless setting&.value&.include?(job_class.to_s)
+        return unless setting.value["job_classes"]&.include?(job_class.to_s)
 
-        setting.value.delete(job_class.to_s)
+        setting.value["job_classes"].delete(job_class.to_s)
       end
       setting.save!
     end
@@ -92,19 +92,23 @@ module GoodJob
       elsif job_class
         job_class.in? paused(:job_classes)
       else
-        paused.values.any?
+        paused.values.any?(&:any?)
       end
     end
 
     def self.paused(type = nil)
+      setting = find_by(key: PAUSES)
+      pauses = setting&.value&.deep_dup || { "queues" => [], "job_classes" => [] }
+      pauses = pauses.with_indifferent_access
+
       if type == :queues
-        find_by(key: PAUSED_QUEUES)&.value || []
+        pauses["queues"]
       elsif type == :job_classes
-        find_by(key: PAUSED_JOB_CLASSES)&.value || []
+        pauses["job_classes"]
       else
         {
-          queues: find_by(key: PAUSED_QUEUES)&.value || [],
-          job_classes: find_by(key: PAUSED_JOB_CLASSES)&.value || [],
+          queues: pauses["queues"] || [],
+          job_classes: pauses["job_classes"] || [],
         }
       end
     end

@@ -21,14 +21,14 @@ RSpec.describe GoodJob::PausesController, type: :controller do
   describe '#create' do
     it 'can pause a queue' do
       post :create, params: { type: 'queue', value: 'default' }
-      expect(GoodJob::Setting.where(key: :paused_queues).pick(:value)).to include('default')
+      expect(GoodJob::Setting.paused(:queues)).to include('default')
       expect(response).to redirect_to action: :index
       expect(flash[:notice]).to eq("Successfully paused queue 'default'")
     end
 
     it 'can pause a job class' do
       post :create, params: { type: 'job_class', value: 'MyJob' }
-      expect(GoodJob::Setting.where(key: :paused_job_classes).pick(:value)).to include('MyJob')
+      expect(GoodJob::Setting.paused(:job_classes)).to include('MyJob')
       expect(response).to redirect_to action: :index
       expect(flash[:notice]).to eq("Successfully paused job_class 'MyJob'")
     end
@@ -46,7 +46,7 @@ RSpec.describe GoodJob::PausesController, type: :controller do
     it 'can unpause a queue' do
       GoodJob::Setting.pause(queue: 'default')
       delete :destroy, params: { type: 'queue', value: 'default' }
-      expect(GoodJob::Setting.where(key: :paused_queues).pick(:value)).not_to include('default')
+      expect(GoodJob::Setting.paused(:queues)).not_to include('default')
       expect(response).to redirect_to action: :index
       expect(flash[:notice]).to eq("Successfully unpaused queue 'default'")
     end
@@ -54,7 +54,7 @@ RSpec.describe GoodJob::PausesController, type: :controller do
     it 'can unpause a job class' do
       GoodJob::Setting.pause(job_class: 'MyJob')
       delete :destroy, params: { type: 'job_class', value: 'MyJob' }
-      expect(GoodJob::Setting.where(key: :paused_job_classes).pick(:value)).not_to include('MyJob')
+      expect(GoodJob::Setting.paused(:job_classes)).not_to include('MyJob')
       expect(response).to redirect_to action: :index
       expect(flash[:notice]).to eq("Successfully unpaused job_class 'MyJob'")
     end

@@ -104,10 +104,9 @@ module GoodJob
     scope :exclude_paused, lambda {
       return all unless GoodJob.configuration.enable_pause
 
-      paused_queues_query = GoodJob::Setting.where(key: GoodJob::Setting::PAUSED_QUEUES)
-                                            .select('jsonb_array_elements_text(value)')
-      paused_job_classes_query = GoodJob::Setting.where(key: GoodJob::Setting::PAUSED_JOB_CLASSES)
-                                                 .select('jsonb_array_elements_text(value)')
+      paused_query = GoodJob::Setting.where(key: GoodJob::Setting::PAUSES)
+      paused_queues_query = paused_query.select("jsonb_array_elements_text(value->'queues')")
+      paused_job_classes_query = paused_query.select("jsonb_array_elements_text(value->'job_classes')")
       where.not(queue_name: paused_queues_query).where.not(job_class: paused_job_classes_query)
     }
 

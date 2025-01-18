@@ -104,51 +104,51 @@ RSpec.describe GoodJob::Setting do
 
       context 'with queue' do
         it 'inserts values into a json array' do
-          expect(described_class.where(key: described_class::PAUSED_QUEUES).count).to eq 0
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 0
 
           described_class.pause(queue: "default")
-          expect(described_class.where(key: described_class::PAUSED_QUEUES).count).to eq 1
-          expect(described_class.find_by(key: described_class::PAUSED_QUEUES).value).to contain_exactly "default"
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 1
+          expect(described_class.find_by(key: described_class::PAUSES).value["queues"]).to contain_exactly "default"
 
           described_class.pause(queue: "mailers")
-          expect(described_class.where(key: described_class::PAUSED_QUEUES).count).to eq 1
-          expect(described_class.find_by(key: described_class::PAUSED_QUEUES).value).to contain_exactly "default", "mailers"
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 1
+          expect(described_class.find_by(key: described_class::PAUSES).value["queues"]).to contain_exactly "default", "mailers"
 
           described_class.unpause(queue: "default")
           described_class.unpause(queue: "mailers")
-          expect(described_class.find_by(key: described_class::PAUSED_QUEUES).value).to eq []
+          expect(described_class.find_by(key: described_class::PAUSES).value["queues"]).to eq []
         end
 
         it 'does not insert duplicate queue names' do
           described_class.pause(queue: "default")
           described_class.pause(queue: "default")
-          expect(described_class.where(key: described_class::PAUSED_QUEUES).count).to eq 1
-          expect(described_class.find_by(key: described_class::PAUSED_QUEUES).value).to contain_exactly "default"
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 1
+          expect(described_class.find_by(key: described_class::PAUSES).value["queues"]).to contain_exactly "default"
         end
       end
 
       context 'with job_class' do
         it 'inserts values into a json array' do
-          expect(described_class.where(key: described_class::PAUSED_JOB_CLASSES).count).to eq 0
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 0
 
           described_class.pause(job_class: "MyJob")
-          expect(described_class.where(key: described_class::PAUSED_JOB_CLASSES).count).to eq 1
-          expect(described_class.find_by(key: described_class::PAUSED_JOB_CLASSES).value).to contain_exactly "MyJob"
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 1
+          expect(described_class.find_by(key: described_class::PAUSES).value["job_classes"]).to contain_exactly "MyJob"
 
           described_class.pause(job_class: "AnotherJob")
-          expect(described_class.where(key: described_class::PAUSED_JOB_CLASSES).count).to eq 1
-          expect(described_class.find_by(key: described_class::PAUSED_JOB_CLASSES).value).to contain_exactly "MyJob", "AnotherJob"
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 1
+          expect(described_class.find_by(key: described_class::PAUSES).value["job_classes"]).to contain_exactly "MyJob", "AnotherJob"
 
           described_class.unpause(job_class: "MyJob")
           described_class.unpause(job_class: "AnotherJob")
-          expect(described_class.find_by(key: described_class::PAUSED_JOB_CLASSES).value).to eq []
+          expect(described_class.find_by(key: described_class::PAUSES).value["job_classes"]).to eq []
         end
 
         it 'does not insert duplicate job classes' do
           described_class.pause(job_class: "MyJob")
           described_class.pause(job_class: "MyJob")
-          expect(described_class.where(key: described_class::PAUSED_JOB_CLASSES).count).to eq 1
-          expect(described_class.find_by(key: described_class::PAUSED_JOB_CLASSES).value).to contain_exactly "MyJob"
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 1
+          expect(described_class.find_by(key: described_class::PAUSES).value["job_classes"]).to contain_exactly "MyJob"
         end
       end
     end
@@ -170,10 +170,10 @@ RSpec.describe GoodJob::Setting do
         it 'removes the queue from the paused list' do
           described_class.pause(queue: "default")
           described_class.pause(queue: "mailers")
-          expect(described_class.find_by(key: described_class::PAUSED_QUEUES).value).to contain_exactly "default", "mailers"
+          expect(described_class.find_by(key: described_class::PAUSES).value["queues"]).to contain_exactly "default", "mailers"
 
           described_class.unpause(queue: "default")
-          expect(described_class.find_by(key: described_class::PAUSED_QUEUES).value).to contain_exactly "mailers"
+          expect(described_class.find_by(key: described_class::PAUSES).value["queues"]).to contain_exactly "mailers"
         end
       end
 
@@ -185,10 +185,10 @@ RSpec.describe GoodJob::Setting do
         it 'removes the job class from the paused list' do
           described_class.pause(job_class: "MyJob")
           described_class.pause(job_class: "AnotherJob")
-          expect(described_class.find_by(key: described_class::PAUSED_JOB_CLASSES).value).to contain_exactly "MyJob", "AnotherJob"
+          expect(described_class.find_by(key: described_class::PAUSES).value["job_classes"]).to contain_exactly "MyJob", "AnotherJob"
 
           described_class.unpause(job_class: "MyJob")
-          expect(described_class.find_by(key: described_class::PAUSED_JOB_CLASSES).value).to contain_exactly "AnotherJob"
+          expect(described_class.find_by(key: described_class::PAUSES).value["job_classes"]).to contain_exactly "AnotherJob"
         end
       end
     end
