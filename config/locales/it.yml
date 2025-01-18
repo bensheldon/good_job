@@ -215,17 +215,23 @@ it:
             trillion: T
             unit: ''
     performance:
+      actions:
+        confirm_pause: Sei sicuro di voler mettere in pausa %{value}?
+        confirm_unpause: Sei sicuro di voler riprendere %{value}?
+        pause: Metti in pausa %{value}
+        unpause: Riprendi %{value}
       index:
         average_duration: Durata media
-        chart_title: Tempo totale di esecuzione del lavoro in secondi
+        chart_title: Tempo totale di esecuzione in secondi
         executions: Esecuzioni
-        job_class: Classe di lavoro
+        job_class: Classe del job
         maximum_duration: Durata massima
         minimum_duration: Durata minima
-        title: Prestazione
+        queue_name: Nome della coda
+        title: Prestazioni
       show:
         slow: Lento
-        title: Prestazione
+        title: Prestazioni
     processes:
       index:
         cron_enabled: Cron abilitato

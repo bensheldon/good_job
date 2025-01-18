@@ -1063,5 +1063,60 @@ RSpec.describe GoodJob::Job do
         expect(execution.runtime_latency).to eq(execution.finished_at - execution.performed_at)
       end
     end
+
+    describe '.schedule_ordered' do
+      it 'orders by scheduled or created (oldest first)' do
+        query = described_class.schedule_ordered
+        expect(query.to_sql).to include('ORDER BY COALESCE')
+      end
+    end
+
+    describe '.exclude_paused' do
+      let!(:default_job) { described_class.create!(queue_name: "default", job_class: "DefaultJob") }
+      let!(:mailers_job) { described_class.create!(queue_name: "mailers", job_class: "ActionMailer::MailDeliveryJob") }
+      let!(:reports_job) { described_class.create!(queue_name: "reports", job_class: "ReportsJob") }
+
+      before do
+        allow(GoodJob.configuration).to receive(:enable_pause).and_return(enable_pause)
+      end
+
+      context 'when enable_pause is false' do
+        let(:enable_pause) { false }
+
+        it 'returns all jobs' do
+          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job)
+        end
+      end
+
+      context 'when enable_pause is true' do
+        let(:enable_pause) { true }
+
+        it 'returns all jobs when nothing is paused' do
+          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job)
+        end
+
+        it 'excludes jobs with paused queue_names' do
+          GoodJob::Setting.pause(queue: "default")
+          GoodJob::Setting.pause(queue: "mailers")
+          expect(described_class.exclude_paused).to contain_exactly(reports_job)
+        end
+
+        it 'excludes jobs with paused job_classes' do
+          GoodJob::Setting.pause(job_class: "DefaultJob")
+          GoodJob::Setting.pause(job_class: "ActionMailer::MailDeliveryJob")
+
+          puts described_class.exclude_paused.to_sql
+
+          expect(described_class.exclude_paused).to contain_exactly(reports_job)
+        end
+
+        it 'excludes jobs with both paused queue_names and job_classes' do
+          GoodJob::Setting.pause(queue: "default")
+          GoodJob::Setting.pause(job_class: "ActionMailer::MailDeliveryJob")
+
+          expect(described_class.exclude_paused).to contain_exactly(reports_job)
+        end
+      end
+    end
   end
 end

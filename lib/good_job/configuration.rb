@@ -35,6 +35,8 @@ module GoodJob
     DEFAULT_DASHBOARD_LIVE_POLL_ENABLED = true
     # Default enqueue_after_transaction_commit
     DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT = false
+    # Default enable_pause setting
+    DEFAULT_ENABLE_PAUSE = false
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
@@ -367,6 +369,16 @@ module GoodJob
       return options[:enqueue_after_transaction_commit] unless options[:enqueue_after_transaction_commit].nil?
 
       DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT
+    end
+
+    # Whether the job processing can be paused.
+    # @return [Boolean]
+    def enable_pause
+      return options[:enable_pause] unless options[:enable_pause].nil?
+      return rails_config[:enable_pause] unless rails_config[:enable_pause].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PAUSE']) unless env['GOOD_JOB_ENABLE_PAUSE'].nil?
+
+      DEFAULT_ENABLE_PAUSE
     end
 
     # Whether running in a web server process.

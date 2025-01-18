@@ -215,13 +215,19 @@ pt-BR:
             trillion: T
             unit: ''
     performance:
+      actions:
+        confirm_pause: Tem certeza que deseja pausar %{value}?
+        confirm_unpause: Tem certeza que deseja retomar %{value}?
+        pause: Pausar %{value}
+        unpause: Retomar %{value}
       index:
         average_duration: Duração média
-        chart_title: Tempo total de execução do trabalho em segundos
+        chart_title: Tempo total de execução em segundos
         executions: Execuções
-        job_class: Classe de trabalho
+        job_class: Classe do trabalho
         maximum_duration: Duração máxima
         minimum_duration: Duração mínima
+        queue_name: Nome da fila
         title: Desempenho
       show:
         slow: Lento

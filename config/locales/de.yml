@@ -215,13 +215,19 @@ de:
             trillion: T
             unit: ''
     performance:
+      actions:
+        confirm_pause: Sind Sie sicher, dass Sie %{value} pausieren möchten?
+        confirm_unpause: Sind Sie sicher, dass Sie %{value} fortsetzen möchten?
+        pause: "%{value} pausieren"
+        unpause: "%{value} fortsetzen"
       index:
         average_duration: Durchschnittliche Dauer
-        chart_title: Gesamtdauer der Jobs in Sekunden
+        chart_title: Gesamtausführungszeit in Sekunden
         executions: Ausführungen
         job_class: Job-Klasse
         maximum_duration: Maximale Dauer
-        minimum_duration: Mindestdauer
+        minimum_duration: Minimale Dauer
+        queue_name: Warteschlangenname
         title: Leistung
       show:
         slow: Langsam

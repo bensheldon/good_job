@@ -241,13 +241,19 @@ uk:
             trillion: Трлн
             unit: ''
     performance:
+      actions:
+        confirm_pause: Ви впевнені, що хочете призупинити %{value}?
+        confirm_unpause: Ви впевнені, що хочете відновити %{value}?
+        pause: Призупинити %{value}
+        unpause: Відновити %{value}
       index:
         average_duration: Середня тривалість
-        chart_title: Загальний час виконання завдання в секундах
-        executions: Страти
-        job_class: Клас роботи
+        chart_title: Загальний час виконання в секундах
+        executions: Виконання
+        job_class: Клас завдання
         maximum_duration: Максимальна тривалість
         minimum_duration: Мінімальна тривалість
+        queue_name: Назва черги
         title: Продуктивність
       show:
         slow: Повільно

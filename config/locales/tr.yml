@@ -215,17 +215,23 @@ tr:
             trillion: Trilyon
             unit: ''
     performance:
+      actions:
+        confirm_pause: "%{value} duraklatmak istediğinizden emin misiniz?"
+        confirm_unpause: "%{value} devam ettirmek istediğinizden emin misiniz?"
+        pause: "%{value} duraklat"
+        unpause: "%{value} devam ettir"
       index:
         average_duration: Ortalama süre
-        chart_title: Saniye cinsinden toplam iş yürütme süresi
-        executions: İnfazlar
+        chart_title: Toplam yürütme süresi (saniye)
+        executions: Yürütmeler
         job_class: İş sınıfı
         maximum_duration: Maksimum süre
         minimum_duration: Minimum süre
-        title: Verim
+        queue_name: Kuyruk adı
+        title: Performans
       show:
         slow: Yavaş
-        title: Verim
+        title: Performans
     processes:
       index:
         cron_enabled: Cron etkin

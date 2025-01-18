@@ -215,6 +215,11 @@ en:
             trillion: T
             unit: ''
     performance:
+      actions:
+        confirm_pause: Are you sure you want to pause %{value}?
+        confirm_unpause: Are you sure you want to unpause %{value}?
+        pause: Pause %{value}
+        unpause: Unpause %{value}
       index:
         average_duration: Average duration
         chart_title: Total job execution time in seconds
@@ -222,6 +227,7 @@ en:
         job_class: Job class
         maximum_duration: Maximum duration
         minimum_duration: Minimum duration
+        queue_name: Queue name
         title: Performance
       show:
         slow: Slow

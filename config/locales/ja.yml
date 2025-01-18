@@ -215,13 +215,19 @@ ja:
             trillion: T
             unit: ''
     performance:
+      actions:
+        confirm_pause: "%{value}を一時停止してもよろしいですか？"
+        confirm_unpause: "%{value}を再開してもよろしいですか？"
+        pause: "%{value}を一時停止"
+        unpause: "%{value}を再開"
       index:
         average_duration: 平均所要時間
-        chart_title: ジョブの総実行時間（秒
-        executions: 実行
+        chart_title: 合計実行時間（秒）
+        executions: 実行回数
         job_class: ジョブクラス
-        maximum_duration: 最大持続時間
-        minimum_duration: 最小期間
+        maximum_duration: 最大所要時間
+        minimum_duration: 最小所要時間
+        queue_name: キュー名
         title: パフォーマンス
       show:
         slow: 遅い

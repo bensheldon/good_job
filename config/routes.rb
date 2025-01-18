@@ -34,7 +34,13 @@ GoodJob::Engine.routes.draw do
   end
 
   resources :processes, only: %i[index]
-  resources :performance, only: %i[index show]
+  resources :performance, only: %i[index show] do
+    collection do
+      get :pause, to: redirect(path: 'performance')
+      post :pause
+      delete :unpause
+    end
+  end
   resources :cleaner, only: %i[index]
 
   scope :frontend, controller: :frontends, defaults: { version: GoodJob::VERSION.tr(".", "-") } do

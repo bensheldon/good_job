@@ -215,17 +215,23 @@ nl:
             trillion: T
             unit: ''
     performance:
+      actions:
+        confirm_pause: Weet u zeker dat u %{value} wilt pauzeren?
+        confirm_unpause: Weet u zeker dat u %{value} wilt hervatten?
+        pause: Pauzeer %{value}
+        unpause: Hervat %{value}
       index:
         average_duration: Gemiddelde duur
-        chart_title: Totale uitvoeringstijd van de taak in seconden
-        executions: Executies
-        job_class: Functie klasse
+        chart_title: Totale uitvoeringstijd in seconden
+        executions: Uitvoeringen
+        job_class: Taakklasse
         maximum_duration: Maximale duur
         minimum_duration: Minimale duur
-        title: Prestatie
+        queue_name: Wachtrijnaam
+        title: Prestaties
       show:
-        slow: Langzaam
-        title: Prestatie
+        slow: Traag
+        title: Prestaties
     processes:
       index:
         cron_enabled: Cron ingeschakeld

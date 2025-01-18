@@ -215,13 +215,19 @@ ko:
             trillion: T
             unit: ''
     performance:
+      actions:
+        confirm_pause: "%{value}을(를) 일시 중지하시겠습니까?"
+        confirm_unpause: "%{value}을(를) 재개하시겠습니까?"
+        pause: "%{value} 일시 중지"
+        unpause: "%{value} 재개"
       index:
-        average_duration: 평균 지속 시간
-        chart_title: 총 작업 실행 시간(초)
-        executions: 실행
+        average_duration: 평균 소요 시간
+        chart_title: 총 실행 시간(초)
+        executions: 실행 횟수
         job_class: 작업 클래스
-        maximum_duration: 최대 기간
-        minimum_duration: 최소 기간
+        maximum_duration: 최대 소요 시간
+        minimum_duration: 최소 소요 시간
+        queue_name: 큐 이름
         title: 성능
       show:
         slow: 느림

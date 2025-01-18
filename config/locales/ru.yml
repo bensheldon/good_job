@@ -241,16 +241,22 @@ ru:
             trillion: Т
             unit: ''
     performance:
+      actions:
+        confirm_pause: Вы уверены, что хотите приостановить %{value}?
+        confirm_unpause: Вы уверены, что хотите возобновить %{value}?
+        pause: Приостановить %{value}
+        unpause: Возобновить %{value}
       index:
         average_duration: Средняя продолжительность
-        chart_title: Общее время выполнения задания в секундах
-        executions: Казни
-        job_class: Класс работы
+        chart_title: Общее время выполнения в секундах
+        executions: Выполнения
+        job_class: Класс задачи
         maximum_duration: Максимальная продолжительность
         minimum_duration: Минимальная продолжительность
+        queue_name: Название очереди
         title: Производительность
       show:
-        slow: Медленный
+        slow: Медленно
         title: Производительность
     processes:
       index:

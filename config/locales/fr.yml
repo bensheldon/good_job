@@ -215,16 +215,22 @@ fr:
             trillion: J
             unit: ''
     performance:
+      actions:
+        confirm_pause: Êtes-vous sûr de vouloir mettre en pause %{value} ?
+        confirm_unpause: Êtes-vous sûr de vouloir reprendre %{value} ?
+        pause: Mettre en pause %{value}
+        unpause: Reprendre %{value}
       index:
         average_duration: Durée moyenne
-        chart_title: Durée totale d'exécution du travail en secondes
+        chart_title: Temps total d'exécution en secondes
         executions: Exécutions
-        job_class: Catégorie d'emplois
+        job_class: Classe de tâche
         maximum_duration: Durée maximale
         minimum_duration: Durée minimale
+        queue_name: Nom de la file
         title: Performance
       show:
-        slow: Lenteur
+        slow: Lent
         title: Performance
     processes:
       index:

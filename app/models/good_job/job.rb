@@ -96,6 +96,21 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(bind_value('scheduled_at', DateTime.current, ActiveRecord::Type::DateTime))).or(where(scheduled_at: nil)) }
 
+    # Exclude jobs that are paused via queue_name or job_class.
+    # Only applies when enable_pause configuration is true.
+    # @!method exclude_paused
+    # @!scope class
+    # @return [ActiveRecord::Relation]
+    scope :exclude_paused, lambda {
+      return all unless GoodJob.configuration.enable_pause
+
+      paused_queues_query = GoodJob::Setting.where(key: GoodJob::Setting::PAUSED_QUEUES)
+                                            .select('jsonb_array_elements_text(value)')
+      paused_job_classes_query = GoodJob::Setting.where(key: GoodJob::Setting::PAUSED_JOB_CLASSES)
+                                                 .select('jsonb_array_elements_text(value)')
+      where.not(queue_name: paused_queues_query).where.not(job_class: paused_job_classes_query)
+    }
+
     # Order jobs by priority (highest priority first).
     # @!method priority_ordered
     # @!scope class
@@ -290,7 +305,7 @@ module GoodJob
       job = nil
       result = nil
 
-      unfinished.dequeueing_ordered(parsed_queues).only_scheduled.limit(1).with_advisory_lock(select_limit: queue_select_limit) do |jobs|
+      unfinished.dequeueing_ordered(parsed_queues).only_scheduled.exclude_paused.limit(1).with_advisory_lock(select_limit: queue_select_limit) do |jobs|
         job = jobs.first
 
         if job&.executable?
