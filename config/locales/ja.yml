@@ -214,12 +214,18 @@ ja:
             thousand: K
             trillion: T
             unit: ''
-    performance:
-      actions:
+    pauses:
+      index:
         confirm_pause: "%{value}を一時停止してもよろしいですか？"
         confirm_unpause: "%{value}を再開してもよろしいですか？"
-        pause: "%{value}を一時停止"
-        unpause: "%{value}を再開"
+        job_class: ジョブクラス
+        pause: 一時停止
+        queue: キュー
+        title: 一時停止
+        type: 一時停止タイプ
+        unpause: 再開
+        value: 値
+    performance:
       index:
         average_duration: 平均所要時間
         chart_title: 合計実行時間（秒）
@@ -262,6 +268,7 @@ ja:
         jobs: ジョブ
         live_poll: リアルタイム更新
         name: "GoodJob 👍"
+        pauses: 一時停止
         performance: パフォーマンス
         processes: プロセス
         theme:

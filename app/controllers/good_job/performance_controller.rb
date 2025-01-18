@@ -27,25 +27,5 @@ module GoodJob
       representative_job = GoodJob::Job.find_by!(job_class: params[:id])
       @job_class = representative_job.job_class
     end
-
-    def pause
-      if params[:queue_name].present?
-        GoodJob::Setting.pause(queue: params[:queue_name])
-      elsif params[:job_class].present?
-        GoodJob::Setting.pause(job_class: params[:job_class])
-      end
-
-      redirect_back(fallback_location: performance_index_path, notice: "Paused successfully")
-    end
-
-    def unpause
-      if params[:queue_name].present?
-        GoodJob::Setting.unpause(queue: params[:queue_name])
-      elsif params[:job_class].present?
-        GoodJob::Setting.unpause(job_class: params[:job_class])
-      end
-
-      redirect_back(fallback_location: performance_index_path, notice: "Unpaused successfully")
-    end
   end
 end

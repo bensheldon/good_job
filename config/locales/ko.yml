@@ -214,12 +214,18 @@ ko:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: "%{value}를 일시 중지하시겠습니까?"
+        confirm_unpause: "%{value}를 재개하시겠습니까?"
+        job_class: 작업 클래스
+        pause: 일시 중지
+        queue: 큐
+        title: 일시 중지
+        type: 중지 유형
+        unpause: 재개
+        value: 값
     performance:
-      actions:
-        confirm_pause: "%{value}을(를) 일시 중지하시겠습니까?"
-        confirm_unpause: "%{value}을(를) 재개하시겠습니까?"
-        pause: "%{value} 일시 중지"
-        unpause: "%{value} 재개"
       index:
         average_duration: 평균 소요 시간
         chart_title: 총 실행 시간(초)
@@ -262,6 +268,7 @@ ko:
         jobs: 작업
         live_poll: 실시간 업데이트
         name: "GoodJob 👍"
+        pauses: 일시 중지
         performance: 성능
         processes: 프로세스
         theme:

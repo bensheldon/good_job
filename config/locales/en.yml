@@ -214,12 +214,18 @@ en:
             thousand: K
             trillion: T
             unit: ''
-    performance:
-      actions:
+    pauses:
+      index:
         confirm_pause: Are you sure you want to pause %{value}?
-        confirm_unpause: Are you sure you want to unpause %{value}?
-        pause: Pause %{value}
-        unpause: Unpause %{value}
+        confirm_unpause: Are you sure you want to resume %{value}?
+        job_class: Job Class
+        pause: Pause
+        queue: Queue
+        title: Pauses
+        type: Pause Type
+        unpause: Resume
+        value: Value
+    performance:
       index:
         average_duration: Average duration
         chart_title: Total job execution time in seconds
@@ -262,6 +268,7 @@ en:
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
+        pauses: Pauses
         performance: Performance
         processes: Processes
         theme:

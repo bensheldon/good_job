@@ -22,19 +22,6 @@
           <div class="col-12 col-lg-4">
             <div class="d-flex gap-3 justify-content-between">
               <%= link_to performance.job_class, performance_path(performance.job_class) %>
-              <div class="d-flex gap-3 justify-content-end">
-                <% if @paused_job_classes.include?(performance.job_class) %>
-                  <%= button_to({ action: :unpause, job_class: performance.job_class }, method: :delete, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", data: { confirm: t("good_job.performance.actions.confirm_unpause", value: performance.job_class) }) do %>
-                    <%= render_icon "play" %>
-                    <div class="visually-hidden"><%= t("good_job.performance.actions.unpause", value: performance.job_class) %></div>
-                  <% end %>
-                <% else %>
-                  <%= button_to({ action: :pause, job_class: performance.job_class }, method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", data: { confirm: t("good_job.performance.actions.confirm_pause", value: performance.job_class) }) do %>
-                    <%= render_icon "pause" %>
-                    <div class="visually-hidden"><%= t("good_job.performance.actions.pause", value: performance.job_class) %></div>
-                  <% end %>
-                <% end %>
-              </div>
             </div>
           </div>
           <div class="col-6 col-lg-2 text-wrap">
@@ -77,19 +64,6 @@
           <div class="col-12 col-lg-4">
             <div class="d-flex gap-3 justify-content-between">
               <%= performance.queue_name %>
-              <div class="d-flex gap-3 justify-content-end">
-                <% if @paused_queues.include?(performance.queue_name) %>
-                  <%= button_to({ action: :unpause, queue_name: performance.queue_name }, method: :delete, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", data: { confirm: t("good_job.performance.actions.confirm_unpause", value: performance.queue_name) }) do %>
-                    <%= render_icon "play" %>
-                    <div class="visually-hidden"><%= t("good_job.performance.actions.unpause", value: performance.queue_name) %></div>
-                  <% end %>
-                <% else %>
-                  <%= button_to({ action: :pause, queue_name: performance.queue_name }, method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", data: { confirm: t("good_job.performance.actions.confirm_pause", value: performance.queue_name) }) do %>
-                    <%= render_icon "pause" %>
-                    <div class="visually-hidden"><%= t("good_job.performance.actions.pause", value: performance.queue_name) %></div>
-                  <% end %>
-                <% end %>
-              </div>
             </div>
           </div>
           <div class="col-6 col-lg-2 text-wrap">

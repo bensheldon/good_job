@@ -214,15 +214,21 @@ es:
             thousand: k
             trillion: T
             unit: ''
-    performance:
-      actions:
+    pauses:
+      index:
         confirm_pause: "¿Está seguro de que desea pausar %{value}?"
         confirm_unpause: "¿Está seguro de que desea reanudar %{value}?"
-        pause: Pausar %{value}
-        unpause: Reanudar %{value}
+        job_class: Clase de Trabajo
+        pause: Pausar
+        queue: Cola
+        title: Pausas
+        type: Tipo de Pausa
+        unpause: Reanudar
+        value: Valor
+    performance:
       index:
         average_duration: Duración promedio
-        chart_title: Tiempo total de ejecución en segundos
+        chart_title: Tiempo total de ejecución del trabajo en segundos
         executions: Ejecuciones
         job_class: Clase de trabajo
         maximum_duration: Duración máxima
@@ -262,6 +268,7 @@ es:
         jobs: Tareas
         live_poll: En vivo
         name: "GoodJob 👍"
+        pauses: Pausas
         performance: Rendimiento
         processes: Procesos
         theme:

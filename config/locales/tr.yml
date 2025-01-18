@@ -214,12 +214,18 @@ tr:
             thousand: Bin
             trillion: Trilyon
             unit: ''
-    performance:
-      actions:
+    pauses:
+      index:
         confirm_pause: "%{value} duraklatmak istediğinizden emin misiniz?"
         confirm_unpause: "%{value} devam ettirmek istediğinizden emin misiniz?"
-        pause: "%{value} duraklat"
-        unpause: "%{value} devam ettir"
+        job_class: İş Sınıfı
+        pause: Duraklat
+        queue: Kuyruk
+        title: Duraklatmalar
+        type: Duraklatma Türü
+        unpause: Devam Et
+        value: Değer
+    performance:
       index:
         average_duration: Ortalama süre
         chart_title: Toplam yürütme süresi (saniye)
@@ -262,6 +268,7 @@ tr:
         jobs: İşler
         live_poll: Anlık Güncelleme
         name: "GoodJob 👍"
+        pauses: Duraklatmalar
         performance: Verim
         processes: Süreçler
         theme:

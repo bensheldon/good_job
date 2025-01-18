@@ -214,15 +214,21 @@ fr:
             thousand: k
             trillion: J
             unit: ''
-    performance:
-      actions:
-        confirm_pause: Êtes-vous sûr de vouloir mettre en pause %{value} ?
+    pauses:
+      index:
+        confirm_pause: Êtes-vous sûr de vouloir mettre en pause %{value}     ?
         confirm_unpause: Êtes-vous sûr de vouloir reprendre %{value} ?
-        pause: Mettre en pause %{value}
-        unpause: Reprendre %{value}
+        job_class: Classe de Tâche
+        pause: Mettre en Pause
+        queue: File d'attente
+        title: Pauses
+        type: Type de Pause
+        unpause: Reprendre
+        value: Valeur
+    performance:
       index:
         average_duration: Durée moyenne
-        chart_title: Temps total d'exécution en secondes
+        chart_title: Temps total d'exécution des tâches en secondes
         executions: Exécutions
         job_class: Classe de tâche
         maximum_duration: Durée maximale
@@ -262,6 +268,7 @@ fr:
         jobs: Jobs
         live_poll: En direct
         name: "GoodJob 👍"
+        pauses: Pauses
         performance: Performance
         processes: Processus
         theme:

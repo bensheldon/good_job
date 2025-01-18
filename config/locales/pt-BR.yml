@@ -214,12 +214,18 @@ pt-BR:
             thousand: K
             trillion: T
             unit: ''
-    performance:
-      actions:
+    pauses:
+      index:
         confirm_pause: Tem certeza que deseja pausar %{value}?
         confirm_unpause: Tem certeza que deseja retomar %{value}?
-        pause: Pausar %{value}
-        unpause: Retomar %{value}
+        job_class: Classe do Job
+        pause: Pausar
+        queue: Fila
+        title: Pausas
+        type: Tipo de Pausa
+        unpause: Retomar
+        value: Valor
+    performance:
       index:
         average_duration: Duração média
         chart_title: Tempo total de execução em segundos
@@ -262,6 +268,7 @@ pt-BR:
         jobs: Tarefas
         live_poll: Acompanhamento ao Vivo
         name: "GoodJob 👍"
+        pauses: Pausas
         performance: Desempenho
         processes: Processos
         theme:

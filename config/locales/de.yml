@@ -214,12 +214,18 @@ de:
             thousand: K
             trillion: T
             unit: ''
-    performance:
-      actions:
+    pauses:
+      index:
         confirm_pause: Sind Sie sicher, dass Sie %{value} pausieren möchten?
         confirm_unpause: Sind Sie sicher, dass Sie %{value} fortsetzen möchten?
-        pause: "%{value} pausieren"
-        unpause: "%{value} fortsetzen"
+        job_class: Job-Klasse
+        pause: Pausieren
+        queue: Warteschlange
+        title: Pausen
+        type: Pausentyp
+        unpause: Fortsetzen
+        value: Wert
+    performance:
       index:
         average_duration: Durchschnittliche Dauer
         chart_title: Gesamtausführungszeit in Sekunden
@@ -262,6 +268,7 @@ de:
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
+        pauses: Pausen
         performance: Leistung
         processes: Prozesse
         theme:

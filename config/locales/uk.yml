@@ -240,12 +240,18 @@ uk:
             thousand: Тис
             trillion: Трлн
             unit: ''
-    performance:
-      actions:
+    pauses:
+      index:
         confirm_pause: Ви впевнені, що хочете призупинити %{value}?
         confirm_unpause: Ви впевнені, що хочете відновити %{value}?
-        pause: Призупинити %{value}
-        unpause: Відновити %{value}
+        job_class: Клас Завдання
+        pause: Призупинити
+        queue: Назва Черги
+        title: Паузи
+        type: Тип Паузи
+        unpause: Відновити
+        value: Значення
+    performance:
       index:
         average_duration: Середня тривалість
         chart_title: Загальний час виконання в секундах
@@ -285,9 +291,10 @@ uk:
         batches: Пакети
         cleaner: Discard Cleaner
         cron_schedules: Cron
-        jobs: Задачі
-        live_poll: Живе Опитування
+        jobs: Роботи
+        live_poll: Живе опитування
         name: "GoodJob 👍"
+        pauses: Паузи
         performance: Продуктивність
         processes: Процеси
         theme:

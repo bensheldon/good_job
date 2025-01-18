@@ -1,0 +1,28 @@
+<% group = type.to_s.pluralize.to_sym %>
+<% items = paused.fetch(group) { [] } %>
+<% if items&.any? %>
+  <div class="my-3 card">
+    <div class="list-group list-group-flush text-nowrap" role="table">
+      <header class="list-group-item bg-body-tertiary">
+        <div class="row small text-muted text-uppercase align-items-center">
+          <div class="col-12"><%= t("good_job.pauses.index.#{type}") %></div>
+        </div>
+      </header>
+
+      <% items.each do |value| %>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <%= value %>
+          <%= button_to(
+                { action: :destroy, type: type, value: value },
+            method: :delete,
+            class: 'btn btn-sm btn-outline-primary',
+            data: { confirm: t('good_job.pauses.index.confirm_unpause', value: value) }
+              ) do %>
+              <%= render_icon "play" %>
+              <%= t("good_job.pauses.index.unpause") %>
+          <% end %>
+        </li>
+      <% end %>
+    </div>
+  </div>
+<% end %>
