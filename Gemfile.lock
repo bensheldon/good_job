@@ -280,13 +280,13 @@ GEM
       net-protocol
     nio4r (2.7.4)
     nio4r (2.7.4-java)
-    nokogiri (1.17.2-arm64-darwin)
+    nokogiri (1.18.2-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.17.2-java)
+    nokogiri (1.18.2-java)
       racc (~> 1.4)
-    nokogiri (1.17.2-x86_64-darwin)
+    nokogiri (1.18.2-x86_64-darwin)
       racc (~> 1.4)
-    nokogiri (1.17.2-x86_64-linux)
+    nokogiri (1.18.2-x86_64-linux-gnu)
       racc (~> 1.4)
     octokit (4.25.1)
       faraday (>= 1, < 3)
@@ -515,6 +515,7 @@ GEM
 PLATFORMS
   arm64-darwin-22
   arm64-darwin-23
+  arm64-darwin-24
   universal-java-11
   universal-java-20
   x86_64-darwin-23
@@ -568,7 +569,7 @@ DEPENDENCIES
   yard-activesupport-concern
 
 RUBY VERSION
-   ruby 3.3.4p94
+   ruby 3.4.1p0
 
 BUNDLED WITH
    2.5.11
