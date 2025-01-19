@@ -1075,6 +1075,8 @@ RSpec.describe GoodJob::Job do
       let!(:default_job) { described_class.create!(queue_name: "default", job_class: "DefaultJob") }
       let!(:mailers_job) { described_class.create!(queue_name: "mailers", job_class: "ActionMailer::MailDeliveryJob") }
       let!(:reports_job) { described_class.create!(queue_name: "reports", job_class: "ReportsJob") }
+      let!(:labeled_job) { described_class.create!(queue_name: "default", job_class: "DefaultJob", labels: %w[important urgent]) }
+      let!(:other_labeled_job) { described_class.create!(queue_name: "default", job_class: "DefaultJob", labels: ["low_priority"]) }
 
       before do
         allow(GoodJob.configuration).to receive(:enable_pause).and_return(enable_pause)
@@ -1084,7 +1086,7 @@ RSpec.describe GoodJob::Job do
         let(:enable_pause) { false }
 
         it 'returns all jobs' do
-          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job)
+          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job, labeled_job, other_labeled_job)
         end
       end
 
@@ -1092,7 +1094,8 @@ RSpec.describe GoodJob::Job do
         let(:enable_pause) { true }
 
         it 'returns all jobs when nothing is paused' do
-          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job)
+          expect(described_class.exclude_paused.count).to eq 5
+          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job, labeled_job, other_labeled_job)
         end
 
         it 'excludes jobs with paused queue_names' do
@@ -1104,17 +1107,42 @@ RSpec.describe GoodJob::Job do
         it 'excludes jobs with paused job_classes' do
           GoodJob::Setting.pause(job_class: "DefaultJob")
           GoodJob::Setting.pause(job_class: "ActionMailer::MailDeliveryJob")
-
-          puts described_class.exclude_paused.to_sql
-
           expect(described_class.exclude_paused).to contain_exactly(reports_job)
+        end
+
+        it 'excludes jobs with paused labels' do
+          GoodJob::Setting.pause(label: "important")
+          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job, other_labeled_job)
+        end
+
+        it 'excludes jobs with any paused label when job has multiple labels' do
+          GoodJob::Setting.pause(label: "urgent")
+          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job, other_labeled_job)
         end
 
         it 'excludes jobs with both paused queue_names and job_classes' do
           GoodJob::Setting.pause(queue: "default")
           GoodJob::Setting.pause(job_class: "ActionMailer::MailDeliveryJob")
-
           expect(described_class.exclude_paused).to contain_exactly(reports_job)
+        end
+
+        it 'excludes jobs with paused queue_names, job_classes, or labels' do
+          GoodJob::Setting.pause(queue: "reports")
+          GoodJob::Setting.pause(job_class: "ActionMailer::MailDeliveryJob")
+          GoodJob::Setting.pause(label: "important")
+          expect(described_class.exclude_paused).to contain_exactly(default_job, other_labeled_job)
+        end
+
+        it 'handles jobs with nil labels' do
+          GoodJob::Setting.pause(label: "important")
+          unlabeled_job = described_class.create!(queue_name: "default", job_class: "DefaultJob", labels: nil)
+          expect(described_class.exclude_paused).to include(unlabeled_job)
+        end
+
+        it 'handles jobs with empty labels array' do
+          GoodJob::Setting.pause(label: "important")
+          empty_labeled_job = described_class.create!(queue_name: "default", job_class: "DefaultJob", labels: [])
+          expect(described_class.exclude_paused).to include(empty_labeled_job)
         end
       end
     end

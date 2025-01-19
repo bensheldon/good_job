@@ -304,21 +304,23 @@ module GoodJob
   # Unpause job execution for a given queue or job class.
   # @param queue [String, nil] Queue name to unpause
   # @param job_class [String, nil] Job class name to unpause
+  # @param label [String, nil] Label to unpause
   # @return [void]
-  def self.unpause(queue: nil, job_class: nil)
-    GoodJob::Setting.unpause(queue: queue, job_class: job_class)
+  def self.unpause(queue: nil, job_class: nil, label: nil)
+    GoodJob::Setting.unpause(queue: queue, job_class: job_class, label: label)
   end
 
   # Check if job execution is paused for a given queue or job class.
   # @param queue [String, nil] Queue name to check
   # @param job_class [String, nil] Job class name to check
+  # @param label [String, nil] Label to check
   # @return [Boolean]
-  def self.paused?(queue: nil, job_class: nil)
-    GoodJob::Setting.paused?(queue: queue, job_class: job_class)
+  def self.paused?(queue: nil, job_class: nil, label: nil)
+    GoodJob::Setting.paused?(queue: queue, job_class: job_class, label: label)
   end
 
   # Get a list of all paused queues and job classes
-  # @return [Hash] Hash with :queues and :job_classes arrays of paused items
+  # @return [Hash] Hash with :queues, :job_classes, :labels arrays of paused items
   def self.paused(type = nil)
     GoodJob::Setting.paused(type)
   end

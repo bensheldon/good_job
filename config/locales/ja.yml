@@ -219,6 +219,7 @@ ja:
         confirm_pause: "%{value}を一時停止してもよろしいですか？"
         confirm_unpause: "%{value}を再開してもよろしいですか？"
         job_class: ジョブクラス
+        label: ラベル
         pause: 一時停止
         queue: キュー
         title: 一時停止

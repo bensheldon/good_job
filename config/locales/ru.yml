@@ -244,9 +244,10 @@ ru:
       index:
         confirm_pause: Вы уверены, что хотите приостановить %{value}?
         confirm_unpause: Вы уверены, что хотите возобновить %{value}?
-        job_class: Класс Задачи
+        job_class: Класс задачи
+        label: Метка
         pause: Приостановить
-        queue: Имя Очереди
+        queue: Очередь
         title: Паузы
         type: Тип Паузы
         unpause: Возобновить

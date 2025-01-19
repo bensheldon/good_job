@@ -219,6 +219,7 @@ de:
         confirm_pause: Sind Sie sicher, dass Sie %{value} pausieren möchten?
         confirm_unpause: Sind Sie sicher, dass Sie %{value} fortsetzen möchten?
         job_class: Job-Klasse
+        label: Label
         pause: Pausieren
         queue: Warteschlange
         title: Pausen

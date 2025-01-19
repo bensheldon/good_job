@@ -198,19 +198,19 @@ describe GoodJob do
   describe '.pause, .unpause, and .paused?' do
     it 'can pause and unpause jobs' do
       expect(described_class.paused?(queue: 'default')).to be false
-      expect(described_class.paused).to eq({ queues: [], job_classes: [] })
+      expect(described_class.paused).to eq({ queues: [], job_classes: [], labels: [] })
 
       described_class.pause(queue: 'default')
       described_class.pause(job_class: 'MyJob')
       expect(described_class.paused?(queue: 'default')).to be true
-      expect(described_class.paused).to eq({ queues: ['default'], job_classes: ['MyJob'] })
+      expect(described_class.paused).to eq({ queues: ['default'], job_classes: ['MyJob'], labels: [] })
 
       described_class.unpause(queue: 'default')
       expect(described_class.paused?(queue: 'default')).to be false
-      expect(described_class.paused).to eq({ queues: [], job_classes: ['MyJob'] })
+      expect(described_class.paused).to eq({ queues: [], job_classes: ['MyJob'], labels: [] })
 
       described_class.unpause(job_class: 'MyJob')
-      expect(described_class.paused).to eq({ queues: [], job_classes: [] })
+      expect(described_class.paused).to eq({ queues: [], job_classes: [], labels: [] })
     end
   end
 end

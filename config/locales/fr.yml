@@ -216,10 +216,11 @@ fr:
             unit: ''
     pauses:
       index:
-        confirm_pause: Êtes-vous sûr de vouloir mettre en pause %{value}     ?
+        confirm_pause: Êtes-vous sûr de vouloir mettre en pause %{value} ?
         confirm_unpause: Êtes-vous sûr de vouloir reprendre %{value} ?
-        job_class: Classe de Tâche
-        pause: Mettre en Pause
+        job_class: Classe de tâche
+        label: Étiquette
+        pause: Pause
         queue: File d'attente
         title: Pauses
         type: Type de Pause

@@ -244,9 +244,10 @@ uk:
       index:
         confirm_pause: Ви впевнені, що хочете призупинити %{value}?
         confirm_unpause: Ви впевнені, що хочете відновити %{value}?
-        job_class: Клас Завдання
+        job_class: Клас завдання
+        label: Мітка
         pause: Призупинити
-        queue: Назва Черги
+        queue: Черга
         title: Паузи
         type: Тип Паузи
         unpause: Відновити

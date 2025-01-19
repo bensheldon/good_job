@@ -219,8 +219,9 @@ ko:
         confirm_pause: "%{value}를 일시 중지하시겠습니까?"
         confirm_unpause: "%{value}를 재개하시겠습니까?"
         job_class: 작업 클래스
+        label: 라벨
         pause: 일시 중지
-        queue: 큐
+        queue: 대기열
         title: 일시 중지
         type: 중지 유형
         unpause: 재개

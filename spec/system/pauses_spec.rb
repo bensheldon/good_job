@@ -57,5 +57,27 @@ describe 'Pauses' do
 
     GoodJob.perform_inline
     expect(GoodJob::Job.unfinished.size).to eq 0
+
+    # Pause label
+    select "Label", from: "Pause Type"
+    fill_in "Value", with: "important"
+    click_on "Pause"
+
+    expect(page).to have_content "important"
+    expect(GoodJob.paused?(label: "important")).to eq true
+
+    ExampleJob.set(good_job_labels: ["important"]).perform_later
+    GoodJob.perform_inline
+    expect(GoodJob::Job.unfinished.size).to eq 1
+
+    # Unpause label
+    within "li", text: "important" do
+      accept_confirm { click_on "Resume" }
+    end
+    expect(page).to have_content "Successfully unpaused"
+    expect(GoodJob.paused?(label: "important")).to eq false
+
+    GoodJob.perform_inline
+    expect(GoodJob::Job.unfinished.size).to eq 0
   end
 end

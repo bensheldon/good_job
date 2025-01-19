@@ -218,8 +218,9 @@ it:
       index:
         confirm_pause: Sei sicuro di voler mettere in pausa %{value}?
         confirm_unpause: Sei sicuro di voler riprendere %{value}?
-        job_class: Classe del Job
-        pause: Metti in Pausa
+        job_class: Classe del job
+        label: Etichetta
+        pause: Pausa
         queue: Coda
         title: Pause
         type: Tipo di Pausa

@@ -94,12 +94,14 @@ RSpec.describe GoodJob::Setting do
 
   describe 'pause settings' do
     describe '.pause' do
-      it 'raises ArgumentError if neither queue nor job_class is provided' do
-        expect { described_class.pause }.to raise_error(ArgumentError, "Must provide either queue or job_class, but not both")
+      it 'raises ArgumentError if no valid argument is provided' do
+        expect { described_class.pause }.to raise_error(ArgumentError, "Must provide exactly one of queue, job_class, or label")
       end
 
-      it 'raises ArgumentError if both queue and job_class are provided' do
-        expect { described_class.pause(queue: "default", job_class: "MyJob") }.to raise_error(ArgumentError, "Must provide either queue or job_class, but not both")
+      it 'raises ArgumentError if multiple arguments are provided' do
+        expect { described_class.pause(queue: "default", job_class: "MyJob") }.to raise_error(ArgumentError, "Must provide exactly one of queue, job_class, or label")
+        expect { described_class.pause(queue: "default", label: "my_label") }.to raise_error(ArgumentError, "Must provide exactly one of queue, job_class, or label")
+        expect { described_class.pause(job_class: "MyJob", label: "my_label") }.to raise_error(ArgumentError, "Must provide exactly one of queue, job_class, or label")
       end
 
       context 'with queue' do
@@ -151,15 +153,42 @@ RSpec.describe GoodJob::Setting do
           expect(described_class.find_by(key: described_class::PAUSES).value["job_classes"]).to contain_exactly "MyJob"
         end
       end
+
+      context 'with label' do
+        it 'inserts values into a json array' do
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 0
+
+          described_class.pause(label: "important")
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 1
+          expect(described_class.find_by(key: described_class::PAUSES).value["labels"]).to contain_exactly "important"
+
+          described_class.pause(label: "urgent")
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 1
+          expect(described_class.find_by(key: described_class::PAUSES).value["labels"]).to contain_exactly "important", "urgent"
+
+          described_class.unpause(label: "important")
+          described_class.unpause(label: "urgent")
+          expect(described_class.find_by(key: described_class::PAUSES).value["labels"]).to eq []
+        end
+
+        it 'does not insert duplicate labels' do
+          described_class.pause(label: "important")
+          described_class.pause(label: "important")
+          expect(described_class.where(key: described_class::PAUSES).count).to eq 1
+          expect(described_class.find_by(key: described_class::PAUSES).value["labels"]).to contain_exactly "important"
+        end
+      end
     end
 
     describe '.unpause' do
-      it 'raises ArgumentError if neither queue nor job_class is provided' do
-        expect { described_class.unpause }.to raise_error(ArgumentError, "Must provide either queue or job_class, but not both")
+      it 'raises ArgumentError if no valid argument is provided' do
+        expect { described_class.unpause }.to raise_error(ArgumentError, "Must provide exactly one of queue, job_class, or label")
       end
 
-      it 'raises ArgumentError if both queue and job_class are provided' do
-        expect { described_class.unpause(queue: "default", job_class: "MyJob") }.to raise_error(ArgumentError, "Must provide either queue or job_class, but not both")
+      it 'raises ArgumentError if multiple arguments are provided' do
+        expect { described_class.unpause(queue: "default", job_class: "MyJob") }.to raise_error(ArgumentError, "Must provide exactly one of queue, job_class, or label")
+        expect { described_class.unpause(queue: "default", label: "my_label") }.to raise_error(ArgumentError, "Must provide exactly one of queue, job_class, or label")
+        expect { described_class.unpause(job_class: "MyJob", label: "my_label") }.to raise_error(ArgumentError, "Must provide exactly one of queue, job_class, or label")
       end
 
       context 'with queue' do
@@ -191,11 +220,28 @@ RSpec.describe GoodJob::Setting do
           expect(described_class.find_by(key: described_class::PAUSES).value["job_classes"]).to contain_exactly "AnotherJob"
         end
       end
+
+      context 'with label' do
+        it 'safely handles non-existent settings' do
+          expect { described_class.unpause(label: "important") }.not_to raise_error
+        end
+
+        it 'removes the label from the paused list' do
+          described_class.pause(label: "important")
+          described_class.pause(label: "urgent")
+          expect(described_class.find_by(key: described_class::PAUSES).value["labels"]).to contain_exactly "important", "urgent"
+
+          described_class.unpause(label: "important")
+          expect(described_class.find_by(key: described_class::PAUSES).value["labels"]).to contain_exactly "urgent"
+        end
+      end
     end
 
     describe '.paused?' do
-      it 'raises ArgumentError if both queue and job_class are provided' do
-        expect { described_class.paused?(queue: "default", job_class: "MyJob") }.to raise_error(ArgumentError, "Must provide either queue or job_class, or neither")
+      it 'raises ArgumentError if multiple arguments are provided' do
+        expect { described_class.paused?(queue: "default", job_class: "MyJob") }.to raise_error(ArgumentError, "Must provide at most one of queue, job_class, or label")
+        expect { described_class.paused?(queue: "default", label: "my_label") }.to raise_error(ArgumentError, "Must provide at most one of queue, job_class, or label")
+        expect { described_class.paused?(job_class: "MyJob", label: "my_label") }.to raise_error(ArgumentError, "Must provide at most one of queue, job_class, or label")
       end
 
       it 'returns true when queue is paused' do
@@ -215,11 +261,20 @@ RSpec.describe GoodJob::Setting do
       it 'returns false when job class is not paused' do
         expect(described_class.paused?(job_class: "MyJob")).to be false
       end
+
+      it 'returns true when label is paused' do
+        described_class.pause(label: "important")
+        expect(described_class.paused?(label: "important")).to be true
+      end
+
+      it 'returns false when label is not paused' do
+        expect(described_class.paused?(label: "important")).to be false
+      end
     end
 
     describe '.paused' do
       it 'returns empty arrays when nothing is paused' do
-        expect(described_class.paused).to eq({ queues: [], job_classes: [] })
+        expect(described_class.paused).to eq({ queues: [], job_classes: [], labels: [] })
       end
 
       it 'returns only queues when type is :queues' do
@@ -234,12 +289,21 @@ RSpec.describe GoodJob::Setting do
         expect(described_class.paused(:job_classes)).to contain_exactly "MyJob"
       end
 
-      it 'returns both queues and job classes by default' do
+      it 'returns only labels when type is :labels' do
         described_class.pause(queue: "default")
         described_class.pause(job_class: "MyJob")
+        described_class.pause(label: "important")
+        expect(described_class.paused(:labels)).to contain_exactly "important"
+      end
+
+      it 'returns queues, job classes, and labels by default' do
+        described_class.pause(queue: "default")
+        described_class.pause(job_class: "MyJob")
+        described_class.pause(label: "important")
         expect(described_class.paused).to eq({
                                                queues: ["default"],
           job_classes: ["MyJob"],
+          labels: ["important"],
                                              })
       end
     end

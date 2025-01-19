@@ -14,6 +14,7 @@
           options_for_select([
                                [t('good_job.pauses.index.queue'), 'queue'],
                                [t('good_job.pauses.index.job_class'), 'job_class'],
+                               [t('good_job.pauses.index.label'), 'label'],
                              ]),
           class: 'form-select',
           required: true %>
@@ -31,3 +32,4 @@
 
 <%= render 'group', paused: @paused, type: :queue %>
 <%= render 'group', paused: @paused, type: :job_class %>
+<%= render 'group', paused: @paused, type: :label %>

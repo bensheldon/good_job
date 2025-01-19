@@ -218,7 +218,8 @@ tr:
       index:
         confirm_pause: "%{value} duraklatmak istediğinizden emin misiniz?"
         confirm_unpause: "%{value} devam ettirmek istediğinizden emin misiniz?"
-        job_class: İş Sınıfı
+        job_class: İş sınıfı
+        label: Etiket
         pause: Duraklat
         queue: Kuyruk
         title: Duraklatmalar

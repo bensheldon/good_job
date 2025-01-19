@@ -107,7 +107,20 @@ module GoodJob
       paused_query = GoodJob::Setting.where(key: GoodJob::Setting::PAUSES)
       paused_queues_query = paused_query.select("jsonb_array_elements_text(value->'queues')")
       paused_job_classes_query = paused_query.select("jsonb_array_elements_text(value->'job_classes')")
-      where.not(queue_name: paused_queues_query).where.not(job_class: paused_job_classes_query)
+      paused_labels_query = paused_query.select("jsonb_array_elements_text(value->'labels')")
+
+      where.not(queue_name: paused_queues_query)
+           .where.not(job_class: paused_job_classes_query)
+           .where(
+             Arel::Nodes::Not.new(
+               Arel::Nodes::NamedFunction.new(
+                 "COALESCE", [
+                   Arel::Nodes::InfixOperation.new('&&', arel_table['labels'], Arel::Nodes::NamedFunction.new('ARRAY', [paused_labels_query.arel])),
+                   Arel::Nodes::SqlLiteral.new('FALSE'),
+                 ]
+               )
+             )
+           )
     }
 
     # Order jobs by priority (highest priority first).

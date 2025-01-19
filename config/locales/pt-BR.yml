@@ -218,7 +218,8 @@ pt-BR:
       index:
         confirm_pause: Tem certeza que deseja pausar %{value}?
         confirm_unpause: Tem certeza que deseja retomar %{value}?
-        job_class: Classe do Job
+        job_class: Classe do trabalho
+        label: Rótulo
         pause: Pausar
         queue: Fila
         title: Pausas
