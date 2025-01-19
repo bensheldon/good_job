@@ -218,6 +218,7 @@ nl:
       index:
         confirm_pause: Weet u zeker dat u %{value} wilt pauzeren?
         confirm_unpause: Weet u zeker dat u %{value} wilt hervatten?
+        disabled: De experimentele Pauzes-functie van GoodJob is standaard uitgeschakeld omdat het de prestaties kan verminderen. Configureer om in te schakelen
         job_class: Taakklasse
         label: Label
         pause: Pauzeren

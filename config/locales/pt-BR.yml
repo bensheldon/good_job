@@ -218,6 +218,7 @@ pt-BR:
       index:
         confirm_pause: Tem certeza que deseja pausar %{value}?
         confirm_unpause: Tem certeza que deseja retomar %{value}?
+        disabled: O recurso experimental de Pausas do GoodJob está desativado por padrão porque pode degradar o desempenho. Configure para ativar
         job_class: Classe do trabalho
         label: Rótulo
         pause: Pausar

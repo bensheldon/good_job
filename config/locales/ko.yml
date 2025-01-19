@@ -218,6 +218,7 @@ ko:
       index:
         confirm_pause: "%{value}를 일시 중지하시겠습니까?"
         confirm_unpause: "%{value}를 재개하시겠습니까?"
+        disabled: GoodJob의 실험적인 일시 중지 기능은 성능이 저하될 수 있으므로 기본적으로 비활성화되어 있습니다. 활성화하려면 구성하세요
         job_class: 작업 클래스
         label: 라벨
         pause: 일시 중지

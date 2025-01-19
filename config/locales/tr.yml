@@ -218,6 +218,7 @@ tr:
       index:
         confirm_pause: "%{value} duraklatmak istediğinizden emin misiniz?"
         confirm_unpause: "%{value} devam ettirmek istediğinizden emin misiniz?"
+        disabled: GoodJob'ın deneysel Duraklatma özelliği, performansı düşürebileceği için varsayılan olarak devre dışıdır. Etkinleştirmek için yapılandırın
         job_class: İş sınıfı
         label: Etiket
         pause: Duraklat

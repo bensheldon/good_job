@@ -218,6 +218,7 @@ de:
       index:
         confirm_pause: Sind Sie sicher, dass Sie %{value} pausieren möchten?
         confirm_unpause: Sind Sie sicher, dass Sie %{value} fortsetzen möchten?
+        disabled: Die experimentelle Pausenfunktion von GoodJob ist standardmäßig deaktiviert, da sie die Leistung beeinträchtigen kann. Konfigurieren Sie sie zur Aktivierung
         job_class: Job-Klasse
         label: Label
         pause: Pausieren

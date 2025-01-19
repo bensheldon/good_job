@@ -218,6 +218,7 @@ ja:
       index:
         confirm_pause: "%{value}を一時停止してもよろしいですか？"
         confirm_unpause: "%{value}を再開してもよろしいですか？"
+        disabled: GoodJobの実験的な一時停止機能は、パフォーマンスが低下する可能性があるため、デフォルトでは無効になっています。有効にするには設定してください
         job_class: ジョブクラス
         label: ラベル
         pause: 一時停止

@@ -218,6 +218,7 @@ it:
       index:
         confirm_pause: Sei sicuro di voler mettere in pausa %{value}?
         confirm_unpause: Sei sicuro di voler riprendere %{value}?
+        disabled: La funzione sperimentale Pause di GoodJob è disabilitata per impostazione predefinita perché potrebbe degradare le prestazioni. Configurare per abilitare
         job_class: Classe del job
         label: Etichetta
         pause: Pausa

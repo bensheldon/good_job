@@ -1567,7 +1567,7 @@ If WEBrick is configured to be used, but the dependency is not found, GoodJob wi
 GoodJob allows for pausing jobs by queue or job class. This feature is currently opt-in because the performance impact of loading and filtering these attributes is not yet known. To enable this feature, add the following to your configuration:
 
 > ```ruby
-> config.good_job.enable_pause = true
+> config.good_job.enable_pauses = true
 > ```
 
 Pausing can be done via the Dashboard's Performance page, or in Ruby

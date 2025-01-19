@@ -373,9 +373,9 @@ module GoodJob
 
     # Whether the job processing can be paused.
     # @return [Boolean]
-    def enable_pause
-      return options[:enable_pause] unless options[:enable_pause].nil?
-      return rails_config[:enable_pause] unless rails_config[:enable_pause].nil?
+    def enable_pauses
+      return options[:enable_pauses] unless options[:enable_pauses].nil?
+      return rails_config[:enable_pauses] unless rails_config[:enable_pauses].nil?
       return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PAUSE']) unless env['GOOD_JOB_ENABLE_PAUSE'].nil?
 
       DEFAULT_ENABLE_PAUSE

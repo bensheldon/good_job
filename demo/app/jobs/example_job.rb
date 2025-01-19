@@ -43,7 +43,26 @@ class ExampleJob < ApplicationJob
     elsif type == DEAD_TYPE
       raise DeadError
     elsif type == SLOW_TYPE
-      sleep 5
+      50.times do
+        break if blocking_reload?
+        sleep 0.1
+      end
+    end
+  end
+
+  private
+
+  def blocking_reload?
+    return false unless Rails.application.config.reloading_enabled?
+
+    ActiveSupport::Dependencies.interlock.raw_state do |threads|
+      # Find any thread attempting to unload (reload) code
+      return unless threads.any? { |_, info| info[:purpose] == :unload }
+
+      # Is the current thread blocking it? Likely yes.
+      info = threads[Thread.current]
+      info[:sharing] > 0 || # Thread holds a share lock
+        (info[:exclusive] && ![:load, :unload].include?(info[:purpose])) # Or holds incompatible exclusive lock
     end
   end
 end

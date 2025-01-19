@@ -102,7 +102,7 @@ module GoodJob
     # @!scope class
     # @return [ActiveRecord::Relation]
     scope :exclude_paused, lambda {
-      return all unless GoodJob.configuration.enable_pause
+      return all unless GoodJob.configuration.enable_pauses
 
       paused_query = GoodJob::Setting.where(key: GoodJob::Setting::PAUSES)
       paused_queues_query = paused_query.select("jsonb_array_elements_text(value->'queues')")

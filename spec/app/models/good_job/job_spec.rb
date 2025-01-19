@@ -1079,11 +1079,11 @@ RSpec.describe GoodJob::Job do
       let!(:other_labeled_job) { described_class.create!(queue_name: "default", job_class: "DefaultJob", labels: ["low_priority"]) }
 
       before do
-        allow(GoodJob.configuration).to receive(:enable_pause).and_return(enable_pause)
+        allow(GoodJob.configuration).to receive(:enable_pauses).and_return(enable_pauses)
       end
 
       context 'when enable_pause is false' do
-        let(:enable_pause) { false }
+        let(:enable_pauses) { false }
 
         it 'returns all jobs' do
           expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job, labeled_job, other_labeled_job)
@@ -1091,7 +1091,7 @@ RSpec.describe GoodJob::Job do
       end
 
       context 'when enable_pause is true' do
-        let(:enable_pause) { true }
+        let(:enable_pauses) { true }
 
         it 'returns all jobs when nothing is paused' do
           expect(described_class.exclude_paused.count).to eq 5

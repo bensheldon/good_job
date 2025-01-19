@@ -218,6 +218,7 @@ fr:
       index:
         confirm_pause: Êtes-vous sûr de vouloir mettre en pause %{value} ?
         confirm_unpause: Êtes-vous sûr de vouloir reprendre %{value} ?
+        disabled: La fonction expérimentale de Pauses de GoodJob est désactivée par défaut car elle peut dégrader les performances. Configurez pour activer
         job_class: Classe de tâche
         label: Étiquette
         pause: Pause
