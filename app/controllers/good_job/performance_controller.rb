@@ -18,10 +18,6 @@ module GoodJob
         MIN(duration) AS min_duration,
         MAX(duration) AS max_duration
       ").order(:queue_name)
-
-      @paused = GoodJob::Setting.paused
-      @paused_job_classes = @paused[:job_classes]
-      @paused_queues = @paused[:queues]
     end
 
     def show

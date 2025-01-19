@@ -34,13 +34,7 @@ GoodJob::Engine.routes.draw do
   end
 
   resources :processes, only: %i[index]
-  resources :performance, only: %i[index show] do
-    collection do
-      get :pause, to: redirect(path: 'performance')
-      post :pause
-      delete :unpause
-    end
-  end
+  resources :performance, only: %i[index show]
   resources :pauses, only: %i[index] do
     collection do
       post :create

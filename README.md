@@ -330,7 +330,7 @@ Available configuration options are:
     config.good_job.probe_handler = 'webrick'
     ```
 
-- `enable_pause` (boolean) whether job processing can be paused. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_PAUSE`.
+- `enable_pauses` (boolean) whether job processing can be paused. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_PAUSES`.
 
 By default, GoodJob configures the following execution modes per environment:
 

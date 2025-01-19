@@ -97,7 +97,7 @@ module GoodJob
     scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(bind_value('scheduled_at', DateTime.current, ActiveRecord::Type::DateTime))).or(where(scheduled_at: nil)) }
 
     # Exclude jobs that are paused via queue_name or job_class.
-    # Only applies when enable_pause configuration is true.
+    # Only applies when enable_pauses configuration is true.
     # @!method exclude_paused
     # @!scope class
     # @return [ActiveRecord::Relation]

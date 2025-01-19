@@ -1082,7 +1082,7 @@ RSpec.describe GoodJob::Job do
         allow(GoodJob.configuration).to receive(:enable_pauses).and_return(enable_pauses)
       end
 
-      context 'when enable_pause is false' do
+      context 'when enable_pauses is false' do
         let(:enable_pauses) { false }
 
         it 'returns all jobs' do
@@ -1090,7 +1090,7 @@ RSpec.describe GoodJob::Job do
         end
       end
 
-      context 'when enable_pause is true' do
+      context 'when enable_pauses is true' do
         let(:enable_pauses) { true }
 
         it 'returns all jobs when nothing is paused' do
