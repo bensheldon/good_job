@@ -44,7 +44,7 @@ class ExampleJob < ApplicationJob
       raise DeadError
     elsif type == SLOW_TYPE
       50.times do
-        break if blocking_reload?
+        break if blocking_reload? || GoodJob.current_thread_shutting_down?
         sleep 0.1
       end
     end
@@ -53,7 +53,7 @@ class ExampleJob < ApplicationJob
   private
 
   def blocking_reload?
-    return false unless Rails.application.config.reloading_enabled?
+    return false if Rails.application.config.cache_classes
 
     ActiveSupport::Dependencies.interlock.raw_state do |threads|
       # Find any thread attempting to unload (reload) code
