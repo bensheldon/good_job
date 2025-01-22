@@ -34,11 +34,13 @@ RSpec.describe GoodJob::PausesController, type: :controller do
     end
 
     it 'redirects with no action for invalid parameters' do
-      post :create, params: { type: 'invalid', value: 'something' }
-      expect(response).to redirect_to action: :index
+      expect do
+        post :create, params: { type: 'invalid', value: 'something' }
+      end.to raise_error(ActionController::BadRequest)
 
-      post :create, params: { type: 'queue', value: '' }
-      expect(response).to redirect_to action: :index
+      expect do
+        post :create, params: { type: 'queue', value: '' }
+      end.to raise_error(ActionController::BadRequest)
     end
   end
 
@@ -60,11 +62,13 @@ RSpec.describe GoodJob::PausesController, type: :controller do
     end
 
     it 'redirects with no action for invalid parameters' do
-      delete :destroy, params: { type: 'invalid', value: 'something' }
-      expect(response).to redirect_to action: :index
+      expect do
+        delete :destroy, params: { type: 'invalid', value: 'something' }
+      end.to raise_error(ActionController::BadRequest)
 
-      delete :destroy, params: { type: 'queue', value: '' }
-      expect(response).to redirect_to action: :index
+      expect do
+        delete :destroy, params: { type: 'queue', value: '' }
+      end.to raise_error(ActionController::BadRequest)
     end
   end
 end

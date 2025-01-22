@@ -9,7 +9,7 @@
 <% if GoodJob.configuration.enable_pauses %>
   <div class="card mb-4">
     <div class="card-body">
-      <%= form_tag({ action: :destroy }, method: :post, class: 'row g-3 align-items-end') do %>
+      <%= form_tag({ action: :create }, method: :post, class: 'row g-3 align-items-end') do %>
         <div class="col-3">
           <%= label_tag :type, t('good_job.pauses.index.type'), class: 'form-label' %>
           <%= select_tag :type,
@@ -26,7 +26,10 @@
           <%= text_field_tag :value, nil, class: 'form-control', autocomplete: "off", required: true %>
         </div>
         <div class="col-3">
-          <%= submit_tag t('good_job.pauses.index.pause', value: ''), class: 'btn btn-primary' %>
+          <%= button_tag type: "submit", class: 'btn btn-primary' do %>
+            <%= render_icon "pause" %>
+            <%= t('good_job.pauses.index.pause', value: '') %>
+          <% end %>
         </div>
       <% end %>
     </div>
