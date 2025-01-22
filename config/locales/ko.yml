@@ -214,14 +214,28 @@ ko:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: "%{value}를 일시 중지하시겠습니까?"
+        confirm_unpause: "%{value}를 재개하시겠습니까?"
+        disabled: GoodJob의 실험적인 일시 중지 기능은 성능이 저하될 수 있으므로 기본적으로 비활성화되어 있습니다. 활성화하려면 구성하세요
+        job_class: 작업 클래스
+        label: 라벨
+        pause: 일시 중지
+        queue: 대기열
+        title: 일시 중지
+        type: 중지 유형
+        unpause: 재개
+        value: 값
     performance:
       index:
-        average_duration: 평균 지속 시간
-        chart_title: 총 작업 실행 시간(초)
-        executions: 실행
+        average_duration: 평균 소요 시간
+        chart_title: 총 실행 시간(초)
+        executions: 실행 횟수
         job_class: 작업 클래스
-        maximum_duration: 최대 기간
-        minimum_duration: 최소 기간
+        maximum_duration: 최대 소요 시간
+        minimum_duration: 최소 소요 시간
+        queue_name: 큐 이름
         title: 성능
       show:
         slow: 느림
@@ -256,6 +270,7 @@ ko:
         jobs: 작업
         live_poll: 실시간 업데이트
         name: "GoodJob 👍"
+        pauses: 일시 중지
         performance: 성능
         processes: 프로세스
         theme:

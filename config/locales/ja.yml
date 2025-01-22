@@ -214,14 +214,28 @@ ja:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: "%{value}を一時停止してもよろしいですか？"
+        confirm_unpause: "%{value}を再開してもよろしいですか？"
+        disabled: GoodJobの実験的な一時停止機能は、パフォーマンスが低下する可能性があるため、デフォルトでは無効になっています。有効にするには設定してください
+        job_class: ジョブクラス
+        label: ラベル
+        pause: 一時停止
+        queue: キュー
+        title: 一時停止
+        type: 一時停止タイプ
+        unpause: 再開
+        value: 値
     performance:
       index:
         average_duration: 平均所要時間
-        chart_title: ジョブの総実行時間（秒
-        executions: 実行
+        chart_title: 合計実行時間（秒）
+        executions: 実行回数
         job_class: ジョブクラス
-        maximum_duration: 最大持続時間
-        minimum_duration: 最小期間
+        maximum_duration: 最大所要時間
+        minimum_duration: 最小所要時間
+        queue_name: キュー名
         title: パフォーマンス
       show:
         slow: 遅い
@@ -256,6 +270,7 @@ ja:
         jobs: ジョブ
         live_poll: リアルタイム更新
         name: "GoodJob 👍"
+        pauses: 一時停止
         performance: パフォーマンス
         processes: プロセス
         theme:

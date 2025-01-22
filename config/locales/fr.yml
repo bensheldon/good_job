@@ -10,17 +10,17 @@ fr:
       retry: Recommencez
     batches:
       actions:
-        confirm_retry: Voulez-vous vraiment réessayer ce lot ?
+        confirm_retry: Voulez-vous vraiment réessayer ce lot ?
         retry: Réessayer
       index:
         older_batches: Lots plus anciens
         title: Lots
       jobs:
         actions:
-          confirm_destroy: Voulez-vous vraiment détruire ce job ?
-          confirm_discard: Voulez-vous vraiment mettre au rebut ce job ?
-          confirm_reschedule: Voulez-vous vraiment replanifier ce job ?
-          confirm_retry: Voulez-vous vraiment réessayer ce job ?
+          confirm_destroy: Voulez-vous vraiment détruire ce job ?
+          confirm_discard: Voulez-vous vraiment mettre au rebut ce job ?
+          confirm_reschedule: Voulez-vous vraiment replanifier ce job ?
+          confirm_retry: Voulez-vous vraiment réessayer ce job ?
           destroy: Détruire le job
           discard: Mettre au rebut le job
           reschedule: Replanifier le job
@@ -51,9 +51,9 @@ fr:
         total: Total
     cron_entries:
       actions:
-        confirm_disable: Voulez-vous vraiment désactiver cette entrée cron ?
-        confirm_enable: Voulez-vous vraiment activer cette entrée cron ?
-        confirm_enqueue: Voulez-vous vraiment mettre en file d'attente cette entrée cron ?
+        confirm_disable: Voulez-vous vraiment désactiver cette entrée cron ?
+        confirm_enable: Voulez-vous vraiment activer cette entrée cron ?
+        confirm_enqueue: Voulez-vous vraiment mettre en file d'attente cette entrée cron ?
         disable: Désactiver l'entrée cron
         enable: Activer l'entrée cron
         enqueue: Mettre en file d'attente l'entrée cron maintenant
@@ -126,11 +126,11 @@ fr:
         past: il y a %{time}
     jobs:
       actions:
-        confirm_destroy: Voulez-vous vraiment détruire le job ?
-        confirm_discard: Voulez-vous vraiment mettre au rebut le job ?
+        confirm_destroy: Voulez-vous vraiment détruire le job ?
+        confirm_discard: Voulez-vous vraiment mettre au rebut le job ?
         confirm_force_discard: Êtes-vous sûr de vouloir forcer l'abandon du travail? Le travail sera marqué comme abandonné mais le travail en cours ne sera pas arrêté - cependant, il ne sera pas réessayé en cas d'échec.
-        confirm_reschedule: Voulez-vous vraiment replanifier le job ?
-        confirm_retry: Voulez-vous vraiment réessayer le job ?
+        confirm_reschedule: Voulez-vous vraiment replanifier le job ?
+        confirm_retry: Voulez-vous vraiment réessayer le job ?
         destroy: Détruire le job
         discard: Mettre au rebut le job
         force_discard: Forcer l'abandon du travail
@@ -162,10 +162,10 @@ fr:
           apply_to_all:
             one: Appliquer à ce job
             other: Appliquer aux %{count} jobs
-          confirm_destroy_all: Voulez-vous vraiment détruire les jobs sélectionnés ?
-          confirm_discard_all: Voulez-vous vraiment mettre au rebut les jobs sélectionnés ?
-          confirm_reschedule_all: Voulez-vous vraiment replanifier les jobs sélectionnées ?
-          confirm_retry_all: Voulez-vous vraiment réessayer les jobs sélectionnées ?
+          confirm_destroy_all: Voulez-vous vraiment détruire les jobs sélectionnés ?
+          confirm_discard_all: Voulez-vous vraiment mettre au rebut les jobs sélectionnés ?
+          confirm_reschedule_all: Voulez-vous vraiment replanifier les jobs sélectionnées ?
+          confirm_retry_all: Voulez-vous vraiment réessayer les jobs sélectionnées ?
           destroy_all: Tout détruire
           discard_all: Tout mettre au rebut
           reschedule_all: Tout replanifier
@@ -214,17 +214,31 @@ fr:
             thousand: k
             trillion: J
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Êtes-vous sûr de vouloir mettre en pause %{value} ?
+        confirm_unpause: Êtes-vous sûr de vouloir reprendre %{value} ?
+        disabled: La fonction expérimentale de Pauses de GoodJob est désactivée par défaut car elle peut dégrader les performances. Configurez pour activer
+        job_class: Classe de tâche
+        label: Étiquette
+        pause: Pause
+        queue: File d'attente
+        title: Pauses
+        type: Type de Pause
+        unpause: Reprendre
+        value: Valeur
     performance:
       index:
         average_duration: Durée moyenne
-        chart_title: Durée totale d'exécution du travail en secondes
+        chart_title: Temps total d'exécution des tâches en secondes
         executions: Exécutions
-        job_class: Catégorie d'emplois
+        job_class: Classe de tâche
         maximum_duration: Durée maximale
         minimum_duration: Durée minimale
+        queue_name: Nom de la file
         title: Performance
       show:
-        slow: Lenteur
+        slow: Lent
         title: Performance
     processes:
       index:
@@ -256,6 +270,7 @@ fr:
         jobs: Jobs
         live_poll: En direct
         name: "GoodJob 👍"
+        pauses: Pauses
         performance: Performance
         processes: Processus
         theme:
@@ -265,7 +280,7 @@ fr:
           theme: Thème
       pending_migrations: GoodJob a des migrations de bases de données en attente.
       secondary_navbar:
-        inspiration: N'oublie pas, toi aussi tu fais du bon boulot !
+        inspiration: N'oublie pas, toi aussi tu fais du bon boulot !
         last_updated: Dernière mise à jour
     status:
       discarded: Mis au rebut
