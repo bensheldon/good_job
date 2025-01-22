@@ -1,5 +1,25 @@
 # Changelog
 
+## [v4.8.0](https://github.com/bensheldon/good_job/tree/v4.8.0) (2025-01-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.7.0...v4.8.0)
+
+**Implemented enhancements:**
+
+- Add ability to pause jobs by queue, job class, or label \(experimental\) [\#1575](https://github.com/bensheldon/good_job/pull/1575) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- perform\_now enqueues a job when raising exception [\#1570](https://github.com/bensheldon/good_job/issues/1570)
+
+**Merged pull requests:**
+
+- Use Ruby 3.4.1 for development [\#1579](https://github.com/bensheldon/good_job/pull/1579) ([bensheldon](https://github.com/bensheldon))
+- Fix generator tests [\#1577](https://github.com/bensheldon/good_job/pull/1577) ([bensheldon](https://github.com/bensheldon))
+- Add the logger gem as a dependency to fix rails head [\#1576](https://github.com/bensheldon/good_job/pull/1576) ([bensheldon](https://github.com/bensheldon))
+- fix: typo in en.yml when discarding jobs [\#1569](https://github.com/bensheldon/good_job/pull/1569) ([nickstanish](https://github.com/nickstanish))
+- Bump the all group with 60 updates [\#1567](https://github.com/bensheldon/good_job/pull/1567) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.7.0](https://github.com/bensheldon/good_job/tree/v4.7.0) (2024-12-31)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.6.0...v4.7.0)
