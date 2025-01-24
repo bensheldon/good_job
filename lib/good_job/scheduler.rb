@@ -162,6 +162,8 @@ module GoodJob # :nodoc:
         if state[:scheduled_at]
           scheduled_at = if state[:scheduled_at].is_a? String
                            Time.zone.parse state[:scheduled_at]
+                         elsif state[:scheduled_at].is_a? Numeric
+                           Time.zone.at state[:scheduled_at]
                          else
                            state[:scheduled_at]
                          end

@@ -165,6 +165,11 @@ RSpec.describe GoodJob::Adapter do
         priority: -55,
         scheduled_at: be_within(1).of(10.minutes.from_now)
       )
+      expect(GoodJob::Notifier).to have_received(:notify).with({
+                                                                 queue_name: 'elephant',
+                                                                 count: 1,
+                                                                 scheduled_at: within(1).of(10.minutes.from_now),
+                                                               })
     end
 
     it 'sets default values' do
@@ -176,6 +181,12 @@ RSpec.describe GoodJob::Adapter do
         priority: 0,
         scheduled_at: be_within(1.second).of(Time.current)
       )
+
+      expect(GoodJob::Notifier).to have_received(:notify).with({
+                                                                 queue_name: 'default',
+                                                                 count: 1,
+                                                                 scheduled_at: within(1).of(Time.current),
+                                                               })
     end
 
     context 'when a job fails to enqueue' do
