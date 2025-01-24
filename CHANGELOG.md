@@ -1,5 +1,19 @@
 # Changelog
 
+## [v4.8.1](https://github.com/bensheldon/good_job/tree/v4.8.1) (2025-01-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.8.0...v4.8.1)
+
+**Fixed bugs:**
+
+- Fix notifier/scheduler handling of integer/epoch serialized scheduled\_at values [\#1583](https://github.com/bensheldon/good_job/pull/1583) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Losing "Processes" on the dashboard [\#1582](https://github.com/bensheldon/good_job/issues/1582)
+- Notifier errored: TypeError: ActiveSupport::TimeWithZone can't be coerced into Integer [\#1581](https://github.com/bensheldon/good_job/issues/1581)
+- Ability to pause queues [\#1574](https://github.com/bensheldon/good_job/issues/1574)
+
 ## [v4.8.0](https://github.com/bensheldon/good_job/tree/v4.8.0) (2025-01-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.7.0...v4.8.0)
