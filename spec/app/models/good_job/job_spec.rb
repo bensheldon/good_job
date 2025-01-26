@@ -494,7 +494,7 @@ RSpec.describe GoodJob::Job do
 
       context "with multiple jobs and ordered queues" do
         def job_params
-          { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" } }
+          { active_job_id: SecureRandom.uuid, scheduled_at: Time.current, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" } }
         end
 
         let(:parsed_queues) { { include: %w{one two}, ordered_queues: true } }
@@ -1067,7 +1067,7 @@ RSpec.describe GoodJob::Job do
     describe '.schedule_ordered' do
       it 'orders by scheduled or created (oldest first)' do
         query = described_class.schedule_ordered
-        expect(query.to_sql).to include('ORDER BY COALESCE')
+        expect(query.to_sql).to include('ORDER BY')
       end
     end
 

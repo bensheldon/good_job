@@ -15,11 +15,11 @@ module GoodJob
       #   Display records after this ID for keyset pagination
       # @return [ActiveRecord::Relation]
       scope :display_all, (lambda do |after_scheduled_at: nil, after_id: nil|
-        query = order(Arel.sql('COALESCE(scheduled_at, created_at) DESC, id DESC'))
+        query = order(Arel.sql('scheduled_at DESC, id DESC'))
         if after_scheduled_at.present? && after_id.present?
-          query = query.where Arel::Nodes::Grouping.new([coalesce_scheduled_at_created_at, arel_table["id"]]).lt(Arel::Nodes::Grouping.new([bind_value('coalesce', after_scheduled_at, ActiveRecord::Type::DateTime), bind_value('id', after_id, ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Uuid)]))
+          query = query.where Arel::Nodes::Grouping.new([arel_table["scheduled_at"], arel_table["id"]]).lt(Arel::Nodes::Grouping.new([bind_value('scheduled_at', after_scheduled_at, ActiveRecord::Type::DateTime), bind_value('id', after_id, ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Uuid)]))
         elsif after_scheduled_at.present?
-          query = query.where coalesce_scheduled_at_created_at.lt(bind_value('coalesce', after_scheduled_at, ActiveRecord::Type::DateTime))
+          query = query.where arel_table["scheduled_at"].lt(bind_value('scheduled_at', after_scheduled_at, ActiveRecord::Type::DateTime))
         end
         query
       end)
