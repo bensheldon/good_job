@@ -1,5 +1,18 @@
 # Changelog
 
+## [v4.8.2](https://github.com/bensheldon/good_job/tree/v4.8.2) (2025-01-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.8.1...v4.8.2)
+
+**Fixed bugs:**
+
+- Ensure that executions are properly ordered in the dashboard [\#1588](https://github.com/bensheldon/good_job/pull/1588) ([Earlopain](https://github.com/Earlopain))
+
+**Merged pull requests:**
+
+- Fix passing a block to `advisory_lock` in tests [\#1587](https://github.com/bensheldon/good_job/pull/1587) ([Earlopain](https://github.com/Earlopain))
+- Expect `Job#scheduled_at` to always be present; remove nil checks [\#1585](https://github.com/bensheldon/good_job/pull/1585) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.8.1](https://github.com/bensheldon/good_job/tree/v4.8.1) (2025-01-24)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.8.0...v4.8.1)
@@ -11,7 +24,6 @@
 **Closed issues:**
 
 - Losing "Processes" on the dashboard [\#1582](https://github.com/bensheldon/good_job/issues/1582)
-- Notifier errored: TypeError: ActiveSupport::TimeWithZone can't be coerced into Integer [\#1581](https://github.com/bensheldon/good_job/issues/1581)
 - Ability to pause queues [\#1574](https://github.com/bensheldon/good_job/issues/1574)
 
 ## [v4.8.0](https://github.com/bensheldon/good_job/tree/v4.8.0) (2025-01-22)
