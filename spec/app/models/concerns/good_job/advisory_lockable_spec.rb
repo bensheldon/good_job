@@ -483,9 +483,8 @@ RSpec.describe GoodJob::AdvisoryLockable do
 
       it "locks and unlocks" do
         GoodJob::Job.transaction do
-          job.advisory_lock(function: "pg_advisory_xact_lock") do
-            expect(job.advisory_locked?).to be true
-          end
+          job.advisory_lock(function: "pg_advisory_xact_lock")
+          expect(job.advisory_locked?).to be true
         end
         expect(job.advisory_locked?).to be false
       end
