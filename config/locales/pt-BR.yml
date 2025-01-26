@@ -194,6 +194,7 @@ pt-BR:
       job:
         arguments: Argumentos
         attempts: Tentativas
+        labels: Rótulos
         priority: Prioridade
         queue: Fila
     number:
@@ -213,14 +214,28 @@ pt-BR:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Tem certeza que deseja pausar %{value}?
+        confirm_unpause: Tem certeza que deseja retomar %{value}?
+        disabled: O recurso experimental de Pausas do GoodJob está desativado por padrão porque pode degradar o desempenho. Configure para ativar
+        job_class: Classe do trabalho
+        label: Rótulo
+        pause: Pausar
+        queue: Fila
+        title: Pausas
+        type: Tipo de Pausa
+        unpause: Retomar
+        value: Valor
     performance:
       index:
         average_duration: Duração média
-        chart_title: Tempo total de execução do trabalho em segundos
+        chart_title: Tempo total de execução em segundos
         executions: Execuções
-        job_class: Classe de trabalho
+        job_class: Classe do trabalho
         maximum_duration: Duração máxima
         minimum_duration: Duração mínima
+        queue_name: Nome da fila
         title: Desempenho
       show:
         slow: Lento
@@ -255,6 +270,7 @@ pt-BR:
         jobs: Tarefas
         live_poll: Acompanhamento ao Vivo
         name: "GoodJob 👍"
+        pauses: Pausas
         performance: Desempenho
         processes: Processos
         theme:

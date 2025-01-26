@@ -127,7 +127,7 @@ en:
     jobs:
       actions:
         confirm_destroy: Are you sure you want to destroy the job?
-        confirm_discard: Are you usure you want to discard the job?
+        confirm_discard: Are you sure you want to discard the job?
         confirm_force_discard: Are you sure you want to force discard this job? The job will be marked as discarded but the running job will not be stopped - it will, however, not be retried on failures.
         confirm_reschedule: Are you sure you want to reschedule the job?
         confirm_retry: Are you sure you want to retry the job?
@@ -163,7 +163,7 @@ en:
             one: Apply to all 1 job.
             other: Apply to all %{count} jobs.
           confirm_destroy_all: Are you sure you want to destroy the selected jobs?
-          confirm_discard_all: Are you usure you want to discard the selected jobs?
+          confirm_discard_all: Are you sure you want to discard the selected jobs?
           confirm_reschedule_all: Are you sure you want to reschedule the selected jobs?
           confirm_retry_all: Are you sure you want to retry the selected jobs?
           destroy_all: Destroy all
@@ -194,6 +194,7 @@ en:
       job:
         arguments: Arguments
         attempts: Attempts
+        labels: Labels
         priority: Priority
         queue: Queue
     number:
@@ -213,6 +214,19 @@ en:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Are you sure you want to pause %{value}?
+        confirm_unpause: Are you sure you want to resume %{value}?
+        disabled: GoodJob's experimental Pauses feature is disabled by default because it may degrade performance. Configure to enable
+        job_class: Job Class
+        label: Label
+        pause: Pause
+        queue: Queue
+        title: Pauses
+        type: Pause Type
+        unpause: Resume
+        value: Value
     performance:
       index:
         average_duration: Average duration
@@ -221,6 +235,7 @@ en:
         job_class: Job class
         maximum_duration: Maximum duration
         minimum_duration: Minimum duration
+        queue_name: Queue name
         title: Performance
       show:
         slow: Slow
@@ -255,6 +270,7 @@ en:
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
+        pauses: Pauses
         performance: Performance
         processes: Processes
         theme:

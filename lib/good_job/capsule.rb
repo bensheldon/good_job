@@ -24,6 +24,7 @@ module GoodJob
 
       @shared_executor = GoodJob::SharedExecutor.new
       @tracker = GoodJob::CapsuleTracker.new(executor: @shared_executor)
+      @lower_thread_priority = nil
 
       self.class.instances << self
     end
@@ -38,7 +39,9 @@ module GoodJob
 
         @notifier = GoodJob::Notifier.new(enable_listening: configuration.enable_listen_notify, capsule: self, executor: @shared_executor)
         @poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
-        @multi_scheduler = GoodJob::MultiScheduler.from_configuration(configuration, capsule: self, warm_cache_on_initialize: true)
+        @multi_scheduler = GoodJob::MultiScheduler.from_configuration(configuration, capsule: self, warm_cache_on_initialize: true).tap do |multischeduler|
+          multischeduler.lower_thread_priority = @lower_thread_priority unless @lower_thread_priority.nil?
+        end
         @notifier.recipients.push([@multi_scheduler, :create_thread])
         @poller.recipients.push(-> { @multi_scheduler.create_thread({ fanout: true }) })
 
@@ -108,6 +111,11 @@ module GoodJob
     # @return [String]
     def process_id
       @tracker.process_id
+    end
+
+    def lower_thread_priority=(value)
+      @lower_thread_priority = value
+      @multi_scheduler&.lower_thread_priority = value
     end
 
     private

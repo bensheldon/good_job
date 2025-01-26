@@ -194,6 +194,7 @@ nl:
       job:
         arguments: Argumenten
         attempts: Pogingen
+        labels: Labels
         priority: Prioriteit
         queue: Wachtrij
     number:
@@ -213,18 +214,32 @@ nl:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Weet u zeker dat u %{value} wilt pauzeren?
+        confirm_unpause: Weet u zeker dat u %{value} wilt hervatten?
+        disabled: De experimentele Pauzes-functie van GoodJob is standaard uitgeschakeld omdat het de prestaties kan verminderen. Configureer om in te schakelen
+        job_class: Taakklasse
+        label: Label
+        pause: Pauzeren
+        queue: Wachtrij
+        title: Pauzes
+        type: Pauze Type
+        unpause: Hervatten
+        value: Waarde
     performance:
       index:
         average_duration: Gemiddelde duur
-        chart_title: Totale uitvoeringstijd van de taak in seconden
-        executions: Executies
-        job_class: Functie klasse
+        chart_title: Totale uitvoeringstijd in seconden
+        executions: Uitvoeringen
+        job_class: Taakklasse
         maximum_duration: Maximale duur
         minimum_duration: Minimale duur
-        title: Prestatie
+        queue_name: Wachtrijnaam
+        title: Prestaties
       show:
-        slow: Langzaam
-        title: Prestatie
+        slow: Traag
+        title: Prestaties
     processes:
       index:
         cron_enabled: Cron ingeschakeld
@@ -255,6 +270,7 @@ nl:
         jobs: Taken
         live_poll: Live Poll
         name: "GoodJob 👍"
+        pauses: Pauzes
         performance: Prestatie
         processes: Processen
         theme:

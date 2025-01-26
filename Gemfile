@@ -24,13 +24,13 @@ gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
 
 rails_versions = {
   "6.1" => { github: "rails/rails", branch: "6-1-stable" }, # https://github.com/bensheldon/good_job/issues/1280
-  "7.0" => "~> 7.0.1", # Ruby 3.1 requires Rails 7.0.1+
+  "7.0" => { github: "rails/rails", branch: "7-0-stable" }, # Ruby 3.4 requires bigdecimal which rails doesn't declare
   "7.1" => "~> 7.1.0",
   "7.2" => "~> 7.2.0",
   "8.0" => "~> 8.0.0",
   "head" => { github: "rails/rails", branch: "main" },
 }
-gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", nil)]
+gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", "8.0")]
 
 platforms :ruby do
   gem "bootsnap"

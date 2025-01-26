@@ -158,6 +158,30 @@ RSpec.describe GoodJob::Scheduler do
       expect(scheduler.create_thread({ queue_name: 'elephant' })).to be false
     end
 
+    it 'uses state[:scheduled_at] to cache future jobs' do
+      scheduler = described_class.new(GoodJob::JobPerformer.new('mice'), max_threads: 2)
+
+      # Handle Time objects
+      result = scheduler.create_thread({ scheduled_at: 1.day.from_now })
+      expect(result).to be_nil
+      expect(scheduler.stats[:active_cache]).to eq 1
+
+      # Handle JSON / ISO8601
+      result = scheduler.create_thread({ scheduled_at: 1.day.from_now.to_json })
+      expect(result).to be_nil
+      expect(scheduler.stats[:active_cache]).to eq 2
+
+      # Handle integers
+      result = scheduler.create_thread({ scheduled_at: 1.day.from_now.to_i })
+      expect(result).to be_nil
+      expect(scheduler.stats[:active_cache]).to eq 3
+
+      # Past scheduled_at should not be cached
+      result = scheduler.create_thread({ scheduled_at: 1.day.ago })
+      expect(result).to be true
+      expect(scheduler.stats[:active_cache]).to eq 3
+    end
+
     it 'uses state[:count] to create multiple threads' do
       job_performer = instance_double(GoodJob::JobPerformer, next: nil, next?: true, name: '', next_at: [], cleanup: nil, reset_stats: nil)
       scheduler = described_class.new(job_performer, max_threads: 1)

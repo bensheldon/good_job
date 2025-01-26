@@ -1,0 +1,46 @@
+<%= content_for :page_title do %>
+  <%= t('good_job.pauses.index.title') %>
+<% end %>
+
+<div class="border-bottom">
+  <h1 class="h2 pt-3 pb-2"><%= t('good_job.pauses.index.title') %></h1>
+</div>
+
+<% if GoodJob.configuration.enable_pauses %>
+  <div class="card mb-4">
+    <div class="card-body">
+      <%= form_tag({ action: :create }, method: :post, class: 'row g-3 align-items-end') do %>
+        <div class="col-3">
+          <%= label_tag :type, t('good_job.pauses.index.type'), class: 'form-label' %>
+          <%= select_tag :type,
+            options_for_select([
+                                 [t('good_job.pauses.index.queue'), 'queue'],
+                                 [t('good_job.pauses.index.job_class'), 'job_class'],
+                                 [t('good_job.pauses.index.label'), 'label'],
+                               ]),
+            class: 'form-select',
+            required: true %>
+        </div>
+        <div class="col-6">
+          <%= label_tag :value, t('good_job.pauses.index.value'), class: 'form-label' %>
+          <%= text_field_tag :value, nil, class: 'form-control', autocomplete: "off", required: true %>
+        </div>
+        <div class="col-3">
+          <%= button_tag type: "submit", class: 'btn btn-primary' do %>
+            <%= render_icon "pause" %>
+            <%= t('good_job.pauses.index.pause', value: '') %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render 'group', paused: @paused, type: :queue %>
+  <%= render 'group', paused: @paused, type: :job_class %>
+  <%= render 'group', paused: @paused, type: :label %>
+<% else %>
+  <div class="alert alert-warning" role="alert">
+    <p><%= t('good_job.pauses.index.disabled') %>:</p>
+    <pre class="mb-0">config.good_job.enable_pauses = true</pre>
+  </div>
+<% end %>

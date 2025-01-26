@@ -194,6 +194,7 @@ it:
       job:
         arguments: Argomenti
         attempts: Tentativi
+        labels: Etichette
         priority: Priorità
         queue: Coda
     number:
@@ -213,18 +214,32 @@ it:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Sei sicuro di voler mettere in pausa %{value}?
+        confirm_unpause: Sei sicuro di voler riprendere %{value}?
+        disabled: La funzione sperimentale Pause di GoodJob è disabilitata per impostazione predefinita perché potrebbe degradare le prestazioni. Configurare per abilitare
+        job_class: Classe del job
+        label: Etichetta
+        pause: Pausa
+        queue: Coda
+        title: Pause
+        type: Tipo di Pausa
+        unpause: Riprendi
+        value: Valore
     performance:
       index:
         average_duration: Durata media
-        chart_title: Tempo totale di esecuzione del lavoro in secondi
+        chart_title: Tempo totale di esecuzione in secondi
         executions: Esecuzioni
-        job_class: Classe di lavoro
+        job_class: Classe del job
         maximum_duration: Durata massima
         minimum_duration: Durata minima
-        title: Prestazione
+        queue_name: Nome della coda
+        title: Prestazioni
       show:
         slow: Lento
-        title: Prestazione
+        title: Prestazioni
     processes:
       index:
         cron_enabled: Cron abilitato
@@ -255,6 +270,7 @@ it:
         jobs: Job
         live_poll: Live Poll
         name: "GoodJob 👍"
+        pauses: Pause
         performance: Prestazione
         processes: Processi
         theme:

@@ -73,6 +73,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Write tests](#write-tests)
     - [PgBouncer compatibility](#pgbouncer-compatibility)
     - [CLI HTTP health check probes](#cli-http-health-check-probes)
+    - [Pausing Jobs](#pausing-jobs)
 - [Doing your best job with GoodJob](#doing-your-best-job-with-goodjob)
     - [Sizing jobs: mice and elephants](#sizing-jobs-mice-and-elephants)
     - [Isolating by total latency](#isolating-by-total-latency)
@@ -328,6 +329,8 @@ Available configuration options are:
     ```ruby
     config.good_job.probe_handler = 'webrick'
     ```
+
+- `enable_pauses` (boolean) whether job processing can be paused. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_PAUSES`.
 
 By default, GoodJob configures the following execution modes per environment:
 
@@ -1559,9 +1562,35 @@ gem 'webrick'
 
 If WEBrick is configured to be used, but the dependency is not found, GoodJob will log a warning and fallback to the default probe server.
 
+### Pausing Jobs
+
+GoodJob allows for pausing jobs by queue or job class. This feature is currently opt-in because the performance impact of loading and filtering these attributes is not yet known. To enable this feature, add the following to your configuration:
+
+> ```ruby
+> config.good_job.enable_pauses = true
+> ```
+
+Pausing can be done via the Dashboard's Performance page, or in Ruby
+
+```ruby
+# To pause:
+GoodJob.pause(queue: "default")
+GoodJob.pause(job_class: "MyJob")
+
+# To check status
+GoodJob.paused # => { queues: ["default"], job_classes: ["MyJob"] }
+GoodJob.paused?(queue: "default") # => true
+GoodJob.paused?(job_class: "MyJob") # => true
+GoodJob.paused? # => true
+
+# To unpause
+GoodJob.unpause(queue: "default")
+GoodJob.unpause(job_class: "MyJob")
+````
+
 ## Doing your best job with GoodJob
 
-_This section explains how to use GoodJob the most efficiently and performantly, according to its maintainers. GoodJob is very flexible and you don’t necessarily have to use it this way, but the concepts explained here are part of GoodJob’s design intent._
+_This section explains how to use GoodJob the most efficiently and performantly, according to its maintainers. GoodJob is very flexible and you don't necessarily have to use it this way, but the concepts explained here are part of GoodJob's design intent._
 
 Background jobs are hard. There are two extremes:
 

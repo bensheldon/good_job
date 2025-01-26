@@ -1,5 +1,72 @@
 # Changelog
 
+## [v4.8.1](https://github.com/bensheldon/good_job/tree/v4.8.1) (2025-01-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.8.0...v4.8.1)
+
+**Fixed bugs:**
+
+- Fix notifier/scheduler handling of integer/epoch serialized scheduled\_at values [\#1583](https://github.com/bensheldon/good_job/pull/1583) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Losing "Processes" on the dashboard [\#1582](https://github.com/bensheldon/good_job/issues/1582)
+- Notifier errored: TypeError: ActiveSupport::TimeWithZone can't be coerced into Integer [\#1581](https://github.com/bensheldon/good_job/issues/1581)
+- Ability to pause queues [\#1574](https://github.com/bensheldon/good_job/issues/1574)
+
+## [v4.8.0](https://github.com/bensheldon/good_job/tree/v4.8.0) (2025-01-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.7.0...v4.8.0)
+
+**Implemented enhancements:**
+
+- Add ability to pause jobs by queue, job class, or label \(experimental\) [\#1575](https://github.com/bensheldon/good_job/pull/1575) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- perform\_now enqueues a job when raising exception [\#1570](https://github.com/bensheldon/good_job/issues/1570)
+
+**Merged pull requests:**
+
+- Use Ruby 3.4.1 for development [\#1579](https://github.com/bensheldon/good_job/pull/1579) ([bensheldon](https://github.com/bensheldon))
+- Fix generator tests [\#1577](https://github.com/bensheldon/good_job/pull/1577) ([bensheldon](https://github.com/bensheldon))
+- Add the logger gem as a dependency to fix rails head [\#1576](https://github.com/bensheldon/good_job/pull/1576) ([bensheldon](https://github.com/bensheldon))
+- fix: typo in en.yml when discarding jobs [\#1569](https://github.com/bensheldon/good_job/pull/1569) ([nickstanish](https://github.com/nickstanish))
+- Bump the all group with 60 updates [\#1567](https://github.com/bensheldon/good_job/pull/1567) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v4.7.0](https://github.com/bensheldon/good_job/tree/v4.7.0) (2024-12-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.6.0...v4.7.0)
+
+**Implemented enhancements:**
+
+- Expose good job labels in dashboard [\#1561](https://github.com/bensheldon/good_job/pull/1561) ([BClark88](https://github.com/BClark88))
+
+**Merged pull requests:**
+
+- Allow cron configuration `class` value to be a proc [\#1566](https://github.com/bensheldon/good_job/pull/1566) ([bensheldon](https://github.com/bensheldon))
+- Add Ruby 3.4 to CI [\#1565](https://github.com/bensheldon/good_job/pull/1565) ([Earlopain](https://github.com/Earlopain))
+
+## [v4.6.0](https://github.com/bensheldon/good_job/tree/v4.6.0) (2024-12-12)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.5.1...v4.6.0)
+
+**Implemented enhancements:**
+
+- Set job execution thread priority to `-3` when in async mode [\#1560](https://github.com/bensheldon/good_job/pull/1560) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Attaching metadata to jobs [\#1558](https://github.com/bensheldon/good_job/issues/1558)
+- Lower Ruby Thread priority for jobs by default when running in Async mode [\#1554](https://github.com/bensheldon/good_job/issues/1554)
+- NoMethodError:  undefined method `\<' for nil \(process.rb:125 in stale?\) [\#1363](https://github.com/bensheldon/good_job/issues/1363)
+- Install PgHero on the Demo app [\#1166](https://github.com/bensheldon/good_job/issues/1166)
+
+**Merged pull requests:**
+
+- Bump rails-html-sanitizer from 1.6.0 to 1.6.1 [\#1557](https://github.com/bensheldon/good_job/pull/1557) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add PGHero to the demo app [\#1294](https://github.com/bensheldon/good_job/pull/1294) ([mec](https://github.com/mec))
+
 ## [v4.5.1](https://github.com/bensheldon/good_job/tree/v4.5.1) (2024-11-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.5.0...v4.5.1)

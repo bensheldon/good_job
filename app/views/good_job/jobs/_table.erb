@@ -35,6 +35,7 @@
           </div>
           <div class="d-none d-lg-block col-lg-1 text-lg-center"><%= t "good_job.models.job.queue" %></div>
           <div class="d-none d-lg-block col-lg-1 text-lg-end"><%= t "good_job.models.job.priority" %></div>
+          <div class="d-none d-lg-block col-lg-1 text-lg-end"><%= t "good_job.models.job.labels" %></div>
           <div class="d-none d-lg-block col-lg-1 text-lg-end"><%= t "good_job.models.job.attempts" %></div>
           <div class="col text-end">
             <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
@@ -81,6 +82,12 @@
               <div class="col-4 col-lg-1 text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.priority" %></div>
                 <%= job.priority %>
+              </div>
+              <div class="col-4 col-lg-1 text-wrap text-lg-end">
+                <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.labels" %></div>
+                <% job.labels&.each do |label| %>
+                  <span class="badge rounded-pill bg-secondary font-monospace"><%= label %></span>
+                <% end %>
               </div>
               <div class="col-4 col-lg-1 text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.attempts" %></div>

@@ -167,6 +167,22 @@ describe GoodJob::CronEntry do
       I18n.default_locale = :en
     end
 
+    it 'can handle a proc for a class value that enqueues a job directly' do
+      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+
+      cron_at = Time.current
+
+      entry = described_class.new(params.merge(class: -> { TestJob.set(queue: "direct").perform_later(42, name: 'Direct') }))
+      entry.enqueue(cron_at)
+
+      job = GoodJob::Job.last
+      expect(job).to have_attributes(
+        job_class: 'TestJob',
+        cron_at: be_within(0.001.seconds).of(cron_at),
+        queue_name: 'direct'
+      )
+    end
+
     describe 'job execution' do
       it 'executes the job properly' do
         perform_enqueued_jobs do

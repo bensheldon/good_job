@@ -194,6 +194,7 @@ es:
       job:
         arguments: Argumentos
         attempts: Intentos
+        labels: Etiquetas
         priority: Prioridad
         queue: Cola
     number:
@@ -213,18 +214,32 @@ es:
             thousand: k
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: "¿Está seguro de que desea pausar %{value}?"
+        confirm_unpause: "¿Está seguro de que desea reanudar %{value}?"
+        disabled: La función experimental de Pausas de GoodJob está desactivada por defecto porque puede degradar el rendimiento. Configure para habilitar
+        job_class: Clase de trabajo
+        label: Etiqueta
+        pause: Pausar
+        queue: Cola
+        title: Pausas
+        type: Tipo de Pausa
+        unpause: Reanudar
+        value: Valor
     performance:
       index:
         average_duration: Duración promedio
-        chart_title: Tiempo total de ejecución de la tarea en segundos
+        chart_title: Tiempo total de ejecución del trabajo en segundos
         executions: Ejecuciones
-        job_class: clase de tarea
+        job_class: Clase de trabajo
         maximum_duration: Duración máxima
         minimum_duration: Duración mínima
+        queue_name: Nombre de la cola
         title: Rendimiento
       show:
         slow: Lento
-        title: Actuación
+        title: Rendimiento
     processes:
       index:
         cron_enabled: Cron habilitado
@@ -255,6 +270,7 @@ es:
         jobs: Tareas
         live_poll: En vivo
         name: "GoodJob 👍"
+        pauses: Pausas
         performance: Rendimiento
         processes: Procesos
         theme:

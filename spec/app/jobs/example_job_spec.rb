@@ -62,13 +62,18 @@ describe ExampleJob do
         execution = good_job.executions.last
         expect(execution.error).to be_present
         expect(execution.error_backtrace.count).to be > 100
-        expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:41:in `perform'"])
+
+        if RUBY_VERSION >= "3.4"
+          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:44:in 'ExampleJob#perform'"])
+        else
+          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:44:in `perform'"])
+        end
       end
     end
 
     describe "SLOW_TYPE" do
       it 'sleeps for period' do
-        expect_any_instance_of(described_class).to receive(:sleep)
+        expect_any_instance_of(described_class).to receive(:sleep).at_least(:once)
 
         active_job = described_class.perform_later(described_class::SLOW_TYPE)
 

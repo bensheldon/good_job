@@ -21,6 +21,9 @@ Warning.ignore(%r{/lib/mail/parsers/})
 Warning.ignore(%r{/lib/selenium/.*URI::RFC3986_PARSER.escape is obsolete})
 # https://github.com/teamcapybara/capybara/pull/2781
 Warning.ignore(%r{/lib/capybara/.*URI::RFC3986_PARSER.make_regexp is obsolete})
+# https://github.com/rails/rails/pull/54053
+Warning.ignore(%r{the block passed to 'ActiveModel::Type::Value#serializable\?'})
+Warning.ignore(%r{the block passed to 'ActiveModel::Attribute#value'})
 
 require File.expand_path('../demo/config/environment', __dir__)
 

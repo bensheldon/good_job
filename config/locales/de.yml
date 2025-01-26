@@ -194,6 +194,7 @@ de:
       job:
         arguments: Argumente
         attempts: Versuche
+        labels: Etiketten
         priority: Priorität
         queue: Warteschlange
     number:
@@ -213,14 +214,28 @@ de:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Sind Sie sicher, dass Sie %{value} pausieren möchten?
+        confirm_unpause: Sind Sie sicher, dass Sie %{value} fortsetzen möchten?
+        disabled: Die experimentelle Pausenfunktion von GoodJob ist standardmäßig deaktiviert, da sie die Leistung beeinträchtigen kann. Konfigurieren Sie sie zur Aktivierung
+        job_class: Job-Klasse
+        label: Label
+        pause: Pausieren
+        queue: Warteschlange
+        title: Pausen
+        type: Pausentyp
+        unpause: Fortsetzen
+        value: Wert
     performance:
       index:
         average_duration: Durchschnittliche Dauer
-        chart_title: Gesamtdauer der Jobs in Sekunden
+        chart_title: Gesamtausführungszeit in Sekunden
         executions: Ausführungen
         job_class: Job-Klasse
         maximum_duration: Maximale Dauer
-        minimum_duration: Mindestdauer
+        minimum_duration: Minimale Dauer
+        queue_name: Warteschlangenname
         title: Leistung
       show:
         slow: Langsam
@@ -255,6 +270,7 @@ de:
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
+        pauses: Pausen
         performance: Leistung
         processes: Prozesse
         theme:

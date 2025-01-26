@@ -194,6 +194,7 @@ tr:
       job:
         arguments: Argümanlar
         attempts: Denemeler
+        labels: Etiketler
         priority: Öncelik
         queue: Kuyruk
     number:
@@ -213,18 +214,32 @@ tr:
             thousand: Bin
             trillion: Trilyon
             unit: ''
+    pauses:
+      index:
+        confirm_pause: "%{value} duraklatmak istediğinizden emin misiniz?"
+        confirm_unpause: "%{value} devam ettirmek istediğinizden emin misiniz?"
+        disabled: GoodJob'ın deneysel Duraklatma özelliği, performansı düşürebileceği için varsayılan olarak devre dışıdır. Etkinleştirmek için yapılandırın
+        job_class: İş sınıfı
+        label: Etiket
+        pause: Duraklat
+        queue: Kuyruk
+        title: Duraklatmalar
+        type: Duraklatma Türü
+        unpause: Devam Et
+        value: Değer
     performance:
       index:
         average_duration: Ortalama süre
-        chart_title: Saniye cinsinden toplam iş yürütme süresi
-        executions: İnfazlar
+        chart_title: Toplam yürütme süresi (saniye)
+        executions: Yürütmeler
         job_class: İş sınıfı
         maximum_duration: Maksimum süre
         minimum_duration: Minimum süre
-        title: Verim
+        queue_name: Kuyruk adı
+        title: Performans
       show:
         slow: Yavaş
-        title: Verim
+        title: Performans
     processes:
       index:
         cron_enabled: Cron etkin
@@ -255,6 +270,7 @@ tr:
         jobs: İşler
         live_poll: Anlık Güncelleme
         name: "GoodJob 👍"
+        pauses: Duraklatmalar
         performance: Verim
         processes: Süreçler
         theme:

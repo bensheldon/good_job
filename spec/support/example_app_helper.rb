@@ -11,14 +11,19 @@ module ExampleAppHelper
 
     root_path = example_app_path.join('..')
     FileUtils.cd(root_path) do
-      system("rails new #{app_name} -d postgresql --skip-action-text --skip-action-mailer --skip-action-mailbox --skip-action-cable --skip-git --skip-sprockets --skip-listen --skip-javascript --skip-turbolinks --skip-solid --skip-kamal --skip-system-test --skip-test-unit --skip-bootsnap --skip-spring --skip-active-storage")
+      system <<~BASH, exception: true
+        bundle exec rails new #{app_name} -d postgresql \
+        --skip-action-text --skip-action-mailer --skip-action-mailbox --skip-action-cable --skip-git --skip-sprockets \
+        --skip-listen --skip-javascript --skip-turbolinks --skip-solid --skip-kamal --skip-system-test --skip-test-unit \
+        --skip-bootsnap --skip-spring --skip-active-storage
+      BASH
     end
 
     FileUtils.rm_rf("#{example_app_path}/config/initializers/assets.rb")
     FileUtils.cp(::Rails.root.join('config/database.yml'), "#{example_app_path}/config/database.yml")
 
     File.open("#{example_app_path}/Gemfile", 'a') do |f|
-      f.puts 'gem "good_job", path: "#{File.dirname(__FILE__)}/../../../"' # rubocop:disable Lint/InterpolationCheck
+      f.puts 'gem "good_job", path: "#{File.dirname(__FILE__)}/../../../"'
     end
   end
 
