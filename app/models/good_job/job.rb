@@ -54,11 +54,11 @@ module GoodJob
     scope :finished_before, ->(timestamp) { where(arel_table['finished_at'].lteq(bind_value('finished_at', timestamp, ActiveRecord::Type::DateTime))) }
 
     # First execution will run in the future
-    scope :scheduled, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).where(params_execution_count.lt(2)) }
+    scope :scheduled, -> { where(finished_at: nil).where(arel_table['scheduled_at'].gt(bind_value('scheduled_at', Time.current, ActiveRecord::Type::DateTime))).where(params_execution_count.lt(2)) }
     # Execution errored, will run in the future
-    scope :retried, -> { where(finished_at: nil).where(coalesce_scheduled_at_created_at.gt(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))).where(params_execution_count.gt(1)) }
+    scope :retried, -> { where(finished_at: nil).where(arel_table['scheduled_at'].gt(bind_value('scheduled_at', Time.current, ActiveRecord::Type::DateTime))).where(params_execution_count.gt(1)) }
     # Immediate/Scheduled time to run has passed, waiting for an available thread run
-    scope :queued, -> { where(performed_at: nil, finished_at: nil).where(coalesce_scheduled_at_created_at.lteq(bind_value('coalesce', Time.current, ActiveRecord::Type::DateTime))) }
+    scope :queued, -> { where(performed_at: nil, finished_at: nil).where(arel_table['scheduled_at'].lteq(bind_value('scheduled_at', Time.current, ActiveRecord::Type::DateTime))) }
     # Advisory locked and executing
     scope :running, -> { where.not(performed_at: nil).where(finished_at: nil) }
     # Finished executing (succeeded or discarded)
@@ -94,7 +94,7 @@ module GoodJob
     # @!method only_scheduled
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(bind_value('scheduled_at', DateTime.current, ActiveRecord::Type::DateTime))).or(where(scheduled_at: nil)) }
+    scope :only_scheduled, -> { where(arel_table['scheduled_at'].lteq(bind_value('scheduled_at', DateTime.current, ActiveRecord::Type::DateTime))) }
 
     # Exclude jobs that are paused via queue_name or job_class.
     # Only applies when enable_pauses configuration is true.
@@ -166,7 +166,7 @@ module GoodJob
     # @!method schedule_ordered
     # @!scope class
     # @return [ActiveRecord::Relation]
-    scope :schedule_ordered, -> { order(coalesce_scheduled_at_created_at.asc) }
+    scope :schedule_ordered, -> { order(scheduled_at: :asc) }
 
     # Get Jobs on queues that match the given queue string.
     # @!method queue_string(string)
@@ -248,10 +248,6 @@ module GoodJob
           json_string(arel_table['serialized_params'], 'executions'),
           Arel.sql('integer')
         )
-      end
-
-      def coalesce_scheduled_at_created_at
-        arel_table.coalesce(arel_table['scheduled_at'], arel_table['created_at'])
       end
     end
 
@@ -344,12 +340,13 @@ module GoodJob
 
       after ||= Time.current
       after_bind = bind_value('scheduled_at', after, ActiveRecord::Type::DateTime)
-      after_query = query.where(arel_table['scheduled_at'].gt(after_bind)).or query.where(scheduled_at: nil).where(arel_table['created_at'].gt(after_bind))
-      after_at = after_query.limit(limit).pluck(:scheduled_at, :created_at).map { |timestamps| timestamps.compact.first }
+      after_query = query.where(arel_table['scheduled_at'].gt(after_bind))
+      after_at = after_query.limit(limit).pluck(:scheduled_at)
 
       if now_limit&.positive?
-        now_query = query.where(arel_table['scheduled_at'].lt(bind_value('scheduled_at', Time.current, ActiveRecord::Type::DateTime))).or query.where(scheduled_at: nil)
-        now_at = now_query.limit(now_limit).pluck(:scheduled_at, :created_at).map { |timestamps| timestamps.compact.first }
+        now_bind = bind_value('scheduled_at', Time.current, ActiveRecord::Type::DateTime)
+        now_query = query.where(arel_table['scheduled_at'].lt(now_bind))
+        now_at = now_query.limit(now_limit).pluck(:scheduled_at)
       end
 
       Array(now_at) + after_at
