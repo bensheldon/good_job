@@ -84,4 +84,4 @@
   <%= tag.pre JSON.pretty_generate(@job.display_serialized_params) %>
 <% end %>
 
-<%= render 'executions', executions: @job.executions.reverse %>
+<%= render 'executions', executions: @job.executions.sort_by(&:number).reverse %>
