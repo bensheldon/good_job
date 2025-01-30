@@ -213,4 +213,14 @@ describe GoodJob do
       expect(described_class.paused).to eq({ queues: [], job_classes: [], labels: [] })
     end
   end
+
+  describe '.cli?' do
+    it 'returns true when in a CLI environment' do
+      allow(GoodJob::CLI).to receive(:within_exe?).and_return(false)
+      expect(described_class.cli?).to be false
+
+      allow(GoodJob::CLI).to receive(:within_exe?).and_return(true)
+      expect(described_class.cli?).to be true
+    end
+  end
 end

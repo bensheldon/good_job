@@ -324,6 +324,12 @@ module GoodJob
   def self.paused(type = nil)
     GoodJob::Setting.paused(type)
   end
+
+  # Whether this process was initialized via the GoodJob executable (`$ good_job`)
+  # @return [Boolean]
+  def self.cli?
+    GoodJob::CLI.within_exe?
+  end
 end
 
 ActiveSupport.run_load_hooks(:good_job, GoodJob)
