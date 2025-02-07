@@ -1,5 +1,18 @@
 # Changelog
 
+## [v4.9.0](https://github.com/bensheldon/good_job/tree/v4.9.0) (2025-02-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.8.2...v4.9.0)
+
+**Implemented enhancements:**
+
+- Add `GoodJob.cli?` to check if the current process was started by the `good_job` executable [\#1592](https://github.com/bensheldon/good_job/pull/1592) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Option to only preserve discarded/errored jobs? [\#1594](https://github.com/bensheldon/good_job/issues/1594)
+- Notifier errored: TypeError: ActiveSupport::TimeWithZone can't be coerced into Integer [\#1581](https://github.com/bensheldon/good_job/issues/1581)
+
 ## [v4.8.2](https://github.com/bensheldon/good_job/tree/v4.8.2) (2025-01-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.8.1...v4.8.2)
@@ -3054,7 +3067,7 @@
 
 **Implemented enhancements:**
 
-- Suppress backtrace of ConcurrencyExceededError [\#348](https://github.com/bensheldon/good_job/pull/348) ([reczy](https://github.com/reczy))
+- Suppress backtrace of ConcurrencyExceededError [\#348](https://github.com/bensheldon/good_job/pull/348) ([mikereczek](https://github.com/mikereczek))
 
 **Closed issues:**
 
@@ -3440,7 +3453,7 @@
 
 **Merged pull requests:**
 
-- Fix equality typo in development.rb of test\_app [\#207](https://github.com/bensheldon/good_job/pull/207) ([reczy](https://github.com/reczy))
+- Fix equality typo in development.rb of test\_app [\#207](https://github.com/bensheldon/good_job/pull/207) ([mikereczek](https://github.com/mikereczek))
 
 ## [v1.7.0](https://github.com/bensheldon/good_job/tree/v1.7.0) (2021-01-25)
 
