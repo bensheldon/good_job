@@ -31,6 +31,15 @@ module GoodJob
                 .to_h
     end
 
+    def labels
+      filtered_query(params.slice(:queue_name))
+        .joins("CROSS JOIN unnest(labels) AS label")
+        .group("label")
+        .order("label")
+        .count
+        .to_h
+    end
+
     def job_classes
       filtered_query(params.slice(:queue_name)).unscope(:select)
                                                .group(GoodJob::Job.params_job_class).count
@@ -53,6 +62,7 @@ module GoodJob
         queue_name: params[:queue_name],
         query: params[:query],
         state: params[:state],
+        labels: params[:labels],
         cron_key: params[:cron_key],
         finished_since: params[:finished_since],
       }.merge(override).delete_if { |_, v| v.blank? }

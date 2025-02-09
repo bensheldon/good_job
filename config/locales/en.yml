@@ -257,8 +257,10 @@ en:
       filter:
         all: All
         all_jobs: All jobs
+        all_labels: All labels
         all_queues: All queues
         clear: Clear
+        job_labels: Job labels
         job_name: Job name
         placeholder: Search by class, job id, job params, and error text.
         queue_name: Queue name
