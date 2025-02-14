@@ -14,10 +14,18 @@ module GoodJob
       # @param after_id [Numeric, String, nil]
       #   Display records after this ID for keyset pagination
       # @return [ActiveRecord::Relation]
-      scope :display_all, (lambda do |after_scheduled_at: nil, after_id: nil|
-        query = order(Arel.sql('scheduled_at DESC, id DESC'))
+      scope :display_all, (lambda do |state: nil, after_scheduled_at: nil, after_id: nil|
+        query = if state == 'scheduled'
+                  order(Arel.sql('scheduled_at ASC, id DESC'))
+                else
+                  order(Arel.sql('scheduled_at DESC, id DESC'))
+                end
         if after_scheduled_at.present? && after_id.present?
-          query = query.where Arel::Nodes::Grouping.new([arel_table["scheduled_at"], arel_table["id"]]).lt(Arel::Nodes::Grouping.new([bind_value('scheduled_at', after_scheduled_at, ActiveRecord::Type::DateTime), bind_value('id', after_id, ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Uuid)]))
+          query = if state == 'scheduled'
+                    query.where Arel::Nodes::Grouping.new([arel_table["scheduled_at"], arel_table["id"]]).gteq(Arel::Nodes::Grouping.new([bind_value('scheduled_at', after_scheduled_at, ActiveRecord::Type::DateTime), bind_value('id', after_id, ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Uuid)]))
+                  else
+                    query.where Arel::Nodes::Grouping.new([arel_table["scheduled_at"], arel_table["id"]]).lt(Arel::Nodes::Grouping.new([bind_value('scheduled_at', after_scheduled_at, ActiveRecord::Type::DateTime), bind_value('id', after_id, ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Uuid)]))
+                  end
         elsif after_scheduled_at.present?
           query = query.where arel_table["scheduled_at"].lt(bind_value('scheduled_at', after_scheduled_at, ActiveRecord::Type::DateTime))
         end
