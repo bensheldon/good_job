@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddIndexGoodJobsConcurrencyKeyCreatedAt <ActiveRecord::Migration<%= migration_version %>
+class AddIndexGoodJobsConcurrencyKeyCreatedAt < ActiveRecord::Migration<%= migration_version %>
   def change
     add_index :good_jobs, [:concurrency_key, :created_at]
   end
