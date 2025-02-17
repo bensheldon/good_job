@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddIndexGoodJobsConcurrencyKeyCreatedAt < ActiveRecord::Migration[8.0]
+class AddIndexGoodJobsConcurrencyKeyCreatedAt < ActiveRecord::Migration[7.1]
   disable_ddl_transaction!
 
   def change
