@@ -24,7 +24,7 @@ module GoodJob
     alias_attribute :discarded?, :discarded_at
     alias_attribute :finished?, :finished_at
 
-    scope :display_all, (lambda do |_state: nil, after_created_at: nil, after_id: nil|
+    scope :display_all, (lambda do |state: nil, after_created_at: nil, after_id: nil| # rubocop:disable Lint/UnusedBlockArgument
       query = order(created_at: :desc, id: :desc)
       if after_created_at.present? && after_id.present?
         query = if Gem::Version.new(Rails.version) < Gem::Version.new('7.0.0.a') || Concurrent.on_jruby?
