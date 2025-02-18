@@ -16,6 +16,7 @@ module GoodJob
       after_scheduled_at = params[:after_scheduled_at].present? ? Time.zone.parse(params[:after_scheduled_at]) : nil
 
       query_for_records.display_all(
+        state: params[:state],
         after_scheduled_at: after_scheduled_at,
         after_id: params[:after_id]
       ).limit(params.fetch(:limit, DEFAULT_LIMIT))
