@@ -4,7 +4,7 @@
       <h2 class="pt-3 pb-2"><%= title %></h2>
     </div>
 
-    <%= form_with(url: "", method: :get, local: true, id: "filter_form", class: "") do |form| %>
+    <%= form_with(model: false, url: "", method: :get, local: true, id: "filter_form", class: "") do |form| %>
       <%= hidden_field_tag :poll, params[:poll] %>
       <%= hidden_field_tag :state, params[:state] %>
       <%= hidden_field_tag :locale, params[:locale] if params[:locale] %>
