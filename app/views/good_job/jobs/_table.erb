@@ -1,4 +1,4 @@
-<%= form_with(url: mass_update_jobs_path(filter.to_params), method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
+<%= form_with(model: false, url: mass_update_jobs_path(filter.to_params), method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
   <div class="my-3 card" data-gj-poll-replace id="jobs-table">
     <div class="list-group list-group-flush text-nowrap table-jobs" role="table">
       <header class="list-group-item bg-body-tertiary">
