@@ -51,7 +51,9 @@ describe 'Jobs', :js, :without_executor do
     end
 
     describe 'filtering' do
-      let!(:foo_queue_job) { ConfigurableQueueJob.set(wait: 10.minutes).perform_later(queue_as: 'foo') }
+      let!(:foo_queue_job) do
+        ConfigurableQueueJob.set(good_job_labels: ["my label"], wait: 10.minutes).perform_later(queue_as: 'foo')
+      end
 
       it "can filter by job class" do
         visit good_job.jobs_path
@@ -83,6 +85,18 @@ describe 'Jobs', :js, :without_executor do
 
         select "foo", from: "job_queue_filter"
         expect(current_url).to match(/queue_name=foo/)
+
+        table = page.find("[role=table]")
+        expect(table).to have_css("[role=row]", count: 1)
+        expect(table).to have_content(foo_queue_job.job_id)
+      end
+
+      it "can filter by label" do
+        visit good_job.jobs_path
+
+        select "my label", from: "job_label_filter"
+        click_button 'Search'
+        expect(current_url).to match(/labels%5B%5D=my\+label/)
 
         table = page.find("[role=table]")
         expect(table).to have_css("[role=row]", count: 1)
