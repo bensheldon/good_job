@@ -1032,7 +1032,7 @@ To detect the start of a graceful shutdown from within a performing job, for exa
 ```ruby
 def perform(lots_of_records)
   lots_of_records.each do |record|
-    break if GoodJob.current_thread_shutting_down? # or `unless GoodJob.current_thread.running?`
+    break if GoodJob.current_thread_shutting_down? # or `unless GoodJob.current_thread_running?`
     # process record ...
   end
 end
