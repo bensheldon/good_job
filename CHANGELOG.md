@@ -1,5 +1,13 @@
 # Changelog
 
+## [v4.9.2](https://github.com/bensheldon/good_job/tree/v4.9.2) (2025-03-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.9.1...v4.9.2)
+
+**Fixed bugs:**
+
+- Quiet duplicate cron enqueue logging by pretending it was halted at before\_enqueue [\#1615](https://github.com/bensheldon/good_job/pull/1615) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.9.1](https://github.com/bensheldon/good_job/tree/v4.9.1) (2025-03-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.9.0...v4.9.1)
