@@ -5,6 +5,7 @@ require 'active_job/arguments'
 module GoodJob
   class BatchRecord < BaseRecord
     include AdvisoryLockable
+    include Filterable
 
     self.table_name = 'good_job_batches'
     self.implicit_order_column = 'created_at'
@@ -23,20 +24,6 @@ module GoodJob
     alias_attribute :enqueued?, :enqueued_at
     alias_attribute :discarded?, :discarded_at
     alias_attribute :finished?, :finished_at
-
-    scope :display_all, (lambda do |state: nil, after_created_at: nil, after_id: nil| # rubocop:disable Lint/UnusedBlockArgument
-      query = order(created_at: :desc, id: :desc)
-      if after_created_at.present? && after_id.present?
-        query = if Gem::Version.new(Rails.version) < Gem::Version.new('7.0.0.a') || Concurrent.on_jruby?
-                  query.where(Arel.sql('(created_at, id) < (:after_created_at, :after_id)'), after_created_at: after_created_at, after_id: after_id)
-                else
-                  query.where Arel::Nodes::Grouping.new([arel_table["created_at"], arel_table["id"]]).lt(Arel::Nodes::Grouping.new([bind_value('created_at', after_created_at, ActiveRecord::Type::DateTime), bind_value('id', after_id, ActiveRecord::Type::String)]))
-                end
-      elsif after_created_at.present?
-        query = query.where arel_table["created_at"].lt(bind_value('created_at', after_created_at, ActiveRecord::Type::DateTime))
-      end
-      query
-    end)
 
     def self.jobs_finished_at_migrated?
       column_names.include?('jobs_finished_at')

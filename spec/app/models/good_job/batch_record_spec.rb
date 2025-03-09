@@ -24,7 +24,7 @@ describe GoodJob::BatchRecord do
       second_job = described_class.create(id: '3732d706-fd5a-4c39-b1a5-a9bc6d265811')
       last_job = described_class.create(id: '4fbae77c-6f22-488f-ad42-5bd20f39c28c')
 
-      result = described_class.display_all(after_created_at: last_job.created_at, after_id: last_job.id)
+      result = described_class.display_all(after_at: last_job.created_at, after_id: last_job.id)
 
       expect(result).to eq [second_job, first_job]
     end
