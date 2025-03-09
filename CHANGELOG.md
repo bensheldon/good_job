@@ -1,5 +1,27 @@
 # Changelog
 
+## [v4.9.1](https://github.com/bensheldon/good_job/tree/v4.9.1) (2025-03-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.9.0...v4.9.1)
+
+**Implemented enhancements:**
+
+- Order Dashboard jobs in more "natural" order [\#1604](https://github.com/bensheldon/good_job/pull/1604) ([francois](https://github.com/francois))
+
+**Fixed bugs:**
+
+- \[dashboard\] Scheduled tasks are shown "backwards" [\#1580](https://github.com/bensheldon/good_job/issues/1580)
+- Update `form_with` calls to be compatible with Rails 8 [\#1610](https://github.com/bensheldon/good_job/pull/1610) ([sallyhall](https://github.com/sallyhall))
+- Add index on good\_jobs: \[:concurrency\_key, :created\_at\] to improve performance of throttling \(\#1603\) [\#1605](https://github.com/bensheldon/good_job/pull/1605) ([Intrepidd](https://github.com/Intrepidd))
+
+**Closed issues:**
+
+- Cron did not enqueue jobs [\#1600](https://github.com/bensheldon/good_job/issues/1600)
+- Same job performed by all threads [\#1599](https://github.com/bensheldon/good_job/issues/1599)
+- Option for bin/rails g good\_job:install to purge Solid gems [\#1593](https://github.com/bensheldon/good_job/issues/1593)
+- Jobs are not being picked up at the expected rate [\#1578](https://github.com/bensheldon/good_job/issues/1578)
+- Question about GoodJob Batches in tests [\#1479](https://github.com/bensheldon/good_job/issues/1479)
+
 ## [v4.9.0](https://github.com/bensheldon/good_job/tree/v4.9.0) (2025-02-07)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.8.2...v4.9.0)
