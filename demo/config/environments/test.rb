@@ -15,10 +15,13 @@ Rails.application.configure do
   # Raises error for missing translations.
   config.i18n.raise_on_missing_translations = true
 
+  config.log_level = :debug
+
   config.colorize_logging = false if ENV["CI"]
   if ActiveModel::Type::Boolean.new.cast(ENV['RAILS_LOG_TO_STDOUT'])
     logger = ActiveSupport::Logger.new(STDOUT)
     logger.formatter = config.log_formatter
+    logger.level = config.log_level
     config.logger = ActiveSupport::TaggedLogging.new(logger)
   end
 end
