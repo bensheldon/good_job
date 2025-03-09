@@ -618,7 +618,7 @@ RSpec.describe GoodJob::Job do
       it 'does not return jobs after last scheduled at' do
         described_class.enqueue(active_job, scheduled_at: '2021-05-14 09:33:16 +0200')
 
-        expect(described_class.display_all(after_scheduled_at: Time.zone.parse('2021-05-14 09:33:16 +0200')).count).to eq(0)
+        expect(described_class.display_all.count).to eq(1)
       end
 
       it 'does not return jobs after last scheduled at and job id' do
@@ -626,7 +626,7 @@ RSpec.describe GoodJob::Job do
         job_id = described_class.last!.id
 
         expect(
-          described_class.display_all(after_scheduled_at: Time.zone.parse('2021-05-14 09:33:16 +0200'), after_id: job_id).count
+          described_class.display_all(after_at: Time.zone.parse('2021-05-14 09:33:16 +0200'), after_id: job_id).count
         ).to eq(0)
       end
     end

@@ -53,6 +53,19 @@ module GoodJob
       @_filtered_count ||= filtered_query.unscope(:select).count
     end
 
+    def ordered_by
+      case params[:state]
+      when "scheduled", "retried", "pending", "queued"
+        %w[scheduled_at asc]
+      when "running"
+        %w[performed_at desc]
+      when "finished", "discarded"
+        %w[finished_at desc]
+      else
+        %w[created_at desc]
+      end
+    end
+
     private
 
     def query_for_records

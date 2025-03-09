@@ -13,12 +13,15 @@ module GoodJob
     end
 
     def records
-      after_scheduled_at = params[:after_scheduled_at].present? ? Time.zone.parse(params[:after_scheduled_at]) : nil
+      after_at = params[:after_at].present? ? Time.zone.parse(params[:after_at]) : nil
+      after_id = params[:after_id] if after_at
+      limit = params.fetch(:limit, DEFAULT_LIMIT)
 
       query_for_records.display_all(
-        after_scheduled_at: after_scheduled_at,
-        after_id: params[:after_id]
-      ).limit(params.fetch(:limit, DEFAULT_LIMIT))
+        ordered_by: ordered_by,
+        after_at: after_at,
+        after_id: after_id
+      ).limit(limit)
     end
 
     def last
@@ -64,6 +67,19 @@ module GoodJob
 
     def filtered_count
       filtered_query.count
+    end
+
+    def ordered_by
+      %w[created_at desc]
+    end
+
+    def next_page_params
+      order_column = ordered_by.first
+
+      {
+        after_at: records.last&.send(order_column),
+        after_id: records.last&.id,
+      }.merge(to_params)
     end
 
     private
