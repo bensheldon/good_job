@@ -163,8 +163,10 @@ module GoodJob
             scheduled_at: scheduled_at
           )
 
-          executed_locally = execute_async? && @capsule&.create_thread(job.job_state)
-          Notifier.notify(job.job_state) if !executed_locally && send_notify?(active_job)
+          if job
+            executed_locally = execute_async? && @capsule&.create_thread(job.job_state)
+            Notifier.notify(job.job_state) if !executed_locally && send_notify?(active_job)
+          end
         end
 
         job

@@ -387,7 +387,16 @@ module GoodJob
         end
 
         instrument_payload[:job] = job
-        job.save!
+        begin
+          job.save!
+        rescue ActiveRecord::RecordNotUnique
+          raise unless job.cron_key
+
+          # Active Job doesn't have a clean way to cancel an enqueue for unexceptional reasons
+          # This is a workaround to mark it as having been halted in before_enqueue
+          active_job.send(:halted_callback_hook, "duplicate_cron_key", "good_job")
+          return false
+        end
 
         CurrentThread.retried_job = job if retried
 

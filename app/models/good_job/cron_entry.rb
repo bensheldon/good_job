@@ -110,8 +110,6 @@ module GoodJob # :nodoc:
           kwargs_value.present? ? configured_job.perform_later(*args_value, **kwargs_value) : configured_job.perform_later(*args_value)
         end
       end
-    rescue ActiveRecord::RecordNotUnique
-      false
     end
 
     def display_properties
