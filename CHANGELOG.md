@@ -1,5 +1,17 @@
 # Changelog
 
+## [v4.9.3](https://github.com/bensheldon/good_job/tree/v4.9.3) (2025-03-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.9.2...v4.9.3)
+
+**Closed issues:**
+
+- perform\_job.good\_job notification for successful jobs has error\_event: :discarded [\#1609](https://github.com/bensheldon/good_job/issues/1609)
+
+**Merged pull requests:**
+
+- Fix instrumentation of "perform\_job.good\_job" event [\#1616](https://github.com/bensheldon/good_job/pull/1616) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.9.2](https://github.com/bensheldon/good_job/tree/v4.9.2) (2025-03-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.9.1...v4.9.2)
