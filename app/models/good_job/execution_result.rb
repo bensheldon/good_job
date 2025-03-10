@@ -9,7 +9,7 @@ module GoodJob
     attr_reader :handled_error
     # @return [Exception, nil]
     attr_reader :unhandled_error
-    # @return [String, nil]
+    # @return [Symbol, nil]
     attr_reader :error_event
     # @return [Boolean, nil]
     attr_reader :unexecutable

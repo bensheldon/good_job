@@ -1017,6 +1017,45 @@ RSpec.describe GoodJob::Job do
           end
         end
       end
+
+      describe "instrumentation" do
+        context "when it succeeds" do
+          let(:active_job) { TestJob.new("a string") }
+
+          it "has correct payload" do
+            callback = lambda do |_name, _started, _finished, _unique_id, payload|
+              expect(payload).to include(
+                job: good_job,
+                value: "a string",
+                error: nil,
+                handled_error: nil,
+                error_event: nil
+              )
+            end
+            ActiveSupport::Notifications.subscribed(callback, "perform_job.good_job") do
+              good_job.perform(lock_id: process_id)
+            end
+          end
+        end
+
+        context "when it errors" do
+          let(:active_job) { TestJob.new("a string", raise_error: true) }
+
+          it "has correct payload" do
+            callback = lambda do |_name, _started, _finished, _unique_id, payload|
+              expect(payload).to include(
+                job: good_job,
+                error: an_instance_of(TestJob::ExpectedError),
+                unhandled_error: an_instance_of(TestJob::ExpectedError),
+                error_event: :unhandled
+              )
+            end
+            ActiveSupport::Notifications.subscribed(callback, "perform_job.good_job") do
+              good_job.perform(lock_id: process_id)
+            end
+          end
+        end
+      end
     end
 
     describe '#queue_latency' do
