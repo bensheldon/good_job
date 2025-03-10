@@ -642,8 +642,9 @@ module GoodJob
               value = nil
             end
             handled_error ||= current_thread.error_on_retry || current_thread.error_on_discard
-
-            error_event = if handled_error == current_thread.error_on_discard
+            error_event = if !handled_error
+                            nil
+                          elsif handled_error == current_thread.error_on_discard
                             :discarded
                           elsif handled_error == current_thread.error_on_retry
                             :retried
@@ -655,6 +656,7 @@ module GoodJob
 
             instrument_payload.merge!(
               value: value,
+              error: handled_error,
               handled_error: handled_error,
               retried: current_thread.retried_job.present?,
               error_event: error_event
@@ -669,7 +671,11 @@ module GoodJob
                             :unhandled
                           end
 
-            instrument_payload[:unhandled_error] = e
+            instrument_payload.merge!(
+              error: e,
+              unhandled_error: e,
+              error_event: error_event
+            )
             ExecutionResult.new(value: nil, unhandled_error: e, error_event: error_event)
           end
         end
