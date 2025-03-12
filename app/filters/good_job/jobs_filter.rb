@@ -25,7 +25,14 @@ module GoodJob
 
       query = query.job_class(filter_params[:job_class]) if filter_params[:job_class].present?
       query = query.where(queue_name: filter_params[:queue_name]) if filter_params[:queue_name].present?
-      query = query.search_text(filter_params[:query]) if filter_params[:query].present?
+      query = case filter_params[:query].presence
+              when /\A[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\z/i
+                query.where(active_job_id: filter_params[:query])
+              when nil
+                query # no query parameter were specified
+              else
+                query.search_text(filter_params[:query])
+              end
       query = query.where(cron_key: filter_params[:cron_key]) if filter_params[:cron_key].present?
       query = query.where(finished_at: finished_since(filter_params[:finished_since])..) if filter_params[:finished_since].present?
 
