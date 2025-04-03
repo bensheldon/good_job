@@ -367,6 +367,7 @@ module GoodJob
     # @return [Boolean]
     def enqueue_after_transaction_commit
       return options[:enqueue_after_transaction_commit] unless options[:enqueue_after_transaction_commit].nil?
+      return rails_config[:enqueue_after_transaction_commit] unless rails_config[:enqueue_after_transaction_commit].nil?
 
       DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT
     end
