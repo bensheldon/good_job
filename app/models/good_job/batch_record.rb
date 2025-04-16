@@ -76,6 +76,9 @@ module GoodJob
 
       def self.load(value)
         ActiveJob::Arguments.deserialize([value]).first
+      rescue ActiveJob::DeserializationError => e
+        GoodJob.logger.debug("Failed to deserialize properties: #{e.message}")
+        value
       end
     end
 

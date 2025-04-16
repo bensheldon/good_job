@@ -176,6 +176,31 @@ describe GoodJob::Batch do
       reloaded_batch = described_class.find(batch.id)
       expect(reloaded_batch.properties).to eq({ globalid: globalid })
     end
+
+    context 'when GlobalID cannot be deserialized' do
+      before do
+        stub_const 'SomeClass', (Class.new do
+          include GlobalID::Identification
+
+          def id
+            1
+          end
+
+          def self.find(_id)
+            raise ActiveRecord::RecordNotFound
+          end
+        end)
+      end
+
+      it 'returns the unserialized value' do
+        serialized_record = ActiveJob::Arguments.serialize([SomeClass.new]).first
+        batch = described_class.new
+        batch.save
+        batch.assign_properties({ 'record' => serialized_record })
+
+        expect(batch.properties).to eq('record' => { "_aj_globalid" => "gid://test-app/SomeClass/1" })
+      end
+    end
   end
 
   describe 'callbacks' do
