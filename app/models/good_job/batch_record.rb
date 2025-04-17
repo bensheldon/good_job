@@ -41,6 +41,8 @@ module GoodJob
 
     def display_attributes
       attributes.except('serialized_properties').merge(properties: properties)
+    rescue ActiveJob::DeserializationError
+      attributes_before_type_cast.except('serialized_properties').merge(properties: display_serialized_properties)
     end
 
     def _continue_discard_or_finish(job = nil, lock: true)
@@ -98,6 +100,15 @@ module GoodJob
 
     def jobs_finished_at
       self.class.jobs_finished_at_migrated? ? self[:jobs_finished_at] : self[:finished_at]
+    end
+
+    # Return formatted serialized_properties for display in the dashboard.
+    # If the properties cannot be deserialized, return the raw value.
+    # @return [Hash]
+    def display_serialized_properties
+      serialized_properties
+    rescue ActiveJob::DeserializationError
+      JSON.parse(read_attribute_before_type_cast(:serialized_properties))
     end
 
     private

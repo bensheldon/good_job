@@ -76,7 +76,7 @@
             </div>
           </div>
           <%= tag.div id: dom_id(batch, "properties"), class: "batch-properties list-group-item collapse small bg-dark text-light" do %>
-            <%= tag.pre JSON.pretty_generate(JSON.parse(batch.read_attribute_before_type_cast(:serialized_properties))) %>
+            <%= tag.pre JSON.pretty_generate(batch.display_serialized_properties) %>
           <% end %>
         <% end %>
       <% else %>
