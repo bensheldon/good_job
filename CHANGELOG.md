@@ -1,5 +1,28 @@
 # Changelog
 
+## [v4.10.0](https://github.com/bensheldon/good_job/tree/v4.10.0) (2025-04-26)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.9.3...v4.10.0)
+
+**Implemented enhancements:**
+
+- Improve dashboard performance when searching for job ID [\#1619](https://github.com/bensheldon/good_job/pull/1619) ([francois](https://github.com/francois))
+
+**Fixed bugs:**
+
+- Fix Batches dashboard deserealization error [\#1628](https://github.com/bensheldon/good_job/pull/1628) ([JulianPasquale](https://github.com/JulianPasquale))
+- Fix enqueue\_after\_transaction\_commit config [\#1626](https://github.com/bensheldon/good_job/pull/1626) ([santib](https://github.com/santib))
+
+**Closed issues:**
+
+- Retried jobs with GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError lose their arguments [\#1620](https://github.com/bensheldon/good_job/issues/1620)
+- Searching for job ID fails on Heroku due to 30s request limit [\#1618](https://github.com/bensheldon/good_job/issues/1618)
+- Poor performance when enqueuing many throttled jobs because of unindexed queries [\#1603](https://github.com/bensheldon/good_job/issues/1603)
+
+**Merged pull requests:**
+
+- Update `GoodJob.migrated?` for latest migration [\#1631](https://github.com/bensheldon/good_job/pull/1631) ([Earlopain](https://github.com/Earlopain))
+
 ## [v4.9.3](https://github.com/bensheldon/good_job/tree/v4.9.3) (2025-03-10)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.9.2...v4.9.3)
