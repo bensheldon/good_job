@@ -2,6 +2,8 @@
 
 module GoodJob
   class JobsFilter < BaseFilter
+    UUID_REGEX = /\A[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\z/i
+
     def state_names
       %w[scheduled retried queued running succeeded discarded]
     end
@@ -25,7 +27,16 @@ module GoodJob
 
       query = query.job_class(filter_params[:job_class]) if filter_params[:job_class].present?
       query = query.where(queue_name: filter_params[:queue_name]) if filter_params[:queue_name].present?
-      query = query.search_text(filter_params[:query]) if filter_params[:query].present?
+
+      search_query = filter_params[:query]&.strip
+      if search_query.present?
+        query = if query_is_uuid_and_job_exists?(search_query)
+                  query.where(active_job_id: search_query)
+                else
+                  query.search_text(search_query)
+                end
+      end
+
       query = query.where(cron_key: filter_params[:cron_key]) if filter_params[:cron_key].present?
       query = query.where(finished_at: finished_since(filter_params[:finished_since])..) if filter_params[:finished_since].present?
 
@@ -89,6 +100,10 @@ module GoodJob
       when '7_days_ago'
         7.days.ago
       end
+    end
+
+    def query_is_uuid_and_job_exists?(search_query)
+      @_query_is_uuid_and_job_exists ||= search_query&.match?(UUID_REGEX) && base_query.exists?(active_job_id: search_query)
     end
   end
 end
