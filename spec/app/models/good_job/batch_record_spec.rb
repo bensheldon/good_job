@@ -30,10 +30,10 @@ describe GoodJob::BatchRecord do
     end
   end
 
-  describe '#display_serialized_properties' do
+  describe '#display_attributes' do
     it 'returns the serialized properties' do
       record = described_class.create(serialized_properties: { 'test' => 'test' })
-      expect(record.display_serialized_properties).to eq({ 'test' => 'test' })
+      expect(record.display_attributes["properties"]).to eq({ 'test' => 'test' })
     end
 
     context 'when the properties cannot be deserialized' do
@@ -57,7 +57,7 @@ describe GoodJob::BatchRecord do
 
         allow(SomeClass).to receive(:find).and_raise(ActiveRecord::RecordNotFound)
 
-        expect(record.display_serialized_properties).to eq(
+        expect(record.display_attributes["properties"]).to eq(
           "_aj_symbol_keys" => [],
           "record" => { "_aj_globalid" => "gid://test-app/SomeClass/1" }
         )
