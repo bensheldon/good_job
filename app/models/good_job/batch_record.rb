@@ -40,7 +40,19 @@ module GoodJob
     end
 
     def display_attributes
-      attributes.except('serialized_properties').merge(properties: properties)
+      display_properties = begin
+        serialized_properties
+      rescue ActiveJob::DeserializationError
+        JSON.parse(read_attribute_before_type_cast(:serialized_properties))
+      end
+
+      attribute_names.to_h do |name|
+        if name == "serialized_properties"
+          ["properties", display_properties]
+        else
+          [name, self[name]]
+        end
+      end
     end
 
     def _continue_discard_or_finish(job = nil, lock: true)

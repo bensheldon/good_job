@@ -30,6 +30,41 @@ describe GoodJob::BatchRecord do
     end
   end
 
+  describe '#display_attributes' do
+    it 'returns the serialized properties' do
+      record = described_class.create(serialized_properties: { 'test' => 'test' })
+      expect(record.display_attributes["properties"]).to eq({ 'test' => 'test' })
+    end
+
+    context 'when the properties cannot be deserialized' do
+      before do
+        stub_const 'SomeClass', (Class.new do
+          include GlobalID::Identification
+
+          def id
+            1
+          end
+
+          def self.find(_id)
+            new
+          end
+        end)
+      end
+
+      it 'returns the raw value' do
+        instance = SomeClass.new
+        record = described_class.create(serialized_properties: { 'record' => instance })
+
+        allow(SomeClass).to receive(:find).and_raise(ActiveRecord::RecordNotFound)
+
+        expect(record.display_attributes["properties"]).to eq(
+          "_aj_symbol_keys" => [],
+          "record" => { "_aj_globalid" => "gid://test-app/SomeClass/1" }
+        )
+      end
+    end
+  end
+
   describe 'implicit sort order' do
     it 'is by created at' do
       first_job = described_class.create(id: '67160140-1bec-4c3b-bc34-1a8b36f87b21')
