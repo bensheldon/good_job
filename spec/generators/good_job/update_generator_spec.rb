@@ -5,6 +5,9 @@ require 'generators/good_job/update_generator'
 
 describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
   context 'when running the generator alone' do
+    # Migrations are caught up and removed every major release of GoodJob
+    let(:migration_templates) { Rails.application.root.join("../lib/generators/good_job/templates/update/migrations").glob("*.erb") }
+    
     around do |example|
       within_example_app do
         example.run
@@ -16,9 +19,11 @@ describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
         run_in_example_app 'rails g good_job:update'
       end
 
-      expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_jobs.rb")).not_to be_empty
-      # TODO: remove/replace this when migrations are removed/re-added
-      # expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*_create_good_job_settings.rb")).not_to be_empty
+      if migration_templates.any?
+        # Check that templates are copied over
+        first_migration_filematch = File.basename(migration_templates.first).match(/^\d+(_.*)\.erb$/)[1]
+        expect(Dir.glob("#{example_app_path}/db/migrate/[0-9]*#{first_migration_filematch}")).not_to be_empty
+      end
 
       quiet do
         run_in_example_app 'rails db:migrate'
@@ -26,12 +31,16 @@ describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
 
       # Check that `GoodJob.migrated?` is updated
       expect(GoodJob.migrated?).to be true
-      quiet do
-        run_in_example_app 'rails db:rollback'
-        expect(GoodJob.migrated?).to be false
-        run_in_example_app 'rails db:migrate'
+
+      if migration_templates.any?
+        # Check that migrations cleanly rollback and forward
+        quiet do
+          run_in_example_app 'rails db:rollback'
+          expect(GoodJob.migrated?).to be false
+          run_in_example_app 'rails db:migrate'
+        end
+        expect(GoodJob.migrated?).to be true
       end
-      expect(GoodJob.migrated?).to be true
     end
   end
 
