@@ -103,6 +103,17 @@ RSpec.describe GoodJob::JobsFilter do
           expect(filter.records.size).to eq 1
         end
       end
+
+      describe 'Job ID query' do
+        before do
+          params[:query] = GoodJob::Job.last.id
+        end
+
+        it 'returns the job' do
+          expect(filter.records.size).to eq 1
+          expect(filter.records.first).to eq GoodJob::Job.last
+        end
+      end
     end
 
     context 'when filtered by cron_key' do
