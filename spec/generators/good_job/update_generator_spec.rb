@@ -7,7 +7,7 @@ describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
   context 'when running the generator alone' do
     # Migrations are caught up and removed every major release of GoodJob
     let(:migration_templates) { Rails.application.root.join("../lib/generators/good_job/templates/update/migrations").glob("*.erb") }
-    
+
     around do |example|
       within_example_app do
         example.run
