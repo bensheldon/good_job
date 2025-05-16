@@ -178,6 +178,11 @@ module GoodJob # :nodoc:
 
             @refresh_task = nil
             create_refresh_task
+
+            # This is indicative that transactional tests / shared connections
+            # are used and issuing a heartbeat is unnecessary or a deadlock risk.
+            next if @record && @record.class.connection.open_transactions.positive?
+
             renew(silent: true)
           end
         end
