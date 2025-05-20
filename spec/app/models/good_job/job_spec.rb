@@ -500,7 +500,7 @@ RSpec.describe GoodJob::Job do
 
       context "with multiple jobs and ordered queues" do
         def job_params
-          { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" } }
+          { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" }, scheduled_at: Time.current }
         end
 
         let(:parsed_queues) { { include: %w{one two}, ordered_queues: true } }
