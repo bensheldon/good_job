@@ -196,6 +196,14 @@ de:
             thousand: K
             trillion: T
             unit: ''
+    performances:
+      show:
+        average_duration: Durchschnittliche Dauer
+        executions: Hinrichtungen
+        job_class: Berufsklasse
+        maximum_duration: Maximale Dauer
+        minimum_duration: Mindestdauer
+        title: Leistung
     processes:
       index:
         cron_enabled: Cron aktiviert
@@ -225,6 +233,7 @@ de:
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
+        performances: Leistung
         processes: Prozesse
         theme:
           auto: Auto
@@ -241,3 +250,5 @@ de:
       running: Laufend
       scheduled: Geplant
       succeeded: Erfolgreich
+  shared:
+    needs_migration: Bitte führen Sie GoodJob-Migrationen aus.

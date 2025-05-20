@@ -196,6 +196,14 @@ ko:
             thousand: K
             trillion: T
             unit: ''
+    performances:
+      show:
+        average_duration: 평균 지속 시간
+        executions: 처형
+        job_class: 직업군
+        maximum_duration: 최대 기간
+        minimum_duration: 최소 기간
+        title: 성능
     processes:
       index:
         cron_enabled: Cron이 활성화되어 있음
@@ -225,6 +233,7 @@ ko:
         jobs: 작업
         live_poll: 실시간 업데이트
         name: "GoodJob 👍"
+        performances: 성능
         processes: 프로세스
         theme:
           auto: 자동
@@ -241,3 +250,5 @@ ko:
       running: 실행 중
       scheduled: 예정됨
       succeeded: 성공함
+  shared:
+    needs_migration: GoodJob 마이그레이션을 실행하세요.

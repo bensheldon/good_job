@@ -16,7 +16,7 @@ module GoodJob # :nodoc:
       def register_process
         GoodJob::Process.override_connection(connection) do
           GoodJob::Process.cleanup
-          @process = GoodJob::Process.register
+          @capsule.tracker.register(with_advisory_lock: true)
         end
       end
 
@@ -24,7 +24,7 @@ module GoodJob # :nodoc:
         Rails.application.executor.wrap do
           GoodJob::Process.override_connection(connection) do
             GoodJob::Process.with_logger_silenced do
-              @process&.refresh_if_stale(cleanup: true)
+              @capsule.tracker.renew
             end
           end
         end
@@ -33,7 +33,7 @@ module GoodJob # :nodoc:
       # Deregisters the current process.
       def deregister_process
         GoodJob::Process.override_connection(connection) do
-          @process&.deregister
+          @capsule.tracker.unregister(with_advisory_lock: true)
         end
       end
     end

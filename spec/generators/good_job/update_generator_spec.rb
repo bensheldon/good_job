@@ -58,6 +58,16 @@ describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
     expect(normalize_schema(only_update_schema)).to eq normalize_schema(install_schema)
   end
 
+  it 'has files with unique number prefixes' do
+    update_path = "lib/generators/good_job/templates/update/migrations"
+    expect(File).to exist(update_path)
+
+    migrations = Dir.glob("#{update_path}/*")
+    prefixes = migrations.map { |path| File.basename(path).split("_", 2).first }
+
+    expect(prefixes.map(&:to_i).sort).to eq(1.upto(prefixes.size).to_a)
+  end
+
   def normalize_schema(text)
     text.sub(/\.define\(version: ([\d_]*)\)/, '.define(version: SCHEMA_VERSION)')
   end

@@ -14,8 +14,9 @@ module GoodJob
     cattr_accessor :performing_active_job_ids, default: Concurrent::Set.new
 
     # @param queue_string [String] Queues to execute jobs from
-    def initialize(queue_string)
+    def initialize(queue_string, capsule: GoodJob.capsule)
       @queue_string = queue_string
+      @capsule = capsule
       @metrics = Metrics.new
     end
 
@@ -30,20 +31,22 @@ module GoodJob
     # @return [Object, nil] Returns job result or +nil+ if no job was found
     def next
       active_job_id = nil
-      job_query.perform_with_advisory_lock(parsed_queues: parsed_queues, queue_select_limit: GoodJob.configuration.queue_select_limit) do |execution|
-        @metrics.touch_check_queue_at
+      @capsule.tracker.register do
+        job_query.perform_with_advisory_lock(lock_id: @capsule.tracker.id_for_lock, parsed_queues: parsed_queues, queue_select_limit: GoodJob.configuration.queue_select_limit) do |execution|
+          @metrics.touch_check_queue_at
 
-        if execution
-          active_job_id = execution.active_job_id
-          performing_active_job_ids << active_job_id
-          @metrics.touch_execution_at
-          yield(execution) if block_given?
-        else
-          @metrics.increment_empty_executions
-        end
-      end.tap do |result|
-        if result
-          result.succeeded? ? @metrics.increment_succeeded_executions : @metrics.increment_errored_executions
+          if execution
+            active_job_id = execution.active_job_id
+            performing_active_job_ids << active_job_id
+            @metrics.touch_execution_at
+            yield(execution) if block_given?
+          else
+            @metrics.increment_empty_executions
+          end
+        end.tap do |result|
+          if result
+            result.succeeded? ? @metrics.increment_succeeded_executions : @metrics.increment_errored_executions
+          end
         end
       end
     ensure

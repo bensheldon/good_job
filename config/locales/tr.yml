@@ -196,6 +196,14 @@ tr:
             thousand: Bin
             trillion: Trilyon
             unit: ''
+    performances:
+      show:
+        average_duration: Ortalama süre
+        executions: İnfazlar
+        job_class: İş sınıfı
+        maximum_duration: Maksimum süre
+        minimum_duration: Minimum süre
+        title: Verim
     processes:
       index:
         cron_enabled: Cron etkin
@@ -225,6 +233,7 @@ tr:
         jobs: İşler
         live_poll: Anlık Güncelleme
         name: "GoodJob 👍"
+        performances: Verim
         processes: Süreçler
         theme:
           auto: Oto
@@ -241,3 +250,5 @@ tr:
       running: Çalışıyor
       scheduled: Planlandı
       succeeded: Başarılı
+  shared:
+    needs_migration: Lütfen GoodJob geçişlerini çalıştırın.

@@ -53,6 +53,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Batches](#batches)
     - [Updating](#updating)
         - [Upgrading minor versions](#upgrading-minor-versions)
+        - [Upgrading v3 to v4](#upgrading-v3-to-v4)
         - [Upgrading v2 to v3](#upgrading-v2-to-v3)
         - [Upgrading v1 to v2](#upgrading-v1-to-v2)
 - [Go deeper](#go-deeper)
@@ -404,7 +405,7 @@ GoodJob includes a Dashboard as a mountable `Rails::Engine`.
     ```ruby
     # config/initializers/good_job.rb
     GoodJob::Engine.middleware.use(Rack::Auth::Basic) do |username, password|
-      ActiveSupport::SecurityUtils.secure_compare(Rails.application.credentials.good_job_username, username) &&
+      ActiveSupport::SecurityUtils.secure_compare(Rails.application.credentials.good_job_username, username) &
         ActiveSupport::SecurityUtils.secure_compare(Rails.application.credentials.good_job_password, password)
     end
     ```
@@ -879,6 +880,27 @@ To perform upgrades to the GoodJob database tables:
 1. Commit the migration files and resulting `db/schema.rb` changes.
 1. Deploy the code, run the migrations against the production database, and restart server/worker processes.
 
+#### Upgrading v3 to v4
+
+GoodJob v4 changes how job and job execution records are stored in the database; moving from job and executions being commingled in the `good_jobs` table to separately and discretely storing job executions in `good_job_executions`. To safely upgrade, all unfinished jobs must use the new format. This change was introduced in GoodJob [v3.15.4 (April 2023)](https://github.com/bensheldon/good_job/releases/tag/v3.15.4), so your application is likely ready-to-upgrade already if you have kept up with GoodJob updates.
+
+To upgrade:
+
+1. Upgrade to v3.99.x, following the minor version upgrade process, running any remaining database migrations (rails g good_job:update) and addressing deprecation warnings.
+1. Check if your application is safe to upgrade to the new job record format by running either:
+    - In a production console, run `GoodJob.v4_ready?` which should return `true` when safely upgradable.
+    - Or, when connected to the production database verify that `SELECT COUNT(*) FROM "good_jobs" WHERE finished_at IS NULL AND is_discrete IS NOT TRUE` returns `0`
+
+    If not all unfinished jobs are stored in the new format, either wait to upgrade until those jobs finish or discard them. Not waiting could prevent those jobs from successfully running when upgrading to v4.
+1. Upgrade from v3.99.x to v4.x.
+
+Notable changes:
+
+- Only supports Rails 6.1+, CRuby 3.0+ and JRuby 9.4+, Postgres 12+. Rails 6.0 is no longer supported. CRuby 2.6 and 2.7 are no longer supported. JRuby 9.3 is no longer supported.
+- Changes job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority.
+- Enqueues and executes jobs via the `GoodJob::Job` model instead of `GoodJob::Execution`
+- Setting `config.good_job.cleanup_interval_jobs`, `GOOD_JOB_CLEANUP_INTERVAL_JOBS`, `config.good_job.cleanup_interval_seconds`, or `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` to `nil` or `""` no longer disables count- or time-based cleanups. Set to `false` to disable, or `-1` to run a cleanup after every job execution.
+
 #### Upgrading v2 to v3
 
 GoodJob v3 is operationally identical to v2; upgrading to GoodJob v3 should be simple. If you are already using `>= v2.9+` no other changes are necessary.
@@ -939,7 +961,7 @@ Active Job can be configured to retry an infinite number of times, with a polyno
 
 ```ruby
 class ApplicationJob < ActiveJob::Base
-  retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
+  retry_on StandardError, wait: :polynomially_longer, attempts: Float::INFINITY
   # ...
 end
 ```
@@ -959,7 +981,7 @@ When using `retry_on` with an infinite number of retries, exceptions will never 
 
 ```ruby
 class ApplicationJob < ActiveJob::Base
-  retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
+  retry_on StandardError, wait: :polynomially_longer, attempts: Float::INFINITY
 
   retry_on SpecialError, attempts: 5 do |_job, exception|
     Rails.error.report(exception)
@@ -985,7 +1007,7 @@ You can use an initializer to configure `ActionMailer::MailDeliveryJob`, for exa
 
 ```ruby
 # config/initializers/good_job.rb
-ActionMailer::MailDeliveryJob.retry_on StandardError, wait: :exponentially_longer, attempts: Float::INFINITY
+ActionMailer::MailDeliveryJob.retry_on StandardError, wait: :polynomially_longer, attempts: Float::INFINITY
 
 # With Sentry (or Bugsnag, Airbrake, Honeybadger, etc.)
 ActionMailer::MailDeliveryJob.around_perform do |_job, block|
@@ -1389,7 +1411,7 @@ _Note: Rails `travel`/`travel_to` time helpers do not have millisecond precision
 
 GoodJob is not compatible with PgBouncer in _transaction_ mode, but is compatible with PgBouncer's _connection_ mode. GoodJob uses connection-based advisory locks and LISTEN/NOTIFY, both of which require full database connections.
 
-A workaround to this limitation is to make a direct database connection available to GoodJob. With Rails 6.0's support for [multiple databases](https://guides.rubyonrails.org/active_record_multiple_databases.html), a direct connection to the database can be configured:
+If you want to use PgBouncer with the rest of your Rails app you can workaround this limitation by making a direct database connection available to GoodJob. With Rails 6.0's support for [multiple databases](https://guides.rubyonrails.org/active_record_multiple_databases.html), a direct connection to the database can be configured by following the three steps below.
 
 1. Define a direct connection to your database that is not proxied through PgBouncer, for example:
 

@@ -326,4 +326,16 @@ RSpec.describe 'Batches' do
       expect(callback_job.status).to eq :succeeded
     end
   end
+
+  describe 'adding to an existing batch' do
+    it 'will add jobs to the existing batch' do
+      batch = GoodJob::Batch.new(metadata: 'foo')
+      batch.enqueue { TestJob.perform_later }
+
+      GoodJob::Batch.find(batch.id).enqueue { TestJob.perform_later }
+
+      batch = GoodJob::Batch.find(batch.id)
+      expect(batch.active_jobs.count).to eq 2
+    end
+  end
 end

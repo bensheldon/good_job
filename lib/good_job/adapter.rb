@@ -98,16 +98,17 @@ module GoodJob
           end
         end
 
+        @capsule.tracker.register
         begin
           until inline_executions.empty?
             begin
               inline_execution = inline_executions.shift
-              inline_result = inline_execution.perform
+              inline_result = inline_execution.perform(lock_id: @capsule.tracker.id_for_lock)
 
               retried_execution = inline_result.retried
               while retried_execution && retried_execution.scheduled_at <= Time.current
                 inline_execution = retried_execution
-                inline_result = inline_execution.perform
+                inline_result = inline_execution.perform(lock_id: @capsule.tracker.id_for_lock)
                 retried_execution = inline_result.retried
               end
             ensure
@@ -117,6 +118,7 @@ module GoodJob
             raise inline_result.unhandled_error if inline_result.unhandled_error
           end
         ensure
+          @capsule.tracker.unregister
           inline_executions.each(&:advisory_unlock)
         end
 
@@ -169,12 +171,12 @@ module GoodJob
             create_with_advisory_lock: true
           )
           begin
-            result = execution.perform
+            result = @capsule.tracker.register { execution.perform(lock_id: @capsule.tracker.id_for_lock) }
 
             retried_execution = result.retried
             while retried_execution && (retried_execution.scheduled_at.present? && retried_execution.scheduled_at <= Time.current)
               execution = retried_execution
-              result = execution.perform
+              result = @capsule.tracker.register { execution.perform(lock_id: @capsule.tracker.id_for_lock) }
               retried_execution = result.retried
             end
 

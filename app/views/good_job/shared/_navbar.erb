@@ -39,6 +39,11 @@
             <span data-async-values-target="value" data-async-values-key="processes_count" data-async-values-zero-class="bg-danger" class="badge bg-secondary rounded-pill d-none"></span>
           <% end %>
         </li>
+        <li class="nav-item">
+          <%= link_to performance_path, class: ["nav-link", ("active" if controller_name == 'performances')] do %>
+            <%= t(".performances") %>
+          <% end %>
+        </li>
       </ul>
 
       <ul class="navbar-nav">

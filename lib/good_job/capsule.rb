@@ -11,12 +11,19 @@ module GoodJob
     #   @return [Array<GoodJob::Capsule>, nil]
     cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
 
+    delegate :register, :renew, :unregister, :id_for_lock, to: :@tracker, prefix: :_tracker
+
+    attr_reader :tracker
+
     # @param configuration [GoodJob::Configuration] Configuration to use for this capsule.
     def initialize(configuration: nil)
       @configuration = configuration
       @startable = true
       @started_at = nil
       @mutex = Mutex.new
+
+      @shared_executor = GoodJob::SharedExecutor.new
+      @tracker = GoodJob::CapsuleTracker.new(executor: @shared_executor)
 
       self.class.instances << self
     end
@@ -29,15 +36,13 @@ module GoodJob
       @mutex.synchronize do
         return unless startable?(force: force)
 
-        @shared_executor = GoodJob::SharedExecutor.new
-        @notifier = GoodJob::Notifier.new(enable_listening: configuration.enable_listen_notify, executor: @shared_executor.executor)
+        @notifier = GoodJob::Notifier.new(enable_listening: configuration.enable_listen_notify, capsule: self, executor: @shared_executor)
         @poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
-        @multi_scheduler = GoodJob::MultiScheduler.from_configuration(configuration, warm_cache_on_initialize: true)
+        @multi_scheduler = GoodJob::MultiScheduler.from_configuration(configuration, capsule: self, warm_cache_on_initialize: true)
         @notifier.recipients.push([@multi_scheduler, :create_thread])
         @poller.recipients.push(-> { @multi_scheduler.create_thread({ fanout: true }) })
 
-        @cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true, executor: @shared_executor.executor) if configuration.enable_cron?
-
+        @cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true, executor: @shared_executor) if configuration.enable_cron?
         @startable = false
         @started_at = Time.current
       end
@@ -52,7 +57,7 @@ module GoodJob
     # @return [void]
     def shutdown(timeout: NONE)
       timeout = configuration.shutdown_timeout if timeout == NONE
-      GoodJob._shutdown_all([@shared_executor, @notifier, @poller, @multi_scheduler, @cron_manager].compact, timeout: timeout)
+      GoodJob._shutdown_all([@notifier, @poller, @multi_scheduler, @cron_manager].compact, after: [@shared_executor], timeout: timeout)
       @startable = false
       @started_at = nil
     end
@@ -74,7 +79,7 @@ module GoodJob
 
     # @return [Boolean] Whether the capsule has been shutdown.
     def shutdown?
-      [@shared_executor, @notifier, @poller, @multi_scheduler, @cron_manager].compact.all?(&:shutdown?)
+      [@notifier, @poller, @multi_scheduler, @cron_manager].compact.all?(&:shutdown?)
     end
 
     # @param duration [nil, Numeric] Length of idleness to check for (in seconds).
@@ -97,6 +102,12 @@ module GoodJob
     def create_thread(job_state = nil)
       start if startable?
       @multi_scheduler&.create_thread(job_state)
+    end
+
+    # UUID for this capsule; to be used for inspection (not directly for locking jobs).
+    # @return [String]
+    def process_id
+      @tracker.process_id
     end
 
     private

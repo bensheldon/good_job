@@ -39,6 +39,7 @@ RSpec.describe 'Server modes', :skip_if_java do
     it 'successfully runs in the server' do
       env = {
         "RAILS_ENV" => "production",
+        "SECRET_KEY_BASE" => "iaminallyoursecretkeybase",
         "GOOD_JOB_EXECUTION_MODE" => "async",
         "GOOD_JOB_ENABLE_CRON" => "true",
       }
@@ -54,6 +55,7 @@ RSpec.describe 'Server modes', :skip_if_java do
     it 'does not start GoodJob when running other commands' do
       env = {
         "RAILS_ENV" => "production",
+        "SECRET_KEY_BASE" => "iaminallyoursecretkeybase",
         "GOOD_JOB_EXECUTION_MODE" => "async",
       }
       ShellOut.command('bundle exec rails db:version', env: env) do |shell|

@@ -45,6 +45,11 @@ RSpec.configure do |config|
     )
     GoodJob._shutdown_all(executables, timeout: -1)
 
+    GoodJob::CapsuleTracker.instances.each do |tracker|
+      expect(tracker.locks).to eq 0
+    end
+    GoodJob::CapsuleTracker.instances.clear
+
     expect(GoodJob::Notifier.instances).to all be_shutdown
     GoodJob::Notifier.instances.clear
 

@@ -1,5 +1,134 @@
 # Changelog
 
+## [v3.99.0](https://github.com/bensheldon/good_job/tree/v3.99.0) (2024-07-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.30.1...v3.99.0)
+
+**Merged pull requests:**
+
+- Remove deprecation silencers for v3.99 release [\#1395](https://github.com/bensheldon/good_job/pull/1395) ([bensheldon](https://github.com/bensheldon))
+- Add instructions and `GoodJob.v4_ready?` for upgrading to v4 [\#1356](https://github.com/bensheldon/good_job/pull/1356) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.30.1](https://github.com/bensheldon/good_job/tree/v3.30.1) (2024-07-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.30.0...v3.30.1)
+
+**Fixed bugs:**
+
+- Fix Performance table formatting, change url from `performances` to singular `performance` [\#1393](https://github.com/bensheldon/good_job/pull/1393) ([bensheldon](https://github.com/bensheldon))
+- Add a version check for Rails whether to use pg interval or calculate float [\#1389](https://github.com/bensheldon/good_job/pull/1389) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Add missing newline after frozen string literal for migrations [\#1392](https://github.com/bensheldon/good_job/pull/1392) ([Earlopain](https://github.com/Earlopain))
+- Temporarily remove JRuby builds [\#1391](https://github.com/bensheldon/good_job/pull/1391) ([bensheldon](https://github.com/bensheldon))
+- Add initial Performance panel to dashboard [\#1388](https://github.com/bensheldon/good_job/pull/1388) ([bensheldon](https://github.com/bensheldon))
+- Move job execution logic from Execution to BaseExecution to simplify v4 changes [\#1357](https://github.com/bensheldon/good_job/pull/1357) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.30.0](https://github.com/bensheldon/good_job/tree/v3.30.0) (2024-07-05)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.5...v3.30.0)
+
+**Implemented enhancements:**
+
+- Added GoodJob::DiscreteExecution\#duration column [\#1374](https://github.com/bensheldon/good_job/pull/1374) ([SebouChu](https://github.com/SebouChu))
+
+**Closed issues:**
+
+- Job retried infinitely  [\#1384](https://github.com/bensheldon/good_job/issues/1384)
+
+**Merged pull requests:**
+
+- Use newer syntax in documentation for `wait` config on `retry` [\#1380](https://github.com/bensheldon/good_job/pull/1380) ([benoittgt](https://github.com/benoittgt))
+
+## [v3.29.5](https://github.com/bensheldon/good_job/tree/v3.29.5) (2024-06-24)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.4...v3.29.5)
+
+**Fixed bugs:**
+
+- fix: require rack/handler for rack \>= 3.1.x [\#1383](https://github.com/bensheldon/good_job/pull/1383) ([shouichi](https://github.com/shouichi))
+
+**Closed issues:**
+
+- Unexpected behavior of calling perform\_now inside another job [\#1379](https://github.com/bensheldon/good_job/issues/1379)
+- \[BUG\] \[Dashboard\] count isn't following by the filter [\#1376](https://github.com/bensheldon/good_job/issues/1376)
+
+## [v3.29.4](https://github.com/bensheldon/good_job/tree/v3.29.4) (2024-06-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.3...v3.29.4)
+
+**Fixed bugs:**
+
+- Fix display of empty array in flash messages [\#1377](https://github.com/bensheldon/good_job/pull/1377) ([andynu](https://github.com/andynu))
+- Fix counts in tab links with filters [\#1373](https://github.com/bensheldon/good_job/pull/1373) ([SebouChu](https://github.com/SebouChu))
+
+## [v3.29.3](https://github.com/bensheldon/good_job/tree/v3.29.3) (2024-06-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.2...v3.29.3)
+
+**Fixed bugs:**
+
+- Synchronize `CapsuleTracker#renew` [\#1369](https://github.com/bensheldon/good_job/pull/1369) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- docs: Basic auth route mount example improvement [\#1368](https://github.com/bensheldon/good_job/issues/1368)
+- Tips for debugging/optimizing slow dashboard? \(45 second response time\) [\#1366](https://github.com/bensheldon/good_job/issues/1366)
+
+## [v3.29.2](https://github.com/bensheldon/good_job/tree/v3.29.2) (2024-05-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.1...v3.29.2)
+
+**Fixed bugs:**
+
+- Fix label modifications on job instance polluting labels on job class [\#1355](https://github.com/bensheldon/good_job/pull/1355) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- `#good_job_labels` retains values across job instances [\#1354](https://github.com/bensheldon/good_job/issues/1354)
+
+## [v3.29.1](https://github.com/bensheldon/good_job/tree/v3.29.1) (2024-05-23)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.29.0...v3.29.1)
+
+**Fixed bugs:**
+
+- Fix AdvisoryLockable using wrong `advisory_lockable_column` attribute when aborting `create_with_advisory_lock` [\#1360](https://github.com/bensheldon/good_job/pull/1360) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Warn on unapplied migrations [\#1361](https://github.com/bensheldon/good_job/issues/1361)
+- Undefined `GoodJob::Process.advisory_lockable_column` [\#1358](https://github.com/bensheldon/good_job/issues/1358)
+
+## [v3.29.0](https://github.com/bensheldon/good_job/tree/v3.29.0) (2024-05-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.3...v3.29.0)
+
+**Merged pull requests:**
+
+- Add association between Process and Jobs, and add a heartbeat to the Process record [\#999](https://github.com/bensheldon/good_job/pull/999) ([bensheldon](https://github.com/bensheldon))
+
+## [v3.28.3](https://github.com/bensheldon/good_job/tree/v3.28.3) (2024-05-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.2...v3.28.3)
+
+**Fixed bugs:**
+
+- Strip more whitespace when parsing queues string [\#1352](https://github.com/bensheldon/good_job/pull/1352) ([bensheldon](https://github.com/bensheldon))
+- Fix latest migration not affecting `GoodJob.migrated?` [\#1345](https://github.com/bensheldon/good_job/pull/1345) ([Earlopain](https://github.com/Earlopain))
+
+**Closed issues:**
+
+- Whitespace in `queues` configuration can cause issues. [\#1351](https://github.com/bensheldon/good_job/issues/1351)
+- How to properly handle interrupts [\#1343](https://github.com/bensheldon/good_job/issues/1343)
+- ActiveSupport::CurrentAttributes Compatibility [\#1341](https://github.com/bensheldon/good_job/issues/1341)
+
+**Merged pull requests:**
+
+- Don't abort CI jobs when a single one fails [\#1346](https://github.com/bensheldon/good_job/pull/1346) ([Earlopain](https://github.com/Earlopain))
+- Clarify PgBouncer Compatibility [\#1338](https://github.com/bensheldon/good_job/pull/1338) ([isaac](https://github.com/isaac))
+
 ## [v3.28.2](https://github.com/bensheldon/good_job/tree/v3.28.2) (2024-04-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.28.1...v3.28.2)

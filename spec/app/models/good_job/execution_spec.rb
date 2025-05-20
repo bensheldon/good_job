@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::Execution do
+  let(:process_id) { SecureRandom.uuid }
+
   around do |example|
     Rails.application.executor.wrap { example.run }
   end
@@ -141,10 +143,10 @@ RSpec.describe GoodJob::Execution do
       context 'when smaller_number_higher_priority=false' do
         before { allow(Rails.application.config).to receive(:good_job).and_return(smaller_number_is_higher_priority: false) }
 
-        it 'does not warn' do
+        it 'warns to ensure the upgrade is obvious' do
           active_job.priority = 50
           described_class.enqueue(active_job)
-          expect(GoodJob.deprecator).not_to have_received(:warn)
+          expect(GoodJob.deprecator).to have_received(:warn)
         end
       end
     end
@@ -158,21 +160,21 @@ RSpec.describe GoodJob::Execution do
       it 'performs one job' do
         good_job_2 = described_class.create!(serialized_params: {})
 
-        described_class.perform_with_advisory_lock
+        described_class.perform_with_advisory_lock(lock_id: process_id)
 
         expect(good_job.reload.finished_at).to be_present
         expect(good_job_2.reload.finished_at).to be_blank
       end
 
       it 'returns the result or nil if not' do
-        result = described_class.perform_with_advisory_lock
+        result = described_class.perform_with_advisory_lock(lock_id: process_id)
 
         expect(result).to be_a GoodJob::ExecutionResult
         expect(result.value).to eq 'a string'
         expect(result.unhandled_error).to be_nil
 
         described_class.enqueue(TestJob.new(true, raise_error: true))
-        errored_result = described_class.all.perform_with_advisory_lock
+        errored_result = described_class.all.perform_with_advisory_lock(lock_id: process_id)
 
         expect(result).to be_a GoodJob::ExecutionResult
         expect(errored_result.value).to be_nil
@@ -193,7 +195,7 @@ RSpec.describe GoodJob::Execution do
 
       it "orders by priority ascending and creation descending" do
         4.times do
-          described_class.perform_with_advisory_lock
+          described_class.perform_with_advisory_lock(lock_id: process_id)
         end
         expect(described_class.order(finished_at: :asc).to_a).to eq([
                                                                       high_priority_job,
@@ -215,10 +217,10 @@ RSpec.describe GoodJob::Execution do
       let!(:queue_one_job) { described_class.create!(job_params.merge(queue_name: "one", created_at: 1.minute.ago, priority: 1)) }
 
       it "orders by queue order" do
-        described_class.perform_with_advisory_lock(parsed_queues: parsed_queues) do |execution|
+        described_class.perform_with_advisory_lock(lock_id: process_id, parsed_queues: parsed_queues) do |execution|
           expect(execution).to eq queue_one_job
         end
-        described_class.perform_with_advisory_lock(parsed_queues: parsed_queues) do |execution|
+        described_class.perform_with_advisory_lock(lock_id: process_id, parsed_queues: parsed_queues) do |execution|
           expect(execution).to eq queue_two_job
         end
       end
@@ -384,7 +386,7 @@ RSpec.describe GoodJob::Execution do
 
     describe 'return value' do
       it 'returns the results of the job' do
-        result = good_job.perform
+        result = good_job.perform(lock_id: process_id)
 
         expect(result.value).to eq "a string"
         expect(result.unhandled_error).to be_nil
@@ -407,7 +409,7 @@ RSpec.describe GoodJob::Execution do
         end
 
         it 'returns the error' do
-          result = good_job.perform
+          result = good_job.perform(lock_id: process_id)
 
           expect(result.value).to be_nil
           expect(result.unhandled_error).to be_an_instance_of TestJob::ExpectedError
@@ -428,7 +430,7 @@ RSpec.describe GoodJob::Execution do
           end
 
           it 'records the new job UUID on the executing record' do
-            good_job.perform
+            good_job.perform(lock_id: process_id)
             expect(good_job.reload.retried_good_job_id).to be_present
           end
         end
@@ -445,7 +447,7 @@ RSpec.describe GoodJob::Execution do
             allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
             expect do
-              good_job.perform
+              good_job.perform(lock_id: process_id)
             end.not_to change { good_job.reload.serialized_params["exception_executions"]["[TestJob::ExpectedError]"] }
           end
         end
@@ -466,7 +468,7 @@ RSpec.describe GoodJob::Execution do
           end
 
           it 'returns the error' do
-            result = good_job.perform
+            result = good_job.perform(lock_id: process_id)
 
             expect(result.value).to be_nil
             expect(result.unhandled_error).to be_an_instance_of TestJob::ExpectedError
@@ -478,7 +480,7 @@ RSpec.describe GoodJob::Execution do
             end
 
             it 'returns the error' do
-              result = good_job.perform
+              result = good_job.perform(lock_id: process_id)
 
               expect(result.value).to be_nil
               expect(result.handled_error).to be_an_instance_of TestJob::ExpectedError
@@ -491,7 +493,7 @@ RSpec.describe GoodJob::Execution do
             end
 
             it 'returns the error' do
-              result = good_job.perform
+              result = good_job.perform(lock_id: process_id)
 
               expect(result.value).to be_nil
               expect(result.handled_error).to be_an_instance_of TestJob::ExpectedError
@@ -502,7 +504,7 @@ RSpec.describe GoodJob::Execution do
     end
 
     it 'preserves the job by default' do
-      good_job.perform
+      good_job.perform(lock_id: process_id)
       expect(good_job.reload).to have_attributes(
         performed_at: within(1.second).of(Time.current),
         finished_at: within(1.second).of(Time.current)
@@ -511,13 +513,13 @@ RSpec.describe GoodJob::Execution do
 
     it 'can destroy the job when preserve_job_records is false' do
       allow(GoodJob).to receive(:preserve_job_records).and_return(false)
-      good_job.perform
+      good_job.perform(lock_id: process_id)
       expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
     it 'destroys the job when preserving record only on error' do
       allow(GoodJob).to receive(:preserve_job_records).and_return(:on_unhandled_error)
-      good_job.perform
+      good_job.perform(lock_id: process_id)
       expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
@@ -534,7 +536,7 @@ RSpec.describe GoodJob::Execution do
 
       it 'destroys the job and prior executions when preserving record only on error' do
         allow(GoodJob).to receive(:preserve_job_records).and_return(:on_unhandled_error)
-        good_job.perform
+        good_job.perform(lock_id: process_id)
         expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
         expect { prior_execution.reload }.to raise_error ActiveRecord::RecordNotFound
       end
@@ -550,7 +552,7 @@ RSpec.describe GoodJob::Execution do
       end
 
       it 'does not destroy the execution records' do
-        good_job.perform
+        good_job.perform(lock_id: process_id)
         expect { good_job.reload }.not_to raise_error
         expect(described_class.where(active_job_id: good_job.active_job_id).count).to eq 2
       end
@@ -564,7 +566,7 @@ RSpec.describe GoodJob::Execution do
       end
 
       it 'preserves the job record anyway' do
-        good_job.perform
+        good_job.perform(lock_id: process_id)
         expect(good_job.reload).to have_attributes(
           performed_at: within(1.second).of(Time.current),
           finished_at: within(1.second).of(Time.current)
@@ -574,7 +576,7 @@ RSpec.describe GoodJob::Execution do
 
     it 'raises an error if the job is attempted to be re-run' do
       good_job.update!(finished_at: Time.current)
-      expect { good_job.perform }.to raise_error described_class::PreviouslyPerformedError
+      expect { good_job.perform(lock_id: process_id) }.to raise_error described_class::PreviouslyPerformedError
     end
 
     context 'when ActiveJob rescues an error' do
@@ -585,7 +587,7 @@ RSpec.describe GoodJob::Execution do
       end
 
       it 'returns the results of the job' do
-        result = good_job.perform
+        result = good_job.perform(lock_id: process_id)
 
         expect(result.value).to be_nil
         expect(result.handled_error).to be_a(TestJob::ExpectedError)
@@ -594,7 +596,7 @@ RSpec.describe GoodJob::Execution do
       it 'can preserves the job' do
         allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
-        good_job.perform
+        good_job.perform(lock_id: process_id)
 
         expect(good_job.reload).to have_attributes(
           error: "TestJob::ExpectedError: Raised expected error",
@@ -608,7 +610,7 @@ RSpec.describe GoodJob::Execution do
       let(:active_job) { TestJob.new("a string", raise_error: true) }
 
       it 'returns the results of the job' do
-        result = good_job.perform
+        result = good_job.perform(lock_id: process_id)
 
         expect(result.value).to be_nil
         expect(result.unhandled_error).to be_a(TestJob::ExpectedError)
@@ -623,7 +625,7 @@ RSpec.describe GoodJob::Execution do
           it 'leaves the job record unfinished' do
             allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
-            good_job.perform
+            good_job.perform(lock_id: process_id)
 
             expect(good_job.reload).to have_attributes(
               error: "TestJob::ExpectedError: Raised expected error",
@@ -635,7 +637,7 @@ RSpec.describe GoodJob::Execution do
           it 'does not destroy the job record' do
             allow(GoodJob).to receive(:preserve_job_records).and_return(false)
 
-            good_job.perform
+            good_job.perform(lock_id: process_id)
             expect { good_job.reload }.not_to raise_error
           end
         end
@@ -648,14 +650,14 @@ RSpec.describe GoodJob::Execution do
           it 'destroys the job' do
             allow(GoodJob).to receive(:preserve_job_records).and_return(false)
 
-            good_job.perform
+            good_job.perform(lock_id: process_id)
             expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
           end
 
           it 'can preserve the job' do
             allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
-            good_job.perform
+            good_job.perform(lock_id: process_id)
 
             expect(good_job.reload).to have_attributes(
               error: "TestJob::ExpectedError: Raised expected error",
@@ -666,7 +668,7 @@ RSpec.describe GoodJob::Execution do
 
           it 'preserves the job when preserving record only on error' do
             allow(GoodJob).to receive(:preserve_job_records).and_return(:on_unhandled_error)
-            good_job.perform
+            good_job.perform(lock_id: process_id)
 
             expect(good_job.reload).to have_attributes(
               error: "TestJob::ExpectedError: Raised expected error",
@@ -686,7 +688,7 @@ RSpec.describe GoodJob::Execution do
       end
 
       it 'updates the Execution record and creates a DiscreteExecution record' do
-        good_job.perform
+        good_job.perform(lock_id: process_id)
 
         expect(good_job.reload).to have_attributes(
           executions_count: 1,
@@ -702,6 +704,7 @@ RSpec.describe GoodJob::Execution do
           created_at: within(0.001).of(good_job.performed_at),
           scheduled_at: within(0.1).of(good_job.created_at),
           finished_at: within(1.second).of(Time.current),
+          duration: GoodJob::DiscreteExecution.duration_interval_usable? ? be_present : nil,
           error: nil,
           serialized_params: good_job.serialized_params
         )
@@ -719,7 +722,7 @@ RSpec.describe GoodJob::Execution do
         end
 
         it 'updates the existing Execution/Job record instead of creating a new one' do
-          expect { good_job.perform }
+          expect { good_job.perform(lock_id: process_id) }
             .to not_change(described_class, :count)
             .and change { good_job.reload.serialized_params["executions"] }.by(1)
             .and not_change { good_job.reload.id }
@@ -739,7 +742,8 @@ RSpec.describe GoodJob::Execution do
             error: "TestJob::ExpectedError: Raised expected error",
             created_at: within(1.second).of(Time.current),
             scheduled_at: within(1.second).of(Time.current),
-            finished_at: within(1.second).of(Time.current)
+            finished_at: within(1.second).of(Time.current),
+            duration: GoodJob::DiscreteExecution.duration_interval_usable? ? be_present : nil
           )
         end
       end
@@ -752,7 +756,7 @@ RSpec.describe GoodJob::Execution do
         end
 
         it 'finishes the execution but does not finish the job' do
-          good_job.perform
+          good_job.perform(lock_id: process_id)
 
           expect(good_job.reload).to have_attributes(
             performed_at: nil,
@@ -763,7 +767,8 @@ RSpec.describe GoodJob::Execution do
           expect(good_job.discrete_executions.size).to eq(1)
           expect(good_job.discrete_executions.first).to have_attributes(
             performed_at: within(1.second).of(Time.current),
-            finished_at: within(1.second).of(Time.current)
+            finished_at: within(1.second).of(Time.current),
+            duration: GoodJob::DiscreteExecution.duration_interval_usable? ? be_present : nil
           )
         end
       end

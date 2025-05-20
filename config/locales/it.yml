@@ -196,6 +196,14 @@ it:
             thousand: K
             trillion: T
             unit: ''
+    performances:
+      show:
+        average_duration: Durata media
+        executions: Esecuzioni
+        job_class: Classe di lavoro
+        maximum_duration: Durata massima
+        minimum_duration: Durata minima
+        title: Prestazione
     processes:
       index:
         cron_enabled: Cron abilitato
@@ -225,6 +233,7 @@ it:
         jobs: Job
         live_poll: Live Poll
         name: "GoodJob 👍"
+        performances: Prestazione
         processes: Processi
         theme:
           auto: Auto
@@ -241,3 +250,5 @@ it:
       running: In esecuzione
       scheduled: Pianificato
       succeeded: Riuscito
+  shared:
+    needs_migration: Esegui le migrazioni GoodJob.

@@ -29,6 +29,7 @@ module GoodJob
     self.implicit_order_column = 'created_at'
 
     belongs_to :batch, class_name: 'GoodJob::BatchRecord', inverse_of: :jobs, optional: true
+    belongs_to :locked_by_process, class_name: "GoodJob::Process", foreign_key: :locked_by_id, inverse_of: :locked_jobs, optional: true
     has_many :executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
     has_many :discrete_executions, -> { order(created_at: :asc) }, class_name: 'GoodJob::DiscreteExecution', foreign_key: 'active_job_id', primary_key: :active_job_id, inverse_of: :job # rubocop:disable Rails/HasManyOrHasOneDependent
 
@@ -200,7 +201,7 @@ module GoodJob
         active_job.executions = (active_job.executions || 0) + 1
 
         begin
-          error_class, error_message = execution.error.split(GoodJob::Execution::ERROR_MESSAGE_SEPARATOR).map(&:strip)
+          error_class, error_message = execution.error.split(ERROR_MESSAGE_SEPARATOR).map(&:strip)
           error = error_class.constantize.new(error_message)
         rescue StandardError
           error = StandardError.new(execution.error)

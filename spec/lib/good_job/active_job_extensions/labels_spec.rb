@@ -53,6 +53,18 @@ RSpec.describe GoodJob::ActiveJobExtensions::Labels do
     expect(active_job.good_job_labels).to eq []
   end
 
+  it 'the instance value does not modify the class label value' do
+    TestJob.good_job_labels = ["buffalo"]
+    TestJob.before_enqueue { |job| job.good_job_labels << "gopher" }
+
+    job = TestJob.perform_later
+    expect(job.good_job_labels).to eq %w[buffalo gopher]
+    expect(TestJob.good_job_labels).to eq ["buffalo"]
+
+    job = TestJob.perform_later
+    expect(job.good_job_labels).to eq %w[buffalo gopher]
+  end
+
   it 'is unique' do
     TestJob.good_job_labels = %w[buffalo gopher gopher]
     TestJob.perform_later

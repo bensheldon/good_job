@@ -196,6 +196,14 @@ ja:
             thousand: K
             trillion: T
             unit: ''
+    performances:
+      show:
+        average_duration: 平均所要時間
+        executions: 処刑
+        job_class: 職種
+        maximum_duration: 最大持続時間
+        minimum_duration: 最小期間
+        title: パフォーマンス
     processes:
       index:
         cron_enabled: Cron が有効になっている
@@ -225,6 +233,7 @@ ja:
         jobs: ジョブ
         live_poll: リアルタイム更新
         name: "GoodJob 👍"
+        performances: パフォーマンス
         processes: プロセス
         theme:
           auto: 自動
@@ -241,3 +250,5 @@ ja:
       running: 実行中
       scheduled: スケジュール待ち
       succeeded: 成功済み
+  shared:
+    needs_migration: GoodJob 移行を実行してください。
