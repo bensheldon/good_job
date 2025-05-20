@@ -23,7 +23,7 @@ RSpec.describe GoodJob::Job do
         'arguments' => ['cat', { 'canine' => 'dog' }],
       }
     ).tap do |job|
-      job.discrete_executions.create!(
+      job.executions.create!(
         scheduled_at: 1.minute.ago,
         created_at: 1.minute.ago,
         finished_at: 1.minute.ago,
@@ -94,12 +94,8 @@ RSpec.describe GoodJob::Job do
   describe '#finished?' do
     it 'is true if the job has finished' do
       expect do
-        job.update(finished_at: Time.current, retried_good_job_id: nil)
+        job.update(finished_at: Time.current)
       end.to change(job, :finished?).from(false).to(true)
-
-      expect do
-        job.update(finished_at: Time.current, retried_good_job_id: SecureRandom.uuid)
-      end.to change(job, :finished?).from(true).to(false)
     end
   end
 
@@ -166,7 +162,7 @@ RSpec.describe GoodJob::Job do
 
           expect(job).to be_finished
 
-          executions = job.discrete_executions.order(created_at: :asc).to_a
+          executions = job.executions.order(created_at: :asc).to_a
           expect(executions.size).to eq 3 # initial execution isn't created in test
           expect(executions.map(&:error)).to eq ["TestJob::Error: TestJob::Error", "TestJob::Error: TestJob::Error", nil]
           expect(executions[0].finished_at).to be < executions[1].finished_at
@@ -284,7 +280,7 @@ RSpec.describe GoodJob::Job do
   end
 
   describe '#force_discard_job' do
-    it 'will discard the job even when advisory locked' do
+    it 'discards the job even when advisory locked' do
       locked_event = Concurrent::Event.new
       done_event = Concurrent::Event.new
 
@@ -341,7 +337,7 @@ RSpec.describe GoodJob::Job do
       job.destroy_job
 
       expect { job.reload }.to raise_error ActiveRecord::RecordNotFound
-      expect(GoodJob::DiscreteExecution.count).to eq 0
+      expect(GoodJob::Execution.count).to eq 0
     end
 
     context 'when a job is not finished' do
@@ -390,18 +386,16 @@ RSpec.describe GoodJob::Job do
     describe '.enqueue' do
       let(:active_job) { TestJob.new }
 
-      context 'when discrete' do
-        it 'assigns is discrete, id, scheduled_at' do
-          expect { described_class.enqueue(active_job) }.to change(described_class, :count).by(1)
+      it 'assigns id, scheduled_at' do
+        expect { described_class.enqueue(active_job) }.to change(described_class, :count).by(1)
 
-          job = described_class.last
-          expect(job).to have_attributes(
-            id: active_job.job_id,
-            active_job_id: active_job.job_id,
-            created_at: within(1.second).of(Time.current),
-            scheduled_at: job.created_at
-          )
-        end
+        job = described_class.last
+        expect(job).to have_attributes(
+          id: active_job.job_id,
+          active_job_id: active_job.job_id,
+          created_at: within(1.second).of(Time.current),
+          scheduled_at: job.created_at
+        )
       end
 
       it 'creates a new GoodJob record' do
@@ -500,7 +494,7 @@ RSpec.describe GoodJob::Job do
 
       context "with multiple jobs and ordered queues" do
         def job_params
-          { active_job_id: SecureRandom.uuid, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" }, scheduled_at: Time.current }
+          { active_job_id: SecureRandom.uuid, scheduled_at: Time.current, queue_name: "default", priority: 0, serialized_params: { job_class: "TestJob" } }
         end
 
         let(:parsed_queues) { { include: %w{one two}, ordered_queues: true } }
@@ -572,18 +566,8 @@ RSpec.describe GoodJob::Job do
       let!(:small_priority_job) { described_class.create!(priority: -50) }
       let!(:large_priority_job) { described_class.create!(priority: 50) }
 
-      it 'smaller_number_is_higher_priority=true orders with smaller number being HIGHER priority' do
+      it 'orders with smaller number being HIGHER priority' do
         allow(Rails.application.config).to receive(:good_job).and_return({ smaller_number_is_higher_priority: true })
-        expect(described_class.priority_ordered.pluck(:priority)).to eq([-50, 50])
-      end
-
-      it 'smaller_number_is_higher_priority=false orders with smaller number being LOWER priority' do
-        allow(Rails.application.config).to receive(:good_job).and_return({ smaller_number_is_higher_priority: false })
-        expect(described_class.priority_ordered.pluck(:priority)).to eq([50, -50])
-      end
-
-      it 'smaller_number_is_higher_priority=nil orders with smaller number being HIGHER priority' do
-        allow(Rails.application.config).to receive(:good_job).and_return({})
         expect(described_class.priority_ordered.pluck(:priority)).to eq([-50, 50])
       end
     end
@@ -634,7 +618,7 @@ RSpec.describe GoodJob::Job do
       it 'does not return jobs after last scheduled at' do
         described_class.enqueue(active_job, scheduled_at: '2021-05-14 09:33:16 +0200')
 
-        expect(described_class.display_all(after_scheduled_at: Time.zone.parse('2021-05-14 09:33:16 +0200')).count).to eq(0)
+        expect(described_class.display_all.count).to eq(1)
       end
 
       it 'does not return jobs after last scheduled at and job id' do
@@ -642,7 +626,7 @@ RSpec.describe GoodJob::Job do
         job_id = described_class.last!.id
 
         expect(
-          described_class.display_all(after_scheduled_at: Time.zone.parse('2021-05-14 09:33:16 +0200'), after_id: job_id).count
+          described_class.display_all(after_at: Time.zone.parse('2021-05-14 09:33:16 +0200'), after_id: job_id).count
         ).to eq(0)
       end
     end
@@ -748,8 +732,6 @@ RSpec.describe GoodJob::Job do
                 next if rescue_with_handler(e)
 
                 raise e
-              ensure
-                nil
               end
             end
 
@@ -951,7 +933,7 @@ RSpec.describe GoodJob::Job do
           ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
         end
 
-        it 'updates the Execution record and creates a DiscreteExecution record' do
+        it 'updates the Job record and creates a Execution record' do
           good_job.perform(lock_id: process_id)
 
           expect(good_job.reload).to have_attributes(
@@ -959,9 +941,9 @@ RSpec.describe GoodJob::Job do
             finished_at: within(1.second).of(Time.current)
           )
 
-          dexecution = good_job.discrete_executions.first
-          expect(dexecution).to be_present
-          expect(dexecution).to have_attributes(
+          execution = good_job.executions.first
+          expect(execution).to be_present
+          expect(execution).to have_attributes(
             active_job_id: good_job.active_job_id,
             job_class: good_job.job_class,
             queue_name: good_job.queue_name,
@@ -997,9 +979,9 @@ RSpec.describe GoodJob::Job do
               finished_at: nil,
               scheduled_at: within(10.minutes).of(1.hour.from_now) # interval because of retry jitter
             )
-            expect(GoodJob::DiscreteExecution.count).to eq(1)
-            discrete_execution = good_job.discrete_executions.first
-            expect(discrete_execution).to have_attributes(
+            expect(GoodJob::Execution.count).to eq(1)
+            execution = good_job.executions.first
+            expect(execution).to have_attributes(
               active_job_id: good_job.active_job_id,
               error: "TestJob::ExpectedError: Raised expected error",
               created_at: within(1.second).of(Time.current),
@@ -1026,12 +1008,51 @@ RSpec.describe GoodJob::Job do
               scheduled_at: within(0.5).of(1.second.from_now)
             )
 
-            expect(good_job.discrete_executions.size).to eq(1)
-            expect(good_job.discrete_executions.first).to have_attributes(
+            expect(good_job.executions.size).to eq(1)
+            expect(good_job.executions.first).to have_attributes(
               performed_at: within(1.second).of(Time.current),
               finished_at: within(1.second).of(Time.current),
               duration: be_a(ActiveSupport::Duration)
             )
+          end
+        end
+      end
+
+      describe "instrumentation" do
+        context "when it succeeds" do
+          let(:active_job) { TestJob.new("a string") }
+
+          it "has correct payload" do
+            callback = lambda do |_name, _started, _finished, _unique_id, payload|
+              expect(payload).to include(
+                job: good_job,
+                value: "a string",
+                error: nil,
+                handled_error: nil,
+                error_event: nil
+              )
+            end
+            ActiveSupport::Notifications.subscribed(callback, "perform_job.good_job") do
+              good_job.perform(lock_id: process_id)
+            end
+          end
+        end
+
+        context "when it errors" do
+          let(:active_job) { TestJob.new("a string", raise_error: true) }
+
+          it "has correct payload" do
+            callback = lambda do |_name, _started, _finished, _unique_id, payload|
+              expect(payload).to include(
+                job: good_job,
+                error: an_instance_of(TestJob::ExpectedError),
+                unhandled_error: an_instance_of(TestJob::ExpectedError),
+                error_event: :unhandled
+              )
+            end
+            ActiveSupport::Notifications.subscribed(callback, "perform_job.good_job") do
+              good_job.perform(lock_id: process_id)
+            end
           end
         end
       end
@@ -1079,6 +1100,89 @@ RSpec.describe GoodJob::Job do
         execution.performed_at = 5.seconds.ago
         execution.finished_at = 1.second.ago
         expect(execution.runtime_latency).to eq(execution.finished_at - execution.performed_at)
+      end
+    end
+
+    describe '.schedule_ordered' do
+      it 'orders by scheduled or created (oldest first)' do
+        query = described_class.schedule_ordered
+        expect(query.to_sql).to include('ORDER BY')
+      end
+    end
+
+    describe '.exclude_paused' do
+      let!(:default_job) { described_class.create!(queue_name: "default", job_class: "DefaultJob") }
+      let!(:mailers_job) { described_class.create!(queue_name: "mailers", job_class: "ActionMailer::MailDeliveryJob") }
+      let!(:reports_job) { described_class.create!(queue_name: "reports", job_class: "ReportsJob") }
+      let!(:labeled_job) { described_class.create!(queue_name: "default", job_class: "DefaultJob", labels: %w[important urgent]) }
+      let!(:other_labeled_job) { described_class.create!(queue_name: "default", job_class: "DefaultJob", labels: ["low_priority"]) }
+
+      before do
+        allow(GoodJob.configuration).to receive(:enable_pauses).and_return(enable_pauses)
+      end
+
+      context 'when enable_pauses is false' do
+        let(:enable_pauses) { false }
+
+        it 'returns all jobs' do
+          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job, labeled_job, other_labeled_job)
+        end
+      end
+
+      context 'when enable_pauses is true' do
+        let(:enable_pauses) { true }
+
+        it 'returns all jobs when nothing is paused' do
+          expect(described_class.exclude_paused.count).to eq 5
+          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job, labeled_job, other_labeled_job)
+        end
+
+        it 'excludes jobs with paused queue_names' do
+          GoodJob::Setting.pause(queue: "default")
+          GoodJob::Setting.pause(queue: "mailers")
+          expect(described_class.exclude_paused).to contain_exactly(reports_job)
+        end
+
+        it 'excludes jobs with paused job_classes' do
+          GoodJob::Setting.pause(job_class: "DefaultJob")
+          GoodJob::Setting.pause(job_class: "ActionMailer::MailDeliveryJob")
+          expect(described_class.exclude_paused).to contain_exactly(reports_job)
+        end
+
+        it 'excludes jobs with paused labels' do
+          GoodJob::Setting.pause(label: "important")
+          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job, other_labeled_job)
+        end
+
+        it 'excludes jobs with any paused label when job has multiple labels' do
+          GoodJob::Setting.pause(label: "urgent")
+          expect(described_class.exclude_paused).to contain_exactly(default_job, mailers_job, reports_job, other_labeled_job)
+        end
+
+        it 'excludes jobs with both paused queue_names and job_classes' do
+          GoodJob::Setting.pause(queue: "default")
+          GoodJob::Setting.pause(job_class: "ActionMailer::MailDeliveryJob")
+          expect(described_class.exclude_paused).to contain_exactly(reports_job)
+        end
+
+        it 'excludes jobs with paused queue_names, job_classes, or labels' do
+          GoodJob::Setting.pause(queue: "reports")
+          GoodJob::Setting.pause(job_class: "ActionMailer::MailDeliveryJob")
+          GoodJob::Setting.pause(label: "important")
+          expect(described_class.exclude_paused).to contain_exactly(default_job, other_labeled_job)
+        end
+
+        it 'handles jobs with nil labels' do
+          GoodJob::Setting.pause(label: "important")
+          unlabeled_job = described_class.create!(queue_name: "default", job_class: "DefaultJob", labels: nil)
+          expect(described_class.exclude_paused).to include(unlabeled_job)
+        end
+
+        it 'handles jobs with empty labels array' do
+          GoodJob::Setting.pause(label: "important")
+          empty_labeled_job = described_class.create!(queue_name: "default", job_class: "DefaultJob", labels: [])
+          expect(described_class.exclude_paused).to include(empty_labeled_job)
+        end
       end
     end
   end

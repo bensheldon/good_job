@@ -70,6 +70,12 @@ describe GoodJob::CronEntry do
     end
   end
 
+  describe '#within' do
+    it 'returns an array of timestamps for the time period' do
+      expect(entry.within(2.minutes.ago..Time.current)).to eq([Time.current.at_beginning_of_minute - 1.minute, Time.current.at_beginning_of_minute])
+    end
+  end
+
   describe '#enabled' do
     it 'is enabled by default' do
       expect(entry).to be_enabled
@@ -161,6 +167,22 @@ describe GoodJob::CronEntry do
       I18n.default_locale = :en
     end
 
+    it 'can handle a proc for a class value that enqueues a job directly' do
+      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+
+      cron_at = Time.current
+
+      entry = described_class.new(params.merge(class: -> { TestJob.set(queue: "direct").perform_later(42, name: 'Direct') }))
+      entry.enqueue(cron_at)
+
+      job = GoodJob::Job.last
+      expect(job).to have_attributes(
+        job_class: 'TestJob',
+        cron_at: be_within(0.001.seconds).of(cron_at),
+        queue_name: 'direct'
+      )
+    end
+
     describe 'job execution' do
       it 'executes the job properly' do
         perform_enqueued_jobs do
@@ -169,15 +191,28 @@ describe GoodJob::CronEntry do
       end
     end
 
-    it 'assigns cron_key and cron_at to the execution' do
-      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+    describe "adapter integration" do
+      before do
+        ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+      end
 
-      cron_at = 10.minutes.ago
-      entry.enqueue(cron_at)
+      it 'assigns cron_key and cron_at to the execution' do
+        cron_at = 10.minutes.ago
+        entry.enqueue(cron_at)
 
-      job = GoodJob::Job.last
-      expect(job.cron_key).to eq 'test'
-      expect(job.cron_at).to be_within(0.001.seconds).of(cron_at)
+        job = GoodJob::Job.last
+        expect(job.cron_key).to eq 'test'
+        expect(job.cron_at).to be_within(0.001.seconds).of(cron_at)
+      end
+
+      it 'gracefully handles a duplicate enqueue, for example across multiple processes' do
+        cron_at = 10.minutes.ago
+
+        expect do
+          entry.enqueue(cron_at)
+          entry.enqueue(cron_at)
+        end.to change(GoodJob::Job, :count).by(1)
+      end
     end
   end
 
@@ -196,11 +231,11 @@ describe GoodJob::CronEntry do
     it 'returns a hash of properties' do
       expect(entry.display_properties).to eq({
                                                key: 'test',
-                                               cron: "* * * * *",
-                                               class: "TestJob",
-                                               args: [42, { name: "Alice" }],
-                                               set: "Lambda/Callable",
-                                               description: "Something helpful",
+        cron: "* * * * *",
+        class: "TestJob",
+        args: [42, { name: "Alice" }],
+        set: "Lambda/Callable",
+        description: "Something helpful",
                                              })
     end
   end

@@ -9,6 +9,9 @@ uk:
       reschedule: Перепланувати
       retry: Повторити
     batches:
+      actions:
+        confirm_retry: Ви впевнені, що хочете повторити цю групу завдань?
+        retry: Повторити групу завдань
       index:
         older_batches: Старі пакети
         title: Пакети
@@ -24,12 +27,28 @@ uk:
           retry: Повторити задачу
           title: Дії
         no_jobs_found: Задачі не знайдені.
+      retry:
+        notice: Групу завдань було повторено
       show:
         attributes: Атрибути
         batched_jobs: Задачі в пакеті
         callback_jobs: Задачі з зворотнім викликом
       table:
         no_batches_found: Пакети не знайдені.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Ви впевнені, що хочете вимкнути цю cron-запис?
@@ -201,6 +220,7 @@ uk:
       job:
         arguments: Аргументи
         attempts: Спроби
+        labels: Мітки
         priority: Пріоритет
         queue: Черга
     number:
@@ -220,13 +240,31 @@ uk:
             thousand: Тис
             trillion: Трлн
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Ви впевнені, що хочете призупинити %{value}?
+        confirm_unpause: Ви впевнені, що хочете відновити %{value}?
+        disabled: Експериментальна функція Паузи в GoodJob вимкнена за замовчуванням, оскільки це може знизити продуктивність. Налаштуйте для увімкнення
+        job_class: Клас завдання
+        label: Мітка
+        pause: Призупинити
+        queue: Черга
+        title: Паузи
+        type: Тип Паузи
+        unpause: Відновити
+        value: Значення
     performance:
       index:
         average_duration: Середня тривалість
-        executions: Страти
-        job_class: Клас роботи
+        chart_title: Загальний час виконання в секундах
+        executions: Виконання
+        job_class: Клас завдання
         maximum_duration: Максимальна тривалість
         minimum_duration: Мінімальна тривалість
+        queue_name: Назва черги
+        title: Продуктивність
+      show:
+        slow: Повільно
         title: Продуктивність
     processes:
       index:
@@ -252,11 +290,13 @@ uk:
         queue_name: Назва черги
         search: Пошук
       navbar:
-        batches: Batches
+        batches: Пакети
+        cleaner: Discard Cleaner
         cron_schedules: Cron
-        jobs: Задачі
-        live_poll: Живе Опитування
+        jobs: Роботи
+        live_poll: Живе опитування
         name: "GoodJob 👍"
+        pauses: Паузи
         performance: Продуктивність
         processes: Процеси
         theme:

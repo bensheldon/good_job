@@ -51,7 +51,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
   end
 
   describe '.good_job_control_concurrency_with' do
-    describe 'total_limit:', :skip_rails_5 do
+    describe 'total_limit:' do
       before do
         TestJob.good_job_control_concurrency_with(
           total_limit: -> { 1 },
@@ -75,7 +75,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
     end
 
-    describe 'enqueue_limit:', :skip_rails_5 do
+    describe 'enqueue_limit:' do
       before do
         TestJob.good_job_control_concurrency_with(
           enqueue_limit: -> { 2 },
@@ -99,7 +99,10 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         expect(GoodJob::Job.where(concurrency_key: "Bob").count).to eq 1
 
         expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its enqueue limit of 2 jobs/)).exactly(:once)
-        if ActiveJob.gem_version >= Gem::Version.new("6.1.0")
+        if RUBY_VERSION >= "3.4"
+          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {name: "Alice"}/)).exactly(:twice)
+          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {name: "Bob"}/)).exactly(:once)
+        else
           expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
           expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
         end
@@ -129,7 +132,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         )
       end
 
-      it "will error and retry jobs if concurrency is exceeded" do
+      it "errors and retry jobs if concurrency is exceeded" do
         active_job = TestJob.perform_later(name: "Alice")
 
         performer = GoodJob::JobPerformer.new('*')
@@ -137,14 +140,14 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         5.times { scheduler.create_thread }
 
         sleep_until(max: 10, increments_of: 0.5) do
-          GoodJob::DiscreteExecution.where(active_job_id: active_job.job_id).finished.count >= 1
+          GoodJob::Execution.where(active_job_id: active_job.job_id).finished.count >= 1
         end
         scheduler.shutdown
 
         expect(GoodJob::Job.find_by(active_job_id: active_job.job_id).concurrency_key).to eq "Alice"
 
-        expect(GoodJob::DiscreteExecution.count).to be >= 1
-        expect(GoodJob::DiscreteExecution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
+        expect(GoodJob::Execution.count).to be >= 1
+        expect(GoodJob::Execution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
       end
 
       it 'is ignored with the job is executed via perform_now' do
@@ -189,6 +192,38 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
         TestJob.good_job_control_concurrency_with(
+          perform_throttle: -> { [1, 1.minute] },
+          key: -> { arguments.first[:name] }
+        )
+      end
+
+      it 'does not perform if throttle period has not passed' do
+        TestJob.perform_later(name: "Alice")
+        TestJob.perform_later(name: "Alice")
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 1
+
+        Timecop.travel(61.seconds)
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 2
+
+        Timecop.travel(61.seconds)
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 3
+      end
+    end
+
+    describe 'perform_limit: together with perform_throttle:' do
+      before do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+
+        TestJob.good_job_control_concurrency_with(
+          perform_limit: -> { 1 },
           perform_throttle: -> { [1, 1.minute] },
           key: -> { arguments.first[:name] }
         )

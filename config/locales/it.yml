@@ -9,6 +9,9 @@ it:
       reschedule: Riprogramma
       retry: Riprova
     batches:
+      actions:
+        confirm_retry: Sei sicuro di voler riprovare questo batch?
+        retry: Riprova
       index:
         older_batches: Batch più vecchi
         title: Batch
@@ -24,12 +27,28 @@ it:
           retry: Riprova job
           title: Azioni
         no_jobs_found: Nessun job trovato.
+      retry:
+        notice: Il batch è stato riprovato
       show:
         attributes: Attributi
         batched_jobs: Job raggruppati
         callback_jobs: Job di callback
       table:
         no_batches_found: Nessun batch trovato.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Sei sicuro di voler disabilitare questa voce cron?
@@ -175,6 +194,7 @@ it:
       job:
         arguments: Argomenti
         attempts: Tentativi
+        labels: Etichette
         priority: Priorità
         queue: Coda
     number:
@@ -194,14 +214,32 @@ it:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Sei sicuro di voler mettere in pausa %{value}?
+        confirm_unpause: Sei sicuro di voler riprendere %{value}?
+        disabled: La funzione sperimentale Pause di GoodJob è disabilitata per impostazione predefinita perché potrebbe degradare le prestazioni. Configurare per abilitare
+        job_class: Classe del job
+        label: Etichetta
+        pause: Pausa
+        queue: Coda
+        title: Pause
+        type: Tipo di Pausa
+        unpause: Riprendi
+        value: Valore
     performance:
       index:
         average_duration: Durata media
+        chart_title: Tempo totale di esecuzione in secondi
         executions: Esecuzioni
-        job_class: Classe di lavoro
+        job_class: Classe del job
         maximum_duration: Durata massima
         minimum_duration: Durata minima
-        title: Prestazione
+        queue_name: Nome della coda
+        title: Prestazioni
+      show:
+        slow: Lento
+        title: Prestazioni
     processes:
       index:
         cron_enabled: Cron abilitato
@@ -227,10 +265,12 @@ it:
         search: Cerca
       navbar:
         batches: Batch
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Job
         live_poll: Live Poll
         name: "GoodJob 👍"
+        pauses: Pause
         performance: Prestazione
         processes: Processi
         theme:

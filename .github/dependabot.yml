@@ -4,13 +4,13 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    allow:
+      - dependency-type: "all"
     groups:
-      bundler-dependencies:
+      all:
         patterns:
           - "*"
-        exclude-patterns:
-          - puma
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: weekly
+      interval: monthly

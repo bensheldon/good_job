@@ -14,7 +14,7 @@ module GoodJob
       if sec < 1
         t 'good_job.duration.milliseconds', ms: (sec * 1000).floor
       elsif sec < 10
-        t 'good_job.duration.less_than_10_seconds', sec: sec.floor
+        t 'good_job.duration.less_than_10_seconds', sec: number_with_delimiter(sec.floor(1))
       elsif sec < 60
         t 'good_job.duration.seconds', sec: sec.floor
       elsif sec < 3600
@@ -28,6 +28,14 @@ module GoodJob
       options = options.reverse_merge({ scope: "good_job.datetime.distance_in_words" })
       text = t("good_job.helpers.relative_time.#{timestamp.future? ? 'future' : 'past'}", time: time_ago_in_words(timestamp, **options))
       tag.time(text, datetime: timestamp, title: timestamp)
+    end
+
+    def number_to_human(count)
+      super(count, **translate_hash("good_job.number.human.decimal_units"))
+    end
+
+    def number_with_delimiter(count)
+      super(count, **translate_hash('good_job.number.format'))
     end
 
     def translate_hash(key, **options)

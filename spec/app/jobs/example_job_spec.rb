@@ -27,8 +27,8 @@ describe ExampleJob do
         Timecop.return
 
         good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
-        expect(good_job.discrete_executions.count).to eq 2
-        expect(good_job.discrete_executions.last.error).to be_nil
+        expect(good_job.executions.count).to eq 2
+        expect(good_job.executions.last.error).to be_nil
       end
     end
 
@@ -43,8 +43,8 @@ describe ExampleJob do
 
         good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
 
-        expect(good_job.discrete_executions.count).to eq 6
-        expect(good_job.discrete_executions.last.error).to be_nil
+        expect(good_job.executions.count).to eq 6
+        expect(good_job.executions.last.error).to be_nil
       end
     end
 
@@ -58,17 +58,22 @@ describe ExampleJob do
         Timecop.return
 
         good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
-        expect(good_job.discrete_executions.count).to eq 3
-        discrete_execution = good_job.discrete_executions.last
-        expect(discrete_execution.error).to be_present
-        expect(discrete_execution.error_backtrace.count).to be > 100
-        expect(discrete_execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:41:in `perform'"])
+        expect(good_job.executions.count).to eq 3
+        execution = good_job.executions.last
+        expect(execution.error).to be_present
+        expect(execution.error_backtrace.count).to be > 100
+
+        if RUBY_VERSION >= "3.4"
+          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:44:in 'ExampleJob#perform'"])
+        else
+          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:44:in `perform'"])
+        end
       end
     end
 
     describe "SLOW_TYPE" do
       it 'sleeps for period' do
-        expect_any_instance_of(described_class).to receive(:sleep)
+        expect_any_instance_of(described_class).to receive(:sleep).at_least(:once)
 
         active_job = described_class.perform_later(described_class::SLOW_TYPE)
 

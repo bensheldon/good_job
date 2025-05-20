@@ -29,6 +29,9 @@ module GoodJob # :nodoc:
       fallback_policy: :discard,
     }.freeze
 
+    # In CRuby, this sets the thread quantum to ~12.5ms ( 100ms * 2^(-3) ).
+    LOW_THREAD_PRIORITY = -3
+
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated Schedulers in the current process.
@@ -39,13 +42,18 @@ module GoodJob # :nodoc:
     # @return [String]
     attr_reader :name
 
+    # Whether to lower the thread priority to a fixed value
+    # @return [Boolean]
+    attr_accessor :lower_thread_priority
+
     # @param performer [GoodJob::JobPerformer]
     # @param max_threads [Numeric, nil] number of seconds between polls for jobs
     # @param max_cache [Numeric, nil] maximum number of scheduled jobs to cache in memory
     # @param warm_cache_on_initialize [Boolean] whether to warm the cache immediately, or manually by calling +warm_cache+
     # @param cleanup_interval_seconds [Numeric, nil] number of seconds between cleaning up job records
     # @param cleanup_interval_jobs [Numeric, nil] number of executed jobs between cleaning up job records
-    def initialize(performer, max_threads: nil, max_cache: nil, warm_cache_on_initialize: false, cleanup_interval_seconds: nil, cleanup_interval_jobs: nil)
+    # @param lower_thread_priority [Boolean] whether to lower the thread priority of execution threads
+    def initialize(performer, max_threads: nil, max_cache: nil, warm_cache_on_initialize: false, cleanup_interval_seconds: nil, cleanup_interval_jobs: nil, lower_thread_priority: false)
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
 
       @performer = performer
@@ -61,6 +69,8 @@ module GoodJob # :nodoc:
 
       @cleanup_tracker = CleanupTracker.new(cleanup_interval_seconds: cleanup_interval_seconds, cleanup_interval_jobs: cleanup_interval_jobs)
       @executor_options[:name] = name
+
+      self.lower_thread_priority = lower_thread_priority
 
       create_executor
       warm_cache if warm_cache_on_initialize
@@ -152,6 +162,8 @@ module GoodJob # :nodoc:
         if state[:scheduled_at]
           scheduled_at = if state[:scheduled_at].is_a? String
                            Time.zone.parse state[:scheduled_at]
+                         elsif state[:scheduled_at].is_a? Numeric
+                           Time.zone.at state[:scheduled_at]
                          else
                            state[:scheduled_at]
                          end
@@ -271,6 +283,7 @@ module GoodJob # :nodoc:
       future = Concurrent::ScheduledTask.new(delay, args: [self, performer], executor: executor, timer_set: timer_set) do |thr_scheduler, thr_performer|
         Thread.current.name = Thread.current.name.sub("-worker-", "-thread-") if Thread.current.name
         Thread.current[:good_job_scheduler] = thr_scheduler
+        Thread.current.priority = -3 if thr_scheduler.lower_thread_priority
 
         Rails.application.reloader.wrap do
           thr_performer.next do |found|

@@ -41,6 +41,23 @@ RSpec.describe GoodJob::Process do
     end
   end
 
+  describe 'find_or_create_record' do
+    let(:record_id) { '67160140-1bec-4c3b-bc34-1a8b36f87b21' }
+
+    it 'creates a new record' do
+      record = described_class.find_or_create_record(id: record_id)
+      expect(record).to be_a(described_class)
+    end
+
+    it 'updates an existing record' do
+      record = described_class.find_or_create_record(id: record_id)
+      record.update!(updated_at: 1.day.ago)
+      updated_record = described_class.find_or_create_record(id: record_id)
+      expect(updated_record).to eq(record)
+      expect(updated_record.updated_at).to be_within(1.second).of(Time.current)
+    end
+  end
+
   describe '#basename' do
     let(:process) { described_class.new state: {} }
 
@@ -60,7 +77,8 @@ RSpec.describe GoodJob::Process do
       process = described_class.create! state: {}, updated_at: 1.day.ago
       expect do
         expect(process.refresh).to be true
-      end.to change(process, :updated_at).to within(1.second).of(Time.current)
+      end.to change(process, :state)
+         .and change(process, :updated_at).to within(1.second).of(Time.current)
     end
 
     context 'when the record has been deleted elsewhere' do

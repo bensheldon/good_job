@@ -73,6 +73,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Write tests](#write-tests)
     - [PgBouncer compatibility](#pgbouncer-compatibility)
     - [CLI HTTP health check probes](#cli-http-health-check-probes)
+    - [Pausing Jobs](#pausing-jobs)
 - [Doing your best job with GoodJob](#doing-your-best-job-with-goodjob)
     - [Sizing jobs: mice and elephants](#sizing-jobs-mice-and-elephants)
     - [Isolating by total latency](#isolating-by-total-latency)
@@ -164,8 +165,8 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 
 ## Compatibility
 
-- **Ruby on Rails:** 6.0+
-- **Ruby:** Ruby 2.6+. JRuby 9.3+
+- **Ruby on Rails:** 6.1+
+- **Ruby:** Ruby 3.0+. JRuby 9.4+
 - **Postgres:** 10.0+
 
 ## Configuration
@@ -257,6 +258,7 @@ Rails.application.configure do
   config.good_job.shutdown_timeout = 25 # seconds
   config.good_job.enable_cron = true
   config.good_job.cron = { example: { cron: '0 * * * *', class: 'ExampleJob'  } }
+  config.good_job.cron_graceful_restart_period = 5.minutes
   config.good_job.dashboard_default_locale = :en
 
   # ...or all at once.
@@ -298,6 +300,7 @@ Available configuration options are:
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
 - `shutdown_timeout` (integer) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 - `enable_cron` (boolean) whether to run cron process. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_CRON`.
+- `cron_graceful_restart_period` (integer) when restarting cron, attempt to re-enqueue jobs that would have been enqueued by cron within this time period (e.g. `1.minute`). This should match the expected downtime during deploys.
 - `enable_listen_notify` (boolean) whether to enqueue and read jobs with Postgres LISTEN/NOTIFY. Defaults to `true`. You can also set this with the environment variable `GOOD_JOB_ENABLE_LISTEN_NOTIFY`.
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
 - `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`. _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
@@ -307,7 +310,7 @@ Available configuration options are:
 - `inline_execution_respects_schedule` (boolean) Opt-in to future behavior of inline execution respecting scheduled jobs. Defaults to `false`.
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
 - `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
-- `smaller_number_is_higher_priority` (boolean) allows you to specifiy that jobs should be run in ascending order of priority (smallest priority numbers first). This will be enabled by default in the next major version of GoodJob (v4.0), but jobs with the highest priority number are run first by default in all earlier versions of GoodJob.
+- `advisory_lock_heartbeat` (boolean) whether to use an advisory lock for the purpose of determining whether an execeution process is active. (Default `true` in Development; `false` in other environments)
 - `retry_on_unhandled_error` (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Be advised this may lead to jobs being repeated infinitely ([see below for more on retries](#retries)). Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `false`)
 - `on_thread_error` (proc, lambda, or callable) will be called when there is an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake. Example:
 
@@ -326,6 +329,8 @@ Available configuration options are:
     ```ruby
     config.good_job.probe_handler = 'webrick'
     ```
+
+- `enable_pauses` (boolean) whether job processing can be paused. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_PAUSES`.
 
 By default, GoodJob configures the following execution modes per environment:
 
@@ -499,7 +504,9 @@ As a second example, you may wish to show a link to a log aggregator next to eac
 
 ### Job priority
 
-Higher priority numbers run first in all versions of GoodJob v3.x and below. GoodJob v4.x will change job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority (see #524). To opt-in to this behavior now, set `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or `application.rb`.
+Smaller `priority` values have higher priority and run first (default: `0`), in accordance with [Active Job's definition of priority](https://github.com/rails/rails/blob/e17faead4f2aff28da079d50f02ea5b015322d5b/activejob/lib/active_job/core.rb#L22).
+
+Prior to GoodJob v4, this was reversed: higher priority numbers ran first in all versions of GoodJob v3.x and below. When migrating from v3 to v4, new behavior can be opted into by setting `config.good_job.smaller_number_is_higher_priority = true` in your GoodJob initializer or `application.rb`.
 
 ### Labelled jobs
 
@@ -611,9 +618,7 @@ GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry 
 
 GoodJob can enqueue Active Job jobs on a recurring basis that can be used as a replacement for cron.
 
-Cron-style jobs can be performed by any GoodJob process (e.g., CLI or `:async` execution mode) that has `config.good_job.enable_cron` set to `true`. That is, one or more job executor processes can be configured to perform recurring jobs.
-
-GoodJob's cron uses unique indexes to ensure that only a single job is enqueued at the given time interval. In order for this to work, GoodJob must preserve cron-created job records; these records will be automatically deleted like any other preserved record.
+Cron-style jobs can be enequeued by any GoodJob process (e.g., CLI or `:async` execution mode) that has `config.good_job.enable_cron` set to `true`. Enabling cron on multiple processes will not enqueue duplicate jobs; GoodJob's cron uses unique indexes to ensure that only a single job is enqueued for a given time interval.  In order for this to work, GoodJob must preserve cron-created job records; these records will be automatically deleted like any other preserved record.
 
 Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`) and natural language parsing (e.g. `every second`).
 
@@ -622,8 +627,11 @@ If you use the [Dashboard](#dashboard) the scheduled tasks can be viewed in the 
 ```ruby
 # config/environments/application.rb or a specific environment e.g. production.rb
 
-# Enable cron in this process, e.g., only run on the first Heroku worker process
-config.good_job.enable_cron = ENV['DYNO'] == 'worker.1' # or `true` or via $GOOD_JOB_ENABLE_CRON
+# Enable cron enqueuing in this process
+config.good_job.enable_cron = true
+
+# Without zero-downtime deploys, re-attempt previous schedules after a deploy
+config.good_job.cron_graceful_restart_period = 1.minute
 
 # Configure cron with a hash that has a unique key for each recurring job
 config.good_job.cron = {
@@ -681,15 +689,15 @@ Batches track a set of jobs, and enqueue an optional callback job when all of th
       OtherJob.perform_later
     end
 
-    # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, options)`
+    # When these jobs have finished, it will enqueue your `MyBatchCallbackJob.perform_later(batch, context)`
     class MyBatchCallbackJob < ApplicationJob
-      # Callback jobs must accept a `batch` and `options` argument
-      def perform(batch, params)
+      # Callback jobs must accept a `batch` and `context` argument
+      def perform(batch, context)
         # The batch object will contain the Batch's properties, which are mutable
         batch.properties[:user] # => <User id: 1, ...>
 
-        # Params is a hash containing additional context (more may be added in the future)
-        params[:event] # => :finish, :success, :discard
+        # Context is a hash containing additional context (more may be added in the future)
+        context[:event] # => :finish, :success, :discard
       end
     end
     ```
@@ -759,19 +767,19 @@ Batch callbacks are Active Job jobs that are enqueued at certain events during t
 - `:success` - Enqueued only when all jobs in the batch have finished and succeeded.
 - `:discard` - Enqueued immediately the first time a job in the batch is discarded.
 
-Callback jobs must accept a `batch` and `params` argument in their `perform` method:
+Callback jobs must accept a `batch` and `context` argument in their `perform` method:
 
 ```ruby
 class MyBatchCallbackJob < ApplicationJob
-  def perform(batch, params)
+  def perform(batch, context)
     # The batch object will contain the Batch's properties
     batch.properties[:user] # => <User id: 1, ...>
     # Batches are mutable
     batch.properties[:user] = User.find(2)
     batch.save
 
-    # Params is a hash containing additional context (more may be added in the future)
-    params[:event] # => :finish, :success, :discard
+    # Context is a hash containing additional context (more may be added in the future)
+    context[:event] # => :finish, :success, :discard
   end
 end
 ```
@@ -813,7 +821,7 @@ class WorkJob < ApplicationJob
 end
 
 class BatchJob < ApplicationJob
-  def perform(batch, options)
+  def perform(batch, context)
     if batch.properties[:stage].nil?
       batch.enqueue(stage: 1) do
         WorkJob.perform_later('a')
@@ -882,7 +890,7 @@ To perform upgrades to the GoodJob database tables:
 
 #### Upgrading v3 to v4
 
-GoodJob v4 changes how job and job execution records are stored in the database; moving from job and executions being commingled in the `good_jobs` table to separately and discretely storing job executions in `good_job_executions`. To safely upgrade, all unfinished jobs must use the new format. This change was introduced in GoodJob [v3.15.4 (April 2023)](https://github.com/bensheldon/good_job/releases/tag/v3.15.4), so your application is likely ready-to-upgrade already if you have kept up with GoodJob updates.
+GoodJob v4 changes how job and job execution records are stored in the database; moving from job and executions being commingled in the `good_jobs` table to separately and discretely storing job executions in `good_job_executions`. To safely upgrade, all unfinished jobs must use the new format. This change was introduced in GoodJob [v3.15.4 (April 2023)](https://github.com/bensheldon/good_job/releases/tag/v3.15.4), so your application is likely ready-to-upgrade in this respect if you have kept up with GoodJob updates and applied migrations (`bin/rails g good_job:update`). _Please be sure to doublecheck you are not missing subsequent migrations or deprecations too by following the instructions below._
 
 To upgrade:
 
@@ -896,7 +904,7 @@ To upgrade:
 
 Notable changes:
 
-- Only supports Rails 6.1+, CRuby 3.0+ and JRuby 9.4+, Postgres 12+. Rails 6.0 is no longer supported. CRuby 2.6 and 2.7 are no longer supported. JRuby 9.3 is no longer supported.
+- Only supports Rails 6.1+, CRuby 3.0+ and JRuby 9.4+. Rails 6.0 is no longer supported. CRuby 2.6 and 2.7 are no longer supported. JRuby 9.3 is no longer supported.
 - Changes job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority.
 - Enqueues and executes jobs via the `GoodJob::Job` model instead of `GoodJob::Execution`
 - Setting `config.good_job.cleanup_interval_jobs`, `GOOD_JOB_CLEANUP_INTERVAL_JOBS`, `config.good_job.cleanup_interval_seconds`, or `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` to `nil` or `""` no longer disables count- or time-based cleanups. Set to `false` to disable, or `-1` to run a cleanup after every job execution.
@@ -1030,7 +1038,7 @@ To detect the start of a graceful shutdown from within a performing job, for exa
 ```ruby
 def perform(lots_of_records)
   lots_of_records.each do |record|
-    break if GoodJob.current_thread_shutting_down? # or `unless GoodJob.current_thread.running?`
+    break if GoodJob.current_thread_shutting_down? # or `unless GoodJob.current_thread_running?`
     # process record ...
   end
 end
@@ -1560,9 +1568,35 @@ gem 'webrick'
 
 If WEBrick is configured to be used, but the dependency is not found, GoodJob will log a warning and fallback to the default probe server.
 
+### Pausing Jobs
+
+GoodJob allows for pausing jobs by queue or job class. This feature is currently opt-in because the performance impact of loading and filtering these attributes is not yet known. To enable this feature, add the following to your configuration:
+
+> ```ruby
+> config.good_job.enable_pauses = true
+> ```
+
+Pausing can be done via the Dashboard's Performance page, or in Ruby
+
+```ruby
+# To pause:
+GoodJob.pause(queue: "default")
+GoodJob.pause(job_class: "MyJob")
+
+# To check status
+GoodJob.paused # => { queues: ["default"], job_classes: ["MyJob"] }
+GoodJob.paused?(queue: "default") # => true
+GoodJob.paused?(job_class: "MyJob") # => true
+GoodJob.paused? # => true
+
+# To unpause
+GoodJob.unpause(queue: "default")
+GoodJob.unpause(job_class: "MyJob")
+````
+
 ## Doing your best job with GoodJob
 
-_This section explains how to use GoodJob the most efficiently and performantly, according to its maintainers. GoodJob is very flexible and you don’t necessarily have to use it this way, but the concepts explained here are part of GoodJob’s design intent._
+_This section explains how to use GoodJob the most efficiently and performantly, according to its maintainers. GoodJob is very flexible and you don't necessarily have to use it this way, but the concepts explained here are part of GoodJob's design intent._
 
 Background jobs are hard. There are two extremes:
 
@@ -1716,14 +1750,14 @@ Environment variables that may help with debugging:
 - `LOUD=1`: display all stdout/stderr output from all sources. This is helpful because GoodJob wraps some tests with `quiet { }` for cleaner test output, but it can hinder debugging.
 - `SHOW_BROWSER=1`: Run system tests headfully with Chrome/Chromedriver. Use `binding.irb` in the system tests to pause.
 
-Appraisal can be used to run a test matrix of multiple versions of Rails:
+The gemfiles in `gemfiles/` can be used to run tests against different rails versions:
 
 ```bash
-# Install Appraisal matrix of gemfiles
-bin/appraisal
+# Install dependencies
+BUNDLE_GEMFILE=gemfiles/rails_6.1.gemfile bundle install
 
-# Run tests against matrix
-bin/appraisal bin/rspec
+# Run the tests
+BUNDLE_GEMFILE=gemfiles/rails_6.1.gemfile bin/rspec
 ```
 
 ### Release

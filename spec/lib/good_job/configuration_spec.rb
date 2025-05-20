@@ -282,6 +282,11 @@ RSpec.describe GoodJob::Configuration do
 
       expect(configuration.cron).to eq({})
     end
+
+    it 'has a graceful restart period' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ cron_graceful_restart_period: 5.minutes })
+      expect(described_class.new({}).cron_graceful_restart_period).to eq 5.minutes
+    end
   end
 
   describe '#enable_listen_notify' do
@@ -295,14 +300,6 @@ RSpec.describe GoodJob::Configuration do
 
       configuration = described_class.new({})
       expect(configuration.enable_listen_notify).to be false
-    end
-  end
-
-  describe '#smaller_number_is_higher_priority' do
-    it 'delegates to rails configuration' do
-      allow(Rails.application.config).to receive(:good_job).and_return({ smaller_number_is_higher_priority: true })
-      configuration = described_class.new({})
-      expect(configuration.smaller_number_is_higher_priority).to be true
     end
   end
 
@@ -324,6 +321,37 @@ RSpec.describe GoodJob::Configuration do
     it 'has a "true" default value' do
       configuration = described_class.new({})
       expect(configuration.dashboard_live_poll_enabled).to eq true
+    end
+  end
+
+  describe '#advisory_lock_heartbeat' do
+    it 'defaults to true in development' do
+      allow(Rails).to receive(:env) { "development".inquiry }
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be true
+    end
+
+    it 'defaults to false in other environments' do
+      allow(Rails).to receive(:env) { "production".inquiry }
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be false
+    end
+
+    it 'can be overridden by options' do
+      configuration = described_class.new({ advisory_lock_heartbeat: true })
+      expect(configuration.advisory_lock_heartbeat).to be true
+    end
+
+    it 'can be overridden by rails config' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ advisory_lock_heartbeat: true })
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be true
+    end
+
+    it 'can be overridden by environment variable' do
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_ADVISORY_LOCK_HEARTBEAT' => 'true' })
+      configuration = described_class.new({})
+      expect(configuration.advisory_lock_heartbeat).to be true
     end
   end
 end

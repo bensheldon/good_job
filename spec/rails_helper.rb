@@ -14,6 +14,17 @@ end
 
 require "timecop"
 
+require "warning"
+# https://github.com/mikel/mail/pull/1557
+Warning.ignore(%r{/lib/mail/parsers/})
+# https://github.com/SeleniumHQ/selenium/pull/14770
+Warning.ignore(%r{/lib/selenium/.*URI::RFC3986_PARSER.escape is obsolete})
+# https://github.com/teamcapybara/capybara/pull/2781
+Warning.ignore(%r{/lib/capybara/.*URI::RFC3986_PARSER.make_regexp is obsolete})
+# https://github.com/rails/rails/pull/54053
+Warning.ignore(%r{the block passed to 'ActiveModel::Type::Value#serializable\?'})
+Warning.ignore(%r{the block passed to 'ActiveModel::Attribute#value'})
+
 require File.expand_path('../demo/config/environment', __dir__)
 
 # Prevent database truncation if the environment is production

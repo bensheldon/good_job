@@ -31,13 +31,9 @@ RSpec.describe GoodJob::JobsFilter do
     running_active_job = ExampleJob.perform_later('success')
     running_job = GoodJob::Job.find(running_active_job.provider_job_id)
     running_job.update!(
+      performed_at: 1.minute.ago,
       finished_at: nil
     )
-    running_job.advisory_lock
-  end
-
-  after do
-    GoodJob::Job.advisory_unlock_session
   end
 
   describe '#job_classes' do
@@ -109,11 +105,34 @@ RSpec.describe GoodJob::JobsFilter do
           expect(filter.records.size).to eq 1
         end
       end
+
+      describe 'Job ID query' do
+        before do
+          params[:query] = GoodJob::Job.last.id
+        end
+
+        it 'returns the job' do
+          expect(filter.records.size).to eq 1
+          expect(filter.records.first).to eq GoodJob::Job.last
+        end
+      end
     end
 
     context 'when filtered by cron_key' do
       before do
         params[:cron_key] = 'frequent_cron'
+      end
+
+      it 'filters results' do
+        expect(filter.records.size).to eq 1
+      end
+    end
+
+    context 'when filtered by finished_since' do
+      before do
+        GoodJob::Job.find_each { |job| job.update!(finished_at: 6.hours.ago) }
+        GoodJob::Job.take.update!(finished_at: 30.minutes.ago)
+        params[:finished_since] = '1_hour_ago'
       end
 
       it 'filters results' do

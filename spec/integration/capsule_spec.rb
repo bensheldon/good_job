@@ -27,6 +27,6 @@ RSpec.describe 'Capsule' do
     perform_capsule.shutdown
     enqueue_capsule.shutdown
 
-    expect(GoodJob::DiscreteExecution.count).to eq(total_jobs)
+    expect(GoodJob::Execution.count).to eq(total_jobs)
   end
 end

@@ -110,7 +110,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Labels do
       TestJob.set(good_job_labels: ["buffalo"]).perform_later
       GoodJob.perform_inline
 
-      expect(GoodJob::DiscreteExecution.count).to eq 3
+      expect(GoodJob::Execution.count).to eq 3
       expect(GoodJob::Job.first).to have_attributes(labels: %w[buffalo gopher])
     end
   end

@@ -15,7 +15,7 @@ module GoodJob
       error_on_retry_stopped
       job
       execution_interrupted
-      execution_retried
+      retried_job
       retry_now
     ].freeze
 
@@ -61,11 +61,11 @@ module GoodJob
     #   @return [Boolean, nil]
     thread_mattr_accessor :execution_interrupted
 
-    # @!attribute [rw] execution_retried
+    # @!attribute [rw] retried_job
     #   @!scope class
     #   Execution Retried
-    #   @return [Boolean, nil]
-    thread_mattr_accessor :execution_retried
+    #   @return [GoodJob::Job, nil]
+    thread_mattr_accessor :retried_job
 
     # @!attribute [rw] retry_now
     #   @!scope class

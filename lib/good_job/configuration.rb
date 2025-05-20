@@ -35,8 +35,8 @@ module GoodJob
     DEFAULT_DASHBOARD_LIVE_POLL_ENABLED = true
     # Default enqueue_after_transaction_commit
     DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT = false
-    # Default smaller_number_is_higher_priority
-    DEFAULT_SMALLER_NUMBER_IS_HIGHER_PRIORITY = true
+    # Default enable_pauses setting
+    DEFAULT_ENABLE_PAUSES = false
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
@@ -150,11 +150,10 @@ module GoodJob
     # poll (using this interval) for new queued jobs to execute.
     # @return [Integer]
     def poll_interval
-      interval = (
+      interval =
         options[:poll_interval] ||
-          rails_config[:poll_interval] ||
-          env['GOOD_JOB_POLL_INTERVAL']
-      )
+        rails_config[:poll_interval] ||
+        env['GOOD_JOB_POLL_INTERVAL']
 
       if interval
         interval.to_i
@@ -220,6 +219,12 @@ module GoodJob
 
     def cron_entries
       cron.map { |cron_key, params| GoodJob::CronEntry.new(params.merge(key: cron_key)) }
+    end
+
+    def cron_graceful_restart_period
+      options[:cron_graceful_restart_period] ||
+        rails_config[:cron_graceful_restart_period] ||
+        env['GOOD_JOB_CRON_GRACEFUL_RESTART_PERIOD']
     end
 
     # The number of queued jobs to select when polling for a job to run.
@@ -348,12 +353,6 @@ module GoodJob
       DEFAULT_ENABLE_LISTEN_NOTIFY
     end
 
-    def smaller_number_is_higher_priority
-      return rails_config[:smaller_number_is_higher_priority] unless rails_config[:smaller_number_is_higher_priority].nil?
-
-      DEFAULT_SMALLER_NUMBER_IS_HIGHER_PRIORITY
-    end
-
     def dashboard_default_locale
       rails_config[:dashboard_default_locale] || DEFAULT_DASHBOARD_DEFAULT_LOCALE
     end
@@ -368,8 +367,19 @@ module GoodJob
     # @return [Boolean]
     def enqueue_after_transaction_commit
       return options[:enqueue_after_transaction_commit] unless options[:enqueue_after_transaction_commit].nil?
+      return rails_config[:enqueue_after_transaction_commit] unless rails_config[:enqueue_after_transaction_commit].nil?
 
       DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT
+    end
+
+    # Whether the job processing can be paused.
+    # @return [Boolean]
+    def enable_pauses
+      return options[:enable_pauses] unless options[:enable_pauses].nil?
+      return rails_config[:enable_pauses] unless rails_config[:enable_pauses].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PAUSES']) unless env['GOOD_JOB_ENABLE_PAUSE'].nil?
+
+      DEFAULT_ENABLE_PAUSES
     end
 
     # Whether running in a web server process.
@@ -384,6 +394,24 @@ module GoodJob
           self_caller.grep(%{/rack/handler/}).any? || # EXAMPLE: iodine-0.7.44/lib/rack/handler/iodine.rb:13:in `start'
           (Concurrent.on_jruby? && self_caller.grep(%r{jruby/rack/rails_booter}).any?) # EXAMPLE: uri:classloader:/jruby/rack/rails_booter.rb:83:in `load_environment'
       end || false
+    end
+
+    def lower_thread_priority
+      return options[:lower_thread_priority] unless options[:lower_thread_priority].nil?
+      return rails_config[:lower_thread_priority] unless rails_config[:lower_thread_priority].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_LOWER_THREAD_PRIORITY']) unless env['GOOD_JOB_LOWER_THREAD_PRIORITY'].nil?
+
+      nil
+    end
+
+    # Whether to take an advisory lock on the process record in the notifier reactor.
+    # @return [Boolean]
+    def advisory_lock_heartbeat
+      return options[:advisory_lock_heartbeat] unless options[:advisory_lock_heartbeat].nil?
+      return rails_config[:advisory_lock_heartbeat] unless rails_config[:advisory_lock_heartbeat].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ADVISORY_LOCK_HEARTBEAT']) unless env['GOOD_JOB_ADVISORY_LOCK_HEARTBEAT'].nil?
+
+      Rails.env.development?
     end
 
     private

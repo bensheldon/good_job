@@ -7,6 +7,7 @@ require_relative "good_job/version"
 require_relative "good_job/engine"
 
 require_relative "good_job/adapter"
+require_relative "good_job/adapter/inline_buffer"
 require_relative "active_job/queue_adapters/good_job_adapter"
 require_relative "good_job/active_job_extensions/batches"
 require_relative "good_job/active_job_extensions/concurrency"
@@ -171,10 +172,10 @@ module GoodJob
     _shutdown_all(Capsule.instances, :restart, timeout: timeout)
   end
 
-  # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager})
+  # Sends +#shutdown+ or +#restart+ to executable objects ({GoodJob::Notifier}, {GoodJob::Poller}, {GoodJob::Scheduler}, {GoodJob::MultiScheduler}, {GoodJob::CronManager}, {GoodJob::SharedExecutor})
   # @param executables [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager, SharedExecutor>] Objects to shut down.
-  # @param method_name [:symbol] Method to call, e.g. +:shutdown+ or +:restart+.
-  # @param timeout [nil,Numeric]
+  # @param method_name [Symbol] Method to call, e.g. +:shutdown+ or +:restart+.
+  # @param timeout [nil, Numeric] Seconds to wait for actively executing jobs to finish.
   # @param after [Array<Notifier, Poller, Scheduler, MultiScheduler, CronManager, SharedExecutor>] Objects to shut down after initial executables shut down.
   # @return [void]
   def self._shutdown_all(executables, method_name = :shutdown, timeout: -1, after: [])
@@ -203,16 +204,16 @@ module GoodJob
   # If you are preserving job records this way, use this method regularly to
   # destroy old records and preserve space in your database.
   # @param older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
+  # @param include_discarded [Boolean] Whether or not to destroy discarded jobs (default: per +cleanup_discarded_jobs+ config option)
   # @return [Integer] Number of job execution records and batches that were destroyed.
-  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000)
+  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000, include_discarded: GoodJob.configuration.cleanup_discarded_jobs?)
     older_than ||= GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
-    include_discarded = GoodJob.configuration.cleanup_discarded_jobs?
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
       deleted_jobs_count = 0
       deleted_batches_count = 0
-      deleted_discrete_executions_count = 0
+      deleted_executions_count = 0
 
       jobs_query = GoodJob::Job.finished_before(timestamp).order(finished_at: :asc).limit(in_batches_of)
       jobs_query = jobs_query.succeeded unless include_discarded
@@ -220,8 +221,8 @@ module GoodJob
         active_job_ids = jobs_query.pluck(:active_job_id)
         break if active_job_ids.empty?
 
-        deleted_discrete_executions = GoodJob::DiscreteExecution.where(active_job_id: active_job_ids).delete_all
-        deleted_discrete_executions_count += deleted_discrete_executions
+        deleted_executions = GoodJob::Execution.where(active_job_id: active_job_ids).delete_all
+        deleted_executions_count += deleted_executions
 
         deleted_jobs = GoodJob::Job.where(active_job_id: active_job_ids).delete_all
         deleted_jobs_count += deleted_jobs
@@ -237,10 +238,10 @@ module GoodJob
       end
 
       payload[:destroyed_batches_count] = deleted_batches_count
-      payload[:destroyed_discrete_executions_count] = deleted_discrete_executions_count
+      payload[:destroyed_executions_count] = deleted_executions_count
       payload[:destroyed_jobs_count] = deleted_jobs_count
 
-      destroyed_records_count = deleted_batches_count + deleted_discrete_executions_count + deleted_jobs_count
+      destroyed_records_count = deleted_batches_count + deleted_executions_count + deleted_jobs_count
       payload[:destroyed_records_count] = destroyed_records_count
 
       destroyed_records_count
@@ -290,7 +291,45 @@ module GoodJob
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    true
+    GoodJob::Job.concurrency_key_created_at_index_migrated?
+  end
+
+  # Pause job execution for a given queue or job class.
+  # @param queue [String, nil] Queue name to pause
+  # @param job_class [String, nil] Job class name to pause
+  # @return [void]
+  def self.pause(queue: nil, job_class: nil)
+    GoodJob::Setting.pause(queue: queue, job_class: job_class)
+  end
+
+  # Unpause job execution for a given queue or job class.
+  # @param queue [String, nil] Queue name to unpause
+  # @param job_class [String, nil] Job class name to unpause
+  # @param label [String, nil] Label to unpause
+  # @return [void]
+  def self.unpause(queue: nil, job_class: nil, label: nil)
+    GoodJob::Setting.unpause(queue: queue, job_class: job_class, label: label)
+  end
+
+  # Check if job execution is paused for a given queue or job class.
+  # @param queue [String, nil] Queue name to check
+  # @param job_class [String, nil] Job class name to check
+  # @param label [String, nil] Label to check
+  # @return [Boolean]
+  def self.paused?(queue: nil, job_class: nil, label: nil)
+    GoodJob::Setting.paused?(queue: queue, job_class: job_class, label: label)
+  end
+
+  # Get a list of all paused queues and job classes
+  # @return [Hash] Hash with :queues, :job_classes, :labels arrays of paused items
+  def self.paused(type = nil)
+    GoodJob::Setting.paused(type)
+  end
+
+  # Whether this process was initialized via the GoodJob executable (`$ good_job`)
+  # @return [Boolean]
+  def self.cli?
+    GoodJob::CLI.within_exe?
   end
 end
 

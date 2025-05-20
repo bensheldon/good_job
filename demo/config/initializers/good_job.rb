@@ -1,4 +1,5 @@
 Rails.application.configure do
+  config.good_job.enable_pauses = true
   config.good_job.cron = {
     example: {
       cron: '*/5 * * * * *', # every 5 seconds
@@ -6,6 +7,12 @@ Rails.application.configure do
       description: "Enqueue ExampleJob every 5 seconds",
     },
   }
+end
+
+Rails.configuration.after_initialize do
+  # TODO: It should not be necessary to manually initialize Active Record base
+  #   This seemed to be introduced when PG Hero was added.
+  ActiveJob::Base
 end
 
 case Rails.env
@@ -79,6 +86,11 @@ when 'demo'
       complex_schedule: {
         cron: -> (last_ran) { last_ran ? last_ran + 17.hours : Time.now},
         class: "OtherJob",
+      },
+      pg_hero_maintenance: {
+        cron: "*/10 * * * *", # Every 10 minutes
+        class: "PgHeroMaintenanceJob",
+        description: "Runs PG Hero maintenance",
       }
     }
   end

@@ -9,9 +9,12 @@ es:
       reschedule: Reprogramar
       retry: Reintentar
     batches:
+      actions:
+        confirm_retry: "¿Estás seguro que querés reintentar este lote?"
+        retry: Reintentar
       index:
-        older_batches: Batches anteriores
-        title: Batches
+        older_batches: Lotes anteriores
+        title: Lotes
       jobs:
         actions:
           confirm_destroy: "¿Estás seguro que querés eliminar esta tarea?"
@@ -24,12 +27,28 @@ es:
           retry: Reintentar tarea
           title: Acciones
         no_jobs_found: No hay tareas.
+      retry:
+        notice: El lote ha sido reintentado
       show:
         attributes: Atributos
-        batched_jobs: Batched Jobs
+        batched_jobs: Tareas en lote
         callback_jobs: Callback Jobs
       table:
-        no_batches_found: No hay batches.
+        no_batches_found: No hay lotes.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: "¿Estás seguro que querés deshabilitar esta tarea programada?"
@@ -109,12 +128,12 @@ es:
       actions:
         confirm_destroy: "¿Estás seguro que querés eliminar esta tarea?"
         confirm_discard: "¿Estás seguro que querés descartar esta tarea?"
-        confirm_force_discard: "¿Está seguro de que desea forzar el descarte de este trabajo? El trabajo se marcará como descartado, pero el trabajo en ejecución no se detendrá; sin embargo, no se volverá a intentar en caso de falla.\n"
+        confirm_force_discard: "¿Está seguro de que desea forzar el descarte de esta tarea? La tarea se marcará como descartada, pero la tarea en ejecución no se detendrá; sin embargo, no se volverá a intentar en caso de falla.\n"
         confirm_reschedule: "¿Estás seguro que querés reprogramar esta tarea?"
         confirm_retry: "¿Estás seguro que querés reintentar esta tarea?"
         destroy: Eliminar tarea
         discard: Descartar tarea
-        force_discard: Forzar el descarte del trabajo
+        force_discard: Forzar el descarte de la tarea
         reschedule: Reprogramar tarea
         retry: Reiuntentar tarea
       destroy:
@@ -122,13 +141,13 @@ es:
       discard:
         notice: La tarea ha sido descartada
       executions:
-        application_trace: Application Trace
-        full_trace: Full Trace
+        application_trace: Traza de la aplicación
+        full_trace: Traza completa
         in_queue: en cola
         runtime: en ejecución
         title: Ejecuciones
       force_discard:
-        notice: Job ha sido descartado a la fuerza. Continuará ejecutándose pero no se volverá a intentar en caso de fallas.
+        notice: La tarea ha sido descartada a la fuerza. Continuará ejecutándose pero no se volverá a intentar en caso de fallas.
       index:
         job_pagination: Paginación de tareas
         older_jobs: Tareas anteriores
@@ -175,6 +194,7 @@ es:
       job:
         arguments: Argumentos
         attempts: Intentos
+        labels: Etiquetas
         priority: Prioridad
         queue: Cola
     number:
@@ -194,14 +214,32 @@ es:
             thousand: k
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: "¿Está seguro de que desea pausar %{value}?"
+        confirm_unpause: "¿Está seguro de que desea reanudar %{value}?"
+        disabled: La función experimental de Pausas de GoodJob está desactivada por defecto porque puede degradar el rendimiento. Configure para habilitar
+        job_class: Clase de trabajo
+        label: Etiqueta
+        pause: Pausar
+        queue: Cola
+        title: Pausas
+        type: Tipo de Pausa
+        unpause: Reanudar
+        value: Valor
     performance:
       index:
         average_duration: Duración promedio
+        chart_title: Tiempo total de ejecución del trabajo en segundos
         executions: Ejecuciones
-        job_class: clase de trabajo
+        job_class: Clase de trabajo
         maximum_duration: Duración máxima
         minimum_duration: Duración mínima
-        title: Actuación
+        queue_name: Nombre de la cola
+        title: Rendimiento
+      show:
+        slow: Lento
+        title: Rendimiento
     processes:
       index:
         cron_enabled: Cron habilitado
@@ -226,12 +264,14 @@ es:
         queue_name: Nombre de la cola
         search: Buscar
       navbar:
-        batches: Batches
+        batches: Lotes
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Tareas
         live_poll: En vivo
         name: "GoodJob 👍"
-        performance: Actuación
+        pauses: Pausas
+        performance: Rendimiento
         processes: Procesos
         theme:
           auto: Auto

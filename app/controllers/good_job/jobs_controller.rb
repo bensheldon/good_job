@@ -61,7 +61,7 @@ module GoodJob
     end
 
     def show
-      @job = Job.includes_advisory_locks.find(params[:id])
+      @job = Job.includes(:executions).includes_advisory_locks.find(params[:id])
     end
 
     def discard
@@ -92,6 +92,12 @@ module GoodJob
       @job = Job.find(params[:id])
       @job.destroy_job
       redirect_to jobs_path, notice: t(".notice")
+    end
+
+    def redirect_to_index
+      # Redirect to the jobs page, maintaining query parameters. This is
+      # necessary to support the `?poll=1` parameter that enables live polling.
+      redirect_to jobs_path(request.query_parameters)
     end
 
     private

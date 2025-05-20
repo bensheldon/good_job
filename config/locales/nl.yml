@@ -9,6 +9,9 @@ nl:
       reschedule: Opnieuw plannen
       retry: Opnieuw proberen
     batches:
+      actions:
+        confirm_retry: Weet je zeker dat je deze batch opnieuw wilt proberen?
+        retry: Batch opnieuw proberen
       index:
         older_batches: Oudere partijen
         title: Partijen
@@ -24,12 +27,28 @@ nl:
           retry: Taak opnieuw
           title: Acties
         no_jobs_found: Geen vacatures gevonden.
+      retry:
+        notice: Batch is opnieuw geprobeerd
       show:
         attributes: attributen
         batched_jobs: Gegroepeerde banen
         callback_jobs: Terugbelopdrachten
       table:
         no_batches_found: Geen batches gevonden.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Weet u zekerf dat u deze cron-vermelding wilt uitschakelen?
@@ -175,6 +194,7 @@ nl:
       job:
         arguments: Argumenten
         attempts: Pogingen
+        labels: Labels
         priority: Prioriteit
         queue: Wachtrij
     number:
@@ -194,14 +214,32 @@ nl:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Weet u zeker dat u %{value} wilt pauzeren?
+        confirm_unpause: Weet u zeker dat u %{value} wilt hervatten?
+        disabled: De experimentele Pauzes-functie van GoodJob is standaard uitgeschakeld omdat het de prestaties kan verminderen. Configureer om in te schakelen
+        job_class: Taakklasse
+        label: Label
+        pause: Pauzeren
+        queue: Wachtrij
+        title: Pauzes
+        type: Pauze Type
+        unpause: Hervatten
+        value: Waarde
     performance:
       index:
         average_duration: Gemiddelde duur
-        executions: Executies
-        job_class: Functie klasse
+        chart_title: Totale uitvoeringstijd in seconden
+        executions: Uitvoeringen
+        job_class: Taakklasse
         maximum_duration: Maximale duur
         minimum_duration: Minimale duur
-        title: Prestatie
+        queue_name: Wachtrijnaam
+        title: Prestaties
+      show:
+        slow: Traag
+        title: Prestaties
     processes:
       index:
         cron_enabled: Cron ingeschakeld
@@ -227,10 +265,12 @@ nl:
         search: Zoekopdracht
       navbar:
         batches: Batches
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Taken
         live_poll: Live Poll
         name: "GoodJob 👍"
+        pauses: Pauzes
         performance: Prestatie
         processes: Processen
         theme:

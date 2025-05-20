@@ -1,5 +1,7 @@
 require_relative 'boot'
 
+require 'logger' # Before rails: https://github.com/rails/rails/pull/54264
+
 require 'rails/all'
 require "good_job"
 require "good_job/engine"

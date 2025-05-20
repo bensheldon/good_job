@@ -9,6 +9,9 @@ en:
       reschedule: Reschedule
       retry: Retry
     batches:
+      actions:
+        confirm_retry: Are you sure you want to retry this batch?
+        retry: Retry
       index:
         older_batches: Older batches
         title: Batches
@@ -24,12 +27,28 @@ en:
           retry: Retry Job
           title: Actions
         no_jobs_found: No jobs found.
+      retry:
+        notice: Batch has been retried
       show:
         attributes: Attributes
         batched_jobs: Batched Jobs
         callback_jobs: Callback Jobs
       table:
         no_batches_found: No batches found.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Are you sure you want to disable this cron entry?
@@ -108,7 +127,7 @@ en:
     jobs:
       actions:
         confirm_destroy: Are you sure you want to destroy the job?
-        confirm_discard: Are you usure you want to discard the job?
+        confirm_discard: Are you sure you want to discard the job?
         confirm_force_discard: Are you sure you want to force discard this job? The job will be marked as discarded but the running job will not be stopped - it will, however, not be retried on failures.
         confirm_reschedule: Are you sure you want to reschedule the job?
         confirm_retry: Are you sure you want to retry the job?
@@ -144,7 +163,7 @@ en:
             one: Apply to all 1 job.
             other: Apply to all %{count} jobs.
           confirm_destroy_all: Are you sure you want to destroy the selected jobs?
-          confirm_discard_all: Are you usure you want to discard the selected jobs?
+          confirm_discard_all: Are you sure you want to discard the selected jobs?
           confirm_reschedule_all: Are you sure you want to reschedule the selected jobs?
           confirm_retry_all: Are you sure you want to retry the selected jobs?
           destroy_all: Destroy all
@@ -175,6 +194,7 @@ en:
       job:
         arguments: Arguments
         attempts: Attempts
+        labels: Labels
         priority: Priority
         queue: Queue
     number:
@@ -194,13 +214,31 @@ en:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Are you sure you want to pause %{value}?
+        confirm_unpause: Are you sure you want to resume %{value}?
+        disabled: GoodJob's experimental Pauses feature is disabled by default because it may degrade performance. Configure to enable
+        job_class: Job Class
+        label: Label
+        pause: Pause
+        queue: Queue
+        title: Pauses
+        type: Pause Type
+        unpause: Resume
+        value: Value
     performance:
       index:
         average_duration: Average duration
+        chart_title: Total job execution time in seconds
         executions: Executions
         job_class: Job class
         maximum_duration: Maximum duration
         minimum_duration: Minimum duration
+        queue_name: Queue name
+        title: Performance
+      show:
+        slow: Slow
         title: Performance
     processes:
       index:
@@ -227,10 +265,12 @@ en:
         search: Search
       navbar:
         batches: Batches
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
+        pauses: Pauses
         performance: Performance
         processes: Processes
         theme:

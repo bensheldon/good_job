@@ -12,21 +12,43 @@ module GoodJob # :nodoc:
     STALE_INTERVAL = 30.seconds
     # Interval until the process record is treated as expired
     EXPIRED_INTERVAL = 5.minutes
+    PROCESS_MEMORY = case RUBY_PLATFORM
+                     when /linux/
+                       lambda do |pid|
+                         File.readlines("/proc/#{pid}/smaps_rollup").each do |line|
+                           next unless line.start_with?('Pss:')
+
+                           break line.split[1].to_i
+                         end
+                       rescue Errno::ENOENT
+                         File.readlines("/proc/#{pid}/status").each do |line|
+                           next unless line.start_with?('VmRSS:')
+
+                           break line.split[1].to_i
+                         end
+                       end
+                     when /darwin|bsd/
+                       lambda do |pid|
+                         `ps -o pid,rss -p #{pid.to_i}`.lines.last.split.last.to_i
+                       end
+                     else
+                       ->(_pid) { 0 }
+                     end
 
     self.table_name = 'good_job_processes'
     self.implicit_order_column = 'created_at'
-    LOCK_TYPES = [
-      LOCK_TYPE_ADVISORY = 'advisory',
-    ].freeze
 
-    LOCK_TYPE_ENUMS = {
-      LOCK_TYPE_ADVISORY => 1,
-    }.freeze
-
-    self.table_name = 'good_job_processes'
+    lock_type_enum = {
+      advisory: 0,
+    }
+    if Gem::Version.new(Rails.version) >= Gem::Version.new('7.1.0.a')
+      enum :lock_type, lock_type_enum, validate: { allow_nil: true }, scopes: false
+    else
+      enum lock_type: lock_type_enum, _scopes: false
+    end
 
     has_many :locked_jobs, class_name: "GoodJob::Job", foreign_key: :locked_by_id, inverse_of: :locked_by_process, dependent: nil
-    after_destroy { locked_jobs.update_all(locked_by_id: nil) if GoodJob::Job.columns_hash.key?("locked_by_id") } # rubocop:disable Rails/SkipsModelValidations
+    after_destroy { locked_jobs.update_all(locked_by_id: nil) } # rubocop:disable Rails/SkipsModelValidations
 
     # Processes that are active and locked.
     # @!method active
@@ -34,7 +56,7 @@ module GoodJob # :nodoc:
     # @return [ActiveRecord::Relation]
     scope :active, (lambda do
       query = joins_advisory_locks
-      query.where(lock_type: LOCK_TYPE_ENUMS[LOCK_TYPE_ADVISORY]).advisory_locked
+      query.where(lock_type: :advisory).advisory_locked
         .or(query.where(lock_type: nil).where(arel_table[:updated_at].gt(EXPIRED_INTERVAL.ago)))
     end)
 
@@ -44,34 +66,53 @@ module GoodJob # :nodoc:
     # @return [ActiveRecord::Relation]
     scope :inactive, (lambda do
       query = joins_advisory_locks
-      query.where(lock_type: LOCK_TYPE_ENUMS[LOCK_TYPE_ADVISORY]).advisory_unlocked
+      query.where(lock_type: :advisory).advisory_unlocked
         .or(query.where(lock_type: nil).where(arel_table[:updated_at].lt(EXPIRED_INTERVAL.ago)))
     end)
 
     # Deletes all inactive process records.
     def self.cleanup
       inactive.find_each do |process|
-        GoodJob::Job.where(locked_by_id: process.id).update_all(locked_by_id: nil, locked_at: nil) if GoodJob::Job.columns_hash.key?("locked_by_id") # rubocop:disable Rails/SkipsModelValidations
+        GoodJob::Job.where(locked_by_id: process.id).update_all(locked_by_id: nil, locked_at: nil) # rubocop:disable Rails/SkipsModelValidations
         process.delete
       end
     end
 
-    def self.create_record(id:, with_advisory_lock: false)
+    # @return [Integer]
+    def self.memory_usage(pid)
+      PROCESS_MEMORY.call(pid)
+    rescue StandardError
+      0
+    end
+
+    def self.find_or_create_record(id:, with_advisory_lock: false)
       attributes = {
         id: id,
         state: process_state,
       }
       if with_advisory_lock
         attributes[:create_with_advisory_lock] = true
-        attributes[:lock_type] = LOCK_TYPE_ADVISORY
+        attributes[:lock_type] = :advisory
       end
       create!(attributes)
+    rescue ActiveRecord::RecordNotUnique
+      find_by(id: id).tap do |existing_record|
+        next unless existing_record
+
+        if with_advisory_lock
+          existing_record.advisory_lock!
+          existing_record.update(lock_type: :advisory, state: process_state, updated_at: Time.current)
+        else
+          existing_record.update(lock_type: nil, state: process_state, updated_at: Time.current)
+        end
+      end
     end
 
     def self.process_state
       {
         hostname: Socket.gethostname,
         pid: ::Process.pid,
+        memory: memory_usage(::Process.pid),
         proctitle: $PROGRAM_NAME,
         preserve_job_records: GoodJob.preserve_job_records,
         retry_on_unhandled_error: GoodJob.retry_on_unhandled_error,
@@ -87,8 +128,8 @@ module GoodJob # :nodoc:
     end
 
     def refresh
-      self.state = self.class.process_state
       reload # verify the record still exists in the database
+      self.state = self.class.process_state
       update(state: state, updated_at: Time.current)
     rescue ActiveRecord::RecordNotFound
       @new_record = true
@@ -123,22 +164,6 @@ module GoodJob # :nodoc:
 
     def schedulers
       state.fetch("schedulers", [])
-    end
-
-    def lock_type
-      return unless self.class.columns_hash['lock_type']
-
-      enum = super
-      LOCK_TYPE_ENUMS.key(enum) if enum
-    end
-
-    def lock_type=(value)
-      return unless self.class.columns_hash['lock_type']
-
-      enum = LOCK_TYPE_ENUMS[value]
-      raise(ArgumentError, "Invalid error_event: #{value}") if value && !enum
-
-      super(enum)
     end
   end
 end

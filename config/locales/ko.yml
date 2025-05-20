@@ -9,6 +9,9 @@ ko:
       reschedule: 재예약하기
       retry: 다시 시도하기
     batches:
+      actions:
+        confirm_retry: 이 배치를 다시 시도하시겠습니까?
+        retry: 배치 다시 시도
       index:
         older_batches: 더 오래된 배치
         title: 배치
@@ -24,12 +27,28 @@ ko:
           retry: 작업 다시 시도
           title: 작업 액션
         no_jobs_found: 작업이 없습니다.
+      retry:
+        notice: 배치가 다시 시도되었습니다.
       show:
         attributes: 속성
         batched_jobs: 배치된 작업
         callback_jobs: 콜백 작업
       table:
         no_batches_found: 배치를 찾을 수 없습니다.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: 이 cron 엔트리를 비활성화하시겠습니까?
@@ -122,8 +141,8 @@ ko:
       discard:
         notice: 작업이 폐기되었습니다.
       executions:
-        application_trace: Application Trace
-        full_trace: Full Trace
+        application_trace: 애플리케이션 추적
+        full_trace: 전체 추적
         in_queue: 대기 중
         runtime: 실행 시간
         title: 실행
@@ -175,6 +194,7 @@ ko:
       job:
         arguments: 인수
         attempts: 시도 횟수
+        labels: 레이블
         priority: 우선순위
         queue: 큐
     number:
@@ -194,13 +214,31 @@ ko:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: "%{value}를 일시 중지하시겠습니까?"
+        confirm_unpause: "%{value}를 재개하시겠습니까?"
+        disabled: GoodJob의 실험적인 일시 중지 기능은 성능이 저하될 수 있으므로 기본적으로 비활성화되어 있습니다. 활성화하려면 구성하세요
+        job_class: 작업 클래스
+        label: 라벨
+        pause: 일시 중지
+        queue: 대기열
+        title: 일시 중지
+        type: 중지 유형
+        unpause: 재개
+        value: 값
     performance:
       index:
-        average_duration: 평균 지속 시간
-        executions: 처형
-        job_class: 직업군
-        maximum_duration: 최대 기간
-        minimum_duration: 최소 기간
+        average_duration: 평균 소요 시간
+        chart_title: 총 실행 시간(초)
+        executions: 실행 횟수
+        job_class: 작업 클래스
+        maximum_duration: 최대 소요 시간
+        minimum_duration: 최소 소요 시간
+        queue_name: 큐 이름
+        title: 성능
+      show:
+        slow: 느림
         title: 성능
     processes:
       index:
@@ -227,10 +265,12 @@ ko:
         search: 검색
       navbar:
         batches: 배치
+        cleaner: Discard Cleaner
         cron_schedules: Cron
         jobs: 작업
         live_poll: 실시간 업데이트
         name: "GoodJob 👍"
+        pauses: 일시 중지
         performance: 성능
         processes: 프로세스
         theme:

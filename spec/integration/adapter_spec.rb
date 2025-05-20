@@ -149,6 +149,37 @@ RSpec.describe 'Adapter Integration' do
       expect(PERFORMED.size).to eq 3
     end
 
+    describe 'autoloading error' do
+      around do |example|
+        File.write("autoload_error.rb", <<~RUBY)
+          module AutoloadModule
+            class Error
+              gem "missing"
+            end
+          end
+        RUBY
+        example.call
+      ensure
+        FileUtils.rm_f("autoload_error.rb")
+      end
+
+      before do
+        stub_const "AutoloadModule", Module.new
+        AutoloadModule.autoload :Error, "./autoload_error"
+        stub_const "TestJob", (Class.new(ActiveJob::Base) do
+          def perform
+            AutoloadModule::Error
+          end
+        end)
+      end
+
+      it 'raises the correct error' do
+        expect do
+          TestJob.perform_later
+        end.to raise_error(Gem::LoadError, /is not part of the bundle/)
+      end
+    end
+
     describe 'immediate retries' do
       before do
         stub_const "TestJob", (Class.new(ActiveJob::Base) do
@@ -167,7 +198,7 @@ RSpec.describe 'Adapter Integration' do
         job = GoodJob::Job.first
 
         expect(job.status).to eq :succeeded
-        expect(job.discrete_executions.count).to eq 3
+        expect(job.executions.count).to eq 3
       end
 
       it 'retries immediately when bulk enqueued' do

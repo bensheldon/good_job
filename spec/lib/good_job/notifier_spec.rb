@@ -69,6 +69,7 @@ RSpec.describe GoodJob::Notifier do
 
       expect(notifier.connected?(timeout: 5)).to be true
       expect(notifier.listening?(timeout: 1)).to be false
+
       sleep 1
       notifier.shutdown
 
@@ -85,6 +86,7 @@ RSpec.describe GoodJob::Notifier do
         expect(notifier).to be_listening(timeout: 2)
         described_class.notify(true)
 
+        wait_until { expect(GoodJob.capsule.tracker.id_for_lock).to be_present }
         wait_until(max: 5) { expect(refreshes.value).to be > 0 }
 
         notifier.shutdown
@@ -131,6 +133,20 @@ RSpec.describe GoodJob::Notifier do
 
       described_class.notify(true)
       wait_until { expect(on_thread_error).to have_received(:call).at_least(:once).with instance_of(ExpectedError) }
+
+      notifier.shutdown
+    end
+
+    it 'executes a noop SQL query every 10 seconds to keep the connection alive' do
+      stub_const("GoodJob::Notifier::KEEPALIVE_INTERVAL", 0.1)
+      stub_const("GoodJob::Notifier::WAIT_INTERVAL", 0.1)
+
+      notifier = described_class.new(enable_listening: true)
+      original_keepalive = notifier.instance_variable_get(:@last_keepalive_time)
+
+      expect(notifier).to be_listening(timeout: 2)
+      sleep 0.2
+      expect(notifier.instance_variable_get(:@last_keepalive_time)).to be > original_keepalive
 
       notifier.shutdown
     end
@@ -181,14 +197,34 @@ RSpec.describe GoodJob::Notifier do
     it 'creates and destroys a new Process record' do
       notifier = described_class.new(enable_listening: true)
 
-      wait_until { expect(GoodJob::Process.count).to eq 1 }
+      wait_until { expect(GoodJob.capsule.tracker.locks).to eq 1 }
 
+      # Process record won't be created until the first lock is acquired when not advisory locked
+      id_for_lock = GoodJob.capsule.tracker.id_for_lock
       process = GoodJob::Process.first
-      expect(process.id).to eq GoodJob.capsule.tracker.id_for_lock
-      expect(process).to be_advisory_locked
+      expect(process.id).to eq id_for_lock
+      expect(process).not_to be_advisory_locked
 
       notifier.shutdown
       expect { process.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
+
+    context 'when advisory_lock_heartbeat is true' do
+      before do
+        allow(GoodJob.configuration).to receive(:advisory_lock_heartbeat).and_return(true)
+      end
+
+      it 'takes an advisory lock on the process record' do
+        notifier = described_class.new(enable_listening: true)
+
+        wait_until { expect(GoodJob::Process.count).to eq 1 }
+
+        process = GoodJob::Process.first
+        expect(process.id).to eq GoodJob.capsule.tracker.id_for_lock
+
+        notifier.shutdown
+        expect { process.reload }.to raise_error ActiveRecord::RecordNotFound
+      end
     end
   end
 end

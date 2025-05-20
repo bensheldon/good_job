@@ -5,6 +5,7 @@
         <div class="col-4"><%= t("good_job.models.batch.jobs") %></div>
           <div class="d-none d-lg-block col-lg-1 text-lg-center"><%= t "good_job.models.job.queue" %></div>
           <div class="d-none d-lg-block col-lg-1 text-lg-end"><%= t "good_job.models.job.priority" %></div>
+          <div class="d-none d-lg-block col-lg-1 text-lg-end"><%= t "good_job.models.job.labels" %></div>
           <div class="d-none d-lg-block col-lg-1 text-lg-end"><%= t "good_job.models.job.attempts" %></div>
           <div class="col text-end">
             <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
@@ -30,22 +31,29 @@
                 <span class="badge bg-primary text-dark font-monospace"><%= job.queue_name %></span>
               </div>
               <div class="col-4 col-lg-1 text-lg-end">
-                <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.priority" %>Priority</div>
+                <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.priority" %></div>
                 <span class="font-monospace fw-bold"><%= job.priority %></span>
               </div>
               <div class="col-4 col-lg-1 text-lg-end">
+                <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.labels" %></div>
+                <% job.labels&.each do |label| %>
+                  <span class="badge rounded-pill bg-secondary font-monospace"><%= label %></span>
+                <% end %>
+              </div>
+              <div class="col-4 col-lg-1 text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.attempts" %></div>
-                <% if job.executions_count > 0 && job.status != :finished %>
+                <% if job.error %>
                   <%= tag.span job.executions_count, class: "badge rounded-pill bg-danger",
                     data: {
                       bs_toggle: "popover",
                       bs_trigger: "hover focus click",
                       bs_placement: "bottom",
-                      bs_content: job.recent_error,
+                      bs_content: job.display_error,
                     }
                   %>
                 <% else %>
-                  <span class="badge bg-secondary rounded-pill"><%= job.executions_count %></span>
+                  <% executions_badge_color = job.executions_count > 1 ? "bg-warning" : "bg-secondary" %>
+                  <span class="badge rounded-pill <%= executions_badge_color %>"><%= job.executions_count %></span>
                 <% end %>
               </div>
               <div class="mt-3 mt-lg-0 col d-flex gap-3 align-items-center justify-content-end">
@@ -79,7 +87,7 @@
                       <% end %>
                     </li>
                     <li>
-                      <%= link_to job_path(job.id), method: :delete, class: "dropdown-item #{'disabled' unless job.status.in? [:discarded, :finished]}", title: t(".actions.destroy"), data: { confirm: t(".actions.confirm_destroy"), disable: true } do %>
+                      <%= link_to job_path(job.id), method: :delete, class: "dropdown-item #{'disabled' unless job.finished?}", title: t(".actions.destroy"), data: { confirm: t(".actions.confirm_destroy"), disable: true } do %>
                         <%= render_icon "trash" %>
                         <%= t "good_job.actions.destroy" %>
                       <% end %>

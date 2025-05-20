@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+
+require 'logger' # Before rails: https://github.com/rails/rails/pull/54264
+
 APP_PATH = File.expand_path('../config/application', __dir__)
 require_relative '../config/boot'
 require 'rails/commands'

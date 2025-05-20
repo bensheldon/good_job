@@ -88,7 +88,7 @@ RSpec.describe GoodJob::Adapter do
         allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
         allow(GoodJob::Notifier).to receive(:notify)
 
-        capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil)
+        capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil, "lower_thread_priority=": nil)
         allow(GoodJob).to receive(:capsule).and_return(capsule)
         allow(capsule).to receive(:start)
 
@@ -98,6 +98,16 @@ RSpec.describe GoodJob::Adapter do
         expect(capsule).to have_received(:start)
         expect(capsule).to have_received(:create_thread)
         expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: 'default' })
+      end
+
+      it 'lowers the thread priority of the capsule' do
+        capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil, "lower_thread_priority=": nil)
+        allow(GoodJob).to receive(:capsule).and_return(capsule)
+        allow(capsule).to receive(:start)
+
+        described_class.new(execution_mode: :async_all)
+
+        expect(capsule).to have_received(:lower_thread_priority=).with(true)
       end
     end
   end
@@ -155,6 +165,11 @@ RSpec.describe GoodJob::Adapter do
         priority: -55,
         scheduled_at: be_within(1).of(10.minutes.from_now)
       )
+      expect(GoodJob::Notifier).to have_received(:notify).with({
+                                                                 queue_name: 'elephant',
+                                                                 count: 1,
+                                                                 scheduled_at: within(1).of(10.minutes.from_now),
+                                                               })
     end
 
     it 'sets default values' do
@@ -166,6 +181,12 @@ RSpec.describe GoodJob::Adapter do
         priority: 0,
         scheduled_at: be_within(1.second).of(Time.current)
       )
+
+      expect(GoodJob::Notifier).to have_received(:notify).with({
+                                                                 queue_name: 'default',
+                                                                 count: 1,
+                                                                 scheduled_at: within(1).of(Time.current),
+                                                               })
     end
 
     context 'when a job fails to enqueue' do
@@ -200,9 +221,9 @@ RSpec.describe GoodJob::Adapter do
     context 'when the adapter is inline' do
       let(:adapter) { described_class.new(execution_mode: :inline) }
 
-      it 'executes the jobs immediately' do
+      before do
         stub_const 'PERFORMED', []
-        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+        stub_const 'SuccessJob', (Class.new(ActiveJob::Base) do
           def perform
             raise "Not advisory locked" unless GoodJob::Job.find(provider_job_id).advisory_locked?
 
@@ -210,10 +231,42 @@ RSpec.describe GoodJob::Adapter do
           end
         end)
 
-        active_jobs = [TestJob.new, TestJob.new]
+        stub_const 'ErrorJob', (Class.new(ActiveJob::Base) do
+          def perform
+            raise "Not advisory locked" unless GoodJob::Job.find(provider_job_id).advisory_locked?
+
+            PERFORMED << Time.current
+            raise TestJob::Error, "Error"
+          end
+        end)
+        stub_const 'TestJob::Error', Class.new(StandardError)
+      end
+
+      it 'executes the jobs immediately' do
+        active_jobs = [SuccessJob.new, SuccessJob.new]
         result = adapter.enqueue_all(active_jobs)
         expect(result).to eq 2
         expect(PERFORMED.size).to eq 2
+      end
+
+      it 'raises an exception when the job errors' do
+        active_jobs = [ErrorJob.new, SuccessJob.new]
+        expect do
+          adapter.enqueue_all(active_jobs)
+        end.to raise_error(TestJob::Error)
+
+        expect(PERFORMED.size).to eq 1
+      end
+
+      it 'does not execute future scheduled jobs' do
+        allow(GoodJob::Notifier).to receive(:notify)
+        scheduled_at = 1.minute.from_now
+        future_job = SuccessJob.new.tap { |job| job.scheduled_at = scheduled_at }
+
+        adapter.enqueue_all([SuccessJob.new, future_job])
+        expect(PERFORMED.size).to eq 1
+        expect(GoodJob::Notifier).to have_received(:notify).once
+        expect(GoodJob::Notifier).to have_received(:notify).with(queue_name: 'default', count: 1, scheduled_at: scheduled_at)
       end
     end
   end

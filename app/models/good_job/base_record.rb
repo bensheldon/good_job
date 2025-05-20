@@ -7,6 +7,7 @@ module GoodJob
   #   class BaseRecord < ActiveRecord::Base; end
   class BaseRecord < ActiveRecordParentClass
     self.abstract_class = true
+    self.strict_loading_by_default = false
 
     def self.migration_pending_warning!
       GoodJob.deprecator.warn(<<~DEPRECATION)

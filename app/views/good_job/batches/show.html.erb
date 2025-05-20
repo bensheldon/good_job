@@ -10,6 +10,14 @@
           <h2 class="h5 mt-2"><%= @batch.description %></h2>
         </nav>
       </div>
+      <div class="col text-end">
+        <% if @batch.discarded? %>
+          <%= button_to retry_batch_path(@batch), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.batches.actions.retry") }, title: t("good_job.batches.actions.retry"), data: { confirm: t("good_job.batches.actions.confirm_retry") } do %>
+            <%= render_icon "arrow_clockwise" %>
+            <%= t "good_job.actions.retry" %>
+          <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
 </div>

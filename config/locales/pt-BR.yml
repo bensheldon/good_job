@@ -9,6 +9,9 @@ pt-BR:
       reschedule: Reagendar
       retry: Tentar novamente
     batches:
+      actions:
+        confirm_retry: Tem certeza de que deseja tentar novamente este lote?
+        retry: Tentar novamente
       index:
         older_batches: Lotes antigos
         title: Lotes
@@ -24,12 +27,28 @@ pt-BR:
           retry: Tentar Tarefa Novamente
           title: Ações
         no_jobs_found: Nenhuma tarefa encontrada.
+      retry:
+        notice: O lote foi tentado novamente
       show:
         attributes: Atributos
         batched_jobs: Tarefas em Lote
         callback_jobs: Tarefas de Callback
       table:
         no_batches_found: Nenhum lote encontrado.
+    cleaner:
+      index:
+        all: All
+        class: Class
+        exception: Exception
+        grouped_by_class: Discards grouped by Class
+        grouped_by_exception: Discards grouped by Exception
+        last_1_hour: Last 1 hour
+        last_24_hours: Last 24 hours
+        last_3_days: Last 3 days
+        last_3_hours: Last 3 hours
+        last_7_days: Last 7 days
+        title: Discard Cleaner
+        total: Total
     cron_entries:
       actions:
         confirm_disable: Tem certeza de que deseja desativar esta tarefa programada?
@@ -175,6 +194,7 @@ pt-BR:
       job:
         arguments: Argumentos
         attempts: Tentativas
+        labels: Rótulos
         priority: Prioridade
         queue: Fila
     number:
@@ -194,13 +214,31 @@ pt-BR:
             thousand: K
             trillion: T
             unit: ''
+    pauses:
+      index:
+        confirm_pause: Tem certeza que deseja pausar %{value}?
+        confirm_unpause: Tem certeza que deseja retomar %{value}?
+        disabled: O recurso experimental de Pausas do GoodJob está desativado por padrão porque pode degradar o desempenho. Configure para ativar
+        job_class: Classe do trabalho
+        label: Rótulo
+        pause: Pausar
+        queue: Fila
+        title: Pausas
+        type: Tipo de Pausa
+        unpause: Retomar
+        value: Valor
     performance:
       index:
         average_duration: Duração média
+        chart_title: Tempo total de execução em segundos
         executions: Execuções
-        job_class: Classe de trabalho
+        job_class: Classe do trabalho
         maximum_duration: Duração máxima
         minimum_duration: Duração mínima
+        queue_name: Nome da fila
+        title: Desempenho
+      show:
+        slow: Lento
         title: Desempenho
     processes:
       index:
@@ -227,10 +265,12 @@ pt-BR:
         search: Pesquisar
       navbar:
         batches: Lotes
+        cleaner: Discard Cleaner
         cron_schedules: Agendamentos
         jobs: Tarefas
         live_poll: Acompanhamento ao Vivo
         name: "GoodJob 👍"
+        pauses: Pausas
         performance: Desempenho
         processes: Processos
         theme:

@@ -32,15 +32,7 @@ module GoodJob # :nodoc:
       @record = nil
       @refresh_task = nil
 
-      # AS::ForkTracker is only present on Rails v6.1+.
-      # Fall back to PID checking if ForkTracker is not available
-      if defined?(ActiveSupport::ForkTracker)
-        ActiveSupport::ForkTracker.after_fork { reset }
-        @forktracker = true
-      else
-        @ruby_pid = ::Process.pid
-        @forktracker = false
-      end
+      ActiveSupport::ForkTracker.after_fork { reset }
 
       self.class.instances << self
     end
@@ -53,11 +45,10 @@ module GoodJob # :nodoc:
       synchronize do
         next if @locks.zero?
 
-        reset_on_fork
         if @record
           @record.refresh_if_stale
         else
-          @record = GoodJob::Process.create_record(id: @record_id)
+          @record = GoodJob::Process.find_or_create_record(id: @record_id)
           create_refresh_task
         end
         value = @record&.id
@@ -84,12 +75,12 @@ module GoodJob # :nodoc:
             if !advisory_locked? || !advisory_locked_connection?
               @record.class.transaction do
                 @record.advisory_lock!
-                @record.update(lock_type: GoodJob::Process::LOCK_TYPE_ADVISORY)
+                @record.update(lock_type: :advisory)
               end
               @advisory_locked_connection = WeakRef.new(@record.class.connection)
             end
           else
-            @record = GoodJob::Process.create_record(id: @record_id, with_advisory_lock: true)
+            @record = GoodJob::Process.find_or_create_record(id: @record_id, with_advisory_lock: true)
             @advisory_locked_connection = WeakRef.new(@record.class.connection)
             create_refresh_task
           end
@@ -153,7 +144,7 @@ module GoodJob # :nodoc:
     # Tests whether an active advisory lock has been taken on the record.
     # @return [Boolean]
     def advisory_locked?
-      @advisory_locked_connection&.weakref_alive? && @advisory_locked_connection&.active?
+      @advisory_locked_connection&.weakref_alive? && @advisory_locked_connection.active?
     end
 
     # @!visibility private
@@ -202,14 +193,6 @@ module GoodJob # :nodoc:
 
     def reset
       synchronize { ns_reset }
-    end
-
-    def reset_on_fork
-      return if Concurrent.on_jruby?
-      return if @forktracker || ::Process.pid == @ruby_pid
-
-      @ruby_pid = ::Process.pid
-      ns_reset
     end
 
     def ns_reset

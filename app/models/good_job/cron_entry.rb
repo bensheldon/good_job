@@ -71,6 +71,19 @@ module GoodJob # :nodoc:
       end
     end
 
+    def within(period, previously_at: nil)
+      if cron_proc?
+        result = Rails.application.executor.wrap { cron.call(previously_at || last_job_at) }
+        if result.is_a?(String)
+          Fugit.parse(result).within(period).map(&:to_t)
+        else
+          result
+        end
+      else
+        fugit.within(period).map(&:to_t)
+      end
+    end
+
     def enabled?
       GoodJob::Setting.cron_key_enabled?(key, default: enabled_by_default?)
     end
@@ -88,13 +101,15 @@ module GoodJob # :nodoc:
         current_thread.cron_key = key
         current_thread.cron_at = cron_at
 
-        configured_job = job_class.constantize.set(set_value)
         I18n.with_locale(I18n.default_locale) do
+          job_klass = job_class_value
+          job_klass = job_klass.constantize if job_klass.is_a?(String)
+          next unless job_klass.is_a?(Class)
+
+          configured_job = job_klass.set(set_value)
           kwargs_value.present? ? configured_job.perform_later(*args_value, **kwargs_value) : configured_job.perform_later(*args_value)
         end
       end
-    rescue ActiveRecord::RecordNotUnique
-      false
     end
 
     def display_properties
@@ -105,6 +120,7 @@ module GoodJob # :nodoc:
         set: display_property(set),
         description: display_property(description),
       }.tap do |properties|
+        properties[:class] = display_property(job_class) if job_class.present?
         properties[:args] = display_property(args) if args.present?
         properties[:kwargs] = display_property(kwargs) if kwargs.present?
       end
@@ -145,6 +161,11 @@ module GoodJob # :nodoc:
 
     def fugit
       @_fugit ||= Fugit.parse(cron)
+    end
+
+    def job_class_value
+      value = job_class || nil
+      value.respond_to?(:call) ? value.call : value
     end
 
     def set_value
