@@ -524,7 +524,10 @@ module GoodJob
           current_thread.retry_now = true
 
           transaction do
-            new_active_job = active_job.retry_job(wait: 0, error: error)
+            # NOTE: Required until fixed in rails https://github.com/rails/rails/pull/52121
+            I18n.with_locale(active_job.locale) do
+              new_active_job = active_job.retry_job(wait: 0, error: error)
+            end
             self.error_event = :retried if error
             save!
           end

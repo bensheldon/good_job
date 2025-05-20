@@ -175,4 +175,25 @@ describe GoodJob::JobsController do
       end
     end
   end
+
+  describe 'PUT #retry_job' do
+    let!(:job) do
+      I18n.with_locale("es") do
+        ExampleJob.perform_later(ExampleJob::ERROR_ONCE_TYPE)
+      end
+      job = GoodJob::Job.first
+      job.discard_job("discard!")
+      job
+    end
+
+    it 'preserves the locale' do
+      I18n.with_locale("en") do
+        put good_job.retry_job_path(job.id)
+      end
+
+      executions = job.reload.executions
+      expect(executions[0].serialized_params["locale"]).to eq("es")
+      expect(executions[1].serialized_params["locale"]).to eq("es")
+    end
+  end
 end
