@@ -14,30 +14,8 @@ module GoodJob # :nodoc:
 
     alias_attribute :performed_at, :created_at
 
-    def self.error_event_migrated?
-      return true if columns_hash["error_event"].present?
-
-      migration_pending_warning!
-      false
-    end
-
-    def self.backtrace_migrated?
-      return true if columns_hash["error_backtrace"].present?
-
-      migration_pending_warning!
-      false
-    end
-
-    def self.duration_interval_migrated?
-      return true if columns_hash["duration"].present?
-
-      migration_pending_warning!
-      false
-    end
-
-    def self.duration_interval_usable?
-      duration_interval_migrated? && Gem::Version.new(Rails.version) >= Gem::Version.new('6.1.0.a')
-    end
+    # TODO: Remove when support for Rails 6.1 is dropped
+    attribute :duration, :interval if ActiveJob.version.canonical_segments.take(2) == [6, 1]
 
     def number
       serialized_params.fetch('executions', 0) + 1
@@ -50,12 +28,7 @@ module GoodJob # :nodoc:
 
     # Monotonic time between when this job started and finished
     def runtime_latency
-      # migrated and Rails greater than 6.1
-      if self.class.duration_interval_usable?
-        duration
-      elsif performed_at
-        (finished_at || Time.current) - performed_at
-      end
+      duration
     end
 
     def last_status_at
@@ -87,3 +60,5 @@ module GoodJob # :nodoc:
     end
   end
 end
+
+ActiveSupport.run_load_hooks(:good_job_execution, GoodJob::DiscreteExecution)

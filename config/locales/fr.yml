@@ -11,7 +11,6 @@ fr:
     batches:
       index:
         older_batches: Lots plus anciens
-        pending_migrations: GoodJob a des migrations de bases de données en attente.
         title: Lots
       jobs:
         actions:
@@ -48,7 +47,6 @@ fr:
       index:
         no_cron_schedules_found: Aucune planification cron trouvée.
         title: Entrées Cron
-      pending_migrations: Nécessite une migration de la base de données GoodJob en attente.
       show:
         cron_entry_key: Clé d'entrée Cron
     datetime:
@@ -196,8 +194,8 @@ fr:
             thousand: k
             trillion: J
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Durée moyenne
         executions: Exécutions
         job_class: Catégorie d'emplois
@@ -233,13 +231,14 @@ fr:
         jobs: Jobs
         live_poll: En direct
         name: "GoodJob 👍"
-        performances: Performance
+        performance: Performance
         processes: Processus
         theme:
           auto: Auto
           dark: Sombre
           light: Lumière
           theme: Thème
+      pending_migrations: GoodJob a des migrations de bases de données en attente.
       secondary_navbar:
         inspiration: N'oublie pas, toi aussi tu fais du bon boulot !
         last_updated: Dernière mise à jour
@@ -250,5 +249,3 @@ fr:
       running: En cours
       scheduled: Planifiés
       succeeded: Réussis
-  shared:
-    needs_migration: Veuillez exécuter des migrations GoodJob.

@@ -11,7 +11,6 @@ ko:
     batches:
       index:
         older_batches: 더 오래된 배치
-        pending_migrations: GoodJob에 보류 중인 데이터베이스 마이그레이션 작업이 있습니다.
         title: 배치
       jobs:
         actions:
@@ -48,7 +47,6 @@ ko:
       index:
         no_cron_schedules_found: cron 스케줄을 찾을 수 없습니다.
         title: cron 스케줄
-      pending_migrations: 보류 중인 GoodJob 데이터베이스 마이그레이션이 필요합니다.
       show:
         cron_entry_key: cron 엔트리 키
     datetime:
@@ -196,8 +194,8 @@ ko:
             thousand: K
             trillion: T
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: 평균 지속 시간
         executions: 처형
         job_class: 직업군
@@ -233,13 +231,14 @@ ko:
         jobs: 작업
         live_poll: 실시간 업데이트
         name: "GoodJob 👍"
-        performances: 성능
+        performance: 성능
         processes: 프로세스
         theme:
           auto: 자동
           dark: 어두운
           light: 밝은
           theme: 테마
+      pending_migrations: GoodJob에 보류 중인 데이터베이스 마이그레이션 작업이 있습니다.
       secondary_navbar:
         inspiration: 기억하세요, 당신도 좋은 일을 하고 있습니다!
         last_updated: 최종 업데이트
@@ -250,5 +249,3 @@ ko:
       running: 실행 중
       scheduled: 예정됨
       succeeded: 성공함
-  shared:
-    needs_migration: GoodJob 마이그레이션을 실행하세요.

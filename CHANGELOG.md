@@ -1,5 +1,66 @@
 # Changelog
 
+## [v4.0.3](https://github.com/bensheldon/good_job/tree/v4.0.3) (2024-07-10)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.0.2...v4.0.3)
+
+**Fixed bugs:**
+
+- Only set duration attribute to interval on Rails 6.1 [\#1412](https://github.com/bensheldon/good_job/pull/1412) ([bdewater-thatch](https://github.com/bdewater-thatch))
+
+**Closed issues:**
+
+- GoodJob error: TypeError: can't cast ActiveSupport::Duration \(on v4.0.0\) [\#1413](https://github.com/bensheldon/good_job/issues/1413)
+- Question: is it possible to clean a set of scheduled jobs \(by class name\) from console? [\#1410](https://github.com/bensheldon/good_job/issues/1410)
+- "Couldn't find GoodJob::BatchRecord" error [\#1387](https://github.com/bensheldon/good_job/issues/1387)
+- Empty alerts "\[\]"? [\#1372](https://github.com/bensheldon/good_job/issues/1372)
+- Release GoodJob 4.0 [\#764](https://github.com/bensheldon/good_job/issues/764)
+
+**Merged pull requests:**
+
+- Add Active Support load hooks for Job and \(Discrete\)Execution; move all outside class definition bodies [\#1414](https://github.com/bensheldon/good_job/pull/1414) ([bensheldon](https://github.com/bensheldon))
+
+## [v4.0.2](https://github.com/bensheldon/good_job/tree/v4.0.2) (2024-07-08)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.0.1...v4.0.2)
+
+**Fixed bugs:**
+
+- Fix a rails 6.1 deprecation warning for the duration attribute [\#1408](https://github.com/bensheldon/good_job/pull/1408) ([Earlopain](https://github.com/Earlopain))
+- Actually remove deprecated configuration for `cleanup_interval_seconds`, `cleanup_interval_jobs`; remove deprecated `Lockable` [\#1406](https://github.com/bensheldon/good_job/pull/1406) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- PG::UndefinedColumn: ERROR:  column good\_job\_processes.lock\_type does not exist [\#1405](https://github.com/bensheldon/good_job/issues/1405)
+- undefined method `duration=' for an instance of GoodJob::Execution [\#1404](https://github.com/bensheldon/good_job/issues/1404)
+- v3 deprecations are still present [\#1399](https://github.com/bensheldon/good_job/issues/1399)
+
+**Merged pull requests:**
+
+- Fix Batch integration test to not exhaust database connection thread pool [\#1409](https://github.com/bensheldon/good_job/pull/1409) ([bensheldon](https://github.com/bensheldon))
+- Discrete cleanup [\#1401](https://github.com/bensheldon/good_job/pull/1401) ([Earlopain](https://github.com/Earlopain))
+
+## [v4.0.1](https://github.com/bensheldon/good_job/tree/v4.0.1) (2024-07-08)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.0.0...v4.0.1)
+
+**Fixed bugs:**
+
+- Actually change `smaller_number_is_higher_priority` for v4 [\#1402](https://github.com/bensheldon/good_job/pull/1402) ([Earlopain](https://github.com/Earlopain))
+
+**Merged pull requests:**
+
+- Bump prism/rbi dev dependency [\#1403](https://github.com/bensheldon/good_job/pull/1403) ([Earlopain](https://github.com/Earlopain))
+- Use index action for the performance controller [\#1398](https://github.com/bensheldon/good_job/pull/1398) ([Earlopain](https://github.com/Earlopain))
+
+## [v4.0.0](https://github.com/bensheldon/good_job/tree/v4.0.0) (2024-07-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v3.99.0...v4.0.0)
+
+**Implemented enhancements:**
+
+- Release GoodJob v4 [\#1394](https://github.com/bensheldon/good_job/pull/1394) ([bensheldon](https://github.com/bensheldon))
+
 ## [v3.99.0](https://github.com/bensheldon/good_job/tree/v3.99.0) (2024-07-07)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v3.30.1...v3.99.0)

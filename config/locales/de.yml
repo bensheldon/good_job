@@ -11,7 +11,6 @@ de:
     batches:
       index:
         older_batches: Ältere Chargen
-        pending_migrations: GoodJob hat ausstehende Datenbankmigrationen.
         title: Chargen
       jobs:
         actions:
@@ -48,7 +47,6 @@ de:
       index:
         no_cron_schedules_found: Keine Cron-Zeitpläne gefunden.
         title: Cron-Zeitpläne
-      pending_migrations: Erfordert ausstehende GoodJob-Datenbankmigration.
       show:
         cron_entry_key: Cron-Eingabetaste
     datetime:
@@ -196,8 +194,8 @@ de:
             thousand: K
             trillion: T
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Durchschnittliche Dauer
         executions: Hinrichtungen
         job_class: Berufsklasse
@@ -233,13 +231,14 @@ de:
         jobs: Jobs
         live_poll: Live Poll
         name: "GoodJob 👍"
-        performances: Leistung
+        performance: Leistung
         processes: Prozesse
         theme:
           auto: Auto
           dark: Dunkel
           light: Licht
           theme: Thema
+      pending_migrations: GoodJob hat ausstehende Datenbankmigrationen.
       secondary_navbar:
         inspiration: Denk daran, auch du machst einen guten Job!
         last_updated: Zuletzt aktualisiert
@@ -250,5 +249,3 @@ de:
       running: Laufend
       scheduled: Geplant
       succeeded: Erfolgreich
-  shared:
-    needs_migration: Bitte führen Sie GoodJob-Migrationen aus.

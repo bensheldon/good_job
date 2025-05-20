@@ -59,7 +59,7 @@ module GoodJob
 
   # @!attribute [rw] active_record_parent_class
   #   @!scope class
-  #   The ActiveRecord parent class inherited by +GoodJob::Execution+ (default: +ActiveRecord::Base+).
+  #   The ActiveRecord parent class inherited by +GoodJob::Job+ (default: +ActiveRecord::Base+).
   #   Use this when using multiple databases or other custom ActiveRecord configuration.
   #   @return [ActiveRecord::Base]
   #   @example Change the base class:
@@ -134,6 +134,7 @@ module GoodJob
   def self.configure_active_record(&block)
     self._active_record_configuration = block
   end
+
   mattr_accessor :_active_record_configuration, default: nil
 
   # Stop executing jobs.
@@ -209,7 +210,7 @@ module GoodJob
     include_discarded = GoodJob.configuration.cleanup_discarded_jobs?
 
     ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
-      deleted_executions_count = 0
+      deleted_jobs_count = 0
       deleted_batches_count = 0
       deleted_discrete_executions_count = 0
 
@@ -219,31 +220,27 @@ module GoodJob
         active_job_ids = jobs_query.pluck(:active_job_id)
         break if active_job_ids.empty?
 
-        if GoodJob::Execution.discrete_support?
-          deleted_discrete_executions = GoodJob::DiscreteExecution.where(active_job_id: active_job_ids).delete_all
-          deleted_discrete_executions_count += deleted_discrete_executions
-        end
+        deleted_discrete_executions = GoodJob::DiscreteExecution.where(active_job_id: active_job_ids).delete_all
+        deleted_discrete_executions_count += deleted_discrete_executions
 
-        deleted_executions = GoodJob::Execution.where(active_job_id: active_job_ids).delete_all
-        deleted_executions_count += deleted_executions
+        deleted_jobs = GoodJob::Job.where(active_job_id: active_job_ids).delete_all
+        deleted_jobs_count += deleted_jobs
       end
 
-      if GoodJob::BatchRecord.migrated?
-        batches_query = GoodJob::BatchRecord.finished_before(timestamp).limit(in_batches_of)
-        batches_query = batches_query.succeeded unless include_discarded
-        loop do
-          deleted = batches_query.delete_all
-          break if deleted.zero?
+      batches_query = GoodJob::BatchRecord.finished_before(timestamp).limit(in_batches_of)
+      batches_query = batches_query.succeeded unless include_discarded
+      loop do
+        deleted = batches_query.delete_all
+        break if deleted.zero?
 
-          deleted_batches_count += deleted
-        end
+        deleted_batches_count += deleted
       end
 
       payload[:destroyed_batches_count] = deleted_batches_count
       payload[:destroyed_discrete_executions_count] = deleted_discrete_executions_count
-      payload[:destroyed_executions_count] = deleted_executions_count
+      payload[:destroyed_jobs_count] = deleted_jobs_count
 
-      destroyed_records_count = deleted_batches_count + deleted_discrete_executions_count + deleted_executions_count
+      destroyed_records_count = deleted_batches_count + deleted_discrete_executions_count + deleted_jobs_count
       payload[:destroyed_records_count] = destroyed_records_count
 
       destroyed_records_count
@@ -273,7 +270,11 @@ module GoodJob
   # Tests whether GoodJob can be safely upgraded to v4
   # @return [Boolean]
   def self.v4_ready?
-    GoodJob::Job.discrete_support? && GoodJob::Job.where(finished_at: nil).where(is_discrete: [nil, false]).none?
+    GoodJob.deprecator.warn(<<~MSG)
+      Calling `GoodJob.v4_ready?` is deprecated and will be removed in GoodJob v5.
+      If you are reading this deprecation you are already on v4.
+    MSG
+    true
   end
 
   # Deprecator for providing deprecation warnings.
@@ -285,17 +286,12 @@ module GoodJob
     end
   end
 
-  include ActiveSupport::Deprecation::DeprecatedConstantAccessor
-  deprecate_constant :Lockable, 'GoodJob::AdvisoryLockable', deprecator: deprecator
-
   # Whether all GoodJob migrations have been applied.
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    # Always update with the most recent migration check
-    GoodJob::DiscreteExecution.reset_column_information
-    GoodJob::DiscreteExecution.duration_interval_migrated?
+    true
   end
-
-  ActiveSupport.run_load_hooks(:good_job, self)
 end
+
+ActiveSupport.run_load_hooks(:good_job, GoodJob)

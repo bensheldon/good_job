@@ -4,7 +4,7 @@ module GoodJob
   class MetricsController < ApplicationController
     def primary_nav
       jobs_count = GoodJob::Job.count
-      batches_count = GoodJob::BatchRecord.migrated? ? GoodJob::BatchRecord.all.size : 0
+      batches_count = GoodJob::BatchRecord.all.size
       cron_entries_count = GoodJob::CronEntry.all.size
       processes_count = GoodJob::Process.active.count
 

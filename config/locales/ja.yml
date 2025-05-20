@@ -11,7 +11,6 @@ ja:
     batches:
       index:
         older_batches: より古いバッチ
-        pending_migrations: GoodJobに保留中のデータベースマイグレーションがあります。
         title: バッチ
       jobs:
         actions:
@@ -48,7 +47,6 @@ ja:
       index:
         no_cron_schedules_found: cronスケジュールが見つかりませんでした。
         title: cronスケジュール
-      pending_migrations: GoodJobの保留中のデータベースマイグレーションが必要です。
       show:
         cron_entry_key: cronエントリキー
     datetime:
@@ -196,8 +194,8 @@ ja:
             thousand: K
             trillion: T
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: 平均所要時間
         executions: 処刑
         job_class: 職種
@@ -233,13 +231,14 @@ ja:
         jobs: ジョブ
         live_poll: リアルタイム更新
         name: "GoodJob 👍"
-        performances: パフォーマンス
+        performance: パフォーマンス
         processes: プロセス
         theme:
           auto: 自動
           dark: 暗い
           light: ライト
           theme: テーマ
+      pending_migrations: GoodJobに保留中のデータベースマイグレーションがあります。
       secondary_navbar:
         inspiration: 覚えておいてください、あなたも良い仕事をしています！
         last_updated: 最終更新
@@ -250,5 +249,3 @@ ja:
       running: 実行中
       scheduled: スケジュール待ち
       succeeded: 成功済み
-  shared:
-    needs_migration: GoodJob 移行を実行してください。

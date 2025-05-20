@@ -18,14 +18,6 @@ module GoodJob
     #   Responds to the +$0.good_job+ notification.
     #   @param event [ActiveSupport::Notifications::Event]
     #   @return [void]
-    def create(event)
-      # FIXME: This method does not match any good_job notifications.
-      execution = event.payload[:execution]
-
-      debug do
-        "GoodJob created job resource with id #{execution.id}"
-      end
-    end
 
     # @!macro notification_responder
     def finished_timer_task(event)
@@ -110,12 +102,12 @@ module GoodJob
 
     # @!macro notification_responder
     def perform_job(event)
-      execution = event.payload[:execution]
+      job = event.payload[:job]
       process_id = event.payload[:process_id]
       thread_name = event.payload[:thread_name]
 
       info(tags: [process_id, thread_name]) do
-        "Executed GoodJob #{execution.id}"
+        "Executed GoodJob #{job.id}"
       end
     end
 

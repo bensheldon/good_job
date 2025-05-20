@@ -28,16 +28,16 @@ RSpec.describe GoodJob::JobsFilter do
     end
     Timecop.return
 
-    running_job = ExampleJob.perform_later('success')
-    running_execution = GoodJob::Execution.find(running_job.provider_job_id)
-    running_execution.update!(
+    running_active_job = ExampleJob.perform_later('success')
+    running_job = GoodJob::Job.find(running_active_job.provider_job_id)
+    running_job.update!(
       finished_at: nil
     )
-    running_execution.advisory_lock
+    running_job.advisory_lock
   end
 
   after do
-    GoodJob::Execution.advisory_unlock_session
+    GoodJob::Job.advisory_unlock_session
   end
 
   describe '#job_classes' do

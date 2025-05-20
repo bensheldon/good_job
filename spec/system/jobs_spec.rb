@@ -136,7 +136,7 @@ describe 'Jobs', :js, :without_executor do
           accept_confirm { click_link 'Discard job' }
         end
         expect(page).to have_content "Job has been discarded"
-      end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
+      end.to change { unfinished_job.reload.finished_at }.from(nil).to within(1.second).of(Time.current)
     end
 
     it 'can force discard jobs' do
@@ -165,7 +165,7 @@ describe 'Jobs', :js, :without_executor do
           accept_confirm { click_link 'Force discard' }
         end
         expect(page).to have_content "Job has been force discarded"
-      end.to change { unfinished_job.head_execution(reload: true).finished_at }.from(nil).to within(1.second).of(Time.current)
+      end.to change { unfinished_job.reload.finished_at }.from(nil).to within(1.second).of(Time.current)
     ensure
       locked_event.set
       done_event.set

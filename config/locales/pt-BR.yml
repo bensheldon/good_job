@@ -11,7 +11,6 @@ pt-BR:
     batches:
       index:
         older_batches: Lotes antigos
-        pending_migrations: O GoodJob tem migrações pendentes no banco de dados.
         title: Lotes
       jobs:
         actions:
@@ -48,7 +47,6 @@ pt-BR:
       index:
         no_cron_schedules_found: Nenhuma tarefa programada encontrada.
         title: Tarefas Programadas
-      pending_migrations: Requer migração pendente do GoodJob no banco de dados.
       show:
         cron_entry_key: Chave da Tarefa Programada
     datetime:
@@ -196,8 +194,8 @@ pt-BR:
             thousand: K
             trillion: T
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Duração média
         executions: Execuções
         job_class: Classe de trabalho
@@ -233,13 +231,14 @@ pt-BR:
         jobs: Tarefas
         live_poll: Acompanhamento ao Vivo
         name: "GoodJob 👍"
-        performances: Desempenho
+        performance: Desempenho
         processes: Processos
         theme:
           auto: Automático
           dark: Escuro
           light: Claro
           theme: Tema
+      pending_migrations: O GoodJob tem migrações pendentes no banco de dados.
       secondary_navbar:
         inspiration: Lembre-se, você também está fazendo uma Boa Tarefa!
         last_updated: Última atualização
@@ -250,5 +249,3 @@ pt-BR:
       running: Em execução
       scheduled: Agendado
       succeeded: Concluído com sucesso
-  shared:
-    needs_migration: Execute migrações GoodJob.

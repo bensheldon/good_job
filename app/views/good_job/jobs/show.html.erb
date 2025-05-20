@@ -5,9 +5,6 @@
         <li class="breadcrumb-item"><%= link_to t(".jobs"), jobs_path %></li>
         <li class="breadcrumb-item active" aria-current="page">
           <%= tag.code @job.id, class: "text-muted" %>
-          <% if @job.discrete? %>
-            <span class="badge bg-info">Discrete</span>
-          <% end %>
         </li>
       </ol>
     </nav>
@@ -87,8 +84,4 @@
   <%= tag.pre JSON.pretty_generate(@job.display_serialized_params) %>
 <% end %>
 
-<% if @job.discrete? %>
-  <%= render 'executions', executions: @job.discrete_executions.reverse %>
-<% else %>
-  <%= render 'executions', executions: @job.executions.includes_advisory_locks.reverse %>
-<% end %>
+<%= render 'executions', executions: @job.executions.reverse %>

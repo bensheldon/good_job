@@ -102,7 +102,7 @@
                   <%= tag.span relative_time(job.last_status_at), class: "small mt-1" %>
                   <div>
                     <%= status_badge job.status %>
-                    <% if job.status == :discarded && job.class.error_event_migrated? && job.error_event %>
+                    <% if job.status == :discarded && job.error_event %>
                       <div class="text-black text-center">
                         <small><%= t(job.error_event, scope: 'good_job.error_event') %></small>
                       </div>

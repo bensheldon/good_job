@@ -5,12 +5,15 @@ require 'rails_helper'
 RSpec.describe GoodJob::Filterable do
   let(:model_class) { GoodJob::Job }
   let!(:job) do
-    model_class.create(
+    model_class.create!(
       active_job_id: SecureRandom.uuid,
       queue_name: "default",
+      job_class: "ExampleJob",
+      scheduled_at: Time.current,
       serialized_params: { example_key: 'example_value' },
       labels: %w[buffalo gopher],
-      error: "ExampleJob::ExampleError: a message"
+      error: "ExampleJob::ExampleError: a message",
+      error_event: GoodJob::ErrorEvents::ERROR_EVENT_RETRIED
     )
   end
 

@@ -11,7 +11,6 @@ es:
     batches:
       index:
         older_batches: Batches anteriores
-        pending_migrations: GoodJob tiene migraciones pendientes.
         title: Batches
       jobs:
         actions:
@@ -48,7 +47,6 @@ es:
       index:
         no_cron_schedules_found: No hay tareas programadas.
         title: Tareas Programadas
-      pending_migrations: Require las migraciones de GoodJob pendientes.
       show:
         cron_entry_key: Cron Entry Key
     datetime:
@@ -196,8 +194,8 @@ es:
             thousand: k
             trillion: T
             unit: ''
-    performances:
-      show:
+    performance:
+      index:
         average_duration: Duración promedio
         executions: Ejecuciones
         job_class: clase de trabajo
@@ -233,13 +231,14 @@ es:
         jobs: Tareas
         live_poll: En vivo
         name: "GoodJob 👍"
-        performances: Actuación
+        performance: Actuación
         processes: Procesos
         theme:
           auto: Auto
           dark: Oscuro
           light: Luz
           theme: Tema
+      pending_migrations: GoodJob tiene migraciones pendientes.
       secondary_navbar:
         inspiration: "¡Recuerda, también tú estás haciendo un buen trabajo!"
         last_updated: Última actualización
@@ -250,5 +249,3 @@ es:
       running: Ejecutando
       scheduled: Programado
       succeeded: Exitoso
-  shared:
-    needs_migration: Ejecute las migraciones de GoodJob.

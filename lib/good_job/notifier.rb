@@ -51,7 +51,7 @@ module GoodJob # :nodoc:
     # Send a message via Postgres NOTIFY
     # @param message [#to_json]
     def self.notify(message)
-      connection = ::GoodJob::Execution.connection
+      connection = ::GoodJob::Job.connection
       connection.exec_query <<~SQL.squish
         NOTIFY #{CHANNEL}, #{connection.quote(message.to_json)}
       SQL
@@ -251,8 +251,8 @@ module GoodJob # :nodoc:
 
     def with_connection
       Rails.application.executor.wrap do
-        self.connection = ::GoodJob::Execution.connection_pool.checkout.tap do |conn|
-          ::GoodJob::Execution.connection_pool.remove(conn)
+        self.connection = ::GoodJob::Job.connection_pool.checkout.tap do |conn|
+          ::GoodJob::Job.connection_pool.remove(conn)
         end
       end
       connection.execute("SET application_name = #{connection.quote(self.class.name)}")

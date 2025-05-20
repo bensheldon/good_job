@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe GoodJob::Adapter do
   let(:adapter) { described_class.new(execution_mode: :external) }
   let(:active_job) { instance_double(ActiveJob::Base) }
-  let(:good_job) { instance_double(GoodJob::Execution, queue_name: 'default', scheduled_at: nil, job_state: { queue_name: 'default' }) }
+  let(:good_job) { instance_double(GoodJob::Job, queue_name: 'default', scheduled_at: nil, job_state: { queue_name: 'default' }) }
 
   before do
     GoodJob.configuration.instance_variable_set(:@_in_webserver, nil)
@@ -27,8 +27,6 @@ RSpec.describe GoodJob::Adapter do
 
   describe '#enqueue' do
     it 'sets default values' do
-      allow(GoodJob::Job).to receive(:discrete_support?).and_return(true)
-
       active_job = ExampleJob.new
       adapter.enqueue(active_job)
 
@@ -37,24 +35,14 @@ RSpec.describe GoodJob::Adapter do
         priority: 0,
         scheduled_at: be_within(1.second).of(Time.current)
       )
-
-      allow(GoodJob::Job).to receive(:discrete_support?).and_return(false)
-      active_job = ExampleJob.new
-      adapter.enqueue(active_job)
-
-      expect(GoodJob::Job.last).to have_attributes(
-        queue_name: 'default',
-        priority: 0
-        # scheduled_at: be_within(1.second).of(Time.current) # TODO: this should be expected
-      )
     end
 
-    it 'calls GoodJob::Execution.enqueue with parameters' do
-      allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
+    it 'calls GoodJob::Job.enqueue with parameters' do
+      allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
 
       adapter.enqueue(active_job)
 
-      expect(GoodJob::Execution).to have_received(:enqueue).with(
+      expect(GoodJob::Job).to have_received(:enqueue).with(
         active_job,
         scheduled_at: be_within(1).of(Time.current)
       )
@@ -97,7 +85,7 @@ RSpec.describe GoodJob::Adapter do
 
     context 'when async' do
       it 'triggers the capsule and the notifier' do
-        allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
+        allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
         allow(GoodJob::Notifier).to receive(:notify)
 
         capsule = instance_double(GoodJob::Capsule, start: nil, create_thread: nil)
@@ -115,21 +103,20 @@ RSpec.describe GoodJob::Adapter do
   end
 
   describe '#enqueue_at' do
-    it 'calls GoodJob::Execution.enqueue with parameters' do
-      allow(GoodJob::Execution).to receive(:enqueue).and_return(good_job)
+    it 'calls GoodJob::Job.enqueue with parameters' do
+      allow(GoodJob::Job).to receive(:enqueue).and_return(good_job)
 
       scheduled_at = 1.minute.from_now
 
       adapter.enqueue_at(active_job, scheduled_at.to_i)
 
-      expect(GoodJob::Execution).to have_received(:enqueue).with(
+      expect(GoodJob::Job).to have_received(:enqueue).with(
         active_job,
         scheduled_at: scheduled_at.change(usec: 0)
       )
     end
 
     it 'sets default values' do
-      allow(GoodJob::Job).to receive(:discrete_support?).and_return(true)
       active_job = ExampleJob.new
       adapter.enqueue_at(active_job, nil)
 
@@ -137,16 +124,6 @@ RSpec.describe GoodJob::Adapter do
         queue_name: 'default',
         priority: 0,
         scheduled_at: be_within(1.second).of(Time.current)
-      )
-
-      allow(GoodJob::Job).to receive(:discrete_support?).and_return(false)
-      active_job = ExampleJob.new
-      adapter.enqueue_at(active_job, nil)
-
-      expect(GoodJob::Job.last).to have_attributes(
-        queue_name: 'default',
-        priority: 0
-        # scheduled_at: be_within(1.second).of(Time.current) # TODO: this should be expected
       )
     end
   end
@@ -181,7 +158,6 @@ RSpec.describe GoodJob::Adapter do
     end
 
     it 'sets default values' do
-      allow(GoodJob::Job).to receive(:discrete_support?).and_return(true)
       active_job = ExampleJob.new
       adapter.enqueue_all([active_job])
 
@@ -190,21 +166,11 @@ RSpec.describe GoodJob::Adapter do
         priority: 0,
         scheduled_at: be_within(1.second).of(Time.current)
       )
-
-      allow(GoodJob::Job).to receive(:discrete_support?).and_return(false)
-      active_job = ExampleJob.new
-      adapter.enqueue_at(active_job, nil)
-
-      expect(GoodJob::Job.last).to have_attributes(
-        queue_name: 'default',
-        priority: 0
-        # scheduled_at: be_within(1.second).of(Time.current) # TODO: this should be expected
-      )
     end
 
     context 'when a job fails to enqueue' do
       it 'does not set a provider_job_id' do
-        allow(GoodJob::Execution).to receive(:insert_all).and_wrap_original do |original_method, *args|
+        allow(GoodJob::Job).to receive(:insert_all).and_wrap_original do |original_method, *args|
           attributes, kwargs = *args
           original_method.call(attributes[0, 1], **kwargs) #  pretend only the first item is successfully inserted
         end
@@ -218,7 +184,7 @@ RSpec.describe GoodJob::Adapter do
       end
 
       it 'sets successfully_enqueued, if Rails supports it' do
-        allow(GoodJob::Execution).to receive(:insert_all).and_wrap_original do |original_method, *args|
+        allow(GoodJob::Job).to receive(:insert_all).and_wrap_original do |original_method, *args|
           attributes, kwargs = *args
           original_method.call(attributes[0, 1], **kwargs) #  pretend only the first item is successfully inserted
         end
@@ -238,7 +204,7 @@ RSpec.describe GoodJob::Adapter do
         stub_const 'PERFORMED', []
         stub_const 'TestJob', (Class.new(ActiveJob::Base) do
           def perform
-            raise "Not advisory locked" unless GoodJob::Execution.find(provider_job_id).advisory_locked?
+            raise "Not advisory locked" unless GoodJob::Job.find(provider_job_id).advisory_locked?
 
             PERFORMED << Time.current
           end

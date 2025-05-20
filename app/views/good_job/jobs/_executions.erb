@@ -38,7 +38,7 @@
             <strong class="small text-danger"><%= t "good_job.shared.error" %>:</strong>
             <code class="text-wrap text-break m-0 text-secondary-emphasis"><%= execution.error %></code>
           </div>
-          <% if GoodJob::DiscreteExecution.backtrace_migrated? && execution.error_backtrace&.any? %>
+          <% if execution.error_backtrace&.any? %>
             <%= tag.ul class: "nav nav-tabs small w-fit-content", id: dom_id(execution, :tab), role: "tablist" do %>
               <li class="nav-item" role="presentation">
                 <%= tag.button t(".application_trace"), class: "nav-link active p-1", id: dom_id(execution, :application), data: { bs_toggle: "tab", bs_target: dom_id(execution, :"#application_pane") }, type: "button", role: "tab", aria: { controls: dom_id(execution, :application_pane), selected: true } %>

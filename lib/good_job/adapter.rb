@@ -37,7 +37,7 @@ module GoodJob
     # Enqueues the ActiveJob job to be performed.
     # For use by Rails; you should generally not call this directly.
     # @param active_job [ActiveJob::Base] the job to be enqueued from +#perform_later+
-    # @return [GoodJob::Execution]
+    # @return [GoodJob::Job]
     def enqueue(active_job)
       enqueue_at(active_job, nil)
     end
@@ -58,29 +58,18 @@ module GoodJob
       Rails.application.executor.wrap do
         current_time = Time.current
         executions = active_jobs.map do |active_job|
-          GoodJob::Execution.build_for_enqueue(active_job).tap do |execution|
-            if GoodJob::Execution.discrete_support?
-              execution.make_discrete
-              execution.scheduled_at = current_time if execution.scheduled_at == execution.created_at
-              execution.scheduled_at = nil if active_job.respond_to?(:good_job_paused) && active_job.good_job_paused
-            end
-
-            execution.created_at = current_time
-            execution.updated_at = current_time
+          GoodJob::Job.build_for_enqueue(active_job).tap do |job|
+            job.scheduled_at = current_time if job.scheduled_at == job.created_at
+            job.scheduled_at = nil if active_job.respond_to?(:good_job_paused) && active_job.good_job_paused
+            job.created_at = current_time
+            job.updated_at = current_time
           end
         end
 
         inline_executions = []
-        GoodJob::Execution.transaction(requires_new: true, joinable: false) do
-          execution_attributes = executions.map do |execution|
-            if GoodJob::Execution.error_event_migrated?
-              execution.attributes
-            else
-              execution.attributes.except('error_event')
-            end
-          end
-
-          results = GoodJob::Execution.insert_all(execution_attributes, returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
+        GoodJob::Job.transaction(requires_new: true, joinable: false) do
+          execution_attributes = executions.map(&:attributes)
+          results = GoodJob::Job.insert_all(execution_attributes, returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
 
           job_id_to_provider_job_id = results.each_with_object({}) { |result, hash| hash[result['active_job_id']] = result['id'] }
           active_jobs.each do |active_job|
@@ -147,7 +136,7 @@ module GoodJob
     # For use by Rails; you should generally not call this directly.
     # @param active_job [ActiveJob::Base] the job to be enqueued from +#perform_later+
     # @param timestamp [Integer, nil] the epoch time to perform the job
-    # @return [GoodJob::Execution]
+    # @return [GoodJob::Job]
     def enqueue_at(active_job, timestamp)
       scheduled_at = timestamp ? Time.zone.at(timestamp) : Time.current
 
@@ -157,15 +146,15 @@ module GoodJob
 
       Rails.application.executor.wrap do
         will_execute_inline = execute_inline? && (scheduled_at.present? && scheduled_at <= Time.current)
-        will_retry_inline = will_execute_inline && CurrentThread.execution&.active_job_id == active_job.job_id && !CurrentThread.retry_now
+        will_retry_inline = will_execute_inline && CurrentThread.job&.active_job_id == active_job.job_id && !CurrentThread.retry_now
 
         if will_retry_inline
-          execution = GoodJob::Execution.enqueue(
+          execution = GoodJob::Job.enqueue(
             active_job,
             scheduled_at: scheduled_at
           )
         elsif will_execute_inline
-          execution = GoodJob::Execution.enqueue(
+          execution = GoodJob::Job.enqueue(
             active_job,
             scheduled_at: scheduled_at,
             create_with_advisory_lock: true
@@ -187,7 +176,7 @@ module GoodJob
           end
           raise result.unhandled_error if result.unhandled_error
         else
-          execution = GoodJob::Execution.enqueue(
+          execution = GoodJob::Job.enqueue(
             active_job,
             scheduled_at: scheduled_at
           )
