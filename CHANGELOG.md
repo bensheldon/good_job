@@ -1,5 +1,17 @@
 # Changelog
 
+## [v4.10.1](https://github.com/bensheldon/good_job/tree/v4.10.1) (2025-05-20)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.10.0...v4.10.1)
+
+**Fixed bugs:**
+
+- Preserve job locale when retrying on dashboard [\#1634](https://github.com/bensheldon/good_job/pull/1634) ([Earlopain](https://github.com/Earlopain))
+
+**Closed issues:**
+
+- Dashboard retry overwrites original job locale — is this intended behavior? [\#1630](https://github.com/bensheldon/good_job/issues/1630)
+
 ## [v4.10.0](https://github.com/bensheldon/good_job/tree/v4.10.0) (2025-04-26)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.9.3...v4.10.0)
