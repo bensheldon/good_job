@@ -64,9 +64,9 @@ describe ExampleJob do
         expect(execution.error_backtrace.count).to be > 100
 
         if RUBY_VERSION >= "3.4"
-          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:44:in 'ExampleJob#perform'"])
+          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:45:in 'ExampleJob#perform'"])
         else
-          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:44:in `perform'"])
+          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:45:in `perform'"])
         end
       end
     end
