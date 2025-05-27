@@ -16,6 +16,10 @@ module GoodJob
     end
 
     initializer "good_job.active_job_notifications" do
+      ActiveSupport::Notifications.subscribe "perform.active_job" do |event|
+        GoodJob::CurrentThread.active_job = event.payload[:job]
+      end
+
       ActiveSupport::Notifications.subscribe "enqueue_retry.active_job" do |event|
         GoodJob::CurrentThread.error_on_retry = event.payload[:error]
       end
