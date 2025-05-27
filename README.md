@@ -470,8 +470,8 @@ The Dashboard can be set to automatically refresh by checking "Live Poll" in the
 
 GoodJob exposes some views that are intended to be overriden by placing views in your application:
 
-- [`app/views/good_job/jobs/_custom_job_details.html.erb`](app/views/good_job/_custom_job_details.html.erb): content added to this partial will be displayed above the argument list on the good_job/jobs#show page.
-- [`app/views/good_job/jobs/_custom_execution_details.html.erb`](app/views/good_job/_custom_execution_details.html.erb): content added to this partial will be displayed above each execution on the good_job/jobs#show page.
+- [`app/views/good_job/_custom_job_details.html.erb`](app/views/good_job/_custom_job_details.html.erb): content added to this partial will be displayed above the argument list on the good_job/jobs#show page.
+- [`app/views/good_job/_custom_execution_details.html.erb`](app/views/good_job/_custom_execution_details.html.erb): content added to this partial will be displayed above each execution on the good_job/jobs#show page.
 - [`app/views/good_job/_custom_job_index_details.html.erb`](app/views/good_job/_custom_job_index_details.html.erb): content added to this partial will be displayed in the job row on the jobs index page.
 
 **Warning:** these partials expose classes (such as `GoodJob::Job`) that are considered internal implementation details of GoodJob. You should always test your custom partials after upgrading GoodJob.
