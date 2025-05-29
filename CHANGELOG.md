@@ -1,5 +1,21 @@
 # Changelog
 
+## [v4.10.2](https://github.com/bensheldon/good_job/tree/v4.10.2) (2025-05-29)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.10.1...v4.10.2)
+
+**Fixed bugs:**
+
+- Fix Dashboard retries by wrapping in original/application locale [\#1643](https://github.com/bensheldon/good_job/pull/1643) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- I18n::InvalidLocale in GoodJob::JobsController\#mass\_update [\#1641](https://github.com/bensheldon/good_job/issues/1641)
+
+**Merged pull requests:**
+
+- Fix the path for the extended dashboard views in README.md [\#1638](https://github.com/bensheldon/good_job/pull/1638) ([zarembas](https://github.com/zarembas))
+
 ## [v4.10.1](https://github.com/bensheldon/good_job/tree/v4.10.1) (2025-05-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.10.0...v4.10.1)
