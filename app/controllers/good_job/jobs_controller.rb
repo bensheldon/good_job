@@ -38,7 +38,7 @@ module GoodJob
         when :reschedule
           job.reschedule_job
         when :retry
-          job.retry_job
+          use_original_locale { job.retry_job }
         when :destroy
           job.destroy_job
         end
@@ -84,7 +84,7 @@ module GoodJob
 
     def retry
       @job = Job.find(params[:id])
-      @job.retry_job
+      use_original_locale { @job.retry_job }
       redirect_back(fallback_location: jobs_path, notice: t(".notice"))
     end
 
