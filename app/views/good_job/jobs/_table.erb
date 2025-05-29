@@ -171,6 +171,10 @@
                 </div>
               </div>
             </div>
+
+            <div id="<%= dom_id(job, 'custom') %>" class="row ms-2">
+              <%= render 'good_job/custom_job_index_details', job: job %>
+            </div>
           <% end %>
           <%= tag.div id: dom_id(job, "params"), class: "job-params list-group-item collapse small bg-dark text-light" do %>
             <%= tag.pre JSON.pretty_generate(job.display_serialized_params) %>
