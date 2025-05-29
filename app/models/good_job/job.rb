@@ -612,13 +612,13 @@ module GoodJob
 
             interrupt_error_string = self.class.format_error(GoodJob::InterruptError.new("Interrupted after starting perform at '#{existing_performed_at}'"))
             self.error = interrupt_error_string
-            self.error_event = :interrupted
+            self.error_event = ErrorEvents::INTERRUPTED
             monotonic_duration = (::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - monotonic_start).seconds
 
             execution_attrs = {
               error: interrupt_error_string,
               finished_at: job_performed_at,
-              error_event: :interrupted,
+              error_event: error_event,
               duration: monotonic_duration,
             }
             executions.where(finished_at: nil).where.not(performed_at: nil).update_all(execution_attrs) # rubocop:disable Rails/SkipsModelValidations
@@ -655,13 +655,13 @@ module GoodJob
             error_event = if !handled_error
                             nil
                           elsif handled_error == current_thread.error_on_discard
-                            :discarded
+                            ErrorEvents::DISCARDED
                           elsif handled_error == current_thread.error_on_retry
-                            :retried
+                            ErrorEvents::RETRIED
                           elsif handled_error == current_thread.error_on_retry_stopped
-                            :retry_stopped
+                            ErrorEvents::RETRY_STOPPED
                           elsif handled_error
-                            :handled
+                            ErrorEvents::HANDLED
                           end
 
             instrument_payload.merge!(
@@ -674,11 +674,11 @@ module GoodJob
             ExecutionResult.new(value: value, handled_error: handled_error, error_event: error_event, retried_job: current_thread.retried_job)
           rescue StandardError => e
             error_event = if e.is_a?(GoodJob::InterruptError)
-                            :interrupted
+                            ErrorEvents::INTERRUPTED
                           elsif e == current_thread.error_on_retry_stopped
-                            :retry_stopped
+                            ErrorEvents::RETRY_STOPPED
                           else
-                            :unhandled
+                            ErrorEvents::UNHANDLED
                           end
 
             instrument_payload.merge!(
@@ -722,8 +722,7 @@ module GoodJob
         end
 
         assign_attributes(job_attributes)
-        preserve_unhandled = result.unhandled_error && (GoodJob.retry_on_unhandled_error || GoodJob.preserve_job_records == :on_unhandled_error)
-        if finished_at.blank? || GoodJob.preserve_job_records == true || reenqueued || preserve_unhandled || cron_key.present?
+        if finished_at.blank? || cron_key.present? || preserve_job_record?(result)
           transaction do
             execution.save!
             save!
@@ -808,6 +807,14 @@ module GoodJob
         job_data["good_job_concurrency_key"] = concurrency_key if concurrency_key
         job_data["good_job_labels"] = Array(labels) if labels.present?
       end
+    end
+
+    def preserve_job_record?(result)
+      return true if GoodJob.preserve_job_records == true
+      return true if result.unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error
+      return true if GoodJob.preserve_job_records.respond_to?(:call) && GoodJob.preserve_job_records.call(result.error_event)
+
+      false
     end
   end
 end
