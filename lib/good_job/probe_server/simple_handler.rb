@@ -33,7 +33,7 @@ module GoodJob
         start_server
         handle_connections if @running.true?
       rescue StandardError => e
-        @logger.error "Server encountered an error: #{e}"
+        @logger.error "Server encountered an error: #{e.class} - #{e}"
       ensure
         stop
       end
@@ -60,8 +60,14 @@ module GoodJob
             end
 
             client.close
-          rescue IO::WaitReadable, Errno::EINTR, Errno::EPIPE
-            retry
+          rescue IO::WaitReadable, Errno::EINTR
+            retry # on transient errors
+          rescue Errno::EPIPE
+            next # Client disconnected - continue
+          rescue Errno::EBADF
+            break if @server&.closed? # Server shut down - stop
+
+            raise
           end
         end
       end
