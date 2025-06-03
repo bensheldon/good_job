@@ -43,8 +43,9 @@
           </div>
           <div class="col mw-100 text-truncate">
             <% process.schedulers.each do |scheduler| %>
-              <pre class="text-truncate mb-0" title="<%= scheduler.is_a?(Hash) ? scheduler['name'] : scheduler %>">
-                <%= scheduler.is_a?(Hash) ? scheduler['name'] : scheduler %>
+              <%- scheduler_name = scheduler.is_a?(Hash) ? scheduler['name'] : scheduler %>
+              <pre class="text-truncate mb-0" title="<%= scheduler_name %>">
+                <%= scheduler_name %>
               </pre>
             <% end %>
           </div>
