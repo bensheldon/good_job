@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddIndexGoodJobsPriorityScheduledAt < ActiveRecord::Migration<%= migration_version %>
+class AddIndexGoodJobsPriorityScheduledAt < ActiveRecord::Migration[8.0]
   disable_ddl_transaction!
 
   def change
