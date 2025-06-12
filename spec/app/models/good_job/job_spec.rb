@@ -1047,7 +1047,7 @@ RSpec.describe GoodJob::Job do
                 job: good_job,
                 error: an_instance_of(TestJob::ExpectedError),
                 unhandled_error: an_instance_of(TestJob::ExpectedError),
-                error_event: :unhandled
+                error_event: GoodJob::ErrorEvents::UNHANDLED
               )
             end
             ActiveSupport::Notifications.subscribed(callback, "perform_job.good_job") do
