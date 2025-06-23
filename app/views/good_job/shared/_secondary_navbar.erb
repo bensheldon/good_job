@@ -4,7 +4,7 @@
       <%= t(".inspiration") %>
     </div>
     <div class="flex-fill text-end">
-      <% last_updated_at = Time.current.utc.iso8601 %>
+      <% last_updated_at = Time.current.to_s %>
       <%= t(".last_updated") %>&nbsp;<time id="page-updated-at" datetime="<%= last_updated_at %>"><%= last_updated_at %></time>
     </div>
   </div>
