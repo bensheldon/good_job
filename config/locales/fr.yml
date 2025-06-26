@@ -191,6 +191,10 @@ fr:
         last_run: Dernière exécution
         next_scheduled: Prochaine exécution
         schedule: Planification
+        state: État
+        states:
+          active: Actif
+          paused: En pause
       job:
         arguments: Paramètres
         attempts: Tentatives

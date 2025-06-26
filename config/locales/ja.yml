@@ -191,6 +191,10 @@ ja:
         last_run: 前回実行日時
         next_scheduled: 次回予定日時
         schedule: スケジュール
+        state: 状態
+        states:
+          active: アクティブ
+          paused: 一時停止
       job:
         arguments: 引数
         attempts: 試行回数
