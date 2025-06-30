@@ -1,5 +1,17 @@
 # Changelog
 
+## [v4.11.0](https://github.com/bensheldon/good_job/tree/v4.11.0) (2025-06-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.10.2...v4.11.0)
+
+**Implemented enhancements:**
+
+- Add GoodJob::Adapter\#stopping to support Active Job continuations feature [\#1646](https://github.com/bensheldon/good_job/pull/1646) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Fix Probe Server handling server shutdown on SIGINT when daemonized [\#1644](https://github.com/bensheldon/good_job/pull/1644) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.10.2](https://github.com/bensheldon/good_job/tree/v4.10.2) (2025-05-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.10.1...v4.10.2)
