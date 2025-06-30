@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "rails"
+require "good_job"
+
 module GoodJob
   # Ruby on Rails integration.
   class Engine < ::Rails::Engine
