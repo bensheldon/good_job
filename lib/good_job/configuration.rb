@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "active_support/core_ext/numeric/time"
+
 module GoodJob
   #
   # +GoodJob::Configuration+ provides normalized configuration information to
