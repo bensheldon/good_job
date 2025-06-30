@@ -1,5 +1,13 @@
 # Changelog
 
+## [v4.11.1](https://github.com/bensheldon/good_job/tree/v4.11.1) (2025-06-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.11.0...v4.11.1)
+
+**Merged pull requests:**
+
+- Add `require rails` to good\_job/engine.rb to allow `bundle console` usage [\#1653](https://github.com/bensheldon/good_job/pull/1653) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.11.0](https://github.com/bensheldon/good_job/tree/v4.11.0) (2025-06-30)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.10.2...v4.11.0)
