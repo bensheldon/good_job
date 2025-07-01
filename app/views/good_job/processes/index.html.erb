@@ -41,13 +41,9 @@
               <span class="badge rounded-pill bg-body-secondary text-secondary"><%= (process.state["memory"] / 1024).to_i %> MB</span>
             </div>
           </div>
-          <div class="col mw-100 text-truncate">
-            <% process.schedulers.each do |scheduler| %>
-              <%- scheduler_name = scheduler.is_a?(Hash) ? scheduler['name'] : scheduler %>
-              <%- scheduler_details = scheduler_name.match(/\(([^)]+)\)/)&.[](1) || scheduler_name %>
-              <pre class="text-truncate mb-0" title="<%= scheduler_details %>">
-                <%= scheduler_details %>
-              </pre>
+          <div class="col mw-100">
+            <% process.schedulers.each do |scheduler_data| %>
+              <pre class="mb-0" title="<%= scheduler_data %>">queues=<%= scheduler_data["queues"] %> max_threads=<%= scheduler_data["max_threads"] %></pre>
             <% end %>
           </div>
           <div class="col-2 small"><%= t(ActiveModel::Type::Boolean.new.cast(process.state["cron_enabled"]), scope: "good_job.shared.boolean") %></div>
