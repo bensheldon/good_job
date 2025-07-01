@@ -97,7 +97,8 @@ module GoodJob
     def redirect_to_index
       # Redirect to the jobs page, maintaining query parameters. This is
       # necessary to support the `?poll=1` parameter that enables live polling.
-      redirect_to jobs_path(request.query_parameters)
+      # But `locale` will be set by `default_url_options`.
+      redirect_to jobs_path(request.query_parameters.except("locale"))
     end
 
     private
