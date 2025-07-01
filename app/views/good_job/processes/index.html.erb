@@ -3,7 +3,7 @@
 </div>
 
 <div class="card my-3" data-live-poll-region="processes">
-  <div class="list-group list-group-flush text-nowrap" role="table">
+  <div class="list-group list-group-flush" role="table">
     <header class="list-group-item bg-body-tertiary">
       <div class="row small text-muted text-uppercase align-items-center">
         <div class="col"><%= t ".process" %></div>
@@ -41,9 +41,9 @@
               <span class="badge rounded-pill bg-body-secondary text-secondary"><%= (process.state["memory"] / 1024).to_i %> MB</span>
             </div>
           </div>
-          <div class="col">
-            <% process.schedulers.each do |scheduler| %>
-              <pre class="mb-0"><%= scheduler.is_a?(Hash) ? scheduler['name'] : scheduler %></pre>
+          <div class="col mw-100">
+            <% process.schedulers.each do |scheduler_data| %>
+              <pre class="mb-0" title="<%= scheduler_data %>">queues=<%= scheduler_data["queues"] %> max_threads=<%= scheduler_data["max_threads"] %></pre>
             <% end %>
           </div>
           <div class="col-2 small"><%= t(ActiveModel::Type::Boolean.new.cast(process.state["cron_enabled"]), scope: "good_job.shared.boolean") %></div>
