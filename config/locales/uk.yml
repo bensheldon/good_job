@@ -217,6 +217,10 @@ uk:
         last_run: Останній запуск
         next_scheduled: Наступне заплановане
         schedule: Розклад
+        state: Стан
+        states:
+          active: Активний
+          paused: Призупинено
       job:
         arguments: Аргументи
         attempts: Спроби

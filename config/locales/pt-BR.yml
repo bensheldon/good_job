@@ -191,6 +191,10 @@ pt-BR:
         last_run: Última execução
         next_scheduled: Próximo agendamento
         schedule: Agendamento
+        state: Estado
+        states:
+          active: Ativo
+          paused: Pausado
       job:
         arguments: Argumentos
         attempts: Tentativas
