@@ -11,7 +11,7 @@
         <div class="col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.schedule" %></div>
         <div class="col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.next_scheduled" %></div>
         <div class="col-lg-1 d-none d-lg-block"><%= t "good_job.models.cron.last_run" %></div>
-        <div class="col-lg-1 d-none d-lg-block"><%= t "good_job.models.cron.state" %></div>
+        <div class="col-lg-1 d-none d-lg-block"><%= t "good_job.models.cron.status" %></div>
         <div class="col-lg-2 text-end">
           <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                          data: { bs_toggle: "collapse", bs_target: ".cron-entry-properties" },
@@ -45,7 +45,7 @@
             <% end %>
           </div>
           <div class="col-6 col-lg-1 text-wrap small">
-            <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.state" %></div>
+            <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.status" %></div>
             <% if cron_entry.enabled? %>
               <span class="text-success"><%= t "good_job.models.cron.states.active" %></span>
             <% else %>

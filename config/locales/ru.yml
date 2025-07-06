@@ -217,7 +217,7 @@ ru:
         last_run: Последний запуск
         next_scheduled: Следующий по расписанию
         schedule: Расписание
-        state: Состояние
+        status: Состояние
         states:
           active: Активно
           paused: Приостановлено

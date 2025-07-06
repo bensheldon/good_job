@@ -191,7 +191,7 @@ pt-BR:
         last_run: Última execução
         next_scheduled: Próximo agendamento
         schedule: Agendamento
-        state: Estado
+        status: Estado
         states:
           active: Ativo
           paused: Pausado

@@ -217,7 +217,7 @@ uk:
         last_run: Останній запуск
         next_scheduled: Наступне заплановане
         schedule: Розклад
-        state: Стан
+        status: Стан
         states:
           active: Активний
           paused: Призупинено

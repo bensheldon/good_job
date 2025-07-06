@@ -191,7 +191,7 @@ fr:
         last_run: Dernière exécution
         next_scheduled: Prochaine exécution
         schedule: Planification
-        state: État
+        status: État
         states:
           active: Actif
           paused: En pause

@@ -191,7 +191,7 @@ nl:
         last_run: Laatste ronde
         next_scheduled: Volgende gepland
         schedule: Schema
-        state: Status
+        status: Status
         states:
           active: Actief
           paused: Gepauzeerd

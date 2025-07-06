@@ -191,7 +191,7 @@ it:
         last_run: Ultima esecuzione
         next_scheduled: Prossima pianificazione
         schedule: Pianificazione
-        state: Stato
+        status: Stato
         states:
           active: Attivo
           paused: In pausa

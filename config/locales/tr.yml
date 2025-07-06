@@ -191,7 +191,7 @@ tr:
         last_run: Son çalıştırma
         next_scheduled: Sonraki planlama
         schedule: Program
-        state: Durum
+        status: Durum
         states:
           active: Aktif
           paused: Duraklatıldı

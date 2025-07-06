@@ -191,7 +191,7 @@ es:
         last_run: Última ejecución
         next_scheduled: Próxima ejecución
         schedule: Cronograma
-        state: Estado
+        status: Estado
         states:
           active: Activo
           paused: Pausado
