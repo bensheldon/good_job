@@ -5,11 +5,12 @@ require 'rails_helper'
 describe 'Pauses' do
   before do
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
-    ExampleJob.perform_later
-    GoodJob.perform_inline
   end
 
   it "can pause and unpause jobs" do
+    ExampleJob.perform_later
+    GoodJob.perform_inline
+
     visit good_job.root_path
 
     click_on "Pauses"
