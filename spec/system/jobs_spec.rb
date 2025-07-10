@@ -57,7 +57,7 @@ describe 'Jobs', :js, :without_executor do
         visit good_job.jobs_path
 
         select "ConfigurableQueueJob", from: "job_class_filter"
-        expect(current_url).to match(/job_class=ConfigurableQueueJob/)
+        expect(page).to have_current_path(/job_class=ConfigurableQueueJob/)
 
         table = page.find("[role=table]")
         expect(table).to have_css("[role=row]", count: 1)
@@ -71,22 +71,24 @@ describe 'Jobs', :js, :without_executor do
           click_link "Scheduled"
         end
 
-        expect(current_url).to match(/state=scheduled/)
+        expect(page).to have_current_path(/state=scheduled/)
 
-        table = page.find("[role=table]")
-        expect(table).to have_css("[role=row]", count: 2)
-        expect(table).to have_content(foo_queue_job.job_id)
+        expect(page).to have_css("[role=table] [role=row]", count: 2)
+        within("[role=table]") do
+          expect(page).to have_content(foo_queue_job.job_id)
+        end
       end
 
       it "can filter by queue" do
         visit good_job.jobs_path
 
         select "foo", from: "job_queue_filter"
-        expect(current_url).to match(/queue_name=foo/)
+        expect(page).to have_current_path(/queue_name=foo/)
 
-        table = page.find("[role=table]")
-        expect(table).to have_css("[role=row]", count: 1)
-        expect(table).to have_content(foo_queue_job.job_id)
+        expect(page).to have_css("[role=table] [role=row]", count: 1)
+        within("[role=table]") do
+          expect(page).to have_content(foo_queue_job.job_id)
+        end
       end
 
       it "can filter by multiple variables" do
@@ -98,24 +100,22 @@ describe 'Jobs', :js, :without_executor do
         expect(page).to have_content("No jobs found.")
 
         select "foo", from: "job_queue_filter"
-
         expect(page).to have_content(foo_queue_job.job_id)
       end
 
       it 'can search by argument' do
         visit '/good_job'
-        click_link "Jobs"
 
         expect(page).to have_css('[role=row]', count: 3)
         fill_in 'query', with: ExampleJob::DEAD_TYPE
         click_button 'Search'
+
         expect(page).to have_css('[role=row]', count: 1)
       end
     end
 
     it 'can retry discarded jobs' do
       visit '/good_job'
-      click_link "Jobs"
 
       expect do
         within "##{dom_id(discarded_job)}" do
@@ -128,14 +128,13 @@ describe 'Jobs', :js, :without_executor do
 
     it 'can discard jobs' do
       visit '/good_job'
-      click_link "Jobs"
 
       expect do
         within "##{dom_id(unfinished_job)}" do
           click_button 'Actions'
           accept_confirm { click_link 'Discard job' }
         end
-        expect(page).to have_content "Job has been discarded"
+        expect(page).to have_content :all, "Job has been discarded"
       end.to change { unfinished_job.reload.finished_at }.from(nil).to within(1.second).of(Time.current)
     end
 
@@ -143,20 +142,18 @@ describe 'Jobs', :js, :without_executor do
       unfinished_job.update performed_at: 1.hour.ago, finished_at: nil
 
       visit '/good_job'
-      click_link "Jobs"
 
       expect do
         within "##{dom_id(unfinished_job)}" do
           click_button 'Actions'
           accept_confirm { click_link 'Force discard' }
         end
-        expect(page).to have_content "Job has been force discarded"
+        expect(page).to have_content :all, "Job has been force discarded"
       end.to change { unfinished_job.reload.finished_at }.from(nil).to within(1.second).of(Time.current)
     end
 
     it 'can destroy jobs' do
       visit '/good_job'
-      click_link "Jobs"
 
       within "##{dom_id(discarded_job)}" do
         click_button 'Actions'
@@ -168,7 +165,6 @@ describe 'Jobs', :js, :without_executor do
 
     it 'performs batch job actions' do
       visit "/good_job"
-      click_link "Jobs"
 
       expect(page).to have_field(checked: true, count: 0)
 
@@ -205,7 +201,7 @@ describe 'Jobs', :js, :without_executor do
       end.to change { GoodJob::Job.discarded.count }.from(0).to(2)
 
       visit "/good_job"
-      click_link "Jobs"
+
       expect do
         check "toggle_job_ids"
         within("[role=table] header") do
