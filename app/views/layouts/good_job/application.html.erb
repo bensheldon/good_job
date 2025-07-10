@@ -25,11 +25,13 @@
     <%= tag.link rel: "stylesheet", href: frontend_static_path(:style, format: :css, locale: nil), nonce: content_security_policy_nonce %>
     <%= tag.script "", src: frontend_static_path(:bootstrap, format: :js, locale: nil), nonce: content_security_policy_nonce %>
     <%= tag.script "", src: frontend_static_path(:chartjs, format: :js, locale: nil), nonce: content_security_policy_nonce %>
-    <%= tag.script "", src: frontend_static_path(:rails_ujs, format: :js, locale: nil), nonce: content_security_policy_nonce %>
     <%= tag.script "", src: frontend_static_path(:es_module_shims, format: :js, locale: nil), async: true, nonce: content_security_policy_nonce %>
+
     <% importmaps = GoodJob::FrontendsController.js_modules.keys.index_with { |module_name| frontend_module_path(module_name, format: :js, locale: nil) } %>
     <%= tag.script({ imports: importmaps }.to_json.html_safe, type: "importmap", nonce: content_security_policy_nonce) %>
-    <%= tag.script "", type: "module", nonce: content_security_policy_nonce do %> import "application"; <% end %>
+
+    <%= tag.script "", rel: "modulepreload", href: frontend_static_path(:application, format: :js, locale: nil), nonce: content_security_policy_nonce %>
+    <%= tag.script "", type: "module", nonce: content_security_policy_nonce do %>import "application"<% end %>
   </head>
   <body>
     <div class="d-flex flex-column min-vh-100">

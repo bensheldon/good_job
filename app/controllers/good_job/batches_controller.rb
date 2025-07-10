@@ -13,7 +13,7 @@ module GoodJob
     def retry
       @batch = GoodJob::Batch.find(params[:id])
       @batch.retry
-      redirect_back(fallback_location: batches_path, notice: t(".notice"))
+      redirect_back(fallback_location: batches_path, notice: t(".notice"), status: :see_other)
     end
   end
 end
