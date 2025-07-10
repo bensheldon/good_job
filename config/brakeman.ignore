@@ -7,7 +7,7 @@
       "check_name": "Render",
       "message": "Render path contains parameter value",
       "file": "app/controllers/good_job/frontends_controller.rb",
-      "line": 47,
+      "line": 52,
       "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
       "code": "render(file => (self.class.js_modules[params[:id].to_sym] or raise(ActionController::RoutingError, \"Not Found\")), {})",
       "render_path": null,
@@ -15,29 +15,6 @@
         "type": "method",
         "class": "GoodJob::FrontendsController",
         "method": "module"
-      },
-      "user_input": "params[:id].to_sym",
-      "confidence": "Weak",
-      "cwe_id": [
-        22
-      ],
-      "note": "Files are explicitly enumerated in the array"
-    },
-    {
-      "warning_type": "Dynamic Render Path",
-      "warning_code": 15,
-      "fingerprint": "b0c2888c9b217671d90d0141b49b036af3b2a70c63b02968cc97ae2052c86272",
-      "check_name": "Render",
-      "message": "Render path contains parameter value",
-      "file": "app/controllers/good_job/frontends_controller.rb",
-      "line": 41,
-      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(file => ({ :css => ({ :bootstrap => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"bootstrap\", \"bootstrap.min.css\"), :style => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"style.css\") }), :js => ({ :bootstrap => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"bootstrap\", \"bootstrap.bundle.min.js\"), :chartjs => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"chartjs\", \"chart.min.js\"), :es_module_shims => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"es_module_shims.js\"), :rails_ujs => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"rails_ujs.js\") }), :svg => ({ :icons => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"icons.svg\") }) }.dig(params[:format].to_sym, params[:id].to_sym) or raise(ActionController::RoutingError, \"Not Found\")), {})",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GoodJob::FrontendsController",
-        "method": "static"
       },
       "user_input": "params[:id].to_sym",
       "confidence": "Weak",
@@ -115,7 +92,30 @@
         77
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Dynamic Render Path",
+      "warning_code": 15,
+      "fingerprint": "ebc35a48169b7ee1f2e1b024f3bf6abe7138924a3a318ab2ad405c2b6e9bbb55",
+      "check_name": "Render",
+      "message": "Render path contains parameter value",
+      "file": "app/controllers/good_job/frontends_controller.rb",
+      "line": 46,
+      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
+      "code": "render(file => ({ :css => ({ :bootstrap => asset_path(\"vendor\", \"bootstrap\", \"bootstrap.min.css\"), :style => asset_path(\"style.css\") }), :js => ({ :bootstrap => asset_path(\"vendor\", \"bootstrap\", \"bootstrap.bundle.min.js\"), :chartjs => asset_path(\"vendor\", \"chartjs\", \"chart.min.js\"), :es_module_shims => asset_path(\"vendor\", \"es_module_shims.js\"), :turbo => asset_path(\"vendor\", \"turbo.js\") }), :svg => ({ :icons => asset_path(\"icons.svg\") }) }.dig(params[:format].to_sym, params[:id].to_sym) or raise(ActionController::RoutingError, \"Not Found\")), {})",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GoodJob::FrontendsController",
+        "method": "static"
+      },
+      "user_input": "params[:id].to_sym",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": ""
     }
   ],
-  "brakeman_version": "7.0.2"
+  "brakeman_version": "7.1.1"
 }

@@ -55,6 +55,7 @@ describe 'Jobs', :js, :without_executor do
 
       it "can filter by job class" do
         visit good_job.jobs_path
+        wait_for_turbo_load
 
         select "ConfigurableQueueJob", from: "job_class_filter"
         expect(page).to have_current_path(/job_class=ConfigurableQueueJob/)
@@ -66,6 +67,7 @@ describe 'Jobs', :js, :without_executor do
 
       it "can filter by state" do
         visit good_job.jobs_path
+        wait_for_turbo_load
 
         within "#filter" do
           click_link "Scheduled"
@@ -81,6 +83,7 @@ describe 'Jobs', :js, :without_executor do
 
       it "can filter by queue" do
         visit good_job.jobs_path
+        wait_for_turbo_load
 
         select "foo", from: "job_queue_filter"
         expect(page).to have_current_path(/queue_name=foo/)
@@ -93,9 +96,13 @@ describe 'Jobs', :js, :without_executor do
 
       it "can filter by multiple variables" do
         visit good_job.jobs_path
+        wait_for_turbo_load
 
         select "ConfigurableQueueJob", from: "job_class_filter"
+        expect(page).to have_current_path(/job_class=ConfigurableQueueJob/)
+
         select "mice", from: "job_queue_filter"
+        expect(page).to have_current_path(/queue_name=mice&job_class=ConfigurableQueueJob/)
 
         expect(page).to have_content("No jobs found.")
 
@@ -105,6 +112,7 @@ describe 'Jobs', :js, :without_executor do
 
       it 'can search by argument' do
         visit '/good_job'
+        wait_for_turbo_load
 
         expect(page).to have_css('[role=row]', count: 3)
         fill_in 'query', with: ExampleJob::DEAD_TYPE
@@ -116,11 +124,12 @@ describe 'Jobs', :js, :without_executor do
 
     it 'can retry discarded jobs' do
       visit '/good_job'
+      wait_for_turbo_load
 
       expect do
         within "##{dom_id(discarded_job)}" do
           click_button 'Actions'
-          accept_confirm { click_link 'Retry job' }
+          accept_confirm { click_on 'Retry job' }
         end
         expect(page).to have_content "Job has been retried"
       end.to change { discarded_job.reload.status }.from(:discarded).to(:queued)
@@ -128,11 +137,12 @@ describe 'Jobs', :js, :without_executor do
 
     it 'can discard jobs' do
       visit '/good_job'
+      wait_for_turbo_load
 
       expect do
         within "##{dom_id(unfinished_job)}" do
           click_button 'Actions'
-          accept_confirm { click_link 'Discard job' }
+          accept_confirm { click_on 'Discard job' }
         end
         expect(page).to have_content :all, "Job has been discarded"
       end.to change { unfinished_job.reload.finished_at }.from(nil).to within(1.second).of(Time.current)
@@ -142,11 +152,12 @@ describe 'Jobs', :js, :without_executor do
       unfinished_job.update performed_at: 1.hour.ago, finished_at: nil
 
       visit '/good_job'
+      wait_for_turbo_load
 
       expect do
         within "##{dom_id(unfinished_job)}" do
           click_button 'Actions'
-          accept_confirm { click_link 'Force discard' }
+          accept_confirm { click_on 'Force discard' }
         end
         expect(page).to have_content :all, "Job has been force discarded"
       end.to change { unfinished_job.reload.finished_at }.from(nil).to within(1.second).of(Time.current)
@@ -154,10 +165,11 @@ describe 'Jobs', :js, :without_executor do
 
     it 'can destroy jobs' do
       visit '/good_job'
+      wait_for_turbo_load
 
       within "##{dom_id(discarded_job)}" do
         click_button 'Actions'
-        accept_confirm { click_link 'Destroy job' }
+        accept_confirm { click_on 'Destroy job' }
       end
       expect(page).to have_content "Job has been destroyed"
       expect { discarded_job.reload }.to raise_error(ActiveRecord::RecordNotFound)
@@ -165,6 +177,7 @@ describe 'Jobs', :js, :without_executor do
 
     it 'performs batch job actions' do
       visit "/good_job"
+      wait_for_turbo_load
 
       expect(page).to have_field(checked: true, count: 0)
 
@@ -200,7 +213,7 @@ describe 'Jobs', :js, :without_executor do
         expect(page).to have_field(checked: true, count: 0)
       end.to change { GoodJob::Job.discarded.count }.from(0).to(2)
 
-      visit "/good_job"
+      click_link "Jobs"
 
       expect do
         check "toggle_job_ids"
