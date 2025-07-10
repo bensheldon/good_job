@@ -1,20 +1,30 @@
 /*jshint esversion: 6, strict: false */
 
+import "turbo";
+import { Application } from "stimulus";
+window.Stimulus = Application.start();
+
+import FormController from "form_controller";
+Stimulus.register("form", FormController);
+import ThemeController from "theme_controller";
+Stimulus.register("theme", ThemeController);
+import AsyncValuesController from "async_values_controller";
+Stimulus.register("async-values", AsyncValuesController);
+
+document.addEventListener("turbo:submit-start", function() {
+  document.documentElement.setAttribute("data-turbo-loading", "1")
+})
+document.addEventListener("turbo:submit-end", function() {
+  document.documentElement.removeAttribute("data-turbo-loading")
+})
+
 import renderCharts from "charts";
 import checkboxToggle from "checkbox_toggle";
-import documentReady from "document_ready";
 import showToasts from "toasts";
 import setupPopovers from "popovers";
 import LivePoll from "live_poll";
 
-import { Application } from "stimulus";
-import ThemeController from "theme_controller";
-import AsyncValuesController from "async_values_controller";
-window.Stimulus = Application.start();
-Stimulus.register("theme", ThemeController)
-Stimulus.register("async-values", AsyncValuesController)
-
-documentReady(function() {
+window.document.addEventListener("turbo:load", function() {
   renderCharts();
   showToasts();
   setupPopovers();
@@ -22,5 +32,11 @@ documentReady(function() {
 
   const livePoll = new LivePoll
   livePoll.start();
+
+  document.body.setAttribute("data-turbo-loaded", "");
+
+  document.addEventListener("turbo:before-visit", () => {
+    document.body.removeAttribute("data-turbo-loaded");
+  }, { once: true });
 });
 
