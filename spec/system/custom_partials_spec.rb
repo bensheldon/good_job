@@ -5,11 +5,12 @@ require 'rails_helper'
 RSpec.describe 'Custom partials' do
   before do
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
-    ExampleJob.perform_later
   end
 
   it 'renders custom partials on the Job#show page' do
+    ExampleJob.perform_later
     job = GoodJob::Job.last
+
     visit good_job.job_path(job.id)
     expect(page).to have_content 'ExampleJob'
     expect(page).to have_css ".custom-job-details-for-demo"
