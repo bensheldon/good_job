@@ -19,7 +19,7 @@ describe GoodJob::FrontendsController do
       get good_job.frontend_static_path(:bootstrap, format: :yowza, locale: nil)
       expect(response).to have_http_status(:not_found)
 
-      get good_job.frontend_static_path(:rails_ujs, format: :css, locale: nil)
+      get good_job.frontend_static_path(:turbo, format: :css, locale: nil)
       expect(response).to have_http_status(:not_found)
     end
   end

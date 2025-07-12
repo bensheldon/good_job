@@ -33,28 +33,28 @@
               form_class: "d-inline-block",
               aria: { label: t("good_job.jobs.actions.reschedule") },
               title: t("good_job.jobs.actions.reschedule"),
-              data: { confirm: t("good_job.jobs.actions.confirm_reschedule") } do %>
+              data: { turbo_confirm: t("good_job.jobs.actions.confirm_reschedule") } do %>
             <%= render_icon "skip_forward" %>
             <%= t "good_job.actions.reschedule" %>
           <% end %>
         <% end %>
 
         <% if @job.status.in? [:scheduled, :retried, :queued] %>
-          <%= button_to discard_job_path(@job.id), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.jobs.actions.discard") }, title: t("good_job.jobs.actions.discard"), data: { confirm: t("good_job.jobs.actions.confirm_discard") } do %>
+          <%= button_to discard_job_path(@job.id), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.jobs.actions.discard") }, title: t("good_job.jobs.actions.discard"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_discard") } do %>
             <%= render_icon "stop" %>
             <%= t "good_job.actions.discard" %>
           <% end %>
         <% end %>
 
         <% if @job.status == :discarded %>
-          <%= button_to retry_job_path(@job.id), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.jobs.actions.retry") }, title: t("good_job.jobs.actions.retry"), data: { confirm: t("good_job.jobs.actions.confirm_retry") } do %>
+          <%= button_to retry_job_path(@job.id), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.jobs.actions.retry") }, title: t("good_job.jobs.actions.retry"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_retry") } do %>
             <%= render_icon "arrow_clockwise" %>
             <%= t "good_job.actions.retry" %>
           <% end %>
         <% end %>
 
         <% if @job.status.in? [:discarded, :succeeded] %>
-          <%= button_to job_path(@job.id), method: :delete, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.jobs.actions.destroy") }, title: t("good_job.jobs.actions.destroy"), data: { confirm: t("good_job.jobs.actions.confirm_destroy") } do %>
+          <%= button_to job_path(@job.id), method: :delete, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.jobs.actions.destroy") }, title: t("good_job.jobs.actions.destroy"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_destroy") } do %>
             <%= render_icon "trash" %>
             <%= t "good_job.actions.destroy" %>
           <% end %>

@@ -60,7 +60,7 @@
               </div>
               <div class="col text-end">
                 <% if batch.discarded? %>
-                  <%= link_to retry_batch_path(batch), method: :put, class: "btn btn-sm btn-outline-primary", title: t("good_job.batches.actions.retry"), data: { confirm: t("good_job.batches.actions.confirm_retry") } do %>
+                  <%= link_to retry_batch_path(batch), class: "btn btn-sm btn-outline-primary", title: t("good_job.batches.actions.retry"), data: { turbo_method: :put, turbo_confirm: t("good_job.batches.actions.confirm_retry") } do %>
                     <%= render_icon "arrow_clockwise" %>
                     <%= t "good_job.batches.actions.retry" %>
                   <% end %>
