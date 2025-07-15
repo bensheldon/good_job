@@ -16,8 +16,8 @@ RSpec.configure do |config|
   config.around do |example|
     GoodJob.preserve_job_records = true
 
-    PgLock.current_database.advisory_lock.owns.all?(&:unlock) if PgLock.advisory_lock.owns.count > 0
-    PgLock.current_database.advisory_lock.others.each(&:unlock!) if PgLock.advisory_lock.others.count > 0
+    PgLock.current_database.advisory_lock.owns.all?(&:unlock) if PgLock.advisory_lock.owns.any?
+    PgLock.current_database.advisory_lock.others.each(&:unlock!) if PgLock.advisory_lock.others.any?
     expect(PgLock.current_database.advisory_lock.count).to eq(0), "Existing advisory locks BEFORE test run"
 
     GoodJob::CurrentThread.reset

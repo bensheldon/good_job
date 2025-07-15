@@ -47,13 +47,37 @@
       "note": "Files are explicitly enumerated in the array"
     },
     {
+      "warning_type": "Dangerous Eval",
+      "warning_code": 13,
+      "fingerprint": "c4c3e1b8b28ebbfd4672cf3e8f0022a27aff3c12dc4fea750b412de1387f91e6",
+      "check_name": "Evaluation",
+      "message": "Dynamic string evaluated as code",
+      "file": "lib/good_job/log_subscriber.rb",
+      "line": 256,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_eval/",
+      "code": "class_eval(\"        def #{level}(progname = nil, tags: [], &block)   # def info(progname = nil, tags: [], &block)\\n          return unless logger                           #   return unless logger\\n                                                         #\\n          tag_logger(*tags) do                           #   tag_logger(*tags) do\\n            logger.#{level}(progname, &block)            #     logger.info(progname, &block)\\n          end                                            #   end\\n        end                                              #\\n\", \"lib/good_job/log_subscriber.rb\", (256 + 1))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "LogSubscriber",
+        "method": null
+      },
+      "user_input": null,
+      "confidence": "Weak",
+      "cwe_id": [
+        913,
+        95
+      ],
+      "note": ""
+    },
+    {
       "warning_type": "SQL Injection",
       "warning_code": 0,
       "fingerprint": "c837568c590d9608a8bb9927b31b9597aaacc72053b6482e1a54bd02aa0dd2d7",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/good_job/job.rb",
-      "line": 135,
+      "line": 162,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql(\"(CASE #{queues.map.with_index do\n sanitize_sql_array([\"WHEN queue_name = ? THEN ?\", queue_name, index])\n end.join(\" \")} ELSE #{queues.size} END)\")",
       "render_path": null,
@@ -93,6 +117,5 @@
       "note": ""
     }
   ],
-  "updated": "2024-11-16 17:00:20 -0600",
-  "brakeman_version": "6.2.1"
+  "brakeman_version": "7.0.2"
 }

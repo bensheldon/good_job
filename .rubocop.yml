@@ -1,6 +1,6 @@
 inherit_from: .rubocop_todo.yml
 
-require:
+plugins:
   - rubocop-capybara
   - rubocop-performance
   - rubocop-rails
@@ -59,6 +59,9 @@ Metrics:
 
 Naming/MemoizedInstanceVariableName:
   EnforcedStyleForLeadingUnderscores: required
+
+Naming/PredicateMethod:
+  Enabled: false
 
 Naming/VariableNumber:
   EnforcedStyle: snake_case
