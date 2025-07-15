@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
-require "selenium-webdriver"
+require "capybara/cuprite"
 
-Capybara.default_max_wait_time = 2
+Capybara.default_max_wait_time = 5
+Capybara.disable_animation = true
 Capybara.server = :puma, { Silent: true }
-Capybara.disable_animation = true # injects CSP-incompatible CSS and JS
 
 module SystemTestHelpers
+  def js_driver?
+    Capybara.current_driver != :rack_test
+  end
+
   [
     :accept_alert,
     :dismiss_alert,
@@ -16,12 +20,13 @@ module SystemTestHelpers
     :dismiss_prompt,
     :accept_modal,
     :dismiss_modal,
-  ].each do |driver_method|
-    define_method(driver_method) do |text = nil, **options, &blk|
-      super(text, **options, &blk)
-    rescue Capybara::NotSupportedByDriverError
-      blk.call
-    end
+  ].each do |method|
+    module_eval <<-RUBY, __FILE__, __LINE__ + 1
+        def #{method}(...)                 # def accept_alert(...)
+          return yield unless js_driver?   #   return yield unless js_driver?
+          super                            #   super
+        end                                # end
+    RUBY
   end
 end
 
@@ -30,31 +35,25 @@ RSpec.configure do |config|
   config.include SystemTestHelpers, type: :system
 
   config.before(:each, type: :system) do |example|
-    ActiveRecord::Base.connection.disable_query_cache!
+    example.metadata[:js] = true if ENV['SHOW_BROWSER']
 
-    if ENV['SHOW_BROWSER']
-      example.metadata[:js] = true
-      driven_by :selenium, using: :chrome, screen_size: [1024, 800]
+    if example.metadata[:js]
+      Capybara.session_options.automatic_label_click = true
+
+      # Chrome's no-sandbox option is required for running in Docker
+      driven_by(
+        :cuprite,
+        screen_size: [1024, 800],
+        options: {
+          process_timeout: 30,
+          headless: ENV['SHOW_BROWSER'] ? false : true,
+          slowmo: ENV["SLOWMO"]&.to_f,
+          browser_options: ENV["DOCKER"] || ENV["CI"] ? { "no-sandbox" => nil } : {},
+        }
+      )
     else
+      Capybara.session_options.automatic_label_click = false
       driven_by :rack_test
     end
   end
-
-  config.before(:each, :js, type: :system) do
-    # Chrome's no-sandbox option is required for running in Docker
-    driven_by :selenium, using: (ENV['SHOW_BROWSER'] ? :chrome : :headless_chrome), screen_size: [1024, 800] do |driver_options|
-      driver_options.add_argument("--disable-dev-shm-usage")
-      driver_options.add_argument("--no-sandbox")
-    end
-  end
-
-  # config.after(:each, type: :system, js: true) do |example|
-  #   @previous_browser_logs ||= []
-  #
-  #   if example.exception
-  #     browser_logs = page.driver.browser.manage.logs.get(:browser) - @previous_browser_logs
-  #     raise "Browser logs:\n\n#{browser_logs.join("\n")}" unless browser_logs.empty?
-  #   end
-  #   @previous_browser_logs = page.driver.browser.manage.logs.get(:browser)
-  # end
 end
