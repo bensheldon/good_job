@@ -12,7 +12,7 @@ module GoodJob
       pause_value = params[:value].to_s
 
       GoodJob::Setting.pause(pause_type => pause_value)
-      redirect_to({ action: :index }, notice: "Successfully paused #{params[:type]} '#{params[:value]}'")
+      redirect_to({ action: :index }, notice: "Successfully paused #{params[:type]} '#{params[:value]}'", status: :see_other)
     end
 
     def destroy
@@ -20,7 +20,7 @@ module GoodJob
       pause_value = params[:value].to_s
 
       GoodJob::Setting.unpause(pause_type => pause_value)
-      redirect_to({ action: :index }, notice: "Successfully unpaused #{params[:type]} '#{params[:value]}'")
+      redirect_to({ action: :index }, notice: "Successfully unpaused #{params[:type]} '#{params[:value]}'", status: :see_other)
     end
 
     private
