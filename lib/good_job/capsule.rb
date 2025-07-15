@@ -109,9 +109,7 @@ module GoodJob
 
     # UUID for this capsule; to be used for inspection (not directly for locking jobs).
     # @return [String]
-    def process_id
-      @tracker.process_id
-    end
+    delegate :process_id, to: :@tracker
 
     def lower_thread_priority=(value)
       @lower_thread_priority = value

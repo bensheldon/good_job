@@ -175,9 +175,7 @@ module GoodJob
 
     # Get the logger associated with this {LogSubscriber} instance.
     # @return [Logger]
-    def logger
-      GoodJob::LogSubscriber.logger
-    end
+    delegate :logger, to: :'GoodJob::LogSubscriber'
 
     class << self
       # Tracks all loggers that {LogSubscriber} is writing to. You can write to
