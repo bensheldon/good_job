@@ -56,6 +56,7 @@ RSpec.describe GoodJob::CurrentThread do
   describe '.to_h' do
     it 'returns a hash' do
       value = {
+        active_job: nil,
         cron_at: 5.minutes.ago,
         cron_key: 'example',
         error_on_discard: false,
