@@ -358,7 +358,7 @@ Good Job’s general behavior can also be configured via attributes directly on 
     ```ruby
     # config/initializers/good_job.rb
     GoodJob.configure_active_record do
-      connects_to database: :special_database
+      connects_to database: { writing: :special_database }
       self.table_name_prefix = "special_application_"
     end
     ```
