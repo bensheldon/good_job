@@ -4,6 +4,7 @@ module GoodJob
   # Active Record model that represents an +ActiveJob+ job.
   class Job < BaseRecord
     include AdvisoryLockable
+    include RowLockable
     include ErrorEvents
     include Filterable
     include Reportable
@@ -189,6 +190,9 @@ module GoodJob
         where(queue_name: parsed[:include])
       end
     end)
+
+    # Find jobs that don't have a matching Process record
+    scope :illocked, -> { left_joins(:locked_by_process).where.not(locked_by_id: nil).where(locked_by_process: { id: nil }) }
 
     class << self
       # Parse a string representing a group of queues into a more readable data
