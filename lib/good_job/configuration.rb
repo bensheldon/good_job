@@ -39,9 +39,15 @@ module GoodJob
     DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT = false
     # Default enable_pauses setting
     DEFAULT_ENABLE_PAUSES = false
+    # Valid dequeue query sorts
+    DEQUEUE_QUERY_SORTS = [:created_at, :scheduled_at]
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
+    end
+
+    def self.validate_dequeue_query_sort(dequeue_query_sort)
+      raise ArgumentError, "GoodJob dequeue query sortmust be one of #{DEQUEUE_QUERY_SORTS.join(', ')}. It was '#{dequeue_query_sort}' which is not valid." unless dequeue_query_sort.in?(DEQUEUE_QUERY_SORTS)
     end
 
     # The options that were explicitly set when initializing +Configuration+.
@@ -93,6 +99,7 @@ module GoodJob
 
     def validate!
       self.class.validate_execution_mode(execution_mode)
+      self.class.validate_dequeue_query_sort(dequeue_query_sort)
     end
 
     # Specifies how and where jobs should be executed. See {Adapter#initialize}
@@ -414,6 +421,10 @@ module GoodJob
       return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ADVISORY_LOCK_HEARTBEAT']) unless env['GOOD_JOB_ADVISORY_LOCK_HEARTBEAT'].nil?
 
       Rails.env.development?
+    end
+
+    def dequeue_query_sort
+      (options[:dequeue_query_sort] || rails_config[:dequeue_query_sort] || :created_at).to_sym
     end
 
     private
