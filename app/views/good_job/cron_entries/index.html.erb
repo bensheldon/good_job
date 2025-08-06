@@ -25,7 +25,7 @@
       <div id="<%= dom_id(cron_entry) %>" class="list-group-item py-3" role="row">
         <div class="row align-items-center">
           <div class="col-12 col-lg-2">
-            <div class="small font-monospace"><%= cron_entry.key %></div>
+            <div class="small font-monospace text-wrap"><%= cron_entry.key %></div>
             <div class="small text-muted text-wrap"><%= cron_entry.description %></div>
           </div>
           <div class="col-12 col-lg-2 text-wrap"><%= tag.span tag.code(cron_entry.job_class), class: "fs-5 mb-0" %></div>
