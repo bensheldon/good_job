@@ -20,48 +20,55 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 <details markdown="1">
 <summary><strong>📊 Comparison of GoodJob with other job queue backends (click to expand)</strong></summary>
 
-|                 | Queues, priority, retries | Database                              | Concurrency       | Reliability/Integrity  | Latency                  |
-|-----------------|---------------------------|---------------------------------------|-------------------|------------------------|--------------------------|
-| **GoodJob**     | ✅ Yes                     | ✅ Postgres                            | ✅ Multithreaded   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
-| **Solid Queue** | ✅ Yes                     | ✅ Postgres and other databases ✨     | 🔶 Multithreaded in forked process   | ✅ ACID, Advisory Locks | 🔶 Polling |
-| **Que**         | ✅ Yes                     | 🔶️ Postgres, requires  `structure.sql` | ✅ Multithreaded   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
-| **Delayed Job** | ✅ Yes                     | ✅ Postgres                            | 🔴 Single-threaded | ✅ ACID, record-based   | 🔶 Polling                |
-| **Sidekiq**     | ✅ Yes                     | 🔴 Redis                               | ✅ Multithreaded   | 🔴 Crashes lose jobs    | ✅ Redis BRPOP            |
-| **Sidekiq Pro** | ✅ Yes                     | 🔴 Redis                               | ✅ Multithreaded   | ✅ Redis RPOPLPUSH      | ✅ Redis RPOPLPUSH        |
+|                 | Queues, priority, retries | Database                              | Concurrency                       | Reliability/Integrity  | Latency                  |
+| --------------- | ------------------------- | ------------------------------------- | --------------------------------- | ---------------------- | ------------------------ |
+| **GoodJob**     | ✅ Yes                     | ✅ Postgres                            | ✅ Multithreaded                   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
+| **Solid Queue** | ✅ Yes                     | ✅ Postgres and other databases ✨      | 🔶 Multithreaded in forked process | ✅ ACID, Advisory Locks | 🔶 Polling                |
+| **Que**         | ✅ Yes                     | 🔶️ Postgres, requires  `structure.sql` | ✅ Multithreaded                   | ✅ ACID, Advisory Locks | ✅ Postgres LISTEN/NOTIFY |
+| **Delayed Job** | ✅ Yes                     | ✅ Postgres                            | 🔴 Single-threaded                 | ✅ ACID, record-based   | 🔶 Polling                |
+| **Sidekiq**     | ✅ Yes                     | 🔴 Redis                               | ✅ Multithreaded                   | 🔴 Crashes lose jobs    | ✅ Redis BRPOP            |
+| **Sidekiq Pro** | ✅ Yes                     | 🔴 Redis                               | ✅ Multithreaded                   | ✅ Redis RPOPLPUSH      | ✅ Redis RPOPLPUSH        |
 
 </details>
 
 ## Table of contents
 
-- [Set up](#set-up)
-- [Compatibility](#compatibility)
-- [Configuration](#configuration)
+- [GoodJob](#goodjob)
+  - [Table of contents](#table-of-contents)
+  - [Set up](#set-up)
+  - [Compatibility](#compatibility)
+  - [Configuration](#configuration)
     - [Command-line options](#command-line-options)
-        - [`good_job start`](#good_job-start)
-        - [`good_job cleanup_preserved_jobs`](#good_job-cleanup_preserved_jobs)
+      - [`good_job start`](#good_job-start)
+      - [`good_job cleanup_preserved_jobs`](#good_job-cleanup_preserved_jobs)
     - [Configuration options](#configuration-options)
+      - [Performance Optimization: Disabling Job Priority](#performance-optimization-disabling-job-priority)
     - [Global options](#global-options)
     - [Dashboard](#dashboard)
-        - [API-only Rails applications](#api-only-rails-applications)
-        - [Live polling](#live-polling)
-        - [Extending dashboard views](#extending-dashboard-views)
+      - [API-only Rails applications](#api-only-rails-applications)
+      - [Live polling](#live-polling)
+      - [Extending dashboard views](#extending-dashboard-views)
     - [Job priority](#job-priority)
+    - [Labelled jobs](#labelled-jobs)
     - [Concurrency controls](#concurrency-controls)
-        - [How concurrency controls work](#how-concurrency-controls-work)
+      - [How concurrency controls work](#how-concurrency-controls-work)
     - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
     - [Bulk enqueue](#bulk-enqueue)
     - [Batches](#batches)
+    - [Batch callback jobs](#batch-callback-jobs)
+      - [Complex batches](#complex-batches)
+      - [Other batch details](#other-batch-details)
     - [Updating](#updating)
-        - [Upgrading minor versions](#upgrading-minor-versions)
-        - [Upgrading v3 to v4](#upgrading-v3-to-v4)
-        - [Upgrading v2 to v3](#upgrading-v2-to-v3)
-        - [Upgrading v1 to v2](#upgrading-v1-to-v2)
-- [Go deeper](#go-deeper)
+      - [Upgrading minor versions](#upgrading-minor-versions)
+      - [Upgrading v3 to v4](#upgrading-v3-to-v4)
+      - [Upgrading v2 to v3](#upgrading-v2-to-v3)
+      - [Upgrading v1 to v2](#upgrading-v1-to-v2)
+  - [Go deeper](#go-deeper)
     - [Exceptions, retries, and reliability](#exceptions-retries-and-reliability)
-        - [Exceptions](#exceptions)
-        - [Retries](#retries)
-        - [Action Mailer retries](#action-mailer-retries)
-        - [Interrupts, graceful shutdown, and SIGKILL](#Interrupts-graceful-shutdown-and-SIGKILL)
+      - [Exceptions](#exceptions)
+      - [Retries](#retries)
+      - [Action Mailer retries](#action-mailer-retries)
+    - [Interrupts, graceful shutdown, and SIGKILL](#interrupts-graceful-shutdown-and-sigkill)
     - [Timeouts](#timeouts)
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
     - [Database connections](#database-connections)
@@ -69,23 +76,25 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Queue performance with Queue Select Limit](#queue-performance-with-queue-select-limit)
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
     - [Migrate to GoodJob from a different Active Job backend](#migrate-to-goodjob-from-a-different-active-job-backend)
-    - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
     - [Write tests](#write-tests)
     - [PgBouncer compatibility](#pgbouncer-compatibility)
     - [CLI HTTP health check probes](#cli-http-health-check-probes)
+      - [Default configuration](#default-configuration)
+      - [Custom configuration](#custom-configuration)
+        - [Using WEBrick](#using-webrick)
     - [Pausing Jobs](#pausing-jobs)
-- [Doing your best job with GoodJob](#doing-your-best-job-with-goodjob)
+  - [Doing your best job with GoodJob](#doing-your-best-job-with-goodjob)
     - [Sizing jobs: mice and elephants](#sizing-jobs-mice-and-elephants)
     - [Isolating by total latency](#isolating-by-total-latency)
     - [Configuring your queues](#configuring-your-queues)
     - [Additional observations](#additional-observations)
-- [Contribute](#contribute)
+  - [Contribute](#contribute)
     - [Gem development](#gem-development)
-        - [Development setup](#development-setup)
-        - [Rails development harness](#rails-development-harness)
-        - [Running tests](#running-tests)
+      - [Development setup](#development-setup)
+      - [Rails development harness](#rails-development-harness)
+      - [Running tests](#running-tests)
     - [Release](#release)
-- [License](#license)
+  - [License](#license)
 
 ## Set up
 
@@ -331,6 +340,108 @@ Available configuration options are:
     ```
 
 - `enable_pauses` (boolean) whether job processing can be paused. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_PAUSES`.
+- `enable_priority` (boolean) whether to use job priority in dequeuing and sorting. When disabled, jobs are processed in FIFO (first-in, first-out) order only, which can improve performance. Defaults to `true` for backwards compatibility. You can also set this with the environment variable `GOOD_JOB_ENABLE_PRIORITY`. When disabled, GoodJob will log a warning if jobs are enqueued with non-default priority values.
+
+#### Performance Optimization: Disabling Job Priority
+
+For optimal dequeuing performance, it's recommended to rely on latency-based queues rather than relying on priority.
+You can disable job priority to use FIFO-only processing:
+
+```ruby
+# config/application.rb or config/environments/{RAILS_ENV}.rb
+config.good_job.enable_priority = false
+```
+
+When priority is disabled, you should also optimize your database indexes. For existing installations, create a migration to replace priority-based indexes:
+
+```ruby
+# Migration to optimize indexes when priority is disabled
+class OptimizeGoodJobIndexesForFifo < ActiveRecord::Migration[7.0]
+  disable_ddl_transaction!
+
+  def up
+    # Remove priority-based indexes
+    remove_index :good_jobs, name: :index_good_jobs_jobs_on_priority_created_at_when_unfinished, algorithm: :concurrently, if_exists: true
+    remove_index :good_jobs, name: :index_good_job_jobs_for_candidate_lookup, algorithm: :concurrently, if_exists: true
+    remove_index :good_jobs, name: :index_good_jobs_on_priority_scheduled_at_unfinished_unlocked, algorithm: :concurrently, if_exists: true
+
+    # Add FIFO-optimized indexes
+
+    # TODO(nickstanish): double check these. Chances are that we actually want an index with the `queue`.
+    # Also still need to suggest the indexes I've added that greatly improved dequeue
+    # Dequeue Indexes:
+    #   add_index :good_jobs, %i[priority created_at],
+    #     order: { priority: 'ASC NULLS LAST', created_at: :asc },
+    #     include: %i[id queue_name scheduled_at],
+    #     where: 'finished_at IS NULL',
+    #     name: :index_good_job_jobs_for_priority_candidate_lookup,
+    #     algorithm: :concurrently,
+    #     if_not_exists: true
+    #
+    #   add_index :good_jobs, %i[queue_name scheduled_at created_at],
+    #     include: %i[id priority],
+    #     where: 'finished_at IS NULL',
+    #     name: :index_good_job_jobs_for_scheduled_candidate_lookup,
+    #     algorithm: :concurrently,
+    #     if_not_exists: true
+    #
+    #   remove_index :good_jobs, %i[priority created_at],
+    #     order: { priority: 'ASC NULLS LAST', created_at: :asc },
+    #     where: 'finished_at IS NULL',
+    #     name: :index_good_job_jobs_for_candidate_lookup,
+    #     algorithm: :concurrently,
+    #     if_exists: true
+    #
+    # Dashboard indexes
+    #   add_index :good_jobs, :queue_name, if_not_exists: true, algorithm: :concurrently
+    #   add_index :good_jobs, %i[performed_at finished_at], if_not_exists: true, algorithm: :concurrently
+    #   add_index :good_jobs, %i[finished_at error], if_not_exists: true, algorithm: :concurrently
+    #   add_index :good_jobs, "COALESCE(scheduled_at, created_at), ((serialized_params->>'executions')::integer)",
+    #     name: 'index_good_jobs_on_coalesced_timestamp_and_executions',
+    #     where: 'finished_at IS NULL',
+    #     if_not_exists: true,
+    #     algorithm: :concurrently
+    #
+    #   add_index :good_jobs, 'COALESCE(scheduled_at, created_at)',
+    #     name: 'index_good_jobs_on_coalesced_timestamp',
+    #     if_not_exists: true,
+    #     algorithm: :concurrently
+    #
+    #   add_index :good_jobs, "(serialized_params->>'job_class')",
+    #     name: 'index_good_jobs_on_jsonb_job_class',
+    #     if_not_exists: true,
+    #     algorithm: :concurrently
+    #
+    #   add_index :good_jobs, "queue_name, date_trunc('hour', scheduled_at)",
+    #     name: 'index_good_jobs_on_queue_name_and_hourly_scheduled_at',
+    #     if_not_exists: true,
+    #     algorithm: :concurrently
+
+
+    # TODO(nickstanish): Also ask @bensheldon about ordering by scheduled_at since all jobs are setting that value.
+    # Then we could filter + order on the same index.
+
+    add_index :good_jobs, [:created_at], where: "finished_at IS NULL",
+      name: :index_good_jobs_on_created_at_when_unfinished, algorithm: :concurrently
+    add_index :good_jobs, [:scheduled_at], where: "finished_at IS NULL AND locked_by_id IS NULL",
+      name: :index_good_jobs_on_scheduled_at_unfinished_unlocked, algorithm: :concurrently
+  end
+
+  def down
+    # Reverse the changes
+    remove_index :good_jobs, name: :index_good_jobs_on_created_at_when_unfinished, algorithm: :concurrently, if_exists: true
+    remove_index :good_jobs, name: :index_good_jobs_on_scheduled_at_unfinished_unlocked, algorithm: :concurrently, if_exists: true
+
+    add_index :good_jobs, [:priority, :created_at], order: { priority: "DESC NULLS LAST", created_at: :asc },
+      where: "finished_at IS NULL", name: :index_good_jobs_jobs_on_priority_created_at_when_unfinished, algorithm: :concurrently
+    add_index :good_jobs, [:priority, :created_at], order: { priority: "ASC NULLS LAST", created_at: :asc },
+      where: "finished_at IS NULL", name: :index_good_job_jobs_for_candidate_lookup, algorithm: :concurrently
+    add_index :good_jobs, [:priority, :scheduled_at], order: { priority: "ASC NULLS LAST", scheduled_at: :asc },
+      where: "finished_at IS NULL AND locked_by_id IS NULL",
+      name: :index_good_jobs_on_priority_scheduled_at_unfinished_unlocked, algorithm: :concurrently
+  end
+end
+```
 
 By default, GoodJob configures the following execution modes per environment:
 
