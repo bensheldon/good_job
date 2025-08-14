@@ -417,7 +417,11 @@ module GoodJob
     def self.format_error(error)
       raise ArgumentError unless error.is_a?(Exception)
 
-      [error.class.to_s, ERROR_MESSAGE_SEPARATOR, error.message].join
+      [
+        error.class.to_s,
+        error.message,
+        error.backtrace_locations.first
+      ].join(ERROR_MESSAGE_SEPARATOR)
     end
 
     # TODO: it would be nice to enforce these values at the model
