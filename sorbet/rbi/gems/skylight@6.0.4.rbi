@@ -1600,70 +1600,154 @@ end
 class HighLine::String < ::String
   include ::HighLine::StringExtensions
 
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def black; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#50
   def blink; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def blue; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#50
   def bold; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def bright_black; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def bright_blue; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def bright_cyan; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def bright_gray; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def bright_green; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def bright_magenta; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def bright_none; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def bright_red; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def bright_white; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def bright_yellow; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#50
   def clear; end
 
   # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#62
   def color(*args); end
 
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#50
   def concealed; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def cyan; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#50
   def dark; end
 
-  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#62
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#65
   def foreground(*args); end
 
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def gray; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def green; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def magenta; end
 
   # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#93
   def method_missing(method, *args, &blk); end
 
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def none; end
 
   # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#68
   def on(arg); end
 
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_black; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_blue; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_bright_black; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_bright_blue; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_bright_cyan; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_bright_gray; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_bright_green; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_bright_magenta; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_bright_none; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_bright_red; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_bright_white; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_bright_yellow; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_cyan; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_gray; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_green; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_magenta; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_none; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_red; end
 
   # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#85
   def on_rgb(*colors); end
 
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_white; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#42
   def on_yellow; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def red; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#50
   def reset; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#50
   def reverse; end
 
   # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#78
@@ -1672,9 +1756,16 @@ class HighLine::String < ::String
   # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#73
   def uncolor; end
 
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#50
   def underline; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#50
   def underscore; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def white; end
+
+  # source://skylight//lib/skylight/vendor/cli/highline/string_extensions.rb#35
   def yellow; end
 end
 
@@ -1872,8 +1963,19 @@ HighLine::YELLOW_STYLE = T.let(T.unsafe(nil), HighLine::Style)
 #
 # source://skylight//lib/skylight/probes.rb#161
 module Kernel
+  private
+
+  # @api private
+  #
   # source://skylight//lib/skylight/probes.rb#165
-  def require_without_bootsnap(name); end
+  def require(path); end
+
+  # Unfortunately, we can't use prepend here, in part because RubyGems changes require with an alias
+  #
+  # @api private
+  #
+  # source://skylight//lib/skylight/probes.rb#163
+  def require_without_sk(path); end
 end
 
 # Used from extconf and to load libskylight
@@ -1883,7 +1985,7 @@ module Skylight
   extend ::Skylight::Util::Logging
 
   class << self
-    # source://skylight//lib/skylight/util/instrumenter_method.rb#18
+    # source://skylight//lib/skylight.rb#213
     def broken!(*_arg0, **_arg1, &_arg2); end
 
     # @api private
@@ -1891,19 +1993,19 @@ module Skylight
     # source://skylight//lib/skylight/native.rb#103
     def check_install_errors(config); end
 
-    # source://skylight//lib/skylight/util/instrumenter_method.rb#18
+    # source://skylight//lib/skylight.rb#203
     def config(*_arg0, **_arg1, &_arg2); end
 
-    # source://skylight//lib/skylight/util/instrumenter_method.rb#7
+    # source://skylight//lib/skylight.rb#216
     def disable(*_arg0, **_arg1, &_arg2); end
 
-    # source://skylight//lib/skylight/util/instrumenter_method.rb#18
+    # source://skylight//lib/skylight.rb#211
     def done(*_arg0, **_arg1, &_arg2); end
 
     # source://skylight//lib/skylight.rb#67
     def enable_normalizer(*names); end
 
-    # source://skylight//lib/skylight/util/instrumenter_method.rb#18
+    # source://skylight//lib/skylight.rb#208
     def endpoint_assignment_muted?(*_arg0, **_arg1, &_arg2); end
 
     # @overload instrument
@@ -1918,9 +2020,10 @@ module Skylight
     # source://skylight//lib/skylight/native.rb#61
     def libskylight_path; end
 
+    # source://skylight//lib/skylight/native.rb#73
     def load_libskylight(_arg0); end
 
-    # source://skylight//lib/skylight/util/instrumenter_method.rb#7
+    # source://skylight//lib/skylight.rb#205
     def mute(*_arg0, **_arg1, &_arg2); end
 
     # @return [Boolean]
@@ -1964,10 +2067,10 @@ module Skylight
     # source://skylight//lib/skylight.rb#126
     def tracing?; end
 
-    # source://skylight//lib/skylight/util/instrumenter_method.rb#18
+    # source://skylight//lib/skylight.rb#207
     def tracing_muted?(*_arg0, **_arg1, &_arg2); end
 
-    # source://skylight//lib/skylight/util/instrumenter_method.rb#7
+    # source://skylight//lib/skylight.rb#206
     def unmute(*_arg0, **_arg1, &_arg2); end
 
     # @api private
@@ -2157,10 +2260,10 @@ class Skylight::CLI::Base < ::Thor
   # source://skylight//lib/skylight/cli.rb#78
   def disable_env_warning; end
 
-  # source://thor/1.3.2/lib/thor.rb#40
+  # source://skylight//lib/skylight/cli.rb#19
   def doctor(*args); end
 
-  # source://thor/1.3.2/lib/thor.rb#40
+  # source://skylight//lib/skylight/cli.rb#20
   def merge(*args); end
 
   # @api private
@@ -2305,10 +2408,10 @@ class Skylight::CLI::Merger < ::Thor::Group
   # source://skylight//lib/skylight/cli/merger.rb#30
   def fetch_apps; end
 
-  # source://thor/1.3.2/lib/thor/base.rb#163
+  # source://skylight//lib/skylight/cli/merger.rb#20
   def merge_token; end
 
-  # source://thor/1.3.2/lib/thor/base.rb#163
+  # source://skylight//lib/skylight/cli/merger.rb#20
   def merge_token=(_arg0); end
 
   # source://skylight//lib/skylight/cli/merger.rb#127
@@ -2370,10 +2473,10 @@ class Skylight::Config
   # source://skylight//lib/skylight/config.rb#230
   def initialize(*args); end
 
-  # source://skylight//lib/skylight/config.rb#382
+  # source://skylight//lib/skylight/config.rb#398
   def [](key, default = T.unsafe(nil)); end
 
-  # source://skylight//lib/skylight/config.rb#400
+  # source://skylight//lib/skylight/config.rb#424
   def []=(key, val, scope = T.unsafe(nil)); end
 
   # source://skylight//lib/skylight/config.rb#556
@@ -2621,11 +2724,6 @@ class Skylight::Deprecation < ::ActiveSupport::Deprecation
 
   # source://skylight//lib/skylight/deprecation.rb#11
   def ignored_callstack(path); end
-
-  class << self
-    # source://activesupport/7.1.3.4/lib/active_support/deprecation/instance_delegator.rb#34
-    def ignored_callstack(*_arg0, **_arg1, &_arg2); end
-  end
 end
 
 # source://skylight//lib/skylight/extensions.rb#6
@@ -2926,10 +3024,10 @@ end
 # source://skylight//lib/skylight/errors.rb#15
 class Skylight::GrpcConnectError < ::Skylight::NativeError
   class << self
-    # source://skylight//lib/skylight/errors.rb#16
+    # source://skylight//lib/skylight/errors.rb#14
     def code; end
 
-    # source://skylight//lib/skylight/errors.rb#17
+    # source://skylight//lib/skylight/errors.rb#14
     def message; end
   end
 end
@@ -2958,6 +3056,7 @@ end
 #
 # source://skylight//lib/skylight/helpers.rb#10
 module Skylight::Helpers::ClassMethods
+  # source://skylight//lib/skylight/helpers.rb#202
   def __sk_singleton_class; end
 
   # @overload instrument_class_method
@@ -3026,7 +3125,7 @@ class Skylight::Instrumenter
   #
   # @api private
   #
-  # source://skylight//lib/skylight/instrumenter.rb#148
+  # source://skylight//lib/skylight/instrumenter.rb#174
   def disable(ignore: T.unsafe(nil)); end
 
   # @api private
@@ -3037,7 +3136,7 @@ class Skylight::Instrumenter
   # @api private
   # @return [Boolean]
   #
-  # source://skylight//lib/skylight/instrumenter.rb#136
+  # source://skylight//lib/skylight/instrumenter.rb#175
   def disabled?; end
 
   # @api private
@@ -3131,12 +3230,18 @@ class Skylight::Instrumenter
   def muted=(val); end
 
   # @api private
+  #
+  # source://skylight//lib/skylight/instrumenter.rb#90
   def native_start; end
 
   # @api private
+  #
+  # source://skylight//lib/skylight/instrumenter.rb#94
   def native_stop; end
 
   # @api private
+  #
+  # source://skylight//lib/skylight/instrumenter.rb#102
   def native_submit_trace(_arg0); end
 
   # @api private
@@ -3214,6 +3319,8 @@ class Skylight::Instrumenter
 
   class << self
     # @api private
+    #
+    # source://skylight//lib/skylight/instrumenter.rb#50
     def native_new(_arg0, _arg1); end
 
     # @api private
@@ -3278,10 +3385,10 @@ end
 # source://skylight//lib/skylight/errors.rb#15
 class Skylight::InstrumenterUnrecoverableError < ::Skylight::NativeError
   class << self
-    # source://skylight//lib/skylight/errors.rb#16
+    # source://skylight//lib/skylight/errors.rb#14
     def code; end
 
-    # source://skylight//lib/skylight/errors.rb#17
+    # source://skylight//lib/skylight/errors.rb#14
     def message; end
   end
 end
@@ -3289,10 +3396,10 @@ end
 # source://skylight//lib/skylight/errors.rb#15
 class Skylight::InvalidUtf8Error < ::Skylight::NativeError
   class << self
-    # source://skylight//lib/skylight/errors.rb#16
+    # source://skylight//lib/skylight/errors.rb#14
     def code; end
 
-    # source://skylight//lib/skylight/errors.rb#17
+    # source://skylight//lib/skylight/errors.rb#14
     def message; end
   end
 end
@@ -3303,10 +3410,10 @@ Skylight::LOCK = T.let(T.unsafe(nil), Thread::Mutex)
 # source://skylight//lib/skylight/errors.rb#15
 class Skylight::MaximumTraceSpansError < ::Skylight::NativeError
   class << self
-    # source://skylight//lib/skylight/errors.rb#16
+    # source://skylight//lib/skylight/errors.rb#14
     def code; end
 
-    # source://skylight//lib/skylight/errors.rb#17
+    # source://skylight//lib/skylight/errors.rb#14
     def message; end
   end
 end
@@ -4595,10 +4702,10 @@ end
 # source://skylight//lib/skylight/errors.rb#15
 class Skylight::SqlLexError < ::Skylight::NativeError
   class << self
-    # source://skylight//lib/skylight/errors.rb#16
+    # source://skylight//lib/skylight/errors.rb#14
     def code; end
 
-    # source://skylight//lib/skylight/errors.rb#17
+    # source://skylight//lib/skylight/errors.rb#14
     def message; end
   end
 end
@@ -4807,22 +4914,55 @@ class Skylight::Trace
   # source://skylight//lib/skylight/trace.rb#96
   def muted; end
 
+  # source://skylight//lib/skylight/native.rb#73
   def native_get_component; end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_get_endpoint; end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_get_started_at; end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_get_uuid; end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_set_component(_arg0); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_set_endpoint(_arg0); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_set_exception(_arg0); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_span_get_category(_arg0); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_span_get_title(_arg0); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_span_set_description(_arg0, _arg1); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_span_set_exception(_arg0, _arg1, _arg2); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_span_set_meta(_arg0, _arg1); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_span_set_title(_arg0, _arg1); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_span_started(_arg0); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_start_span(_arg0, _arg1); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_stop_span(_arg0, _arg1); end
+
+  # source://skylight//lib/skylight/native.rb#73
   def native_use_pruning; end
 
   # Returns the value of attribute notifications.
@@ -4929,6 +5069,7 @@ class Skylight::Trace
   def warnings_silenced?(context); end
 
   class << self
+    # source://skylight//lib/skylight/native.rb#73
     def native_new(_arg0, _arg1, _arg2, _arg3); end
 
     # source://skylight//lib/skylight/trace.rb#15
@@ -5056,6 +5197,7 @@ class Skylight::Util::Clock
   # source://skylight//lib/skylight/util/clock.rb#27
   def nanos; end
 
+  # source://skylight//lib/skylight/native.rb#73
   def native_hrtime; end
 
   # TODO: remove
@@ -5063,7 +5205,7 @@ class Skylight::Util::Clock
   # source://skylight//lib/skylight/util/clock.rb#32
   def secs; end
 
-  # source://skylight//lib/skylight/util/clock.rb#7
+  # source://skylight//lib/skylight/util/clock.rb#14
   def tick; end
 
   class << self
@@ -5376,23 +5518,31 @@ class Skylight::Util::HTTP::ErrorResponse < ::Struct
   # Returns the value of attribute exception
   #
   # @return [Object] the current value of exception
+  #
+  # source://skylight//lib/skylight/util/http.rb#207
   def exception; end
 
   # Sets the attribute exception
   #
   # @param value [Object] the value to set the attribute exception to.
   # @return [Object] the newly set value
+  #
+  # source://skylight//lib/skylight/util/http.rb#207
   def exception=(_); end
 
   # Returns the value of attribute request
   #
   # @return [Object] the current value of request
+  #
+  # source://skylight//lib/skylight/util/http.rb#207
   def request; end
 
   # Sets the attribute request
   #
   # @param value [Object] the value to set the attribute request to.
   # @return [Object] the newly set value
+  #
+  # source://skylight//lib/skylight/util/http.rb#207
   def request=(_); end
 
   # source://skylight//lib/skylight/util/http.rb#208
@@ -5404,10 +5554,19 @@ class Skylight::Util::HTTP::ErrorResponse < ::Struct
   def success?; end
 
   class << self
+    # source://skylight//lib/skylight/util/http.rb#207
     def [](*_arg0); end
+
+    # source://skylight//lib/skylight/util/http.rb#207
     def inspect; end
+
+    # source://skylight//lib/skylight/util/http.rb#207
     def keyword_init?; end
+
+    # source://skylight//lib/skylight/util/http.rb#207
     def members; end
+
+    # source://skylight//lib/skylight/util/http.rb#207
     def new(*_arg0); end
   end
 end
@@ -5540,23 +5699,23 @@ module Skylight::Util::Logging
   # source://skylight//lib/skylight/util/logging.rb#25
   def log_context; end
 
-  # source://skylight//lib/skylight/util/logging.rb#62
+  # source://skylight//lib/skylight/util/logging.rb#86
   def log_debug(msg, *args); end
 
-  # source://skylight//lib/skylight/util/logging.rb#80
+  # source://skylight//lib/skylight/util/logging.rb#89
   def log_error(msg, *args); end
 
-  # source://skylight//lib/skylight/util/logging.rb#68
+  # source://skylight//lib/skylight/util/logging.rb#87
   def log_info(msg, *args); end
 
   # Logs if tracing
   #
   # See {trace?}.
   #
-  # source://skylight//lib/skylight/util/logging.rb#42
+  # source://skylight//lib/skylight/util/logging.rb#85
   def log_trace(msg, *args); end
 
-  # source://skylight//lib/skylight/util/logging.rb#74
+  # source://skylight//lib/skylight/util/logging.rb#88
   def log_warn(msg, *args); end
 
   # @return [Boolean]

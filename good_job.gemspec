@@ -52,11 +52,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency "thor", ">= 1.0.0"
 
   spec.add_development_dependency "capybara"
+  spec.add_development_dependency "cuprite"
   spec.add_development_dependency "kramdown"
   spec.add_development_dependency "kramdown-parser-gfm"
   spec.add_development_dependency "puma"
   spec.add_development_dependency "rspec-rails"
-  spec.add_development_dependency "selenium-webdriver"
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "webrick"
   spec.add_development_dependency "yard"
