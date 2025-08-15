@@ -19,23 +19,32 @@ class Date
     # source://timecop//lib/timecop/time_extensions.rb#107
     def mocked_time_stack_item; end
 
-    # source://timecop//lib/timecop/time_extensions.rb#85
+    # source://timecop//lib/timecop/time_extensions.rb#105
     def parse(*args); end
 
     # source://timecop//lib/timecop/time_extensions.rb#85
     def parse_with_mock_date(*args); end
 
-    # source://timecop//lib/timecop/time_extensions.rb#47
+    # source://timecop//lib/timecop/time_extensions.rb#104
+    def parse_without_mock_date(*_arg0); end
+
+    # source://timecop//lib/timecop/time_extensions.rb#83
     def strptime(str = T.unsafe(nil), fmt = T.unsafe(nil), start = T.unsafe(nil)); end
 
     # source://timecop//lib/timecop/time_extensions.rb#47
     def strptime_with_mock_date(str = T.unsafe(nil), fmt = T.unsafe(nil), start = T.unsafe(nil)); end
 
-    # source://timecop//lib/timecop/time_extensions.rb#39
+    # source://timecop//lib/timecop/time_extensions.rb#45
+    def strptime_without_mock_date(*_arg0); end
+
+    # source://timecop//lib/timecop/time_extensions.rb#43
     def today; end
 
     # source://timecop//lib/timecop/time_extensions.rb#39
     def today_with_mock_date; end
+
+    # source://timecop//lib/timecop/time_extensions.rb#37
+    def today_without_mock_date(*_arg0); end
   end
 end
 
@@ -48,30 +57,39 @@ class DateTime < ::Date
     # source://timecop//lib/timecop/time_extensions.rb#165
     def mocked_time_stack_item; end
 
-    # source://timecop//lib/timecop/time_extensions.rb#126
+    # source://timecop//lib/timecop/time_extensions.rb#132
     def now; end
 
     # source://timecop//lib/timecop/time_extensions.rb#126
     def now_with_mock_time; end
 
-    # source://timecop//lib/timecop/time_extensions.rb#134
+    # source://timecop//lib/timecop/time_extensions.rb#130
+    def now_without_mock_time(*_arg0); end
+
+    # source://timecop//lib/timecop/time_extensions.rb#163
     def parse(*args); end
 
     # source://timecop//lib/timecop/time_extensions.rb#134
     def parse_with_mock_date(*args); end
+
+    # source://timecop//lib/timecop/time_extensions.rb#162
+    def parse_without_mock_date(*_arg0); end
   end
 end
 
 # source://timecop//lib/timecop/time_extensions.rb#172
 module Process
-  extend ::ActiveSupport::ForkTracker::ModernCoreExt
+  extend ::ActiveSupport::ForkTracker::CoreExt
 
   class << self
-    # source://timecop//lib/timecop/time_extensions.rb#176
+    # source://timecop//lib/timecop/time_extensions.rb#206
     def clock_gettime(clock_id, unit = T.unsafe(nil)); end
 
     # source://timecop//lib/timecop/time_extensions.rb#176
     def clock_gettime_mock_time(clock_id, unit = T.unsafe(nil)); end
+
+    # source://timecop//lib/timecop/time_extensions.rb#174
+    def clock_gettime_without_mock(*_arg0); end
 
     private
 
@@ -91,17 +109,23 @@ class Time
     # source://timecop//lib/timecop/time_extensions.rb#6
     def mock_time; end
 
-    # source://timecop//lib/timecop/time_extensions.rb#21
+    # source://timecop//lib/timecop/time_extensions.rb#27
     def new(*args, **_arg1); end
 
     # source://timecop//lib/timecop/time_extensions.rb#21
     def new_with_mock_time(*args, **_arg1); end
 
-    # source://timecop//lib/timecop/time_extensions.rb#13
+    # source://timecop//lib/timecop/time_extensions.rb#19
+    def new_without_mock_time(*_arg0); end
+
+    # source://timecop//lib/timecop/time_extensions.rb#17
     def now; end
 
     # source://timecop//lib/timecop/time_extensions.rb#13
     def now_with_mock_time; end
+
+    # source://timecop//lib/timecop/time_extensions.rb#11
+    def now_without_mock_time(in: T.unsafe(nil)); end
   end
 end
 
@@ -116,6 +140,7 @@ end
 #
 # source://timecop//lib/timecop/time_stack_item.rb#1
 class Timecop
+  include ::Singleton::SingletonInstanceMethods
   include ::Singleton
   extend ::Singleton::SingletonClassMethods
 
@@ -292,16 +317,18 @@ class Timecop
     # no block argument is given, or temporarily reverts back to the system's time temporarily for
     # the given block.
     #
-    # source://timecop//lib/timecop/timecop.rb#95
+    # source://timecop//lib/timecop/timecop.rb#103
     def unfreeze(&block); end
 
     private
 
+    # source://timecop//lib/timecop/timecop.rb#13
     def allocate; end
 
-    # source://singleton/0.2.0/singleton.rb#123
+    # source://timecop//lib/timecop/timecop.rb#16
     def instance; end
 
+    # source://timecop//lib/timecop/timecop.rb#13
     def new(*_arg0); end
 
     # source://timecop//lib/timecop/timecop.rb#154
