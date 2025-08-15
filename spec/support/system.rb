@@ -40,7 +40,7 @@ Capybara.register_driver(:cuprite_custom) do |app|
     timeout: 15,
     headless: ENV['SHOW_BROWSER'] ? false : true,
     slowmo: ENV["SLOWMO"]&.to_f,
-    browser_options: ENV["DOCKER"] || ENV["CI"] ? { "no-sandbox" => nil } : {},
+    browser_options: ENV["DOCKER"] || ENV["CI"] ? { "no-sandbox" => nil } : {}
   )
 end
 
