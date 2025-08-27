@@ -1185,5 +1185,24 @@ RSpec.describe GoodJob::Job do
         end
       end
     end
+
+    describe '.job_class' do
+      it 'filters jobs by job_class column directly, not JSON extraction' do
+        job = described_class.create!(job_class: "TestJob", serialized_params: { job_class: "SerializedJob" })
+
+        # Should find jobs by the column value, not the JSON value
+        expect(described_class.job_class("TestJob")).to contain_exactly(job)
+        expect(described_class.job_class("SerializedJob")).to be_empty
+      end
+
+      it 'uses the job_class column for performance' do
+        # Verify that the scope uses the column, not JSON extraction in WHERE clause
+        scope_sql = described_class.job_class("TestJob").to_sql
+        expect(scope_sql).to include('"good_jobs"."job_class" =')
+        # Should not use JSON extraction operators in WHERE clause
+        expect(scope_sql).not_to include('serialized_params->')
+        expect(scope_sql).not_to include('->>')
+      end
+    end
   end
 end

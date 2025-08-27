@@ -239,7 +239,7 @@ module GoodJob
       end
 
       def params_job_class
-        json_string(arel_table['serialized_params'], 'job_class')
+        arel_table[:job_class]
       end
 
       def params_execution_count
@@ -252,6 +252,13 @@ module GoodJob
 
       def concurrency_key_created_at_index_migrated?
         return true if connection.index_name_exists?(:good_jobs, :index_good_jobs_on_concurrency_key_and_created_at)
+
+        migration_pending_warning!
+        false
+      end
+
+      def job_class_index_migrated?
+        return true if connection.index_name_exists?(:good_jobs, :index_good_jobs_on_job_class)
 
         migration_pending_warning!
         false
