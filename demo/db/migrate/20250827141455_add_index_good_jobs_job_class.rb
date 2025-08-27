@@ -1,4 +1,4 @@
-class AddIndexGoodJobsJobClass < ActiveRecord::Migration[8.0]
+class AddIndexGoodJobsJobClass < ActiveRecord::Migration[7.1]
   disable_ddl_transaction!
 
   def change
