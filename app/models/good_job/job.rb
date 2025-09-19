@@ -250,8 +250,8 @@ module GoodJob
         )
       end
 
-      def partial_finished_at_index_migrated?
-        return true if connection.index_name_exists?(:good_jobs, :index_good_jobs_jobs_on_finished_at_only)
+      def historic_finished_at_index_migrated?
+        return true unless connection.index_name_exists?(:good_jobs, :index_good_jobs_jobs_on_finished_at)
 
         migration_pending_warning!
         false
