@@ -228,7 +228,7 @@ class WebSocket::Frame::Base
   # @param args [Hash] Arguments for frame
   # @return [Base] a new instance of Base
   #
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/frame/base.rb#19
   def initialize(*args); end
 
   # Returns the value of attribute code.
@@ -267,7 +267,7 @@ class WebSocket::Frame::Base
   # source://websocket//lib/websocket/frame/base.rb#31
   def error?; end
 
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/frame/base.rb#27
   def initialize_with_rescue(*args); end
 
   # Is selected type supported for selected handler?
@@ -303,7 +303,7 @@ class WebSocket::Frame::Base
   # source://websocket//lib/websocket/frame/base.rb#49
   def include_version; end
 
-  # source://websocket//lib/websocket/frame/base.rb#19
+  # source://websocket//lib/websocket/frame/base.rb#27
   def initialize_without_rescue(args = T.unsafe(nil)); end
 end
 
@@ -626,13 +626,13 @@ class WebSocket::Frame::Incoming < ::WebSocket::Frame::Base
   #
   # @return [WebSocket::Frame::Incoming] Single incoming frame or nil if no complete frame is available.
   #
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/frame/incoming.rb#40
   def next(*args); end
 
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/frame/incoming.rb#43
   def next_with_rescue(*args); end
 
-  # source://websocket//lib/websocket/frame/incoming.rb#40
+  # source://websocket//lib/websocket/frame/incoming.rb#43
   def next_without_rescue; end
 
   # If decoded then this will return frame content. Otherwise it will return raw frame.
@@ -696,13 +696,13 @@ class WebSocket::Frame::Outgoing < ::WebSocket::Frame::Base
   #
   # @raise [WebSocket::Error::Frame::UnknownFrameType]
   #
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/frame/outgoing.rb#28
   def to_s(*args); end
 
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/frame/outgoing.rb#32
   def to_s_with_rescue(*args); end
 
-  # source://websocket//lib/websocket/frame/outgoing.rb#28
+  # source://websocket//lib/websocket/frame/outgoing.rb#32
   def to_s_without_rescue; end
 end
 
@@ -830,13 +830,13 @@ class WebSocket::Handshake::Base
   #
   # @return [String] text of response
   #
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/handshake/base.rb#40
   def to_s(*args); end
 
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/handshake/base.rb#43
   def to_s_with_rescue(*args); end
 
-  # source://websocket//lib/websocket/handshake/base.rb#40
+  # source://websocket//lib/websocket/handshake/base.rb#43
   def to_s_without_rescue; end
 
   # URI of request.
@@ -852,7 +852,7 @@ class WebSocket::Handshake::Base
   #
   # @return [Boolean] False if some errors occured. Reason for error could be found in error method
   #
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/handshake/base.rb#53
   def valid?(*args); end
 
   # Returns the value of attribute version.
@@ -937,7 +937,7 @@ class WebSocket::Handshake::Client < ::WebSocket::Handshake::Base
   # @raise [WebSocket::Error::Handshake::NoHostProvided]
   # @return [Client] a new instance of Client
   #
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/handshake/client.rb#57
   def initialize(*args); end
 
   # Add text of response from Server. This method will parse content immediately and update state and error(if neccessary)
@@ -952,7 +952,7 @@ class WebSocket::Handshake::Client < ::WebSocket::Handshake::Base
   #   EOF
   # @param data [String] Data to add
   #
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/handshake/client.rb#90
   def <<(*args); end
 
   # Returns the value of attribute headers.
@@ -960,7 +960,7 @@ class WebSocket::Handshake::Client < ::WebSocket::Handshake::Base
   # source://websocket//lib/websocket/handshake/client.rb#37
   def headers; end
 
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/handshake/client.rb#76
   def initialize_with_rescue(*args); end
 
   # Returns the value of attribute origin.
@@ -984,7 +984,7 @@ class WebSocket::Handshake::Client < ::WebSocket::Handshake::Base
   # source://websocket//lib/websocket/handshake/client.rb#106
   def include_version; end
 
-  # source://websocket//lib/websocket/handshake/client.rb#57
+  # source://websocket//lib/websocket/handshake/client.rb#76
   def initialize_without_rescue(args = T.unsafe(nil)); end
 
   # Parse first line of Server response.
@@ -1402,7 +1402,7 @@ class WebSocket::Handshake::Server < ::WebSocket::Handshake::Base
   #   EOF
   # @param data [String] Data to add
   #
-  # source://websocket//lib/websocket/exception_handler.rb#19
+  # source://websocket//lib/websocket/handshake/server.rb#64
   def <<(*args); end
 
   # Parse the request from hash
@@ -1475,11 +1475,7 @@ end
 # source://websocket//lib/websocket/handshake/server.rb#163
 WebSocket::Handshake::Server::PATH = T.let(T.unsafe(nil), Regexp)
 
-module WebSocket::Mask
-  class << self
-    def mask(_arg0, _arg1); end
-  end
-end
+module WebSocket::Mask; end
 
 # source://websocket//lib/websocket/nice_inspect.rb#4
 module WebSocket::NiceInspect

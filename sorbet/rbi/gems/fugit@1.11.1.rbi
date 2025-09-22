@@ -99,7 +99,7 @@ class Fugit::Cron
   # source://fugit//lib/fugit/cron.rb#211
   def day_match?(nt); end
 
-  # source://fugit//lib/fugit/cron.rb#502
+  # source://fugit//lib/fugit/cron.rb#506
   def eql?(o); end
 
   # source://fugit//lib/fugit/cron.rb#508
@@ -717,13 +717,13 @@ Fugit::DAY_S = T.let(T.unsafe(nil), Integer)
 
 # source://fugit//lib/fugit/duration.rb#5
 class Fugit::Duration
-  # source://fugit//lib/fugit/duration.rb#255
+  # source://fugit//lib/fugit/duration.rb#266
   def +(a); end
 
-  # source://fugit//lib/fugit/duration.rb#268
+  # source://fugit//lib/fugit/duration.rb#279
   def -(a); end
 
-  # source://fugit//lib/fugit/duration.rb#199
+  # source://fugit//lib/fugit/duration.rb#206
   def -@; end
 
   # source://fugit//lib/fugit/duration.rb#281
@@ -749,7 +749,7 @@ class Fugit::Duration
   # source://fugit//lib/fugit/duration.rb#299
   def drop_seconds; end
 
-  # source://fugit//lib/fugit/duration.rb#281
+  # source://fugit//lib/fugit/duration.rb#285
   def eql?(o); end
 
   # Returns the value of attribute h.
