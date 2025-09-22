@@ -21,12 +21,11 @@ module GoodJob
     }.freeze
 
     def status_badge(status)
-      content_tag :span, status_icon(status, class: "text-white") + t(status, scope: 'good_job.status', count: 1),
-                  class: "badge rounded-pill bg-#{STATUS_COLOR.fetch(status)} d-inline-flex gap-2 ps-1 pe-3 align-items-center"
+      content_tag :span, status_icon(status) + t(status, scope: 'good_job.status', count: 1),
+                  class: "badge rounded-pill text-bg-#{STATUS_COLOR.fetch(status)} d-inline-flex gap-2 ps-1 pe-3 align-items-center"
     end
 
     def status_icon(status, **options)
-      options[:class] ||= "text-#{STATUS_COLOR.fetch(status)}"
       icon = render_icon STATUS_ICONS.fetch(status)
       content_tag :span, icon, **options
     end
