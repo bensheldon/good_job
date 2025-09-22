@@ -1,5 +1,31 @@
 # Changelog
 
+## [v4.12.0](https://github.com/bensheldon/good_job/tree/v4.12.0) (2025-09-22)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.11.2...v4.12.0)
+
+**Implemented enhancements:**
+
+- Allow `GoodJob::Cli.log_to_stdout =` to be set by the parent application [\#1680](https://github.com/bensheldon/good_job/pull/1680) ([bensheldon](https://github.com/bensheldon))
+- Optimize job\_class scope performance by using column instead of JSON extraction [\#1672](https://github.com/bensheldon/good_job/pull/1672) ([ScotterC](https://github.com/ScotterC))
+- Add state column to cron entries table [\#1652](https://github.com/bensheldon/good_job/pull/1652) ([gregplumbly](https://github.com/gregplumbly))
+
+**Fixed bugs:**
+
+- Reorganize Dashboard header, ensure favicon svg is encoded; fix double mt-auto [\#1668](https://github.com/bensheldon/good_job/pull/1668) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- GoodJob Cron unique index [\#1678](https://github.com/bensheldon/good_job/issues/1678)
+- params\_job\_class JSON extraction causing performance issues - why not use job\_class column? [\#1671](https://github.com/bensheldon/good_job/issues/1671)
+- Good Job process stalling and CPU at 100% [\#1669](https://github.com/bensheldon/good_job/issues/1669)
+
+**Merged pull requests:**
+
+- Update sorbet/tapioca [\#1681](https://github.com/bensheldon/good_job/pull/1681) ([bensheldon](https://github.com/bensheldon))
+- Remove obsolete property from tests [\#1676](https://github.com/bensheldon/good_job/pull/1676) ([RDIL](https://github.com/RDIL))
+- Bump actions/checkout from 4 to 5 [\#1673](https://github.com/bensheldon/good_job/pull/1673) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.11.2](https://github.com/bensheldon/good_job/tree/v4.11.2) (2025-08-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.11.1...v4.11.2)
@@ -1024,7 +1050,7 @@
 
 **Fixed bugs:**
 
-- Skip `RecordAlreadyAdvisoryLockedError` during mass-update action [\#1158](https://github.com/bensheldon/good_job/pull/1158) ([jmarsh24](https://github.com/jmarsh24))
+- Skip `RecordAlreadyAdvisoryLockedError` during mass-update action [\#1158](https://github.com/bensheldon/good_job/pull/1158) ([justinallenmarsh](https://github.com/justinallenmarsh))
 
 **Closed issues:**
 
