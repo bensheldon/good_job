@@ -29,10 +29,15 @@ module GoodJob
       attr_accessor :within_exe
       alias within_exe? within_exe
 
-      # Whether to log to STDOUT
+      # Whether the CLI's default logger should log to STDOUT.
       # @return [Boolean, nil]
       attr_accessor :log_to_stdout
-      alias log_to_stdout? log_to_stdout
+
+      # Whether the CLI's default logger logs to STDOUT.
+      # @return [Boolean, nil]
+      def log_to_stdout?
+        GoodJob::CLI.log_to_stdout.nil? ? GoodJob::CLI.within_exe? : GoodJob::CLI.log_to_stdout
+      end
 
       # @!visibility private
       def exit_on_failure?

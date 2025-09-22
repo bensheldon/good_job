@@ -4,5 +4,4 @@
 require 'good_job/cli'
 
 GoodJob::CLI.within_exe = true
-GoodJob::CLI.log_to_stdout = true
 GoodJob::CLI.start(ARGV)

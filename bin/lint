@@ -39,7 +39,7 @@ FileUtils.chdir GEM_ROOT do
     flags << '--parallel'
   end
 
-  system! "bundle exec rubocop #{flags.join(' ')}"
+  system! "bundle exec rubocop --no-server #{flags.join(' ')}"
 
   puts "\n== YARD =="
   system! "bundle exec yard stats --no-cache --fail-on-warning"

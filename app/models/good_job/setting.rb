@@ -50,7 +50,7 @@ module GoodJob
     end
 
     def self.pause(queue: nil, job_class: nil, label: nil)
-      raise ArgumentError, "Must provide exactly one of queue, job_class, or label" unless [queue, job_class, label].count(&:present?) == 1
+      raise ArgumentError, "Must provide exactly one of queue, job_class, or label" unless [queue, job_class, label].one?(&:present?)
 
       setting = find_or_initialize_by(key: PAUSES) do |record|
         record.value = { "queues" => [], "job_classes" => [], "labels" => [] }
@@ -70,7 +70,7 @@ module GoodJob
     end
 
     def self.unpause(queue: nil, job_class: nil, label: nil)
-      raise ArgumentError, "Must provide exactly one of queue, job_class, or label" unless [queue, job_class, label].count(&:present?) == 1
+      raise ArgumentError, "Must provide exactly one of queue, job_class, or label" unless [queue, job_class, label].one?(&:present?)
 
       setting = find_by(key: PAUSES)
       return unless setting
@@ -92,7 +92,7 @@ module GoodJob
     end
 
     def self.paused?(queue: nil, job_class: nil, label: nil)
-      raise ArgumentError, "Must provide at most one of queue, job_class, or label" if [queue, job_class, label].count(&:present?) > 1
+      raise ArgumentError, "Must provide at most one of queue, job_class, or label" if [queue, job_class, label].many?(&:present?)
 
       if queue
         queue.in? paused(:queues)

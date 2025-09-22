@@ -1,5 +1,50 @@
 # Changelog
 
+## [v4.11.2](https://github.com/bensheldon/good_job/tree/v4.11.2) (2025-08-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.11.1...v4.11.2)
+
+**Implemented enhancements:**
+
+- Add a favicon [\#1664](https://github.com/bensheldon/good_job/pull/1664) ([itsalongstory](https://github.com/itsalongstory))
+
+**Fixed bugs:**
+
+- UI: Add `.text-wrap` to the Cron Entry key [\#1667](https://github.com/bensheldon/good_job/pull/1667) ([seanpdoyle](https://github.com/seanpdoyle))
+- Fix duplicate parameters [\#1648](https://github.com/bensheldon/good_job/pull/1648) ([itsalongstory](https://github.com/itsalongstory))
+
+**Closed issues:**
+
+- проблема с вб [\#1665](https://github.com/bensheldon/good_job/issues/1665)
+
+**Merged pull requests:**
+
+- Docufix: correct connects\_to statement for multiple databases setup [\#1663](https://github.com/bensheldon/good_job/pull/1663) ([amo13](https://github.com/amo13))
+- Update development dependencies and Rubocop [\#1662](https://github.com/bensheldon/good_job/pull/1662) ([bensheldon](https://github.com/bensheldon))
+- Remove circular dependency of requiring good\_job in engine [\#1655](https://github.com/bensheldon/good_job/pull/1655) ([bensheldon](https://github.com/bensheldon))
+- Render the current time according to the Rails application's time zone setting. [\#1650](https://github.com/bensheldon/good_job/pull/1650) ([itsalongstory](https://github.com/itsalongstory))
+- Make the processes page more responsive by extracting queues and max\_threads [\#1647](https://github.com/bensheldon/good_job/pull/1647) ([luizkowalski](https://github.com/luizkowalski))
+
+## [v4.11.1](https://github.com/bensheldon/good_job/tree/v4.11.1) (2025-06-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.11.0...v4.11.1)
+
+**Merged pull requests:**
+
+- Add `require rails` to good\_job/engine.rb to allow `bundle console` usage [\#1653](https://github.com/bensheldon/good_job/pull/1653) ([bensheldon](https://github.com/bensheldon))
+
+## [v4.11.0](https://github.com/bensheldon/good_job/tree/v4.11.0) (2025-06-30)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.10.2...v4.11.0)
+
+**Implemented enhancements:**
+
+- Add GoodJob::Adapter\#stopping to support Active Job continuations feature [\#1646](https://github.com/bensheldon/good_job/pull/1646) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Fix Probe Server handling server shutdown on SIGINT when daemonized [\#1644](https://github.com/bensheldon/good_job/pull/1644) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.10.2](https://github.com/bensheldon/good_job/tree/v4.10.2) (2025-05-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.10.1...v4.10.2)

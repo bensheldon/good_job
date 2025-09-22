@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
     "lib/**/*",
     "README.md",
     "CHANGELOG.md",
-    "LICENSE.txt",
+    "LICENSE.txt"
   ]
   spec.require_paths = ["lib"]
   spec.bindir = "exe"
