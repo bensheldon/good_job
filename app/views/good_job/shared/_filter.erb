@@ -56,7 +56,7 @@
         <li class="nav-item">
           <%= link_to filter.to_params(state: name), class: "nav-link #{'active' if params[:state] == name}" do %>
             <%= t(name, scope: 'good_job.status') %>
-            <span data-async-values-target="value" data-async-values-key="<%= name %>" data-async-values-zero-class="bg-secondary" class="badge bg-primary rounded-pill d-none"></span>
+            <span data-async-values-target="value" data-async-values-key="<%= name %>" data-async-values-zero-class="text-bg-secondary" class="badge text-bg-primary rounded-pill d-none"></span>
           <% end %>
         </li>
       <% end %>

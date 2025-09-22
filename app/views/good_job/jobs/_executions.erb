@@ -5,7 +5,7 @@
       <%= tag.div id: dom_id(execution), class: "list-group-item py-3" do %>
         <div class="row align-items-center text-nowrap">
           <div class="col-md-5 d-flex gap-2">
-            <%= tag.span execution.number, class: "badge bg-secondary rounded-pill" %>
+            <%= tag.span execution.number, class: "badge text-bg-secondary rounded-pill" %>
             <%= tag.code link_to(execution.id, "##{dom_id(execution)}", class: "text-muted text-decoration-none small") %>
           </div>
           <div class="col-md-2 small">

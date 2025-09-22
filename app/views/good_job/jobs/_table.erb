@@ -77,7 +77,7 @@
               </div>
               <div class="col-4 col-lg-1 text-lg-center">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.queue" %></div>
-                <span class="badge bg-primary font-monospace"><%= job.queue_name %></span>
+                <span class="badge text-bg-primary font-monospace"><%= job.queue_name %></span>
               </div>
               <div class="col-4 col-lg-1 text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.priority" %></div>
@@ -86,13 +86,13 @@
               <div class="col-4 col-lg-1 text-wrap text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.labels" %></div>
                 <% job.labels&.each do |label| %>
-                  <span class="badge rounded-pill bg-secondary font-monospace"><%= label %></span>
+                  <span class="badge rounded-pill text-bg-secondary font-monospace"><%= label %></span>
                 <% end %>
               </div>
               <div class="col-4 col-lg-1 text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.attempts" %></div>
                 <% if job.error %>
-                  <%= tag.span job.executions_count, class: "badge rounded-pill bg-danger",
+                  <%= tag.span job.executions_count, class: "badge rounded-pill text-bg-danger",
                     data: {
                       bs_toggle: "popover",
                       bs_trigger: "hover focus click",
@@ -101,7 +101,7 @@
                     }
                   %>
                 <% else %>
-                  <% executions_badge_color = job.executions_count > 1 ? "bg-warning" : "bg-secondary" %>
+                  <% executions_badge_color = job.executions_count > 1 ? "text-bg-warning" : "text-bg-secondary" %>
                   <span class="badge rounded-pill <%= executions_badge_color %>"><%= job.executions_count %></span>
                 <% end %>
               </div>
@@ -111,7 +111,7 @@
                   <div>
                     <%= status_badge job.status %>
                     <% if job.status == :discarded && job.error_event %>
-                      <div class="text-black text-center">
+                      <div class="text-center">
                         <small><%= t(job.error_event, scope: 'good_job.error_event') %></small>
                       </div>
                     <% end %>

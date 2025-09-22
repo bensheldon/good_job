@@ -64,9 +64,3 @@
   height: 1rem;
   width: 1rem;
 }
-
-/* Improve warning color contrast by using orange instead of yellow */
-:root {
-  --bs-warning: var(--bs-orange);
-  --bs-warning-rgb: 253, 126, 20;
-}
