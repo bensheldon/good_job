@@ -191,6 +191,10 @@ en:
         last_run: Last run
         next_scheduled: Next scheduled
         schedule: Schedule
+        states:
+          active: Active
+          paused: Paused
+        status: Status
       job:
         arguments: Arguments
         attempts: Attempts

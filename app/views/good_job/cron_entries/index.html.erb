@@ -6,12 +6,13 @@
   <div class="list-group list-group-flush text-nowrap" role="table">
     <header class="list-group-item body-secondary">
       <div class="row small text-muted text-uppercase align-items-center">
-        <div class="col-12 col-lg-2"></div>
-        <div class="col-6 col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.class" %></div>
-        <div class="col-6 col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.schedule" %></div>
-        <div class="col-6 col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.next_scheduled" %></div>
-        <div class="col-6 col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.last_run" %></div>
-        <div class="col text-end">
+        <div class="col-lg-2"></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.class" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.schedule" %></div>
+        <div class="col-lg-2 d-none d-lg-block"><%= t "good_job.models.cron.next_scheduled" %></div>
+        <div class="col-lg-1 d-none d-lg-block"><%= t "good_job.models.cron.last_run" %></div>
+        <div class="col-lg-1 d-none d-lg-block"><%= t "good_job.models.cron.status" %></div>
+        <div class="col-lg-2 text-end">
           <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
                          data: { bs_toggle: "collapse", bs_target: ".cron-entry-properties" },
                          aria: { expanded: false, controls: @cron_entries.map { |cron_entry| "##{dom_id(cron_entry, 'properties')}" }.join(" ") } do %>
@@ -37,13 +38,21 @@
             <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.next_scheduled" %></div>
             <%= relative_time cron_entry.next_at %>
           </div>
-          <div class="col-6 col-lg-2 text-wrap small">
+          <div class="col-6 col-lg-1 text-wrap small">
             <% if cron_entry.last_job.present? %>
               <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.last_run" %></div>
               <%= link_to relative_time(cron_entry.last_job_at), cron_entry_path(cron_entry), title: "Job #{cron_entry.last_job.id}" %>
             <% end %>
           </div>
-          <div class="col d-flex gap-3 justify-content-end">
+          <div class="col-6 col-lg-1 text-wrap small">
+            <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.status" %></div>
+            <% if cron_entry.enabled? %>
+              <span class="text-success"><%= t "good_job.models.cron.states.active" %></span>
+            <% else %>
+              <span class="text-muted"><%= t "good_job.models.cron.states.paused" %></span>
+            <% end %>
+          </div>
+          <div class="col-lg-2 d-flex gap-3 justify-content-end">
             <%= button_to enqueue_cron_entry_path(cron_entry), method: :post, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.enqueue") }, title: t("good_job.cron_entries.actions.enqueue"), data: { confirm: t("good_job.cron_entries.actions.confirm_enqueue") } do %>
               <%= render_icon "skip_forward" %>
             <% end %>
