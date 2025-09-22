@@ -191,10 +191,10 @@ it:
         last_run: Ultima esecuzione
         next_scheduled: Prossima pianificazione
         schedule: Pianificazione
-        status: Stato
         states:
           active: Attivo
           paused: In pausa
+        status: Stato
       job:
         arguments: Argomenti
         attempts: Tentativi

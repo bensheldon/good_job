@@ -191,10 +191,10 @@ tr:
         last_run: Son çalıştırma
         next_scheduled: Sonraki planlama
         schedule: Program
-        status: Durum
         states:
           active: Aktif
           paused: Duraklatıldı
+        status: Durum
       job:
         arguments: Argümanlar
         attempts: Denemeler

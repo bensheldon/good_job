@@ -191,10 +191,10 @@ de:
         last_run: Letzter Lauf
         next_scheduled: Als nächstes geplant
         schedule: Zeitplan
-        status: Status
         states:
           active: Aktiv
           paused: Pausiert
+        status: Status
       job:
         arguments: Argumente
         attempts: Versuche

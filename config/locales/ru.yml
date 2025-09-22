@@ -217,10 +217,10 @@ ru:
         last_run: Последний запуск
         next_scheduled: Следующий по расписанию
         schedule: Расписание
-        status: Состояние
         states:
           active: Активно
           paused: Приостановлено
+        status: Состояние
       job:
         arguments: Параметры
         attempts: Попытки

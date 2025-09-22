@@ -191,10 +191,10 @@ nl:
         last_run: Laatste ronde
         next_scheduled: Volgende gepland
         schedule: Schema
-        status: Status
         states:
           active: Actief
           paused: Gepauzeerd
+        status: Status
       job:
         arguments: Argumenten
         attempts: Pogingen

@@ -191,10 +191,10 @@ es:
         last_run: Última ejecución
         next_scheduled: Próxima ejecución
         schedule: Cronograma
-        status: Estado
         states:
           active: Activo
           paused: Pausado
+        status: Estado
       job:
         arguments: Argumentos
         attempts: Intentos
