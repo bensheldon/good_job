@@ -1,5 +1,6 @@
 Rails.application.configure do
   config.good_job.enable_pauses = true
+  # config.good_job.enable_priority = false
   config.good_job.cron = {
     example: {
       cron: '*/5 * * * * *', # every 5 seconds
