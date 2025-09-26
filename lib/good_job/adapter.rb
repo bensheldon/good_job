@@ -78,6 +78,11 @@ module GoodJob
             job_id_to_provider_job_id[aj_id] = id
           end
 
+          active_jobs.each do |active_job|
+            active_job.provider_job_id = job_id_to_provider_job_id[active_job.job_id]
+            active_job.successfully_enqueued = active_job.provider_job_id.present? if active_job.respond_to?(:successfully_enqueued=)
+          end
+
           jobs.each do |job|
             job.instance_variable_set(:@new_record, false) if job_id_to_provider_job_id[job.active_job_id]
           end
