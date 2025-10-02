@@ -1057,20 +1057,29 @@ end
 
 ### Timeouts
 
-Job timeouts can be configured with an `around_perform`:
+Avoid using Ruby's built-in [Timeout](https://github.com/ruby/timeout) mechanism
+([1](https://www.mikeperham.com/2015/05/08/timeout-rubys-most-dangerous-api/),
+[2](https://blog.headius.com/2008/02/rubys-threadraise-threadkill-timeoutrb.html)).
+Instead, declare either of Active Job's [discard_on][] or [retry_on][] to handle
+the underlying mechanism's timeout exceptions (when available).
+
+For example, rescue from `Net::OpenTimeout` or `Net::ReadTimeout` and discard
+the job:
 
 ```ruby
-class ApplicationJob < ActiveJob::Base
-  JobTimeoutError = Class.new(StandardError)
+class MyJob < ApplicationJob
+  discard_on Net::OpenTimeout, Net::ReadTimeout
 
-  around_perform do |_job, block|
-    # Timeout jobs after 10 minutes
-    Timeout.timeout(10.minutes, JobTimeoutError) do
-      block.call
+  def perform(uri)
+    Net::HTTP.start(uri.host, uri.port, open_timeout: 3, read_timeout: 3) do |http|
+      http.request(...)
     end
   end
 end
 ```
+
+[discard_on]: https://api.rubyonrails.org/classes/ActiveJob/Exceptions/ClassMethods.html#method-i-discard_on
+[retry_on]: https://api.rubyonrails.org/classes/ActiveJob/Exceptions/ClassMethods.html#method-i-retry_on
 
 ### Optimize queues, threads, and processes
 
