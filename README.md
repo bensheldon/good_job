@@ -1057,7 +1057,28 @@ end
 
 ### Timeouts
 
-Job timeouts can be configured with an `around_perform`:
+Avoid using Ruby's built-in [Timeout](https://github.com/ruby/timeout) mechanism
+([1](https://www.mikeperham.com/2015/05/08/timeout-rubys-most-dangerous-api/),
+[2](https://blog.headius.com/2008/02/rubys-threadraise-threadkill-timeoutrb.html)).
+Instead, declare either of Active Job's [discard_on](https://api.rubyonrails.org/classes/ActiveJob/Exceptions/ClassMethods.html#method-i-discard_on) or [retry_on](https://api.rubyonrails.org/classes/ActiveJob/Exceptions/ClassMethods.html#method-i-retry_on) to handle
+the underlying mechanism's timeout exceptions (when available).
+
+For example, rescue from `Net::OpenTimeout` or `Net::ReadTimeout` and discard
+the job:
+
+```ruby
+class MyJob < ApplicationJob
+  discard_on Net::OpenTimeout, Net::ReadTimeout
+
+  def perform(uri)
+    Net::HTTP.start(uri.host, uri.port, open_timeout: 3, read_timeout: 3) do |http|
+      http.request(...)
+    end
+  end
+end
+```
+
+If you have no other choice but to use a Ruby Timeout, it can be configured with an `around_perform`:
 
 ```ruby
 class ApplicationJob < ActiveJob::Base
