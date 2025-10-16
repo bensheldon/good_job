@@ -1,5 +1,23 @@
 # Changelog
 
+## [v4.12.1](https://github.com/bensheldon/good_job/tree/v4.12.1) (2025-10-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.12.0...v4.12.1)
+
+**Fixed bugs:**
+
+- Improve warning color contrast [\#1679](https://github.com/bensheldon/good_job/pull/1679) ([RDIL](https://github.com/RDIL))
+
+**Closed issues:**
+
+- batch not showing jobs it enqueued [\#1685](https://github.com/bensheldon/good_job/issues/1685)
+- Recommended method to set up job execution timeout [\#1090](https://github.com/bensheldon/good_job/issues/1090)
+
+**Merged pull requests:**
+
+- Add CI for Rails 8.1 \(rc\) and use postgres 18 [\#1686](https://github.com/bensheldon/good_job/pull/1686) ([Earlopain](https://github.com/Earlopain))
+- Add warning and alternative to Ruby Timeout example [\#1684](https://github.com/bensheldon/good_job/pull/1684) ([seanpdoyle](https://github.com/seanpdoyle))
+
 ## [v4.12.0](https://github.com/bensheldon/good_job/tree/v4.12.0) (2025-09-22)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.11.2...v4.12.0)
