@@ -1060,7 +1060,7 @@ end
 Avoid using Ruby's built-in [Timeout](https://github.com/ruby/timeout) mechanism
 ([1](https://www.mikeperham.com/2015/05/08/timeout-rubys-most-dangerous-api/),
 [2](https://blog.headius.com/2008/02/rubys-threadraise-threadkill-timeoutrb.html)).
-Instead, declare either of Active Job's [discard_on][] or [retry_on][] to handle
+Instead, declare either of Active Job's [discard_on](https://api.rubyonrails.org/classes/ActiveJob/Exceptions/ClassMethods.html#method-i-discard_on) or [retry_on](https://api.rubyonrails.org/classes/ActiveJob/Exceptions/ClassMethods.html#method-i-retry_on) to handle
 the underlying mechanism's timeout exceptions (when available).
 
 For example, rescue from `Net::OpenTimeout` or `Net::ReadTimeout` and discard
@@ -1078,8 +1078,20 @@ class MyJob < ApplicationJob
 end
 ```
 
-[discard_on]: https://api.rubyonrails.org/classes/ActiveJob/Exceptions/ClassMethods.html#method-i-discard_on
-[retry_on]: https://api.rubyonrails.org/classes/ActiveJob/Exceptions/ClassMethods.html#method-i-retry_on
+If you have no other choice but to use a Ruby Timeout, it can be configured with an `around_perform`:
+
+```ruby
+class ApplicationJob < ActiveJob::Base
+  JobTimeoutError = Class.new(StandardError)
+
+  around_perform do |_job, block|
+    # Timeout jobs after 10 minutes
+    Timeout.timeout(10.minutes, JobTimeoutError) do
+      block.call
+    end
+  end
+end
+```
 
 ### Optimize queues, threads, and processes
 
