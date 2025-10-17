@@ -308,6 +308,7 @@ Available configuration options are:
 - `cleanup_interval_jobs` (integer) Number of jobs a Scheduler will execute before cleaning up preserved jobs. Defaults to `1000`. Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_JOBS` and disabled with `0`).
 - `cleanup_interval_seconds` (integer) Number of seconds a Scheduler will wait before cleaning up preserved jobs. Defaults to `600` (10 minutes). Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` and disabled with `0`).
 - `inline_execution_respects_schedule` (boolean) Opt-in to future behavior of inline execution respecting scheduled jobs. Defaults to `false`.
+- `environment` (string) The environment to display in the dashboard. Defaults to `Rails.env`. You can also set this with the environment variable `GOOD_JOB_ENVIRONMENT`.
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
 - `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
 - `advisory_lock_heartbeat` (boolean) whether to use an advisory lock for the purpose of determining whether an execeution process is active. (Default `true` in Development; `false` in other environments)

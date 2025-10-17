@@ -39,6 +39,8 @@ module GoodJob
     DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT = false
     # Default enable_pauses setting
     DEFAULT_ENABLE_PAUSES = false
+    # Default environment (uses Rails.env)
+    DEFAULT_ENVIRONMENT = nil
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
@@ -396,6 +398,16 @@ module GoodJob
           self_caller.grep(%{/rack/handler/}).any? || # EXAMPLE: iodine-0.7.44/lib/rack/handler/iodine.rb:13:in `start'
           (Concurrent.on_jruby? && self_caller.grep(%r{jruby/rack/rails_booter}).any?) # EXAMPLE: uri:classloader:/jruby/rack/rails_booter.rb:83:in `load_environment'
       end || false
+    end
+
+    # The environment to display in the dashboard.
+    # @return [String]
+    def environment
+      options[:environment] ||
+        rails_config[:environment] ||
+        env['GOOD_JOB_ENVIRONMENT'] ||
+        DEFAULT_ENVIRONMENT ||
+        Rails.env
     end
 
     def lower_thread_priority
