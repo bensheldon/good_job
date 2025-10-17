@@ -354,4 +354,42 @@ RSpec.describe GoodJob::Configuration do
       expect(configuration.advisory_lock_heartbeat).to be true
     end
   end
+
+  describe '#environment' do
+    it 'defaults to Rails.env' do
+      allow(Rails).to receive(:env) { "production".inquiry }
+      configuration = described_class.new({})
+      expect(configuration.environment).to eq "production"
+    end
+
+    it 'can be overridden by options' do
+      configuration = described_class.new({ environment: "staging" })
+      expect(configuration.environment).to eq "staging"
+    end
+
+    it 'can be overridden by rails config' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ environment: "staging" })
+      configuration = described_class.new({})
+      expect(configuration.environment).to eq "staging"
+    end
+
+    it 'can be overridden by environment variable' do
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_ENVIRONMENT' => 'staging' })
+      configuration = described_class.new({})
+      expect(configuration.environment).to eq "staging"
+    end
+
+    it 'prioritizes options over rails config' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ environment: "staging" })
+      configuration = described_class.new({ environment: "custom" })
+      expect(configuration.environment).to eq "custom"
+    end
+
+    it 'prioritizes rails config over environment variable' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ environment: "staging" })
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_ENVIRONMENT' => 'env_var' })
+      configuration = described_class.new({})
+      expect(configuration.environment).to eq "staging"
+    end
+  end
 end
