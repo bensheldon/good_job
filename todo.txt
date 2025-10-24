@@ -1,0 +1,2 @@
+* Indicate paused status in the jobs dashboard
+
