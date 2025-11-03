@@ -354,4 +354,28 @@ RSpec.describe GoodJob::Configuration do
       expect(configuration.advisory_lock_heartbeat).to be true
     end
   end
+
+  describe '#enable_priority' do
+    it 'defaults to true' do
+      configuration = described_class.new({})
+      expect(configuration.enable_priority).to be true
+    end
+
+    it 'can be overridden by options' do
+      configuration = described_class.new({ enable_priority: false })
+      expect(configuration.enable_priority).to be false
+    end
+
+    it 'can be overridden by rails config' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ enable_priority: false })
+      configuration = described_class.new({})
+      expect(configuration.enable_priority).to be false
+    end
+
+    it 'can be overridden by environment variable' do
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_ENABLE_PRIORITY' => 'false' })
+      configuration = described_class.new({})
+      expect(configuration.enable_priority).to be false
+    end
+  end
 end
