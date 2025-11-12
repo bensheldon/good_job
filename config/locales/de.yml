@@ -137,7 +137,7 @@ de:
         reschedule: Job neu planen
         retry: Job wiederholen
       destroy:
-        notice: Hiob wurde zerstört
+        notice: Job wurde zerstört
       discard:
         notice: Job wurde verworfen
       executions:
@@ -145,7 +145,7 @@ de:
         full_trace: Full Trace
         in_queue: in der Warteschlange
         runtime: Laufzeit
-        title: Hinrichtungen
+        title: Ausführungen
       force_discard:
         notice: Der Job wurde zwangsweise verworfen. Die Ausführung wird fortgesetzt, bei Fehlern wird der Vorgang jedoch nicht wiederholt
       index:
