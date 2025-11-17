@@ -38,6 +38,7 @@ module GoodJob
       end
 
       query = query.where(cron_key: filter_params[:cron_key]) if filter_params[:cron_key].present?
+      query = query.where("labels && ARRAY[?]::text[]", filter_params[:labels]) if filter_params[:labels].present?
       query = query.where(finished_at: finished_since(filter_params[:finished_since])..) if filter_params[:finished_since].present?
 
       if filter_params[:state]
