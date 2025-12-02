@@ -470,7 +470,7 @@ The Dashboard can be set to automatically refresh by checking "Live Poll" in the
 
 GoodJob exposes some views that are intended to be overridden by placing views in your application:
 
-- [`app/views/good_job/_custom_head_additions.html.erb`](app/views/good_job/_custom_head_additions.html.erb): content added to this partial will be added at the end of the `<head>` tag in all GoodJob views. This is ideal for injecting custom scripts or styles.
+- [`app/views/good_job/_custom_head.html.erb`](app/views/good_job/_custom_head.html.erb): content added to this partial will be added at the end of the `<head>` tag in all GoodJob views. This is ideal for injecting custom scripts or styles.
 - [`app/views/good_job/_custom_job_details.html.erb`](app/views/good_job/_custom_job_details.html.erb): content added to this partial will be displayed above the argument list on the good_job/jobs#show page.
 - [`app/views/good_job/_custom_execution_details.html.erb`](app/views/good_job/_custom_execution_details.html.erb): content added to this partial will be displayed above each execution on the good_job/jobs#show page.
 
