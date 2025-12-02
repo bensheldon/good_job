@@ -26,6 +26,3 @@ FileUtils.chdir APP_ROOT do
   system!('bin/rails db:test:prepare')
   system!('bin/rails db:migrate')
 end
-
-puts "\n== Verifying system dependencies =="
-system("chromedriver -v") || abort("\n!!! Chrome/Chromedriver must be installed to run Rails System tests\n\n")
