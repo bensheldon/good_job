@@ -469,8 +469,9 @@ The Dashboard can be set to automatically refresh by checking "Live Poll" in the
 
 #### Extending dashboard views
 
-GoodJob exposes some views that are intended to be overriden by placing views in your application:
+GoodJob exposes some views that are intended to be overridden by placing views in your application:
 
+- [`app/views/good_job/_custom_head.html.erb`](app/views/good_job/_custom_head.html.erb): content added to this partial will be added at the end of the `<head>` tag in all GoodJob views. This is ideal for injecting custom scripts or styles.
 - [`app/views/good_job/_custom_job_details.html.erb`](app/views/good_job/_custom_job_details.html.erb): content added to this partial will be displayed above the argument list on the good_job/jobs#show page.
 - [`app/views/good_job/_custom_execution_details.html.erb`](app/views/good_job/_custom_execution_details.html.erb): content added to this partial will be displayed above each execution on the good_job/jobs#show page.
 
@@ -1764,7 +1765,7 @@ bin/rspec
 Environment variables that may help with debugging:
 
 - `LOUD=1`: display all stdout/stderr output from all sources. This is helpful because GoodJob wraps some tests with `quiet { }` for cleaner test output, but it can hinder debugging.
-- `SHOW_BROWSER=1`: Run system tests headfully with Chrome/Chromedriver. Use `binding.irb` in the system tests to pause.
+- `SHOW_BROWSER=1`: Run system tests headfully with Chrome/Cuprite. Use `binding.irb` in the system tests to pause.
 
 The gemfiles in `gemfiles/` can be used to run tests against different rails versions:
 

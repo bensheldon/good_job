@@ -59,6 +59,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Batches do
 
         stub_const("TestJob", Class.new(ActiveJob::Base) do
           include GoodJob::ActiveJobExtensions::Batches
+
           self.queue_adapter = :inline
 
           def perform

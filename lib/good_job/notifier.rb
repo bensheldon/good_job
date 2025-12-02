@@ -15,6 +15,7 @@ module GoodJob # :nodoc:
   #
   class Notifier
     include ActiveSupport::Callbacks
+
     define_callbacks :listen, :tick, :unlisten
 
     include ProcessHeartbeat

@@ -2,7 +2,7 @@
 de:
   good_job:
     actions:
-      destroy: Zerstören
+      destroy: Löschen
       discard: Verwerfen
       force_discard: Verwerfen erzwingen
       inspect: Prüfen
@@ -17,11 +17,11 @@ de:
         title: Batches
       jobs:
         actions:
-          confirm_destroy: Bist du sicher, dass du diesen Job zerstören wilst?
+          confirm_destroy: Bist du sicher, dass du diesen Job löschen wilst?
           confirm_discard: Bist du sicher, dass du diesen Job verwerfen willst?
           confirm_reschedule: Bist du sicher, dass du diesen Job verschieben willst?
           confirm_retry: Bist du sicher, dass du diesen Job erneut versuchen willst?
-          destroy: Job zerstören
+          destroy: Job löschen
           discard: Job verwerfen
           reschedule: Job neu planen
           retry: Job wiederholen
@@ -38,15 +38,15 @@ de:
     cleaner:
       index:
         all: All
-        class: Class
+        class: Klasse
         exception: Exception
-        grouped_by_class: Discards grouped by Class
-        grouped_by_exception: Discards grouped by Exception
-        last_1_hour: Last 1 hour
-        last_24_hours: Last 24 hours
-        last_3_days: Last 3 days
-        last_3_hours: Last 3 hours
-        last_7_days: Last 7 days
+        grouped_by_class: Discards groupiert nach Klasse
+        grouped_by_exception: Discards groupiert nach Exception
+        last_1_hour: Letzte Stunde
+        last_24_hours: Letzte 24 Stunden
+        last_3_days: Letzte 3 Tage
+        last_3_hours: Letzte 3 Stunden
+        last_7_days: Letzte 7 Tage
         title: Discard Cleaner
         total: Total
     cron_entries:
@@ -126,18 +126,18 @@ de:
         past: Vor %{time}
     jobs:
       actions:
-        confirm_destroy: Bist du sicher, dass du diesen Job zerstören willst?
+        confirm_destroy: Bist du sicher, dass du diesen Job löschen willst?
         confirm_discard: Bist du sicher, dass du diesen Job verwerfen willst?
         confirm_force_discard: Bist du sicher, dass du das Verwerfen dieses Jobs erzwingen möchten? Der Job wird als verworfen markiert, aber der laufende Job wird nicht gestoppt – er wird jedoch bei Fehlern nicht erneut versucht.
         confirm_reschedule: Bist du sicher, dass du diesen Job verschieben willst?
         confirm_retry: Bist du sicher, dass du diesen Job wiederholen willst?
-        destroy: Job zerstören
+        destroy: Job löschen
         discard: Job verwerfen
         force_discard: Job verwerfen erzwingen
         reschedule: Job neu planen
         retry: Job wiederholen
       destroy:
-        notice: Hiob wurde zerstört
+        notice: Job wurde gelöscht
       discard:
         notice: Job wurde verworfen
       executions:
@@ -145,14 +145,14 @@ de:
         full_trace: Full Trace
         in_queue: in der Warteschlange
         runtime: Laufzeit
-        title: Hinrichtungen
+        title: Ausführungen
       force_discard:
         notice: Der Job wurde zwangsweise verworfen. Die Ausführung wird fortgesetzt, bei Fehlern wird der Vorgang jedoch nicht wiederholt
       index:
         job_pagination: Job-Paginierung
         older_jobs: Ältere Jobs
       reschedule:
-        notice: Job wurde neu planen
+        notice: Job wurde neu geplant
       retry:
         notice: Job wurde wiederholt
       show:
@@ -166,7 +166,7 @@ de:
           confirm_discard_all: Bist du sicher, dass du die ausgewählten Jobs verferfen willst?
           confirm_reschedule_all: Bist du sicher, dass du die ausgewählten Jobs neu planen willst?
           confirm_retry_all: Bist du sicher, dass du die ausgewählten Jobs wiederholen willst?
-          destroy_all: Alle zerstören
+          destroy_all: Alle löschen
           discard_all: Alle verwerfen
           reschedule_all: Alle neu planen
           retry_all: Alle wiederholen
@@ -220,11 +220,11 @@ de:
             unit: ''
     pauses:
       index:
-        confirm_pause: Sind Sie sicher, dass Sie %{value} pausieren möchten?
-        confirm_unpause: Sind Sie sicher, dass Sie %{value} fortsetzen möchten?
-        disabled: Die experimentelle Pausenfunktion von GoodJob ist standardmäßig deaktiviert, da sie die Leistung beeinträchtigen kann. Konfigurieren Sie sie zur Aktivierung
+        confirm_pause: Bist du sicher, dass du %{value} pausieren möchten?
+        confirm_unpause: Bist du sicher, dass du %{value} fortsetzen möchten?
+        disabled: Die experimentelle Pausenfunktion von GoodJob ist standardmäßig deaktiviert, da sie die Leistung beeinträchtigen kann. Konfiguriere sie zur Aktivierung.
         job_class: Job-Klasse
-        label: Label
+        label: Etikette
         pause: Pausieren
         queue: Warteschlange
         title: Pausen

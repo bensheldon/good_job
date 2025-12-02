@@ -6,6 +6,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
   before do
     stub_const "TestRecord", (Class.new(GoodJob::BaseRecord) do
       include GoodJob::AdvisoryLockable
+
       self.table_name = "good_jobs"
       self.advisory_lockable_column = "active_job_id"
     end)

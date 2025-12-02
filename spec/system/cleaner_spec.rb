@@ -16,7 +16,6 @@ describe 'Cleaner Page', :js do
 
   before do
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-    discarded_job
   end
 
   it 'render index properly' do
@@ -26,6 +25,8 @@ describe 'Cleaner Page', :js do
   end
 
   it 'redirects to jobs discarded page with job filtered' do
+    discarded_job
+
     visit '/good_job/cleaner'
 
     expect(page).to have_content 'DeadError'

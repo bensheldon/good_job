@@ -71,6 +71,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::NotifyOptions do
         stub_const 'ExpectedError', Class.new(StandardError)
         stub_const 'TestJob', (Class.new(ActiveJob::Base) do
           include GoodJob::ActiveJobExtensions::NotifyOptions
+
           retry_on ExpectedError, wait: 0, attempts: 2
 
           def perform
