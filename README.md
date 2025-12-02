@@ -1764,7 +1764,7 @@ bin/rspec
 Environment variables that may help with debugging:
 
 - `LOUD=1`: display all stdout/stderr output from all sources. This is helpful because GoodJob wraps some tests with `quiet { }` for cleaner test output, but it can hinder debugging.
-- `SHOW_BROWSER=1`: Run system tests headfully with Chrome/Chromedriver. Use `binding.irb` in the system tests to pause.
+- `SHOW_BROWSER=1`: Run system tests headfully with Chrome/Cuprite. Use `binding.irb` in the system tests to pause.
 
 The gemfiles in `gemfiles/` can be used to run tests against different rails versions:
 
