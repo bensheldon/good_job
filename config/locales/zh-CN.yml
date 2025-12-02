@@ -255,8 +255,8 @@ zh-CN:
         updated: 已更新
     shared:
       boolean:
-        'false': '否'
-        'true': '是'
+        'false': 否
+        'true': 是
       error: 错误
       filter:
         all: 全部
