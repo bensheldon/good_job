@@ -1,5 +1,29 @@
 # Changelog
 
+## [v4.13.0](https://github.com/bensheldon/good_job/tree/v4.13.0) (2025-12-02)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.12.1...v4.13.0)
+
+**Implemented enhancements:**
+
+- Add custom partial for adding to the head tag [\#1682](https://github.com/bensheldon/good_job/pull/1682) ([RDIL](https://github.com/RDIL))
+
+**Closed issues:**
+
+- Losing advisory lock during job execution with transaction isolation level :serializable [\#989](https://github.com/bensheldon/good_job/issues/989)
+
+**Merged pull requests:**
+
+- Detangle lockfile platforms again [\#1696](https://github.com/bensheldon/good_job/pull/1696) ([bensheldon](https://github.com/bensheldon))
+- Update development gems and ruby version [\#1695](https://github.com/bensheldon/good_job/pull/1695) ([bensheldon](https://github.com/bensheldon))
+- Bump actions/checkout from 5 to 6 [\#1694](https://github.com/bensheldon/good_job/pull/1694) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Update German translations in locales/de.yml [\#1692](https://github.com/bensheldon/good_job/pull/1692) ([dup2](https://github.com/dup2))
+- Fix german translation [\#1691](https://github.com/bensheldon/good_job/pull/1691) ([nhasselmeyer](https://github.com/nhasselmeyer))
+- Bump github/codeql-action from 3 to 4 [\#1690](https://github.com/bensheldon/good_job/pull/1690) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/upload-artifact from 4 to 5 [\#1689](https://github.com/bensheldon/good_job/pull/1689) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add Simplified Chinese locale [\#1687](https://github.com/bensheldon/good_job/pull/1687) ([icyleaf](https://github.com/icyleaf))
+- Replace Selenium with Cuprite [\#1659](https://github.com/bensheldon/good_job/pull/1659) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.12.1](https://github.com/bensheldon/good_job/tree/v4.12.1) (2025-10-16)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.12.0...v4.12.1)

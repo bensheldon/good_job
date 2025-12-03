@@ -3,12 +3,6 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby_version_path = File.join(File.dirname(__FILE__), '.ruby-version')
-if File.exist?(ruby_version_path)
-  # .ruby-version may not always contain a complete/valid 3+ identifier Ruby version
-  ruby_version_contents = File.read(ruby_version_path).strip
-  ruby(ruby_version_contents) if ruby_version_contents.match?(%r{\d+\.\d+\.\d+})
-end
 # Declare your gem's dependencies in good_job.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
@@ -20,7 +14,7 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
-gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
+gem 'pg', platforms: [:mri, :windows]
 
 rails_versions = {
   "6.1" => { github: "rails/rails", branch: "6-1-stable" }, # https://github.com/bensheldon/good_job/issues/1280
