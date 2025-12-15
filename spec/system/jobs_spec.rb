@@ -120,7 +120,7 @@ describe 'Jobs', :js, :without_executor do
       expect do
         within "##{dom_id(discarded_job)}" do
           click_button 'Actions'
-          accept_confirm { click_link 'Retry job' }
+          accept_confirm { click_on 'Retry job' }
         end
         expect(page).to have_content "Job has been retried"
       end.to change { discarded_job.reload.status }.from(:discarded).to(:queued)
@@ -132,7 +132,7 @@ describe 'Jobs', :js, :without_executor do
       expect do
         within "##{dom_id(unfinished_job)}" do
           click_button 'Actions'
-          accept_confirm { click_link 'Discard job' }
+          accept_confirm { click_on 'Discard job' }
         end
         expect(page).to have_content :all, "Job has been discarded"
       end.to change { unfinished_job.reload.finished_at }.from(nil).to within(1.second).of(Time.current)
@@ -146,7 +146,7 @@ describe 'Jobs', :js, :without_executor do
       expect do
         within "##{dom_id(unfinished_job)}" do
           click_button 'Actions'
-          accept_confirm { click_link 'Force discard' }
+          accept_confirm { click_on 'Force discard' }
         end
         expect(page).to have_content :all, "Job has been force discarded"
       end.to change { unfinished_job.reload.finished_at }.from(nil).to within(1.second).of(Time.current)
@@ -157,7 +157,7 @@ describe 'Jobs', :js, :without_executor do
 
       within "##{dom_id(discarded_job)}" do
         click_button 'Actions'
-        accept_confirm { click_link 'Destroy job' }
+        accept_confirm { click_on 'Destroy job' }
       end
       expect(page).to have_content "Job has been destroyed"
       expect { discarded_job.reload }.to raise_error(ActiveRecord::RecordNotFound)

@@ -68,26 +68,26 @@
                   <ul class="dropdown-menu shadow" aria-labelledby="<%= dom_id(job, :actions) %>">
                     <li>
                       <% job_reschedulable = job.status.in? [:scheduled, :retried, :queued] %>
-                      <%= link_to reschedule_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_reschedulable}", title: t(".actions.reschedule"), data: { confirm: t(".actions.confirm_reschedule"), disable: true } do %>
+                      <%= button_to reschedule_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_reschedulable}", title: t(".actions.reschedule"), data: { confirm: t(".actions.confirm_reschedule") } do %>
                         <%= render_icon "skip_forward" %>
                         <%= t "good_job.actions.reschedule" %>
                       <% end %>
                     </li>
                     <li>
                       <% job_discardable = job.status.in? [:scheduled, :retried, :queued] %>
-                      <%= link_to discard_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_discardable}", title: t(".actions.discard"), data: { confirm: t(".actions.confirm_discard"), disable: true } do %>
+                      <%= button_to discard_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_discardable}", title: t(".actions.discard"), data: { confirm: t(".actions.confirm_discard") } do %>
                         <%= render_icon "stop" %>
                         <%= t "good_job.actions.discard" %>
                       <% end %>
                     </li>
                     <li>
-                      <%= link_to retry_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job.status == :discarded}", title: t(".actions.retry"), data: { confirm: t(".actions.confirm_retry"), disable: true } do %>
+                      <%= button_to retry_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job.status == :discarded}", title: t(".actions.retry"), data: { confirm: t(".actions.confirm_retry") } do %>
                         <%= render_icon "arrow_clockwise" %>
                         <%= t "good_job.actions.retry" %>
                       <% end %>
                     </li>
                     <li>
-                      <%= link_to job_path(job.id), method: :delete, class: "dropdown-item #{'disabled' unless job.finished?}", title: t(".actions.destroy"), data: { confirm: t(".actions.confirm_destroy"), disable: true } do %>
+                      <%= button_to job_path(job.id), method: :delete, class: "dropdown-item #{'disabled' unless job.finished?}", title: t(".actions.destroy"), data: { confirm: t(".actions.confirm_destroy") } do %>
                         <%= render_icon "trash" %>
                         <%= t "good_job.actions.destroy" %>
                       <% end %>
