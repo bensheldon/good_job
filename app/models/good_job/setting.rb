@@ -127,3 +127,5 @@ module GoodJob
     end
   end
 end
+
+ActiveSupport.run_load_hooks(:good_job_setting, GoodJob::Setting)

@@ -123,3 +123,5 @@ module GoodJob
     end
   end
 end
+
+ActiveSupport.run_load_hooks(:good_job_batch_record, GoodJob::BatchRecord)
