@@ -4,14 +4,14 @@
       <h2 class="pt-3 pb-2"><%= title %></h2>
     </div>
 
-    <%= form_with(model: false, url: "", method: :get, local: true, id: "filter_form", class: "") do |form| %>
+    <%= form_with(model: false, url: "", method: :get, local: true, data: { controller: "form" }) do |form| %>
       <%= hidden_field_tag :poll, params[:poll] %>
       <%= hidden_field_tag :state, params[:state] %>
       <%= hidden_field_tag :locale, params[:locale] if params[:locale] %>
       <div class="d-md-flex flex-row w-100">
         <div class="me-md-2 mb-2 mb-md-0">
           <%= label_tag "job_queue_filter", t(".queue_name"), class: "visually-hidden" %>
-          <select name="queue_name" id="job_queue_filter" class="form-select form-select-sm">
+          <select name="queue_name" id="job_queue_filter" class="form-select form-select-sm" data-action="change->form#submit">
             <option value="" <%= "selected='selected'" if params[:queue_name].blank? %>><%= t ".all_queues" %></option>
 
             <% filter.queues.each do |name, count| %>
@@ -22,7 +22,7 @@
 
         <div class="me-md-2 mb-2 mb-md-0">
           <%= label_tag "job_class_filter", t(".job_name"), class: "visually-hidden" %>
-          <select name="job_class" id="job_class_filter" class="form-select form-select-sm">
+          <select name="job_class" id="job_class_filter" class="form-select form-select-sm" data-action="change->form#submit">
             <option value="" <%= "selected='selected'" if params[:job_class].blank? %>><%= t ".all_jobs" %></option>
 
             <% filter.job_classes.each do |name, count| %>
@@ -56,20 +56,10 @@
         <li class="nav-item">
           <%= link_to filter.to_params(state: name), class: "nav-link #{'active' if params[:state] == name}" do %>
             <%= t(name, scope: 'good_job.status') %>
-            <span data-async-values-target="value" data-async-values-key="<%= name %>" data-async-values-zero-class="text-bg-secondary" class="badge text-bg-primary rounded-pill d-none"></span>
+            <span data-async-values-target="value" data-async-values-key="<%= name %>" data-async-values-zero-class="bg-secondary" class="badge text-bg-primary rounded-pill d-none" id="filter_state_<%= name %>" data-turbo-permanent></span>
           <% end %>
         </li>
       <% end %>
     </ul>
   </div>
-
-  <script nonce="<%= content_security_policy_nonce %>">
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll("#job_class_filter, #job_queue_filter").forEach((filter) => {
-        filter.addEventListener("change", () => {
-          document.querySelector("#filter_form").submit();
-        });
-      })
-    })
-  </script>
 </div>

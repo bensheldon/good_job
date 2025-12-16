@@ -11,6 +11,16 @@ module SystemTestHelpers
     Capybara.current_driver != :rack_test
   end
 
+  def wait_for_turbo_load
+    return unless js_driver?
+
+    page.document.synchronize do
+      page.assert_no_selector "html[data-turbo-unloaded]", visible: :all
+      page.assert_no_selector "html[data-turbo-loading]", visible: :all
+      page.assert_no_selector "html[data-turbo-preview]", visible: :all
+    end
+  end
+
   [
     :accept_alert,
     :dismiss_alert,
@@ -24,6 +34,7 @@ module SystemTestHelpers
     module_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{method}(...)                 # def accept_alert(...)
           return yield unless js_driver?   #   return yield unless js_driver?
+          wait_for_turbo_load               #  wait_for_turbo_load
           super                            #   super
         end                                # end
     RUBY
@@ -59,6 +70,9 @@ RSpec.configure do |config|
     else
       Capybara.session_options.automatic_label_click = false
       driven_by :rack_test
+
+      # See https://github.com/rails/rails/pull/56350
+      page.driver.header "sec-fetch-site", "same-site"
     end
   end
 end

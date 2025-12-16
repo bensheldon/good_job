@@ -5,29 +5,34 @@ module GoodJob
     protect_from_forgery with: :exception
     skip_after_action :verify_same_origin_request, raise: false
 
+    def self.asset_path(*path)
+      Engine.root.join("app/frontend/good_job", *path)
+    end
+
     STATIC_ASSETS = {
       css: {
-        bootstrap: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "bootstrap", "bootstrap.min.css"),
-        style: GoodJob::Engine.root.join("app", "frontend", "good_job", "style.css"),
+        bootstrap: asset_path("vendor", "bootstrap", "bootstrap.min.css"),
+        style: asset_path("style.css"),
       },
       js: {
-        bootstrap: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "bootstrap", "bootstrap.bundle.min.js"),
-        chartjs: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "chartjs", "chart.min.js"),
-        es_module_shims: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "es_module_shims.js"),
-        rails_ujs: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "rails_ujs.js"),
+        bootstrap: asset_path("vendor", "bootstrap", "bootstrap.bundle.min.js"),
+        chartjs: asset_path("vendor", "chartjs", "chart.min.js"),
+        es_module_shims: asset_path("vendor", "es_module_shims.js"),
+        turbo: asset_path("vendor", "turbo.js"),
       },
       svg: {
-        icons: GoodJob::Engine.root.join("app", "frontend", "good_job", "icons.svg"),
+        icons: asset_path("icons.svg"),
       },
     }.freeze
 
     MODULE_OVERRIDES = {
-      application: GoodJob::Engine.root.join("app", "frontend", "good_job", "application.js"),
-      stimulus: GoodJob::Engine.root.join("app", "frontend", "good_job", "vendor", "stimulus.js"),
+      application: asset_path("application.js"),
+      stimulus: asset_path("vendor", "stimulus.js"),
+      turbo: asset_path("vendor", "turbo.js"),
     }.freeze
 
     def self.js_modules
-      @_js_modules ||= GoodJob::Engine.root.join("app", "frontend", "good_job", "modules").children.select(&:file?).each_with_object({}) do |file, modules|
+      @_js_modules ||= asset_path("modules").children.select(&:file?).each_with_object({}) do |file, modules|
         key = File.basename(file.basename.to_s, ".js").to_sym
         modules[key] = file
       end.merge(MODULE_OVERRIDES)

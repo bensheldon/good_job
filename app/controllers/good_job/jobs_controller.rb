@@ -57,7 +57,7 @@ module GoodJob
                  "No jobs were #{ACTIONS[mass_action]}"
                end
 
-      redirect_back(fallback_location: jobs_path, notice: notice)
+      redirect_back(fallback_location: jobs_path, notice: notice, status: :see_other)
     end
 
     def show
@@ -67,31 +67,31 @@ module GoodJob
     def discard
       @job = Job.find(params[:id])
       @job.discard_job(DISCARD_MESSAGE)
-      redirect_back(fallback_location: jobs_path, notice: t(".notice"))
+      redirect_back(fallback_location: jobs_path, notice: t(".notice"), status: :see_other)
     end
 
     def force_discard
       @job = Job.find(params[:id])
       @job.force_discard_job(FORCE_DISCARD_MESSAGE)
-      redirect_back(fallback_location: jobs_path, notice: t(".notice"))
+      redirect_back(fallback_location: jobs_path, notice: t(".notice"), status: :see_other)
     end
 
     def reschedule
       @job = Job.find(params[:id])
       @job.reschedule_job
-      redirect_back(fallback_location: jobs_path, notice: t(".notice"))
+      redirect_back(fallback_location: jobs_path, notice: t(".notice"), status: :see_other)
     end
 
     def retry
       @job = Job.find(params[:id])
       use_original_locale { @job.retry_job }
-      redirect_back(fallback_location: jobs_path, notice: t(".notice"))
+      redirect_back(fallback_location: jobs_path, notice: t(".notice"), status: :see_other)
     end
 
     def destroy
       @job = Job.find(params[:id])
       @job.destroy_job
-      redirect_to jobs_path, notice: t(".notice")
+      redirect_to jobs_path, notice: t(".notice"), status: :see_other
     end
 
     def redirect_to_index
@@ -115,7 +115,7 @@ module GoodJob
               else
                 exception.to_s
               end
-      redirect_back(fallback_location: jobs_path, alert: alert)
+      redirect_back(fallback_location: jobs_path, alert: alert, status: :see_other)
     end
   end
 end
