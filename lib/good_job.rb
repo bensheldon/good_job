@@ -290,7 +290,7 @@ module GoodJob
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    GoodJob::Job.job_class_index_migrated?
+    GoodJob::Job.historic_finished_at_index_migrated?
   end
 
   # Pause job execution for a given queue or job class.
