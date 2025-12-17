@@ -14,19 +14,19 @@ module GoodJob
     def enqueue
       @cron_entry = CronEntry.find(params[:cron_key])
       use_original_locale { @cron_entry.enqueue(Time.current) }
-      redirect_back(fallback_location: cron_entries_path, notice: t(".notice"))
+      redirect_back(fallback_location: cron_entries_path, notice: t(".notice"), status: :see_other)
     end
 
     def enable
       @cron_entry = CronEntry.find(params[:cron_key])
       @cron_entry.enable
-      redirect_back(fallback_location: cron_entries_path, notice: t(".notice"))
+      redirect_back(fallback_location: cron_entries_path, notice: t(".notice"), status: :see_other)
     end
 
     def disable
       @cron_entry = CronEntry.find(params[:cron_key])
       @cron_entry.disable
-      redirect_back(fallback_location: cron_entries_path, notice: t(".notice"))
+      redirect_back(fallback_location: cron_entries_path, notice: t(".notice"), status: :see_other)
     end
   end
 end

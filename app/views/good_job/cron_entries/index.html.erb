@@ -58,11 +58,11 @@
             <% end %>
 
             <% if cron_entry.enabled? %>
-              <%= button_to disable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.disable") }, title: t("good_job.cron_entries.actions.disable"), data: { confirm: t("good_job.cron_entries.actions.confirm_disable") } do %>
+              <%= button_to disable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.disable") }, title: t("good_job.cron_entries.actions.disable"), data: { turbo_confirm: t("good_job.cron_entries.actions.confirm_disable") } do %>
                 <%= render_icon "pause" %>
               <% end %>
             <% else %>
-              <%= button_to enable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.enable") }, title: t("good_job.cron_entries.actions.enable"), data: { confirm: t("good_job.cron_entries.actions.confirm_enable") } do %>
+              <%= button_to enable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.enable") }, title: t("good_job.cron_entries.actions.enable"), data: { turbo_confirm: t("good_job.cron_entries.actions.confirm_enable") } do %>
                 <%= render_icon "play" %>
               <% end %>
             <% end %>

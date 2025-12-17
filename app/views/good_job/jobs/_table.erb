@@ -1,3 +1,6 @@
+<%= form_with(id: "job_action_form", method: :put, model: false, local: true) { nil } %>
+<%= form_with(id: "job_destroy_form", method: :delete, model: false, local: true) { nil } %>
+
 <%= form_with(model: false, url: mass_update_jobs_path(filter.to_params), method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
   <div class="my-3 card" data-gj-poll-replace id="jobs-table">
     <div class="list-group list-group-flush text-nowrap table-jobs" role="table">
@@ -8,16 +11,16 @@
               <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %>
               <%= label_tag('toggle_job_ids', t(".toggle_all_jobs"), class: "visually-hidden") %>
             </div>
-            <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'ms-1 btn btn-sm btn-outline-secondary', title: t(".actions.reschedule_all"), data: { confirm: t(".actions.confirm_reschedule_all"), disable: true } do %>
+            <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'ms-1 btn btn-sm btn-outline-secondary', title: t(".actions.reschedule_all"), data: { turbo_confirm: t(".actions.confirm_reschedule_all") } do %>
               <span class="me-1"><%= render_icon "skip_forward" %></span> <%= t "good_job.actions.reschedule" %>
             <% end %>
 
-            <%= form.button type: 'submit', name: 'mass_action', value: 'retry', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.retry_all"), data: { confirm: t(".actions.confirm_retry_all"), disable: true } do %>
+            <%= form.button type: 'submit', name: 'mass_action', value: 'retry', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.retry_all"), data: { turbo_confirm: t(".actions.confirm_retry_all") } do %>
               <span class="me-1"><%= render_icon "arrow_clockwise" %></span> <%= t "good_job.actions.retry" %>
             <% end %>
 
             <div class="btn-group" role="group">
-              <%= form.button type: 'submit', name: 'mass_action', value: 'discard', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.discard_all"), data: { confirm: t(".actions.confirm_discard_all"), disable: true } do %>
+              <%= form.button type: 'submit', name: 'mass_action', value: 'discard', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.discard_all"), data: { turbo_confirm: t(".actions.confirm_discard_all") } do %>
                 <span class="me-1"><%= render_icon "stop" %></span> <%= t "good_job.actions.discard" %>
               <% end %>
               <button id="destroy-dropdown-toggle" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
@@ -25,7 +28,7 @@
               </button>
               <ul class="dropdown-menu" aria-labelledby="destroy-dropdown-toggle">
                 <li>
-                  <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn dropdown-item', title: t(".actions.destroy_all"), data: { confirm: t(".actions.confirm_destroy_all"), disable: true } do %>
+                  <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn dropdown-item', title: t(".actions.destroy_all"), data: { turbo_confirm: t(".actions.confirm_destroy_all") } do %>
                     <span class="me-1"><%= render_icon "trash" %></span> <%= t "good_job.actions.destroy" %>
                   <% end %>
                 </li>
@@ -125,33 +128,33 @@
                     <ul class="dropdown-menu shadow" aria-labelledby="<%= dom_id(job, :actions) %>">
                       <li>
                         <% job_reschedulable = job.status.in? [:scheduled, :retried, :queued] %>
-                        <%= link_to reschedule_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_reschedulable}", title: t("good_job.jobs.actions.reschedule"), data: { confirm: t("good_job.jobs.actions.confirm_reschedule"), disable: true } do %>
+                        <%= tag.button form: "job_action_form", formaction: reschedule_job_path(job.id), class: "dropdown-item #{'disabled' unless job_reschedulable}", title: t("good_job.jobs.actions.reschedule"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_reschedule") } do %>
                           <%= render_icon "skip_forward" %>
                           <%= t "good_job.actions.reschedule" %>
                         <% end %>
                       </li>
                       <li>
                         <% job_discardable = job.status.in? [:scheduled, :retried, :queued] %>
-                        <%= link_to discard_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_discardable}", title: t("good_job.jobs.actions.discard"), data: { confirm: t("good_job.jobs.actions.confirm_discard"), disable: true } do %>
+                        <%= tag.button form: "job_action_form", formaction: discard_job_path(job.id), class: "dropdown-item #{'disabled' unless job_discardable}", title: t("good_job.jobs.actions.discard"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_discard") } do %>
                           <%= render_icon "stop" %>
                           <%= t "good_job.actions.discard" %>
                         <% end %>
                       </li>
                       <li>
                         <% job_force_discardable = job.status.in? [:running] %>
-                        <%= link_to force_discard_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job_force_discardable}", title: t("good_job.jobs.actions.force_discard"), data: { confirm: t("good_job.jobs.actions.confirm_force_discard"), disable: true } do %>
+                        <%= tag.button form: "job_action_form", formaction: force_discard_job_path(job.id), class: "dropdown-item #{'disabled' unless job_force_discardable}", title: t("good_job.jobs.actions.force_discard"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_force_discard") } do %>
                           <%= render_icon "eject" %>
                           <%= t "good_job.actions.force_discard" %>
                         <% end %>
                       </li>
                       <li>
-                        <%= link_to retry_job_path(job.id), method: :put, class: "dropdown-item #{'disabled' unless job.status == :discarded}", title: t("good_job.jobs.actions.retry"), data: { confirm: t("good_job.jobs.actions.confirm_retry"), disable: true } do %>
+                        <%= tag.button form: "job_action_form", formaction: retry_job_path(job.id), class: "dropdown-item #{'disabled' unless job.status == :discarded}", title: t("good_job.jobs.actions.retry"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_retry") } do %>
                           <%= render_icon "arrow_clockwise" %>
                           <%= t "good_job.actions.retry" %>
                         <% end %>
                       </li>
                       <li>
-                        <%= link_to job_path(job.id), method: :delete, class: "dropdown-item #{'disabled' unless job.status.in? [:discarded, :succeeded]}", title: t("good_job.jobs.actions.destroy"), data: { confirm: t("good_job.jobs.actions.confirm_destroy"), disable: true } do %>
+                        <%= tag.button form: "job_destroy_form", formaction: job_path(job.id), class: "dropdown-item #{'disabled' unless job.status.in? [:discarded, :succeeded]}", title: t("good_job.jobs.actions.destroy"), data: { turbo_confirm: t("good_job.jobs.actions.confirm_destroy") } do %>
                           <%= render_icon "trash" %>
                           <%= t "good_job.actions.destroy" %>
                         <% end %>

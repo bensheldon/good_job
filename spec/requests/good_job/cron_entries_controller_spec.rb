@@ -16,7 +16,7 @@ describe GoodJob::CronEntriesController do
       expect do
         put good_job.disable_cron_entry_path(cron_key: 'example')
       end.to change { cron_entry.enabled? }.from(true).to(false)
-      expect(response).to have_http_status(:found)
+      expect(response).to have_http_status(:see_other)
     end
   end
 
@@ -27,7 +27,7 @@ describe GoodJob::CronEntriesController do
       expect do
         put good_job.enable_cron_entry_path(cron_key: 'example')
       end.to change { cron_entry.enabled? }.from(false).to(true)
-      expect(response).to have_http_status(:found)
+      expect(response).to have_http_status(:see_other)
     end
   end
 
@@ -40,7 +40,7 @@ describe GoodJob::CronEntriesController do
       expect do
         post good_job.enqueue_cron_entry_path(cron_key: 'example')
       end.to change(GoodJob::Job, :count).by(1)
-      expect(response).to have_http_status(:found)
+      expect(response).to have_http_status(:see_other)
     end
 
     it 'uses the application I18n.default_locale' do

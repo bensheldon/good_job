@@ -1,5 +1,22 @@
 # Changelog
 
+## [v4.13.1](https://github.com/bensheldon/good_job/tree/v4.13.1) (2025-12-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.0...v4.13.1)
+
+**Fixed bugs:**
+
+- Adjust indexes on `good_jobs.finished_at` to better support job cleanup [\#1677](https://github.com/bensheldon/good_job/pull/1677) ([mkrfowler](https://github.com/mkrfowler))
+
+**Closed issues:**
+
+- ui question: meaning of icons in cron job section [\#1651](https://github.com/bensheldon/good_job/issues/1651)
+
+**Merged pull requests:**
+
+- Add Active Support load hooks for all Active Record classes [\#1699](https://github.com/bensheldon/good_job/pull/1699) ([bensheldon](https://github.com/bensheldon))
+- Replace Rails UJS with Turbo; make navbar badges data-turbo-permanent to not pop-in on every navigation [\#1658](https://github.com/bensheldon/good_job/pull/1658) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.13.0](https://github.com/bensheldon/good_job/tree/v4.13.0) (2025-12-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.12.1...v4.13.0)

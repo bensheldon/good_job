@@ -16,7 +16,7 @@
                 { action: :destroy, type: type, value: value },
                 method: :delete,
                 class: 'btn btn-sm btn-outline-primary',
-                data: { confirm: t('good_job.pauses.index.confirm_unpause', value: value) }
+                data: { turbo_confirm: t('good_job.pauses.index.confirm_unpause', value: value) }
               ) do %>
                   <%= render_icon "play" %>
                   <%= t("good_job.pauses.index.unpause") %>

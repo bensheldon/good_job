@@ -184,3 +184,5 @@ module GoodJob
     attr_accessor :record
   end
 end
+
+ActiveSupport.run_load_hooks(:good_job_batch, GoodJob::Batch)

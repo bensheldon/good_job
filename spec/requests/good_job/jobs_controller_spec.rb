@@ -38,7 +38,7 @@ describe GoodJob::JobsController do
           job_ids: ["garbage"],
           mass_action: 'retry',
         }
-        expect(response).to have_http_status(:found)
+        expect(response).to have_http_status(:see_other)
         expect(flash[:notice]).to eq('No jobs were retried')
       end
 
@@ -62,7 +62,7 @@ describe GoodJob::JobsController do
           job_ids: [job.id],
         }
 
-        expect(response).to have_http_status(:found)
+        expect(response).to have_http_status(:see_other)
         expect(flash[:notice]).to eq('Successfully discarded 1 job')
 
         job.reload
@@ -82,7 +82,7 @@ describe GoodJob::JobsController do
           job_ids: [job.id],
         }
 
-        expect(response).to have_http_status(:found)
+        expect(response).to have_http_status(:see_other)
         expect(flash[:notice]).to eq('Successfully rescheduled 1 job')
 
         job.reload
@@ -104,7 +104,7 @@ describe GoodJob::JobsController do
           }
         end.to change { job.reload.status }.from(:discarded).to(:succeeded)
 
-        expect(response).to have_http_status(:found)
+        expect(response).to have_http_status(:see_other)
         expect(flash[:notice]).to eq('Successfully retried 1 job')
 
         job.reload
@@ -121,7 +121,7 @@ describe GoodJob::JobsController do
             mass_action: 'retry',
             job_ids: [job.id],
           }
-          expect(response).to have_http_status(:found)
+          expect(response).to have_http_status(:see_other)
           expect(flash[:notice]).to eq("No jobs were retried")
         end
       end
@@ -134,7 +134,7 @@ describe GoodJob::JobsController do
           job_ids: [job.id],
         }
 
-        expect(response).to have_http_status(:found)
+        expect(response).to have_http_status(:see_other)
         expect(flash[:notice]).to eq('Successfully destroyed 1 job')
 
         expect { job.reload }.to raise_error(ActiveRecord::RecordNotFound)
@@ -152,7 +152,7 @@ describe GoodJob::JobsController do
           all_job_ids: 1,
         }
 
-        expect(response).to have_http_status(:found)
+        expect(response).to have_http_status(:see_other)
         expect(flash[:notice]).to eq('Successfully discarded 1 job')
 
         job.reload
@@ -167,7 +167,7 @@ describe GoodJob::JobsController do
           state: 'succeeded',
         }
 
-        expect(response).to have_http_status(:found)
+        expect(response).to have_http_status(:see_other)
         expect(flash[:notice]).to eq('No jobs were discarded')
 
         job.reload
