@@ -32,6 +32,8 @@
 
     <%= tag.script "import \"application\";".html_safe, type: "module", nonce: content_security_policy_nonce %>
 
+    <title>Good Job Dashboard</title>
+    <%= tag.link rel: "icon", href: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="10 0 100 100"><text y=".90em" font-size="90">👍</text></svg>' %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
