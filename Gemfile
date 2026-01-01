@@ -27,12 +27,18 @@ rails_versions = {
 }
 gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", "8.1")]
 
+# Ruby 4.0 has moved this gem to a bundled gem. Rails 6.1 doesn't declare it.
+install_if -> { ENV["RAILS_VERSION"] == "6.1" } do
+  gem "benchmark"
+end
+
 platforms :ruby do
   gem "bootsnap"
   gem "dotenv-rails"
   gem "foreman"
   gem "gem-release"
   gem "github_changelog_generator", require: false
+  gem "rdoc", require: false
   gem "warning"
 
   group :debug do
