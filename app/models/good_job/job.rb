@@ -420,6 +420,33 @@ module GoodJob
       [error.class.to_s, ERROR_MESSAGE_SEPARATOR, error.message].join
     end
 
+    # When code needs to optionally handle enqueue_after_transaction_commit
+    def self.defer_after_commit_maybe(good_job_or_active_job_classes)
+      if enqueue_after_commit?(good_job_or_active_job_classes)
+        ActiveRecord.after_all_transactions_commit { yield(true) }
+      else
+        yield(false)
+      end
+    end
+
+    def self.enqueue_after_commit?(good_job_or_active_job_classes)
+      good_job_or_active_job_classes = Array(good_job_or_active_job_classes)
+
+      feature_exists = ActiveRecord.respond_to?(:after_all_transactions_commit)
+      feature_exists && good_job_or_active_job_classes.any? do |klass|
+        active_job_class = case klass
+                           when String
+                             klass.constantize
+                           when Job
+                             klass.job_class.constantize
+                           else
+                             klass
+                           end
+
+        active_job_class.respond_to?(:enqueue_after_transaction_commit)
+      end
+    end
+
     # TODO: it would be nice to enforce these values at the model
     # validates :active_job_id, presence: true
     # validates :scheduled_at, presence: true
@@ -499,41 +526,46 @@ module GoodJob
     # This action will create a new {Execution} record for the job.
     # @return [ActiveJob::Base]
     def retry_job
-      with_advisory_lock do
-        reload
-        active_job = self.active_job(ignore_deserialization_errors: true)
+      Rails.application.executor.wrap do
+        with_advisory_lock do
+          reload
+          active_job = self.active_job(ignore_deserialization_errors: true)
 
-        raise ActiveJobDeserializationError if active_job.nil?
-        raise AdapterNotGoodJobError unless active_job.class.queue_adapter.is_a? GoodJob::Adapter
-        raise ActionForStateMismatchError if finished_at.blank? || error.blank?
+          raise ActiveJobDeserializationError if active_job.nil?
+          raise AdapterNotGoodJobError unless active_job.class.queue_adapter.is_a? GoodJob::Adapter
+          raise ActionForStateMismatchError if finished_at.blank? || error.blank?
 
-        # Update the executions count because the previous execution will not have been preserved
-        # Do not update `exception_executions` because that comes from rescue_from's arguments
-        active_job.executions = (active_job.executions || 0) + 1
+          # Update the executions count because the previous execution will not have been preserved
+          # Do not update `exception_executions` because that comes from rescue_from's arguments
+          active_job.executions = (active_job.executions || 0) + 1
 
-        begin
-          error_class, error_message = error.split(ERROR_MESSAGE_SEPARATOR).map(&:strip)
-          error = error_class.constantize.new(error_message)
-        rescue StandardError
-          error = StandardError.new(error)
-        end
+          begin
+            error_class, error_message = error.split(ERROR_MESSAGE_SEPARATOR).map(&:strip)
+            error = error_class.constantize.new(error_message)
+          rescue StandardError
+            error = StandardError.new(error)
+          end
 
-        new_active_job = nil
-        GoodJob::CurrentThread.within do |current_thread|
-          current_thread.job = self
-          current_thread.retry_now = true
+          new_active_job = nil
 
           transaction do
-            # NOTE: Required until fixed in rails https://github.com/rails/rails/pull/52121
-            I18n.with_locale(active_job.locale) do
-              new_active_job = active_job.retry_job(wait: 0, error: error)
+            Job.defer_after_commit_maybe(active_job.class) do
+              GoodJob::CurrentThread.within do |current_thread|
+                current_thread.job = self
+                current_thread.retry_now = true
+
+                # NOTE: I18n.with_locale necessary until fixed in rails https://github.com/rails/rails/pull/52121
+                I18n.with_locale(active_job.locale) do
+                  new_active_job = active_job.retry_job(wait: 0, error: error)
+                end
+              end
             end
             self.error_event = :retried if error
             save!
           end
-        end
 
-        new_active_job
+          new_active_job
+        end
       end
     end
 

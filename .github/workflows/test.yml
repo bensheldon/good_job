@@ -113,13 +113,14 @@ jobs:
             gemfile: rails_8.1
           - ruby: 3.1
             gemfile: rails_8.1
-          # Rails head is >= 3.2
+          # Rails head is >= 3.3
           - ruby: "3.0"
             gemfile: rails_head
           - ruby: 3.1
             gemfile: rails_head
           - ruby: 3.2
             gemfile: rails_head
+
     env:
       PGHOST: localhost
       PGUSER: good_job
