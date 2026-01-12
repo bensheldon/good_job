@@ -15,6 +15,7 @@ require_relative "good_job/interrupt_error"
 require_relative "good_job/active_job_extensions/interrupt_errors"
 require_relative "good_job/active_job_extensions/labels"
 require_relative "good_job/active_job_extensions/notify_options"
+require_relative "good_job/active_job_extensions/pauseable"
 
 require_relative "good_job/overridable_connection"
 require_relative "good_job/bulk"
