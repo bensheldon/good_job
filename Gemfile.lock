@@ -561,6 +561,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-explain-analyze
   activerecord-jdbcpostgresql-adapter
+  benchmark
   benchmark-ips
   bootsnap
   brakeman
@@ -585,6 +586,7 @@ DEPENDENCIES
   rack-mini-profiler
   rails (~> 8.1.0)
   rbtrace
+  rdoc
   rspec-rails
   rubocop
   rubocop-capybara
