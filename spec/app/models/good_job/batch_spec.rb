@@ -114,6 +114,7 @@ describe GoodJob::Batch do
       GoodJob.perform_inline
 
       expect(batch.reload).to be_discarded
+      expect(batch).to have_attributes(discarded_at: be_present, jobs_finished_at: be_present, finished_at: be_present)
 
       batch.retry
 

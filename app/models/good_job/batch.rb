@@ -151,8 +151,12 @@ module GoodJob
               update_attributes = { discarded_at: nil, finished_at: nil }
               update_attributes[:jobs_finished_at] = nil if GoodJob::BatchRecord.jobs_finished_at_migrated?
               record.update!(update_attributes)
-              record.jobs.discarded.each(&:retry_job)
-              record._continue_discard_or_finish(lock: false)
+
+              discarded_jobs = record.jobs.discarded
+              Job.defer_after_commit_maybe(discarded_jobs) do
+                discarded_jobs.each(&:retry_job)
+                record._continue_discard_or_finish(lock: false)
+              end
             end
           end
         end
