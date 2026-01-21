@@ -3,9 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::ActiveJobExtensions::NotifyOptions do
-  before do
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+  around do |example|
+    perform_good_job_external do
+      example.run
+    end
+  end
 
+  before do
     allow(GoodJob::Notifier).to receive(:notify)
 
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do

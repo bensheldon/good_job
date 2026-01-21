@@ -3,8 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Custom partials' do
-  before do
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+  around do |example|
+    perform_good_job_external do
+      example.run
+    end
   end
 
   it 'renders custom partials on the Job#show page' do

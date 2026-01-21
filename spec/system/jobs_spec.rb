@@ -44,10 +44,8 @@ describe 'Jobs', :js, :without_executor do
     end
 
     before do
-      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-      discarded_job
-      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
-      unfinished_job
+      perform_good_job_inline { discarded_job }
+      perform_good_job_external { unfinished_job }
     end
 
     describe 'filtering' do

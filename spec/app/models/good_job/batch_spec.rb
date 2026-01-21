@@ -3,8 +3,13 @@
 require 'rails_helper'
 
 describe GoodJob::Batch do
+  around do |example|
+    perform_good_job_external do
+      example.run
+    end
+  end
+
   before do
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       def perform
       end

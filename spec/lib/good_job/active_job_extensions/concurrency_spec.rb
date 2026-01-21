@@ -3,10 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
-  before do
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+  around do |example|
+    perform_good_job_external do
+      example.run
+    end
+  end
 
-    stub_const 'JOB_PERFORMED', Concurrent::AtomicBoolean.new(false)
+  before do
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       include GoodJob::ActiveJobExtensions::Concurrency
 
