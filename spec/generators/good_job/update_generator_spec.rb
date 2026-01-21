@@ -44,6 +44,41 @@ describe GoodJob::UpdateGenerator, :skip_if_java, type: :generator do
     end
   end
 
+  context 'when running the generator with --database option' do
+    around do |example|
+      within_example_app do
+        # Setup custom database configuration
+        database_yml_path = example_app_path.join('config/database.yml')
+        database_yml_content = YAML.safe_load(ERB.new(File.read(database_yml_path)).result, aliases: true)
+
+        # In Rails 6+, we can have multiple databases per environment
+        # Reuse the same database name but under a custom key
+        database_yml_content['test'] = {
+          'primary' => database_yml_content['test'],
+          'custom' => database_yml_content['test'].merge({
+                                                           'migrations_paths' => 'db/migrate_custom',
+                                                         }),
+        }
+        File.write(database_yml_path, YAML.dump(database_yml_content))
+
+        example.run
+      end
+    end
+
+    it 'creates migrations in the custom database path and they are runnable' do
+      run_in_example_app 'rails g good_job:update --database custom'
+
+      expect(example_app_path.join('db/migrate_custom')).to exist
+      migration_file = Dir.glob(example_app_path.join('db/migrate_custom/*.rb')).first
+      expect(migration_file).not_to be_nil
+
+      run_in_example_app 'rails db:migrate'
+
+      output = run_in_example_app "rails db:migrate:status"
+      expect(output).not_to include('  down  ')
+    end
+  end
+
   it 'produces an idempotent schema.rb when run with install generator' do
     install_schema = ""
     update_after_install_schema = ""

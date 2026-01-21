@@ -27,21 +27,32 @@ module ExampleAppHelper
     end
   end
 
+  def run_command(*args, path:)
+    FileUtils.cd(path) do
+      print "$ #{args.join(' ')}\n" if ENV['LOUD'] == '1'
+      output = +""
+      Open3.popen2e(*args) do |_stdin, stdout_err, wait_thr|
+        stdout_err.each do |line|
+          output << line
+          print line if ENV['LOUD'] == '1'
+        end
+        raise "Command #{args} failed with output:\n#{output}" unless wait_thr.value.success?
+      end
+      output
+    end
+  end
+
   def teardown_example_app
     Rails.root.join("../bin/_rails").rename(Rails.root.join("../bin/rails"))
     FileUtils.rm_rf(example_app_path)
   end
 
   def run_in_example_app(*args)
-    FileUtils.cd(example_app_path) do
-      system(*args) || raise("Command #{args} failed")
-    end
+    run_command(*args, path: example_app_path)
   end
 
   def run_in_demo_app(*args)
-    FileUtils.cd(Rails.root) do
-      system(*args) || raise("Command #{args} failed")
-    end
+    run_command(*args, path: Rails.root)
   end
 
   def within_example_app
