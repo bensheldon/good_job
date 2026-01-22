@@ -6,13 +6,14 @@ describe GoodJob::JobsController do
   around do |example|
     orig_value = ActionController::Base.allow_forgery_protection
     ActionController::Base.allow_forgery_protection = false
-    example.run
+    perform_good_job_inline do
+      example.run
+    end
     ActionController::Base.allow_forgery_protection = orig_value
   end
 
   before do
     allow(GoodJob).to receive(:preserve_job_records).and_return(true)
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
   end
 
   describe 'GET #index' do

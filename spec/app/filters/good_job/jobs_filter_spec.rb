@@ -10,28 +10,30 @@ RSpec.describe GoodJob::JobsFilter do
   before do
     allow(GoodJob).to receive_messages(retry_on_unhandled_error: false, preserve_job_records: true)
 
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
-    ExampleJob.set(queue: 'cron').perform_later
-    GoodJob::Job.order(created_at: :asc).last.update!(cron_key: "frequent_cron")
-
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-    ExampleJob.set(queue: 'default').perform_later(ExampleJob::SUCCESS_TYPE)
-    ExampleJob.set(queue: 'mice').perform_later(ExampleJob::ERROR_ONCE_TYPE)
-
-    Timecop.travel 1.hour.ago
-    ExampleJob.set(queue: 'elephants').perform_later(ExampleJob::DEAD_TYPE)
-    5.times do
-      Timecop.travel 5.minutes
-      GoodJob.perform_inline
+    perform_good_job_external do
+      ExampleJob.set(queue: 'cron').perform_later
+      GoodJob::Job.order(created_at: :asc).last.update!(cron_key: "frequent_cron")
     end
-    Timecop.return
 
-    running_active_job = ExampleJob.perform_later('success')
-    running_job = GoodJob::Job.find(running_active_job.provider_job_id)
-    running_job.update!(
-      performed_at: 1.minute.ago,
-      finished_at: nil
-    )
+    perform_good_job_inline do
+      ExampleJob.set(queue: 'default').perform_later(ExampleJob::SUCCESS_TYPE)
+      ExampleJob.set(queue: 'mice').perform_later(ExampleJob::ERROR_ONCE_TYPE)
+
+      Timecop.travel 1.hour.ago
+      ExampleJob.set(queue: 'elephants').perform_later(ExampleJob::DEAD_TYPE)
+      5.times do
+        Timecop.travel 5.minutes
+        GoodJob.perform_inline
+      end
+      Timecop.return
+
+      running_active_job = ExampleJob.perform_later('success')
+      running_job = GoodJob::Job.find(running_active_job.provider_job_id)
+      running_job.update!(
+        performed_at: 1.minute.ago,
+        finished_at: nil
+      )
+    end
   end
 
   describe '#job_classes' do

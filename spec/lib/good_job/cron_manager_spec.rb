@@ -37,9 +37,14 @@ RSpec.describe GoodJob::CronManager do
       ]
     end
 
+    around do |example|
+      perform_good_job_external do
+        example.run
+      end
+    end
+
     before do
       stub_const 'TestJob', Class.new(ActiveJob::Base)
-      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
     end
 
     it 'executes the defined tasks' do
@@ -120,13 +125,17 @@ RSpec.describe GoodJob::CronManager do
       ]
     end
 
+    around do |example|
+      perform_good_job_external do
+        example.run
+      end
+    end
+
     before do
       stub_const 'TestJob', (Class.new(ActiveJob::Base) do
         def perform
         end
       end)
-
-      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
     end
 
     it "reenqueues jobs scheduled for the previous period" do

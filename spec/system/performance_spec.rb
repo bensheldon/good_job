@@ -3,8 +3,10 @@
 require 'rails_helper'
 
 describe 'Performance Page', :js do
-  before do
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+  around do |example|
+    perform_good_job_external do
+      example.run
+    end
   end
 
   it 'renders index properly' do

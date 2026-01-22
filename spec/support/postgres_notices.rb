@@ -31,6 +31,8 @@ RSpec.configure do |config|
   config.around do |example|
     POSTGRES_NOTICES.clear
     example.run
+
+    ActiveRecord::Base.connection_handler.clear_all_connections! if POSTGRES_NOTICES.any?
     expect(POSTGRES_NOTICES).to be_empty
   end
 end

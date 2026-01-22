@@ -3,10 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe 'Batches' do
-  let(:adapter) { GoodJob::Adapter.new(execution_mode: :external) }
+  around do |example|
+    perform_good_job_external do
+      example.run
+    end
+  end
 
   before do
-    ActiveJob::Base.queue_adapter = adapter
     GoodJob.preserve_job_records = true
 
     stub_const 'ExpectedError', Class.new(StandardError)
@@ -128,7 +131,11 @@ RSpec.describe 'Batches' do
   end
 
   context 'when running inline' do
-    let(:adapter) { GoodJob::Adapter.new(execution_mode: :inline) }
+    around do |example|
+      perform_good_job_inline do
+        example.run
+      end
+    end
 
     before do
       stub_const 'RecursiveJob', (Class.new(ActiveJob::Base) do
@@ -149,7 +156,11 @@ RSpec.describe 'Batches' do
   end
 
   describe 'complex recursive batching' do
-    let(:adapter) { GoodJob::Adapter.new(execution_mode: :inline) }
+    around do |example|
+      perform_good_job_inline do
+        example.run
+      end
+    end
 
     before do
       stub_const 'DONE', Concurrent::AtomicBoolean.new(false)
