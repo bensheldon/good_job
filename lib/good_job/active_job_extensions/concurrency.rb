@@ -47,7 +47,7 @@ module GoodJob
           @_key ||= begin
             key_spec = @config[:key]
             if key_spec.blank?
-              job.class.name
+              "label:#{label(job)}"
             else
               key_value = key_spec.respond_to?(:call) ? job.instance_exec(&key_spec) : key_spec
               raise TypeError, "Concurrency key must be a String; was a #{key_value.class}" if key_value.present? && VALID_TYPES.none? { |type| key_value.is_a?(type) }
@@ -69,7 +69,7 @@ module GoodJob
 
         def query_scope(job)
           @_query_scope ||= if label(job).present?
-                              GoodJob::Job.where("labels && ARRAY[?]::text[]", [label(job)])
+                              GoodJob::Job.labeled(label(job))
                             else
                               GoodJob::Job
                             end
@@ -95,8 +95,10 @@ module GoodJob
 
         def check_enqueue(limit, throttle, job, enqueue_limit_flag: false)
           exceeded = nil
-          query_scope = query_scope(job)
           key = key(job)
+          return nil unless job.good_job_labels.include?(label(job))
+
+          query_scope = query_scope(job)
 
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
@@ -109,7 +111,7 @@ module GoodJob
                                       end
 
                 if (enqueue_concurrency + 1) > limit
-                  job.logger.info "Aborted enqueue of #{self.class.name} (Job ID: #{job.id}) because the concurrency key '#{key}' has reached its enqueue limit of #{limit} #{'job'.pluralize(limit)}"
+                  job.logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its enqueue limit of #{limit} #{'job'.pluralize(limit)}"
                   exceeded = :limit
                   next
                 end
@@ -140,6 +142,8 @@ module GoodJob
         def check_perform(limit, throttle, job)
           exceeded = nil
           label = label(job)
+          return nil unless job.good_job_labels.include?(label(job))
+
           query_scope = query_scope(job)
           key = key(job)
 
