@@ -145,7 +145,12 @@ module GoodJob
     scope :dequeueing_ordered, (lambda do |parsed_queues|
       relation = self
       relation = relation.queue_ordered(parsed_queues[:include]) if parsed_queues && parsed_queues[:ordered_queues] && parsed_queues[:include]
-      relation = relation.priority_ordered.creation_ordered
+
+      relation = if GoodJob.configuration.enable_priority
+                   relation.priority_ordered.creation_ordered
+                 else
+                   relation.creation_ordered
+                 end
 
       relation
     end)
@@ -264,12 +269,19 @@ module GoodJob
 
     # Construct arguments for GoodJob::Execution from an ActiveJob instance.
     def self.enqueue_args(active_job, scheduled_at: nil)
+      priority_value = active_job.priority || DEFAULT_PRIORITY
+
+      if !GoodJob.configuration.enable_priority && active_job.priority && active_job.priority != DEFAULT_PRIORITY
+        # Warn if priority is set but priority is disabled
+        GoodJob.logger.warn { "GoodJob enqueued a job with priority #{priority_value}, but job priority is disabled (config.good_job.enable_priority = false). The priority will be ignored." }
+      end
+
       execution_args = {
         id: active_job.job_id,
         active_job_id: active_job.job_id,
         job_class: active_job.class.name,
         queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
-        priority: active_job.priority || DEFAULT_PRIORITY,
+        priority: priority_value,
         serialized_params: active_job.serialize,
         created_at: Time.current,
       }
