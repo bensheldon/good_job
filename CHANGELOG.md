@@ -1,5 +1,25 @@
 # Changelog
 
+## [v4.13.2](https://github.com/bensheldon/good_job/tree/v4.13.2) (2026-01-29)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.1...v4.13.2)
+
+**Fixed bugs:**
+
+- Check for graceful shutdown inside job cleanup loops [\#1711](https://github.com/bensheldon/good_job/pull/1711) ([bdewater-thatch](https://github.com/bdewater-thatch))
+- Add title to Good Job Dashboard layout [\#1701](https://github.com/bensheldon/good_job/pull/1701) ([mockdeep](https://github.com/mockdeep))
+
+**Closed issues:**
+
+- Test failures against rails-head [\#1704](https://github.com/bensheldon/good_job/issues/1704)
+
+**Merged pull requests:**
+
+- Add test for Migration generator with custom migration path [\#1709](https://github.com/bensheldon/good_job/pull/1709) ([bensheldon](https://github.com/bensheldon))
+- Support Rails 8.2-dev `enqueue\_after\_transaction\_commit by deferring framework enqueuing preemptively [\#1707](https://github.com/bensheldon/good_job/pull/1707) ([bensheldon](https://github.com/bensheldon))
+- Add Ruby 4.0 to CI [\#1705](https://github.com/bensheldon/good_job/pull/1705) ([Earlopain](https://github.com/Earlopain))
+- Bump actions/upload-artifact from 5 to 6 [\#1703](https://github.com/bensheldon/good_job/pull/1703) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.13.1](https://github.com/bensheldon/good_job/tree/v4.13.1) (2025-12-16)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.0...v4.13.1)
