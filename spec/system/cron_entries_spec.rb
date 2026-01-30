@@ -5,8 +5,10 @@ require 'rails_helper'
 describe 'Cron Schedules' do
   let(:cron_entry) { GoodJob::CronEntry.find(:example) }
 
-  before do
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+  around do |example|
+    perform_good_job_external do
+      example.run
+    end
   end
 
   it 'can enqueue a cron_entry immediately' do
