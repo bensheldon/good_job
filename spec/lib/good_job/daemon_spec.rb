@@ -17,9 +17,9 @@ RSpec.describe GoodJob::Daemon, :skip_if_java do
   end
 
   describe '#daemonize' do
-    it 'calls Process.daemon' do
+    it 'calls Process.daemon preserving work dir' do
       daemon.daemonize
-      expect(Process).to have_received :daemon
+      expect(Process).to have_received(:daemon).with(true)
     end
 
     it 'writes a pidfile' do
