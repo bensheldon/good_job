@@ -19,7 +19,7 @@ module GoodJob
     def daemonize
       check_pid_dir
       check_pid
-      ::Process.daemon
+      ::Process.daemon(true)
       write_pid
     end
 
