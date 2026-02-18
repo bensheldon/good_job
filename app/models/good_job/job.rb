@@ -190,6 +190,10 @@ module GoodJob
       end
     end)
 
+    scope :labeled, (lambda do |labels|
+      where("labels && ARRAY[?]::text[]", Array(labels)) if labels.present?
+    end)
+
     class << self
       # Parse a string representing a group of queues into a more readable data
       # structure.

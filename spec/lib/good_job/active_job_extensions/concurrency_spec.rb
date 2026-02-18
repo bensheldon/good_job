@@ -10,6 +10,10 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       include GoodJob::ActiveJobExtensions::Concurrency
 
+      def id
+        job_id
+      end
+
       def perform(name:)
         name && sleep(1)
         JOB_PERFORMED.make_true
@@ -26,50 +30,26 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
-  describe 'when concurrency key returns nil' do
-    it 'does not limit concurrency' do
-      TestJob.good_job_control_concurrency_with(
-        total_limit: -> { 1 },
-        key: -> {}
-      )
-
-      expect(TestJob.perform_later(name: "Alice")).to be_present
-      expect(TestJob.perform_later(name: "Alice")).to be_present
-    end
-  end
-
-  describe 'when concurrency key is nil' do
-    it 'does not limit concurrency' do
-      TestJob.good_job_control_concurrency_with(
-        total_limit: -> { 1 },
-        key: nil
-      )
-
-      expect(TestJob.perform_later(name: "Alice")).to be_present
-      expect(TestJob.perform_later(name: "Alice")).to be_present
-    end
-  end
-
   describe '.good_job_control_concurrency_with' do
     describe 'total_limit:' do
       before do
-        TestJob.good_job_control_concurrency_with(
-          total_limit: -> { 1 },
-          key: -> { arguments.first[:name] }
+        TestJob.good_job_concurrency_rule(
+          label: "testlabel",
+          total_limit: -> { 1 }
         )
       end
 
       it "does not enqueue if limit is exceeded for a particular key" do
-        expect(TestJob.perform_later(name: "Alice")).to be_present
-        expect(TestJob.perform_later(name: "Alice")).to be false
+        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be_present
+        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be false
       end
 
       it "is inclusive of both performing and enqueued jobs" do
-        expect(TestJob.perform_later(name: "Alice")).to be_present
+        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be_present
 
         Rails.application.executor.wrap do
           GoodJob::Job.all.with_advisory_lock do
-            expect(TestJob.perform_later(name: "Alice")).to be false
+            expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be false
           end
         end
       end
@@ -77,28 +57,28 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
 
     describe 'enqueue_limit:' do
       before do
-        TestJob.good_job_control_concurrency_with(
+        TestJob.good_job_concurrency_rule(
           enqueue_limit: -> { 2 },
-          key: -> { arguments.first[:name] }
+          label: "testlabel"
         )
       end
 
       it "does not enqueue if enqueue concurrency limit is exceeded for a particular key" do
         allow(TestJob.logger.formatter).to receive(:call).and_call_original
 
-        expect(TestJob.perform_later(name: "Alice")).to be_present
-        expect(TestJob.perform_later(name: "Alice")).to be_present
+        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be_present
+        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be_present
 
         # Third usage of key does not enqueue
-        expect(TestJob.perform_later(name: "Alice")).to be false
+        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be false
 
         # Usage of different key does enqueue
-        expect(TestJob.perform_later(name: "Bob")).to be_present
+        expect(TestJob.set(good_job_labels: "otherlabel").perform_later(name: "Bob")).to be_present
 
-        expect(GoodJob::Job.where(concurrency_key: "Alice").count).to eq 2
-        expect(GoodJob::Job.where(concurrency_key: "Bob").count).to eq 1
+        expect(GoodJob::Job.labeled("testlabel").count).to eq 2
+        expect(GoodJob::Job.labeled("otherlabel").count).to eq 1
 
-        expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its enqueue limit of 2 jobs/)).exactly(:once)
+        expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'label:testlabel' has reached its enqueue limit of 2 jobs/)).exactly(:once)
         if RUBY_VERSION >= "3.4"
           expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {name: "Alice"}/)).exactly(:twice)
           expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {name: "Bob"}/)).exactly(:once)
@@ -126,14 +106,14 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       before do
         allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
-        TestJob.good_job_control_concurrency_with(
+        TestJob.good_job_concurrency_rule(
           perform_limit: -> { 0 },
-          key: -> { arguments.first[:name] }
+          label: "testlabel"
         )
       end
 
       it "errors and retry jobs if concurrency is exceeded" do
-        active_job = TestJob.perform_later(name: "Alice")
+        active_job = TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")
 
         performer = GoodJob::JobPerformer.new('*')
         scheduler = GoodJob::Scheduler.new(performer, max_threads: 5)
@@ -144,21 +124,21 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         end
         scheduler.shutdown
 
-        expect(GoodJob::Job.find_by(active_job_id: active_job.job_id).concurrency_key).to eq "Alice"
+        expect(GoodJob::Job.find_by(active_job_id: active_job.job_id).labels).to include "testlabel"
 
         expect(GoodJob::Execution.count).to be >= 1
         expect(GoodJob::Execution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
       end
 
       it 'is ignored with the job is executed via perform_now' do
-        TestJob.perform_now(name: "Alice")
+        TestJob.set(good_job_labels: "testlabel").perform_now(name: "Alice")
         expect(JOB_PERFORMED).to be_true
       end
 
       it 'is ignored when the job is executed inside another job' do
         stub_const("WrapperJob", Class.new(ApplicationJob) do
           def perform
-            TestJob.perform_now(name: "Alice")
+            TestJob.set(good_job_labels: "testlabel").perform_now(name: "Alice")
           end
         end)
 
@@ -172,17 +152,17 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       before do
         allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
-        TestJob.good_job_control_concurrency_with(
+        TestJob.good_job_concurrency_rule(
           enqueue_throttle: -> { [1, 1.minute] },
-          key: -> { arguments.first[:name] }
+          label: 'testlabel'
         )
       end
 
       it 'does not enqueue if throttle period has not passed' do
-        expect(TestJob.perform_later(name: "Alice")).to be_present
-        expect(TestJob.perform_later(name: "Alice")).to be false
+        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be_present
+        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be false
         Timecop.travel(61.seconds.from_now) do
-          expect(TestJob.perform_later(name: "Alice")).to be_present
+          expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be_present
         end
       end
     end
@@ -191,22 +171,22 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       before do
         allow(GoodJob).to receive(:preserve_job_records).and_return(true)
 
-        TestJob.good_job_control_concurrency_with(
+        TestJob.good_job_concurrency_rule(
           perform_throttle: -> { [1, 1.minute] },
-          key: -> { arguments.first[:name] }
+          label: 'testlabel'
         )
       end
 
       it 'does not perform if throttle period has not passed' do
-        TestJob.perform_later(name: "Alice")
-        TestJob.perform_later(name: "Alice")
-        TestJob.perform_later(name: "Alice")
+        TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")
+        TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")
+        TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")
         GoodJob.perform_inline
 
         expect(GoodJob::Job.finished.count).to eq 1
 
         Timecop.travel(61.seconds)
-        TestJob.perform_later(name: "Alice")
+        TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")
         GoodJob.perform_inline
 
         expect(GoodJob::Job.finished.count).to eq 2
@@ -251,77 +231,304 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
-  describe '#good_job_concurrency_key' do
-    context 'when retrying a job' do
-      before do
-        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
-          include GoodJob::ActiveJobExtensions::Concurrency
+  context "legacy functionality" do
+    describe 'when concurrency key returns nil' do
+      it 'does not limit concurrency' do
+        TestJob.good_job_control_concurrency_with(
+          total_limit: -> { 1 },
+          key: -> {}
+        )
 
-          good_job_control_concurrency_with(
-            total_limit: 1,
-            key: -> { Time.current.to_f }
+        expect(TestJob.perform_later(name: "Alice")).to be_present
+        expect(TestJob.perform_later(name: "Alice")).to be_present
+      end
+    end
+
+    describe 'when concurrency key is nil' do
+      it 'does not limit concurrency' do
+        TestJob.good_job_control_concurrency_with(
+          total_limit: -> { 1 },
+          key: nil
+        )
+
+        expect(TestJob.perform_later(name: "Alice")).to be_present
+        expect(TestJob.perform_later(name: "Alice")).to be_present
+      end
+    end
+
+    describe '.good_job_control_concurrency_with' do
+      describe 'total_limit:' do
+        before do
+          TestJob.good_job_control_concurrency_with(
+            total_limit: -> { 1 },
+            key: -> { arguments.first[:name] }
           )
-          retry_on StandardError
+        end
 
-          def perform(*)
-            raise "ERROR"
+        it "does not enqueue if limit is exceeded for a particular key" do
+          expect(TestJob.perform_later(name: "Alice")).to be_present
+          expect(TestJob.perform_later(name: "Alice")).to be false
+        end
+
+        it "is inclusive of both performing and enqueued jobs" do
+          expect(TestJob.perform_later(name: "Alice")).to be_present
+
+          Rails.application.executor.wrap do
+            GoodJob::Job.all.with_advisory_lock do
+              expect(TestJob.perform_later(name: "Alice")).to be false
+            end
           end
-        end)
+        end
       end
 
-      describe 'retries' do
-        it 'preserves the value' do
-          TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
+      describe 'enqueue_limit:' do
+        before do
+          TestJob.good_job_control_concurrency_with(
+            enqueue_limit: -> { 2 },
+            key: -> { arguments.first[:name] }
+          )
+        end
 
-          begin
-            GoodJob.perform_inline
-          rescue StandardError
-            nil
+        it "does not enqueue if enqueue concurrency limit is exceeded for a particular key" do
+          allow(TestJob.logger.formatter).to receive(:call).and_call_original
+
+          expect(TestJob.perform_later(name: "Alice")).to be_present
+          expect(TestJob.perform_later(name: "Alice")).to be_present
+
+          # Third usage of key does not enqueue
+          expect(TestJob.perform_later(name: "Alice")).to be false
+
+          # Usage of different key does enqueue
+          expect(TestJob.perform_later(name: "Bob")).to be_present
+
+          expect(GoodJob::Job.where(concurrency_key: "Alice").count).to eq 2
+          expect(GoodJob::Job.where(concurrency_key: "Bob").count).to eq 1
+
+          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its enqueue limit of 2 jobs/)).exactly(:once)
+          if RUBY_VERSION >= "3.4"
+            expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {name: "Alice"}/)).exactly(:twice)
+            expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {name: "Bob"}/)).exactly(:once)
+          else
+            expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
+            expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
           end
+        end
 
-          expect(GoodJob::Job.count).to eq 1
-          expect(GoodJob::Job.first.concurrency_key).to be_present
-          expect(GoodJob::Job.first).not_to be_finished
+        it 'excludes jobs that are already executing/locked' do
+          expect(TestJob.perform_later(name: "Alice")).to be_present
+          expect(TestJob.perform_later(name: "Alice")).to be_present
+
+          # Lock one of the jobs
+          Rails.application.executor.wrap do
+            GoodJob::Job.first.with_advisory_lock do
+              # Third usage does enqueue
+              expect(TestJob.perform_later(name: "Alice")).to be_present
+            end
+          end
+        end
+      end
+
+      describe 'perform_limit:' do
+        before do
+          allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+
+          TestJob.good_job_control_concurrency_with(
+            perform_limit: -> { 0 },
+            key: -> { arguments.first[:name] }
+          )
+        end
+
+        it "errors and retry jobs if concurrency is exceeded" do
+          active_job = TestJob.perform_later(name: "Alice")
+
+          performer = GoodJob::JobPerformer.new('*')
+          scheduler = GoodJob::Scheduler.new(performer, max_threads: 5)
+          5.times { scheduler.create_thread }
+
+          sleep_until(max: 10, increments_of: 0.5) do
+            GoodJob::Execution.where(active_job_id: active_job.job_id).finished.count >= 1
+          end
+          scheduler.shutdown
+
+          expect(GoodJob::Job.find_by(active_job_id: active_job.job_id).concurrency_key).to eq "Alice"
+
+          expect(GoodJob::Execution.count).to be >= 1
+          expect(GoodJob::Execution.where("error LIKE '%GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError%'")).to be_present
+        end
+
+        it 'is ignored with the job is executed via perform_now' do
+          TestJob.perform_now(name: "Alice")
+          expect(JOB_PERFORMED).to be_true
+        end
+
+        it 'is ignored when the job is executed inside another job' do
+          stub_const("WrapperJob", Class.new(ApplicationJob) do
+            def perform
+              TestJob.perform_now(name: "Alice")
+            end
+          end)
+
+          WrapperJob.perform_later
+          GoodJob.perform_inline
+          expect(JOB_PERFORMED).to be_true
+        end
+      end
+
+      describe '#enqueue_throttle' do
+        before do
+          allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+
+          TestJob.good_job_control_concurrency_with(
+            enqueue_throttle: -> { [1, 1.minute] },
+            key: -> { arguments.first[:name] }
+          )
+        end
+
+        it 'does not enqueue if throttle period has not passed' do
+          expect(TestJob.perform_later(name: "Alice")).to be_present
+          expect(TestJob.perform_later(name: "Alice")).to be false
+          Timecop.travel(61.seconds.from_now) do
+            expect(TestJob.perform_later(name: "Alice")).to be_present
+          end
+        end
+      end
+
+      describe '#perform_throttle' do
+        before do
+          allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+
+          TestJob.good_job_control_concurrency_with(
+            perform_throttle: -> { [1, 1.minute] },
+            key: -> { arguments.first[:name] }
+          )
+        end
+
+        it 'does not perform if throttle period has not passed' do
+          TestJob.perform_later(name: "Alice")
+          TestJob.perform_later(name: "Alice")
+          TestJob.perform_later(name: "Alice")
+          GoodJob.perform_inline
+
+          expect(GoodJob::Job.finished.count).to eq 1
+
+          Timecop.travel(61.seconds)
+          TestJob.perform_later(name: "Alice")
+          GoodJob.perform_inline
+
+          expect(GoodJob::Job.finished.count).to eq 2
+
+          Timecop.travel(61.seconds)
+          GoodJob.perform_inline
+
+          expect(GoodJob::Job.finished.count).to eq 3
+        end
+      end
+
+      describe 'perform_limit: together with perform_throttle:' do
+        before do
+          allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+
+          TestJob.good_job_control_concurrency_with(
+            perform_limit: -> { 1 },
+            perform_throttle: -> { [1, 1.minute] },
+            key: -> { arguments.first[:name] }
+          )
+        end
+
+        it 'does not perform if throttle period has not passed' do
+          TestJob.perform_later(name: "Alice")
+          TestJob.perform_later(name: "Alice")
+          TestJob.perform_later(name: "Alice")
+          GoodJob.perform_inline
+
+          expect(GoodJob::Job.finished.count).to eq 1
+
+          Timecop.travel(61.seconds)
+          TestJob.perform_later(name: "Alice")
+          GoodJob.perform_inline
+
+          expect(GoodJob::Job.finished.count).to eq 2
+
+          Timecop.travel(61.seconds)
+          GoodJob.perform_inline
+
+          expect(GoodJob::Job.finished.count).to eq 3
         end
       end
     end
 
-    context 'when no key is specified' do
-      before do
-        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
-          include GoodJob::ActiveJobExtensions::Concurrency
+    describe '#good_job_concurrency_key' do
+      context 'when retrying a job' do
+        before do
+          stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+            include GoodJob::ActiveJobExtensions::Concurrency
 
-          def perform(name)
+            good_job_control_concurrency_with(
+              total_limit: 1,
+              key: -> { Time.current.to_f }
+            )
+            retry_on StandardError
+
+            def perform(*)
+              raise "ERROR"
+            end
+          end)
+        end
+
+        describe 'retries' do
+          it 'preserves the value' do
+            TestJob.set(wait_until: 5.minutes.ago).perform_later(name: "Alice")
+
+            begin
+              GoodJob.perform_inline
+            rescue StandardError
+              nil
+            end
+
+            expect(GoodJob::Job.count).to eq 1
+            expect(GoodJob::Job.first.concurrency_key).to be_present
+            expect(GoodJob::Job.first).not_to be_finished
           end
-        end)
+        end
       end
 
-      it 'uses the class name as the default concurrency key' do
-        job = TestJob.perform_later("Alice")
-        expect(job.good_job_concurrency_key).to eq('TestJob')
-      end
-    end
+      context 'when no key is specified' do
+        before do
+          stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+            include GoodJob::ActiveJobExtensions::Concurrency
 
-    describe '#perform_later' do
-      before do
-        stub_const 'TestJob', (Class.new(ActiveJob::Base) do
-          include GoodJob::ActiveJobExtensions::Concurrency
+            def perform(name)
+            end
+          end)
+        end
 
-          good_job_control_concurrency_with(
-            total_limit: 1,
-            key: -> { arguments.first }
-          )
-
-          def perform(arg)
-          end
-        end)
+        it 'uses the class name as the default concurrency key' do
+          job = TestJob.perform_later("Alice")
+          expect(job.good_job_concurrency_key).to eq('TestJob')
+        end
       end
 
-      it 'raises an error for non-serializable types' do
-        expect { TestJob.perform_later({ key: "value" }) }.to raise_error(TypeError, "Concurrency key must be a String; was a Hash")
-        expect { TestJob.perform_later({ key: "value" }.with_indifferent_access) }.to raise_error(TypeError)
-        expect { TestJob.perform_later(["key"]) }.to raise_error(TypeError)
-        expect { TestJob.perform_later(TestJob) }.to raise_error(TypeError)
+      describe '#perform_later' do
+        before do
+          stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+            include GoodJob::ActiveJobExtensions::Concurrency
+
+            good_job_control_concurrency_with(
+              total_limit: 1,
+              key: -> { arguments.first }
+            )
+
+            def perform(arg)
+            end
+          end)
+        end
+
+        it 'raises an error for non-serializable types' do
+          expect { TestJob.perform_later({ key: "value" }) }.to raise_error(TypeError, "Concurrency key must be a String; was a Hash")
+          expect { TestJob.perform_later({ key: "value" }.with_indifferent_access) }.to raise_error(TypeError)
+          expect { TestJob.perform_later(["key"]) }.to raise_error(TypeError)
+          expect { TestJob.perform_later(TestJob) }.to raise_error(TypeError)
+        end
       end
     end
   end
