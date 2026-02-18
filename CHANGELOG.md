@@ -1,5 +1,18 @@
 # Changelog
 
+## [v4.13.3](https://github.com/bensheldon/good_job/tree/v4.13.3) (2026-02-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.2...v4.13.3)
+
+**Fixed bugs:**
+
+- Fix search\_text scope using mismatched text search configurations [\#1716](https://github.com/bensheldon/good_job/pull/1716) ([alexspeller](https://github.com/alexspeller))
+- --daemonize no longer changes working directory, fixes relative paths [\#1714](https://github.com/bensheldon/good_job/pull/1714) ([jamie](https://github.com/jamie))
+
+**Merged pull requests:**
+
+- Update suggested Puma config in README [\#1713](https://github.com/bensheldon/good_job/pull/1713) ([Spone](https://github.com/Spone))
+
 ## [v4.13.2](https://github.com/bensheldon/good_job/tree/v4.13.2) (2026-01-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.1...v4.13.2)
