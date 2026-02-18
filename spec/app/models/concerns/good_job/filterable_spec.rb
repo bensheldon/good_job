@@ -56,5 +56,23 @@ RSpec.describe GoodJob::Filterable do
     it 'is chainable and reversible' do
       expect(model_class.where.not(id: nil).search_text('example_value').reverse).to include(job)
     end
+
+    it 'finds results when default_text_search_config is not english' do
+      job_with_stemmed_word = model_class.create!(
+        active_job_id: SecureRandom.uuid,
+        queue_name: "default",
+        job_class: "ExampleJob",
+        scheduled_at: Time.current,
+        serialized_params: { example_key: 'running', arguments: [] },
+        error_event: "retried"
+      )
+
+      ActiveRecord::Base.connection.execute("SET default_text_search_config = 'pg_catalog.simple'")
+      begin
+        expect(model_class.search_text('running')).to include(job_with_stemmed_word)
+      ensure
+        ActiveRecord::Base.connection.execute("SET default_text_search_config = 'pg_catalog.english'")
+      end
+    end
   end
 end
