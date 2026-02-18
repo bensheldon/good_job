@@ -5,7 +5,7 @@
     <div class="d-lg-none d-flex flex-fill justify-content-end me-2">
       <span class="navbar-text">
         <%= render_icon "globe", class: "align-text-bottom" %>
-        <small><%= Rails.env.capitalize %></small>
+        <small><%= GoodJob.configuration.environment.capitalize %></small>
       </span>
     </div>
 
@@ -62,7 +62,7 @@
         <li class="nav-item d-none d-lg-flex align-items-center">
           <span class="navbar-text">
             <%= render_icon "globe", class: "align-text-bottom" %>
-            <small><%= Rails.env.capitalize %></small>
+            <small><%= GoodJob.configuration.environment.capitalize %></small>
           </span>
         </li>
 
