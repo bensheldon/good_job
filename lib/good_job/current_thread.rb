@@ -8,6 +8,7 @@ module GoodJob
   module CurrentThread
     # Resettable accessors for thread-local values.
     ACCESSORS = %i[
+      active_job
       cron_at
       cron_key
       error_on_discard
@@ -18,6 +19,12 @@ module GoodJob
       retried_job
       retry_now
     ].freeze
+
+    # @!attribute [rw] cron_at
+    #   @!scope class
+    #   Cron At
+    #   @return [ActiveJob::Base, nil]
+    thread_mattr_accessor :active_job
 
     # @!attribute [rw] cron_at
     #   @!scope class

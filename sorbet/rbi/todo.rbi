@@ -48,3 +48,6 @@ module GoodJob::Job::ERROR_EVENT_RETRIED; end
 module Rails::Server; end
 module ::AutoloadModule; end
 module ::AutoloadModule::Error; end
+module UnhandledErrorJob; end
+module DiscardedErrorJob; end
+module RetryStoppedErrorJob; end

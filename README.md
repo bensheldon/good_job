@@ -303,13 +303,13 @@ Available configuration options are:
 - `cron_graceful_restart_period` (integer) when restarting cron, attempt to re-enqueue jobs that would have been enqueued by cron within this time period (e.g. `1.minute`). This should match the expected downtime during deploys.
 - `enable_listen_notify` (boolean) whether to enqueue and read jobs with Postgres LISTEN/NOTIFY. Defaults to `true`. You can also set this with the environment variable `GOOD_JOB_ENABLE_LISTEN_NOTIFY`.
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
-- `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`. _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
-- `cleanup_preserved_jobs_before_seconds_ago` (integer) number of seconds to preserve jobs when using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `1209600` (14 days). Can also be set with  the environment variable `GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO`.  _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
+- `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`.
+- `cleanup_preserved_jobs_before_seconds_ago` (integer) number of seconds to preserve jobs when using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `1209600` (14 days). Can also be set with  the environment variable `GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO`.
 - `cleanup_interval_jobs` (integer) Number of jobs a Scheduler will execute before cleaning up preserved jobs. Defaults to `1000`. Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_JOBS` and disabled with `0`).
 - `cleanup_interval_seconds` (integer) Number of seconds a Scheduler will wait before cleaning up preserved jobs. Defaults to `600` (10 minutes). Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` and disabled with `0`).
 - `inline_execution_respects_schedule` (boolean) Opt-in to future behavior of inline execution respecting scheduled jobs. Defaults to `false`.
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
-- `preserve_job_records` (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
+- `preserve_job_records` (boolean, symbol, or lambda) keeps job records in your database even after jobs are completed. If set to `true`, all job records are preserved. If set to `:on_unhandled_error`, only jobs that finished with an unhandled error are preserved. If set to a lambda, the lambda will be called with the error_event (e.g., `:discarded`, `:retry_stopped`, or `:unhandled`) and should return a boolean indicating whether to preserve the job. (Default: `true`)
 - `advisory_lock_heartbeat` (boolean) whether to use an advisory lock for the purpose of determining whether an execeution process is active. (Default `true` in Development; `false` in other environments)
 - `retry_on_unhandled_error` (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Be advised this may lead to jobs being repeated infinitely ([see below for more on retries](#retries)). Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `false`)
 - `on_thread_error` (proc, lambda, or callable) will be called when there is an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake. Example:
@@ -375,7 +375,7 @@ GoodJob.active_record_parent_class = "ApplicationRecord"
 The following options are also configurable via accessors, but you are encouraged to use the configuration attributes instead because these may be deprecated and removed in the future:
 
 - **`GoodJob.logger`** ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger`.
-- **`GoodJob.preserve_job_records`** (boolean) keeps job records in your database even after jobs are completed. (Default: `true`)
+- **`GoodJob.preserve_job_records`** (boolean, symbol, or lambda) keeps job records in your database even after jobs are completed. If set to `true`, all job records are preserved. If set to `:on_unhandled_error`, only jobs that finished with an unhandled error are preserved. If set to a lambda, the lambda will be called with Active Job instance, and if it exists, the exception the error_event (e.g., `:discarded`, `:retry_stopped`, or `:unhandled`) and should return a boolean indicating whether to preserve the job (e.g. `-> (active_job, error, error_event) { !(active_job.is_a(Turbo::Streams::BroadcastStreamJob) || error_event == :retry_stopped`). (Default: `true`)
 - **`GoodJob.retry_on_unhandled_error`** (boolean) causes jobs to be re-queued and retried if they raise an instance of `StandardError`. Be advised this may lead to jobs being repeated infinitely ([see below for more on retries](#retries)). Instances of `Exception`, like SIGINT, will *always* be retried, regardless of this attribute’s value. (Default: `false`)
 - **`GoodJob.on_thread_error`** (proc, lambda, or callable) will be called when there is an Exception. It can be useful for logging errors to bug tracking services, like Sentry or Airbrake.
 
@@ -1390,7 +1390,11 @@ To instead delete job records immediately after they are finished:
 
 ```ruby
 # config/initializers/good_job.rb
-config.good_job.preserve_job_records = false # defaults to true; can also be `false` or `:on_unhandled_error`
+config.good_job.preserve_job_records = false # defaults to true; can also be `false`, `:on_unhandled_error`, or a lambda that takes error_event argument
+
+# Example of using a lambda to preserve only discarded jobs
+config.good_job.preserve_job_records = ->(error_event) { error_event == :discarded }
+
 ```
 
 GoodJob will automatically delete preserved job records after 14 days. The retention period, as well as the frequency GoodJob checks for deletable records can be configured:
