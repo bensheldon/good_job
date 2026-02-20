@@ -23,41 +23,13 @@ module GoodJob
     end
 
     def filtered_query(filter_params = params)
-      query = base_query
-
-      query = query.job_class(filter_params[:job_class]) if filter_params[:job_class].present?
-      query = query.where(queue_name: filter_params[:queue_name]) if filter_params[:queue_name].present?
-
-      search_query = filter_params[:query]&.strip
-      if search_query.present?
-        query = if query_is_uuid_and_job_exists?(search_query)
-                  query.where(active_job_id: search_query)
-                else
-                  query.search_text(search_query)
-                end
-      end
-
-      query = query.where(cron_key: filter_params[:cron_key]) if filter_params[:cron_key].present?
-      query = query.where(finished_at: finished_since(filter_params[:finished_since])..) if filter_params[:finished_since].present?
-
-      if filter_params[:state]
-        case filter_params[:state]
-        when 'discarded'
-          query = query.discarded
-        when 'succeeded'
-          query = query.succeeded
-        when 'retried'
-          query = query.retried
-        when 'scheduled'
-          query = query.scheduled
-        when 'running'
-          query = query.running
-        when 'queued'
-          query = query.queued
-        end
-      end
-
-      query
+      base_query
+        .merge(filter_by_job_class(filter_params[:job_class]))
+        .merge(filter_by_queue_name(filter_params[:queue_name]))
+        .merge(filter_by_search_query(filter_params[:query]))
+        .merge(filter_by_cron_key(filter_params[:cron_key]))
+        .merge(filter_by_finished_since(filter_params[:finished_since]))
+        .merge(filter_by_state(filter_params[:state]))
     end
 
     def filtered_count
@@ -78,6 +50,47 @@ module GoodJob
     end
 
     private
+
+    def filter_by_job_class(job_class)
+      return {} if job_class.blank?
+
+      GoodJob::Job.job_class(job_class)
+    end
+
+    def filter_by_queue_name(queue_name)
+      return {} if queue_name.blank?
+
+      GoodJob::Job.where(queue_name: queue_name)
+    end
+
+    def filter_by_search_query(query)
+      search_query = query&.strip
+      return {} if search_query.blank?
+
+      if query_is_uuid_and_job_exists?(search_query)
+        GoodJob::Job.where(active_job_id: search_query)
+      else
+        GoodJob::Job.search_text(search_query)
+      end
+    end
+
+    def filter_by_cron_key(cron_key)
+      return {} if cron_key.blank?
+
+      GoodJob::Job.where(cron_key: cron_key)
+    end
+
+    def filter_by_finished_since(since)
+      return {} if since.blank?
+
+      GoodJob::Job.where(finished_at: finished_since(since)..)
+    end
+
+    def filter_by_state(state)
+      return {} unless state.present? && state_names.include?(state)
+
+      GoodJob::Job.public_send(state)
+    end
 
     def query_for_records
       filtered_query
