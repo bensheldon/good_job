@@ -87,9 +87,15 @@ module GoodJob
     end
 
     def filter_by_state(state)
-      return {} unless state.present? && state_names.include?(state)
-
-      GoodJob::Job.public_send(state)
+      case state
+      when 'discarded' then GoodJob::Job.discarded
+      when 'succeeded' then GoodJob::Job.succeeded
+      when 'retried'   then GoodJob::Job.retried
+      when 'scheduled' then GoodJob::Job.scheduled
+      when 'running'   then GoodJob::Job.running
+      when 'queued'    then GoodJob::Job.queued
+      else {}
+      end
     end
 
     def query_for_records
