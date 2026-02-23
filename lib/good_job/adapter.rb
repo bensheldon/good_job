@@ -60,6 +60,7 @@ module GoodJob
         jobs = active_jobs.map do |active_job|
           GoodJob::Job.build_for_enqueue(active_job).tap do |job|
             job.scheduled_at = current_time if job.scheduled_at == job.created_at
+            job.scheduled_at = nil if active_job.respond_to?(:good_job_paused) && active_job.good_job_paused
             job.created_at = current_time
             job.updated_at = current_time
           end
@@ -81,7 +82,7 @@ module GoodJob
           jobs = jobs.select(&:persisted?) # prune unpersisted jobs
 
           if execute_inline?
-            inline_jobs = jobs.select { |job| job.scheduled_at.nil? || job.scheduled_at <= Time.current }
+            inline_jobs = jobs.select { |job| job.scheduled_at.present? && job.scheduled_at <= Time.current }
             inline_jobs.each(&:advisory_lock!)
           end
         end
@@ -131,14 +132,14 @@ module GoodJob
     # @param timestamp [Integer, nil] the epoch time to perform the job
     # @return [GoodJob::Job]
     def enqueue_at(active_job, timestamp)
-      scheduled_at = timestamp ? Time.zone.at(timestamp) : nil
+      scheduled_at = timestamp ? Time.zone.at(timestamp) : Time.current
 
       # If there is a currently open Bulk in the current thread, direct the
       # job there to be enqueued using enqueue_all
       return if GoodJob::Bulk.capture(active_job, queue_adapter: self)
 
       Rails.application.executor.wrap do
-        will_execute_inline = execute_inline? && (scheduled_at.nil? || scheduled_at <= Time.current)
+        will_execute_inline = execute_inline? && (scheduled_at.present? && scheduled_at <= Time.current)
         will_retry_inline = will_execute_inline && CurrentThread.job&.active_job_id == active_job.job_id && !CurrentThread.retry_now
 
         if will_retry_inline

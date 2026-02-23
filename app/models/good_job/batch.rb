@@ -132,7 +132,7 @@ module GoodJob
     def add(active_jobs = nil, &block)
       record.save if record.new_record?
 
-      buffer = Bulk::Buffer.new
+      buffer = Bulk::Buffer.new(pause_jobs: properties[:paused] || false)
       buffer.add(active_jobs)
       buffer.capture(&block) if block
 
@@ -141,6 +141,44 @@ module GoodJob
       end
 
       buffer.active_jobs
+    end
+
+    # TODO: document
+    def paused?
+      # TODO: consider querying to see if any jobs within the batch are paused, and if/how that should be represented if that result does not match properties[:paused]
+      # I think there are probably going to need to be separate methods for "is the batch set to pause all jobs within it" and "does the batch contain any paused jobs" as those cases aren't always lined up
+      properties[:paused] || false
+    end
+
+    # TODO
+    # def pause; end
+
+    # TODO: document
+    def unpause
+      # TODO: consider raising an exception if the batch isn't paused in the first place
+
+      # TODO: consider setting this at the end of the method, or doing something similar to help handle situations where an exception is raised during unpausing
+      assign_properties(paused: false)
+
+      # TODO: this could be implemented with COALESCE and `jsonb_path_query(serialized_params, '$.scheduled_at.datetime()')` to extract the previously scheduled time within a single UPDATE, but that method is not available in PG12 (still supported at the time of writing)
+      unpaused_count = 0
+
+      loop do
+        jobs = record.jobs.where(scheduled_at: nil).limit(1_000)
+        break if jobs.empty?
+
+        jobs.each do |job|
+          job.update!(scheduled_at: job.serialized_params['scheduled_at'] || Time.current)
+        end
+
+        jobs.collect(&:queue_name).tally.each do |q, c|
+          GoodJob::Notifier.notify({ queue_name: q, count: c })
+        end
+
+        unpaused_count += jobs.size
+      end
+
+      unpaused_count
     end
 
     def retry
