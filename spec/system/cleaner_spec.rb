@@ -14,8 +14,10 @@ describe 'Cleaner Page', :js do
     GoodJob::Job.order(created_at: :asc).last
   end
 
-  before do
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+  around do |example|
+    perform_good_job_inline do
+      example.run
+    end
   end
 
   it 'render index properly' do

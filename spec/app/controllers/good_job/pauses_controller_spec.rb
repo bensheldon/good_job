@@ -5,9 +5,14 @@ require "rails_helper"
 RSpec.describe GoodJob::PausesController, type: :controller do
   render_views # seems required for Rails HEAD
 
+  around do |example|
+    perform_good_job_external do
+      example.run
+    end
+  end
+
   before do
     @routes = GoodJob::Engine.routes
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
   end
 
   describe '#index' do

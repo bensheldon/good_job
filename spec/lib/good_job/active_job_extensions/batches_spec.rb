@@ -3,9 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::ActiveJobExtensions::Batches do
+  around do |example|
+    perform_good_job_inline do
+      example.run
+    end
+  end
+
   before do
     allow(GoodJob).to receive(:retry_on_unhandled_error).and_return(false)
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
 
     stub_const 'RESULTS', Concurrent::Array.new
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do

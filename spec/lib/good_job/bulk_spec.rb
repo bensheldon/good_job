@@ -3,13 +3,18 @@
 require 'rails_helper'
 
 describe GoodJob::Bulk do
+  around do |example|
+    perform_good_job_external do
+      example.run
+    end
+  end
+
   before do
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       def perform
         true
       end
     end)
-    TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
   end
 
   describe '.capture' do
@@ -98,11 +103,16 @@ describe GoodJob::Bulk do
     it 'can handle non-GoodJob jobs that are directly inserted into the buffer' do
       optional_adapter_kwargs = ActiveJob::QueueAdapters::InlineAdapter.method_defined?(:enqueue_after_transaction_commit?) ? { enqueue_after_transaction_commit?: false } : {}
       adapter = instance_double(ActiveJob::QueueAdapters::InlineAdapter, enqueue: nil, enqueue_at: nil, **optional_adapter_kwargs)
-      TestJob.queue_adapter = adapter
 
-      described_class.enqueue(TestJob.new)
-      expect(GoodJob::Job.count).to eq 0
-      expect(adapter).to have_received(:enqueue).once
+      original_adapter = TestJob.queue_adapter
+      begin
+        TestJob.queue_adapter = adapter
+        described_class.enqueue(TestJob.new)
+        expect(GoodJob::Job.count).to eq 0
+        expect(adapter).to have_received(:enqueue).once
+      ensure
+        TestJob.queue_adapter = original_adapter
+      end
     end
 
     it 'does not enqueue jobs that fail enqueue concurrency' do
