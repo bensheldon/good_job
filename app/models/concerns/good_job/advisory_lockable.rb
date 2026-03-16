@@ -30,6 +30,14 @@ module GoodJob
       # Default Postgres function to be used for Advisory Locks
       class_attribute :advisory_lockable_function, default: "pg_try_advisory_lock"
 
+      # Default hash strategy to derive Advisory Lock keys.
+      # Supported by convention/documentation:
+      # md5, sha1, sha224, sha256, sha384, sha512, hashtextextended, hashtext, uuid_v5
+      # Note:
+      # - sha* algorithms require pgcrypto for PostgreSQL's digest() function.
+      # - uuid_v5 requires uuid-ossp for PostgreSQL's uuid_generate_v5() function.
+      class_attribute :advisory_lockable_hash_function, default: "md5"
+
       # Attempt to acquire an advisory lock on the selected records and
       # return only those records for which a lock could be acquired.
       # @!method advisory_lock(column: _advisory_lockable_column, function: advisory_lockable_function)
@@ -55,7 +63,7 @@ module GoodJob
         cte_type = supports_cte_materialization_specifiers? ? :MATERIALIZED : :""
         composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(cte_type, cte_query.arel))
 
-        lock_condition = "#{function}(('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)"
+        lock_condition = "#{function}(#{advisory_lock_bigint_sql("#{connection.quote(table_name)} || '-' || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text")})"
         query = cte_table.project(cte_table[:id])
                   .with(composed_cte)
                   .where(defined?(Arel::Nodes::BoundSqlLiteral) ? Arel::Nodes::BoundSqlLiteral.new(lock_condition, [], {}) : Arel::Nodes::SqlLiteral.new(lock_condition))
@@ -85,8 +93,8 @@ module GoodJob
         joins(<<~SQL.squish)
           LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'
             AND pg_locks.objsubid = 1
-            AND pg_locks.classid = ('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(32)::int
-            AND pg_locks.objid = (('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64) << 32)::bit(32)::int
+            AND pg_locks.classid = #{advisory_lock_classid_sql("#{connection.quote(table_name)} || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text")}
+            AND pg_locks.objid = #{advisory_lock_objid_sql("#{connection.quote(table_name)} || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text")}
         SQL
       end)
 
@@ -201,11 +209,11 @@ module GoodJob
       def advisory_lock_key(key, function: advisory_lockable_function)
         query = if function.include? "_try_"
                   <<~SQL.squish
-                    SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint) AS locked
+                    SELECT #{function}(#{advisory_lock_bigint_sql('$1::text')}) AS locked
                   SQL
                 else
                   <<~SQL.squish
-                    SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint)::text AS locked
+                    SELECT #{function}(#{advisory_lock_bigint_sql('$1::text')})::text AS locked
                   SQL
                 end
 
@@ -236,7 +244,7 @@ module GoodJob
         raise ArgumentError, "No unlock function provide" if function.blank?
 
         query = <<~SQL.squish
-          SELECT #{function}(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint) AS unlocked
+          SELECT #{function}(#{advisory_lock_bigint_sql('$1::text')}) AS unlocked
         SQL
         binds = [
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
@@ -253,8 +261,8 @@ module GoodJob
           FROM pg_locks
           WHERE pg_locks.locktype = 'advisory'
             AND pg_locks.objsubid = 1
-            AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
-            AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
+            AND pg_locks.classid = #{advisory_lock_classid_sql('$1::text')}
+            AND pg_locks.objid = #{advisory_lock_objid_sql('$2::text')}
           LIMIT 1
         SQL
         binds = [
@@ -273,8 +281,8 @@ module GoodJob
           FROM pg_locks
           WHERE pg_locks.locktype = 'advisory'
             AND pg_locks.objsubid = 1
-            AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
-            AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
+            AND pg_locks.classid = #{advisory_lock_classid_sql('$1::text')}
+            AND pg_locks.objid = #{advisory_lock_objid_sql('$2::text')}
             AND pg_locks.pid = pg_backend_pid()
           LIMIT 1
         SQL
@@ -287,6 +295,29 @@ module GoodJob
 
       def _advisory_lockable_column
         advisory_lockable_column || primary_key
+      end
+
+      def advisory_lock_bigint_sql(value_sql)
+        case advisory_lockable_hash_function.to_s.downcase
+        when "hashtextextended"
+          "hashtextextended((#{value_sql})::text, 0)"
+        when "hashtext"
+          "((hashtext((#{value_sql})::text)::bigint << 32) + (hashtext(('good_job-' || (#{value_sql})::text))::bigint & 4294967295::bigint))"
+        when "uuid_v5"
+          "('x' || substr(replace(uuid_generate_v5('6ba7b810-9dad-11d1-80b4-00c04fd430c8'::uuid, (#{value_sql})::text)::text, '-', ''), 1, 16))::bit(64)::bigint"
+        when "md5"
+          "('x' || substr(md5(#{value_sql}), 1, 16))::bit(64)::bigint"
+        else
+          "('x' || substr(encode(digest(#{value_sql}, #{connection.quote(advisory_lockable_hash_function.to_s.downcase)}), 'hex'), 1, 16))::bit(64)::bigint"
+        end
+      end
+
+      def advisory_lock_classid_sql(value_sql)
+        "substring((#{advisory_lock_bigint_sql(value_sql)})::bit(64) from 1 for 32)::bit(32)::int"
+      end
+
+      def advisory_lock_objid_sql(value_sql)
+        "substring((#{advisory_lock_bigint_sql(value_sql)})::bit(64) from 33 for 32)::bit(32)::int"
       end
 
       def supports_cte_materialization_specifiers?
@@ -399,21 +430,6 @@ module GoodJob
     # @return [Boolean]
     def owns_advisory_lock?(key: lockable_key)
       self.class.owns_advisory_lock_key?(key)
-      query = <<~SQL.squish
-        SELECT 1 AS one
-        FROM pg_locks
-        WHERE pg_locks.locktype = 'advisory'
-          AND pg_locks.objsubid = 1
-          AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
-          AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
-          AND pg_locks.pid = pg_backend_pid()
-        LIMIT 1
-      SQL
-      binds = [
-        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
-        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
-      ]
-      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Owns Advisory Lock?', binds).any?
     end
 
     # Releases all advisory locks on the record that are held by the current
