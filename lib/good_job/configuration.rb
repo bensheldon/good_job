@@ -25,6 +25,8 @@ module GoodJob
     DEFAULT_CLEANUP_INTERVAL_JOBS = 1_000
     # Default number of seconds to wait between preserved job cleanup runs
     DEFAULT_CLEANUP_INTERVAL_SECONDS = 10.minutes.to_i
+    # Default cap for preserved job and execution records. nil disables count-based cleanup.
+    DEFAULT_CLEANUP_PRESERVED_JOBS_MAX_COUNT = nil
     # Default to always wait for jobs to finish for {Adapter#shutdown}
     DEFAULT_SHUTDOWN_TIMEOUT = -1
     # Default to not running cron
@@ -270,6 +272,25 @@ module GoodJob
           env['GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO'] ||
           DEFAULT_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO
       ).to_i
+    end
+
+    # Maximum number of preserved jobs and executions to keep.
+    # nil/false/0 disables count-based cleanup.
+    # @return [Integer, nil]
+    def cleanup_preserved_jobs_max_count
+      value = if options.key?(:cleanup_preserved_jobs_max_count)
+                options[:cleanup_preserved_jobs_max_count]
+              elsif rails_config.key?(:cleanup_preserved_jobs_max_count)
+                rails_config[:cleanup_preserved_jobs_max_count]
+              elsif env.key?('GOOD_JOB_CLEANUP_PRESERVED_JOBS_MAX_COUNT')
+                env['GOOD_JOB_CLEANUP_PRESERVED_JOBS_MAX_COUNT']
+              end
+
+      if value.in? [nil, "", false, "false", 0, "0"]
+        DEFAULT_CLEANUP_PRESERVED_JOBS_MAX_COUNT
+      else
+        value.to_i
+      end
     end
 
     # Number of jobs a {Scheduler} will execute before automatically cleaning up preserved jobs.

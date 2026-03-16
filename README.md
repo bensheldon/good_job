@@ -305,6 +305,7 @@ Available configuration options are:
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
 - `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`. _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
 - `cleanup_preserved_jobs_before_seconds_ago` (integer) number of seconds to preserve jobs when using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `1209600` (14 days). Can also be set with  the environment variable `GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO`.  _This configuration is only used when {GoodJob.preserve_job_records} is `true`._
+- `cleanup_preserved_jobs_max_count` (integer) maximum number of preserved jobs and executions to keep. Defaults to `nil` (disabled). Can also be set with the environment variable `GOOD_JOB_CLEANUP_PRESERVED_JOBS_MAX_COUNT`.
 - `cleanup_interval_jobs` (integer) Number of jobs a Scheduler will execute before cleaning up preserved jobs. Defaults to `1000`. Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_JOBS` and disabled with `0`).
 - `cleanup_interval_seconds` (integer) Number of seconds a Scheduler will wait before cleaning up preserved jobs. Defaults to `600` (10 minutes). Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` and disabled with `0`).
 - `inline_execution_respects_schedule` (boolean) Opt-in to future behavior of inline execution respecting scheduled jobs. Defaults to `false`.
@@ -1397,6 +1398,7 @@ GoodJob will automatically delete preserved job records after 14 days. The reten
 
 ```ruby
 config.good_job.cleanup_preserved_jobs_before_seconds_ago = 14.days
+config.good_job.cleanup_preserved_jobs_max_count = 1_000 # Hard cap for preserved jobs/executions.
 config.good_job.cleanup_interval_jobs = 1_000 # Number of executed jobs between deletion sweeps.
 config.good_job.cleanup_interval_seconds = 10.minutes # Number of seconds between deletion sweeps.
 ```

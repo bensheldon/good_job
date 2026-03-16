@@ -247,6 +247,38 @@ RSpec.describe GoodJob::Configuration do
     end
   end
 
+  describe '#cleanup_preserved_jobs_max_count' do
+    it 'defaults to nil' do
+      configuration = described_class.new({})
+      expect(configuration.cleanup_preserved_jobs_max_count).to be_nil
+    end
+
+    context 'when rails config is set' do
+      it 'uses rails config value' do
+        allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_preserved_jobs_max_count: 1_000 })
+
+        configuration = described_class.new({})
+        expect(configuration.cleanup_preserved_jobs_max_count).to eq 1_000
+      end
+    end
+
+    context 'when environment variable is set' do
+      it 'uses environment variable' do
+        stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_PRESERVED_JOBS_MAX_COUNT' => '2000' })
+
+        configuration = described_class.new({})
+        expect(configuration.cleanup_preserved_jobs_max_count).to eq 2000
+      end
+
+      it 'coerces 0 to nil' do
+        stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_PRESERVED_JOBS_MAX_COUNT' => '0' })
+
+        configuration = described_class.new({})
+        expect(configuration.cleanup_preserved_jobs_max_count).to be_nil
+      end
+    end
+  end
+
   describe '#cron' do
     let(:cron) { { some_task: { cron: "every day", class: "FooJob" } } }
 

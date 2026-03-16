@@ -134,6 +134,18 @@ describe GoodJob do
       described_class.cleanup_preserved_jobs
       expect { old_batch.reload }.to raise_error ActiveRecord::RecordNotFound
     end
+
+    it "caps preserved jobs and executions by count" do
+      destroyed_records_count = described_class.cleanup_preserved_jobs(older_than: 100.years, include_discarded: true, max_count: 1, in_batches_of: 1)
+
+      expect(destroyed_records_count).to eq 3
+
+      expect { recent_job.reload }.not_to raise_error
+      expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_finished_job_execution.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_batch.reload }.not_to raise_error
+    end
   end
 
   describe '.perform_inline' do

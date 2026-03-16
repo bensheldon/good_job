@@ -204,8 +204,14 @@ module GoodJob
   # destroy old records and preserve space in your database.
   # @param older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
   # @param include_discarded [Boolean] Whether or not to destroy discarded jobs (default: per +cleanup_discarded_jobs+ config option)
+  # @param max_count [Integer, nil] Maximum number of preserved jobs/executions to keep. +nil+ disables count-based cleanup.
   # @return [Integer] Number of job execution records and batches that were destroyed.
-  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000, include_discarded: GoodJob.configuration.cleanup_discarded_jobs?)
+  def self.cleanup_preserved_jobs(
+    older_than: nil,
+    in_batches_of: 1_000,
+    include_discarded: GoodJob.configuration.cleanup_discarded_jobs?,
+    max_count: GoodJob.configuration.cleanup_preserved_jobs_max_count
+  )
     older_than ||= GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
 
@@ -238,6 +244,34 @@ module GoodJob
         break if deleted.zero?
 
         deleted_batches_count += deleted
+      end
+
+      if max_count&.positive?
+        loop do
+          break if GoodJob.current_thread_shutting_down?
+
+          capped_jobs_query = GoodJob::Job.finished.order(finished_at: :desc)
+          capped_jobs_query = capped_jobs_query.succeeded unless include_discarded
+
+          active_job_ids = capped_jobs_query.offset(max_count).limit(in_batches_of).pluck(:active_job_id)
+          break if active_job_ids.empty?
+
+          deleted_executions = GoodJob::Execution.where(active_job_id: active_job_ids).delete_all
+          deleted_executions_count += deleted_executions
+
+          deleted_jobs = GoodJob::Job.where(active_job_id: active_job_ids).delete_all
+          deleted_jobs_count += deleted_jobs
+        end
+
+        loop do
+          break if GoodJob.current_thread_shutting_down?
+
+          execution_ids = GoodJob::Execution.finished.order(finished_at: :desc).offset(max_count).limit(in_batches_of).pluck(:id)
+          break if execution_ids.empty?
+
+          deleted_executions = GoodJob::Execution.where(id: execution_ids).delete_all
+          deleted_executions_count += deleted_executions
+        end
       end
 
       payload[:destroyed_batches_count] = deleted_batches_count
