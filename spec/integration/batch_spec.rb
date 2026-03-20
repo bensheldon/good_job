@@ -36,6 +36,14 @@ RSpec.describe 'Batches' do
       expect(good_job.batch_id).to eq batch.id
     end
 
+    it 'supports perform_all_later', skip: -> { !ActiveJob.respond_to?(:perform_all_later) } do
+      batch = GoodJob::Batch.enqueue do
+        ActiveJob.perform_all_later([TestJob.new, TestJob.new])
+      end
+
+      expect(batch.active_jobs.count).to eq 2
+    end
+
     context 'when all jobs complete successfully' do
       it 'has success status' do
         batch = GoodJob::Batch.enqueue do

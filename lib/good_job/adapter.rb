@@ -55,6 +55,10 @@ module GoodJob
       active_jobs = Array(active_jobs)
       return 0 if active_jobs.empty?
 
+      # If there is a currently open Bulk in the current thread, direct the
+      # jobs there to (eventually) be enqueued using enqueue_all
+      return if GoodJob::Bulk.capture(active_jobs, queue_adapter: self)
+
       Rails.application.executor.wrap do
         current_time = Time.current
         jobs = active_jobs.map do |active_job|
