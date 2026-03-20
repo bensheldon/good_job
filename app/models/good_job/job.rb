@@ -645,13 +645,12 @@ module GoodJob
             interrupt_error_string = self.class.format_error(GoodJob::InterruptError.new("Interrupted after starting perform at '#{existing_performed_at}'"))
             self.error = interrupt_error_string
             self.error_event = :interrupted
-            monotonic_duration = (::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - monotonic_start).seconds
 
             execution_attrs = {
               error: interrupt_error_string,
               finished_at: job_performed_at,
               error_event: :interrupted,
-              duration: monotonic_duration,
+              duration: (job_performed_at - existing_performed_at).seconds,
             }
             executions.where(finished_at: nil).where.not(performed_at: nil).update_all(execution_attrs) # rubocop:disable Rails/SkipsModelValidations
           end
