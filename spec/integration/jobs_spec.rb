@@ -212,4 +212,70 @@ RSpec.describe 'Complex Jobs' do
       expect(executions[1].finished_at).to be < executions[2].finished_at
     end
   end
+
+  describe 'GoodJob.preserve_job_records lambda' do
+    let(:received_payloads) { [] }
+    let(:preserve_lambda) do
+      lambda { |*payload|
+        received_payloads << payload
+        true
+      }
+    end
+
+    before do
+      allow(GoodJob).to receive(:preserve_job_records).and_return(preserve_lambda)
+    end
+
+    after do
+      THREAD_ERRORS.clear
+    end
+
+    it 'receives the correct error_event arguments' do
+      allow(GoodJob).to receive(:retry_on_unhandled_error).and_return(false)
+
+      stub_const "ExpectedError", Class.new(StandardError)
+
+      stub_const "UnhandledErrorJob", (Class.new(ActiveJob::Base) do
+        def perform
+          raise ExpectedError, "unhandled error"
+        end
+      end)
+
+      stub_const "DiscardedErrorJob", (Class.new(ActiveJob::Base) do
+        discard_on ExpectedError
+        def perform
+          raise ExpectedError, "discarded error"
+        end
+      end)
+
+      stub_const "RetryStoppedErrorJob", (Class.new(ActiveJob::Base) do
+        retry_on ExpectedError, wait: 0, attempts: 2
+        def perform
+          raise ExpectedError, "retry stopped error"
+        end
+      end)
+
+      UnhandledErrorJob.queue_adapter = async_adapter
+      DiscardedErrorJob.queue_adapter = async_adapter
+      RetryStoppedErrorJob.queue_adapter = async_adapter
+
+      UnhandledErrorJob.perform_later
+      wait_until { expect(GoodJob::Job.where(error_event: "unhandled").count).to eq(1) }
+
+      DiscardedErrorJob.perform_later
+      wait_until { expect(GoodJob::Job.where(error_event: "discarded").count).to eq(1) }
+
+      RetryStoppedErrorJob.perform_later
+      wait_until { expect(GoodJob::Job.where(error_event: "retry_stopped").count).to eq(1) }
+
+      capsule.shutdown
+
+      # Verify the lambda was called with the expected arguments
+      expect(received_payloads).to include(
+        [an_instance_of(UnhandledErrorJob), an_instance_of(ExpectedError), :unhandled],
+        [an_instance_of(DiscardedErrorJob), an_instance_of(ExpectedError), :discarded],
+        [an_instance_of(RetryStoppedErrorJob), an_instance_of(ExpectedError), :retry_stopped]
+      )
+    end
+  end
 end
