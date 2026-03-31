@@ -1,5 +1,24 @@
 # Changelog
 
+## [v4.14.0](https://github.com/bensheldon/good_job/tree/v4.14.0) (2026-03-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.3...v4.14.0)
+
+**Implemented enhancements:**
+
+- Consider using pg\_cron for Cron-style repeating/recurring jobs [\#328](https://github.com/bensheldon/good_job/issues/328)
+- Add Batch.enqueue\_all for bulk-enqueuing multiple batches [\#1726](https://github.com/bensheldon/good_job/pull/1726) ([AliOsm](https://github.com/AliOsm))
+- Allow perform\_all\_later to enqueue to Batches [\#1720](https://github.com/bensheldon/good_job/pull/1720) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- perform\_all\_later not intercepted by Batch [\#1719](https://github.com/bensheldon/good_job/issues/1719)
+- Deprecate and drop :on\_unhandled\_error option [\#1706](https://github.com/bensheldon/good_job/issues/1706)
+
+**Merged pull requests:**
+
+- Bump actions/upload-artifact from 6 to 7 [\#1718](https://github.com/bensheldon/good_job/pull/1718) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.13.3](https://github.com/bensheldon/good_job/tree/v4.13.3) (2026-02-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.2...v4.13.3)
