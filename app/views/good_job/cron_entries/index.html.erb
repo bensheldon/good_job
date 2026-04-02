@@ -39,9 +39,11 @@
             <%= relative_time cron_entry.next_at %>
           </div>
           <div class="col-6 col-lg-1 text-wrap small">
-            <% if cron_entry.last_job.present? %>
+            <% last_job = @last_jobs[cron_entry.key.to_s] %>
+            <% if last_job.present? %>
+              <% last_job_at = (last_job.cron_at || last_job.created_at).localtime %>
               <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.last_run" %></div>
-              <%= link_to relative_time(cron_entry.last_job_at), cron_entry_path(cron_entry), title: "Job #{cron_entry.last_job.id}" %>
+              <%= link_to relative_time(last_job_at), cron_entry_path(cron_entry), title: "Job #{last_job.id}" %>
             <% end %>
           </div>
           <div class="col-6 col-lg-1 text-wrap small">

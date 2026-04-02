@@ -4,6 +4,7 @@ module GoodJob
   class CronEntriesController < GoodJob::ApplicationController
     def index
       @cron_entries = CronEntry.all
+      @last_jobs = CronEntry.last_jobs_by_key(@cron_entries)
       @enabled_states = GoodJob::Setting.cron_keys_enabled(
         @cron_entries.map { |entry| [entry.key, entry.enabled_by_default?] }
       )

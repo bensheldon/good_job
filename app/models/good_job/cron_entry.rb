@@ -18,6 +18,25 @@ module GoodJob # :nodoc:
       configuration.cron_entries
     end
 
+    def self.last_jobs_by_key(cron_entries)
+      cron_keys = cron_entries.map { |entry| entry.key.to_s }
+      return {} if cron_keys.empty?
+
+      bind_params = cron_keys.map { "?" }.join(", ")
+      sql = <<~SQL.squish
+        SELECT lateral_jobs.*
+        FROM unnest(ARRAY[#{bind_params}]::text[]) AS cron_keys(cron_key)
+        CROSS JOIN LATERAL (
+          SELECT * FROM good_jobs
+          WHERE good_jobs.cron_key = cron_keys.cron_key
+          ORDER BY cron_at DESC NULLS LAST
+          LIMIT 1
+        ) AS lateral_jobs
+      SQL
+
+      GoodJob::Job.find_by_sql([sql, *cron_keys]).index_by(&:cron_key)
+    end
+
     def self.find(key, configuration: nil)
       all(configuration: configuration).find { |entry| entry.key == key.to_sym }.tap do |cron_entry|
         raise ActiveRecord::RecordNotFound unless cron_entry
