@@ -22,10 +22,12 @@ module GoodJob # :nodoc:
       cron_keys = cron_entries.map { |entry| entry.key.to_s }
       return {} if cron_keys.empty?
 
-      bind_params = cron_keys.map { "?" }.join(", ")
-      sql = <<~SQL.squish
-        SELECT lateral_jobs.*
-        FROM unnest(ARRAY[#{bind_params}]::text[]) AS cron_keys(cron_key)
+      from_clause = GoodJob::Job.sanitize_sql_array([
+        "unnest(ARRAY[?]::text[]) AS cron_keys(cron_key)",
+        cron_keys,
+      ])
+
+      join_clause = <<~SQL.squish
         CROSS JOIN LATERAL (
           SELECT * FROM good_jobs
           WHERE good_jobs.cron_key = cron_keys.cron_key
@@ -34,7 +36,11 @@ module GoodJob # :nodoc:
         ) AS lateral_jobs
       SQL
 
-      GoodJob::Job.find_by_sql([sql, *cron_keys]).index_by(&:cron_key)
+      GoodJob::Job
+        .select("lateral_jobs.*")
+        .from(from_clause)
+        .joins(join_clause)
+        .index_by(&:cron_key)
     end
 
     def self.find(key, configuration: nil)
