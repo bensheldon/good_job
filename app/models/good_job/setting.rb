@@ -19,6 +19,16 @@ module GoodJob
       end
     end
 
+    def self.cron_keys_enabled(keys_with_defaults)
+      cron_disabled = find_by(key: CRON_KEYS_DISABLED)&.value || []
+      cron_enabled = find_by(key: CRON_KEYS_ENABLED)&.value || []
+
+      keys_with_defaults.to_h do |key, default|
+        key_s = key.to_s
+        [key_s, default ? cron_disabled.exclude?(key_s) : cron_enabled.include?(key_s)]
+      end
+    end
+
     def self.cron_key_enable(key)
       key_string = key.to_s
       enabled_setting = find_or_initialize_by(key: CRON_KEYS_ENABLED) do |record|

@@ -18,6 +18,17 @@ module GoodJob # :nodoc:
       configuration.cron_entries
     end
 
+    def self.last_jobs_by_key(cron_entries)
+      cron_keys = cron_entries.map { |entry| entry.key.to_s }
+      return {} if cron_keys.empty?
+
+      GoodJob::Job
+        .where(cron_key: cron_keys)
+        .select("DISTINCT ON (cron_key) good_jobs.*")
+        .order("cron_key, cron_at DESC NULLS LAST")
+        .index_by(&:cron_key)
+    end
+
     def self.find(key, configuration: nil)
       all(configuration: configuration).find { |entry| entry.key == key.to_sym }.tap do |cron_entry|
         raise ActiveRecord::RecordNotFound unless cron_entry
@@ -144,12 +155,12 @@ module GoodJob # :nodoc:
       (last_job.cron_at || last_job.created_at).localtime
     end
 
-    private
-
     def enabled_by_default?
       value = params.fetch(:enabled_by_default, true)
       value.respond_to?(:call) ? value.call : value
     end
+
+    private
 
     def cron
       params.fetch(:cron)
