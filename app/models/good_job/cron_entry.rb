@@ -22,10 +22,9 @@ module GoodJob # :nodoc:
       cron_keys = cron_entries.map { |entry| entry.key.to_s }
       return {} if cron_keys.empty?
 
-      from_clause = GoodJob::Job.sanitize_sql_array([
-        "unnest(ARRAY[?]::text[]) AS cron_keys(cron_key)",
-        cron_keys,
-      ])
+      from_clause = GoodJob::Job.sanitize_sql_array(
+        ["unnest(ARRAY[?]::text[]) AS cron_keys(cron_key)", cron_keys]
+      )
 
       join_clause = <<~SQL.squish
         CROSS JOIN LATERAL (
