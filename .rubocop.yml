@@ -22,6 +22,7 @@ AllCops:
   Exclude:
     - pkg/**/*
     - demo/**/*
+    - sorbet/rbi/**/*
     - tmp/**/*
     - scripts/**/*
     - gemfiles/**/*
@@ -50,6 +51,10 @@ Layout/ParameterAlignment:
 
 Lint/AmbiguousBlockAssociation:
   Enabled: false
+
+Lint/DuplicateMethods:
+  Exclude:
+    - spec/**/* # broken with stub_const
 
 Lint/IncompatibleIoSelectWithFiberScheduler:
   Enabled: false
@@ -127,11 +132,17 @@ RSpec/MultipleMemoizedHelpers:
 RSpec/NestedGroups:
   Enabled: false
 
+RSpec/Output:
+  Enabled: false
+
 Style/Documentation:
   Enabled: false
 
 Style/EmptyMethod:
   EnforcedStyle: expanded
+
+Style/EmptyClassDefinition:
+  Enabled: false
 
 Style/FormatStringToken:
   EnforcedStyle: template
@@ -144,6 +155,9 @@ Style/MultilineBlockChain:
   Enabled: false
 
 Style/NumericLiterals:
+  Enabled: false
+
+Style/OneClassPerFile:
   Enabled: false
 
 Style/PercentLiteralDelimiters:

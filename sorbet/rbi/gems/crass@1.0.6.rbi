@@ -7,14 +7,14 @@
 
 # A CSS parser based on the CSS Syntax Module Level 3 spec.
 #
-# source://crass//lib/crass/token-scanner.rb#3
+# pkg:gem/crass#lib/crass/token-scanner.rb:3
 module Crass
   class << self
     # Parses _input_ as a CSS stylesheet and returns a parse tree.
     #
     # See {Tokenizer#initialize} for _options_.
     #
-    # source://crass//lib/crass.rb#10
+    # pkg:gem/crass#lib/crass.rb:10
     def parse(input, options = T.unsafe(nil)); end
 
     # Parses _input_ as a string of CSS properties (such as the contents of an
@@ -22,7 +22,7 @@ module Crass
     #
     # See {Tokenizer#initialize} for _options_.
     #
-    # source://crass//lib/crass.rb#18
+    # pkg:gem/crass#lib/crass.rb:18
     def parse_properties(input, options = T.unsafe(nil)); end
   end
 end
@@ -31,7 +31,7 @@ end
 #
 # 5. http://dev.w3.org/csswg/css-syntax/#parsing
 #
-# source://crass//lib/crass/parser.rb#10
+# pkg:gem/crass#lib/crass/parser.rb:10
 class Crass::Parser
   # Initializes a parser based on the given _input_, which may be a CSS string
   # or an array of tokens.
@@ -40,14 +40,14 @@ class Crass::Parser
   #
   # @return [Parser] a new instance of Parser
   #
-  # source://crass//lib/crass/parser.rb#126
+  # pkg:gem/crass#lib/crass/parser.rb:126
   def initialize(input, options = T.unsafe(nil)); end
 
   # Consumes an at-rule and returns it.
   #
   # 5.4.2. http://dev.w3.org/csswg/css-syntax-3/#consume-at-rule
   #
-  # source://crass//lib/crass/parser.rb#137
+  # pkg:gem/crass#lib/crass/parser.rb:137
   def consume_at_rule(input = T.unsafe(nil)); end
 
   # Consumes a component value and returns it, or `nil` if there are no more
@@ -55,14 +55,14 @@ class Crass::Parser
   #
   # 5.4.6. http://dev.w3.org/csswg/css-syntax-3/#consume-a-component-value
   #
-  # source://crass//lib/crass/parser.rb#184
+  # pkg:gem/crass#lib/crass/parser.rb:184
   def consume_component_value(input = T.unsafe(nil)); end
 
   # Consumes a declaration and returns it, or `nil` on parse error.
   #
   # 5.4.5. http://dev.w3.org/csswg/css-syntax-3/#consume-a-declaration
   #
-  # source://crass//lib/crass/parser.rb#209
+  # pkg:gem/crass#lib/crass/parser.rb:209
   def consume_declaration(input = T.unsafe(nil)); end
 
   # Consumes a list of declarations and returns them.
@@ -77,14 +77,14 @@ class Crass::Parser
   #
   # 5.4.4. http://dev.w3.org/csswg/css-syntax/#consume-a-list-of-declarations
   #
-  # source://crass//lib/crass/parser.rb#276
+  # pkg:gem/crass#lib/crass/parser.rb:276
   def consume_declarations(input = T.unsafe(nil), options = T.unsafe(nil)); end
 
   # Consumes a function and returns it.
   #
   # 5.4.8. http://dev.w3.org/csswg/css-syntax-3/#consume-a-function
   #
-  # source://crass//lib/crass/parser.rb#326
+  # pkg:gem/crass#lib/crass/parser.rb:326
   def consume_function(input = T.unsafe(nil)); end
 
   # Consumes a qualified rule and returns it, or `nil` if a parse error
@@ -92,14 +92,14 @@ class Crass::Parser
   #
   # 5.4.3. http://dev.w3.org/csswg/css-syntax-3/#consume-a-qualified-rule
   #
-  # source://crass//lib/crass/parser.rb#357
+  # pkg:gem/crass#lib/crass/parser.rb:357
   def consume_qualified_rule(input = T.unsafe(nil)); end
 
   # Consumes a list of rules and returns them.
   #
   # 5.4.1. http://dev.w3.org/csswg/css-syntax/#consume-a-list-of-rules
   #
-  # source://crass//lib/crass/parser.rb#398
+  # pkg:gem/crass#lib/crass/parser.rb:398
   def consume_rules(flags = T.unsafe(nil)); end
 
   # Consumes and returns a simple block associated with the current input
@@ -107,12 +107,12 @@ class Crass::Parser
   #
   # 5.4.7. http://dev.w3.org/csswg/css-syntax/#consume-a-simple-block
   #
-  # source://crass//lib/crass/parser.rb#434
+  # pkg:gem/crass#lib/crass/parser.rb:434
   def consume_simple_block(input = T.unsafe(nil)); end
 
   # Creates and returns a new parse node with the given _properties_.
   #
-  # source://crass//lib/crass/parser.rb#458
+  # pkg:gem/crass#lib/crass/parser.rb:458
   def create_node(type, properties = T.unsafe(nil)); end
 
   # Parses the given _input_ tokens into a selector node and returns it.
@@ -120,34 +120,34 @@ class Crass::Parser
   # Doesn't bother splitting the selector list into individual selectors or
   # validating them. Feel free to do that yourself! It'll be fun!
   #
-  # source://crass//lib/crass/parser.rb#466
+  # pkg:gem/crass#lib/crass/parser.rb:466
   def create_selector(input); end
 
   # Creates a `:style_rule` node from the given qualified _rule_, and returns
   # it.
   #
-  # source://crass//lib/crass/parser.rb#474
+  # pkg:gem/crass#lib/crass/parser.rb:474
   def create_style_rule(rule); end
 
   # Parses a single component value and returns it.
   #
   # 5.3.7. http://dev.w3.org/csswg/css-syntax-3/#parse-a-component-value
   #
-  # source://crass//lib/crass/parser.rb#483
+  # pkg:gem/crass#lib/crass/parser.rb:483
   def parse_component_value(input = T.unsafe(nil)); end
 
   # Parses a list of component values and returns an array of parsed tokens.
   #
   # 5.3.8. http://dev.w3.org/csswg/css-syntax/#parse-a-list-of-component-values
   #
-  # source://crass//lib/crass/parser.rb#510
+  # pkg:gem/crass#lib/crass/parser.rb:510
   def parse_component_values(input = T.unsafe(nil)); end
 
   # Parses a single declaration and returns it.
   #
   # 5.3.5. http://dev.w3.org/csswg/css-syntax/#parse-a-declaration
   #
-  # source://crass//lib/crass/parser.rb#524
+  # pkg:gem/crass#lib/crass/parser.rb:524
   def parse_declaration(input = T.unsafe(nil)); end
 
   # Parses a list of declarations and returns them.
@@ -156,31 +156,31 @@ class Crass::Parser
   #
   # 5.3.6. http://dev.w3.org/csswg/css-syntax/#parse-a-list-of-declarations
   #
-  # source://crass//lib/crass/parser.rb#552
+  # pkg:gem/crass#lib/crass/parser.rb:552
   def parse_declarations(input = T.unsafe(nil), options = T.unsafe(nil)); end
 
   # Parses a list of declarations and returns an array of `:property` nodes
   # (and any non-declaration nodes that were in the input). This is useful for
   # parsing the contents of an HTML element's `style` attribute.
   #
-  # source://crass//lib/crass/parser.rb#560
+  # pkg:gem/crass#lib/crass/parser.rb:560
   def parse_properties(input = T.unsafe(nil)); end
 
   # Parses a single rule and returns it.
   #
   # 5.3.4. http://dev.w3.org/csswg/css-syntax-3/#parse-a-rule
   #
-  # source://crass//lib/crass/parser.rb#586
+  # pkg:gem/crass#lib/crass/parser.rb:586
   def parse_rule(input = T.unsafe(nil)); end
 
   # Returns the unescaped value of a selector name or property declaration.
   #
-  # source://crass//lib/crass/parser.rb#615
+  # pkg:gem/crass#lib/crass/parser.rb:615
   def parse_value(nodes); end
 
   # {TokenScanner} wrapping the tokens generated from this parser's input.
   #
-  # source://crass//lib/crass/parser.rb#120
+  # pkg:gem/crass#lib/crass/parser.rb:120
   def tokens; end
 
   class << self
@@ -191,7 +191,7 @@ class Crass::Parser
     #
     # 5.3.6. http://dev.w3.org/csswg/css-syntax/#parse-a-list-of-declarations
     #
-    # source://crass//lib/crass/parser.rb#25
+    # pkg:gem/crass#lib/crass/parser.rb:25
     def parse_properties(input, options = T.unsafe(nil)); end
 
     # Parses CSS rules (such as the content of a `@media` block) and returns a
@@ -202,7 +202,7 @@ class Crass::Parser
     #
     # 5.3.3. http://dev.w3.org/csswg/css-syntax/#parse-a-list-of-rules
     #
-    # source://crass//lib/crass/parser.rb#36
+    # pkg:gem/crass#lib/crass/parser.rb:36
     def parse_rules(input, options = T.unsafe(nil)); end
 
     # Parses a CSS stylesheet and returns a parse tree.
@@ -211,7 +211,7 @@ class Crass::Parser
     #
     # 5.3.2. http://dev.w3.org/csswg/css-syntax/#parse-a-stylesheet
     #
-    # source://crass//lib/crass/parser.rb#54
+    # pkg:gem/crass#lib/crass/parser.rb:54
     def parse_stylesheet(input, options = T.unsafe(nil)); end
 
     # Converts a node or array of nodes into a CSS string based on their
@@ -221,43 +221,43 @@ class Crass::Parser
     #
     #   * **:exclude_comments** - When `true`, comments will be excluded.
     #
-    # source://crass//lib/crass/parser.rb#74
+    # pkg:gem/crass#lib/crass/parser.rb:74
     def stringify(nodes, options = T.unsafe(nil)); end
   end
 end
 
-# source://crass//lib/crass/parser.rb#11
+# pkg:gem/crass#lib/crass/parser.rb:11
 Crass::Parser::BLOCK_END_TOKENS = T.let(T.unsafe(nil), Hash)
 
 # Similar to a StringScanner, but with extra functionality needed to tokenize
 # CSS while preserving the original text.
 #
-# source://crass//lib/crass/scanner.rb#8
+# pkg:gem/crass#lib/crass/scanner.rb:8
 class Crass::Scanner
   # Creates a Scanner instance for the given _input_ string or IO instance.
   #
   # @return [Scanner] a new instance of Scanner
   #
-  # source://crass//lib/crass/scanner.rb#25
+  # pkg:gem/crass#lib/crass/scanner.rb:25
   def initialize(input); end
 
   # Consumes the next character and returns it, advancing the pointer, or
   # an empty string if the end of the string has been reached.
   #
-  # source://crass//lib/crass/scanner.rb#34
+  # pkg:gem/crass#lib/crass/scanner.rb:34
   def consume; end
 
   # Consumes the rest of the string and returns it, advancing the pointer to
   # the end of the string. Returns an empty string is the end of the string
   # has already been reached.
   #
-  # source://crass//lib/crass/scanner.rb#46
+  # pkg:gem/crass#lib/crass/scanner.rb:46
   def consume_rest; end
 
   # Current character, or `nil` if the scanner hasn't yet consumed a
   # character, or is at the end of the string.
   #
-  # source://crass//lib/crass/scanner.rb#11
+  # pkg:gem/crass#lib/crass/scanner.rb:11
   def current; end
 
   # Returns `true` if the end of the string has been reached, `false`
@@ -265,136 +265,136 @@ class Crass::Scanner
   #
   # @return [Boolean]
   #
-  # source://crass//lib/crass/scanner.rb#57
+  # pkg:gem/crass#lib/crass/scanner.rb:57
   def eos?; end
 
   # Sets the marker to the position of the next character that will be
   # consumed.
   #
-  # source://crass//lib/crass/scanner.rb#63
+  # pkg:gem/crass#lib/crass/scanner.rb:63
   def mark; end
 
   # Returns the substring between {#marker} and {#pos}, without altering the
   # pointer.
   #
-  # source://crass//lib/crass/scanner.rb#69
+  # pkg:gem/crass#lib/crass/scanner.rb:69
   def marked; end
 
   # Current marker position. Use {#marked} to get the substring between
   # {#marker} and {#pos}.
   #
-  # source://crass//lib/crass/scanner.rb#15
+  # pkg:gem/crass#lib/crass/scanner.rb:15
   def marker; end
 
   # Current marker position. Use {#marked} to get the substring between
   # {#marker} and {#pos}.
   #
-  # source://crass//lib/crass/scanner.rb#15
+  # pkg:gem/crass#lib/crass/scanner.rb:15
   def marker=(_arg0); end
 
   # Returns up to _length_ characters starting at the current position, but
   # doesn't consume them. The number of characters returned may be less than
   # _length_ if the end of the string is reached.
   #
-  # source://crass//lib/crass/scanner.rb#80
+  # pkg:gem/crass#lib/crass/scanner.rb:80
   def peek(length = T.unsafe(nil)); end
 
   # Position of the next character that will be consumed. This is a character
   # position, not a byte position, so it accounts for multi-byte characters.
   #
-  # source://crass//lib/crass/scanner.rb#19
+  # pkg:gem/crass#lib/crass/scanner.rb:19
   def pos; end
 
   # Position of the next character that will be consumed. This is a character
   # position, not a byte position, so it accounts for multi-byte characters.
   #
-  # source://crass//lib/crass/scanner.rb#19
+  # pkg:gem/crass#lib/crass/scanner.rb:19
   def pos=(_arg0); end
 
   # Moves the pointer back one character without changing the value of
   # {#current}. The next call to {#consume} will re-consume the current
   # character.
   #
-  # source://crass//lib/crass/scanner.rb#87
+  # pkg:gem/crass#lib/crass/scanner.rb:87
   def reconsume; end
 
   # Resets the pointer to the beginning of the string.
   #
-  # source://crass//lib/crass/scanner.rb#93
+  # pkg:gem/crass#lib/crass/scanner.rb:93
   def reset; end
 
   # Tries to match _pattern_ at the current position. If it matches, the
   # matched substring will be returned and the pointer will be advanced.
   # Otherwise, `nil` will be returned.
   #
-  # source://crass//lib/crass/scanner.rb#103
+  # pkg:gem/crass#lib/crass/scanner.rb:103
   def scan(pattern); end
 
   # Scans the string until the _pattern_ is matched. Returns the substring up
   # to and including the end of the match, and advances the pointer. If there
   # is no match, `nil` is returned and the pointer is not advanced.
   #
-  # source://crass//lib/crass/scanner.rb#115
+  # pkg:gem/crass#lib/crass/scanner.rb:115
   def scan_until(pattern); end
 
   # String being scanned.
   #
-  # source://crass//lib/crass/scanner.rb#22
+  # pkg:gem/crass#lib/crass/scanner.rb:22
   def string; end
 end
 
 # Like {Scanner}, but for tokens!
 #
-# source://crass//lib/crass/token-scanner.rb#6
+# pkg:gem/crass#lib/crass/token-scanner.rb:6
 class Crass::TokenScanner
   # @return [TokenScanner] a new instance of TokenScanner
   #
-  # source://crass//lib/crass/token-scanner.rb#9
+  # pkg:gem/crass#lib/crass/token-scanner.rb:9
   def initialize(tokens); end
 
   # Executes the given block, collects all tokens that are consumed during its
   # execution, and returns them.
   #
-  # source://crass//lib/crass/token-scanner.rb#16
+  # pkg:gem/crass#lib/crass/token-scanner.rb:16
   def collect; end
 
   # Consumes the next token and returns it, advancing the pointer. Returns
   # `nil` if there is no next token.
   #
-  # source://crass//lib/crass/token-scanner.rb#24
+  # pkg:gem/crass#lib/crass/token-scanner.rb:24
   def consume; end
 
   # Returns the value of attribute current.
   #
-  # source://crass//lib/crass/token-scanner.rb#7
+  # pkg:gem/crass#lib/crass/token-scanner.rb:7
   def current; end
 
   # Returns the next token without consuming it, or `nil` if there is no next
   # token.
   #
-  # source://crass//lib/crass/token-scanner.rb#32
+  # pkg:gem/crass#lib/crass/token-scanner.rb:32
   def peek; end
 
   # Returns the value of attribute pos.
   #
-  # source://crass//lib/crass/token-scanner.rb#7
+  # pkg:gem/crass#lib/crass/token-scanner.rb:7
   def pos; end
 
   # Reconsumes the current token, moving the pointer back one position.
   #
   # http://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#reconsume-the-current-input-token
   #
-  # source://crass//lib/crass/token-scanner.rb#39
+  # pkg:gem/crass#lib/crass/token-scanner.rb:39
   def reconsume; end
 
   # Resets the pointer to the first token in the list.
   #
-  # source://crass//lib/crass/token-scanner.rb#44
+  # pkg:gem/crass#lib/crass/token-scanner.rb:44
   def reset; end
 
   # Returns the value of attribute tokens.
   #
-  # source://crass//lib/crass/token-scanner.rb#7
+  # pkg:gem/crass#lib/crass/token-scanner.rb:7
   def tokens; end
 end
 
@@ -402,7 +402,7 @@ end
 #
 # 4. http://dev.w3.org/csswg/css-syntax/#tokenization
 #
-# source://crass//lib/crass/tokenizer.rb#9
+# pkg:gem/crass#lib/crass/tokenizer.rb:9
 class Crass::Tokenizer
   # Initializes a new Tokenizer.
   #
@@ -417,28 +417,28 @@ class Crass::Tokenizer
   #
   # @return [Tokenizer] a new instance of Tokenizer
   #
-  # source://crass//lib/crass/tokenizer.rb#62
+  # pkg:gem/crass#lib/crass/tokenizer.rb:62
   def initialize(input, options = T.unsafe(nil)); end
 
   # Consumes a token and returns the token that was consumed.
   #
   # 4.3.1. http://dev.w3.org/csswg/css-syntax/#consume-a-token
   #
-  # source://crass//lib/crass/tokenizer.rb#70
+  # pkg:gem/crass#lib/crass/tokenizer.rb:70
   def consume; end
 
   # Consumes the remnants of a bad URL and returns the consumed text.
   #
   # 4.3.15. http://dev.w3.org/csswg/css-syntax/#consume-the-remnants-of-a-bad-url
   #
-  # source://crass//lib/crass/tokenizer.rb#275
+  # pkg:gem/crass#lib/crass/tokenizer.rb:275
   def consume_bad_url; end
 
   # Consumes comments and returns them, or `nil` if no comments were consumed.
   #
   # 4.3.2. http://dev.w3.org/csswg/css-syntax/#consume-comments
   #
-  # source://crass//lib/crass/tokenizer.rb#301
+  # pkg:gem/crass#lib/crass/tokenizer.rb:301
   def consume_comments; end
 
   # Consumes an escaped code point and returns its unescaped value.
@@ -449,21 +449,21 @@ class Crass::Tokenizer
   #
   # 4.3.8. http://dev.w3.org/csswg/css-syntax/#consume-an-escaped-code-point
   #
-  # source://crass//lib/crass/tokenizer.rb#326
+  # pkg:gem/crass#lib/crass/tokenizer.rb:326
   def consume_escaped; end
 
   # Consumes an ident-like token and returns it.
   #
   # 4.3.4. http://dev.w3.org/csswg/css-syntax/#consume-an-ident-like-token
   #
-  # source://crass//lib/crass/tokenizer.rb#350
+  # pkg:gem/crass#lib/crass/tokenizer.rb:350
   def consume_ident; end
 
   # Consumes a name and returns it.
   #
   # 4.3.12. http://dev.w3.org/csswg/css-syntax/#consume-a-name
   #
-  # source://crass//lib/crass/tokenizer.rb#375
+  # pkg:gem/crass#lib/crass/tokenizer.rb:375
   def consume_name; end
 
   # Consumes a number and returns a 3-element array containing the number's
@@ -472,14 +472,14 @@ class Crass::Tokenizer
   #
   # 4.3.13. http://dev.w3.org/csswg/css-syntax/#consume-a-number
   #
-  # source://crass//lib/crass/tokenizer.rb#407
+  # pkg:gem/crass#lib/crass/tokenizer.rb:407
   def consume_number; end
 
   # Consumes a numeric token and returns it.
   #
   # 4.3.3. http://dev.w3.org/csswg/css-syntax/#consume-a-numeric-token
   #
-  # source://crass//lib/crass/tokenizer.rb#430
+  # pkg:gem/crass#lib/crass/tokenizer.rb:430
   def consume_numeric; end
 
   # Consumes a string token that ends at the given character, and returns the
@@ -487,7 +487,7 @@ class Crass::Tokenizer
   #
   # 4.3.5. http://dev.w3.org/csswg/css-syntax/#consume-a-string-token
   #
-  # source://crass//lib/crass/tokenizer.rb#469
+  # pkg:gem/crass#lib/crass/tokenizer.rb:469
   def consume_string(ending = T.unsafe(nil)); end
 
   # Consumes a Unicode range token and returns it. Assumes the initial "u+" or
@@ -495,7 +495,7 @@ class Crass::Tokenizer
   #
   # 4.3.7. http://dev.w3.org/csswg/css-syntax/#consume-a-unicode-range-token
   #
-  # source://crass//lib/crass/tokenizer.rb#510
+  # pkg:gem/crass#lib/crass/tokenizer.rb:510
   def consume_unicode_range; end
 
   # Consumes a URL token and returns it. Assumes the original "url(" has
@@ -503,26 +503,26 @@ class Crass::Tokenizer
   #
   # 4.3.6. http://dev.w3.org/csswg/css-syntax/#consume-a-url-token
   #
-  # source://crass//lib/crass/tokenizer.rb#542
+  # pkg:gem/crass#lib/crass/tokenizer.rb:542
   def consume_url; end
 
   # Converts a valid CSS number string into a number and returns the number.
   #
   # 4.3.14. http://dev.w3.org/csswg/css-syntax/#convert-a-string-to-a-number
   #
-  # source://crass//lib/crass/tokenizer.rb#590
+  # pkg:gem/crass#lib/crass/tokenizer.rb:590
   def convert_string_to_number(str); end
 
   # Creates and returns a new token with the given _properties_.
   #
-  # source://crass//lib/crass/tokenizer.rb#616
+  # pkg:gem/crass#lib/crass/tokenizer.rb:616
   def create_token(type, properties = T.unsafe(nil)); end
 
   # Preprocesses _input_ to prepare it for the tokenizer.
   #
   # 3.3. http://dev.w3.org/csswg/css-syntax/#input-preprocessing
   #
-  # source://crass//lib/crass/tokenizer.rb#627
+  # pkg:gem/crass#lib/crass/tokenizer.rb:627
   def preprocess(input); end
 
   # Returns `true` if the given three-character _text_ would start an
@@ -533,7 +533,7 @@ class Crass::Tokenizer
   #
   # @return [Boolean]
   #
-  # source://crass//lib/crass/tokenizer.rb#642
+  # pkg:gem/crass#lib/crass/tokenizer.rb:642
   def start_identifier?(text = T.unsafe(nil)); end
 
   # Returns `true` if the given three-character _text_ would start a number.
@@ -544,12 +544,12 @@ class Crass::Tokenizer
   #
   # @return [Boolean]
   #
-  # source://crass//lib/crass/tokenizer.rb#666
+  # pkg:gem/crass#lib/crass/tokenizer.rb:666
   def start_number?(text = T.unsafe(nil)); end
 
   # Tokenizes the input stream and returns an array of tokens.
   #
-  # source://crass//lib/crass/tokenizer.rb#685
+  # pkg:gem/crass#lib/crass/tokenizer.rb:685
   def tokenize; end
 
   # Returns `true` if the given two-character _text_ is the beginning of a
@@ -560,7 +560,7 @@ class Crass::Tokenizer
   #
   # @return [Boolean]
   #
-  # source://crass//lib/crass/tokenizer.rb#702
+  # pkg:gem/crass#lib/crass/tokenizer.rb:702
   def valid_escape?(text = T.unsafe(nil)); end
 
   class << self
@@ -569,55 +569,55 @@ class Crass::Tokenizer
     #
     # See {#initialize} for _options_.
     #
-    # source://crass//lib/crass/tokenizer.rb#45
+    # pkg:gem/crass#lib/crass/tokenizer.rb:45
     def tokenize(input, options = T.unsafe(nil)); end
   end
 end
 
-# source://crass//lib/crass/tokenizer.rb#10
+# pkg:gem/crass#lib/crass/tokenizer.rb:10
 Crass::Tokenizer::RE_COMMENT_CLOSE = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#11
+# pkg:gem/crass#lib/crass/tokenizer.rb:11
 Crass::Tokenizer::RE_DIGIT = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#12
+# pkg:gem/crass#lib/crass/tokenizer.rb:12
 Crass::Tokenizer::RE_ESCAPE = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#13
+# pkg:gem/crass#lib/crass/tokenizer.rb:13
 Crass::Tokenizer::RE_HEX = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#14
+# pkg:gem/crass#lib/crass/tokenizer.rb:14
 Crass::Tokenizer::RE_NAME = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#15
+# pkg:gem/crass#lib/crass/tokenizer.rb:15
 Crass::Tokenizer::RE_NAME_START = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#16
+# pkg:gem/crass#lib/crass/tokenizer.rb:16
 Crass::Tokenizer::RE_NON_PRINTABLE = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#17
+# pkg:gem/crass#lib/crass/tokenizer.rb:17
 Crass::Tokenizer::RE_NUMBER_DECIMAL = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#18
+# pkg:gem/crass#lib/crass/tokenizer.rb:18
 Crass::Tokenizer::RE_NUMBER_EXPONENT = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#19
+# pkg:gem/crass#lib/crass/tokenizer.rb:19
 Crass::Tokenizer::RE_NUMBER_SIGN = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#21
+# pkg:gem/crass#lib/crass/tokenizer.rb:21
 Crass::Tokenizer::RE_NUMBER_STR = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#33
+# pkg:gem/crass#lib/crass/tokenizer.rb:33
 Crass::Tokenizer::RE_QUOTED_URL_START = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#35
+# pkg:gem/crass#lib/crass/tokenizer.rb:35
 Crass::Tokenizer::RE_UNICODE_RANGE_END = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#34
+# pkg:gem/crass#lib/crass/tokenizer.rb:34
 Crass::Tokenizer::RE_UNICODE_RANGE_START = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#36
+# pkg:gem/crass#lib/crass/tokenizer.rb:36
 Crass::Tokenizer::RE_WHITESPACE = T.let(T.unsafe(nil), Regexp)
 
-# source://crass//lib/crass/tokenizer.rb#37
+# pkg:gem/crass#lib/crass/tokenizer.rb:37
 Crass::Tokenizer::RE_WHITESPACE_ANCHORED = T.let(T.unsafe(nil), Regexp)
