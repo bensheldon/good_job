@@ -87,6 +87,34 @@ RSpec.describe GoodJob::AdvisoryLockable do
           ORDER BY "good_jobs"."priority" DESC
         SQL
       end
+
+      it 'can be customized with `advisory_lockable_hash_function`' do
+        allow(model_class).to receive(:advisory_lockable_hash_function).and_return("sha256")
+        query = model_class.order(priority: :desc).limit(2).advisory_lock
+
+        expect(query.to_sql).to include("encode(digest('good_jobs' || '-' || \"rows\".\"active_job_id\"::text, 'sha256'), 'hex')")
+      end
+
+      it 'supports hashtextextended hash strategy' do
+        allow(model_class).to receive(:advisory_lockable_hash_function).and_return("hashtextextended")
+        query = model_class.order(priority: :desc).limit(2).advisory_lock
+
+        expect(query.to_sql).to include("hashtextextended(('good_jobs' || '-' || \"rows\".\"active_job_id\"::text)::text, 0)")
+      end
+
+      it 'supports hashtext hash strategy' do
+        allow(model_class).to receive(:advisory_lockable_hash_function).and_return("hashtext")
+        query = model_class.order(priority: :desc).limit(2).advisory_lock
+
+        expect(query.to_sql).to include("hashtext(('good_jobs' || '-' || \"rows\".\"active_job_id\"::text)::text)")
+      end
+
+      it 'supports uuid_v5 hash strategy' do
+        allow(model_class).to receive(:advisory_lockable_hash_function).and_return("uuid_v5")
+        query = model_class.order(priority: :desc).limit(2).advisory_lock
+
+        expect(query.to_sql).to include("uuid_generate_v5('6ba7b810-9dad-11d1-80b4-00c04fd430c8'::uuid, ('good_jobs' || '-' || \"rows\".\"active_job_id\"::text)::text)")
+      end
     end
 
     describe 'select limit' do
