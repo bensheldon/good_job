@@ -666,6 +666,34 @@ RSpec.describe GoodJob::Job do
           expect(result.unhandled_error).to be_nil
         end
 
+        context 'when there is an interrupted execution' do
+          it 'sets the interrupted execution duration' do
+            performed_at = 5.seconds.ago
+            good_job.update!(performed_at: performed_at)
+
+            # We need an existing execution that hasn't finished
+            execution = good_job.executions.create!(
+              job_class: good_job.job_class,
+              queue_name: good_job.queue_name,
+              serialized_params: good_job.serialized_params,
+              scheduled_at: good_job.scheduled_at || good_job.created_at,
+              created_at: performed_at,
+              performed_at: performed_at,
+              process_id: SecureRandom.uuid
+            )
+
+            # 2. Call perform again, which should detect the "interruption" because performed_at is set.
+            good_job.perform(lock_id: process_id)
+
+            # 3. Verify the interrupted execution
+            execution.reload
+            expect(execution.error_event).to eq('interrupted')
+            expect(execution.finished_at).to be_within(1.second).of(Time.current)
+            expect(execution.duration).to be > 5
+            expect(execution.error).to include("Interrupted after starting perform at '#{performed_at}'")
+          end
+        end
+
         context 'when there is an error' do
           let(:active_job) { TestJob.new("whoops", raise_error: true) }
           let(:batch_id) { SecureRandom.uuid }
