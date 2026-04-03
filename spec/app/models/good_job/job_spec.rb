@@ -33,9 +33,14 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  around do |example|
+    perform_good_job_external do
+      example.run
+    end
+  end
+
   before do
     allow(GoodJob).to receive(:preserve_job_records).and_return(true)
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
 
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       def perform(*)
@@ -690,8 +695,13 @@ RSpec.describe GoodJob::Job do
           end
 
           context 'when there is a retry handler' do
+            around do |example|
+              perform_good_job_inline do
+                example.run
+              end
+            end
+
             before do
-              ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
               allow(GoodJob).to receive(:preserve_job_records).and_return(true)
               TestJob.retry_on(TestJob::ExpectedError, attempts: 2)
             end
@@ -928,8 +938,10 @@ RSpec.describe GoodJob::Job do
       end
 
       context 'when Discrete' do
-        before do
-          ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+        around do |example|
+          perform_good_job_inline do
+            example.run
+          end
         end
 
         it 'updates the Job record and creates a Execution record' do

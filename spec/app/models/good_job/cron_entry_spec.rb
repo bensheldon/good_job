@@ -168,19 +168,19 @@ describe GoodJob::CronEntry do
     end
 
     it 'can handle a proc for a class value that enqueues a job directly' do
-      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+      perform_good_job_external do
+        cron_at = Time.current
 
-      cron_at = Time.current
+        entry = described_class.new(params.merge(class: -> { TestJob.set(queue: "direct").perform_later(42, name: 'Direct') }))
+        entry.enqueue(cron_at)
 
-      entry = described_class.new(params.merge(class: -> { TestJob.set(queue: "direct").perform_later(42, name: 'Direct') }))
-      entry.enqueue(cron_at)
-
-      job = GoodJob::Job.last
-      expect(job).to have_attributes(
-        job_class: 'TestJob',
-        cron_at: be_within(0.001.seconds).of(cron_at),
-        queue_name: 'direct'
-      )
+        job = GoodJob::Job.last
+        expect(job).to have_attributes(
+          job_class: 'TestJob',
+          cron_at: be_within(0.001.seconds).of(cron_at),
+          queue_name: 'direct'
+        )
+      end
     end
 
     describe 'job execution' do
@@ -192,8 +192,10 @@ describe GoodJob::CronEntry do
     end
 
     describe "adapter integration" do
-      before do
-        ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+      around do |example|
+        perform_good_job_external do
+          example.run
+        end
       end
 
       it 'assigns cron_key and cron_at to the execution' do

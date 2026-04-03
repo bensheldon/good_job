@@ -3,20 +3,24 @@
 require 'rails_helper'
 
 describe GoodJob::Adapter::InlineBuffer do
+  around do |example|
+    perform_good_job_inline do
+      example.run
+    end
+  end
+
   before do
     stub_const 'SuccessJob', (Class.new(ActiveJob::Base) do
       def perform
         true
       end
     end)
-    SuccessJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
 
     stub_const 'ErrorJob', (Class.new(ActiveJob::Base) do
       def perform
         raise 'Error'
       end
     end)
-    ErrorJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
   end
 
   context "when using enqueue_all" do

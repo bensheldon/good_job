@@ -3,9 +3,14 @@
 require 'rails_helper'
 
 describe ExampleJob do
+  around do |example|
+    perform_good_job_inline do
+      example.run
+    end
+  end
+
   before do
     allow(GoodJob).to receive(:preserve_job_records).and_return(true)
-    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
   end
 
   describe "#perform" do
