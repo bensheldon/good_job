@@ -96,3 +96,8 @@ class ActiveRecord::Relation
   sig { abstract.returns(T::Enumerator[Elem]) }
   def each(&blk); end
 end
+
+module ActiveRecord::Core
+  sig { params(comparison_object: T.anything).returns(T::Boolean) }
+  def ==(comparison_object); end
+end

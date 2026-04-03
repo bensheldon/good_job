@@ -5,7 +5,7 @@
 # Please instead update this file by running `bin/tapioca gem mixlib-cli`.
 
 
-# source://mixlib-cli//lib/mixlib/cli/formatter.rb#2
+# pkg:gem/mixlib-cli#lib/mixlib/cli/formatter.rb:2
 module Mixlib; end
 
 # == Mixlib::CLI
@@ -27,7 +27,7 @@ module Mixlib; end
 # #parse_options. After calling this method, the attribute #config will
 # contain a hash of `:option_name => value` pairs.
 #
-# source://mixlib-cli//lib/mixlib/cli/formatter.rb#3
+# pkg:gem/mixlib-cli#lib/mixlib/cli/formatter.rb:3
 module Mixlib::CLI
   mixes_in_class_methods ::Mixlib::CLI::ClassMethods
   mixes_in_class_methods ::Mixlib::CLI::InheritMethods
@@ -40,32 +40,32 @@ module Mixlib::CLI
   # === Returns
   # object<Mixlib::Config>:: Returns an instance of whatever you wanted :)
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#260
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:260
   def initialize(*args); end
 
   # Banner for the option parser. If the option parser is printed, e.g., by
   # `puts opt_parser`, this string will be used as the first line.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#251
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:251
   def banner; end
 
   # Banner for the option parser. If the option parser is printed, e.g., by
   # `puts opt_parser`, this string will be used as the first line.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#251
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:251
   def banner=(_arg0); end
 
-  # source://mixlib-cli//lib/mixlib/cli.rb#432
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:432
   def build_option_arguments(opt_setting); end
 
   # Any arguments which were not parsed and placed in "config"--the leftovers.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#247
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:247
   def cli_arguments; end
 
   # Any arguments which were not parsed and placed in "config"--the leftovers.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#247
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:247
   def cli_arguments=(_arg0); end
 
   # A Hash containing the values supplied by command line options.
@@ -80,7 +80,7 @@ module Mixlib::CLI
   # After initialization, this will be an empty hash. When #parse_options is
   # called, +config+ is populated *only* with user-supplied values.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#236
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:236
   def config; end
 
   # A Hash containing the values supplied by command line options.
@@ -95,7 +95,7 @@ module Mixlib::CLI
   # After initialization, this will be an empty hash. When #parse_options is
   # called, +config+ is populated *only* with user-supplied values.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#236
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:236
   def config=(_arg0); end
 
   # If ClassMethods#use_separate_default_options is enabled, this will be a
@@ -105,7 +105,7 @@ module Mixlib::CLI
   # If use_separate_default_options is disabled, it will always be an empty
   # hash.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#244
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:244
   def default_config; end
 
   # If ClassMethods#use_separate_default_options is enabled, this will be a
@@ -115,7 +115,7 @@ module Mixlib::CLI
   # If use_separate_default_options is disabled, it will always be an empty
   # hash.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#244
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:244
   def default_config=(_arg0); end
 
   # Iterates through options declared as deprecated,
@@ -124,7 +124,7 @@ module Mixlib::CLI
   #
   # @return NilClass
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#394
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:394
   def handle_deprecated_options(show_deprecations); end
 
   # The option parser generated from the mixlib-cli DSL. +opt_parser+ can be
@@ -133,21 +133,21 @@ module Mixlib::CLI
   # === Returns
   # opt_parser<OptionParser>:: The option parser object.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#344
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:344
   def opt_parser; end
 
   # Gives the command line options definition as configured in the DSL. These
   # are used by #parse_options to generate the option parsing code. To get
   # the values supplied by the user, see #config.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#223
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:223
   def options; end
 
   # Gives the command line options definition as configured in the DSL. These
   # are used by #parse_options to generate the option parsing code. To get
   # the values supplied by the user, see #config.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#223
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:223
   def options=(_arg0); end
 
   # Parses an array, by default ARGV, for command line options (as configured at
@@ -158,18 +158,18 @@ module Mixlib::CLI
   # === Returns
   # argv<Array>:: Returns any un-parsed elements.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#304
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:304
   def parse_options(argv = T.unsafe(nil), show_deprecations: T.unsafe(nil)); end
 
   class << self
     # @private
     #
-    # source://mixlib-cli//lib/mixlib/cli.rb#448
+    # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:448
     def included(receiver); end
   end
 end
 
-# source://mixlib-cli//lib/mixlib/cli.rb#81
+# pkg:gem/mixlib-cli#lib/mixlib/cli.rb:81
 module Mixlib::CLI::ClassMethods
   # Change the banner.  Defaults to:
   #   Usage: #{0} (options)
@@ -180,7 +180,7 @@ module Mixlib::CLI::ClassMethods
   # === Returns
   # @banner<String>:: The current banner
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#210
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:210
   def banner(bstring = T.unsafe(nil)); end
 
   # Declare a deprecated option
@@ -205,7 +205,7 @@ module Mixlib::CLI::ClassMethods
   # === Returns
   # <Hash> :: The config hash for the created option.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#151
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:151
   def deprecated_option(name, replacement: T.unsafe(nil), long: T.unsafe(nil), short: T.unsafe(nil), boolean: T.unsafe(nil), value_mapper: T.unsafe(nil), keep: T.unsafe(nil)); end
 
   # Add a command line option.
@@ -242,7 +242,7 @@ module Mixlib::CLI::ClassMethods
   # @raise [ArgumentError]
   # @return [Hash] :: the config hash for the created option
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#123
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:123
   def option(name, args); end
 
   # Get the hash of current options.
@@ -250,7 +250,7 @@ module Mixlib::CLI::ClassMethods
   # === Returns
   # @options<Hash>:: The current options hash.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#184
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:184
   def options; end
 
   # Set the current options hash
@@ -263,52 +263,52 @@ module Mixlib::CLI::ClassMethods
   #
   # @raise [ArgumentError]
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#196
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:196
   def options=(val); end
 
   # When this setting is set to +true+, default values supplied to the
   # mixlib-cli DSL will be stored in a separate Hash
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#84
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:84
   def use_separate_default_options(true_or_false); end
 
   # @return [Boolean]
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#88
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:88
   def use_separate_defaults?; end
 end
 
-# source://mixlib-cli//lib/mixlib/cli/formatter.rb#4
+# pkg:gem/mixlib-cli#lib/mixlib/cli/formatter.rb:4
 class Mixlib::CLI::Formatter
   class << self
     # Create a string that includes both versions (short/long) of a flag name
     # based on on whether short/long/both/neither are provided
     #
-    # @param short [String] the short name of the option. Can be nil.
     # @param long [String] the long name of the option. Can be nil.
+    # @param short [String] the short name of the option. Can be nil.
     # @return [String] the formatted flag name as described above
     #
-    # source://mixlib-cli//lib/mixlib/cli/formatter.rb#11
+    # pkg:gem/mixlib-cli#lib/mixlib/cli/formatter.rb:11
     def combined_option_display_name(short, long); end
 
     # @param opt_array [Array]
     # @return [String] a friendly quoted list of items complete with "or"
     #
-    # source://mixlib-cli//lib/mixlib/cli/formatter.rb#25
+    # pkg:gem/mixlib-cli#lib/mixlib/cli/formatter.rb:25
     def friendly_opt_list(opt_array); end
   end
 end
 
-# source://mixlib-cli//lib/mixlib/cli.rb#43
+# pkg:gem/mixlib-cli#lib/mixlib/cli.rb:43
 module Mixlib::CLI::InheritMethods
   # object:: Instance to clone
   # This method will return a "deep clone" of the provided
   # `object`. If the provided `object` is an enumerable type the
   # contents will be iterated and cloned as well.
   #
-  # source://mixlib-cli//lib/mixlib/cli.rb#53
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:53
   def deep_dup(object); end
 
-  # source://mixlib-cli//lib/mixlib/cli.rb#44
+  # pkg:gem/mixlib-cli#lib/mixlib/cli.rb:44
   def inherited(receiver); end
 end

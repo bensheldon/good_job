@@ -5,54 +5,54 @@
 # Please instead update this file by running `bin/tapioca gem sprockets-rails`.
 
 
-# source://sprockets-rails//lib/sprockets/railtie.rb#18
+# pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:18
 module Rails; end
 
-# source://sprockets-rails//lib/sprockets/railtie.rb#19
+# pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:19
 class Rails::Application < ::Rails::Engine
   # Called from asset helpers to alert you if you reference an asset URL that
   # isn't precompiled and hence won't be available in production.
   #
   # @return [Boolean]
   #
-  # source://sprockets-rails//lib/sprockets/railtie.rb#38
+  # pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:38
   def asset_precompiled?(logical_path); end
 
   # Returns Sprockets::Environment for app config.
   #
-  # source://sprockets-rails//lib/sprockets/railtie.rb#31
+  # pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:31
   def assets; end
 
   # Returns Sprockets::Environment for app config.
   #
-  # source://sprockets-rails//lib/sprockets/railtie.rb#31
+  # pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:31
   def assets=(_arg0); end
 
   # Returns Sprockets::Manifest for app config.
   #
-  # source://sprockets-rails//lib/sprockets/railtie.rb#34
+  # pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:34
   def assets_manifest; end
 
   # Returns Sprockets::Manifest for app config.
   #
-  # source://sprockets-rails//lib/sprockets/railtie.rb#34
+  # pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:34
   def assets_manifest=(_arg0); end
 
   # Lazy-load the precompile list so we don't cause asset compilation at app
   # boot time, but ensure we cache the list so we don't recompute it for each
   # request or test case.
   #
-  # source://sprockets-rails//lib/sprockets/railtie.rb#52
+  # pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:52
   def precompiled_assets(clear_cache = T.unsafe(nil)); end
 end
 
 # Hack: We need to remove Rails' built in config.assets so we can
 # do our own thing.
 #
-# source://sprockets-rails//lib/sprockets/railtie.rb#22
+# pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:22
 class Rails::Application::Configuration < ::Rails::Engine::Configuration; end
 
-# source://sprockets-rails//lib/sprockets/rails/version.rb#1
+# pkg:gem/sprockets-rails#lib/sprockets/rails/version.rb:1
 module Sprockets
   extend ::Sprockets::Utils
   extend ::Sprockets::URIUtils
@@ -69,28 +69,28 @@ module Sprockets
   extend ::Sprockets::Paths
 end
 
-# source://sprockets-rails//lib/sprockets/rails/version.rb#2
+# pkg:gem/sprockets-rails#lib/sprockets/rails/version.rb:2
 module Sprockets::Rails
   class << self
-    # source://sprockets-rails//lib/sprockets/rails/deprecator.rb#7
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/deprecator.rb:7
     def deprecator; end
   end
 end
 
 # Resolve assets referenced in CSS `url()` calls and replace them with the digested paths
 #
-# source://sprockets-rails//lib/sprockets/rails/asset_url_processor.rb#4
+# pkg:gem/sprockets-rails#lib/sprockets/rails/asset_url_processor.rb:4
 class Sprockets::Rails::AssetUrlProcessor
   class << self
-    # source://sprockets-rails//lib/sprockets/rails/asset_url_processor.rb#6
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/asset_url_processor.rb:6
     def call(input); end
   end
 end
 
-# source://sprockets-rails//lib/sprockets/rails/asset_url_processor.rb#5
+# pkg:gem/sprockets-rails#lib/sprockets/rails/asset_url_processor.rb:5
 Sprockets::Rails::AssetUrlProcessor::REGEX = T.let(T.unsafe(nil), Regexp)
 
-# source://sprockets-rails//lib/sprockets/rails/context.rb#6
+# pkg:gem/sprockets-rails#lib/sprockets/rails/context.rb:6
 module Sprockets::Rails::Context
   include ::ActionView::Helpers::AssetUrlHelper
   include ::ActionView::Helpers::CaptureHelper
@@ -101,13 +101,13 @@ module Sprockets::Rails::Context
 
   mixes_in_class_methods GeneratedClassMethods
 
-  # source://sprockets-rails//lib/sprockets/rails/context.rb#16
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/context.rb:16
   def compute_asset_path(path, options = T.unsafe(nil)); end
 
   class << self
     # @private
     #
-    # source://sprockets-rails//lib/sprockets/rails/context.rb#10
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/context.rb:10
     def included(klass); end
   end
 
@@ -136,7 +136,7 @@ module Sprockets::Rails::Context
   end
 end
 
-# source://sprockets-rails//lib/sprockets/rails/helper.rb#8
+# pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:8
 module Sprockets::Rails::Helper
   include ::ActionView::Helpers::AssetUrlHelper
   include ::ActionView::Helpers::CaptureHelper
@@ -155,7 +155,7 @@ module Sprockets::Rails::Helper
   #
   # Returns String path or nil if no asset was found.
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#112
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:112
   def asset_digest_path(path, options = T.unsafe(nil)); end
 
   # Experimental: Get integrity for asset path.
@@ -165,40 +165,40 @@ module Sprockets::Rails::Helper
   #
   # Returns String integrity attribute or nil if no asset was found.
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#124
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:124
   def asset_integrity(path, options = T.unsafe(nil)); end
 
   # Writes over the built in ActionView::Helpers::AssetUrlHelper#compute_asset_path
   # to use the asset pipeline.
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#77
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:77
   def compute_asset_path(path, options = T.unsafe(nil)); end
 
   # Override javascript tag helper to provide debugging support.
   #
   # Eventually will be deprecated and replaced by source maps.
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#135
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:135
   def javascript_include_tag(*sources); end
 
   # Resolve the asset path against the Sprockets manifest or environment.
   # Returns nil if it's an asset we don't know about.
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#100
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:100
   def resolve_asset_path(path, allow_non_precompiled = T.unsafe(nil)); end
 
   # Override stylesheet tag helper to provide debugging support.
   #
   # Eventually will be deprecated and replaced by source maps.
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#164
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:164
   def stylesheet_link_tag(*sources); end
 
   protected
 
   # List of resolvers in `config.assets.resolve_with` order.
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#249
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:249
   def asset_resolver_strategies; end
 
   # This is awkward: `integrity` is a boolean option indicating whether
@@ -210,23 +210,23 @@ module Sprockets::Rails::Helper
   #
   # @return [Boolean]
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#197
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:197
   def compute_integrity?(options); end
 
   # Append ?body=1 if debug is on and we're on old Sprockets.
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#257
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:257
   def legacy_debug_path(path, debug); end
 
   # Internal method to support multifile debugging. Will
   # eventually be removed w/ Sprockets 3.x.
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#225
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:225
   def lookup_debug_asset(path, options = T.unsafe(nil)); end
 
   # compute_asset_extname is in AV::Helpers::AssetUrlHelper
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#234
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:234
   def path_with_extname(path, options); end
 
   # Enable split asset debugging. Eventually will be deprecated
@@ -234,12 +234,12 @@ module Sprockets::Rails::Helper
   #
   # @return [Boolean]
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#217
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:217
   def request_debug_assets?; end
 
   # Try each asset resolver and return the first non-nil result.
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#240
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:240
   def resolve_asset; end
 
   # Only serve integrity metadata for HTTPS requests:
@@ -247,18 +247,18 @@ module Sprockets::Rails::Helper
   #
   # @return [Boolean]
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#211
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:211
   def secure_subresource_integrity_context?; end
 
   class << self
     # @private
     #
-    # source://sprockets-rails//lib/sprockets/rails/helper.rb#60
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:60
     def extended(obj); end
 
     # @private
     #
-    # source://sprockets-rails//lib/sprockets/rails/helper.rb#43
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:43
     def included(klass); end
   end
 
@@ -329,196 +329,196 @@ module Sprockets::Rails::Helper
   end
 end
 
-# source://sprockets-rails//lib/sprockets/rails/helper.rb#9
+# pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:9
 class Sprockets::Rails::Helper::AssetNotFound < ::StandardError; end
 
-# source://sprockets-rails//lib/sprockets/rails/helper.rb#10
+# pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:10
 class Sprockets::Rails::Helper::AssetNotPrecompiled < ::StandardError; end
 
-# source://sprockets-rails//lib/sprockets/rails/helper.rb#12
+# pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:12
 class Sprockets::Rails::Helper::AssetNotPrecompiledError < ::Sprockets::Rails::Helper::AssetNotPrecompiled
   include ::Sprockets::Rails::Utils
 
   # @return [AssetNotPrecompiledError] a new instance of AssetNotPrecompiledError
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#14
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:14
   def initialize(source); end
 end
 
-# source://sprockets-rails//lib/sprockets/rails/helper.rb#35
+# pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:35
 Sprockets::Rails::Helper::VIEW_ACCESSORS = T.let(T.unsafe(nil), Array)
 
 # Use a separate module since Helper is mixed in and we needn't pollute
 # the class namespace with our internals.
 #
-# source://sprockets-rails//lib/sprockets/rails/helper.rb#268
+# pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:268
 module Sprockets::Rails::HelperAssetResolvers
   class << self
-    # source://sprockets-rails//lib/sprockets/rails/helper.rb#269
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:269
     def [](name); end
   end
 end
 
-# source://sprockets-rails//lib/sprockets/rails/helper.rb#314
+# pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:314
 class Sprockets::Rails::HelperAssetResolvers::Environment
   # @raise [ArgumentError]
   # @return [Environment] a new instance of Environment
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#315
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:315
   def initialize(view); end
 
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#322
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:322
   def asset_path(path, digest, allow_non_precompiled = T.unsafe(nil)); end
 
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#335
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:335
   def digest_path(path, allow_non_precompiled = T.unsafe(nil)); end
 
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#355
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:355
   def find_asset(path, options = T.unsafe(nil)); end
 
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#346
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:346
   def find_debug_asset(path); end
 
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#342
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:342
   def integrity(path); end
 
   private
 
   # @return [Boolean]
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#366
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:366
   def precompiled?(path); end
 
   # @raise [Helper::AssetNotPrecompiledError]
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#370
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:370
   def raise_unless_precompiled_asset(path); end
 end
 
-# source://sprockets-rails//lib/sprockets/rails/helper.rb#280
+# pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:280
 class Sprockets::Rails::HelperAssetResolvers::Manifest
   # @raise [ArgumentError]
   # @return [Manifest] a new instance of Manifest
   #
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#281
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:281
   def initialize(view); end
 
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#286
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:286
   def asset_path(path, digest, allow_non_precompiled = T.unsafe(nil)); end
 
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#292
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:292
   def digest_path(path, allow_non_precompiled = T.unsafe(nil)); end
 
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#302
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:302
   def find_debug_asset(path); end
 
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#296
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:296
   def integrity(path); end
 
   private
 
-  # source://sprockets-rails//lib/sprockets/rails/helper.rb#307
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/helper.rb:307
   def metadata(path); end
 end
 
-# source://sprockets-rails//lib/sprockets/rails/quiet_assets.rb#3
+# pkg:gem/sprockets-rails#lib/sprockets/rails/quiet_assets.rb:3
 class Sprockets::Rails::LoggerSilenceError < ::StandardError; end
 
-# source://sprockets-rails//lib/sprockets/rails/quiet_assets.rb#5
+# pkg:gem/sprockets-rails#lib/sprockets/rails/quiet_assets.rb:5
 class Sprockets::Rails::QuietAssets
   # @return [QuietAssets] a new instance of QuietAssets
   #
-  # source://sprockets-rails//lib/sprockets/rails/quiet_assets.rb#6
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/quiet_assets.rb:6
   def initialize(app); end
 
-  # source://sprockets-rails//lib/sprockets/rails/quiet_assets.rb#11
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/quiet_assets.rb:11
   def call(env); end
 
   private
 
   # @raise [LoggerSilenceError]
   #
-  # source://sprockets-rails//lib/sprockets/rails/quiet_assets.rb#22
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/quiet_assets.rb:22
   def raise_logger_silence_error; end
 end
 
-# source://sprockets-rails//lib/sprockets/rails/route_wrapper.rb#3
+# pkg:gem/sprockets-rails#lib/sprockets/rails/route_wrapper.rb:3
 module Sprockets::Rails::RouteWrapper
   # @return [Boolean]
   #
-  # source://sprockets-rails//lib/sprockets/rails/route_wrapper.rb#8
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/route_wrapper.rb:8
   def internal?; end
 
   # @return [Boolean]
   #
-  # source://sprockets-rails//lib/sprockets/rails/route_wrapper.rb#4
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/route_wrapper.rb:4
   def internal_assets_path?; end
 end
 
 # Rewrites source mapping urls with the digested paths and protect against semicolon appending with a dummy comment line
 #
-# source://sprockets-rails//lib/sprockets/rails/sourcemapping_url_processor.rb#4
+# pkg:gem/sprockets-rails#lib/sprockets/rails/sourcemapping_url_processor.rb:4
 class Sprockets::Rails::SourcemappingUrlProcessor
   class << self
-    # source://sprockets-rails//lib/sprockets/rails/sourcemapping_url_processor.rb#8
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/sourcemapping_url_processor.rb:8
     def call(input); end
 
     private
 
-    # source://sprockets-rails//lib/sprockets/rails/sourcemapping_url_processor.rb#25
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/sourcemapping_url_processor.rb:25
     def combine_sourcemap_logical_path(sourcefile:, sourcemap:); end
 
-    # source://sprockets-rails//lib/sprockets/rails/sourcemapping_url_processor.rb#47
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/sourcemapping_url_processor.rb:47
     def removed_sourcemap_comment(sourcemap_logical_path, filename:, env:); end
 
-    # source://sprockets-rails//lib/sprockets/rails/sourcemapping_url_processor.rb#33
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/sourcemapping_url_processor.rb:33
     def resolved_sourcemap_comment(sourcemap_logical_path, context:); end
 
-    # source://sprockets-rails//lib/sprockets/rails/sourcemapping_url_processor.rb#37
+    # pkg:gem/sprockets-rails#lib/sprockets/rails/sourcemapping_url_processor.rb:37
     def sourcemap_asset_path(sourcemap_logical_path, context:); end
   end
 end
 
-# source://sprockets-rails//lib/sprockets/rails/sourcemapping_url_processor.rb#5
+# pkg:gem/sprockets-rails#lib/sprockets/rails/sourcemapping_url_processor.rb:5
 Sprockets::Rails::SourcemappingUrlProcessor::REGEX = T.let(T.unsafe(nil), Regexp)
 
-# source://sprockets-rails//lib/sprockets/rails/utils.rb#5
+# pkg:gem/sprockets-rails#lib/sprockets/rails/utils.rb:5
 module Sprockets::Rails::Utils
   # @return [Boolean]
   #
-  # source://sprockets-rails//lib/sprockets/rails/utils.rb#6
+  # pkg:gem/sprockets-rails#lib/sprockets/rails/utils.rb:6
   def using_sprockets4?; end
 end
 
-# source://sprockets-rails//lib/sprockets/rails/version.rb#3
+# pkg:gem/sprockets-rails#lib/sprockets/rails/version.rb:3
 Sprockets::Rails::VERSION = T.let(T.unsafe(nil), String)
 
-# source://sprockets-rails//lib/sprockets/railtie.rb#60
+# pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:60
 class Sprockets::Railtie < ::Rails::Railtie
   include ::Sprockets::Rails::Utils
 
-  # source://sprockets-rails//lib/sprockets/railtie.rb#182
+  # pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:182
   def build_environment(app, initialized = T.unsafe(nil)); end
 
   class << self
-    # source://sprockets-rails//lib/sprockets/railtie.rb#213
+    # pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:213
     def build_manifest(app); end
   end
 end
 
-# source://sprockets-rails//lib/sprockets/railtie.rb#78
+# pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:78
 Sprockets::Railtie::LOOSE_APP_ASSETS = T.let(T.unsafe(nil), Proc)
 
-# source://sprockets-rails//lib/sprockets/railtie.rb#63
+# pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:63
 class Sprockets::Railtie::ManifestNeededError < ::StandardError
   # @return [ManifestNeededError] a new instance of ManifestNeededError
   #
-  # source://sprockets-rails//lib/sprockets/railtie.rb#64
+  # pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:64
   def initialize; end
 end
 
-# source://sprockets-rails//lib/sprockets/railtie.rb#83
+# pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:83
 class Sprockets::Railtie::OrderedOptions < ::ActiveSupport::OrderedOptions
-  # source://sprockets-rails//lib/sprockets/railtie.rb#84
+  # pkg:gem/sprockets-rails#lib/sprockets/railtie.rb:84
   def configure(&block); end
 end
