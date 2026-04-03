@@ -1,5 +1,13 @@
 # Changelog
 
+## [v4.14.1](https://github.com/bensheldon/good_job/tree/v4.14.1) (2026-04-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.0...v4.14.1)
+
+**Fixed bugs:**
+
+- Fix N+1 queries on cron entries dashboard index page [\#1727](https://github.com/bensheldon/good_job/pull/1727) ([clinejj](https://github.com/clinejj))
+
 ## [v4.14.0](https://github.com/bensheldon/good_job/tree/v4.14.0) (2026-03-31)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.3...v4.14.0)
