@@ -36,6 +36,14 @@ RSpec.describe 'Batches' do
       expect(good_job.batch_id).to eq batch.id
     end
 
+    it 'supports perform_all_later', skip: -> { !ActiveJob.respond_to?(:perform_all_later) } do
+      batch = GoodJob::Batch.enqueue do
+        ActiveJob.perform_all_later([TestJob.new, TestJob.new])
+      end
+
+      expect(batch.active_jobs.count).to eq 2
+    end
+
     context 'when all jobs complete successfully' do
       it 'has success status' do
         batch = GoodJob::Batch.enqueue do
@@ -367,6 +375,76 @@ RSpec.describe 'Batches' do
       batch.reload
       expect(batch.jobs_finished_at).to be_present
       expect(batch.finished_at).to be_within(1.second).of(Time.current)
+    end
+  end
+
+  describe 'Batch.enqueue_all' do
+    it 'executes jobs and fires callbacks for all batches' do
+      batch_1 = GoodJob::Batch.new(on_finish: "BatchCallbackJob")
+      batch_2 = GoodJob::Batch.new(on_finish: "BatchCallbackJob")
+      job1a = TestJob.new
+      job1b = TestJob.new
+      job2a = TestJob.new
+
+      GoodJob::Batch.enqueue_all([
+                                   [batch_1, [job1a, job1b]],
+                                   [batch_2, [job2a]],
+                                 ])
+
+      # Verify correct batch_id assignment before execution
+      expect(GoodJob::Job.find_by(active_job_id: job1a.job_id).batch_id).to eq batch_1.id
+      expect(GoodJob::Job.find_by(active_job_id: job2a.job_id).batch_id).to eq batch_2.id
+
+      GoodJob.perform_inline
+
+      batch_1.reload
+      batch_2.reload
+      expect(batch_1).to be_finished
+      expect(batch_2).to be_finished
+      expect(batch_1.callback_active_jobs.count).to eq 1
+      expect(batch_2.callback_active_jobs.count).to eq 1
+    end
+
+    it 'handles mixed batches: some with jobs, some empty, callbacks fire for all' do
+      batch_with_jobs = GoodJob::Batch.new(on_finish: "BatchCallbackJob")
+      batch_empty = GoodJob::Batch.new(on_finish: "BatchCallbackJob")
+
+      GoodJob::Batch.enqueue_all([
+                                   [batch_with_jobs, [TestJob.new]],
+                                   [batch_empty, []],
+                                 ])
+
+      GoodJob.perform_inline
+
+      batch_with_jobs.reload
+      batch_empty.reload
+      expect(batch_with_jobs.callback_active_jobs.count).to eq 1
+      expect(batch_empty.callback_active_jobs.count).to eq 1
+    end
+
+    context 'when running inline' do
+      let(:adapter) { GoodJob::Adapter.new(execution_mode: :inline) }
+
+      it 'executes jobs inline and callbacks fire' do
+        batch = GoodJob::Batch.new(on_finish: "BatchCallbackJob")
+
+        GoodJob::Batch.enqueue_all([[batch, [TestJob.new, TestJob.new]]])
+
+        batch.reload
+        expect(batch).to be_finished
+        expect(batch.callback_active_jobs.count).to eq 1
+      end
+    end
+
+    it 'round-trips batch properties through the database' do
+      batch = GoodJob::Batch.new(on_finish: "BatchCallbackJob", properties: { user: 'Alice' })
+      GoodJob::Batch.enqueue_all([[batch, [TestJob.new]]])
+
+      GoodJob.perform_inline
+
+      reloaded = GoodJob::Batch.find(batch.id)
+      expect(reloaded.properties).to eq({ user: 'Alice' })
+      expect(reloaded).to be_finished
     end
   end
 end

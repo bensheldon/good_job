@@ -40,6 +40,7 @@ module GoodJob
 
       included do
         prepend Prepends
+
         class_attribute :good_job_notify, instance_accessor: false, instance_predicate: false, default: nil
         attr_accessor :good_job_notify
       end

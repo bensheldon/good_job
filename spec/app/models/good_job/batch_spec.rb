@@ -56,6 +56,194 @@ describe GoodJob::Batch do
     end
   end
 
+  describe '.enqueue_all' do
+    it 'returns an array of batches' do
+      pairs = Array.new(2) { [described_class.new, [TestJob.new]] }
+      result = described_class.enqueue_all(pairs)
+
+      expect(result).to be_an(Array)
+      expect(result.size).to eq 2
+      expect(result).to all be_a(described_class)
+    end
+
+    it 'creates batch records in the database' do
+      pairs = Array.new(3) { [described_class.new, [TestJob.new]] }
+
+      expect { described_class.enqueue_all(pairs) }
+        .to change(GoodJob::BatchRecord, :count).by(3)
+    end
+
+    it 'creates job records with correct batch_id' do
+      batch_1 = described_class.new
+      batch_2 = described_class.new
+      job_1 = TestJob.new
+      job_2 = TestJob.new
+      job_3 = TestJob.new
+
+      described_class.enqueue_all([[batch_1, [job_1]], [batch_2, [job_2, job_3]]])
+
+      expect(GoodJob::Job.where(batch_id: batch_1.id).count).to eq 1
+      expect(GoodJob::Job.where(batch_id: batch_2.id).count).to eq 2
+    end
+
+    it 'sets enqueued_at on all batches' do
+      pairs = Array.new(2) { [described_class.new, [TestJob.new]] }
+      batches = described_class.enqueue_all(pairs)
+
+      batches.each do |batch|
+        expect(batch.enqueued_at).to be_within(1.second).of(Time.current)
+      end
+    end
+
+    it 'sets provider_job_id on all ActiveJob instances' do
+      jobs = [TestJob.new, TestJob.new]
+      described_class.enqueue_all([[described_class.new, jobs]])
+
+      jobs.each do |job|
+        expect(job.provider_job_id).to be_present
+      end
+    end
+
+    it 'marks batches as persisted' do
+      batch = described_class.new
+      described_class.enqueue_all([[batch, [TestJob.new]]])
+
+      expect(batch).to be_persisted
+      expect(batch.id).to be_present
+    end
+
+    it 'handles empty input' do
+      result = described_class.enqueue_all([])
+      expect(result).to eq []
+    end
+
+    it 'raises ArgumentError for already-persisted batches' do
+      batch = described_class.new
+      batch.save
+
+      expect do
+        described_class.enqueue_all([[batch, [TestJob.new]]])
+      end.to raise_error(ArgumentError, /not persisted/)
+    end
+
+    it 'handles batch properties' do
+      batch = described_class.new(properties: { foo: 'bar', count: 42 })
+      described_class.enqueue_all([[batch, [TestJob.new]]])
+
+      reloaded = described_class.find(batch.id)
+      expect(reloaded.properties).to eq({ foo: 'bar', count: 42 })
+    end
+
+    it 'handles callback configuration' do
+      batch = described_class.new
+      batch.on_finish = "CallbackJob"
+      batch.on_success = "CallbackJob"
+      batch.on_discard = "CallbackJob"
+      batch.callback_queue_name = "callbacks"
+      batch.callback_priority = 5
+
+      described_class.enqueue_all([[batch, [TestJob.new]]])
+
+      reloaded = described_class.find(batch.id)
+      expect(reloaded).to have_attributes(
+        on_finish: "CallbackJob",
+        on_success: "CallbackJob",
+        on_discard: "CallbackJob",
+        callback_queue_name: "callbacks",
+        callback_priority: 5
+      )
+    end
+
+    it 'handles job options (queue, priority)' do
+      job = TestJob.new
+      job.queue_name = "high_priority"
+      job.priority = 1
+
+      described_class.enqueue_all([[described_class.new, [job]]])
+
+      good_job = GoodJob::Job.find_by(active_job_id: job.job_id)
+      expect(good_job).to have_attributes(
+        queue_name: "high_priority",
+        priority: 1
+      )
+    end
+
+    it 'handles description attribute' do
+      batch = described_class.new
+      batch.description = "Test batch"
+      described_class.enqueue_all([[batch, [TestJob.new]]])
+
+      reloaded = described_class.find(batch.id)
+      expect(reloaded.description).to eq "Test batch"
+    end
+
+    it 'handles mixed batches: some with jobs, some empty' do
+      batch_1 = described_class.new
+      batch_2 = described_class.new
+
+      described_class.enqueue_all([
+                                    [batch_1, [TestJob.new, TestJob.new]],
+                                    [batch_2, []],
+                                  ])
+
+      expect(GoodJob::Job.where(batch_id: batch_1.id).count).to eq 2
+      expect(GoodJob::Job.where(batch_id: batch_2.id).count).to eq 0
+      expect(batch_1).to be_persisted
+      expect(batch_2).to be_persisted
+    end
+
+    context 'with empty batches' do
+      it 'triggers callbacks for batches with zero jobs' do
+        batch = described_class.new
+        batch.on_finish = "CallbackJob"
+
+        described_class.enqueue_all([[batch, []]])
+
+        GoodJob.perform_inline
+
+        batch.reload
+        expect(batch.callback_active_jobs.size).to eq 1
+      end
+    end
+
+    context 'with concurrency-limited jobs' do
+      before do
+        stub_const 'ConcurrencyJob', (Class.new(ActiveJob::Base) do
+          include GoodJob::ActiveJobExtensions::Concurrency
+
+          good_job_control_concurrency_with(
+            total_limit: 1,
+            key: -> { "concurrency_test" }
+          )
+
+          def perform
+          end
+        end)
+      end
+
+      it 'enqueues concurrency-limited jobs individually with batch_id' do
+        batch = described_class.new
+        jobs = [ConcurrencyJob.new, TestJob.new]
+
+        described_class.enqueue_all([[batch, jobs]])
+
+        expect(GoodJob::Job.where(batch_id: batch.id).count).to eq 2
+      end
+
+      it 'respects concurrency limits by running before_enqueue checks' do
+        batch = described_class.new
+        job_1 = ConcurrencyJob.new
+        job_2 = ConcurrencyJob.new
+
+        described_class.enqueue_all([[batch, [job_1, job_2]]])
+
+        # total_limit: 1 means only the first should succeed;
+        # the second is silently dropped (matching Bulk::Buffer behavior).
+        expect(GoodJob::Job.where(batch_id: batch.id).count).to eq 1
+      end
+    end
+  end
+
   describe '#add' do
     let(:batch) { described_class.new }
 
@@ -114,6 +302,7 @@ describe GoodJob::Batch do
       GoodJob.perform_inline
 
       expect(batch.reload).to be_discarded
+      expect(batch).to have_attributes(discarded_at: be_present, jobs_finished_at: be_present, finished_at: be_present)
 
       batch.retry
 

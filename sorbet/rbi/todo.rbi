@@ -5,6 +5,7 @@
 # typed: false
 
 module ::ACTIVE_EVENT; end
+module ::ConcurrencyJob; end
 module ::CustomError; end
 module ::DONE; end
 module ::DiscardableError; end

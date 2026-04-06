@@ -6,5 +6,6 @@ module GoodJob
   end
 
   include ActiveSupport::Deprecation::DeprecatedConstantAccessor
+
   deprecate_constant :DiscreteExecution, 'Execution', deprecator: GoodJob.deprecator
 end

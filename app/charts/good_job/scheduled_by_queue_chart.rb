@@ -28,7 +28,7 @@ module GoodJob
         ORDER BY timestamp ASC
       SQL
 
-      executions_data = GoodJob::Job.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(count_query), "GoodJob Dashboard Chart", start_end_binds)
+      executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(count_query), "GoodJob Dashboard Chart", start_end_binds) }
 
       queue_names = executions_data.reject { |d| d['count'].nil? }.map { |d| d['queue_name'] || BaseFilter::EMPTY }.uniq
       labels = []

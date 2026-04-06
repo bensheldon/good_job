@@ -17,6 +17,12 @@ module GoodJob # :nodoc:
         _overridden_connection || super
       end
 
+      # Overrides lease_connection to use the assigned connection when set.
+      # @return [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+      def lease_connection
+        _overridden_connection || super
+      end
+
       # Block interface to assign the connection, yield, then unassign the connection.
       # @param conn [ActiveRecord::ConnectionAdapters::AbstractAdapter]
       # @return [void]

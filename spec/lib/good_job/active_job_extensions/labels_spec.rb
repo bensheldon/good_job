@@ -97,6 +97,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Labels do
       stub_const 'ExpectedError', Class.new(StandardError)
       stub_const 'TestJob', (Class.new(ActiveJob::Base) do
         include GoodJob::ActiveJobExtensions::Labels
+
         retry_on ExpectedError, wait: 0, attempts: 3
 
         def perform

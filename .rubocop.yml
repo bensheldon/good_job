@@ -66,6 +66,9 @@ Naming/PredicateMethod:
 Naming/VariableNumber:
   EnforcedStyle: snake_case
 
+Rails/Exit:
+  Enabled: false
+
 Rails/ApplicationJob:
   Enabled: false
 
@@ -78,6 +81,9 @@ Rails/I18nLocaleTexts:
 Rails/Inquiry:
   Exclude:
     - spec/**/*
+
+Rails/Presence:
+  Enabled: false
 
 Rails/RakeEnvironment:
   Enabled: false
