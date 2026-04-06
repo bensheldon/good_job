@@ -5,8 +5,8 @@
 # Please instead update this file by running `bin/tapioca gem erb_lint`.
 
 
-# source://erb_lint//lib/erb_lint/version.rb#3
+# pkg:gem/erb_lint#lib/erb_lint/version.rb:3
 module ERBLint; end
 
-# source://erb_lint//lib/erb_lint/version.rb#4
+# pkg:gem/erb_lint#lib/erb_lint/version.rb:4
 ERBLint::VERSION = T.let(T.unsafe(nil), String)

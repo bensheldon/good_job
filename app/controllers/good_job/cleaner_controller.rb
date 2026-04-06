@@ -7,7 +7,7 @@ module GoodJob
 
       @discarded_jobs_grouped_by_exception =
         GoodJob::Job.discarded
-                    .select(<<-SQL.squish)
+                    .select(<<~SQL.squish)
                       SPLIT_PART(error, ': ', 1) AS exception_class,
                       count(id) AS failed,
                       COUNT(id) FILTER (WHERE "finished_at" > NOW() - INTERVAL '1 HOUR') AS last_1_hour,
@@ -21,7 +21,7 @@ module GoodJob
 
       @discarded_jobs_grouped_by_class =
         GoodJob::Job.discarded
-                    .select(<<-SQL.squish)
+                    .select(<<~SQL.squish)
                       job_class,
                       count(id) AS failed,
                       COUNT(*) FILTER (WHERE "finished_at" > NOW() - INTERVAL '1 HOUR') AS last_1_hour,

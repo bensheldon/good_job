@@ -363,7 +363,7 @@ module GoodJob
       job_attributes = bulkable_entries.map { |entry| entry[:good_job].attributes }
       results = Job.insert_all(job_attributes, returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
 
-      job_id_map = results.each_with_object({}) { |row, hash| hash[row['active_job_id']] = row['id'] }
+      job_id_map = results.to_h { |row| [row['active_job_id'], row['id']] }
 
       # Set provider_job_id on ActiveJob instances (mirrors adapter.rb:74-76)
       active_jobs_by_job_id.each_value do |active_job|

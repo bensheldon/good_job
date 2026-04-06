@@ -21,7 +21,8 @@ module Rails
     sig { returns(ActiveSupport::ErrorReporter) }
     def error; end
 
-    sig { returns(ActiveSupport::Logger) }
+    # @version >= 7.1.0.rc1
+    sig { returns(ActiveSupport::BroadcastLogger) }
     def logger; end
 
     sig { returns(Pathname) }
@@ -46,7 +47,13 @@ class Rails::Application < ::Rails::Engine
 end
 
 class Rails::Engine < ::Rails::Railtie
-  sig { params(block: T.untyped).returns(ActionDispatch::Routing::RouteSet) }
+  class << self
+    # @shim: delegated to the instance using `method_missing`
+    sig { params(block: T.nilable(T.proc.bind(ActionDispatch::Routing::Mapper).void)).returns(ActionDispatch::Routing::RouteSet) }
+    def routes(&block); end
+  end
+
+  sig { params(block: T.nilable(T.proc.bind(ActionDispatch::Routing::Mapper).void)).returns(ActionDispatch::Routing::RouteSet) }
   def routes(&block); end
 end
 
