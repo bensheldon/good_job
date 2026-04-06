@@ -134,14 +134,14 @@ ActiveSupport.on_load :active_record do
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend PostgresXidExtension
 end
 
-class PgStatActivity < ActiveRecord::Base
+class PgStatActivity < GoodJob::BaseRecord
   include GoodJob::OverridableConnection
 
   self.table_name = 'pg_stat_activity'
   self.primary_key = 'datid'
 end
 
-class PgLock < ActiveRecord::Base
+class PgLock < GoodJob::BaseRecord
   include GoodJob::OverridableConnection
 
   self.table_name = 'pg_locks'
