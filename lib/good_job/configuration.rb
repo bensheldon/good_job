@@ -40,7 +40,7 @@ module GoodJob
     # Default enable_pauses setting
     DEFAULT_ENABLE_PAUSES = false
     # Valid dequeue query sorts
-    DEQUEUE_QUERY_SORTS = [:created_at, :scheduled_at]
+    DEQUEUE_QUERY_SORTS = [:created_at, :scheduled_at].freeze
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
