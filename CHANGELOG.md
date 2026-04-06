@@ -1,5 +1,17 @@
 # Changelog
 
+## [v4.14.2](https://github.com/bensheldon/good_job/tree/v4.14.2) (2026-04-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.1...v4.14.2)
+
+**Closed issues:**
+
+- Incompatible with permanent\_connection\_checkout = :disallowed [\#1729](https://github.com/bensheldon/good_job/issues/1729)
+
+**Merged pull requests:**
+
+- Replace Base.connection with lease\_connection and with\_connection throughout [\#1730](https://github.com/bensheldon/good_job/pull/1730) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.14.1](https://github.com/bensheldon/good_job/tree/v4.14.1) (2026-04-03)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.0...v4.14.1)
