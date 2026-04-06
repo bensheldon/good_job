@@ -30,6 +30,11 @@ module GoodJob
       # Default Postgres function to be used for Advisory Locks
       class_attribute :advisory_lockable_function, default: "pg_try_advisory_lock"
 
+      # Rails < 7.2 does not have lease_connection as a class method.
+      unless respond_to?(:lease_connection)
+        define_singleton_method(:lease_connection) { connection }
+      end
+
       # Rails < 7.2 does not have adapter_class as a class method, and adapter
       # quoting methods (quote_table_name, quote_column_name) are instance-only.
       # Provide a proxy that responds to those methods by delegating to a connection.
