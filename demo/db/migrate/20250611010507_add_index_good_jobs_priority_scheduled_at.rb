@@ -13,10 +13,10 @@ class AddIndexGoodJobsPriorityScheduledAt < ActiveRecord::Migration[8.0]
       end
     end
 
-    add_index :good_jobs, [:priority, :scheduled_at, :created_at, :id],
+    add_index :good_jobs, [:priority, :scheduled_at, :id],
                                                       where: "finished_at IS NULL", name: "index_good_jobs_on_priority_scheduled_at_unfinished",
                                                       algorithm: :concurrently
-    add_index :good_jobs, [:queue_name, :priority, :scheduled_at, :created_at, :id],
+    add_index :good_jobs, [:queue_name, :scheduled_at, :id],
                                                       where: "finished_at IS NULL", name: "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished",
                                                       algorithm: :concurrently
   end
