@@ -57,6 +57,7 @@ module GoodJob
       # @return [ActiveRecord::Relation]
       #   A relation selecting only the records that were locked.
       scope :advisory_lock, (lambda do |column: _advisory_lockable_column, function: advisory_lockable_function, select_limit: nil|
+        lease_connection # ensure a sticky connection; advisory locks are session-scoped and must outlive this query
         original_query = self
 
         primary_key_for_select = primary_key.to_sym

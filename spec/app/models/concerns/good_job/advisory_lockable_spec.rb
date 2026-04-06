@@ -110,7 +110,6 @@ RSpec.describe GoodJob::AdvisoryLockable do
     end
 
     it 'returns first row of the query with a lock' do
-      model_class.lease_connection # pin connection so advisory lock and unlock share the same session
       job.update!(queue_name: "aaaaaa")
       another_job.update!(queue_name: "bbbbbb")
 
@@ -124,7 +123,6 @@ RSpec.describe GoodJob::AdvisoryLockable do
     end
 
     it 'can lock an alternative column' do
-      model_class.lease_connection # pin connection so advisory lock and unlock share the same session
       expect(job).not_to be_advisory_locked
       result_job = model_class.order(created_at: :asc).limit(1).advisory_lock(column: :queue_name).first
       expect(result_job).to eq job
