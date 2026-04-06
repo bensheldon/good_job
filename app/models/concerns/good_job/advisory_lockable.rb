@@ -55,7 +55,7 @@ module GoodJob
         cte_type = supports_cte_materialization_specifiers? ? :MATERIALIZED : :""
         composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(cte_type, cte_query.arel))
 
-        lock_condition = "#{function}(('x' || substr(md5(#{_quoted_table_name_string} || '-' || #{adapter_class.quote_table_name(cte_table.name)}.#{adapter_class.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)"
+        lock_condition = "#{function}(('x' || substr(md5(#{_quoted_table_name_string} || '-' || #{_quote_identifier(cte_table.name)}.#{_quote_identifier(column)}::text), 1, 16))::bit(64)::bigint)"
         query = cte_table.project(cte_table[:id])
                   .with(composed_cte)
                   .where(defined?(Arel::Nodes::BoundSqlLiteral) ? Arel::Nodes::BoundSqlLiteral.new(lock_condition, [], {}) : Arel::Nodes::SqlLiteral.new(lock_condition))
@@ -82,7 +82,7 @@ module GoodJob
       # @example Get the records that have a session awaiting a lock:
       #   MyLockableRecord.joins_advisory_locks.where("pg_locks.granted = ?", false)
       scope :joins_advisory_locks, (lambda do |column: _advisory_lockable_column|
-        quoted_column = adapter_class.quote_column_name(column)
+        quoted_column = _quote_identifier(column)
         joins(<<~SQL.squish)
           LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'
             AND pg_locks.objsubid = 1
@@ -97,8 +97,8 @@ module GoodJob
       # @param column [String, Symbol] column values to Advisory Lock against
       # @return [ActiveRecord::Relation]
       scope :includes_advisory_locks, (lambda do |column: _advisory_lockable_column|
-        owns_advisory_lock_sql = "#{adapter_class.quote_table_name('pg_locks')}.#{adapter_class.quote_column_name('pid')} = pg_backend_pid() AS owns_advisory_lock"
-        joins_advisory_locks(column: column).select("#{quoted_table_name}.*, #{adapter_class.quote_table_name('pg_locks')}.locktype, #{owns_advisory_lock_sql}")
+        owns_advisory_lock_sql = "#{_quote_identifier('pg_locks')}.#{_quote_identifier('pid')} = pg_backend_pid() AS owns_advisory_lock"
+        joins_advisory_locks(column: column).select("#{quoted_table_name}.*, #{_quote_identifier('pg_locks')}.locktype, #{owns_advisory_lock_sql}")
       end)
 
       # Find records that do not have an advisory lock on them.
@@ -299,6 +299,10 @@ module GoodJob
 
       def _quoted_table_name_string
         @_quoted_table_name_string ||= "'#{table_name.gsub("'", "''")}'"
+      end
+
+      def _quote_identifier(name)
+        '"' + name.to_s.gsub('"', '""') + '"'
       end
 
       def supports_cte_materialization_specifiers?
