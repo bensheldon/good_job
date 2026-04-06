@@ -381,7 +381,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
       done_event = Concurrent::Event.new
 
       promise = rails_promise do
-        job.advisory_lock! do
+        job.with_advisory_lock do
           locked_event.set
           done_event.wait(5)
         end
