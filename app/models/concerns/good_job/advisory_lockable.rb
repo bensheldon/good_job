@@ -55,7 +55,7 @@ module GoodJob
         cte_type = supports_cte_materialization_specifiers? ? :MATERIALIZED : :""
         composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(cte_type, cte_query.arel))
 
-        lock_condition = "#{function}(('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{connection.quote_table_name(cte_table.name)}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)"
+        lock_condition = "#{function}(('x' || substr(md5(#{_quoted_table_name_string} || '-' || #{adapter_class.quote_table_name(cte_table.name)}.#{adapter_class.quote_column_name(column)}::text), 1, 16))::bit(64)::bigint)"
         query = cte_table.project(cte_table[:id])
                   .with(composed_cte)
                   .where(defined?(Arel::Nodes::BoundSqlLiteral) ? Arel::Nodes::BoundSqlLiteral.new(lock_condition, [], {}) : Arel::Nodes::SqlLiteral.new(lock_condition))
@@ -82,11 +82,12 @@ module GoodJob
       # @example Get the records that have a session awaiting a lock:
       #   MyLockableRecord.joins_advisory_locks.where("pg_locks.granted = ?", false)
       scope :joins_advisory_locks, (lambda do |column: _advisory_lockable_column|
+        quoted_column = adapter_class.quote_column_name(column)
         joins(<<~SQL.squish)
           LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'
             AND pg_locks.objsubid = 1
-            AND pg_locks.classid = ('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(32)::int
-            AND pg_locks.objid = (('x' || substr(md5(#{connection.quote(table_name)} || '-' || #{quoted_table_name}.#{connection.quote_column_name(column)}::text), 1, 16))::bit(64) << 32)::bit(32)::int
+            AND pg_locks.classid = ('x' || substr(md5(#{_quoted_table_name_string} || '-' || #{quoted_table_name}.#{quoted_column}::text), 1, 16))::bit(32)::int
+            AND pg_locks.objid = (('x' || substr(md5(#{_quoted_table_name_string} || '-' || #{quoted_table_name}.#{quoted_column}::text), 1, 16))::bit(64) << 32)::bit(32)::int
         SQL
       end)
 
@@ -96,8 +97,8 @@ module GoodJob
       # @param column [String, Symbol] column values to Advisory Lock against
       # @return [ActiveRecord::Relation]
       scope :includes_advisory_locks, (lambda do |column: _advisory_lockable_column|
-        owns_advisory_lock_sql = "#{connection.quote_table_name('pg_locks')}.#{connection.quote_column_name('pid')} = pg_backend_pid() AS owns_advisory_lock"
-        joins_advisory_locks(column: column).select("#{quoted_table_name}.*, #{connection.quote_table_name('pg_locks')}.locktype, #{owns_advisory_lock_sql}")
+        owns_advisory_lock_sql = "#{adapter_class.quote_table_name('pg_locks')}.#{adapter_class.quote_column_name('pid')} = pg_backend_pid() AS owns_advisory_lock"
+        joins_advisory_locks(column: column).select("#{quoted_table_name}.*, #{adapter_class.quote_table_name('pg_locks')}.locktype, #{owns_advisory_lock_sql}")
       end)
 
       # Find records that do not have an advisory lock on them.
@@ -174,18 +175,20 @@ module GoodJob
       def with_advisory_lock(column: _advisory_lockable_column, function: advisory_lockable_function, unlock_session: false, select_limit: nil)
         raise ArgumentError, "Must provide a block" unless block_given?
 
-        records = advisory_lock(column: column, function: function, select_limit: select_limit).to_a
+        connection_pool.with_connection do
+          records = advisory_lock(column: column, function: function, select_limit: select_limit).to_a
 
-        begin
-          unscoped { yield(records) }
-        ensure
-          if unlock_session
-            advisory_unlock_session
-          else
-            unlock_function = advisory_unlockable_function(function)
-            if unlock_function
-              records.each do |record|
-                record.advisory_unlock(key: record.lockable_column_key(column: column), function: unlock_function)
+          begin
+            unscoped { yield(records) }
+          ensure
+            if unlock_session
+              advisory_unlock_session
+            else
+              unlock_function = advisory_unlockable_function(function)
+              if unlock_function
+                records.each do |record|
+                  record.advisory_unlock(key: record.lockable_column_key(column: column), function: unlock_function)
+                end
               end
             end
           end
@@ -213,15 +216,20 @@ module GoodJob
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
         ]
 
-        locked = connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).first['locked']
-        return locked unless block_given?
-        return nil unless locked
+        if block_given?
+          connection_pool.with_connection do |conn|
+            locked = conn.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).first['locked']
+            return nil unless locked
 
-        begin
-          yield
-        ensure
-          unlock_function = advisory_unlockable_function(function)
-          advisory_unlock_key(key, function: unlock_function) if unlock_function
+            begin
+              yield
+            ensure
+              unlock_function = advisory_unlockable_function(function)
+              advisory_unlock_key(key, function: unlock_function) if unlock_function
+            end
+          end
+        else
+          lease_connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Lock', binds).first['locked']
         end
       end
 
@@ -241,7 +249,7 @@ module GoodJob
         binds = [
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
         ]
-        connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Unlock', binds).first['unlocked']
+        lease_connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Unlock', binds).first['unlocked']
       end
 
       # Tests whether the provided key has an advisory lock on it.
@@ -261,7 +269,7 @@ module GoodJob
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
         ]
-        connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Locked?', binds).any?
+        connection_pool.with_connection { |conn| conn.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Advisory Locked?', binds).any? }
       end
 
       # Tests whether this record is locked by the current database session.
@@ -282,17 +290,21 @@ module GoodJob
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
         ]
-        connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Owns Advisory Lock?', binds).any?
+        lease_connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Owns Advisory Lock?', binds).any?
       end
 
       def _advisory_lockable_column
         advisory_lockable_column || primary_key
       end
 
+      def _quoted_table_name_string
+        @_quoted_table_name_string ||= "'#{table_name.gsub("'", "''")}'"
+      end
+
       def supports_cte_materialization_specifiers?
         return @_supports_cte_materialization_specifiers if defined?(@_supports_cte_materialization_specifiers)
 
-        @_supports_cte_materialization_specifiers = connection.postgresql_version >= 120000
+        @_supports_cte_materialization_specifiers = connection_pool.with_connection { |conn| conn.postgresql_version >= 120000 }
       end
 
       # Postgres advisory unlocking function for the class
@@ -307,7 +319,7 @@ module GoodJob
       # Unlocks all advisory locks active in the current database session/connection
       # @return [void]
       def advisory_unlock_session
-        connection.exec_query("SELECT pg_advisory_unlock_all()::text AS unlocked", 'GoodJob::Lockable Unlock Session').first[:unlocked]
+        lease_connection.exec_query("SELECT pg_advisory_unlock_all()::text AS unlocked", 'GoodJob::Lockable Unlock Session').first[:unlocked]
       end
 
       # Converts SQL query strings between PG-compatible and JDBC-compatible syntax
@@ -371,12 +383,14 @@ module GoodJob
     def with_advisory_lock(key: lockable_key, function: advisory_lockable_function)
       raise ArgumentError, "Must provide a block" unless block_given?
 
-      advisory_lock!(key: key, function: function)
-      begin
-        yield
-      ensure
-        unlock_function = self.class.advisory_unlockable_function(function)
-        advisory_unlock(key: key, function: unlock_function) if unlock_function
+      self.class.connection_pool.with_connection do
+        advisory_lock!(key: key, function: function)
+        begin
+          yield
+        ensure
+          unlock_function = self.class.advisory_unlockable_function(function)
+          advisory_unlock(key: key, function: unlock_function) if unlock_function
+        end
       end
     end
 
@@ -399,21 +413,6 @@ module GoodJob
     # @return [Boolean]
     def owns_advisory_lock?(key: lockable_key)
       self.class.owns_advisory_lock_key?(key)
-      query = <<~SQL.squish
-        SELECT 1 AS one
-        FROM pg_locks
-        WHERE pg_locks.locktype = 'advisory'
-          AND pg_locks.objsubid = 1
-          AND pg_locks.classid = ('x' || substr(md5($1::text), 1, 16))::bit(32)::int
-          AND pg_locks.objid = (('x' || substr(md5($2::text), 1, 16))::bit(64) << 32)::bit(32)::int
-          AND pg_locks.pid = pg_backend_pid()
-        LIMIT 1
-      SQL
-      binds = [
-        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
-        ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
-      ]
-      self.class.connection.exec_query(pg_or_jdbc_query(query), 'GoodJob::Lockable Owns Advisory Lock?', binds).any?
     end
 
     # Releases all advisory locks on the record that are held by the current

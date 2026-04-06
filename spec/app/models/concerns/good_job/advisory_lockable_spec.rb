@@ -365,6 +365,36 @@ RSpec.describe GoodJob::AdvisoryLockable do
     end
   end
 
+  describe '#owns_advisory_lock?' do
+    it 'returns true when the current thread holds the lock' do
+      job.advisory_lock!
+      expect(job.owns_advisory_lock?).to be true
+      job.advisory_unlock
+    end
+
+    it 'returns false when no lock is held' do
+      expect(job.owns_advisory_lock?).to be false
+    end
+
+    it 'returns false when the lock is held by a different thread' do
+      locked_event = Concurrent::Event.new
+      done_event = Concurrent::Event.new
+
+      promise = rails_promise do
+        job.advisory_lock! do
+          locked_event.set
+          done_event.wait(5)
+        end
+      end
+
+      locked_event.wait(5)
+      expect(job.owns_advisory_lock?).to be false
+    ensure
+      done_event.set
+      promise.value!
+    end
+  end
+
   describe '#advisory_unlock!' do
     it 'unlocks the record entirely' do
       job.advisory_lock!
@@ -427,7 +457,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
       done_event = Concurrent::Event.new
 
       promise = rails_promise do
-        job.class.connection # <= This is necessary to fixate the connection in the thread
+        job.class.lease_connection # <= This is necessary to fixate the connection in the thread
 
         job.class.transaction do
           job.advisory_lock

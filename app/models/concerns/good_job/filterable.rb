@@ -52,7 +52,7 @@ module GoodJob
       def database_supports_websearch_to_tsquery?
         return @_database_supports_websearch_to_tsquery if defined?(@_database_supports_websearch_to_tsquery)
 
-        @_database_supports_websearch_to_tsquery = connection.postgresql_version >= 110000
+        @_database_supports_websearch_to_tsquery = connection_pool.with_connection { |conn| conn.postgresql_version >= 110000 }
       end
     end
   end

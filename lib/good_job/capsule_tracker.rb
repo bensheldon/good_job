@@ -77,11 +77,11 @@ module GoodJob # :nodoc:
                 @record.advisory_lock!
                 @record.update(lock_type: :advisory)
               end
-              @advisory_locked_connection = WeakRef.new(@record.class.connection)
+              @advisory_locked_connection = WeakRef.new(@record.class.lease_connection)
             end
           else
             @record = GoodJob::Process.find_or_create_record(id: @record_id, with_advisory_lock: true)
-            @advisory_locked_connection = WeakRef.new(@record.class.connection)
+            @advisory_locked_connection = WeakRef.new(@record.class.lease_connection)
             create_refresh_task
           end
         end
@@ -155,7 +155,8 @@ module GoodJob # :nodoc:
     private
 
     def advisory_locked_connection?
-      @record&.class&.connection && @advisory_locked_connection&.weakref_alive? && @advisory_locked_connection.eql?(@record.class.connection)
+      conn = @record&.class&.lease_connection
+      conn && @advisory_locked_connection&.weakref_alive? && @advisory_locked_connection.eql?(conn)
     end
 
     def task_interval
