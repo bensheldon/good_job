@@ -8,8 +8,8 @@ class AddIndexGoodJobsPriorityScheduledAt < ActiveRecord::Migration[8.0]
       dir.up do
         # Ensure this incremental update migration is idempotent
         # with monolithic install migration.
-        return if connection.index_exists?(:good_jobs, name: "index_good_jobs_on_priority_scheduled_at_unfinished") &&
-                  connection.index_exists?(:good_jobs, name: "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished")
+        return if connection.index_name_exists?(:good_jobs, "index_good_jobs_on_priority_scheduled_at_unfinished") &&
+                  connection.index_name_exists?(:good_jobs, "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished")
       end
     end
 
