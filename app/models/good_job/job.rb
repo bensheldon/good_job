@@ -256,10 +256,14 @@ module GoodJob
       end
 
       def historic_finished_at_index_migrated?
-        return true unless connection.index_name_exists?(:good_jobs, :index_good_jobs_jobs_on_finished_at)
+        if connection.index_name_exists?(:good_jobs, :index_good_jobs_jobs_on_finished_at) ||
+           !connection.index_name_exists?(:good_jobs, "index_good_jobs_on_priority_scheduled_at_unfinished") ||
+           !connection.index_name_exists?(:good_jobs, "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished")
+          migration_pending_warning!
+          return false
+        end
 
-        migration_pending_warning!
-        false
+        true
       end
     end
 
