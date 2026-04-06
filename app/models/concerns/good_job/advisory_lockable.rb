@@ -31,16 +31,14 @@ module GoodJob
       class_attribute :advisory_lockable_function, default: "pg_try_advisory_lock"
 
       # Rails < 7.2 does not have lease_connection as a class method.
-      unless respond_to?(:lease_connection)
-        define_singleton_method(:lease_connection) { connection }
-      end
+      define_singleton_method(:lease_connection) { connection } unless respond_to?(:lease_connection)
 
       # Rails < 7.2 does not have adapter_class as a class method, and adapter
       # quoting methods (quote_table_name, quote_column_name) are instance-only.
       # Provide a proxy that responds to those methods by delegating to a connection.
       unless respond_to?(:adapter_class)
         define_singleton_method(:adapter_class) do
-          @_adapter_class_proxy ||= begin
+          @_adapter_class ||= begin
             pool = connection_pool
             proxy = Object.new
             proxy.define_singleton_method(:quote_table_name) { |name| pool.with_connection { |c| c.quote_table_name(name) } }
