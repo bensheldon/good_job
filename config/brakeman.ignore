@@ -1,6 +1,48 @@
 {
   "ignored_warnings": [
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "e3b77f1540f622502491e00b2825b0d5cb6cb3962017fa3ef18d4d463799f3fd",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/concerns/good_job/advisory_lockable.rb",
+      "line": 89,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "joins(\"LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'\\n  AND pg_locks.objsubid = 1\\n  AND pg_locks.classid = ...#{_quoted_table_name_string}...\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GoodJob",
+        "method": null
+      },
+      "user_input": "_quoted_table_name_string",
+      "confidence": "Medium",
+      "cwe_id": [89],
+      "note": "Values are quoted identifiers and an escaped table name string; not user input."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ffcbcbd3d170cb7e40cc3b7054e6157983b6ccdf7eab02bc1b0f525158b35248",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/concerns/good_job/advisory_lockable.rb",
+      "line": 89,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "joins(\"LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'\\n  AND pg_locks.objsubid = 1\\n  AND pg_locks.classid = ...#{_quoted_table_name_string}...\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GoodJob::AdvisoryLockable",
+        "method": null
+      },
+      "user_input": "_quoted_table_name_string",
+      "confidence": "Medium",
+      "cwe_id": [89],
+      "note": "Values are quoted identifiers and an escaped table name string; not user input."
+    },
+    {
       "warning_type": "Dynamic Render Path",
       "warning_code": 15,
       "fingerprint": "041ae0dc908151bac0ef0952c625f0dce3a05d2c01a710397a613ef10083f7ae",
