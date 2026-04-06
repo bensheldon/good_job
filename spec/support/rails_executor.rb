@@ -15,12 +15,12 @@ RSpec.configure do |config|
 
     if Rails.application.executor.respond_to?(:perform)
       Rails.application.executor.perform do
-        ActiveRecord::Base.connection_pool.with_connection(&:disable_query_cache!)
+        (ActiveRecord::Base.respond_to?(:lease_connection) ? ActiveRecord::Base.lease_connection : ActiveRecord::Base.connection).disable_query_cache!
         example.run
       end
     else
       Rails.application.executor.wrap do
-        ActiveRecord::Base.connection_pool.with_connection(&:disable_query_cache!)
+        (ActiveRecord::Base.respond_to?(:lease_connection) ? ActiveRecord::Base.lease_connection : ActiveRecord::Base.connection).disable_query_cache!
         example.run
       end
     end

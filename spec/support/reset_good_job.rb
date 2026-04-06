@@ -214,13 +214,13 @@ class PgLock < ActiveRecord::Base
       ActiveRecord::Relation::QueryAttribute.new('classid', classid, ActiveRecord::Type::String.new),
       ActiveRecord::Relation::QueryAttribute.new('objid', objid, ActiveRecord::Type::String.new),
     ]
-    self.class.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', binds).first['unlocked']
+    self.class.lease_connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', binds).first['unlocked']
   end
 
   def unlock!
     query = <<~SQL.squish
       SELECT pg_terminate_backend(#{self[:pid]}) AS terminated
     SQL
-    self.class.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Terminate Backend Lock', []).first['terminated']
+    self.class.lease_connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Terminate Backend Lock', []).first['terminated']
   end
 end

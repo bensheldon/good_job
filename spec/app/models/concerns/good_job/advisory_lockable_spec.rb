@@ -32,13 +32,13 @@ RSpec.describe GoodJob::AdvisoryLockable do
 
     it 'generates bind parameters' do
       query = model_class.where(priority: 99).order(priority: :desc).limit(2).advisory_lock
-      _sql, binds, _preparable = model_class.connection.send :to_sql_and_binds, query.arel
+      _sql, binds, _preparable = model_class.lease_connection.send :to_sql_and_binds, query.arel
       expect(binds.size).to eq 2 # priority and limit
     end
 
     it 'is preparable', skip: !defined?(Arel::Nodes::BoundSqlLiteral) do
       query = model_class.where(priority: 99).order(priority: :desc).limit(2).advisory_lock
-      _sql, _binds, preparable = model_class.connection.send :to_sql_and_binds, query.arel
+      _sql, _binds, preparable = model_class.lease_connection.send :to_sql_and_binds, query.arel
       expect(preparable).to eq true
     end
 
