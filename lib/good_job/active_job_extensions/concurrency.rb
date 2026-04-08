@@ -99,9 +99,10 @@ module GoodJob
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
               if limit
-                # Use advisory_unlocked when enqueue_limit_flag is set (legacy behavior)
+                # Use where(performed_at: nil) when enqueue_limit_flag is set (legacy behavior),
+                # to exclude jobs currently being performed from the enqueue limit count.
                 enqueue_concurrency = if enqueue_limit_flag
-                                        query_scope.unfinished.advisory_unlocked.count
+                                        query_scope.unfinished.where(performed_at: nil).count
                                       else
                                         query_scope.unfinished.count
                                       end
@@ -145,7 +146,7 @@ module GoodJob
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
               if limit
-                allowed_active_job_ids = query_scope.unfinished.advisory_locked
+                allowed_active_job_ids = query_scope.running
                                                     .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
                                                     .limit(limit).pluck(:active_job_id)
                 # The current job has already been locked and will appear in the previous query
