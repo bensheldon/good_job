@@ -20,24 +20,24 @@
 # This class is currently being considered for inclusion into stdlib, via
 # https://bugs.ruby-lang.org/issues/8556
 #
-# source://thread_safe//lib/thread_safe/synchronized_delegator.rb#18
+# pkg:gem/thread_safe#lib/thread_safe/synchronized_delegator.rb:18
 class SynchronizedDelegator < ::SimpleDelegator
   # @return [SynchronizedDelegator] a new instance of SynchronizedDelegator
   #
-  # source://thread_safe//lib/thread_safe/synchronized_delegator.rb#28
+  # pkg:gem/thread_safe#lib/thread_safe/synchronized_delegator.rb:28
   def initialize(obj); end
 
-  # source://thread_safe//lib/thread_safe/synchronized_delegator.rb#33
+  # pkg:gem/thread_safe#lib/thread_safe/synchronized_delegator.rb:33
   def method_missing(method, *args, &block); end
 
-  # source://thread_safe//lib/thread_safe/synchronized_delegator.rb#19
+  # pkg:gem/thread_safe#lib/thread_safe/synchronized_delegator.rb:19
   def setup; end
 
-  # source://thread_safe//lib/thread_safe/synchronized_delegator.rb#24
+  # pkg:gem/thread_safe#lib/thread_safe/synchronized_delegator.rb:24
   def teardown; end
 end
 
-# source://thread_safe//lib/thread_safe/version.rb#1
+# pkg:gem/thread_safe#lib/thread_safe/version.rb:1
 module ThreadSafe; end
 
 # A thread-safe subclass of Array. This version locks
@@ -46,7 +46,7 @@ module ThreadSafe; end
 # at a time. This includes iteration methods like
 # #each.
 #
-# source://thread_safe//lib/thread_safe.rb#34
+# pkg:gem/thread_safe#lib/thread_safe.rb:34
 ThreadSafe::Array = Array
 
 # A Ruby port of the Doug Lea's jsr166e.ConcurrentHashMapV8 class version 1.59
@@ -228,113 +228,113 @@ ThreadSafe::Array = Array
 # contention by only committing count updates upon these size
 # checks.
 #
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#180
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:180
 class ThreadSafe::AtomicReferenceCacheBackend
   extend ::ThreadSafe::Util::Volatile
 
   # @return [AtomicReferenceCacheBackend] a new instance of AtomicReferenceCacheBackend
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#357
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:357
   def initialize(options = T.unsafe(nil)); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#382
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:382
   def [](key); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#390
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:390
   def []=(key, value); end
 
   # Implementation for clear. Steps through each bin, removing all nodes.
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#529
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:529
   def clear; end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#430
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:430
   def compute(key); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#395
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:395
   def compute_if_absent(key); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#418
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:418
   def compute_if_present(key); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#480
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:480
   def delete(key); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#484
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:484
   def delete_pair(key, value); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#493
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:493
   def each_pair; end
 
   # @return [Boolean]
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#524
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:524
   def empty?; end
 
   # internalPut in the original CHMV8
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#460
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:460
   def get_and_set(key, value); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#364
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:364
   def get_or_default(key, else_value = T.unsafe(nil)); end
 
   # @return [Boolean]
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#386
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:386
   def key?(key); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#440
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:440
   def merge_pair(key, value); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#454
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:454
   def replace_if_exists(key, new_value); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#450
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:450
   def replace_pair(key, old_value, new_value); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#520
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:520
   def size; end
 
   private
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#678
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:678
   def attempt_compute(key, hash, current_table, i, node, node_hash); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#708
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:708
   def attempt_get_and_set(key, value, hash, current_table, i, node, node_hash); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#658
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:658
   def attempt_internal_compute_if_absent(key, hash, current_table, i, node, node_hash); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#594
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:594
   def attempt_internal_replace(key, expected_old_value, hash, current_table, i, node, node_hash); end
 
   # If table is too small and not already resizing, creates next table and
   # transfers bins. Rechecks occupancy after a transfer to see if another
   # resize is already needed because resizings are lagging additions.
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#779
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:779
   def check_for_resize; end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#904
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:904
   def decrement_size(by = T.unsafe(nil)); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#617
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:617
   def find_value_in_node_list(node, key, hash, pure_hash); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#900
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:900
   def increment_size; end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#736
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:736
   def initialize_copy(other); end
 
   # Initializes table, using the size recorded in +size_control+.
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#761
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:761
   def initialize_table; end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#633
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:633
   def internal_compute(key, &block); end
 
   # Internal versions of the insertion methods, each a
@@ -353,58 +353,58 @@ class ThreadSafe::AtomicReferenceCacheBackend
   # Someday when details settle down a bit more, it might be worth
   # some factoring to reduce sprawl.
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#574
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:574
   def internal_replace(key, expected_old_value = T.unsafe(nil), &block); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#749
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:749
   def key_hash(key); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#847
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:847
   def lock_and_clean_up_reverse_forwarders(old_table, old_table_size, new_table, i, forwarder); end
 
   # Moves and/or copies the nodes in each bin to new table. See above for explanation.
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#801
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:801
   def rebuild(table); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#867
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:867
   def split_bin(new_table, i, node, node_hash); end
 
   # Splits a normal bin with list headed by e into lo and hi parts; installs in given table.
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#860
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:860
   def split_old_bin(table, new_table, i, node, node_hash, forwarder); end
 
   # Returns a power of two table size for the given desired capacity.
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#754
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:754
   def table_size_for(entry_count); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#744
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:744
   def try_await_lock(current_table, i, node); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#788
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:788
   def try_in_resize_lock(current_table, size_ctrl); end
 end
 
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#339
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:339
 ThreadSafe::AtomicReferenceCacheBackend::DEFAULT_CAPACITY = T.let(T.unsafe(nil), Integer)
 
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#336
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:336
 ThreadSafe::AtomicReferenceCacheBackend::HASH_BITS = T.let(T.unsafe(nil), Integer)
 
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#334
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:334
 ThreadSafe::AtomicReferenceCacheBackend::LOCKED = T.let(T.unsafe(nil), Integer)
 
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#340
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:340
 ThreadSafe::AtomicReferenceCacheBackend::MAX_CAPACITY = T.let(T.unsafe(nil), Integer)
 
 # shorthands
 #
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#333
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:333
 ThreadSafe::AtomicReferenceCacheBackend::MOVED = T.let(T.unsafe(nil), Integer)
 
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#338
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:338
 ThreadSafe::AtomicReferenceCacheBackend::NOW_RESIZING = T.let(T.unsafe(nil), Integer)
 
 # Key-value entry. Nodes with a hash field of +MOVED+ are special, and do
@@ -413,37 +413,37 @@ ThreadSafe::AtomicReferenceCacheBackend::NOW_RESIZING = T.let(T.unsafe(nil), Int
 # deleted or created. For purposes of read-only access, a key may be read
 # before a value, but can only be used after checking value to be +!= NULL+.
 #
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#226
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:226
 class ThreadSafe::AtomicReferenceCacheBackend::Node
   include ::ThreadSafe::Util::CheapLockable
   extend ::ThreadSafe::Util::Volatile
 
   # @return [Node] a new instance of Node
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#243
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:243
   def initialize(hash, key, value, next_node = T.unsafe(nil)); end
 
   # Returns the value of attribute key.
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#241
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:241
   def key; end
 
   # @return [Boolean]
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#281
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:281
   def key?(key); end
 
   # @return [Boolean]
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#303
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:303
   def locked?; end
 
   # @return [Boolean]
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#285
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:285
   def matches?(key, hash); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#289
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:289
   def pure_hash; end
 
   # Spins a while if +LOCKED+ bit set and this node is the first of its bin,
@@ -456,147 +456,147 @@ class ThreadSafe::AtomicReferenceCacheBackend::Node
   # CAS from non-waiting +LOCKED+ state), unlockers acquire the
   # +cheap_synchronize+ lock and perform a +cheap_broadcast+.
   #
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#260
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:260
   def try_await_lock(table, i); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#293
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:293
   def try_lock_via_hash(node_hash = T.unsafe(nil)); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#307
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:307
   def unlock_via_hash(locked_hash, node_hash); end
 
   private
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#315
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:315
   def force_aquire_lock(table, i); end
 
   class << self
     # @return [Boolean]
     #
-    # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#326
+    # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:326
     def locked_hash?(hash); end
   end
 end
 
 # usable bits of normal node hash
 #
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#237
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:237
 ThreadSafe::AtomicReferenceCacheBackend::Node::HASH_BITS = T.let(T.unsafe(nil), Integer)
 
 # set/tested only as a bit
 #
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#235
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:235
 ThreadSafe::AtomicReferenceCacheBackend::Node::LOCKED = T.let(T.unsafe(nil), Integer)
 
 # Encodings for special uses of Node hash fields. See above for explanation.
 #
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#234
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:234
 ThreadSafe::AtomicReferenceCacheBackend::Node::MOVED = T.let(T.unsafe(nil), Integer)
 
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#239
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:239
 ThreadSafe::AtomicReferenceCacheBackend::Node::SPIN_LOCK_ATTEMPTS = T.let(T.unsafe(nil), Integer)
 
 # both bits set/tested together
 #
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#236
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:236
 ThreadSafe::AtomicReferenceCacheBackend::Node::WAITING = T.let(T.unsafe(nil), Integer)
 
 # The buffer size for skipped bins during transfers. The
 # value is arbitrary but should be large enough to avoid
 # most locking stalls during resizes.
 #
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#345
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:345
 ThreadSafe::AtomicReferenceCacheBackend::TRANSFER_BUFFER_SIZE = T.let(T.unsafe(nil), Integer)
 
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#181
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:181
 class ThreadSafe::AtomicReferenceCacheBackend::Table < ::ThreadSafe::Util::PowerOfTwoTuple
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#182
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:182
   def cas_new_node(i, hash, key, value); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#212
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:212
   def delete_node_at(i, node, predecessor_node); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#206
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:206
   def try_lock_via_hash(i, node, node_hash); end
 
-  # source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#186
+  # pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:186
   def try_to_cas_in_computed(i, hash, key); end
 end
 
-# source://thread_safe//lib/thread_safe/atomic_reference_cache_backend.rb#335
+# pkg:gem/thread_safe#lib/thread_safe/atomic_reference_cache_backend.rb:335
 ThreadSafe::AtomicReferenceCacheBackend::WAITING = T.let(T.unsafe(nil), Integer)
 
-# source://thread_safe//lib/thread_safe/cache.rb#23
+# pkg:gem/thread_safe#lib/thread_safe/cache.rb:23
 class ThreadSafe::Cache < ::ThreadSafe::MriCacheBackend
   # @return [Cache] a new instance of Cache
   #
-  # source://thread_safe//lib/thread_safe/cache.rb#24
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:24
   def initialize(options = T.unsafe(nil), &block); end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#35
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:35
   def [](key); end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#98
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:98
   def each_key; end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#102
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:102
   def each_value; end
 
   # @return [Boolean]
   #
-  # source://thread_safe//lib/thread_safe/cache.rb#112
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:112
   def empty?; end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#52
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:52
   def fetch(key, default_value = T.unsafe(nil)); end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#64
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:64
   def fetch_or_store(key, default_value = T.unsafe(nil)); end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#49
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:49
   def get(key); end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#106
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:106
   def key(value); end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#86
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:86
   def keys; end
 
   # @raise [TypeError]
   #
-  # source://thread_safe//lib/thread_safe/cache.rb#123
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:123
   def marshal_dump; end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#130
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:130
   def marshal_load(hash); end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#50
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:50
   def put(key, value); end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#70
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:70
   def put_if_absent(key, value); end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#92
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:92
   def values; end
 
   private
 
-  # source://thread_safe//lib/thread_safe/cache.rb#142
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:142
   def initialize_copy(other); end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#147
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:147
   def populate_from(hash); end
 
   # @raise [KeyError]
   #
-  # source://thread_safe//lib/thread_safe/cache.rb#138
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:138
   def raise_fetch_no_key; end
 
-  # source://thread_safe//lib/thread_safe/cache.rb#152
+  # pkg:gem/thread_safe#lib/thread_safe/cache.rb:152
   def validate_options_hash!(options); end
 end
 
-# source://thread_safe//lib/thread_safe/cache.rb#10
+# pkg:gem/thread_safe#lib/thread_safe/cache.rb:10
 ThreadSafe::ConcurrentCacheBackend = ThreadSafe::MriCacheBackend
 
 # A thread-safe subclass of Hash. This version locks
@@ -605,42 +605,42 @@ ThreadSafe::ConcurrentCacheBackend = ThreadSafe::MriCacheBackend
 # at a time. This includes iteration methods like
 # #each.
 #
-# source://thread_safe//lib/thread_safe.rb#35
+# pkg:gem/thread_safe#lib/thread_safe.rb:35
 ThreadSafe::Hash = Hash
 
-# source://thread_safe//lib/thread_safe/mri_cache_backend.rb#2
+# pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:2
 class ThreadSafe::MriCacheBackend < ::ThreadSafe::NonConcurrentCacheBackend
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#12
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:12
   def []=(key, value); end
 
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#56
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:56
   def clear; end
 
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#28
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:28
   def compute(key); end
 
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#16
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:16
   def compute_if_absent(key); end
 
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#24
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:24
   def compute_if_present(key); end
 
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#48
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:48
   def delete(key); end
 
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#52
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:52
   def delete_pair(key, value); end
 
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#44
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:44
   def get_and_set(key, value); end
 
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#32
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:32
   def merge_pair(key, value); end
 
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#40
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:40
   def replace_if_exists(key, new_value); end
 
-  # source://thread_safe//lib/thread_safe/mri_cache_backend.rb#36
+  # pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:36
   def replace_pair(key, old_value, new_value); end
 end
 
@@ -652,15 +652,15 @@ end
 # c-ext will not work because of the potentially Ruby implemented `#hash`
 # and `#eql?` key methods.
 #
-# source://thread_safe//lib/thread_safe/mri_cache_backend.rb#10
+# pkg:gem/thread_safe#lib/thread_safe/mri_cache_backend.rb:10
 ThreadSafe::MriCacheBackend::WRITE_LOCK = T.let(T.unsafe(nil), Thread::Mutex)
 
 # Various classes within allows for +nil+ values to be stored, so a special +NULL+ token is required to indicate the "nil-ness".
 #
-# source://thread_safe//lib/thread_safe.rb#9
+# pkg:gem/thread_safe#lib/thread_safe.rb:9
 ThreadSafe::NULL = T.let(T.unsafe(nil), Object)
 
-# source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#2
+# pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:2
 class ThreadSafe::NonConcurrentCacheBackend
   # WARNING: all public methods of the class must operate on the @backend
   # directly without calling each other. This is important because of the
@@ -669,88 +669,88 @@ class ThreadSafe::NonConcurrentCacheBackend
   #
   # @return [NonConcurrentCacheBackend] a new instance of NonConcurrentCacheBackend
   #
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#7
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:7
   def initialize(options = T.unsafe(nil)); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#11
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:11
   def [](key); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#15
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:15
   def []=(key, value); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#88
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:88
   def clear; end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#49
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:49
   def compute(key); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#19
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:19
   def compute_if_absent(key); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#43
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:43
   def compute_if_present(key); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#75
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:75
   def delete(key); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#79
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:79
   def delete_pair(key, value); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#93
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:93
   def each_pair; end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#61
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:61
   def get_and_set(key, value); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#104
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:104
   def get_or_default(key, default_value); end
 
   # @return [Boolean]
   #
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#67
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:67
   def key?(key); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#53
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:53
   def merge_pair(key, value); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#36
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:36
   def replace_if_exists(key, new_value); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#27
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:27
   def replace_pair(key, old_value, new_value); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#100
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:100
   def size; end
 
   # @return [Boolean]
   #
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#71
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:71
   def value?(value); end
 
   private
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#108
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:108
   def _get(key); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#109
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:109
   def _set(key, value); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#118
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:118
   def dupped_backend; end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#112
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:112
   def initialize_copy(other); end
 
   # @return [Boolean]
   #
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#122
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:122
   def pair?(key, expected_value); end
 
-  # source://thread_safe//lib/thread_safe/non_concurrent_cache_backend.rb#126
+  # pkg:gem/thread_safe#lib/thread_safe/non_concurrent_cache_backend.rb:126
   def store_computed_value(key, new_value); end
 end
 
-# source://thread_safe//lib/thread_safe/util.rb#2
+# pkg:gem/thread_safe#lib/thread_safe/util.rb:2
 module ThreadSafe::Util; end
 
 # A Ruby port of the Doug Lea's jsr166e.LondAdder class version 1.8
@@ -773,20 +773,20 @@ module ThreadSafe::Util; end
 # this class is significantly higher, at the expense of higher space
 # consumption.
 #
-# source://thread_safe//lib/thread_safe/util/adder.rb#22
+# pkg:gem/thread_safe#lib/thread_safe/util/adder.rb:22
 class ThreadSafe::Util::Adder < ::ThreadSafe::Util::Striped64
   # Adds the given value.
   #
-  # source://thread_safe//lib/thread_safe/util/adder.rb#24
+  # pkg:gem/thread_safe#lib/thread_safe/util/adder.rb:24
   def add(x); end
 
-  # source://thread_safe//lib/thread_safe/util/adder.rb#38
+  # pkg:gem/thread_safe#lib/thread_safe/util/adder.rb:38
   def decrement; end
 
-  # source://thread_safe//lib/thread_safe/util/adder.rb#34
+  # pkg:gem/thread_safe#lib/thread_safe/util/adder.rb:34
   def increment; end
 
-  # source://thread_safe//lib/thread_safe/util/adder.rb#57
+  # pkg:gem/thread_safe#lib/thread_safe/util/adder.rb:57
   def reset; end
 
   # Returns the current sum.  The returned value is _NOT_ an
@@ -795,16 +795,16 @@ class ThreadSafe::Util::Adder < ::ThreadSafe::Util::Striped64
   # occur while the sum is being calculated might not be
   # incorporated.
   #
-  # source://thread_safe//lib/thread_safe/util/adder.rb#47
+  # pkg:gem/thread_safe#lib/thread_safe/util/adder.rb:47
   def sum; end
 end
 
-# source://thread_safe//lib/thread_safe/util/atomic_reference.rb#3
+# pkg:gem/thread_safe#lib/thread_safe/util/atomic_reference.rb:3
 ThreadSafe::Util::AtomicReference = ThreadSafe::Util::FullLockingAtomicReference
 
 # is there a way to determine this?
 #
-# source://thread_safe//lib/thread_safe/util.rb#5
+# pkg:gem/thread_safe#lib/thread_safe/util.rb:5
 ThreadSafe::Util::CPU_COUNT = T.let(T.unsafe(nil), Integer)
 
 # Provides a cheapest possible (mainly in terms of memory usage) +Mutex+
@@ -827,7 +827,7 @@ ThreadSafe::Util::CPU_COUNT = T.let(T.unsafe(nil), Integer)
 #     end
 #   end
 #
-# source://thread_safe//lib/thread_safe/util/cheap_lockable.rb#22
+# pkg:gem/thread_safe#lib/thread_safe/util/cheap_lockable.rb:22
 module ThreadSafe::Util::CheapLockable
   extend ::ThreadSafe::Util::Volatile
 
@@ -836,66 +836,66 @@ module ThreadSafe::Util::CheapLockable
   # Wakes up all threads waiting for this object's +cheap_synchronize+ lock.
   # Must only be called in +cheap_broadcast+'s block.
   #
-  # source://thread_safe//lib/thread_safe/util/cheap_lockable.rb#98
+  # pkg:gem/thread_safe#lib/thread_safe/util/cheap_lockable.rb:98
   def cheap_broadcast; end
 
   # Non-reentrant Mutex#syncrhonize
   #
-  # source://thread_safe//lib/thread_safe/util/cheap_lockable.rb#84
+  # pkg:gem/thread_safe#lib/thread_safe/util/cheap_lockable.rb:84
   def cheap_synchronize; end
 
   # Releases this object's +cheap_synchronize+ lock and goes to sleep waiting for other threads to +cheap_broadcast+, reacquires the lock on wakeup.
   # Must only be called in +cheap_broadcast+'s block.
   #
-  # source://thread_safe//lib/thread_safe/util/cheap_lockable.rb#91
+  # pkg:gem/thread_safe#lib/thread_safe/util/cheap_lockable.rb:91
   def cheap_wait; end
 end
 
-# source://thread_safe//lib/thread_safe/util.rb#3
+# pkg:gem/thread_safe#lib/thread_safe/util.rb:3
 ThreadSafe::Util::FIXNUM_BIT_SIZE = T.let(T.unsafe(nil), Integer)
 
-# source://thread_safe//lib/thread_safe/util/atomic_reference.rb#12
+# pkg:gem/thread_safe#lib/thread_safe/util/atomic_reference.rb:12
 class ThreadSafe::Util::FullLockingAtomicReference
-  # source://thread_safe//lib/thread_safe/util/atomic_reference.rb#13
+  # pkg:gem/thread_safe#lib/thread_safe/util/atomic_reference.rb:13
   def initialize(value = T.unsafe(nil)); end
 
-  # source://thread_safe//lib/thread_safe/util/atomic_reference.rb#28
+  # pkg:gem/thread_safe#lib/thread_safe/util/atomic_reference.rb:28
   def compare_and_set(old_value, new_value); end
 
-  # source://thread_safe//lib/thread_safe/util/atomic_reference.rb#18
+  # pkg:gem/thread_safe#lib/thread_safe/util/atomic_reference.rb:18
   def get; end
 
-  # source://thread_safe//lib/thread_safe/util/atomic_reference.rb#23
+  # pkg:gem/thread_safe#lib/thread_safe/util/atomic_reference.rb:23
   def set(new_value); end
 
-  # source://thread_safe//lib/thread_safe/util/atomic_reference.rb#21
+  # pkg:gem/thread_safe#lib/thread_safe/util/atomic_reference.rb:21
   def value; end
 
-  # source://thread_safe//lib/thread_safe/util/atomic_reference.rb#26
+  # pkg:gem/thread_safe#lib/thread_safe/util/atomic_reference.rb:26
   def value=(new_value); end
 end
 
-# source://thread_safe//lib/thread_safe/util.rb#4
+# pkg:gem/thread_safe#lib/thread_safe/util.rb:4
 ThreadSafe::Util::MAX_INT = T.let(T.unsafe(nil), Integer)
 
-# source://thread_safe//lib/thread_safe/util/power_of_two_tuple.rb#3
+# pkg:gem/thread_safe#lib/thread_safe/util/power_of_two_tuple.rb:3
 class ThreadSafe::Util::PowerOfTwoTuple < ::ThreadSafe::Util::VolatileTuple
   # @raise [ArgumentError]
   # @return [PowerOfTwoTuple] a new instance of PowerOfTwoTuple
   #
-  # source://thread_safe//lib/thread_safe/util/power_of_two_tuple.rb#4
+  # pkg:gem/thread_safe#lib/thread_safe/util/power_of_two_tuple.rb:4
   def initialize(size); end
 
-  # source://thread_safe//lib/thread_safe/util/power_of_two_tuple.rb#9
+  # pkg:gem/thread_safe#lib/thread_safe/util/power_of_two_tuple.rb:9
   def hash_to_index(hash); end
 
-  # source://thread_safe//lib/thread_safe/util/power_of_two_tuple.rb#21
+  # pkg:gem/thread_safe#lib/thread_safe/util/power_of_two_tuple.rb:21
   def next_in_size_table; end
 
-  # source://thread_safe//lib/thread_safe/util/power_of_two_tuple.rb#13
+  # pkg:gem/thread_safe#lib/thread_safe/util/power_of_two_tuple.rb:13
   def volatile_get_by_hash(hash); end
 
-  # source://thread_safe//lib/thread_safe/util/power_of_two_tuple.rb#17
+  # pkg:gem/thread_safe#lib/thread_safe/util/power_of_two_tuple.rb:17
   def volatile_set_by_hash(hash, value); end
 end
 
@@ -961,16 +961,16 @@ end
 # observed contention levels will recur, so the cells will eventually be
 # needed again; and for short-lived ones, it does not matter.
 #
-# source://thread_safe//lib/thread_safe/util/striped64.rb#64
+# pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:64
 class ThreadSafe::Util::Striped64
   extend ::ThreadSafe::Util::Volatile
 
   # @return [Striped64] a new instance of Striped64
   #
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#89
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:89
   def initialize; end
 
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#87
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:87
   def busy?; end
 
   # Handles cases of updates involving initialization, resizing,
@@ -987,43 +987,43 @@ class ThreadSafe::Util::Striped64
   # [+x+]
   #   false if CAS failed before call
   #
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#108
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:108
   def retry_update(x, hash_code, was_uncontended); end
 
   private
 
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#172
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:172
   def cas_base_computed; end
 
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#192
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:192
   def expand_table_unless_stale(current_cells); end
 
   # @return [Boolean]
   #
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#176
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:176
   def free?; end
 
   # A thread-local hash code accessor. The code is initially
   # random, but may be set to a different value upon collisions.
   #
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#153
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:153
   def hash_code; end
 
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#157
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:157
   def hash_code=(hash); end
 
   # Sets base and all +cells+ to the given value.
   #
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#162
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:162
   def internal_reset(initial_value); end
 
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#211
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:211
   def try_in_busy; end
 
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#180
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:180
   def try_initialize_cells(x, hash); end
 
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#202
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:202
   def try_to_install_new_cell(new_cell, hash); end
 end
 
@@ -1034,15 +1034,15 @@ end
 # Optimisation note: It would be possible to use a release-only
 # form of CAS here, if it were provided.
 #
-# source://thread_safe//lib/thread_safe/util/striped64.rb#71
+# pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:71
 class ThreadSafe::Util::Striped64::Cell < ::ThreadSafe::Util::FullLockingAtomicReference
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#75
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:75
   def cas(old_value, new_value); end
 
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#77
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:77
   def cas_computed; end
 
-  # source://thread_safe//lib/thread_safe/util/striped64.rb#73
+  # pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:73
   def padding_; end
 end
 
@@ -1051,10 +1051,10 @@ end
 # collisions in one table are likely to be appropriate for
 # others.
 #
-# source://thread_safe//lib/thread_safe/util/striped64.rb#149
+# pkg:gem/thread_safe#lib/thread_safe/util/striped64.rb:149
 ThreadSafe::Util::Striped64::THREAD_LOCAL_KEY = T.let(T.unsafe(nil), Symbol)
 
-# source://thread_safe//lib/thread_safe/util/volatile.rb#3
+# pkg:gem/thread_safe#lib/thread_safe/util/volatile.rb:3
 module ThreadSafe::Util::Volatile
   # Provides +volatile+ (in the JVM's sense) attribute accessors implemented
   # atop of the +AtomicReference+s.
@@ -1076,7 +1076,7 @@ module ThreadSafe::Util::Volatile
   #     end
   #   end
   #
-  # source://thread_safe//lib/thread_safe/util/volatile.rb#23
+  # pkg:gem/thread_safe#lib/thread_safe/util/volatile.rb:23
   def attr_volatile(*attr_names); end
 end
 
@@ -1088,35 +1088,35 @@ end
 #   arr.cas(0, :foo, :bar) # => true
 #   arr.volatile_get(0)    # => :bar
 #
-# source://thread_safe//lib/thread_safe/util/volatile_tuple.rb#10
+# pkg:gem/thread_safe#lib/thread_safe/util/volatile_tuple.rb:10
 class ThreadSafe::Util::VolatileTuple
   include ::Enumerable
 
   # @return [VolatileTuple] a new instance of VolatileTuple
   #
-  # source://thread_safe//lib/thread_safe/util/volatile_tuple.rb#15
+  # pkg:gem/thread_safe#lib/thread_safe/util/volatile_tuple.rb:15
   def initialize(size); end
 
-  # source://thread_safe//lib/thread_safe/util/volatile_tuple.rb#35
+  # pkg:gem/thread_safe#lib/thread_safe/util/volatile_tuple.rb:35
   def cas(i, old_value, new_value); end
 
-  # source://thread_safe//lib/thread_safe/util/volatile_tuple.rb#32
+  # pkg:gem/thread_safe#lib/thread_safe/util/volatile_tuple.rb:32
   def compare_and_set(i, old_value, new_value); end
 
-  # source://thread_safe//lib/thread_safe/util/volatile_tuple.rb#41
+  # pkg:gem/thread_safe#lib/thread_safe/util/volatile_tuple.rb:41
   def each; end
 
-  # source://thread_safe//lib/thread_safe/util/volatile_tuple.rb#37
+  # pkg:gem/thread_safe#lib/thread_safe/util/volatile_tuple.rb:37
   def size; end
 
-  # source://thread_safe//lib/thread_safe/util/volatile_tuple.rb#24
+  # pkg:gem/thread_safe#lib/thread_safe/util/volatile_tuple.rb:24
   def volatile_get(i); end
 
-  # source://thread_safe//lib/thread_safe/util/volatile_tuple.rb#28
+  # pkg:gem/thread_safe#lib/thread_safe/util/volatile_tuple.rb:28
   def volatile_set(i, value); end
 end
 
-# source://thread_safe//lib/thread_safe/util/volatile_tuple.rb#13
+# pkg:gem/thread_safe#lib/thread_safe/util/volatile_tuple.rb:13
 ThreadSafe::Util::VolatileTuple::Tuple = Array
 
 # A xorshift random number (positive +Fixnum+s) generator, provides
@@ -1131,37 +1131,37 @@ ThreadSafe::Util::VolatileTuple::Tuple = Array
 #     end
 #   end
 #
-# source://thread_safe//lib/thread_safe/util/xor_shift_random.rb#14
+# pkg:gem/thread_safe#lib/thread_safe/util/xor_shift_random.rb:14
 module ThreadSafe::Util::XorShiftRandom
   extend ::ThreadSafe::Util::XorShiftRandom
 
   # Generates an initial non-zero positive +Fixnum+ via +Kernel.rand+.
   #
-  # source://thread_safe//lib/thread_safe/util/xor_shift_random.rb#19
+  # pkg:gem/thread_safe#lib/thread_safe/util/xor_shift_random.rb:19
   def get; end
 
   # using the "yˆ=y>>a; yˆ=y<<b; yˆ=y>>c;" transform with the (a,b,c) tuple with values (1,1,54) to minimise Bignum overflows
   #
-  # source://thread_safe//lib/thread_safe/util/xor_shift_random.rb#33
+  # pkg:gem/thread_safe#lib/thread_safe/util/xor_shift_random.rb:33
   def xorshift(x); end
 end
 
-# source://thread_safe//lib/thread_safe/util/xor_shift_random.rb#16
+# pkg:gem/thread_safe#lib/thread_safe/util/xor_shift_random.rb:16
 ThreadSafe::Util::XorShiftRandom::MAX_XOR_SHIFTABLE_INT = T.let(T.unsafe(nil), Integer)
 
-# source://thread_safe//lib/thread_safe/version.rb#2
+# pkg:gem/thread_safe#lib/thread_safe/version.rb:2
 ThreadSafe::VERSION = T.let(T.unsafe(nil), String)
 
 # NOTE: <= 0.2.0 used Threadsafe::VERSION
 #
 # @private
 #
-# source://thread_safe//lib/thread_safe/version.rb#7
+# pkg:gem/thread_safe#lib/thread_safe/version.rb:7
 module Threadsafe
   class << self
     # @private
     #
-    # source://thread_safe//lib/thread_safe/version.rb#10
+    # pkg:gem/thread_safe#lib/thread_safe/version.rb:10
     def const_missing(name); end
   end
 end

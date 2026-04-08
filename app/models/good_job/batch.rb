@@ -94,60 +94,90 @@ module GoodJob
         # Phase 2: Build and partition jobs by concurrency limits
         build_result = _build_and_partition_jobs(batch_job_pairs, current_time)
 
-        # Phase 3: Insert bulkable jobs
+        # Phase 3–6: Insert, claim, and execute inline jobs
+        lock_strategy = Job.effective_lock_strategy
+        tracker_registered = false
+        lock_id = nil
         persisted_jobs = []
         inline_jobs = []
 
-        if build_result[:bulkable].any?
-          Job.transaction(requires_new: true, joinable: false) do
-            persisted_jobs = _insert_jobs(build_result[:bulkable], build_result[:active_jobs_by_job_id])
+        if execute_inline
+          GoodJob.capsule.tracker.register
+          tracker_registered = true
+          lock_id = GoodJob.capsule.tracker.id_for_lock
+        end
 
-            if execute_inline
-              inline_jobs = persisted_jobs.select { |job| job.scheduled_at.nil? || job.scheduled_at <= Time.current }
-              inline_jobs.each(&:advisory_lock!)
+        begin
+          if build_result[:bulkable].any?
+            Job.transaction(requires_new: true, joinable: false) do
+              persisted_jobs = _insert_jobs(build_result[:bulkable], build_result[:active_jobs_by_job_id])
+
+              if execute_inline
+                inline_jobs = persisted_jobs.select { |job| job.scheduled_at.nil? || job.scheduled_at <= current_time }
+                if lock_strategy != :advisory && lock_id && inline_jobs.any?
+                  Job.where(id: inline_jobs.map(&:id)).update_all( # rubocop:disable Rails/SkipsModelValidations
+                    locked_by_id: lock_id, locked_at: current_time, lock_type: Job.lock_types[lock_strategy.to_s]
+                  )
+                  inline_jobs.each { |j| j.assign_attributes(locked_by_id: lock_id, locked_at: current_time, lock_type: lock_strategy) }
+                end
+                case lock_strategy
+                when :advisory, :hybrid
+                  inline_jobs.each(&:advisory_lock!)
+                end
+              end
             end
           end
-        end
 
-        # Phase 4: Handle empty batches — they need _continue_discard_or_finish
-        # to trigger on_success/on_finish callbacks (batch_record.rb:77).
-        batches_with_jobs = Set.new
-        build_result[:bulkable].each { |entry| batches_with_jobs.add(entry[:batch]) }
-        build_result[:unbulkable].each { |entry| batches_with_jobs.add(entry[:batch]) }
+          # Phase 4: Handle empty batches — they need _continue_discard_or_finish
+          # to trigger on_success/on_finish callbacks (batch_record.rb:77).
+          batches_with_jobs = Set.new
+          build_result[:bulkable].each { |entry| batches_with_jobs.add(entry[:batch]) }
+          build_result[:unbulkable].each { |entry| batches_with_jobs.add(entry[:batch]) }
 
-        empty_batches = batch_job_pairs.map(&:first).reject { |batch| batches_with_jobs.include?(batch) }
-        if empty_batches.any?
-          buffer = GoodJob::Adapter::InlineBuffer.capture do
-            empty_batches.each do |batch|
-              batch._record.reload
-              batch._record._continue_discard_or_finish(lock: true)
+          empty_batches = batch_job_pairs.map(&:first).reject { |batch| batches_with_jobs.include?(batch) }
+          if empty_batches.any?
+            buffer = GoodJob::Adapter::InlineBuffer.capture do
+              empty_batches.each do |batch|
+                batch._record.reload
+                batch._record._continue_discard_or_finish(lock: true)
+              end
             end
+            buffer.call
           end
-          buffer.call
-        end
 
-        # Phase 5: Enqueue concurrency-limited jobs individually
-        build_result[:unbulkable].each do |entry|
-          within_thread(batch_id: entry[:batch].id) do
-            entry[:active_job].enqueue
+          # Phase 5: Enqueue concurrency-limited jobs individually
+          build_result[:unbulkable].each do |entry|
+            within_thread(batch_id: entry[:batch].id) do
+              entry[:active_job].enqueue
+            end
+          rescue GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError
+            # ignore — matches Bulk::Buffer behavior (bulk.rb:107-109)
           end
-        rescue GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError
-          # ignore — matches Bulk::Buffer behavior (bulk.rb:107-109)
-        end
 
-        # Phase 6: Execute inline jobs
-        if inline_jobs.any?
-          GoodJob::Adapter::InlineBuffer.perform_now_or_defer do
-            GoodJob.capsule.tracker.register do
+          # Phase 6: Execute inline jobs
+          if inline_jobs.any?
+            deferred = GoodJob::Adapter::InlineBuffer.defer?
+            GoodJob::Adapter::InlineBuffer.perform_now_or_defer do
               until inline_jobs.empty?
                 inline_job = inline_jobs.shift
                 active_job = build_result[:active_jobs_by_job_id][inline_job.active_job_id]
-                adapter.send(:perform_inline, inline_job, notify: adapter.send(:send_notify?, active_job))
+                adapter.send(:perform_inline, inline_job, notify: deferred ? adapter.send(:send_notify?, active_job) : false, already_claimed: lock_strategy != :advisory, advisory_unlock: lock_strategy != :skiplocked)
               end
             ensure
               inline_jobs.each(&:advisory_unlock)
+              GoodJob.capsule.tracker.unregister if tracker_registered
+              tracker_registered = false
             end
+          elsif tracker_registered
+            GoodJob.capsule.tracker.unregister
+            tracker_registered = false
           end
+        rescue StandardError
+          if tracker_registered
+            GoodJob.capsule.tracker.unregister
+            tracker_registered = false
+          end
+          raise
         end
 
         # Phase 7: Send NOTIFY for non-inline jobs
@@ -360,10 +390,11 @@ module GoodJob
 
     # @!visibility private
     def self._insert_jobs(bulkable_entries, active_jobs_by_job_id)
-      job_attributes = bulkable_entries.map { |entry| entry[:good_job].attributes }
+      column_names = Job.column_names
+      job_attributes = bulkable_entries.map { |entry| entry[:good_job].attributes.slice(*column_names) }
       results = Job.insert_all(job_attributes, returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
 
-      job_id_map = results.each_with_object({}) { |row, hash| hash[row['active_job_id']] = row['id'] }
+      job_id_map = results.to_h { |row| [row['active_job_id'], row['id']] }
 
       # Set provider_job_id on ActiveJob instances (mirrors adapter.rb:74-76)
       active_jobs_by_job_id.each_value do |active_job|

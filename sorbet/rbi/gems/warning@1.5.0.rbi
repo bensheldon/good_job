@@ -5,13 +5,13 @@
 # Please instead update this file by running `bin/tapioca gem warning`.
 
 
-# source://warning//lib/warning.rb#3
+# pkg:gem/warning#lib/warning.rb:3
 module Warning
   extend ::Warning
   extend ::Warning::Processor
 end
 
-# source://warning//lib/warning.rb#4
+# pkg:gem/warning#lib/warning.rb:4
 module Warning::Processor
   # Clear all current ignored warnings, warning processors, and duplicate check cache.
   # Also disables deduplicating warnings if that is currently enabled.
@@ -29,17 +29,17 @@ module Warning::Processor
   #   end
   #   # Previous warning state restored when block exists
   #
-  # source://warning//lib/warning.rb#50
+  # pkg:gem/warning#lib/warning.rb:50
   def clear; end
 
   # Deduplicate warnings, suppress warning messages if the same warning message
   # has already occurred.  Note that this can lead to unbounded memory use
   # if unique warnings are generated.
   #
-  # source://warning//lib/warning.rb#81
+  # pkg:gem/warning#lib/warning.rb:81
   def dedup; end
 
-  # source://warning//lib/warning.rb#85
+  # pkg:gem/warning#lib/warning.rb:85
   def freeze; end
 
   # Ignore any warning messages matching the given regexp, if they
@@ -84,7 +84,7 @@ module Warning::Processor
   #   # Ignore all uninitialized instance variable and method redefined warnings in current file
   #   Warning.ignore([:missing_ivar, :method_redefined],  __FILE__)
   #
-  # source://warning//lib/warning.rb#132
+  # pkg:gem/warning#lib/warning.rb:132
   def ignore(regexp, path = T.unsafe(nil)); end
 
   # Handle all warnings starting with the given path, instead of
@@ -128,29 +128,29 @@ module Warning::Processor
   #
   #   Warning.process(__FILE__, :missing_ivar=>:backtrace, :keyword_separation=>:raise)
   #
-  # source://warning//lib/warning.rb#183
+  # pkg:gem/warning#lib/warning.rb:183
   def process(path = T.unsafe(nil), actions = T.unsafe(nil), &block); end
 
-  # source://warning//lib/warning.rb#223
+  # pkg:gem/warning#lib/warning.rb:223
   def warn(str, category: T.unsafe(nil)); end
 
   private
 
   # Convert the given Regexp, Symbol, or Array of Symbols into a Regexp.
   #
-  # source://warning//lib/warning.rb#276
+  # pkg:gem/warning#lib/warning.rb:276
   def convert_regexp(regexp); end
 
-  # source://warning//lib/warning.rb#289
+  # pkg:gem/warning#lib/warning.rb:289
   def synchronize(&block); end
 end
 
 # Map of action symbols to procs that return the symbol
 #
-# source://warning//lib/warning.rb#28
+# pkg:gem/warning#lib/warning.rb:28
 Warning::Processor::ACTION_PROC_MAP = T.let(T.unsafe(nil), Hash)
 
 # Map of symbols to regexps for warning messages to ignore.
 #
-# source://warning//lib/warning.rb#6
+# pkg:gem/warning#lib/warning.rb:6
 Warning::Processor::IGNORE_MAP = T.let(T.unsafe(nil), Hash)

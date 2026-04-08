@@ -5,7 +5,7 @@
 # Please instead update this file by running `bin/tapioca gem protocol-hpack`.
 
 
-# source://protocol-hpack//lib/protocol/hpack/version.rb#6
+# pkg:gem/protocol-hpack#lib/protocol/hpack/version.rb:6
 module Protocol; end
 
 # Implementation of header compression for HTTP 2.0 (HPACK) format adapted
@@ -13,32 +13,32 @@ module Protocol; end
 #
 # - http://tools.ietf.org/html/draft-ietf-httpbis-header-compression-10
 #
-# source://protocol-hpack//lib/protocol/hpack/version.rb#7
+# pkg:gem/protocol-hpack#lib/protocol/hpack/version.rb:7
 module Protocol::HPACK; end
 
-# source://protocol-hpack//lib/protocol/hpack/context.rb#19
+# pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:19
 Protocol::HPACK::CHANGE_TABLE_SIZE_TYPE = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/error.rb#11
+# pkg:gem/protocol-hpack#lib/protocol/hpack/error.rb:11
 class Protocol::HPACK::CompressionError < ::Protocol::HPACK::Error; end
 
 # Responsible for encoding header key-value pairs using HPACK algorithm.
 #
-# source://protocol-hpack//lib/protocol/hpack/compressor.rb#44
+# pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:44
 class Protocol::HPACK::Compressor
   # @return [Compressor] a new instance of Compressor
   #
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#45
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:45
   def initialize(buffer, context = T.unsafe(nil), table_size_limit: T.unsafe(nil)); end
 
   # Returns the value of attribute buffer.
   #
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#54
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:54
   def buffer; end
 
   # Returns the value of attribute context.
   #
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#55
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:55
   def context; end
 
   # Encodes provided list of HTTP headers.
@@ -46,32 +46,32 @@ class Protocol::HPACK::Compressor
   # @param headers [Array] +[[name, value], ...]+
   # @return [Buffer]
   #
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#173
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:173
   def encode(headers, table_size = T.unsafe(nil)); end
 
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#93
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:93
   def huffman; end
 
   # Returns the value of attribute offset.
   #
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#56
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:56
   def offset; end
 
   # Returns the value of attribute table_size_limit.
   #
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#52
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:52
   def table_size_limit; end
 
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#58
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:58
   def write_bytes(bytes); end
 
   # Encodes header command with appropriate header representation.
   #
-  # @param h [Hash] header command
   # @param buffer [String]
+  # @param h [Hash] header command
   # @return [Buffer]
   #
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#144
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:144
   def write_header(command); end
 
   # Encodes provided value via integer representation.
@@ -86,11 +86,11 @@ class Protocol::HPACK::Compressor
   #           I = I / 128
   #      encode (I) on 8 bits
   #
-  # @param value [Integer] value to encode
   # @param bits [Integer] number of available bits
+  # @param value [Integer] value to encode
   # @return [String] binary string
   #
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#77
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:77
   def write_integer(value, bits); end
 
   # Encodes provided value via string literal representation.
@@ -113,7 +113,7 @@ class Protocol::HPACK::Compressor
   # @param string [String]
   # @return [String] binary string
   #
-  # source://protocol-hpack//lib/protocol/hpack/compressor.rb#117
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:117
   def write_string(string, huffman = T.unsafe(nil)); end
 end
 
@@ -121,20 +121,20 @@ end
 # dynamic table as a decoding context.
 # No other state information is needed.
 #
-# source://protocol-hpack//lib/protocol/hpack/context.rb#33
+# pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:33
 class Protocol::HPACK::Context
   # Initializes compression context with appropriate client/server defaults and maximum size of the dynamic table.
   #
   # @option huffman
-  # @option table_size
   # @option index
-  # @param table_size [Hash] a customizable set of options
+  # @option table_size
   # @param huffman [Hash] a customizable set of options
-  # @param table [Array] Table of header key-value pairs.
   # @param index [Hash] a customizable set of options
+  # @param table [Array] Table of header key-value pairs.
+  # @param table_size [Hash] a customizable set of options
   # @return [Context] a new instance of Context
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#119
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:119
   def initialize(table = T.unsafe(nil), huffman: T.unsafe(nil), index: T.unsafe(nil), table_size: T.unsafe(nil)); end
 
   # Emits command for a header.
@@ -151,17 +151,17 @@ class Protocol::HPACK::Context
   # @param value [String]
   # @return [Hash] command
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#254
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:254
   def add_command(name, value); end
 
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#307
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:307
   def change_table_size(size); end
 
   # Returns current table size in octets
   #
   # @return [Integer]
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#316
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:316
   def compute_current_table_size; end
 
   # Header Block Processing
@@ -170,7 +170,7 @@ class Protocol::HPACK::Context
   # @param command [Hash] {type:, name:, value:, index:}
   # @return [Array] +[name, value]+ header field that is added to the decoded header list
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#169
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:169
   def decode(command); end
 
   # Finds an entry in current dynamic table by index.
@@ -184,7 +184,7 @@ class Protocol::HPACK::Context
   # @param index [Integer] zero-based index in the dynamic table.
   # @return [Array] +[key, value]+
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#153
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:153
   def dereference(index); end
 
   # Plan header compression according to +@index+
@@ -195,33 +195,33 @@ class Protocol::HPACK::Context
   # @param headers [Array] +[[name, value], ...]+
   # @return [Array] array of commands
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#224
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:224
   def encode(headers); end
 
   # Returns the value of attribute huffman.
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#138
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:138
   def huffman; end
 
   # Returns the value of attribute index.
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#139
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:139
   def index; end
 
   # Current table of header key-value pairs.
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#136
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:136
   def table; end
 
   # Returns the value of attribute table_size.
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#141
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:141
   def table_size; end
 
   # Alter dynamic table size.
   #  When the size is reduced, some headers might be evicted.
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#302
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:302
   def table_size=(size); end
 
   private
@@ -230,13 +230,13 @@ class Protocol::HPACK::Context
   #
   # @param command [Array] +[name, value]+
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#325
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:325
   def add_to_table(command); end
 
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#335
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:335
   def entry_size(e); end
 
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#128
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:128
   def initialize_copy(other); end
 
   # To keep the dynamic table size lower than or equal to @table_size,
@@ -245,44 +245,44 @@ class Protocol::HPACK::Context
   # @param command [Hash]
   # @return [Boolean] whether +command+ fits in the dynamic table.
   #
-  # source://protocol-hpack//lib/protocol/hpack/context.rb#344
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:344
   def size_check(command); end
 end
 
-# source://protocol-hpack//lib/protocol/hpack/context.rb#100
+# pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:100
 Protocol::HPACK::Context::STATIC_EXACT_LOOKUP = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/context.rb#101
+# pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:101
 Protocol::HPACK::Context::STATIC_NAME_LOOKUP = T.let(T.unsafe(nil), Hash)
 
 # Static header table.
 # https://tools.ietf.org/html/rfc7541#appendix-A
 #
-# source://protocol-hpack//lib/protocol/hpack/context.rb#36
+# pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:36
 Protocol::HPACK::Context::STATIC_TABLE = T.let(T.unsafe(nil), Array)
 
-# source://protocol-hpack//lib/protocol/hpack/error.rb#14
+# pkg:gem/protocol-hpack#lib/protocol/hpack/error.rb:14
 class Protocol::HPACK::DecompressionError < ::Protocol::HPACK::Error; end
 
 # Responsible for decoding received headers and maintaining compression
 # context of the opposing peer. Decompressor must be initialized with
 # appropriate starting context based on local role: client or server.
 #
-# source://protocol-hpack//lib/protocol/hpack/decompressor.rb#16
+# pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:16
 class Protocol::HPACK::Decompressor
   # @return [Decompressor] a new instance of Decompressor
   #
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#20
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:20
   def initialize(buffer, context = T.unsafe(nil), table_size_limit: T.unsafe(nil)); end
 
   # Returns the value of attribute buffer.
   #
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#28
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:28
   def buffer; end
 
   # Returns the value of attribute context.
   #
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#29
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:29
   def context; end
 
   # Decodes and processes header commands within provided buffer.
@@ -290,26 +290,26 @@ class Protocol::HPACK::Decompressor
   # @param buffer [Buffer]
   # @return [Array] +[[name, value], ...]+
   #
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#192
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:192
   def decode(list = T.unsafe(nil)); end
 
   # @return [Boolean]
   #
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#34
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:34
   def end?; end
 
   # Returns the value of attribute offset.
   #
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#30
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:30
   def offset; end
 
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#46
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:46
   def peek_byte; end
 
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#38
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:38
   def read_byte; end
 
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#50
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:50
   def read_bytes(length); end
 
   # Decodes header command from provided buffer.
@@ -317,7 +317,7 @@ class Protocol::HPACK::Decompressor
   # @param buffer [Buffer]
   # @return [Hash] command
   #
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#102
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:102
   def read_header; end
 
   # Decodes integer value from provided buffer.
@@ -325,7 +325,7 @@ class Protocol::HPACK::Decompressor
   # @param bits [Integer] number of available bits
   # @return [Integer]
   #
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#62
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:62
   def read_integer(bits); end
 
   # Decodes string value from provided buffer.
@@ -333,27 +333,27 @@ class Protocol::HPACK::Decompressor
   # @raise [CompressionError] when input is malformed
   # @return [String] UTF-8 encoded string
   #
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#82
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:82
   def read_string; end
 
   # Returns the value of attribute table_size_limit.
   #
-  # source://protocol-hpack//lib/protocol/hpack/decompressor.rb#32
+  # pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:32
   def table_size_limit; end
 end
 
-# source://protocol-hpack//lib/protocol/hpack/decompressor.rb#18
+# pkg:gem/protocol-hpack#lib/protocol/hpack/decompressor.rb:18
 Protocol::HPACK::Decompressor::MASK_SHIFT_4 = T.let(T.unsafe(nil), Integer)
 
-# source://protocol-hpack//lib/protocol/hpack/error.rb#8
+# pkg:gem/protocol-hpack#lib/protocol/hpack/error.rb:8
 class Protocol::HPACK::Error < ::StandardError; end
 
-# source://protocol-hpack//lib/protocol/hpack/context.rb#22
+# pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:22
 Protocol::HPACK::HEADER_REPRESENTATION = T.let(T.unsafe(nil), Hash)
 
 # Implementation of huffman encoding for HPACK.
 #
-# source://protocol-hpack//lib/protocol/hpack/huffman/machine.rb#11
+# pkg:gem/protocol-hpack#lib/protocol/hpack/huffman/machine.rb:11
 class Protocol::HPACK::Huffman
   class << self
     # Decodes provided Huffman coded string.
@@ -362,7 +362,7 @@ class Protocol::HPACK::Huffman
     # @raise [CompressionError] when Huffman coded string is malformed
     # @return [String] binary string
     #
-    # source://protocol-hpack//lib/protocol/hpack/huffman.rb#37
+    # pkg:gem/protocol-hpack#lib/protocol/hpack/huffman.rb:37
     def decode(buffer); end
 
     # Encodes provided value via huffman encoding.
@@ -371,74 +371,74 @@ class Protocol::HPACK::Huffman
     # @param str [String]
     # @return [String] binary string
     #
-    # source://protocol-hpack//lib/protocol/hpack/huffman.rb#26
+    # pkg:gem/protocol-hpack#lib/protocol/hpack/huffman.rb:26
     def encode(str); end
   end
 end
 
-# source://protocol-hpack//lib/protocol/hpack/huffman.rb#18
+# pkg:gem/protocol-hpack#lib/protocol/hpack/huffman.rb:18
 Protocol::HPACK::Huffman::BITS_AT_ONCE = T.let(T.unsafe(nil), Integer)
 
 # Huffman table as specified in https://tools.ietf.org/html/rfc7541#appendix-B
 #
-# source://protocol-hpack//lib/protocol/hpack/huffman.rb#68
+# pkg:gem/protocol-hpack#lib/protocol/hpack/huffman.rb:68
 Protocol::HPACK::Huffman::CODES = T.let(T.unsafe(nil), Array)
 
-# source://protocol-hpack//lib/protocol/hpack/huffman.rb#328
+# pkg:gem/protocol-hpack#lib/protocol/hpack/huffman.rb:328
 Protocol::HPACK::Huffman::ENCODE_TABLE = T.let(T.unsafe(nil), Array)
 
-# source://protocol-hpack//lib/protocol/hpack/huffman.rb#19
+# pkg:gem/protocol-hpack#lib/protocol/hpack/huffman.rb:19
 Protocol::HPACK::Huffman::EOS = T.let(T.unsafe(nil), Integer)
 
-# source://protocol-hpack//lib/protocol/hpack/huffman/machine.rb#14
+# pkg:gem/protocol-hpack#lib/protocol/hpack/huffman/machine.rb:14
 Protocol::HPACK::Huffman::MACHINE = T.let(T.unsafe(nil), Array)
 
-# source://protocol-hpack//lib/protocol/hpack/huffman/machine.rb#13
+# pkg:gem/protocol-hpack#lib/protocol/hpack/huffman/machine.rb:13
 Protocol::HPACK::Huffman::MAX_FINAL_STATE = T.let(T.unsafe(nil), Integer)
 
-# source://protocol-hpack//lib/protocol/hpack/context.rb#20
+# pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:20
 Protocol::HPACK::INCREMENTAL_TYPE = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/context.rb#21
+# pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:21
 Protocol::HPACK::INDEXED_TYPE = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/compressor.rb#24
+# pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:24
 Protocol::HPACK::LINEAR = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/compressor.rb#28
+# pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:28
 Protocol::HPACK::LINEAR_HUFFMAN = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/compressor.rb#32
+# pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:32
 Protocol::HPACK::MODES = T.let(T.unsafe(nil), Hash)
 
 # Predefined options set for Compressor
 # http://mew.org/~kazu/material/2014-hpack.pdf
 #
-# source://protocol-hpack//lib/protocol/hpack/compressor.rb#23
+# pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:23
 Protocol::HPACK::NAIVE = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/compressor.rb#27
+# pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:27
 Protocol::HPACK::NAIVE_HUFFMAN = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/context.rb#18
+# pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:18
 Protocol::HPACK::NEVER_INDEXED_TYPE = T.let(T.unsafe(nil), Hash)
 
 # Header representation as defined by the spec.
 #
-# source://protocol-hpack//lib/protocol/hpack/context.rb#17
+# pkg:gem/protocol-hpack#lib/protocol/hpack/context.rb:17
 Protocol::HPACK::NO_INDEX_TYPE = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/compressor.rb#26
+# pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:26
 Protocol::HPACK::SHORTER = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/compressor.rb#30
+# pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:30
 Protocol::HPACK::SHORTER_HUFFMAN = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/compressor.rb#25
+# pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:25
 Protocol::HPACK::STATIC = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/compressor.rb#29
+# pkg:gem/protocol-hpack#lib/protocol/hpack/compressor.rb:29
 Protocol::HPACK::STATIC_HUFFMAN = T.let(T.unsafe(nil), Hash)
 
-# source://protocol-hpack//lib/protocol/hpack/version.rb#8
+# pkg:gem/protocol-hpack#lib/protocol/hpack/version.rb:8
 Protocol::HPACK::VERSION = T.let(T.unsafe(nil), String)
