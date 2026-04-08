@@ -21,58 +21,43 @@ module GoodJob
         end
 
         def evaluate(job, stage)
-          return nil if key(job).blank? && label(job).blank?
+          key = key(job)
+          label = label(job)
+          return nil if key.blank? && label.blank?
 
-          exceeded = nil
           if stage == :enqueue
             enqueue_limit = limit(job, :enqueue_limit) || limit(job, :total_limit)
             enqueue_throttle = throttle(job, :enqueue_throttle)
-
             return nil unless enqueue_limit || enqueue_throttle
 
-            exceeded = check_enqueue(enqueue_limit, enqueue_throttle, job, enqueue_limit_flag: @config[:enqueue_limit].present?)
+            check_enqueue(enqueue_limit, enqueue_throttle, job, key, label, enqueue_limit_flag: @config[:enqueue_limit].present?)
           elsif stage == :perform
             perform_limit = limit(job, :perform_limit) || limit(job, :total_limit)
             perform_throttle = throttle(job, :perform_throttle)
-
             return nil unless perform_limit || perform_throttle
 
-            exceeded = check_perform(perform_limit, perform_throttle, job)
+            check_perform(perform_limit, perform_throttle, job, key, label)
           end
-
-          exceeded
         end
 
         def key(job)
-          @_key ||= begin
-            key_spec = @config[:key]
-            if key_spec.blank?
-              "label:#{label(job)}"
-            else
-              key_value = key_spec.respond_to?(:call) ? job.instance_exec(&key_spec) : key_spec
-              raise TypeError, "Concurrency key must be a String; was a #{key_value.class}" if key_value.present? && VALID_TYPES.none? { |type| key_value.is_a?(type) }
+          key_spec = @config[:key]
+          if key_spec.blank?
+            "label:#{label(job)}"
+          else
+            key_value = key_spec.respond_to?(:call) ? job.instance_exec(&key_spec) : key_spec
+            raise TypeError, "Concurrency key must be a String; was a #{key_value.class}" if key_value.present? && VALID_TYPES.none? { |type| key_value.is_a?(type) }
 
-              key_value
-            end
+            key_value
           end
         end
 
         def label(job)
-          @_label ||= begin
-            label_spec = @config[:label]
+          label_spec = @config[:label]
 
-            if label_spec.present?
-              label_spec.respond_to?(:call) ? job.instance_exec(&label_spec) : label_spec
-            end
-          end
-        end
+          return if label_spec.blank?
 
-        def query_scope(job)
-          @_query_scope ||= if label(job).present?
-                              GoodJob::Job.labeled(label(job))
-                            else
-                              GoodJob::Job
-                            end
+          label_spec.respond_to?(:call) ? job.instance_exec(&label_spec) : label_spec
         end
 
         def limit(job, limit_name)
@@ -93,12 +78,23 @@ module GoodJob
           value
         end
 
-        def check_enqueue(limit, throttle, job, enqueue_limit_flag: false)
-          exceeded = nil
-          key = key(job)
-          return nil unless job.good_job_labels.include?(label(job))
+        private
 
-          query_scope = query_scope(job)
+        def query_scope(label, key)
+          if label.present?
+            GoodJob::Job.labeled(label)
+          elsif @config.key?(:key) && key.present?
+            GoodJob::Job.where(concurrency_key: key)
+          else
+            GoodJob::Job
+          end
+        end
+
+        def check_enqueue(limit, throttle, job, key, label, enqueue_limit_flag: false)
+          return nil if label.present? && job.good_job_labels.exclude?(label)
+
+          query_scope = query_scope(label, key)
+          exceeded = nil
 
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
@@ -125,7 +121,7 @@ module GoodJob
                                          .count
 
                 if (enqueued_within_period + 1) > throttle_limit
-                  job.logger.info "Aborted enqueue of #{self.class.name} (Job ID: #{job.id}) because the concurrency key '#{key}' has reached its throttle limit of #{throttle_limit} #{'job'.pluralize(throttle_limit)}"
+                  job.logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its throttle limit of #{throttle_limit} #{'job'.pluralize(throttle_limit)}"
                   exceeded = :throttle
                   next
                 end
@@ -136,16 +132,15 @@ module GoodJob
             # even though nothing has been altered in the transaction.
             raise ActiveRecord::Rollback
           end
+
           exceeded
         end
 
-        def check_perform(limit, throttle, job)
-          exceeded = nil
-          label = label(job)
-          return nil unless job.good_job_labels.include?(label(job))
+        def check_perform(limit, throttle, job, key, label)
+          return nil if label.present? && job.good_job_labels.exclude?(label)
 
-          query_scope = query_scope(job)
-          key = key(job)
+          query_scope = query_scope(label, key)
+          exceeded = nil
 
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
@@ -154,7 +149,7 @@ module GoodJob
                                                     .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
                                                     .limit(limit).pluck(:active_job_id)
                 # The current job has already been locked and will appear in the previous query
-                unless allowed_active_job_ids.include?(job.id)
+                unless allowed_active_job_ids.include?(job.job_id)
                   exceeded = :limit
                   next
                 end
@@ -164,9 +159,7 @@ module GoodJob
                 throttle_limit = throttle[0]
                 throttle_period = throttle[1]
 
-                # use query_scope here?
-                execution_base = Execution.joins(:job)
-                                          .where("#{GoodJob::Job.table_name}.labels && ARRAY[?]::text[]", [label])
+                execution_base = Execution.joins(:job).merge(query_scope)
 
                 query = execution_base
                         .where(Execution.arel_table[:created_at].gt(Execution.bind_value('created_at', throttle_period.ago, ActiveRecord::Type::DateTime)))
@@ -176,12 +169,16 @@ module GoodJob
                                               .limit(throttle_limit)
                                               .pluck(:active_job_id)
 
-                unless allowed_active_job_ids.include?(job.id)
+                unless allowed_active_job_ids.include?(job.job_id)
                   exceeded = :throttle
                   next
                 end
               end
             end
+
+            # Rollback the transaction because it's potentially less expensive than committing it
+            # even though nothing has been altered in the transaction.
+            raise ActiveRecord::Rollback
           end
 
           exceeded
@@ -221,35 +218,19 @@ module GoodJob
           # Always allow jobs to be retried because the current job's execution will complete momentarily
           next if CurrentThread.active_job_id == job.job_id
 
-          exceeded = nil
+          rules = job.class.good_job_concurrency_rules
 
-          # If rules are defined, evaluate each rule and use label- or key-based queries
-          if job.class.good_job_concurrency_rules.present?
-            job.class.good_job_concurrency_rules.each do |rule|
-              exceeded = rule.evaluate(job, :enqueue)
-
-              break if exceeded
-            end
+          # Only generate the concurrency key on the initial enqueue in case it is dynamic
+          if job.class.good_job_concurrency_config.present?
+            job.good_job_concurrency_key ||= job._good_job_concurrency_key
+            legacy_key = job.good_job_concurrency_key
+            rules = [Rule.new(job.class.good_job_concurrency_config.merge(key: legacy_key)), *rules] if legacy_key.present?
           end
 
-          # Support for legacy concurrency configuration
-          # Only generate the concurrency key on the initial enqueue in case it is dynamic
-          job.good_job_concurrency_key ||= job._good_job_concurrency_key
-          key = job.good_job_concurrency_key
-
-          if key.present? && exceeded.nil?
-            # Create a Rule instance from the legacy configuration for easy limit / throttle resolution
-            rule = Rule.new({
-                              enqueue_limit: job.class.good_job_concurrency_config[:enqueue_limit],
-                              total_limit: job.class.good_job_concurrency_config[:total_limit],
-                              enqueue_throttle: job.class.good_job_concurrency_config[:enqueue_throttle],
-                            })
-
-            limit = rule.limit(job, :enqueue_limit) || rule.limit(job, :total_limit)
-            throttle = rule.throttle(job, :enqueue_throttle)
-            next unless limit || throttle
-
-            exceeded = job._check_enqueue(limit, throttle, key, enqueue_limit_flag: job.class.good_job_concurrency_config[:enqueue_limit].present?)
+          exceeded = nil
+          rules.each do |rule|
+            exceeded = rule.evaluate(job, :enqueue)
+            break if exceeded
           end
 
           throw :abort if exceeded
@@ -264,33 +245,17 @@ module GoodJob
             next
           end
 
-          exceeded = nil
+          rules = job.class.good_job_concurrency_rules
 
-          # If rules are defined, evaluate each rule and use label- or key-based queries
-          if job.class.good_job_concurrency_rules.present?
-            job.class.good_job_concurrency_rules.each do |rule|
-              exceeded = rule.evaluate(job, :perform)
-
-              break if exceeded
-            end
+          if job.class.good_job_concurrency_config.present?
+            legacy_key = job.good_job_concurrency_key
+            rules = [Rule.new(job.class.good_job_concurrency_config.merge(key: legacy_key)), *rules] if legacy_key.present?
           end
 
-          # Support for legacy concurrency configuration
-          key = job.good_job_concurrency_key
-          if key.present? && exceeded.nil?
-
-            # Create a Rule instance from the legacy configuration for easy limit / throttle resolution
-            rule = Rule.new({
-                              perform_limit: job.class.good_job_concurrency_config[:perform_limit],
-                              total_limit: job.class.good_job_concurrency_config[:total_limit],
-                              perform_throttle: job.class.good_job_concurrency_config[:perform_throttle],
-                            })
-
-            limit = rule.limit(job, :perform_limit) || rule.limit(job, :total_limit)
-            throttle = rule.throttle(job, :perform_throttle)
-            next unless limit || throttle
-
-            exceeded = job._check_perform(limit, throttle, key)
+          exceeded = nil
+          rules.each do |rule|
+            exceeded = rule.evaluate(job, :perform)
+            break if exceeded
           end
 
           if exceeded == :limit
@@ -340,112 +305,6 @@ module GoodJob
       # @return [String] concurrency key
       def _good_job_default_concurrency_key
         self.class.name.to_s
-      end
-
-      # The following enqueue and perform concurrency check methods are retained
-      # for legacy support of the good_job_concurrency_config settings.
-
-      # Enqueue concurrency check
-      # @param limit [Numeric] concurrency limit
-      # @param throttle [Array] concurrency throttle
-      # @param key [String] concurrency key
-      # @param enqueue_limit_flag [Boolean] whether the limit is an enqueue limit
-      # @return [Symbol, nil] :limit or :throttle if exceeded, otherwise nil
-      def _check_enqueue(limit, throttle, key, enqueue_limit_flag: false)
-        exceeded = nil
-
-        GoodJob::Job.transaction(requires_new: true, joinable: false) do
-          GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
-            query_base = GoodJob::Job.where(concurrency_key: key)
-            if limit
-
-              # Use advisory_unlocked when enqueue_limit_flag is set
-              enqueue_concurrency = if enqueue_limit_flag
-                                      query_base.unfinished.advisory_unlocked.count
-                                    else
-                                      query_base.unfinished.count
-                                    end
-
-              if (enqueue_concurrency + 1) > limit
-                logger.info "Aborted enqueue of #{self.class.name} (Job ID: #{job_id}) because the concurrency key '#{key}' has reached its enqueue limit of #{limit} #{'job'.pluralize(limit)}"
-                exceeded = :limit
-                next
-              end
-            end
-
-            if throttle
-              throttle_limit = throttle[0]
-              throttle_period = throttle[1]
-              enqueued_within_period = query_base.where(GoodJob::Job.arel_table[:created_at].gt(throttle_period.ago))
-                                                 .count
-
-              if (enqueued_within_period + 1) > throttle_limit
-                logger.info "Aborted enqueue of #{self.class.name} (Job ID: #{job_id}) because the concurrency key '#{key}' has reached its throttle limit of #{throttle_limit} #{'job'.pluralize(throttle_limit)}"
-                exceeded = :throttle
-                next
-              end
-            end
-          end
-
-          # Rollback the transaction because it's potentially less expensive than committing it
-          # even though nothing has been altered in the transaction.
-          raise ActiveRecord::Rollback
-        end
-
-        exceeded
-      end
-
-      # Perform concurrency check
-      # @param limit [Numeric] concurrency limit
-      # @param throttle [Array] concurrency throttle
-      # @param key [String] concurrency key
-      # @return [Symbol, nil] :limit or :throttle if exceeded, otherwise nil
-      def _check_perform(limit, throttle, key)
-        exceeded = nil
-
-        GoodJob::Job.transaction(requires_new: true, joinable: false) do
-          GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
-            if limit
-              query_base = GoodJob::Job.where(concurrency_key: key)
-
-              allowed_active_job_ids = query_base.unfinished.advisory_locked
-                                                 .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
-                                                 .limit(limit).pluck(:active_job_id)
-              # The current job has already been locked and will appear in the previous query
-              unless allowed_active_job_ids.include?(job_id)
-                exceeded = :limit
-                next
-              end
-            end
-
-            if throttle
-              throttle_limit = throttle[0]
-              throttle_period = throttle[1]
-
-              execution_base = Execution.joins(:job)
-                                        .where(GoodJob::Job.table_name => { concurrency_key: key })
-
-              query_base = execution_base
-                           .where(Execution.arel_table[:created_at].gt(Execution.bind_value('created_at', throttle_period.ago, ActiveRecord::Type::DateTime)))
-
-              allowed_active_job_ids = query_base.where(error: nil).or(query_base.where.not(error: "GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError: GoodJob::ActiveJobExtensions::Concurrency::ThrottleExceededError"))
-                                                 .order(created_at: :asc)
-                                                 .limit(throttle_limit)
-                                                 .pluck(:active_job_id)
-
-              unless allowed_active_job_ids.include?(job_id)
-                exceeded = :throttle
-                next
-              end
-            end
-          end
-
-          # Rollback the transaction because it's potentially less expensive than committing it
-          # even though nothing has been altered in the transaction.
-          raise ActiveRecord::Rollback
-        end
-
-        exceeded
       end
     end
   end
