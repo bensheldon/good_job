@@ -30,7 +30,7 @@ module GoodJob
 
     def queues
       base_query.group(:queue_name).count
-                .sort_by { |name, _count| name.to_s || EMPTY }
+                .sort_by { |name, _count| name.presence || EMPTY }
                 .to_h
     end
 

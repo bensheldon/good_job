@@ -19,6 +19,16 @@ module GoodJob
       end
     end
 
+    def self.cron_keys_enabled(keys_with_defaults)
+      cron_disabled = find_by(key: CRON_KEYS_DISABLED)&.value || []
+      cron_enabled = find_by(key: CRON_KEYS_ENABLED)&.value || []
+
+      keys_with_defaults.to_h do |key, default|
+        key_s = key.to_s
+        [key_s, default ? cron_disabled.exclude?(key_s) : cron_enabled.include?(key_s)]
+      end
+    end
+
     def self.cron_key_enable(key)
       key_string = key.to_s
       enabled_setting = find_or_initialize_by(key: CRON_KEYS_ENABLED) do |record|
@@ -50,7 +60,7 @@ module GoodJob
     end
 
     def self.pause(queue: nil, job_class: nil, label: nil)
-      raise ArgumentError, "Must provide exactly one of queue, job_class, or label" unless [queue, job_class, label].count(&:present?) == 1
+      raise ArgumentError, "Must provide exactly one of queue, job_class, or label" unless [queue, job_class, label].one?(&:present?)
 
       setting = find_or_initialize_by(key: PAUSES) do |record|
         record.value = { "queues" => [], "job_classes" => [], "labels" => [] }
@@ -70,7 +80,7 @@ module GoodJob
     end
 
     def self.unpause(queue: nil, job_class: nil, label: nil)
-      raise ArgumentError, "Must provide exactly one of queue, job_class, or label" unless [queue, job_class, label].count(&:present?) == 1
+      raise ArgumentError, "Must provide exactly one of queue, job_class, or label" unless [queue, job_class, label].one?(&:present?)
 
       setting = find_by(key: PAUSES)
       return unless setting
@@ -92,7 +102,7 @@ module GoodJob
     end
 
     def self.paused?(queue: nil, job_class: nil, label: nil)
-      raise ArgumentError, "Must provide at most one of queue, job_class, or label" if [queue, job_class, label].count(&:present?) > 1
+      raise ArgumentError, "Must provide at most one of queue, job_class, or label" if [queue, job_class, label].many?(&:present?)
 
       if queue
         queue.in? paused(:queues)
@@ -127,3 +137,5 @@ module GoodJob
     end
   end
 end
+
+ActiveSupport.run_load_hooks(:good_job_setting, GoodJob::Setting)

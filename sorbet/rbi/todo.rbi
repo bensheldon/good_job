@@ -5,6 +5,7 @@
 # typed: false
 
 module ::ACTIVE_EVENT; end
+module ::ConcurrencyJob; end
 module ::CustomError; end
 module ::DONE; end
 module ::DiscardableError; end
@@ -17,7 +18,6 @@ module ::JOB_PERFORMED; end
 module ::JOB_RUNNING_EVENT; end
 module ::JobError; end
 module ::LATCH; end
-module ::MemoryProfiler; end
 module ::PERFORMED; end
 module ::POLL_COUNT; end
 module ::PROCESS_IDS; end
@@ -35,15 +35,12 @@ module ::THREAD_JOBS; end
 module ::TestError; end
 module ::TestJob; end
 module ::SuccessJob; end
-module ::ErrorJob; end
 module ::WAIT_EVENT; end
 module ::TestJob::Error; end
 module ::TestJob::ExpectedError; end
 module ::TestJob::RunError; end
 module ::TestJob::SuccessCallbackJob; end
 module ::SomeClass; end
-module ::SuccessJob; end
-module ::ErrorJob; end
 module ::ErrorJob::Error; end
 module ::TestRecord; end
 module ::WrapperJob; end
@@ -55,3 +52,7 @@ module ::AutoloadModule::Error; end
 module UnhandledErrorJob; end
 module DiscardedErrorJob; end
 module RetryStoppedErrorJob; end
+module ::BLOCKING_LATCH; end
+module ::BlockingJob; end
+module ::LockCapturingJob; end
+

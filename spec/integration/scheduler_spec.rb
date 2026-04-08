@@ -113,7 +113,7 @@ RSpec.describe 'Schedule Integration' do
       scheduler.create_thread
 
       sleep_until(max: 10, increments_of: 0.5) do
-        GoodJob::Job.unfinished.count.zero?
+        GoodJob::Job.unfinished.none?
       end
       scheduler.shutdown
       expect(scheduler).to be_shutdown
@@ -146,7 +146,7 @@ RSpec.describe 'Schedule Integration' do
       performer = GoodJob::JobPerformer.new('*')
       scheduler = GoodJob::Scheduler.new(performer, max_threads: 5, max_cache: 5)
       scheduler.warm_cache
-      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.unfinished.count.zero? }
+      sleep_until(max: 5, increments_of: 0.5) { GoodJob::Job.unfinished.none? }
       scheduler.shutdown
       expect(scheduler).to be_shutdown
     end

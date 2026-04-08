@@ -340,9 +340,7 @@ module GoodJob # :nodoc:
     class TimerSet < ::Concurrent::TimerSet
       # Number of scheduled jobs in the queue
       # @return [Integer]
-      def length
-        @queue.length
-      end
+      delegate :length, to: :@queue
 
       # Clear the queue
       # @return [void]

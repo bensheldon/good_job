@@ -358,7 +358,7 @@ Good Job’s general behavior can also be configured via attributes directly on 
     ```ruby
     # config/initializers/good_job.rb
     GoodJob.configure_active_record do
-      connects_to database: :special_database
+      connects_to database: { writing: :special_database }
       self.table_name_prefix = "special_application_"
     end
     ```
@@ -468,10 +468,11 @@ The Dashboard can be set to automatically refresh by checking "Live Poll" in the
 
 #### Extending dashboard views
 
-GoodJob exposes some views that are intended to be overriden by placing views in your application:
+GoodJob exposes some views that are intended to be overridden by placing views in your application:
 
-- [`app/views/good_job/jobs/_custom_job_details.html.erb`](app/views/good_job/_custom_job_details.html.erb): content added to this partial will be displayed above the argument list on the good_job/jobs#show page.
-- [`app/views/good_job/jobs/_custom_execution_details.html.erb`](app/views/good_job/_custom_execution_details.html.erb): content added to this partial will be displayed above each execution on the good_job/jobs#show page.
+- [`app/views/good_job/_custom_head.html.erb`](app/views/good_job/_custom_head.html.erb): content added to this partial will be added at the end of the `<head>` tag in all GoodJob views. This is ideal for injecting custom scripts or styles.
+- [`app/views/good_job/_custom_job_details.html.erb`](app/views/good_job/_custom_job_details.html.erb): content added to this partial will be displayed above the argument list on the good_job/jobs#show page.
+- [`app/views/good_job/_custom_execution_details.html.erb`](app/views/good_job/_custom_execution_details.html.erb): content added to this partial will be displayed above each execution on the good_job/jobs#show page.
 
 **Warning:** these partials expose classes (such as `GoodJob::Job`) that are considered internal implementation details of GoodJob. You should always test your custom partials after upgrading GoodJob.
 
@@ -1057,7 +1058,28 @@ end
 
 ### Timeouts
 
-Job timeouts can be configured with an `around_perform`:
+Avoid using Ruby's built-in [Timeout](https://github.com/ruby/timeout) mechanism
+([1](https://www.mikeperham.com/2015/05/08/timeout-rubys-most-dangerous-api/),
+[2](https://blog.headius.com/2008/02/rubys-threadraise-threadkill-timeoutrb.html)).
+Instead, declare either of Active Job's [discard_on](https://api.rubyonrails.org/classes/ActiveJob/Exceptions/ClassMethods.html#method-i-discard_on) or [retry_on](https://api.rubyonrails.org/classes/ActiveJob/Exceptions/ClassMethods.html#method-i-retry_on) to handle
+the underlying mechanism's timeout exceptions (when available).
+
+For example, rescue from `Net::OpenTimeout` or `Net::ReadTimeout` and discard
+the job:
+
+```ruby
+class MyJob < ApplicationJob
+  discard_on Net::OpenTimeout, Net::ReadTimeout
+
+  def perform(uri)
+    Net::HTTP.start(uri.host, uri.port, open_timeout: 3, read_timeout: 3) do |http|
+      http.request(...)
+    end
+  end
+end
+```
+
+If you have no other choice but to use a Ruby Timeout, it can be configured with an `around_perform`:
 
 ```ruby
 class ApplicationJob < ActiveJob::Base
@@ -1280,16 +1302,18 @@ Depending on your application configuration, you may need to take additional ste
     ```ruby
     # config/puma.rb
 
-    before_fork do
-      GoodJob.shutdown
-    end
+    if ENV.fetch("WEB_CONCURRENCY", 0).to_i > 0
+      before_fork do
+        GoodJob.shutdown
+      end
 
-    on_worker_boot do
-      GoodJob.restart
-    end
+      before_worker_boot do
+        GoodJob.restart
+      end
 
-    on_worker_shutdown do
-      GoodJob.shutdown
+      before_worker_shutdown do
+        GoodJob.shutdown
+      end
     end
 
     MAIN_PID = Process.pid
@@ -1412,6 +1436,53 @@ travel_to(15.minutes.from_now) { GoodJob.perform_inline }
 ```
 
 _Note: Rails `travel`/`travel_to` time helpers do not have millisecond precision, so you must leave at least 1 second between the schedule and time traveling for the job to be executed. This [behavior may change in Rails 7.1](https://github.com/rails/rails/pull/44088)._
+
+### SKIP LOCKED experimental mode
+
+By default, GoodJob claims jobs using PostgreSQL advisory locks. As an alternative, GoodJob can use `SELECT FOR UPDATE SKIP LOCKED` to claim jobs, which writes the lock state directly to the `good_jobs` table rather than relying on session-level advisory locks.
+
+Two strategies are available:
+
+- **`:skiplocked`** — Claims jobs using `SELECT FOR UPDATE SKIP LOCKED` only. No advisory locks are held. Compatible with PgBouncer in transaction mode.
+- **`:hybrid`** — Claims jobs using `SELECT FOR UPDATE SKIP LOCKED` and _also_ acquires a session-level advisory lock on the job. Intended for rolling deploys where some workers are still using the default `:advisory` strategy.
+
+Configure the lock strategy in an initializer or via environment variable:
+
+```ruby
+# config/initializers/good_job.rb
+GoodJob.configure do |config|
+  config.lock_strategy = :skiplocked
+end
+```
+
+```bash
+GOOD_JOB_LOCK_STRATEGY=skiplocked
+```
+
+All three strategies (`:advisory`, `:skiplocked`, `:hybrid`) can coexist safely during a rolling deploy — each strategy excludes jobs that are already locked by another worker regardless of which strategy that worker uses.
+
+#### PgBouncer configuration
+
+GoodJob's `:skiplocked` mode makes it compatible with PgBouncer in _transaction_ mode. In addition to setting the lock strategy, you must also disable the `LISTEN/NOTIFY` notifier (which requires a persistent connection) and rely on polling instead:
+
+```ruby
+# config/initializers/good_job.rb
+GoodJob.configure do |config|
+  config.lock_strategy = :skiplocked
+  config.enable_listen_notify = false
+  config.advisory_lock_heartbeat = false
+  config.poll_interval = 5 # seconds; tune based on your latency tolerance
+end
+```
+
+```bash
+GOOD_JOB_LOCK_STRATEGY=skiplocked
+GOOD_JOB_ENABLE_LISTEN_NOTIFY=false
+GOOD_JOB_ADVISORY_LOCK_HEARTBEAT=false
+GOOD_JOB_POLL_INTERVAL=5
+```
+
+With these four settings, GoodJob will not hold any session-level state between queries and is safe to use behind PgBouncer in transaction mode.
 
 ### PgBouncer compatibility
 
@@ -1746,7 +1817,7 @@ bin/rspec
 Environment variables that may help with debugging:
 
 - `LOUD=1`: display all stdout/stderr output from all sources. This is helpful because GoodJob wraps some tests with `quiet { }` for cleaner test output, but it can hinder debugging.
-- `SHOW_BROWSER=1`: Run system tests headfully with Chrome/Chromedriver. Use `binding.irb` in the system tests to pause.
+- `SHOW_BROWSER=1`: Run system tests headfully with Chrome/Cuprite. Use `binding.irb` in the system tests to pause.
 
 The gemfiles in `gemfiles/` can be used to run tests against different rails versions:
 

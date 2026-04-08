@@ -8,6 +8,7 @@ RSpec.describe GoodJob::ProbeServer do
 
   describe 'default rack app' do
     include Rack::Test::Methods
+
     let(:app) { described_class.default_app }
 
     it "responds to the expected routes" do

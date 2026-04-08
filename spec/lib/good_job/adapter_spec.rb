@@ -277,6 +277,12 @@ RSpec.describe GoodJob::Adapter do
     end
   end
 
+  describe '#stopping?' do
+    it 'is callable' do
+      expect { adapter.stopping? }.not_to raise_error
+    end
+  end
+
   describe '#execute_async?' do
     context 'when execution mode async_all' do
       let(:adapter) { described_class.new(execution_mode: :async_all) }

@@ -220,6 +220,8 @@ module GoodJob
       jobs_query = GoodJob::Job.finished_before(timestamp).order(finished_at: :asc).limit(in_batches_of)
       jobs_query = jobs_query.succeeded unless include_discarded
       loop do
+        break if GoodJob.current_thread_shutting_down?
+
         active_job_ids = jobs_query.pluck(:active_job_id)
         break if active_job_ids.empty?
 
@@ -233,6 +235,8 @@ module GoodJob
       batches_query = GoodJob::BatchRecord.finished_before(timestamp).limit(in_batches_of)
       batches_query = batches_query.succeeded unless include_discarded
       loop do
+        break if GoodJob.current_thread_shutting_down?
+
         deleted = batches_query.delete_all
         break if deleted.zero?
 
@@ -293,7 +297,7 @@ module GoodJob
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    GoodJob::Job.concurrency_key_created_at_index_migrated?
+    GoodJob::Job.lock_type_migrated?
   end
 
   # Pause job execution for a given queue or job class.

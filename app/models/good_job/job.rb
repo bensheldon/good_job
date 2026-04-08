@@ -4,6 +4,7 @@ module GoodJob
   # Active Record model that represents an +ActiveJob+ job.
   class Job < BaseRecord
     include AdvisoryLockable
+    include Lockable
     include ErrorEvents
     include Filterable
     include Reportable
@@ -32,6 +33,20 @@ module GoodJob
     self.advisory_lockable_column = 'id'
     self.implicit_order_column = 'created_at'
     self.ignored_columns += %w[is_discrete retried_good_job_id]
+
+    lock_type_enum = {
+      advisory: 0,
+      skiplocked: 1,
+      hybrid: 2,
+    }
+    # Declare the attribute explicitly so the enum can be defined even before the
+    # lock_type column migration has run (zero-downtime deployment safety).
+    attribute :lock_type, :integer
+    if Gem::Version.new(Rails.version) >= Gem::Version.new('7.1.0.a')
+      enum :lock_type, lock_type_enum, validate: { allow_nil: true }, scopes: false
+    else
+      enum lock_type: lock_type_enum, _scopes: false
+    end
 
     define_model_callbacks :perform
     define_model_callbacks :perform_unlocked, only: :after
@@ -239,7 +254,7 @@ module GoodJob
       end
 
       def params_job_class
-        json_string(arel_table['serialized_params'], 'job_class')
+        arel_table[:job_class]
       end
 
       def params_execution_count
@@ -250,11 +265,35 @@ module GoodJob
         )
       end
 
-      def concurrency_key_created_at_index_migrated?
-        return true if connection.index_name_exists?(:good_jobs, :index_good_jobs_on_concurrency_key_and_created_at)
+      def historic_finished_at_index_migrated?
+        return true unless connection.index_name_exists?(:good_jobs, :index_good_jobs_jobs_on_finished_at)
 
         migration_pending_warning!
         false
+      end
+
+      def lock_type_migrated?
+        return true if connection.index_name_exists?(:good_jobs, :index_good_jobs_for_candidate_dequeue_unlocked)
+
+        migration_pending_warning!
+        false
+      end
+
+      # Returns true if the lock_type column exists on the good_jobs table.
+      # Used to guard lock_type writes for zero-downtime deployment safety:
+      # if the migration hasn't run yet, all strategies fall back to :advisory.
+      def lock_type_column_exists?
+        return @_lock_type_column_exists if defined?(@_lock_type_column_exists)
+
+        @_lock_type_column_exists = connection_pool.with_connection { |conn| conn.column_exists?(:good_jobs, :lock_type) }
+      end
+
+      # Returns the effective lock strategy, falling back to :advisory if the
+      # lock_type column hasn't been migrated yet.
+      def effective_lock_strategy(strategy = GoodJob.configuration.lock_strategy)
+        return :advisory unless lock_type_column_exists?
+
+        strategy
       end
     end
 
@@ -317,24 +356,100 @@ module GoodJob
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
     def self.perform_with_advisory_lock(lock_id:, parsed_queues: nil, queue_select_limit: nil)
-      job = nil
       result = nil
 
-      unfinished.dequeueing_ordered(parsed_queues).only_scheduled.exclude_paused.limit(1).with_advisory_lock(select_limit: queue_select_limit) do |jobs|
-        job = jobs.first
+      job = unfinished.dequeueing_ordered(parsed_queues)
+                      .only_scheduled
+                      .exclude_paused
+                      .limit(1)
+                      .with_advisory_lock_claim(select_limit: queue_select_limit)
 
-        if job&.executable?
-          yield(job) if block_given?
+      if job&.executable?
+        yield(job) if block_given?
+        result = job.perform(lock_id: lock_id)
+      else
+        job&.advisory_unlock
+        job = nil
+        yield(nil) if block_given?
+      end
 
-          result = job.perform(lock_id: lock_id)
-        else
-          job = nil
-          yield(nil) if block_given?
-        end
+      result
+    ensure
+      job&.advisory_unlock
+      job&.run_callbacks(:perform_unlocked)
+    end
+
+    # Dispatches to the appropriate perform method based on lock_strategy.
+    # @param lock_id [String] Process UUID used as the lock identifier
+    # @param parsed_queues [Hash] Optional parsed queue config
+    # @param queue_select_limit [Integer, nil] Optional candidate selection limit
+    # @param lock_strategy [Symbol] One of :advisory, :skiplocked, :hybrid
+    # @yield [Job, nil] The claimed job, or nil if none found
+    # @return [ExecutionResult, nil]
+    def self.perform_with_lock(lock_id:, parsed_queues: nil, queue_select_limit: nil, lock_strategy: :advisory, &block)
+      lock_strategy = effective_lock_strategy(lock_strategy)
+      case lock_strategy
+      when :advisory   then perform_with_advisory_lock(lock_id: lock_id, parsed_queues: parsed_queues, queue_select_limit: queue_select_limit, &block)
+      when :skiplocked then perform_with_skip_locked(lock_id: lock_id, parsed_queues: parsed_queues, &block)
+      when :hybrid     then perform_with_hybrid_lock(lock_id: lock_id, parsed_queues: parsed_queues, &block)
+      end
+    end
+
+    # Claims and performs a job using SELECT FOR UPDATE SKIP LOCKED.
+    # No session-level advisory locks are acquired.
+    # @param lock_id [String] Process UUID used as the lock identifier
+    # @param parsed_queues [Hash] Optional parsed queue config
+    # @yield [Job, nil] The claimed job, or nil if none found
+    # @return [ExecutionResult, nil]
+    def self.perform_with_skip_locked(lock_id:, parsed_queues: nil)
+      result = nil
+
+      job = unfinished.where(locked_by_id: nil)
+                      .dequeueing_ordered(parsed_queues)
+                      .only_scheduled
+                      .exclude_paused
+                      .limit(1)
+                      .with_skip_locked_claim(locked_by_id: lock_id, locked_at: Time.current, lock_type: :skiplocked)
+
+      if job
+        yield(job) if block_given?
+        result = job.perform(lock_id: lock_id, already_claimed: true)
+      elsif block_given?
+        yield(nil)
       end
 
       job&.run_callbacks(:perform_unlocked)
       result
+    end
+
+    # Claims and performs a job using SELECT FOR UPDATE SKIP LOCKED combined with
+    # a session-level advisory lock for pg_locks visibility.
+    # @param lock_id [String] Process UUID used as the lock identifier
+    # @param parsed_queues [Hash] Optional parsed queue config
+    # @yield [Job, nil] The claimed job, or nil if none found
+    # @return [ExecutionResult, nil]
+    def self.perform_with_hybrid_lock(lock_id:, parsed_queues: nil)
+      result = nil
+
+      lease_connection # sticky connection; advisory lock must outlive this statement
+      job = unfinished.where(locked_by_id: nil)
+                      .dequeueing_ordered(parsed_queues)
+                      .only_scheduled
+                      .exclude_paused
+                      .limit(1)
+                      .with_hybrid_lock_claim(locked_by_id: lock_id, locked_at: Time.current, lock_type: :hybrid)
+
+      if job
+        yield(job) if block_given?
+        result = job.perform(lock_id: lock_id, already_claimed: true)
+      elsif block_given?
+        yield(nil)
+      end
+
+      result
+    ensure
+      job&.advisory_unlock # release session-level advisory lock
+      job&.run_callbacks(:perform_unlocked)
     end
 
     # Fetches the scheduled execution time of the next eligible Execution(s).
@@ -343,7 +458,7 @@ module GoodJob
     # @param now_limit [Integer, nil]
     # @return [Array<DateTime>]
     def self.next_scheduled_at(after: nil, limit: 100, now_limit: nil)
-      query = advisory_unlocked.unfinished.schedule_ordered
+      query = unfinished.where(locked_by_id: nil).schedule_ordered
 
       after ||= Time.current
       after_bind = bind_value('scheduled_at', after, ActiveRecord::Type::DateTime)
@@ -366,9 +481,13 @@ module GoodJob
     #   Epoch timestamp when the job should be executed, if blank will delegate to the ActiveJob instance
     # @param create_with_advisory_lock [Boolean]
     #   Whether to establish a lock on the {Execution} record after it is created.
+    # @param lock_id [String, nil]
+    #   When provided, sets locked_by_id/locked_at/lock_type on the job at creation (for inline non-advisory claiming).
+    # @param lock_type [Symbol, nil]
+    #   The lock type to record when +lock_id+ is given (e.g. +:skiplocked+, +:hybrid+).
     # @return [Execution]
     #   The new {Execution} instance representing the queued ActiveJob job.
-    def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false)
+    def self.enqueue(active_job, scheduled_at: nil, create_with_advisory_lock: false, lock_id: nil, lock_type: nil)
       ActiveSupport::Notifications.instrument("enqueue_job.good_job", { active_job: active_job, scheduled_at: scheduled_at, create_with_advisory_lock: create_with_advisory_lock }) do |instrument_payload|
         current_job = CurrentThread.job
 
@@ -392,6 +511,8 @@ module GoodJob
             job.create_with_advisory_lock = true
           end
         end
+
+        job.assign_attributes(locked_by_id: lock_id, locked_at: Time.current, lock_type: lock_type) if lock_id
 
         instrument_payload[:job] = job
         begin
@@ -418,6 +539,33 @@ module GoodJob
       raise ArgumentError unless error.is_a?(Exception)
 
       [error.class.to_s, ERROR_MESSAGE_SEPARATOR, error.message].join
+    end
+
+    # When code needs to optionally handle enqueue_after_transaction_commit
+    def self.defer_after_commit_maybe(good_job_or_active_job_classes)
+      if enqueue_after_commit?(good_job_or_active_job_classes)
+        ActiveRecord.after_all_transactions_commit { yield(true) }
+      else
+        yield(false)
+      end
+    end
+
+    def self.enqueue_after_commit?(good_job_or_active_job_classes)
+      good_job_or_active_job_classes = Array(good_job_or_active_job_classes)
+
+      feature_exists = ActiveRecord.respond_to?(:after_all_transactions_commit)
+      feature_exists && good_job_or_active_job_classes.any? do |klass|
+        active_job_class = case klass
+                           when String
+                             klass.constantize
+                           when Job
+                             klass.job_class.constantize
+                           else
+                             klass
+                           end
+
+        active_job_class.respond_to?(:enqueue_after_transaction_commit)
+      end
     end
 
     # TODO: it would be nice to enforce these values at the model
@@ -471,9 +619,9 @@ module GoodJob
     def running?
       # Avoid N+1 Query: `.includes_advisory_locks`
       if has_attribute?(:locktype)
-        self['locktype'].present?
+        self['locktype'].present? || locked_by_id.present?
       else
-        advisory_locked?
+        advisory_locked? || locked_by_id.present?
       end
     end
 
@@ -499,41 +647,46 @@ module GoodJob
     # This action will create a new {Execution} record for the job.
     # @return [ActiveJob::Base]
     def retry_job
-      with_advisory_lock do
-        reload
-        active_job = self.active_job(ignore_deserialization_errors: true)
+      Rails.application.executor.wrap do
+        with_advisory_lock do
+          reload
+          active_job = self.active_job(ignore_deserialization_errors: true)
 
-        raise ActiveJobDeserializationError if active_job.nil?
-        raise AdapterNotGoodJobError unless active_job.class.queue_adapter.is_a? GoodJob::Adapter
-        raise ActionForStateMismatchError if finished_at.blank? || error.blank?
+          raise ActiveJobDeserializationError if active_job.nil?
+          raise AdapterNotGoodJobError unless active_job.class.queue_adapter.is_a? GoodJob::Adapter
+          raise ActionForStateMismatchError if finished_at.blank? || error.blank?
 
-        # Update the executions count because the previous execution will not have been preserved
-        # Do not update `exception_executions` because that comes from rescue_from's arguments
-        active_job.executions = (active_job.executions || 0) + 1
+          # Update the executions count because the previous execution will not have been preserved
+          # Do not update `exception_executions` because that comes from rescue_from's arguments
+          active_job.executions = (active_job.executions || 0) + 1
 
-        begin
-          error_class, error_message = error.split(ERROR_MESSAGE_SEPARATOR).map(&:strip)
-          error = error_class.constantize.new(error_message)
-        rescue StandardError
-          error = StandardError.new(error)
-        end
+          begin
+            error_class, error_message = error.split(ERROR_MESSAGE_SEPARATOR).map(&:strip)
+            error = error_class.constantize.new(error_message)
+          rescue StandardError
+            error = StandardError.new(error)
+          end
 
-        new_active_job = nil
-        GoodJob::CurrentThread.within do |current_thread|
-          current_thread.job = self
-          current_thread.retry_now = true
+          new_active_job = nil
 
           transaction do
-            # NOTE: Required until fixed in rails https://github.com/rails/rails/pull/52121
-            I18n.with_locale(active_job.locale) do
-              new_active_job = active_job.retry_job(wait: 0, error: error)
+            Job.defer_after_commit_maybe(active_job.class) do
+              GoodJob::CurrentThread.within do |current_thread|
+                current_thread.job = self
+                current_thread.retry_now = true
+
+                # NOTE: I18n.with_locale necessary until fixed in rails https://github.com/rails/rails/pull/52121
+                I18n.with_locale(active_job.locale) do
+                  new_active_job = active_job.retry_job(wait: 0, error: error)
+                end
+              end
             end
             self.error_event = :retried if error
             save!
           end
-        end
 
-        new_active_job
+          new_active_job
+        end
       end
     end
 
@@ -591,11 +744,13 @@ module GoodJob
     end
 
     # Execute the ActiveJob job this {Execution} represents.
+    # @param lock_id [String] Process UUID used as the lock identifier
+    # @param already_claimed [Boolean] When true, skips writing lock columns (already set by CTE claim)
     # @return [ExecutionResult]
     #   An array of the return value of the job's +#perform+ method and the
     #   exception raised by the job, if any. If the job completed successfully,
     #   the second array entry (the exception) will be +nil+ and vice versa.
-    def perform(lock_id:)
+    def perform(lock_id:, already_claimed: false)
       run_callbacks(:perform) do
         raise PreviouslyPerformedError, 'Cannot perform a job that has already been performed' if finished_at
 
@@ -636,9 +791,12 @@ module GoodJob
             job_attrs = {
               performed_at: job_performed_at,
               executions_count: ((executions_count || 0) + 1),
-              locked_by_id: lock_id,
-              locked_at: Time.current,
             }
+            unless already_claimed
+              job_attrs[:locked_by_id] = lock_id
+              job_attrs[:locked_at] = Time.current
+              job_attrs[:lock_type] = :advisory if self.class.lock_type_column_exists?
+            end
 
             execution = executions.create!(execution_attrs)
             update!(job_attrs)
@@ -693,6 +851,7 @@ module GoodJob
         end
 
         job_attributes = { locked_by_id: nil, locked_at: nil }
+        job_attributes[:lock_type] = nil if self.class.lock_type_column_exists?
 
         job_error = result.handled_error || result.unhandled_error
         if job_error

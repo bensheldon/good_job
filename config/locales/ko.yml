@@ -191,6 +191,10 @@ ko:
         last_run: 마지막 실행 일시
         next_scheduled: 다음 예정 일시
         schedule: 스케줄
+        states:
+          active: 활성
+          paused: 일시정지
+        status: 상태
       job:
         arguments: 인수
         attempts: 시도 횟수

@@ -20,7 +20,7 @@ FileUtils.chdir GEM_ROOT do
 
   system! "bundle exec srb tc", failure: <<~MESSAGE
     You may need to run one of the following commands
-      1. Regenerate gem RBIs by running `bin/tapioca gem --all` and `bin/tapioca annotations`
+      1. Regenerate gem RBIs by running `bin/tapioca gem --all --verbose` and `bin/tapioca annotations`
       2. Generate RBIs for DSLs by running `bin/tapioca dsl`
       3. If the missing constants are defined in files that a gem does not load by default,
          manually require those files in `sorbet/tapioca/require.rb` and regenerate gem RBIs
@@ -39,10 +39,13 @@ FileUtils.chdir GEM_ROOT do
     flags << '--parallel'
   end
 
-  system! "bundle exec rubocop #{flags.join(' ')}"
+  system! "bundle exec rubocop --no-server #{flags.join(' ')}"
 
   puts "\n== YARD =="
   system! "bundle exec yard stats --no-cache --fail-on-warning"
+
+  puts "\n== Herb =="
+  system! "bundle exec herb analyze app"
 
   puts "\n== ERB Lint =="
   if options[:nofix]

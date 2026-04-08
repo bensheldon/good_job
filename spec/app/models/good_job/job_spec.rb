@@ -89,6 +89,19 @@ RSpec.describe GoodJob::Job do
         expect(job_with_locktype).to be_running
       end
     end
+
+    context 'when locked_by_id is set (skiplocked/hybrid strategies)' do
+      it 'is true without advisory lock data loaded' do
+        job.update!(locked_by_id: SecureRandom.uuid, locked_at: Time.current)
+        expect(job.reload).to be_running
+      end
+
+      it 'is true when advisory lock data is loaded but no advisory lock held' do
+        job.update!(locked_by_id: SecureRandom.uuid, locked_at: Time.current)
+        job_with_locktype = described_class.where(id: job.id).includes_advisory_locks.first
+        expect(job_with_locktype).to be_running
+      end
+    end
   end
 
   describe '#finished?' do
@@ -512,6 +525,142 @@ RSpec.describe GoodJob::Job do
       end
     end
 
+    describe '.perform_with_lock' do
+      let(:active_job) { TestJob.new('a string') }
+      let!(:good_job) { described_class.enqueue(active_job) }
+
+      it 'dispatches to perform_with_advisory_lock when strategy is :advisory' do
+        allow(described_class).to receive(:perform_with_advisory_lock).and_call_original
+        described_class.perform_with_lock(lock_id: process_id, lock_strategy: :advisory)
+        expect(described_class).to have_received(:perform_with_advisory_lock)
+      end
+
+      it 'dispatches to perform_with_skip_locked when strategy is :skiplocked' do
+        allow(described_class).to receive(:perform_with_skip_locked).and_call_original
+        described_class.perform_with_lock(lock_id: process_id, lock_strategy: :skiplocked)
+        expect(described_class).to have_received(:perform_with_skip_locked)
+      end
+
+      it 'dispatches to perform_with_hybrid_lock when strategy is :hybrid' do
+        allow(described_class).to receive(:perform_with_hybrid_lock).and_call_original
+        described_class.perform_with_lock(lock_id: process_id, lock_strategy: :hybrid)
+        expect(described_class).to have_received(:perform_with_hybrid_lock)
+      end
+
+      it 'falls back to :advisory when lock_type column does not exist' do
+        allow(described_class).to receive(:lock_type_column_exists?).and_return(false)
+        allow(described_class).to receive(:perform_with_advisory_lock).and_call_original
+
+        described_class.perform_with_lock(lock_id: process_id, lock_strategy: :skiplocked)
+        described_class.perform_with_lock(lock_id: process_id, lock_strategy: :hybrid)
+
+        expect(described_class).to have_received(:perform_with_advisory_lock).twice
+      end
+    end
+
+    describe '.perform_with_skip_locked' do
+      let(:active_job) { TestJob.new('a string') }
+      let!(:good_job) { described_class.enqueue(active_job) }
+
+      it 'performs the job and returns an ExecutionResult' do
+        result = described_class.perform_with_skip_locked(lock_id: process_id)
+
+        expect(result).to be_a GoodJob::ExecutionResult
+        expect(result.value).to eq 'a string'
+        expect(result.unhandled_error).to be_nil
+      end
+
+      it 'yields the job before performing it' do
+        yielded_job = nil
+        described_class.perform_with_skip_locked(lock_id: process_id) do |job|
+          yielded_job = job
+        end
+
+        expect(yielded_job).to eq good_job
+      end
+
+      it 'yields nil when no eligible job is found' do
+        good_job.update!(finished_at: Time.current)
+        yielded = :not_called
+
+        described_class.perform_with_skip_locked(lock_id: process_id) do |job|
+          yielded = job
+        end
+
+        expect(yielded).to be_nil
+      end
+
+      it 'sets lock_type to skiplocked and clears it after completion' do
+        described_class.perform_with_skip_locked(lock_id: process_id) do |job|
+          expect(job.lock_type).to eq 'skiplocked'
+          expect(job.locked_by_id).to eq process_id
+        end
+
+        expect(good_job.reload.lock_type).to be_nil
+        expect(good_job.reload.locked_by_id).to be_nil
+        expect(good_job.reload.locked_at).to be_nil
+      end
+
+      it 'skips jobs with locked_by_id already set' do
+        good_job.update!(locked_by_id: SecureRandom.uuid, locked_at: Time.current)
+
+        result = described_class.perform_with_skip_locked(lock_id: process_id)
+        expect(result).to be_nil
+      end
+
+      it 'does not hold an advisory lock during or after execution' do
+        described_class.perform_with_skip_locked(lock_id: process_id)
+
+        expect(PgLock.current_database.advisory_lock.owns.count).to eq 0
+      end
+    end
+
+    describe '.perform_with_hybrid_lock' do
+      let(:active_job) { TestJob.new('a string') }
+      let!(:good_job) { described_class.enqueue(active_job) }
+
+      it 'performs the job and returns an ExecutionResult' do
+        result = described_class.perform_with_hybrid_lock(lock_id: process_id)
+
+        expect(result).to be_a GoodJob::ExecutionResult
+        expect(result.value).to eq 'a string'
+        expect(result.unhandled_error).to be_nil
+      end
+
+      it 'yields the job before performing it' do
+        yielded_job = nil
+        described_class.perform_with_hybrid_lock(lock_id: process_id) do |job|
+          yielded_job = job
+        end
+
+        expect(yielded_job).to eq good_job
+      end
+
+      it 'sets lock_type to hybrid and clears it after completion' do
+        described_class.perform_with_hybrid_lock(lock_id: process_id) do |job|
+          expect(job.lock_type).to eq 'hybrid'
+          expect(job.locked_by_id).to eq process_id
+        end
+
+        expect(good_job.reload.lock_type).to be_nil
+        expect(good_job.reload.locked_by_id).to be_nil
+        expect(good_job.reload.locked_at).to be_nil
+      end
+
+      it 'does not hold an advisory lock after execution' do
+        described_class.perform_with_hybrid_lock(lock_id: process_id)
+
+        expect(PgLock.current_database.advisory_lock.owns.count).to eq 0
+      end
+
+      it 'skips jobs with locked_by_id already set' do
+        good_job.update!(locked_by_id: SecureRandom.uuid, locked_at: Time.current)
+
+        result = described_class.perform_with_hybrid_lock(lock_id: process_id)
+        expect(result).to be_nil
+      end
+    end
+
     describe '.queue_parser' do
       it 'creates an intermediary hash' do
         result = described_class.queue_parser('first,second')
@@ -567,7 +716,6 @@ RSpec.describe GoodJob::Job do
       let!(:large_priority_job) { described_class.create!(priority: 50) }
 
       it 'orders with smaller number being HIGHER priority' do
-        allow(Rails.application.config).to receive(:good_job).and_return({ smaller_number_is_higher_priority: true })
         expect(described_class.priority_ordered.pluck(:priority)).to eq([-50, 50])
       end
     end
@@ -658,6 +806,17 @@ RSpec.describe GoodJob::Job do
     describe '#perform' do
       let(:active_job) { TestJob.new("a string") }
       let!(:good_job) { described_class.enqueue(active_job) }
+
+      context 'when lock_type column does not exist (pre-migration)' do
+        before { allow(described_class).to receive(:lock_type_column_exists?).and_return(false) }
+
+        it 'performs successfully without writing lock_type' do
+          result = good_job.perform(lock_id: process_id)
+          expect(result.value).to eq "a string"
+          expect(result.unhandled_error).to be_nil
+          expect(good_job.reload).to have_attributes(finished_at: be_present, locked_by_id: nil, locked_at: nil)
+        end
+      end
 
       describe 'return value' do
         it 'returns the results of the job' do
@@ -777,6 +936,44 @@ RSpec.describe GoodJob::Job do
           performed_at: within(1.second).of(Time.current),
           finished_at: within(1.second).of(Time.current)
         )
+      end
+
+      it 'sets lock_type to advisory and clears all lock columns on finish' do
+        good_job.perform(lock_id: process_id)
+
+        expect(good_job.reload).to have_attributes(
+          lock_type: nil,
+          locked_by_id: nil,
+          locked_at: nil,
+          finished_at: be_present
+        )
+      end
+
+      context 'with already_claimed: true (skiplocked/hybrid strategies)' do
+        before do
+          # Simulate the CTE having already claimed the job
+          good_job.update!(locked_by_id: process_id, locked_at: Time.current, lock_type: 'skiplocked')
+        end
+
+        it 'does not overwrite lock columns during perform' do
+          good_job.perform(lock_id: process_id, already_claimed: true)
+
+          # lock columns existed before perform and were cleared on finish
+          expect(good_job.reload).to have_attributes(
+            lock_type: nil,
+            locked_by_id: nil,
+            locked_at: nil
+          )
+        end
+
+        it 'sets performed_at and executions_count' do
+          good_job.perform(lock_id: process_id, already_claimed: true)
+
+          expect(good_job.reload).to have_attributes(
+            performed_at: within(1.second).of(Time.current),
+            executions_count: 1
+          )
+        end
       end
 
       it 'can destroy the job when preserve_job_records is false' do

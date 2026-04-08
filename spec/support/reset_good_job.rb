@@ -16,8 +16,8 @@ RSpec.configure do |config|
   config.around do |example|
     GoodJob.preserve_job_records = true
 
-    PgLock.current_database.advisory_lock.owns.all?(&:unlock) if PgLock.advisory_lock.owns.count > 0
-    PgLock.current_database.advisory_lock.others.each(&:unlock!) if PgLock.advisory_lock.others.count > 0
+    PgLock.current_database.advisory_lock.owns.all?(&:unlock) if PgLock.advisory_lock.owns.any?
+    PgLock.current_database.advisory_lock.others.each(&:unlock!) if PgLock.advisory_lock.others.any?
     expect(PgLock.current_database.advisory_lock.count).to eq(0), "Existing advisory locks BEFORE test run"
 
     GoodJob::CurrentThread.reset
@@ -134,14 +134,14 @@ ActiveSupport.on_load :active_record do
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend PostgresXidExtension
 end
 
-class PgStatActivity < ActiveRecord::Base
+class PgStatActivity < GoodJob::BaseRecord
   include GoodJob::OverridableConnection
 
   self.table_name = 'pg_stat_activity'
   self.primary_key = 'datid'
 end
 
-class PgLock < ActiveRecord::Base
+class PgLock < GoodJob::BaseRecord
   include GoodJob::OverridableConnection
 
   self.table_name = 'pg_locks'
@@ -214,13 +214,13 @@ class PgLock < ActiveRecord::Base
       ActiveRecord::Relation::QueryAttribute.new('classid', classid, ActiveRecord::Type::String.new),
       ActiveRecord::Relation::QueryAttribute.new('objid', objid, ActiveRecord::Type::String.new),
     ]
-    self.class.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', binds).first['unlocked']
+    self.class.lease_connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', binds).first['unlocked']
   end
 
   def unlock!
     query = <<~SQL.squish
       SELECT pg_terminate_backend(#{self[:pid]}) AS terminated
     SQL
-    self.class.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Terminate Backend Lock', []).first['terminated']
+    self.class.lease_connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Terminate Backend Lock', []).first['terminated']
   end
 end

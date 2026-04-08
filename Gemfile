@@ -3,12 +3,6 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby_version_path = File.join(File.dirname(__FILE__), '.ruby-version')
-if File.exist?(ruby_version_path)
-  # .ruby-version may not always contain a complete/valid 3+ identifier Ruby version
-  ruby_version_contents = File.read(ruby_version_path).strip
-  ruby(ruby_version_contents) if ruby_version_contents.match?(%r{\d+\.\d+\.\d+})
-end
 # Declare your gem's dependencies in good_job.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
@@ -20,7 +14,7 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
-gem 'pg', platforms: [:mri, :mingw, :x64_mingw]
+gem 'pg', platforms: [:mri, :windows]
 
 rails_versions = {
   "6.1" => { github: "rails/rails", branch: "6-1-stable" }, # https://github.com/bensheldon/good_job/issues/1280
@@ -28,9 +22,15 @@ rails_versions = {
   "7.1" => "~> 7.1.0",
   "7.2" => "~> 7.2.0",
   "8.0" => "~> 8.0.0",
+  "8.1" => "~> 8.1.0",
   "head" => { github: "rails/rails", branch: "main" },
 }
-gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", "8.0")]
+gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", "8.1")]
+
+# Ruby 4.0 has moved this gem to a bundled gem. Rails 6.1 doesn't declare it.
+install_if -> { ENV["RAILS_VERSION"] == "6.1" } do
+  gem "benchmark"
+end
 
 platforms :ruby do
   gem "bootsnap"
@@ -38,6 +38,7 @@ platforms :ruby do
   gem "foreman"
   gem "gem-release"
   gem "github_changelog_generator", require: false
+  gem "rdoc", require: false
   gem "warning"
 
   group :debug do
@@ -54,6 +55,7 @@ platforms :ruby do
     gem "brakeman"
     gem "easy_translate"
     gem "erb_lint"
+    gem "herb"
     gem "i18n-tasks"
     gem "mdl"
     gem "rubocop"

@@ -1,50 +1,112 @@
 {
   "ignored_warnings": [
     {
-      "warning_type": "Dynamic Render Path",
-      "warning_code": 15,
-      "fingerprint": "041ae0dc908151bac0ef0952c625f0dce3a05d2c01a710397a613ef10083f7ae",
-      "check_name": "Render",
-      "message": "Render path contains parameter value",
-      "file": "app/controllers/good_job/frontends_controller.rb",
-      "line": 47,
-      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(file => (self.class.js_modules[params[:id].to_sym] or raise(ActionController::RoutingError, \"Not Found\")), {})",
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "c27b4ea38ea42ec72c9343f4c59b81907e6df0d9bcece140bda3d4df82c44127",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/concerns/good_job/lockable.rb",
+      "line": 41,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "unscoped.find_by_sql([\"WITH candidate AS #{(\"MATERIALIZED \" or \"\")}(#{select(:id).lock(\"FOR NO KEY UPDATE SKIP LOCKED\").to_sql})\\nUPDATE #{adapter_class.quote_table_name(table_name)}\\nSET locked_by_id = ?,\\n    locked_at = ?,\\n    lock_type = ?\\nFROM candidate\\nWHERE #{adapter_class.quote_table_name(table_name)}.id = candidate.id\\nRETURNING #{adapter_class.quote_table_name(table_name)}.*\\n\".squish, locked_by_id, locked_at, lock_types[lock_type.to_s]])",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "GoodJob::FrontendsController",
-        "method": "module"
+        "class": "GoodJob::Lockable",
+        "method": "with_skip_locked_claim"
       },
-      "user_input": "params[:id].to_sym",
+      "user_input": "adapter_class.quote_table_name(table_name)",
       "confidence": "Weak",
-      "cwe_id": [
-        22
-      ],
-      "note": "Files are explicitly enumerated in the array"
+      "cwe_id": [89],
+      "note": "Table name is quoted via adapter_class.quote_table_name; candidate SQL is Rails-generated; values are parameterized bindings."
     },
     {
-      "warning_type": "Dynamic Render Path",
-      "warning_code": 15,
-      "fingerprint": "b0c2888c9b217671d90d0141b49b036af3b2a70c63b02968cc97ae2052c86272",
-      "check_name": "Render",
-      "message": "Render path contains parameter value",
-      "file": "app/controllers/good_job/frontends_controller.rb",
-      "line": 41,
-      "link": "https://brakemanscanner.org/docs/warning_types/dynamic_render_path/",
-      "code": "render(file => ({ :css => ({ :bootstrap => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"bootstrap\", \"bootstrap.min.css\"), :style => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"style.css\") }), :js => ({ :bootstrap => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"bootstrap\", \"bootstrap.bundle.min.js\"), :chartjs => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"chartjs\", \"chart.min.js\"), :es_module_shims => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"es_module_shims.js\"), :rails_ujs => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"vendor\", \"rails_ujs.js\") }), :svg => ({ :icons => GoodJob::Engine.root.join(\"app\", \"frontend\", \"good_job\", \"icons.svg\") }) }.dig(params[:format].to_sym, params[:id].to_sym) or raise(ActionController::RoutingError, \"Not Found\")), {})",
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "5e7e94f72997d95dd2fa079c0e3da0765d58dd500d7f1c62ae924b397a8662fd",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/concerns/good_job/lockable.rb",
+      "line": 71,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "unscoped.find_by_sql([\"WITH candidate AS #{(\"MATERIALIZED \" or \"\")}(#{select(:id).lock(\"FOR NO KEY UPDATE SKIP LOCKED\").to_sql})\\nUPDATE #{adapter_class.quote_table_name(table_name)}\\nSET locked_by_id = ?,\\n    locked_at = ?,\\n    lock_type = ?\\nFROM (\\n  SELECT id FROM candidate\\n  WHERE pg_try_advisory_lock(#{\"('x' || substr(md5(#{_quoted_table_name_string} || '-' || id::text), 1, 16))::bit(64)::bigint\"})\\n) AS locked\\nWHERE #{adapter_class.quote_table_name(table_name)}.id = locked.id\\nRETURNING #{adapter_class.quote_table_name(table_name)}.*\\n\".squish, locked_by_id, locked_at, lock_types[lock_type.to_s]])",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "GoodJob::FrontendsController",
-        "method": "static"
+        "class": "GoodJob::Lockable",
+        "method": "with_hybrid_lock_claim"
       },
-      "user_input": "params[:id].to_sym",
+      "user_input": "adapter_class.quote_table_name(table_name)",
+      "confidence": "Weak",
+      "cwe_id": [89],
+      "note": "Table name is quoted via adapter_class.quote_table_name; advisory lock expression uses _quoted_table_name_string (escaped); candidate SQL is Rails-generated; values are parameterized bindings."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "e3b77f1540f622502491e00b2825b0d5cb6cb3962017fa3ef18d4d463799f3fd",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/concerns/good_job/advisory_lockable.rb",
+      "line": 89,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "joins(\"LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'\\n  AND pg_locks.objsubid = 1\\n  AND pg_locks.classid = ...#{_quoted_table_name_string}...\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GoodJob",
+        "method": null
+      },
+      "user_input": "_quoted_table_name_string",
+      "confidence": "Medium",
+      "cwe_id": [89],
+      "note": "Values are quoted identifiers and an escaped table name string; not user input."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ffcbcbd3d170cb7e40cc3b7054e6157983b6ccdf7eab02bc1b0f525158b35248",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/concerns/good_job/advisory_lockable.rb",
+      "line": 89,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "joins(\"LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'\\n  AND pg_locks.objsubid = 1\\n  AND pg_locks.classid = ...#{_quoted_table_name_string}...\\n\".squish)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GoodJob::AdvisoryLockable",
+        "method": null
+      },
+      "user_input": "_quoted_table_name_string",
+      "confidence": "Medium",
+      "cwe_id": [89],
+      "note": "Values are quoted identifiers and an escaped table name string; not user input."
+    },
+    {
+      "warning_type": "Dangerous Eval",
+      "warning_code": 13,
+      "fingerprint": "c4c3e1b8b28ebbfd4672cf3e8f0022a27aff3c12dc4fea750b412de1387f91e6",
+      "check_name": "Evaluation",
+      "message": "Dynamic string evaluated as code",
+      "file": "lib/good_job/log_subscriber.rb",
+      "line": 256,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_eval/",
+      "code": "class_eval(\"        def #{level}(progname = nil, tags: [], &block)   # def info(progname = nil, tags: [], &block)\\n          return unless logger                           #   return unless logger\\n                                                         #\\n          tag_logger(*tags) do                           #   tag_logger(*tags) do\\n            logger.#{level}(progname, &block)            #     logger.info(progname, &block)\\n          end                                            #   end\\n        end                                              #\\n\", \"lib/good_job/log_subscriber.rb\", (256 + 1))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "LogSubscriber",
+        "method": null
+      },
+      "user_input": null,
       "confidence": "Weak",
       "cwe_id": [
-        22
+        913,
+        95
       ],
-      "note": "Files are explicitly enumerated in the array"
+      "note": ""
     },
     {
       "warning_type": "SQL Injection",
@@ -53,7 +115,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/good_job/job.rb",
-      "line": 135,
+      "line": 162,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql(\"(CASE #{queues.map.with_index do\n sanitize_sql_array([\"WHEN queue_name = ? THEN ?\", queue_name, index])\n end.join(\" \")} ELSE #{queues.size} END)\")",
       "render_path": null,
@@ -93,6 +155,5 @@
       "note": ""
     }
   ],
-  "updated": "2024-11-16 17:00:20 -0600",
-  "brakeman_version": "6.2.1"
+  "brakeman_version": "7.1.1"
 }

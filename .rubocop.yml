@@ -1,6 +1,6 @@
 inherit_from: .rubocop_todo.yml
 
-require:
+plugins:
   - rubocop-capybara
   - rubocop-performance
   - rubocop-rails
@@ -22,6 +22,7 @@ AllCops:
   Exclude:
     - pkg/**/*
     - demo/**/*
+    - sorbet/rbi/**/*
     - tmp/**/*
     - scripts/**/*
     - gemfiles/**/*
@@ -51,6 +52,10 @@ Layout/ParameterAlignment:
 Lint/AmbiguousBlockAssociation:
   Enabled: false
 
+Lint/DuplicateMethods:
+  Exclude:
+    - spec/**/* # broken with stub_const
+
 Lint/IncompatibleIoSelectWithFiberScheduler:
   Enabled: false
 
@@ -60,8 +65,14 @@ Metrics:
 Naming/MemoizedInstanceVariableName:
   EnforcedStyleForLeadingUnderscores: required
 
+Naming/PredicateMethod:
+  Enabled: false
+
 Naming/VariableNumber:
   EnforcedStyle: snake_case
+
+Rails/Exit:
+  Enabled: false
 
 Rails/ApplicationJob:
   Enabled: false
@@ -75,6 +86,9 @@ Rails/I18nLocaleTexts:
 Rails/Inquiry:
   Exclude:
     - spec/**/*
+
+Rails/Presence:
+  Enabled: false
 
 Rails/RakeEnvironment:
   Enabled: false
@@ -118,11 +132,17 @@ RSpec/MultipleMemoizedHelpers:
 RSpec/NestedGroups:
   Enabled: false
 
+RSpec/Output:
+  Enabled: false
+
 Style/Documentation:
   Enabled: false
 
 Style/EmptyMethod:
   EnforcedStyle: expanded
+
+Style/EmptyClassDefinition:
+  Enabled: false
 
 Style/FormatStringToken:
   EnforcedStyle: template
@@ -135,6 +155,9 @@ Style/MultilineBlockChain:
   Enabled: false
 
 Style/NumericLiterals:
+  Enabled: false
+
+Style/OneClassPerFile:
   Enabled: false
 
 Style/PercentLiteralDelimiters:
