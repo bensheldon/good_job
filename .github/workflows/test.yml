@@ -71,7 +71,7 @@ jobs:
         run: bin/rspec --require ./spec/support/pre_documentation_formatter.rb --format PreDocumentationFormatter
       # Archive
       - name: Archive system spec screenshots
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: screenshots-devenv
@@ -79,7 +79,7 @@ jobs:
             demo/tmp/screenshots
             demo/tmp/capybara
       - name: Archive Rails logs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: rails_logs-devenv
@@ -92,7 +92,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby: ["3.0", 3.1, 3.2, 3.3, 3.4]
+        ruby: ["3.0", 3.1, 3.2, 3.3, 3.4, "4.0"]
         gemfile: [rails_6.1, rails_7.0, rails_7.1, rails_7.2, rails_8.0, rails_8.1, rails_head]
         pg: [18]
         include:
@@ -113,10 +113,12 @@ jobs:
             gemfile: rails_8.1
           - ruby: 3.1
             gemfile: rails_8.1
-          # Rails head is >= 3.2
+          # Rails head is >= 3.3
           - ruby: "3.0"
             gemfile: rails_head
           - ruby: 3.1
+            gemfile: rails_head
+          - ruby: 3.2
             gemfile: rails_head
 
     env:
@@ -178,7 +180,7 @@ jobs:
 
       # Archive
       - name: Archive system spec screenshots
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: screenshots-${{ matrix.gemfile }}-${{ matrix.ruby }}-${{ matrix.pg }}
@@ -186,7 +188,7 @@ jobs:
             demo/tmp/screenshots
             demo/tmp/capybara
       - name: Archive Rails logs
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: rails_logs-${{ matrix.gemfile }}-${{ matrix.ruby }}-${{ matrix.pg }}

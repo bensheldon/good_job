@@ -1,5 +1,94 @@
 # Changelog
 
+## [v4.14.2](https://github.com/bensheldon/good_job/tree/v4.14.2) (2026-04-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.1...v4.14.2)
+
+**Closed issues:**
+
+- Incompatible with permanent\_connection\_checkout = :disallowed [\#1729](https://github.com/bensheldon/good_job/issues/1729)
+
+**Merged pull requests:**
+
+- Replace Base.connection with lease\_connection and with\_connection throughout [\#1730](https://github.com/bensheldon/good_job/pull/1730) ([bensheldon](https://github.com/bensheldon))
+
+## [v4.14.1](https://github.com/bensheldon/good_job/tree/v4.14.1) (2026-04-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.0...v4.14.1)
+
+**Fixed bugs:**
+
+- Fix N+1 queries on cron entries dashboard index page [\#1727](https://github.com/bensheldon/good_job/pull/1727) ([clinejj](https://github.com/clinejj))
+
+## [v4.14.0](https://github.com/bensheldon/good_job/tree/v4.14.0) (2026-03-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.3...v4.14.0)
+
+**Implemented enhancements:**
+
+- Consider using pg\_cron for Cron-style repeating/recurring jobs [\#328](https://github.com/bensheldon/good_job/issues/328)
+- Add Batch.enqueue\_all for bulk-enqueuing multiple batches [\#1726](https://github.com/bensheldon/good_job/pull/1726) ([AliOsm](https://github.com/AliOsm))
+- Allow perform\_all\_later to enqueue to Batches [\#1720](https://github.com/bensheldon/good_job/pull/1720) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- perform\_all\_later not intercepted by Batch [\#1719](https://github.com/bensheldon/good_job/issues/1719)
+- Deprecate and drop :on\_unhandled\_error option [\#1706](https://github.com/bensheldon/good_job/issues/1706)
+
+**Merged pull requests:**
+
+- Bump actions/upload-artifact from 6 to 7 [\#1718](https://github.com/bensheldon/good_job/pull/1718) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v4.13.3](https://github.com/bensheldon/good_job/tree/v4.13.3) (2026-02-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.2...v4.13.3)
+
+**Fixed bugs:**
+
+- Fix search\_text scope using mismatched text search configurations [\#1716](https://github.com/bensheldon/good_job/pull/1716) ([alexspeller](https://github.com/alexspeller))
+- --daemonize no longer changes working directory, fixes relative paths [\#1714](https://github.com/bensheldon/good_job/pull/1714) ([jamie](https://github.com/jamie))
+
+**Merged pull requests:**
+
+- Update suggested Puma config in README [\#1713](https://github.com/bensheldon/good_job/pull/1713) ([Spone](https://github.com/Spone))
+
+## [v4.13.2](https://github.com/bensheldon/good_job/tree/v4.13.2) (2026-01-29)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.1...v4.13.2)
+
+**Fixed bugs:**
+
+- Check for graceful shutdown inside job cleanup loops [\#1711](https://github.com/bensheldon/good_job/pull/1711) ([bdewater-thatch](https://github.com/bdewater-thatch))
+- Add title to Good Job Dashboard layout [\#1701](https://github.com/bensheldon/good_job/pull/1701) ([mockdeep](https://github.com/mockdeep))
+
+**Closed issues:**
+
+- Test failures against rails-head [\#1704](https://github.com/bensheldon/good_job/issues/1704)
+
+**Merged pull requests:**
+
+- Add test for Migration generator with custom migration path [\#1709](https://github.com/bensheldon/good_job/pull/1709) ([bensheldon](https://github.com/bensheldon))
+- Support Rails 8.2-dev `enqueue\_after\_transaction\_commit by deferring framework enqueuing preemptively [\#1707](https://github.com/bensheldon/good_job/pull/1707) ([bensheldon](https://github.com/bensheldon))
+- Add Ruby 4.0 to CI [\#1705](https://github.com/bensheldon/good_job/pull/1705) ([Earlopain](https://github.com/Earlopain))
+- Bump actions/upload-artifact from 5 to 6 [\#1703](https://github.com/bensheldon/good_job/pull/1703) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [v4.13.1](https://github.com/bensheldon/good_job/tree/v4.13.1) (2025-12-16)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.0...v4.13.1)
+
+**Fixed bugs:**
+
+- Adjust indexes on `good_jobs.finished_at` to better support job cleanup [\#1677](https://github.com/bensheldon/good_job/pull/1677) ([mkrfowler](https://github.com/mkrfowler))
+
+**Closed issues:**
+
+- ui question: meaning of icons in cron job section [\#1651](https://github.com/bensheldon/good_job/issues/1651)
+
+**Merged pull requests:**
+
+- Add Active Support load hooks for all Active Record classes [\#1699](https://github.com/bensheldon/good_job/pull/1699) ([bensheldon](https://github.com/bensheldon))
+- Replace Rails UJS with Turbo; make navbar badges data-turbo-permanent to not pop-in on every navigation [\#1658](https://github.com/bensheldon/good_job/pull/1658) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.13.0](https://github.com/bensheldon/good_job/tree/v4.13.0) (2025-12-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.12.1...v4.13.0)

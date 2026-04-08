@@ -40,7 +40,7 @@ module GoodJob
       ]
       labels = BUCKET_INTERVALS.map { |interval| GoodJob::ApplicationController.helpers.format_duration(interval) }
       labels[-1] = I18n.t("good_job.performance.show.slow")
-      executions_data = GoodJob::Job.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(sum_query), "GoodJob Performance Job Chart", binds)
+      executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(sum_query), "GoodJob Performance Job Chart", binds) }
       executions_data = executions_data.to_a.index_by { |data| data["bucket_index"] }
 
       bucket_data = 0.upto(BUCKET_INTERVALS.count).map do |bucket_index|

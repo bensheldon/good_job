@@ -5,32 +5,32 @@
 # Please instead update this file by running `bin/tapioca gem yard-activesupport-concern`.
 
 
-# source://yard-activesupport-concern//lib/yard-activesupport-concern/version.rb#1
+# pkg:gem/yard-activesupport-concern#lib/yard-activesupport-concern/version.rb:1
 module YARD; end
 
-# source://yard-activesupport-concern//lib/yard-activesupport-concern/version.rb#2
+# pkg:gem/yard-activesupport-concern#lib/yard-activesupport-concern/version.rb:2
 module YARD::ActiveSupport; end
 
-# source://yard-activesupport-concern//lib/yard-activesupport-concern/version.rb#3
+# pkg:gem/yard-activesupport-concern#lib/yard-activesupport-concern/version.rb:3
 module YARD::ActiveSupport::Concern; end
 
-# source://yard-activesupport-concern//lib/yard-activesupport-concern.rb#23
+# pkg:gem/yard-activesupport-concern#lib/yard-activesupport-concern.rb:23
 class YARD::ActiveSupport::Concern::ClassMethodsHandler < ::YARD::Handlers::Ruby::Base
   # Process any found `class_methods` block within a "namespace" scope
   # (class or module).
   #
-  # source://yard-activesupport-concern//lib/yard-activesupport-concern.rb#29
+  # pkg:gem/yard-activesupport-concern#lib/yard-activesupport-concern.rb:29
   def process; end
 end
 
-# source://yard-activesupport-concern//lib/yard-activesupport-concern.rb#8
+# pkg:gem/yard-activesupport-concern#lib/yard-activesupport-concern.rb:8
 class YARD::ActiveSupport::Concern::IncludedHandler < ::YARD::Handlers::Ruby::Base
   # Process any found `included` block within a "namespace" scope (class
   # or module).
   #
-  # source://yard-activesupport-concern//lib/yard-activesupport-concern.rb#14
+  # pkg:gem/yard-activesupport-concern#lib/yard-activesupport-concern.rb:14
   def process; end
 end
 
-# source://yard-activesupport-concern//lib/yard-activesupport-concern/version.rb#4
+# pkg:gem/yard-activesupport-concern#lib/yard-activesupport-concern/version.rb:4
 YARD::ActiveSupport::Concern::VERSION = T.let(T.unsafe(nil), String)

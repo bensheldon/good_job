@@ -1302,16 +1302,18 @@ Depending on your application configuration, you may need to take additional ste
     ```ruby
     # config/puma.rb
 
-    before_fork do
-      GoodJob.shutdown
-    end
+    if ENV.fetch("WEB_CONCURRENCY", 0).to_i > 0
+      before_fork do
+        GoodJob.shutdown
+      end
 
-    on_worker_boot do
-      GoodJob.restart
-    end
+      before_worker_boot do
+        GoodJob.restart
+      end
 
-    on_worker_shutdown do
-      GoodJob.shutdown
+      before_worker_shutdown do
+        GoodJob.shutdown
+      end
     end
 
     MAIN_PID = Process.pid

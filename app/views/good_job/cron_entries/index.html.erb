@@ -39,14 +39,16 @@
             <%= relative_time cron_entry.next_at %>
           </div>
           <div class="col-6 col-lg-1 text-wrap small">
-            <% if cron_entry.last_job.present? %>
+            <% last_job = @last_jobs[cron_entry.key.to_s] %>
+            <% if last_job.present? %>
+              <% last_job_at = (last_job.cron_at || last_job.created_at).localtime %>
               <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.last_run" %></div>
-              <%= link_to relative_time(cron_entry.last_job_at), cron_entry_path(cron_entry), title: "Job #{cron_entry.last_job.id}" %>
+              <%= link_to relative_time(last_job_at), cron_entry_path(cron_entry), title: "Job #{last_job.id}" %>
             <% end %>
           </div>
           <div class="col-6 col-lg-1 text-wrap small">
             <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.status" %></div>
-            <% if cron_entry.enabled? %>
+            <% if @enabled_states[cron_entry.key.to_s] %>
               <span class="text-success"><%= t "good_job.models.cron.states.active" %></span>
             <% else %>
               <span class="text-muted"><%= t "good_job.models.cron.states.paused" %></span>
@@ -57,12 +59,12 @@
               <%= render_icon "skip_forward" %>
             <% end %>
 
-            <% if cron_entry.enabled? %>
-              <%= button_to disable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.disable") }, title: t("good_job.cron_entries.actions.disable"), data: { confirm: t("good_job.cron_entries.actions.confirm_disable") } do %>
+            <% if @enabled_states[cron_entry.key.to_s] %>
+              <%= button_to disable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.disable") }, title: t("good_job.cron_entries.actions.disable"), data: { turbo_confirm: t("good_job.cron_entries.actions.confirm_disable") } do %>
                 <%= render_icon "pause" %>
               <% end %>
             <% else %>
-              <%= button_to enable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.enable") }, title: t("good_job.cron_entries.actions.enable"), data: { confirm: t("good_job.cron_entries.actions.confirm_enable") } do %>
+              <%= button_to enable_cron_entry_path(cron_entry), method: :put, class: "btn btn-sm btn-outline-primary", form_class: "d-inline-block", aria: { label: t("good_job.cron_entries.actions.enable") }, title: t("good_job.cron_entries.actions.enable"), data: { turbo_confirm: t("good_job.cron_entries.actions.confirm_enable") } do %>
                 <%= render_icon "play" %>
               <% end %>
             <% end %>

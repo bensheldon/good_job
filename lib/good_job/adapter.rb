@@ -55,6 +55,10 @@ module GoodJob
       active_jobs = Array(active_jobs)
       return 0 if active_jobs.empty?
 
+      # If there is a currently open Bulk in the current thread, direct the
+      # jobs there to (eventually) be enqueued using enqueue_all
+      return if GoodJob::Bulk.capture(active_jobs, queue_adapter: self)
+
       Rails.application.executor.wrap do
         current_time = Time.current
         jobs = active_jobs.map do |active_job|
@@ -70,7 +74,7 @@ module GoodJob
           job_attributes = jobs.map(&:attributes)
           results = GoodJob::Job.insert_all(job_attributes, returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
 
-          job_id_to_provider_job_id = results.each_with_object({}) { |result, hash| hash[result['active_job_id']] = result['id'] }
+          job_id_to_provider_job_id = results.to_h { |result| [result['active_job_id'], result['id']] }
           active_jobs.each do |active_job|
             active_job.provider_job_id = job_id_to_provider_job_id[active_job.job_id]
             active_job.successfully_enqueued = active_job.provider_job_id.present? if active_job.respond_to?(:successfully_enqueued=)
