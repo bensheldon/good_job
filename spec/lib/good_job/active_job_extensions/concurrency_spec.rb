@@ -10,10 +10,6 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       include GoodJob::ActiveJobExtensions::Concurrency
 
-      def id
-        job_id
-      end
-
       def perform(name:)
         name && sleep(1)
         JOB_PERFORMED.make_true
@@ -231,7 +227,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
-  context "legacy functionality" do
+  describe "legacy functionality" do
     describe 'when concurrency key returns nil' do
       it 'does not limit concurrency' do
         TestJob.good_job_control_concurrency_with(

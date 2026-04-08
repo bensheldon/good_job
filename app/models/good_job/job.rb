@@ -211,7 +211,7 @@ module GoodJob
     end)
 
     scope :labeled, (lambda do |labels|
-      where("labels && ARRAY[?]::text[]", Array(labels)) if labels.present?
+      where(Arel::Nodes::InfixOperation.new('&&', arel_table[:labels], Arel.sql(sanitize_sql_array(["ARRAY[?]::text[]", Array(labels)])))) if labels.present?
     end)
 
     class << self

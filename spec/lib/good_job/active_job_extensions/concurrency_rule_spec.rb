@@ -13,10 +13,6 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
 
       good_job_concurrency_rule(rule)
 
-      def id
-        job_id
-      end
-
       def perform(name:)
       end
     end)
