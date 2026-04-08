@@ -39,6 +39,8 @@ module GoodJob
     DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT = false
     # Default enable_pauses setting
     DEFAULT_ENABLE_PAUSES = false
+    # Valid lock strategies
+    LOCK_STRATEGIES = [:advisory, :skiplocked, :hybrid].freeze
 
     def self.validate_execution_mode(execution_mode)
       raise ArgumentError, "GoodJob execution mode must be one of #{EXECUTION_MODES.join(', ')}. It was '#{execution_mode}' which is not valid." unless execution_mode.in?(EXECUTION_MODES)
@@ -382,6 +384,17 @@ module GoodJob
       return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PAUSES']) unless env['GOOD_JOB_ENABLE_PAUSE'].nil?
 
       DEFAULT_ENABLE_PAUSES
+    end
+
+    # Strategy for locking jobs during dequeue.
+    # @return [Symbol]
+    def lock_strategy
+      (
+        options[:lock_strategy] ||
+          rails_config[:lock_strategy] ||
+          env['GOOD_JOB_LOCK_STRATEGY'] ||
+          :advisory
+      )&.to_sym
     end
 
     # Whether running in a web server process.

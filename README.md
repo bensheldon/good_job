@@ -1491,6 +1491,53 @@ travel_to(15.minutes.from_now) { GoodJob.perform_inline }
 
 _Note: Rails `travel`/`travel_to` time helpers do not have millisecond precision, so you must leave at least 1 second between the schedule and time traveling for the job to be executed. This [behavior may change in Rails 7.1](https://github.com/rails/rails/pull/44088)._
 
+### SKIP LOCKED experimental mode
+
+By default, GoodJob claims jobs using PostgreSQL advisory locks. As an alternative, GoodJob can use `SELECT FOR UPDATE SKIP LOCKED` to claim jobs, which writes the lock state directly to the `good_jobs` table rather than relying on session-level advisory locks.
+
+Two strategies are available:
+
+- **`:skiplocked`** — Claims jobs using `SELECT FOR UPDATE SKIP LOCKED` only. No advisory locks are held. Compatible with PgBouncer in transaction mode.
+- **`:hybrid`** — Claims jobs using `SELECT FOR UPDATE SKIP LOCKED` and _also_ acquires a session-level advisory lock on the job. Intended for rolling deploys where some workers are still using the default `:advisory` strategy.
+
+Configure the lock strategy in an initializer or via environment variable:
+
+```ruby
+# config/initializers/good_job.rb
+GoodJob.configure do |config|
+  config.lock_strategy = :skiplocked
+end
+```
+
+```bash
+GOOD_JOB_LOCK_STRATEGY=skiplocked
+```
+
+All three strategies (`:advisory`, `:skiplocked`, `:hybrid`) can coexist safely during a rolling deploy — each strategy excludes jobs that are already locked by another worker regardless of which strategy that worker uses.
+
+#### PgBouncer configuration
+
+GoodJob's `:skiplocked` mode makes it compatible with PgBouncer in _transaction_ mode. In addition to setting the lock strategy, you must also disable the `LISTEN/NOTIFY` notifier (which requires a persistent connection) and rely on polling instead:
+
+```ruby
+# config/initializers/good_job.rb
+GoodJob.configure do |config|
+  config.lock_strategy = :skiplocked
+  config.enable_listen_notify = false
+  config.advisory_lock_heartbeat = false
+  config.poll_interval = 5 # seconds; tune based on your latency tolerance
+end
+```
+
+```bash
+GOOD_JOB_LOCK_STRATEGY=skiplocked
+GOOD_JOB_ENABLE_LISTEN_NOTIFY=false
+GOOD_JOB_ADVISORY_LOCK_HEARTBEAT=false
+GOOD_JOB_POLL_INTERVAL=5
+```
+
+With these four settings, GoodJob will not hold any session-level state between queries and is safe to use behind PgBouncer in transaction mode.
+
 ### PgBouncer compatibility
 
 GoodJob is not compatible with PgBouncer in _transaction_ mode, but is compatible with PgBouncer's _connection_ mode. GoodJob uses connection-based advisory locks and LISTEN/NOTIFY, both of which require full database connections.
