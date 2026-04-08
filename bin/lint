@@ -44,6 +44,9 @@ FileUtils.chdir GEM_ROOT do
   puts "\n== YARD =="
   system! "bundle exec yard stats --no-cache --fail-on-warning"
 
+  puts "\n== Herb =="
+  system! "bundle exec herb analyze app"
+
   puts "\n== ERB Lint =="
   if options[:nofix]
     system!("bundle exec erb_lint app/views")
