@@ -160,7 +160,12 @@ module GoodJob
     scope :dequeueing_ordered, (lambda do |parsed_queues|
       relation = self
       relation = relation.queue_ordered(parsed_queues[:include]) if parsed_queues && parsed_queues[:ordered_queues] && parsed_queues[:include]
-      relation = relation.priority_ordered.creation_ordered
+
+      relation = if GoodJob.configuration.dequeue_query_sort == :scheduled_at
+                   relation.priority_ordered.schedule_ordered.order(:id)
+                 else
+                   relation.priority_ordered.creation_ordered
+                 end
 
       relation
     end)
@@ -266,7 +271,7 @@ module GoodJob
       end
 
       def historic_finished_at_index_migrated?
-        return true unless connection.index_name_exists?(:good_jobs, :index_good_jobs_jobs_on_finished_at)
+        return true if connection.index_name_exists?(:good_jobs, "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished")
 
         migration_pending_warning!
         false
