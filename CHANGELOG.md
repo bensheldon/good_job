@@ -1,5 +1,21 @@
 # Changelog
 
+## [v4.15.0](https://github.com/bensheldon/good_job/tree/v4.15.0) (2026-04-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.2...v4.15.0)
+
+**Implemented enhancements:**
+
+- Add opt-in "FOR NO KEY UPDATE SKIP LOCKED" job lock strategy and hybrid strategy for online migration [\#1731](https://github.com/bensheldon/good_job/pull/1731) ([bensheldon](https://github.com/bensheldon))
+- Allow ordering by scheduled\_at instead of created\_at when dequeueing job [\#1645](https://github.com/bensheldon/good_job/pull/1645) ([lsylvester](https://github.com/lsylvester))
+- Allow `GoodJob.preserve_job_records` to take a lambda that is callable after each job executes [\#1640](https://github.com/bensheldon/good_job/pull/1640) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Fix JRuby in development lockfile, with test [\#1734](https://github.com/bensheldon/good_job/pull/1734) ([bensheldon](https://github.com/bensheldon))
+- Add herb to linter [\#1732](https://github.com/bensheldon/good_job/pull/1732) ([bensheldon](https://github.com/bensheldon))
+- Update development dependencies; apply Rubocop to\_h lints [\#1728](https://github.com/bensheldon/good_job/pull/1728) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.14.2](https://github.com/bensheldon/good_job/tree/v4.14.2) (2026-04-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.1...v4.14.2)
