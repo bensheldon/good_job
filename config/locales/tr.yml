@@ -144,6 +144,7 @@ tr:
         application_trace: Application Trace
         full_trace: Full Trace
         in_queue: sırada
+        recovery: kurtarma
         runtime: çalışma süresi
         title: İşlemler
       force_discard:
