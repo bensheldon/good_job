@@ -99,10 +99,11 @@ module GoodJob
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
               if limit
-                # Use where(performed_at: nil) when enqueue_limit_flag is set (legacy behavior),
-                # to exclude jobs currently being performed from the enqueue limit count.
+                # Use advisory_unlocked + where(locked_by_id: nil) when enqueue_limit_flag is set
+                # (legacy behavior), to exclude jobs currently claimed/performing from the count.
+                # advisory_unlocked handles :advisory strategy; locked_by_id handles :skiplocked/:hybrid.
                 enqueue_concurrency = if enqueue_limit_flag
-                                        query_scope.unfinished.where(performed_at: nil).count
+                                        query_scope.unfinished.advisory_unlocked.where(locked_by_id: nil).count
                                       else
                                         query_scope.unfinished.count
                                       end
