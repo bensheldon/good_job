@@ -70,6 +70,11 @@ GEM
     activerecord-explain-analyze (0.1.0)
       activerecord (>= 4)
       pg
+    activerecord-jdbc-adapter (1.3.22)
+      activerecord (>= 2.2)
+    activerecord-jdbcpostgresql-adapter (1.3.22)
+      activerecord-jdbc-adapter (~> 1.3.22)
+      jdbc-postgres (>= 9.1)
     activestorage (8.1.3)
       actionpack (= 8.1.3)
       activejob (= 8.1.3)
@@ -125,6 +130,7 @@ GEM
       parser (>= 2.4)
       smart_properties
     bigdecimal (4.1.0)
+    bigdecimal (4.1.0-java)
     bootsnap (1.23.0)
       msgpack (~> 1.2)
     brakeman (8.0.4)
@@ -152,6 +158,7 @@ GEM
       capybara (~> 3.0)
       ferrum (~> 0.17.0)
     date (3.5.1)
+    date (3.5.1-java)
     debug (1.11.1)
       irb (~> 1.10)
       reline (>= 0.3.8)
@@ -165,6 +172,7 @@ GEM
       thread
       thread_safe
     erb (6.0.2)
+    erb (6.0.2-java)
     erb_lint (0.9.0)
       activesupport
       better_html (>= 2.0.1)
@@ -189,9 +197,11 @@ GEM
       concurrent-ruby (~> 1.1)
       webrick (~> 1.7)
       websocket-driver (~> 0.7)
+    ffi (1.17.4)
     ffi (1.17.4-aarch64-linux-gnu)
     ffi (1.17.4-arm-linux-gnu)
     ffi (1.17.4-arm64-darwin)
+    ffi (1.17.4-java)
     ffi (1.17.4-x86-linux-gnu)
     ffi (1.17.4-x86_64-darwin)
     ffi (1.17.4-x86_64-linux-gnu)
@@ -216,6 +226,7 @@ GEM
       rake (>= 10.0)
     globalid (1.3.0)
       activesupport (>= 6.1)
+    herb (0.9.5)
     herb (0.9.5-aarch64-linux-gnu)
     herb (0.9.5-arm-linux-gnu)
     herb (0.9.5-arm64-darwin)
@@ -239,6 +250,7 @@ GEM
       ruby-progressbar (~> 1.8, >= 1.8.1)
       terminal-table (>= 1.5.1)
     io-console (0.8.2)
+    io-console (0.8.2-java)
     io-endpoint (0.17.2)
     io-event (1.14.5)
     io-stream (0.11.1)
@@ -247,7 +259,10 @@ GEM
       prism (>= 1.3.0)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
+    jar-dependencies (0.5.7)
+    jdbc-postgres (42.7.8)
     json (2.19.3)
+    json (2.19.3-java)
     kramdown (2.5.2)
       rexml (>= 3.4.4)
     kramdown-parser-gfm (1.1.0)
@@ -284,6 +299,7 @@ GEM
     mixlib-shellout (3.4.10)
       chef-utils
     msgpack (1.8.0)
+    msgpack (1.8.0-java)
     net-http (0.9.1)
       uri (>= 0.11.1)
     net-imap (0.6.3)
@@ -297,11 +313,14 @@ GEM
       net-protocol
     netrc (0.11.0)
     nio4r (2.7.5)
+    nio4r (2.7.5-java)
     nokogiri (1.19.2-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.2-arm-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.2-arm64-darwin)
+      racc (~> 1.4)
+    nokogiri (1.19.2-java)
       racc (~> 1.4)
     nokogiri (1.19.2-x86_64-darwin)
       racc (~> 1.4)
@@ -315,6 +334,7 @@ GEM
     parser (3.3.11.1)
       ast (~> 2.4.1)
       racc
+    pg (1.6.3)
     pg (1.6.3-aarch64-linux)
     pg (1.6.3-arm64-darwin)
     pg (1.6.3-x86_64-darwin)
@@ -336,11 +356,17 @@ GEM
     psych (5.3.1)
       date
       stringio
+    psych (5.3.1-java)
+      date
+      jar-dependencies (>= 0.1.7)
     public_suffix (7.0.5)
     puma (7.2.0)
       nio4r (~> 2.0)
+    puma (7.2.0-java)
+      nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
+    racc (1.8.1-java)
     rack (3.2.6)
     rack-mini-profiler (4.0.1)
       rack (>= 1.2.0)
@@ -469,6 +495,7 @@ GEM
       sorbet-static (= 0.6.13080)
     sorbet-runtime (0.6.13080)
     sorbet-static (0.6.13080-aarch64-linux)
+    sorbet-static (0.6.13080-java)
     sorbet-static (0.6.13080-universal-darwin)
     sorbet-static (0.6.13080-x86_64-linux)
     sorbet-static-and-runtime (0.6.13080)
@@ -509,6 +536,7 @@ GEM
     thor (1.5.0)
     thread (0.2.2)
     thread_safe (0.3.6)
+    thread_safe (0.3.6-java)
     timecop (0.9.10)
     timeout (0.6.1)
     tomlrb (2.0.4)
@@ -526,6 +554,9 @@ GEM
     websocket-driver (0.8.0)
       base64
       websocket-extensions (>= 0.1.0)
+    websocket-driver (0.8.0-java)
+      base64
+      websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
@@ -540,6 +571,8 @@ GEM
 PLATFORMS
   darwin
   linux
+  universal-java-25
+  x86_64-linux
 
 DEPENDENCIES
   activerecord-explain-analyze
@@ -592,4 +625,4 @@ DEPENDENCIES
   yard-activesupport-concern
 
 BUNDLED WITH
-  4.0.9
+  4.0.10
