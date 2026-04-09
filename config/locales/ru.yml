@@ -168,6 +168,7 @@ ru:
         application_trace: Application Trace
         full_trace: Full Trace
         in_queue: в очереди
+        recovery: восстановление
         runtime: время выполнения
         title: Выполнение заданий
       force_discard:

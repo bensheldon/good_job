@@ -144,6 +144,7 @@ ko:
         application_trace: 애플리케이션 추적
         full_trace: 전체 추적
         in_queue: 대기 중
+        recovery: 복구
         runtime: 실행 시간
         title: 실행
       force_discard:
