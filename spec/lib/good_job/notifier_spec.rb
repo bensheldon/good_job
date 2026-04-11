@@ -145,8 +145,7 @@ RSpec.describe GoodJob::Notifier do
       original_keepalive = notifier.instance_variable_get(:@last_keepalive_time)
 
       expect(notifier).to be_listening(timeout: 2)
-      sleep 0.2
-      expect(notifier.instance_variable_get(:@last_keepalive_time)).to be > original_keepalive
+      wait_until { expect(notifier.instance_variable_get(:@last_keepalive_time)).to be > original_keepalive }
 
       notifier.shutdown
     end
@@ -156,6 +155,8 @@ RSpec.describe GoodJob::Notifier do
     let(:executor) { Concurrent::FixedThreadPool.new(1) }
 
     it 'shuts down when the thread is killed' do
+      skip "Thread#kill does not reliably terminate JRuby threads" if Concurrent.on_jruby?
+
       notifier = described_class.new(executor: executor, enable_listening: true)
       wait_until { expect(notifier).to be_listening }
       executor.kill

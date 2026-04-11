@@ -8,7 +8,12 @@ ActiveSupport.on_load :active_record do
     sql = "SET application_name = #{quote(thread_name)}"
 
     # Necessary because of https://github.com/rails/rails/pull/51083/files#r1496720821
-    @raw_connection ? @raw_connection.query(sql) : exec_query(sql, "Set application name")
+    # JDBC raw connections don't have #query, fall back to exec_query (safe after checkout)
+    if @raw_connection.respond_to?(:query)
+      @raw_connection.query(sql)
+    else
+      exec_query(sql, "Set application name")
+    end
   }
 end
 
