@@ -101,7 +101,7 @@ jobs:
             pg: 10
           # JRuby 10 targets Ruby 3.4
           - ruby: jruby-10
-            gemfile: rails_8.1
+            gemfile: rails_7.2
             pg: 18
         exclude:
           # Rails 7.2 is >= 3.1
