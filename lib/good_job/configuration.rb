@@ -427,7 +427,7 @@ module GoodJob
         rails_config[:environment] ||
         env['GOOD_JOB_ENVIRONMENT'] ||
         DEFAULT_ENVIRONMENT ||
-        Rails.env
+        Rails.env&.capitalize
     end
 
     def lower_thread_priority
