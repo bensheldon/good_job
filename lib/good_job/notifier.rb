@@ -280,6 +280,7 @@ module GoodJob # :nodoc:
         end
       elsif @enable_listening && raw_connection.respond_to?(:jdbc_connection)
         raw_connection.execute_query("SELECT 1")
+        @last_keepalive_time = Time.current
         notifications = raw_connection.jdbc_connection.getNotifications
         Array(notifications).each do |notification|
           channel = notification.getName
