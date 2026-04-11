@@ -192,6 +192,7 @@ describe GoodJob::JobsController do
       end
 
       executions = job.reload.executions
+      expect(executions.size).to eq(2)
       expect(executions[0].serialized_params["locale"]).to eq("es")
       expect(executions[1].serialized_params["locale"]).to eq("es")
     end

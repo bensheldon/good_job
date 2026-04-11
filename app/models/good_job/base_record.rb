@@ -44,6 +44,13 @@ module GoodJob
     def self.bind_value(name, value, type_class)
       Arel::Nodes::BindParam.new(ActiveRecord::Relation::QueryAttribute.new(name, value, type_class.new))
     end
+
+    # Rails < 7.2 does not have lease_connection; connection is behaviorally equivalent.
+    unless respond_to?(:lease_connection)
+      def self.lease_connection
+        connection
+      end
+    end
   end
 end
 

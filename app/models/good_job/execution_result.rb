@@ -3,6 +3,8 @@
 module GoodJob
   # Stores the results of job execution
   class ExecutionResult
+    # @return [ActiveJob::Base, nil]
+    attr_reader :active_job
     # @return [Object, nil]
     attr_reader :value
     # @return [Exception, nil]
@@ -22,8 +24,9 @@ module GoodJob
     # @param error_event [String, nil]
     # @param unexecutable [Boolean, nil]
     # @param retried_job [GoodJob::Job, nil]
-    def initialize(value:, handled_error: nil, unhandled_error: nil, error_event: nil, unexecutable: nil, retried_job: nil)
+    def initialize(value:, active_job: nil, handled_error: nil, unhandled_error: nil, error_event: nil, unexecutable: nil, retried_job: nil)
       @value = value
+      @active_job = active_job
       @handled_error = handled_error
       @unhandled_error = unhandled_error
       @error_event = error_event

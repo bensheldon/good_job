@@ -21,7 +21,7 @@ class ActiveSupport::EnvironmentInquirer
 
   # @method_missing: delegated to String through ActiveSupport::StringInquirer
   sig { returns(T::Boolean) }
-  def staging?; end
+  def local?; end
 end
 
 module ActiveSupport::Testing::SetupAndTeardown::ClassMethods
@@ -90,7 +90,7 @@ class Hash
   def extractable_options?; end
 
   # @version >= 6.1.0
-  sig { returns(T::Hash[K, V]) }
+  sig { returns(T.self_type) }
   def compact_blank; end
 end
 
@@ -489,4 +489,7 @@ end
 module ActiveSupport::Testing::Assertions
   sig { type_parameters(:Block).params(block: T.proc.returns(T.type_parameter(:Block))).returns(T.type_parameter(:Block)) }
   def assert_nothing_raised(&block); end
+
+  sig { type_parameters(:TResult).params(expression: T.any(Proc, Kernel), message: Kernel, from: T.anything, to: T.anything, block: T.proc.returns(T.type_parameter(:TResult))).returns(T.type_parameter(:TResult)) }
+  def assert_changes(expression, message = T.unsafe(nil), from: T.unsafe(nil), to: T.unsafe(nil), &block); end
 end

@@ -59,25 +59,47 @@ module GoodJob
       job_discarded = job && job.finished_at.present? && job.error.present?
       buffer = GoodJob::Adapter::InlineBuffer.capture do
         advisory_lock_maybe(lock) do
-          Batch.within_thread(batch_id: nil, batch_callback_id: id) do
-            reload
+          reload
 
-            if job_discarded && !discarded_at
-              update(discarded_at: Time.current)
-              on_discard.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :discard }) if on_discard.present?
+          if job_discarded && !discarded_at
+            update(discarded_at: Time.current)
+
+            if on_discard.present?
+              discard_job_class = on_discard.constantize
+              Job.defer_after_commit_maybe(discard_job_class) do
+                Batch.within_thread(batch_id: nil, batch_callback_id: id) do
+                  discard_job_class.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :discard })
+                end
+              end
             end
-
-            if enqueued_at && !(self.class.jobs_finished_at_migrated? ? jobs_finished_at : finished_at) && jobs.where(finished_at: nil).none?
-              self.class.jobs_finished_at_migrated? ? update(jobs_finished_at: Time.current) : update(finished_at: Time.current)
-
-              on_success.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :success }) if !discarded_at && on_success.present?
-              on_finish.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :finish }) if on_finish.present?
-            end
-
-            update(finished_at: Time.current) if !finished_at && self.class.jobs_finished_at_migrated? && jobs_finished? && callback_jobs.where(finished_at: nil).none?
           end
+
+          if enqueued_at && !(self.class.jobs_finished_at_migrated? ? jobs_finished_at : finished_at) && jobs.where(finished_at: nil).none?
+            self.class.jobs_finished_at_migrated? ? update(jobs_finished_at: Time.current) : update(finished_at: Time.current)
+
+            if !discarded_at && on_success.present?
+              success_job_class = on_success.constantize
+              Job.defer_after_commit_maybe(success_job_class) do
+                Batch.within_thread(batch_id: nil, batch_callback_id: id) do
+                  success_job_class.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :success })
+                end
+              end
+            end
+
+            if on_finish.present?
+              finish_job_class = on_finish.constantize
+              Job.defer_after_commit_maybe(finish_job_class) do
+                Batch.within_thread(batch_id: nil, batch_callback_id: id) do
+                  on_finish.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :finish })
+                end
+              end
+            end
+          end
+
+          update(finished_at: Time.current) if !finished_at && self.class.jobs_finished_at_migrated? && jobs_finished? && callback_jobs.where(finished_at: nil).none?
         end
       end
+
       buffer.call
     end
 

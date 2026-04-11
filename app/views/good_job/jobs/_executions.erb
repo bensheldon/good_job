@@ -16,6 +16,8 @@
           <div class="col-md-2 small">
             <% if execution.runtime_latency %>
               <%= format_duration execution.runtime_latency %> <span class="text-muted"><%= t ".runtime" %></span>
+            <% elsif execution.interrupted_duration %>
+              <%= format_duration execution.interrupted_duration %> <span class="text-muted"><%= t ".recovery" %></span>
             <% end %>
           </div>
           <div class="col">

@@ -144,6 +144,7 @@ en:
         application_trace: Application Trace
         full_trace: Full Trace
         in_queue: in queue
+        recovery: recovery
         runtime: runtime
         title: Executions
       force_discard:

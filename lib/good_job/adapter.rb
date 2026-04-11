@@ -55,6 +55,10 @@ module GoodJob
       active_jobs = Array(active_jobs)
       return 0 if active_jobs.empty?
 
+      # If there is a currently open Bulk in the current thread, direct the
+      # jobs there to (eventually) be enqueued using enqueue_all
+      return if GoodJob::Bulk.capture(active_jobs, queue_adapter: self)
+
       Rails.application.executor.wrap do
         current_time = Time.current
         jobs = active_jobs.map do |active_job|
@@ -66,38 +70,69 @@ module GoodJob
         end
 
         inline_jobs = []
-        GoodJob::Job.transaction(requires_new: true, joinable: false) do
-          job_attributes = jobs.map(&:attributes)
-          results = GoodJob::Job.insert_all(job_attributes, returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
+        lock_strategy = GoodJob::Job.effective_lock_strategy
+        tracker_registered = false
+        lock_id = nil
 
-          job_id_to_provider_job_id = results.each_with_object({}) { |result, hash| hash[result['active_job_id']] = result['id'] }
-          active_jobs.each do |active_job|
-            active_job.provider_job_id = job_id_to_provider_job_id[active_job.job_id]
-            active_job.successfully_enqueued = active_job.provider_job_id.present? if active_job.respond_to?(:successfully_enqueued=)
-          end
-          jobs.each do |job|
-            job.instance_variable_set(:@new_record, false) if job_id_to_provider_job_id[job.active_job_id]
-          end
-          jobs = jobs.select(&:persisted?) # prune unpersisted jobs
-
-          if execute_inline?
-            inline_jobs = jobs.select { |job| job.scheduled_at.nil? || job.scheduled_at <= Time.current }
-            inline_jobs.each(&:advisory_lock!)
-          end
+        if execute_inline?
+          @capsule.tracker.register
+          tracker_registered = true
+          lock_id = @capsule.tracker.id_for_lock
         end
 
-        if inline_jobs.any?
-          deferred = InlineBuffer.defer?
-          InlineBuffer.perform_now_or_defer do
-            @capsule.tracker.register do
+        begin
+          GoodJob::Job.transaction(requires_new: true, joinable: false) do
+            column_names = GoodJob::Job.column_names
+            job_attributes = jobs.map { |job| job.attributes.slice(*column_names) }
+            results = GoodJob::Job.insert_all(job_attributes, returning: %w[id active_job_id]) # rubocop:disable Rails/SkipsModelValidations
+
+            job_id_to_provider_job_id = results.to_h { |result| [result['active_job_id'], result['id']] }
+            active_jobs.each do |active_job|
+              active_job.provider_job_id = job_id_to_provider_job_id[active_job.job_id]
+              active_job.successfully_enqueued = active_job.provider_job_id.present? if active_job.respond_to?(:successfully_enqueued=)
+            end
+            jobs.each do |job|
+              job.instance_variable_set(:@new_record, false) if job_id_to_provider_job_id[job.active_job_id]
+            end
+            jobs = jobs.select(&:persisted?) # prune unpersisted jobs
+
+            if execute_inline?
+              inline_jobs = jobs.select { |job| job.scheduled_at.nil? || job.scheduled_at <= Time.current }
+              if lock_strategy != :advisory && lock_id && inline_jobs.any?
+                GoodJob::Job.where(id: inline_jobs.map(&:id)).update_all( # rubocop:disable Rails/SkipsModelValidations
+                  locked_by_id: lock_id, locked_at: current_time, lock_type: GoodJob::Job.lock_types[lock_strategy.to_s]
+                )
+                inline_jobs.each { |j| j.assign_attributes(locked_by_id: lock_id, locked_at: current_time, lock_type: lock_strategy) }
+              end
+              case lock_strategy
+              when :advisory, :hybrid
+                inline_jobs.each(&:advisory_lock!)
+              end
+            end
+          end
+
+          if inline_jobs.any?
+            deferred = InlineBuffer.defer?
+            InlineBuffer.perform_now_or_defer do
               until inline_jobs.empty?
                 inline_job = inline_jobs.shift
-                perform_inline(inline_job, notify: deferred ? send_notify?(inline_job) : false)
+                perform_inline(inline_job, notify: deferred ? send_notify?(inline_job) : false, already_claimed: lock_strategy != :advisory, advisory_unlock: lock_strategy != :skiplocked)
               end
             ensure
               inline_jobs.each(&:advisory_unlock)
+              @capsule.tracker.unregister if tracker_registered
+              tracker_registered = false
             end
+          elsif tracker_registered
+            @capsule.tracker.unregister
+            tracker_registered = false
           end
+        rescue StandardError
+          if tracker_registered
+            @capsule.tracker.unregister
+            tracker_registered = false
+          end
+          raise
         end
 
         non_inline_jobs = if InlineBuffer.defer?
@@ -147,15 +182,31 @@ module GoodJob
             scheduled_at: scheduled_at
           )
         elsif will_execute_inline
-          job = GoodJob::Job.enqueue(
-            active_job,
-            scheduled_at: scheduled_at,
-            create_with_advisory_lock: true
-          )
-          InlineBuffer.perform_now_or_defer do
-            @capsule.tracker.register do
-              perform_inline(job, notify: send_notify?(active_job))
+          lock_strategy = GoodJob::Job.effective_lock_strategy
+          @capsule.tracker.register
+          lock_id = @capsule.tracker.id_for_lock
+          tracker_registered = true
+          begin
+            job = case lock_strategy
+                  when :skiplocked
+                    GoodJob::Job.enqueue(active_job, scheduled_at: scheduled_at, lock_id: lock_id, lock_type: :skiplocked)
+                  when :hybrid
+                    GoodJob::Job.enqueue(active_job, scheduled_at: scheduled_at, lock_id: lock_id, lock_type: :hybrid, create_with_advisory_lock: true)
+                  else
+                    GoodJob::Job.enqueue(active_job, scheduled_at: scheduled_at, create_with_advisory_lock: true)
+                  end
+            InlineBuffer.perform_now_or_defer do
+              perform_inline(job, notify: send_notify?(active_job), already_claimed: lock_strategy != :advisory, advisory_unlock: lock_strategy != :skiplocked)
+            ensure
+              @capsule.tracker.unregister if tracker_registered
+              tracker_registered = false
             end
+          rescue StandardError
+            if tracker_registered
+              @capsule.tracker.unregister
+              tracker_registered = false
+            end
+            raise
           end
         else
           job = GoodJob::Job.enqueue(
@@ -248,12 +299,13 @@ module GoodJob
 
     # @param job [GoodJob::Job] the job to perform, which must be enqueued and advisory locked already
     # @param notify [Boolean] whether to send a NOTIFY event for a retried job
-    def perform_inline(job, notify: true)
+    def perform_inline(job, notify: true, already_claimed: false, advisory_unlock: true)
       result = nil
       retried_job = nil
 
       loop do
-        result = job.perform(lock_id: @capsule.tracker.id_for_lock)
+        result = job.perform(lock_id: @capsule.tracker.id_for_lock, already_claimed: already_claimed)
+        already_claimed = false # only skip lock-write on first iteration
         retried_job = result.retried_job
         break if retried_job.nil? || retried_job.scheduled_at.nil? || retried_job.scheduled_at > Time.current
 
@@ -263,7 +315,7 @@ module GoodJob
       Notifier.notify(retried_job.job_state) if notify && retried_job&.scheduled_at && retried_job.scheduled_at > Time.current
       result
     ensure
-      job.advisory_unlock
+      job.advisory_unlock if advisory_unlock
       job.run_callbacks(:perform_unlocked)
 
       raise result.unhandled_error if result&.unhandled_error

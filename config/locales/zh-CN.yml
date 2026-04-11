@@ -144,6 +144,7 @@ zh-CN:
         application_trace: 应用跟踪
         full_trace: 完整跟踪
         in_queue: 队列中
+        recovery: 恢复
         runtime: 运行时间
         title: 执行情况
       force_discard:

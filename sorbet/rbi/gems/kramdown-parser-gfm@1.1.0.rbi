@@ -5,90 +5,90 @@
 # Please instead update this file by running `bin/tapioca gem kramdown-parser-gfm`.
 
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm/options.rb#10
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm/options.rb:10
 module Kramdown; end
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm/options.rb#11
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm/options.rb:11
 module Kramdown::Options; end
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#16
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:16
 module Kramdown::Parser; end
 
 # This class provides a parser implementation for the GFM dialect of Markdown.
 #
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#19
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:19
 class Kramdown::Parser::GFM < ::Kramdown::Parser::Kramdown
   # @return [GFM] a new instance of GFM
   #
-  # source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#25
+  # pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:25
   def initialize(source, options); end
 
-  # source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#108
+  # pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:108
   def generate_gfm_header_id(text); end
 
   # Returns the value of attribute paragraph_end.
   #
-  # source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#23
+  # pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:23
   def paragraph_end; end
 
-  # source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#55
+  # pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:55
   def parse; end
 
   # Copied from kramdown/parser/kramdown/header.rb, removed the first line
   #
-  # source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#125
+  # pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:125
   def parse_atx_header_gfm_quirk; end
 
   # To handle task-lists we override the parse method for lists, converting matching text into
   # checkbox input elements where necessary (as well as applying classes to the ul/ol and li
   # elements).
   #
-  # source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#163
+  # pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:163
   def parse_list; end
 
-  # source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#142
+  # pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:142
   def parse_strikethrough_gfm; end
 
-  # source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#60
+  # pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:60
   def update_elements(element); end
 
   # Update the raw text for automatic ID generation.
   #
-  # source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#77
+  # pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:77
   def update_raw_text(item); end
 
   private
 
-  # source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#200
+  # pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:200
   def update_text_type(element, child); end
 end
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#120
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:120
 Kramdown::Parser::GFM::ATX_HEADER_START = T.let(T.unsafe(nil), Regexp)
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#190
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:190
 Kramdown::Parser::GFM::ESCAPED_CHARS_GFM = T.let(T.unsafe(nil), Regexp)
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#135
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:135
 Kramdown::Parser::GFM::FENCED_CODEBLOCK_MATCH = T.let(T.unsafe(nil), Regexp)
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#134
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:134
 Kramdown::Parser::GFM::FENCED_CODEBLOCK_START = T.let(T.unsafe(nil), Regexp)
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#158
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:158
 Kramdown::Parser::GFM::LIST_TYPES = T.let(T.unsafe(nil), Array)
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#106
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:106
 Kramdown::Parser::GFM::NON_WORD_RE = T.let(T.unsafe(nil), Regexp)
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#193
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:193
 Kramdown::Parser::GFM::PARAGRAPH_END_GFM = T.let(T.unsafe(nil), Regexp)
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#138
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:138
 Kramdown::Parser::GFM::STRIKETHROUGH_DELIM = T.let(T.unsafe(nil), Regexp)
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#139
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:139
 Kramdown::Parser::GFM::STRIKETHROUGH_MATCH = T.let(T.unsafe(nil), Regexp)
 
-# source://kramdown-parser-gfm//lib/kramdown/parser/gfm.rb#21
+# pkg:gem/kramdown-parser-gfm#lib/kramdown/parser/gfm.rb:21
 Kramdown::Parser::GFM::VERSION = T.let(T.unsafe(nil), String)

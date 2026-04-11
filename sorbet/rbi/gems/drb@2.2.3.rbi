@@ -291,7 +291,7 @@
 # can be made persistent across processes by having each process
 # register an object using the same dRuby name.
 #
-# source://drb//lib/drb/eq.rb#2
+# pkg:gem/drb#lib/drb/eq.rb:2
 module DRb
   private
 
@@ -300,7 +300,7 @@ module DRb
   # If there is no current server, this returns the default configuration.
   # See #current_server and DRbServer::make_config.
   #
-  # source://drb//lib/drb/drb.rb#1882
+  # pkg:gem/drb#lib/drb/drb.rb:1882
   def config; end
 
   # Get the 'current' server.
@@ -316,14 +316,14 @@ module DRb
   #
   # @raise [DRbServerNotFound]
   #
-  # source://drb//lib/drb/drb.rb#1839
+  # pkg:gem/drb#lib/drb/drb.rb:1839
   def current_server; end
 
   # Retrieves the server with the given +uri+.
   #
   # See also regist_server and remove_server.
   #
-  # source://drb//lib/drb/drb.rb#1984
+  # pkg:gem/drb#lib/drb/drb.rb:1984
   def fetch_server(uri); end
 
   # Get the front object of the current server.
@@ -331,21 +331,21 @@ module DRb
   # This raises a DRbServerNotFound error if there is no current server.
   # See #current_server.
   #
-  # source://drb//lib/drb/drb.rb#1893
+  # pkg:gem/drb#lib/drb/drb.rb:1893
   def front; end
 
   # Is +uri+ the URI for the current local server?
   #
   # @return [Boolean]
   #
-  # source://drb//lib/drb/drb.rb#1872
+  # pkg:gem/drb#lib/drb/drb.rb:1872
   def here?(uri); end
 
   # Set the default ACL to +acl+.
   #
   # See DRb::DRbServer.default_acl.
   #
-  # source://drb//lib/drb/drb.rb#1938
+  # pkg:gem/drb#lib/drb/drb.rb:1938
   def install_acl(acl); end
 
   # Set the default id conversion object.
@@ -355,24 +355,24 @@ module DRb
   #
   # See DRbServer#default_id_conv.
   #
-  # source://drb//lib/drb/drb.rb#1930
+  # pkg:gem/drb#lib/drb/drb.rb:1930
   def install_id_conv(idconv); end
 
-  # source://drb//lib/drb/drb.rb#1944
+  # pkg:gem/drb#lib/drb/drb.rb:1944
   def mutex; end
 
   # The primary local dRuby server.
   #
   # This is the server created by the #start_service call.
   #
-  # source://drb//lib/drb/drb.rb#1826
+  # pkg:gem/drb#lib/drb/drb.rb:1826
   def primary_server; end
 
   # The primary local dRuby server.
   #
   # This is the server created by the #start_service call.
   #
-  # source://drb//lib/drb/drb.rb#1826
+  # pkg:gem/drb#lib/drb/drb.rb:1826
   def primary_server=(_arg0); end
 
   # Registers +server+ with DRb.
@@ -388,12 +388,12 @@ module DRb
   #  s = DRb::DRbServer.new # automatically calls regist_server
   #  DRb.fetch_server s.uri #=> #<DRb::DRbServer:0x...>
   #
-  # source://drb//lib/drb/drb.rb#1962
+  # pkg:gem/drb#lib/drb/drb.rb:1962
   def regist_server(server); end
 
   # Removes +server+ from the list of registered servers.
   #
-  # source://drb//lib/drb/drb.rb#1971
+  # pkg:gem/drb#lib/drb/drb.rb:1971
   def remove_server(server); end
 
   # Start a dRuby server locally.
@@ -412,7 +412,7 @@ module DRb
   #
   # See DRbServer::new.
   #
-  # source://drb//lib/drb/drb.rb#1818
+  # pkg:gem/drb#lib/drb/drb.rb:1818
   def start_service(uri = T.unsafe(nil), front = T.unsafe(nil), config = T.unsafe(nil)); end
 
   # Stop the local dRuby server.
@@ -420,14 +420,14 @@ module DRb
   # This operates on the primary server.  If there is no primary
   # server currently running, it is a noop.
   #
-  # source://drb//lib/drb/drb.rb#1851
+  # pkg:gem/drb#lib/drb/drb.rb:1851
   def stop_service; end
 
   # Get the thread of the primary server.
   #
   # This returns nil if there is no primary server.  See #primary_server.
   #
-  # source://drb//lib/drb/drb.rb#1919
+  # pkg:gem/drb#lib/drb/drb.rb:1919
   def thread; end
 
   # Get a reference id for an object using the current server.
@@ -435,7 +435,7 @@ module DRb
   # This raises a DRbServerNotFound error if there is no current server.
   # See #current_server.
   #
-  # source://drb//lib/drb/drb.rb#1910
+  # pkg:gem/drb#lib/drb/drb.rb:1910
   def to_id(obj); end
 
   # Convert a reference into an object using the current server.
@@ -443,14 +443,14 @@ module DRb
   # This raises a DRbServerNotFound error if there is no current server.
   # See #current_server.
   #
-  # source://drb//lib/drb/drb.rb#1902
+  # pkg:gem/drb#lib/drb/drb.rb:1902
   def to_obj(ref); end
 
   # Get the URI defining the local dRuby space.
   #
   # This is the URI of the current server.  See #current_server.
   #
-  # source://drb//lib/drb/drb.rb#1860
+  # pkg:gem/drb#lib/drb/drb.rb:1860
   def uri; end
 
   class << self
@@ -459,7 +459,7 @@ module DRb
     # If there is no current server, this returns the default configuration.
     # See #current_server and DRbServer::make_config.
     #
-    # source://drb//lib/drb/drb.rb#1887
+    # pkg:gem/drb#lib/drb/drb.rb:1887
     def config; end
 
     # Get the 'current' server.
@@ -475,14 +475,14 @@ module DRb
     #
     # @raise [DRbServerNotFound]
     #
-    # source://drb//lib/drb/drb.rb#1845
+    # pkg:gem/drb#lib/drb/drb.rb:1845
     def current_server; end
 
     # Retrieves the server with the given +uri+.
     #
     # See also regist_server and remove_server.
     #
-    # source://drb//lib/drb/drb.rb#1987
+    # pkg:gem/drb#lib/drb/drb.rb:1987
     def fetch_server(uri); end
 
     # Get the front object of the current server.
@@ -490,21 +490,21 @@ module DRb
     # This raises a DRbServerNotFound error if there is no current server.
     # See #current_server.
     #
-    # source://drb//lib/drb/drb.rb#1896
+    # pkg:gem/drb#lib/drb/drb.rb:1896
     def front; end
 
     # Is +uri+ the URI for the current local server?
     #
     # @return [Boolean]
     #
-    # source://drb//lib/drb/drb.rb#1876
+    # pkg:gem/drb#lib/drb/drb.rb:1876
     def here?(uri); end
 
     # Set the default ACL to +acl+.
     #
     # See DRb::DRbServer.default_acl.
     #
-    # source://drb//lib/drb/drb.rb#1941
+    # pkg:gem/drb#lib/drb/drb.rb:1941
     def install_acl(acl); end
 
     # Set the default id conversion object.
@@ -514,24 +514,24 @@ module DRb
     #
     # See DRbServer#default_id_conv.
     #
-    # source://drb//lib/drb/drb.rb#1933
+    # pkg:gem/drb#lib/drb/drb.rb:1933
     def install_id_conv(idconv); end
 
-    # source://drb//lib/drb/drb.rb#1947
+    # pkg:gem/drb#lib/drb/drb.rb:1947
     def mutex; end
 
     # The primary local dRuby server.
     #
     # This is the server created by the #start_service call.
     #
-    # source://drb//lib/drb/drb.rb#1827
+    # pkg:gem/drb#lib/drb/drb.rb:1827
     def primary_server; end
 
     # The primary local dRuby server.
     #
     # This is the server created by the #start_service call.
     #
-    # source://drb//lib/drb/drb.rb#1827
+    # pkg:gem/drb#lib/drb/drb.rb:1827
     def primary_server=(_arg0); end
 
     # Registers +server+ with DRb.
@@ -547,12 +547,12 @@ module DRb
     #  s = DRb::DRbServer.new # automatically calls regist_server
     #  DRb.fetch_server s.uri #=> #<DRb::DRbServer:0x...>
     #
-    # source://drb//lib/drb/drb.rb#1968
+    # pkg:gem/drb#lib/drb/drb.rb:1968
     def regist_server(server); end
 
     # Removes +server+ from the list of registered servers.
     #
-    # source://drb//lib/drb/drb.rb#1979
+    # pkg:gem/drb#lib/drb/drb.rb:1979
     def remove_server(server); end
 
     # Start a dRuby server locally.
@@ -571,7 +571,7 @@ module DRb
     #
     # See DRbServer::new.
     #
-    # source://drb//lib/drb/drb.rb#1821
+    # pkg:gem/drb#lib/drb/drb.rb:1821
     def start_service(uri = T.unsafe(nil), front = T.unsafe(nil), config = T.unsafe(nil)); end
 
     # Stop the local dRuby server.
@@ -579,14 +579,14 @@ module DRb
     # This operates on the primary server.  If there is no primary
     # server currently running, it is a noop.
     #
-    # source://drb//lib/drb/drb.rb#1855
+    # pkg:gem/drb#lib/drb/drb.rb:1855
     def stop_service; end
 
     # Get the thread of the primary server.
     #
     # This returns nil if there is no primary server.  See #primary_server.
     #
-    # source://drb//lib/drb/drb.rb#1922
+    # pkg:gem/drb#lib/drb/drb.rb:1922
     def thread; end
 
     # Get a reference id for an object using the current server.
@@ -594,7 +594,7 @@ module DRb
     # This raises a DRbServerNotFound error if there is no current server.
     # See #current_server.
     #
-    # source://drb//lib/drb/drb.rb#1913
+    # pkg:gem/drb#lib/drb/drb.rb:1913
     def to_id(obj); end
 
     # Convert a reference into an object using the current server.
@@ -602,14 +602,14 @@ module DRb
     # This raises a DRbServerNotFound error if there is no current server.
     # See #current_server.
     #
-    # source://drb//lib/drb/drb.rb#1914
+    # pkg:gem/drb#lib/drb/drb.rb:1914
     def to_obj(ref); end
 
     # Get the URI defining the local dRuby space.
     #
     # This is the URI of the current server.  See #current_server.
     #
-    # source://drb//lib/drb/drb.rb#1869
+    # pkg:gem/drb#lib/drb/drb.rb:1869
     def uri; end
   end
 end
@@ -618,7 +618,7 @@ end
 # This is an internal singleton instance. This must not be used
 # by users.
 #
-# source://drb//lib/drb/drb.rb#382
+# pkg:gem/drb#lib/drb/drb.rb:382
 DRb::DRB_OBJECT_SPACE = T.let(T.unsafe(nil), DRb::DRbObjectSpace)
 
 # An Array wrapper that can be sent to another server via DRb.
@@ -626,21 +626,21 @@ DRb::DRB_OBJECT_SPACE = T.let(T.unsafe(nil), DRb::DRbObjectSpace)
 # All entries in the array will be dumped or be references that point to
 # the local server.
 #
-# source://drb//lib/drb/drb.rb#546
+# pkg:gem/drb#lib/drb/drb.rb:546
 class DRb::DRbArray
   # Creates a new DRbArray that either dumps or wraps all the items in the
   # Array +ary+ so they can be loaded by a remote DRb server.
   #
   # @return [DRbArray] a new instance of DRbArray
   #
-  # source://drb//lib/drb/drb.rb#551
+  # pkg:gem/drb#lib/drb/drb.rb:551
   def initialize(ary); end
 
-  # source://drb//lib/drb/drb.rb#570
+  # pkg:gem/drb#lib/drb/drb.rb:570
   def _dump(lv); end
 
   class << self
-    # source://drb//lib/drb/drb.rb#566
+    # pkg:gem/drb#lib/drb/drb.rb:566
     def _load(s); end
   end
 end
@@ -655,35 +655,35 @@ end
 # This class is used internally by DRbObject.  The user does
 # not normally need to deal with it directly.
 #
-# source://drb//lib/drb/drb.rb#1284
+# pkg:gem/drb#lib/drb/drb.rb:1284
 class DRb::DRbConn
   # @return [DRbConn] a new instance of DRbConn
   #
-  # source://drb//lib/drb/drb.rb#1345
+  # pkg:gem/drb#lib/drb/drb.rb:1345
   def initialize(remote_uri); end
 
   # @return [Boolean]
   #
-  # source://drb//lib/drb/drb.rb#1361
+  # pkg:gem/drb#lib/drb/drb.rb:1361
   def alive?; end
 
-  # source://drb//lib/drb/drb.rb#1356
+  # pkg:gem/drb#lib/drb/drb.rb:1356
   def close; end
 
-  # source://drb//lib/drb/drb.rb#1351
+  # pkg:gem/drb#lib/drb/drb.rb:1351
   def send_message(ref, msg_id, arg, block); end
 
-  # source://drb//lib/drb/drb.rb#1349
+  # pkg:gem/drb#lib/drb/drb.rb:1349
   def uri; end
 
   class << self
-    # source://drb//lib/drb/drb.rb#1287
+    # pkg:gem/drb#lib/drb/drb.rb:1287
     def make_pool; end
 
-    # source://drb//lib/drb/drb.rb#1325
+    # pkg:gem/drb#lib/drb/drb.rb:1325
     def open(remote_uri); end
 
-    # source://drb//lib/drb/drb.rb#1320
+    # pkg:gem/drb#lib/drb/drb.rb:1320
     def stop_pool; end
   end
 end
@@ -698,14 +698,14 @@ end
 # For alternative mechanisms, see DRb::TimerIdConv in drb/timeridconv.rb
 # and DRbNameIdConv in sample/name.rb in the full drb distribution.
 #
-# source://drb//lib/drb/drb.rb#393
+# pkg:gem/drb#lib/drb/drb.rb:393
 class DRb::DRbIdConv
   # Convert an object into a reference id.
   #
   # This implementation returns the object's __id__ in the local
   # object space.
   #
-  # source://drb//lib/drb/drb.rb#407
+  # pkg:gem/drb#lib/drb/drb.rb:407
   def to_id(obj); end
 
   # Convert an object reference id to an object.
@@ -713,7 +713,7 @@ class DRb::DRbIdConv
   # This implementation looks up the reference id in the local object
   # space and returns the object it refers to.
   #
-  # source://drb//lib/drb/drb.rb#399
+  # pkg:gem/drb#lib/drb/drb.rb:399
   def to_obj(ref); end
 end
 
@@ -727,42 +727,42 @@ end
 # The user does not have to directly deal with this object in
 # normal use.
 #
-# source://drb//lib/drb/drb.rb#584
+# pkg:gem/drb#lib/drb/drb.rb:584
 class DRb::DRbMessage
   # @return [DRbMessage] a new instance of DRbMessage
   #
-  # source://drb//lib/drb/drb.rb#585
+  # pkg:gem/drb#lib/drb/drb.rb:585
   def initialize(config); end
 
-  # source://drb//lib/drb/drb.rb#590
+  # pkg:gem/drb#lib/drb/drb.rb:590
   def dump(obj, error = T.unsafe(nil)); end
 
   # @raise [DRbConnError]
   #
-  # source://drb//lib/drb/drb.rb#607
+  # pkg:gem/drb#lib/drb/drb.rb:607
   def load(soc); end
 
-  # source://drb//lib/drb/drb.rb#667
+  # pkg:gem/drb#lib/drb/drb.rb:667
   def recv_reply(stream); end
 
   # @raise [DRbConnError]
   #
-  # source://drb//lib/drb/drb.rb#647
+  # pkg:gem/drb#lib/drb/drb.rb:647
   def recv_request(stream); end
 
-  # source://drb//lib/drb/drb.rb#661
+  # pkg:gem/drb#lib/drb/drb.rb:661
   def send_reply(stream, succ, result); end
 
-  # source://drb//lib/drb/drb.rb#633
+  # pkg:gem/drb#lib/drb/drb.rb:633
   def send_request(stream, ref, msg_id, arg, b); end
 
   private
 
-  # source://drb//lib/drb/drb.rb#674
+  # pkg:gem/drb#lib/drb/drb.rb:674
   def make_proxy(obj, error = T.unsafe(nil)); end
 end
 
-# source://drb//lib/drb/eq.rb#3
+# pkg:gem/drb#lib/drb/eq.rb:3
 class DRb::DRbObject
   # Create a new remote object stub.
   #
@@ -772,49 +772,49 @@ class DRb::DRbObject
   #
   # @return [DRbObject] a new instance of DRbObject
   #
-  # source://drb//lib/drb/drb.rb#1117
+  # pkg:gem/drb#lib/drb/drb.rb:1117
   def initialize(obj, uri = T.unsafe(nil)); end
 
-  # source://drb//lib/drb/eq.rb#4
+  # pkg:gem/drb#lib/drb/eq.rb:4
   def ==(other); end
 
   # Get the reference of the object, if local.
   #
-  # source://drb//lib/drb/drb.rb#1143
+  # pkg:gem/drb#lib/drb/drb.rb:1143
   def __drbref; end
 
   # Get the URI of the remote object.
   #
-  # source://drb//lib/drb/drb.rb#1138
+  # pkg:gem/drb#lib/drb/drb.rb:1138
   def __drburi; end
 
   # Marshall this object.
   #
   # The URI and ref of the object are marshalled.
   #
-  # source://drb//lib/drb/drb.rb#1108
+  # pkg:gem/drb#lib/drb/drb.rb:1108
   def _dump(lv); end
 
-  # source://drb//lib/drb/eq.rb#13
+  # pkg:gem/drb#lib/drb/eq.rb:13
   def eql?(other); end
 
-  # source://drb//lib/drb/eq.rb#9
+  # pkg:gem/drb#lib/drb/eq.rb:9
   def hash; end
 
-  # source://drb//lib/drb/drb.rb#1163
+  # pkg:gem/drb#lib/drb/drb.rb:1163
   def method_missing(msg_id, *a, **_arg2, &b); end
 
-  # source://drb//lib/drb/drb.rb#1215
+  # pkg:gem/drb#lib/drb/drb.rb:1215
   def pretty_print(q); end
 
-  # source://drb//lib/drb/drb.rb#1219
+  # pkg:gem/drb#lib/drb/drb.rb:1219
   def pretty_print_cycle(q); end
 
   # Routes respond_to? to the referenced remote object.
   #
   # @return [Boolean]
   #
-  # source://drb//lib/drb/drb.rb#1151
+  # pkg:gem/drb#lib/drb/drb.rb:1151
   def respond_to?(msg_id, priv = T.unsafe(nil)); end
 
   class << self
@@ -824,46 +824,46 @@ class DRb::DRbObject
     # the object itself is returned.  Otherwise, a new DRbObject is
     # created to act as a stub for the remote referenced object.
     #
-    # source://drb//lib/drb/drb.rb#1079
+    # pkg:gem/drb#lib/drb/drb.rb:1079
     def _load(s); end
 
     # Creates a DRb::DRbObject given the reference information to the remote
     # host +uri+ and object +ref+.
     #
-    # source://drb//lib/drb/drb.rb#1093
+    # pkg:gem/drb#lib/drb/drb.rb:1093
     def new_with(uri, ref); end
 
     # Create a new DRbObject from a URI alone.
     #
-    # source://drb//lib/drb/drb.rb#1101
+    # pkg:gem/drb#lib/drb/drb.rb:1101
     def new_with_uri(uri); end
 
     # Returns a modified backtrace from +result+ with the +uri+ where each call
     # in the backtrace came from.
     #
-    # source://drb//lib/drb/drb.rb#1201
+    # pkg:gem/drb#lib/drb/drb.rb:1201
     def prepare_backtrace(uri, result); end
 
     # Given the +uri+ of another host executes the block provided.
     #
-    # source://drb//lib/drb/drb.rb#1188
+    # pkg:gem/drb#lib/drb/drb.rb:1188
     def with_friend(uri); end
   end
 end
 
-# source://drb//lib/drb/drb.rb#351
+# pkg:gem/drb#lib/drb/drb.rb:351
 class DRb::DRbObjectSpace
   include ::MonitorMixin
 
   # @return [DRbObjectSpace] a new instance of DRbObjectSpace
   #
-  # source://drb//lib/drb/drb.rb#357
+  # pkg:gem/drb#lib/drb/drb.rb:357
   def initialize; end
 
-  # source://drb//lib/drb/drb.rb#362
+  # pkg:gem/drb#lib/drb/drb.rb:362
   def to_id(obj); end
 
-  # source://drb//lib/drb/drb.rb#369
+  # pkg:gem/drb#lib/drb/drb.rb:369
   def to_obj(ref); end
 end
 
@@ -934,16 +934,16 @@ end
 # and HTTP0 in sample/http0.rb and sample/http0serv.rb in the full
 # drb distribution.
 #
-# source://drb//lib/drb/drb.rb#749
+# pkg:gem/drb#lib/drb/drb.rb:749
 module DRb::DRbProtocol
   private
 
   # Add a new protocol to the DRbProtocol module.
   #
-  # source://drb//lib/drb/drb.rb#752
+  # pkg:gem/drb#lib/drb/drb.rb:752
   def add_protocol(prot); end
 
-  # source://drb//lib/drb/drb.rb#830
+  # pkg:gem/drb#lib/drb/drb.rb:830
   def auto_load(uri); end
 
   # Open a client connection to +uri+ with the configuration +config+.
@@ -956,7 +956,7 @@ module DRb::DRbProtocol
   #
   # @raise [DRbBadURI]
   #
-  # source://drb//lib/drb/drb.rb#764
+  # pkg:gem/drb#lib/drb/drb.rb:764
   def open(uri, config, first = T.unsafe(nil)); end
 
   # Open a server listening for connections at +uri+ with
@@ -971,7 +971,7 @@ module DRb::DRbProtocol
   #
   # @raise [DRbBadURI]
   #
-  # source://drb//lib/drb/drb.rb#792
+  # pkg:gem/drb#lib/drb/drb.rb:792
   def open_server(uri, config, first = T.unsafe(nil)); end
 
   # Parse +uri+ into a [uri, option] pair.
@@ -983,16 +983,16 @@ module DRb::DRbProtocol
   #
   # @raise [DRbBadURI]
   #
-  # source://drb//lib/drb/drb.rb#813
+  # pkg:gem/drb#lib/drb/drb.rb:813
   def uri_option(uri, config, first = T.unsafe(nil)); end
 
   class << self
     # Add a new protocol to the DRbProtocol module.
     #
-    # source://drb//lib/drb/drb.rb#755
+    # pkg:gem/drb#lib/drb/drb.rb:755
     def add_protocol(prot); end
 
-    # source://drb//lib/drb/drb.rb#835
+    # pkg:gem/drb#lib/drb/drb.rb:835
     def auto_load(uri); end
 
     # Open a client connection to +uri+ with the configuration +config+.
@@ -1005,7 +1005,7 @@ module DRb::DRbProtocol
     #
     # @raise [DRbBadURI]
     #
-    # source://drb//lib/drb/drb.rb#781
+    # pkg:gem/drb#lib/drb/drb.rb:781
     def open(uri, config, first = T.unsafe(nil)); end
 
     # Open a server listening for connections at +uri+ with
@@ -1020,7 +1020,7 @@ module DRb::DRbProtocol
     #
     # @raise [DRbBadURI]
     #
-    # source://drb//lib/drb/drb.rb#805
+    # pkg:gem/drb#lib/drb/drb.rb:805
     def open_server(uri, config, first = T.unsafe(nil)); end
 
     # Parse +uri+ into a [uri, option] pair.
@@ -1032,25 +1032,25 @@ module DRb::DRbProtocol
     #
     # @raise [DRbBadURI]
     #
-    # source://drb//lib/drb/drb.rb#828
+    # pkg:gem/drb#lib/drb/drb.rb:828
     def uri_option(uri, config, first = T.unsafe(nil)); end
   end
 end
 
 # An exception wrapping an error object
 #
-# source://drb//lib/drb/drb.rb#459
+# pkg:gem/drb#lib/drb/drb.rb:459
 class DRb::DRbRemoteError < ::DRb::DRbError
   # Creates a new remote error that wraps the Exception +error+
   #
   # @return [DRbRemoteError] a new instance of DRbRemoteError
   #
-  # source://drb//lib/drb/drb.rb#462
+  # pkg:gem/drb#lib/drb/drb.rb:462
   def initialize(error); end
 
   # the class of the error, as a string.
   #
-  # source://drb//lib/drb/drb.rb#469
+  # pkg:gem/drb#lib/drb/drb.rb:469
   def reason; end
 end
 
@@ -1066,7 +1066,7 @@ end
 # Unless multiple servers are being used, the local DRbServer is normally
 # started by calling DRb.start_service.
 #
-# source://drb//lib/drb/drb.rb#1378
+# pkg:gem/drb#lib/drb/drb.rb:1378
 class DRb::DRbServer
   # Create a new DRbServer instance.
   #
@@ -1113,14 +1113,14 @@ class DRb::DRbServer
   #
   # @return [DRbServer] a new instance of DRbServer
   #
-  # source://drb//lib/drb/drb.rb#1479
+  # pkg:gem/drb#lib/drb/drb.rb:1479
   def initialize(uri = T.unsafe(nil), front = T.unsafe(nil), config_or_acl = T.unsafe(nil)); end
 
   # Is this server alive?
   #
   # @return [Boolean]
   #
-  # source://drb//lib/drb/drb.rb#1534
+  # pkg:gem/drb#lib/drb/drb.rb:1534
   def alive?; end
 
   # Check that a method is callable via dRuby.
@@ -1134,12 +1134,12 @@ class DRb::DRbServer
   #
   # @raise [ArgumentError]
   #
-  # source://drb//lib/drb/drb.rb#1622
+  # pkg:gem/drb#lib/drb/drb.rb:1622
   def check_insecure_method(obj, msg_id); end
 
   # The configuration of this DRbServer
   #
-  # source://drb//lib/drb/drb.rb#1521
+  # pkg:gem/drb#lib/drb/drb.rb:1521
   def config; end
 
   # The front object of the DRbServer.
@@ -1147,19 +1147,19 @@ class DRb::DRbServer
   # This object receives remote method calls made on the server's
   # URI alone, with an object id.
   #
-  # source://drb//lib/drb/drb.rb#1518
+  # pkg:gem/drb#lib/drb/drb.rb:1518
   def front; end
 
   # Is +uri+ the URI for this server?
   #
   # @return [Boolean]
   #
-  # source://drb//lib/drb/drb.rb#1539
+  # pkg:gem/drb#lib/drb/drb.rb:1539
   def here?(uri); end
 
   # Stop this server.
   #
-  # source://drb//lib/drb/drb.rb#1544
+  # pkg:gem/drb#lib/drb/drb.rb:1544
   def stop_service; end
 
   # The main thread of this DRbServer.
@@ -1168,36 +1168,36 @@ class DRb::DRbServer
   # from clients, not that handles each client's request-response
   # session.
   #
-  # source://drb//lib/drb/drb.rb#1512
+  # pkg:gem/drb#lib/drb/drb.rb:1512
   def thread; end
 
   # Convert a local object to a dRuby reference.
   #
-  # source://drb//lib/drb/drb.rb#1561
+  # pkg:gem/drb#lib/drb/drb.rb:1561
   def to_id(obj); end
 
   # Convert a dRuby reference to the local object it refers to.
   #
-  # source://drb//lib/drb/drb.rb#1554
+  # pkg:gem/drb#lib/drb/drb.rb:1554
   def to_obj(ref); end
 
   # The URI of this DRbServer.
   #
-  # source://drb//lib/drb/drb.rb#1505
+  # pkg:gem/drb#lib/drb/drb.rb:1505
   def uri; end
 
   # Get whether the server is in verbose mode.
   #
   # In verbose mode, failed calls are logged to stdout.
   #
-  # source://drb//lib/drb/drb.rb#1531
+  # pkg:gem/drb#lib/drb/drb.rb:1531
   def verbose; end
 
   # Set whether to operate in verbose mode.
   #
   # In verbose mode, failed calls are logged to stdout.
   #
-  # source://drb//lib/drb/drb.rb#1526
+  # pkg:gem/drb#lib/drb/drb.rb:1526
   def verbose=(v); end
 
   private
@@ -1205,17 +1205,17 @@ class DRb::DRbServer
   # Coerce an object to a string, providing our own representation if
   # to_s is not defined for the object.
   #
-  # source://drb//lib/drb/drb.rb#1608
+  # pkg:gem/drb#lib/drb/drb.rb:1608
   def any_to_s(obj); end
 
-  # source://drb//lib/drb/drb.rb#1746
+  # pkg:gem/drb#lib/drb/drb.rb:1746
   def error_print(exception); end
 
   # Has a method been included in the list of insecure methods?
   #
   # @return [Boolean]
   #
-  # source://drb//lib/drb/drb.rb#1602
+  # pkg:gem/drb#lib/drb/drb.rb:1602
   def insecure_method?(msg_id); end
 
   # The main loop performed by a DRbServer's internal thread.
@@ -1226,15 +1226,15 @@ class DRb::DRbServer
   # returning responses, until the client closes the connection
   # or a local method call fails.
   #
-  # source://drb//lib/drb/drb.rb#1764
+  # pkg:gem/drb#lib/drb/drb.rb:1764
   def main_loop; end
 
   # Starts the DRb main loop in a new thread.
   #
-  # source://drb//lib/drb/drb.rb#1583
+  # pkg:gem/drb#lib/drb/drb.rb:1583
   def run; end
 
-  # source://drb//lib/drb/drb.rb#1568
+  # pkg:gem/drb#lib/drb/drb.rb:1568
   def shutdown; end
 
   class << self
@@ -1242,75 +1242,75 @@ class DRb::DRbServer
     #
     # See also DRb::ACL and #new()
     #
-    # source://drb//lib/drb/drb.rb#1403
+    # pkg:gem/drb#lib/drb/drb.rb:1403
     def default_acl(acl); end
 
     # Set the default value for the :argc_limit option.
     #
     # See #new().  The initial default value is 256.
     #
-    # source://drb//lib/drb/drb.rb#1389
+    # pkg:gem/drb#lib/drb/drb.rb:1389
     def default_argc_limit(argc); end
 
     # Set the default value for the :id_conv option.
     #
     # See #new().  The initial default value is a DRbIdConv instance.
     #
-    # source://drb//lib/drb/drb.rb#1410
+    # pkg:gem/drb#lib/drb/drb.rb:1410
     def default_id_conv(idconv); end
 
     # Set the default value for the :load_limit option.
     #
     # See #new().  The initial default value is 25 MB.
     #
-    # source://drb//lib/drb/drb.rb#1396
+    # pkg:gem/drb#lib/drb/drb.rb:1396
     def default_load_limit(sz); end
 
-    # source://drb//lib/drb/drb.rb#1426
+    # pkg:gem/drb#lib/drb/drb.rb:1426
     def make_config(hash = T.unsafe(nil)); end
 
     # Get the default value of the :verbose option.
     #
-    # source://drb//lib/drb/drb.rb#1422
+    # pkg:gem/drb#lib/drb/drb.rb:1422
     def verbose; end
 
     # Set the default value of the :verbose option.
     #
     # See #new().  The initial default value is false.
     #
-    # source://drb//lib/drb/drb.rb#1417
+    # pkg:gem/drb#lib/drb/drb.rb:1417
     def verbose=(on); end
   end
 end
 
-# source://drb//lib/drb/drb.rb#1652
+# pkg:gem/drb#lib/drb/drb.rb:1652
 class DRb::DRbServer::InvokeMethod
   # @return [InvokeMethod] a new instance of InvokeMethod
   #
-  # source://drb//lib/drb/drb.rb#1653
+  # pkg:gem/drb#lib/drb/drb.rb:1653
   def initialize(drb_server, client); end
 
-  # source://drb//lib/drb/drb.rb#1658
+  # pkg:gem/drb#lib/drb/drb.rb:1658
   def perform; end
 
   private
 
-  # source://drb//lib/drb/drb.rb#1704
+  # pkg:gem/drb#lib/drb/drb.rb:1704
   def block_yield(x); end
 
-  # source://drb//lib/drb/drb.rb#1695
+  # pkg:gem/drb#lib/drb/drb.rb:1695
   def check_insecure_method; end
 
-  # source://drb//lib/drb/drb.rb#1687
+  # pkg:gem/drb#lib/drb/drb.rb:1687
   def init_with_client; end
 
-  # source://drb//lib/drb/drb.rb#1711
+  # pkg:gem/drb#lib/drb/drb.rb:1711
   def perform_with_block; end
 
-  # source://drb//lib/drb/drb.rb#1731
+  # pkg:gem/drb#lib/drb/drb.rb:1731
   def perform_without_block; end
 
-  # source://drb//lib/drb/drb.rb#1699
+  # pkg:gem/drb#lib/drb/drb.rb:1699
   def setup_message; end
 end
 
@@ -1319,7 +1319,7 @@ end
 # The DRb TCP protocol URI looks like:
 # <code>druby://<host>:<port>?<option></code>.  The option is optional.
 #
-# source://drb//lib/drb/drb.rb#843
+# pkg:gem/drb#lib/drb/drb.rb:843
 class DRb::DRbTCPSocket
   # Create a new DRbTCPSocket instance.
   #
@@ -1329,21 +1329,21 @@ class DRb::DRbTCPSocket
   #
   # @return [DRbTCPSocket] a new instance of DRbTCPSocket
   #
-  # source://drb//lib/drb/drb.rb#931
+  # pkg:gem/drb#lib/drb/drb.rb:931
   def initialize(uri, soc, config = T.unsafe(nil)); end
 
   # On the server side, for an instance returned by #open_server,
   # accept a client connection and return a new instance to handle
   # the server's side of this client-server session.
   #
-  # source://drb//lib/drb/drb.rb#999
+  # pkg:gem/drb#lib/drb/drb.rb:999
   def accept; end
 
   # Check to see if this connection is alive.
   #
   # @return [Boolean]
   #
-  # source://drb//lib/drb/drb.rb#1029
+  # pkg:gem/drb#lib/drb/drb.rb:1029
   def alive?; end
 
   # Close the connection.
@@ -1353,65 +1353,65 @@ class DRb::DRbTCPSocket
   # returned by #open or by #accept, then it closes this particular
   # client-server session.
   #
-  # source://drb//lib/drb/drb.rb#981
+  # pkg:gem/drb#lib/drb/drb.rb:981
   def close; end
 
   # Get the address of our TCP peer (the other end of the socket
   # we are bound to.
   #
-  # source://drb//lib/drb/drb.rb#946
+  # pkg:gem/drb#lib/drb/drb.rb:946
   def peeraddr; end
 
   # On the client side, receive a reply from the server.
   #
-  # source://drb//lib/drb/drb.rb#969
+  # pkg:gem/drb#lib/drb/drb.rb:969
   def recv_reply; end
 
   # On the server side, receive a request from the client.
   #
-  # source://drb//lib/drb/drb.rb#959
+  # pkg:gem/drb#lib/drb/drb.rb:959
   def recv_request; end
 
   # On the server side, send a reply to the client.
   #
-  # source://drb//lib/drb/drb.rb#964
+  # pkg:gem/drb#lib/drb/drb.rb:964
   def send_reply(succ, result); end
 
   # On the client side, send a request to the server.
   #
-  # source://drb//lib/drb/drb.rb#954
+  # pkg:gem/drb#lib/drb/drb.rb:954
   def send_request(ref, msg_id, arg, b); end
 
-  # source://drb//lib/drb/drb.rb#1038
+  # pkg:gem/drb#lib/drb/drb.rb:1038
   def set_sockopt(soc); end
 
   # Graceful shutdown
   #
-  # source://drb//lib/drb/drb.rb#1024
+  # pkg:gem/drb#lib/drb/drb.rb:1024
   def shutdown; end
 
   # Get the socket.
   #
-  # source://drb//lib/drb/drb.rb#951
+  # pkg:gem/drb#lib/drb/drb.rb:951
   def stream; end
 
   # Get the URI that we are connected to.
   #
-  # source://drb//lib/drb/drb.rb#942
+  # pkg:gem/drb#lib/drb/drb.rb:942
   def uri; end
 
   private
 
-  # source://drb//lib/drb/drb.rb#1014
+  # pkg:gem/drb#lib/drb/drb.rb:1014
   def accept_or_shutdown; end
 
-  # source://drb//lib/drb/drb.rb#990
+  # pkg:gem/drb#lib/drb/drb.rb:990
   def close_shutdown_pipe; end
 
   class << self
     # Returns the hostname of this server
     #
-    # source://drb//lib/drb/drb.rb#873
+    # pkg:gem/drb#lib/drb/drb.rb:873
     def getservername; end
 
     # Open a client connection to +uri+ (DRb URI string) using configuration
@@ -1421,28 +1421,28 @@ class DRb::DRbTCPSocket
     # recognized protocol.  See DRb::DRbServer.new for information on built-in
     # URI protocols.
     #
-    # source://drb//lib/drb/drb.rb#866
+    # pkg:gem/drb#lib/drb/drb.rb:866
     def open(uri, config); end
 
     # Open a server listening for connections at +uri+ using
     # configuration +config+.
     #
-    # source://drb//lib/drb/drb.rb#904
+    # pkg:gem/drb#lib/drb/drb.rb:904
     def open_server(uri, config); end
 
     # For the families available for +host+, returns a TCPServer on +port+.
     # If +port+ is 0 the first available port is used.  IPv4 servers are
     # preferred over IPv6 servers.
     #
-    # source://drb//lib/drb/drb.rb#889
+    # pkg:gem/drb#lib/drb/drb.rb:889
     def open_server_inaddr_any(host, port); end
 
-    # source://drb//lib/drb/drb.rb#846
+    # pkg:gem/drb#lib/drb/drb.rb:846
     def parse_uri(uri); end
 
     # Parse +uri+ into a [uri, option] pair.
     #
-    # source://drb//lib/drb/drb.rb#921
+    # pkg:gem/drb#lib/drb/drb.rb:921
     def uri_option(uri, config); end
   end
 end
@@ -1452,69 +1452,69 @@ end
 # DRb UNIX socket URIs look like <code>drbunix:<path>?<option></code>.  The
 # option is optional.
 #
-# source://drb//lib/drb/unix.rb#15
+# pkg:gem/drb#lib/drb/unix.rb:15
 class DRb::DRbUNIXSocket < ::DRb::DRbTCPSocket
   # @return [DRbUNIXSocket] a new instance of DRbUNIXSocket
   #
-  # source://drb//lib/drb/unix.rb#62
+  # pkg:gem/drb#lib/drb/unix.rb:62
   def initialize(uri, soc, config = T.unsafe(nil), server_mode = T.unsafe(nil)); end
 
-  # source://drb//lib/drb/unix.rb#105
+  # pkg:gem/drb#lib/drb/unix.rb:105
   def accept; end
 
-  # source://drb//lib/drb/unix.rb#95
+  # pkg:gem/drb#lib/drb/unix.rb:95
   def close; end
 
-  # source://drb//lib/drb/unix.rb#111
+  # pkg:gem/drb#lib/drb/unix.rb:111
   def set_sockopt(soc); end
 
   class << self
-    # source://drb//lib/drb/unix.rb#28
+    # pkg:gem/drb#lib/drb/unix.rb:28
     def open(uri, config); end
 
-    # source://drb//lib/drb/unix.rb#34
+    # pkg:gem/drb#lib/drb/unix.rb:34
     def open_server(uri, config); end
 
     # :stopdoc:
     #
-    # source://drb//lib/drb/unix.rb#17
+    # pkg:gem/drb#lib/drb/unix.rb:17
     def parse_uri(uri); end
 
-    # source://drb//lib/drb/unix.rb#72
+    # pkg:gem/drb#lib/drb/unix.rb:72
     def temp_server; end
 
-    # source://drb//lib/drb/unix.rb#57
+    # pkg:gem/drb#lib/drb/unix.rb:57
     def uri_option(uri, config); end
   end
 end
 
 # import from tempfile.rb
 #
-# source://drb//lib/drb/unix.rb#70
+# pkg:gem/drb#lib/drb/unix.rb:70
 DRb::DRbUNIXSocket::Max_try = T.let(T.unsafe(nil), Integer)
 
-# source://drb//lib/drb/drb.rb#1049
+# pkg:gem/drb#lib/drb/drb.rb:1049
 class DRb::DRbURIOption
   # @return [DRbURIOption] a new instance of DRbURIOption
   #
-  # source://drb//lib/drb/drb.rb#1050
+  # pkg:gem/drb#lib/drb/drb.rb:1050
   def initialize(option); end
 
-  # source://drb//lib/drb/drb.rb#1056
+  # pkg:gem/drb#lib/drb/drb.rb:1056
   def ==(other); end
 
-  # source://drb//lib/drb/drb.rb#1065
+  # pkg:gem/drb#lib/drb/drb.rb:1065
   def eql?(other); end
 
-  # source://drb//lib/drb/drb.rb#1061
+  # pkg:gem/drb#lib/drb/drb.rb:1061
   def hash; end
 
   # Returns the value of attribute option.
   #
-  # source://drb//lib/drb/drb.rb#1053
+  # pkg:gem/drb#lib/drb/drb.rb:1053
   def option; end
 
-  # source://drb//lib/drb/drb.rb#1054
+  # pkg:gem/drb#lib/drb/drb.rb:1054
   def to_s; end
 end
 
@@ -1525,11 +1525,11 @@ end
 # and a reference to the object is returned, rather than the
 # object being marshalled and moved into the client space.
 #
-# source://drb//lib/drb/drb.rb#418
+# pkg:gem/drb#lib/drb/drb.rb:418
 module DRb::DRbUndumped
   # @raise [TypeError]
   #
-  # source://drb//lib/drb/drb.rb#419
+  # pkg:gem/drb#lib/drb/drb.rb:419
   def _dump(dummy); end
 end
 
@@ -1547,7 +1547,7 @@ end
 # +name+ attribute.  The marshalled object is held in the +buf+
 # attribute.
 #
-# source://drb//lib/drb/drb.rb#485
+# pkg:gem/drb#lib/drb/drb.rb:485
 class DRb::DRbUnknown
   # Create a new DRbUnknown object.
   #
@@ -1558,20 +1558,20 @@ class DRb::DRbUnknown
   #
   # @return [DRbUnknown] a new instance of DRbUnknown
   #
-  # source://drb//lib/drb/drb.rb#493
+  # pkg:gem/drb#lib/drb/drb.rb:493
   def initialize(err, buf); end
 
-  # source://drb//lib/drb/drb.rb#522
+  # pkg:gem/drb#lib/drb/drb.rb:522
   def _dump(lv); end
 
   # Buffer contained the marshalled, unknown object.
   #
-  # source://drb//lib/drb/drb.rb#512
+  # pkg:gem/drb#lib/drb/drb.rb:512
   def buf; end
 
   # Create a DRbUnknownError exception containing this object.
   #
-  # source://drb//lib/drb/drb.rb#536
+  # pkg:gem/drb#lib/drb/drb.rb:536
   def exception; end
 
   # The name of the unknown thing.
@@ -1579,7 +1579,7 @@ class DRb::DRbUnknown
   # Class name for unknown objects; variable name for unknown
   # constants.
   #
-  # source://drb//lib/drb/drb.rb#509
+  # pkg:gem/drb#lib/drb/drb.rb:509
   def name; end
 
   # Attempt to load the wrapped marshalled object again.
@@ -1588,74 +1588,74 @@ class DRb::DRbUnknown
   # will be unmarshalled and returned.  Otherwise, a new
   # but identical DRbUnknown object will be returned.
   #
-  # source://drb//lib/drb/drb.rb#531
+  # pkg:gem/drb#lib/drb/drb.rb:531
   def reload; end
 
   class << self
-    # source://drb//lib/drb/drb.rb#514
+    # pkg:gem/drb#lib/drb/drb.rb:514
     def _load(s); end
   end
 end
 
 # An exception wrapping a DRb::DRbUnknown object
 #
-# source://drb//lib/drb/drb.rb#438
+# pkg:gem/drb#lib/drb/drb.rb:438
 class DRb::DRbUnknownError < ::DRb::DRbError
   # Create a new DRbUnknownError for the DRb::DRbUnknown object +unknown+
   #
   # @return [DRbUnknownError] a new instance of DRbUnknownError
   #
-  # source://drb//lib/drb/drb.rb#441
+  # pkg:gem/drb#lib/drb/drb.rb:441
   def initialize(unknown); end
 
-  # source://drb//lib/drb/drb.rb#453
+  # pkg:gem/drb#lib/drb/drb.rb:453
   def _dump(lv); end
 
   # Get the wrapped DRb::DRbUnknown object.
   #
-  # source://drb//lib/drb/drb.rb#447
+  # pkg:gem/drb#lib/drb/drb.rb:447
   def unknown; end
 
   class << self
-    # source://drb//lib/drb/drb.rb#449
+    # pkg:gem/drb#lib/drb/drb.rb:449
     def _load(s); end
   end
 end
 
-# source://drb//lib/drb/drb.rb#1227
+# pkg:gem/drb#lib/drb/drb.rb:1227
 class DRb::ThreadObject
   include ::MonitorMixin
 
   # @return [ThreadObject] a new instance of ThreadObject
   #
-  # source://drb//lib/drb/drb.rb#1230
+  # pkg:gem/drb#lib/drb/drb.rb:1230
   def initialize(&blk); end
 
-  # source://drb//lib/drb/drb.rb#1265
+  # pkg:gem/drb#lib/drb/drb.rb:1265
   def _execute; end
 
   # @return [Boolean]
   #
-  # source://drb//lib/drb/drb.rb#1241
+  # pkg:gem/drb#lib/drb/drb.rb:1241
   def alive?; end
 
-  # source://drb//lib/drb/drb.rb#1245
+  # pkg:gem/drb#lib/drb/drb.rb:1245
   def kill; end
 
-  # source://drb//lib/drb/drb.rb#1250
+  # pkg:gem/drb#lib/drb/drb.rb:1250
   def method_missing(msg, *arg, &blk); end
 end
 
-# source://drb//lib/drb/version.rb#2
+# pkg:gem/drb#lib/drb/version.rb:2
 DRb::VERSION = T.let(T.unsafe(nil), String)
 
-# source://drb//lib/drb/drb.rb#1993
+# pkg:gem/drb#lib/drb/drb.rb:1993
 DRbIdConv = DRb::DRbIdConv
 
 # :stopdoc:
 #
-# source://drb//lib/drb/drb.rb#1991
+# pkg:gem/drb#lib/drb/drb.rb:1991
 DRbObject = DRb::DRbObject
 
-# source://drb//lib/drb/drb.rb#1992
+# pkg:gem/drb#lib/drb/drb.rb:1992
 DRbUndumped = DRb::DRbUndumped
