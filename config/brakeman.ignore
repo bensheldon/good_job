@@ -3,44 +3,23 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "c27b4ea38ea42ec72c9343f4c59b81907e6df0d9bcece140bda3d4df82c44127",
+      "fingerprint": "e3cc5489d3e3e81f35347b7530d5743fbac8491ab612ceec0d034e22656269ed",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "app/models/concerns/good_job/lockable.rb",
-      "line": 41,
+      "file": "app/models/good_job/job/lockable.rb",
+      "line": 103,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "unscoped.find_by_sql([\"WITH candidate AS #{(\"MATERIALIZED \" or \"\")}(#{select(:id).lock(\"FOR NO KEY UPDATE SKIP LOCKED\").to_sql})\\nUPDATE #{adapter_class.quote_table_name(table_name)}\\nSET locked_by_id = ?,\\n    locked_at = ?,\\n    lock_type = ?\\nFROM candidate\\nWHERE #{adapter_class.quote_table_name(table_name)}.id = candidate.id\\nRETURNING #{adapter_class.quote_table_name(table_name)}.*\\n\".squish, locked_by_id, locked_at, lock_types[lock_type.to_s]])",
+      "code": "unscoped.find_by_sql([\"WITH candidate AS #{(\"MATERIALIZED \" or \"\")}(#{select(:id).lock(\"FOR NO KEY UPDATE SKIP LOCKED\").to_sql})\\nUPDATE #{quoted_table_name}\\nSET locked_by_id = ?,\\n    locked_at = ?,\\n    lock_type = ?\\nFROM (\\n  SELECT id FROM candidate\\n  WHERE pg_try_advisory_lock(#{\"('x' || substr(md5(#{_quoted_table_name_string} || '-' || id::text), 1, 16))::bit(64)::bigint\"})\\n) AS locked\\nWHERE #{quoted_table_name}.id = locked.id\\nRETURNING #{quoted_table_name}.*\\n\".squish, locked_by_id, locked_at, lock_types[lock_type.to_s]])",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "GoodJob::Lockable",
-        "method": "with_skip_locked_claim"
-      },
-      "user_input": "adapter_class.quote_table_name(table_name)",
-      "confidence": "Weak",
-      "cwe_id": [89],
-      "note": "Table name is quoted via adapter_class.quote_table_name; candidate SQL is Rails-generated; values are parameterized bindings."
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "5e7e94f72997d95dd2fa079c0e3da0765d58dd500d7f1c62ae924b397a8662fd",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/concerns/good_job/lockable.rb",
-      "line": 71,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "unscoped.find_by_sql([\"WITH candidate AS #{(\"MATERIALIZED \" or \"\")}(#{select(:id).lock(\"FOR NO KEY UPDATE SKIP LOCKED\").to_sql})\\nUPDATE #{adapter_class.quote_table_name(table_name)}\\nSET locked_by_id = ?,\\n    locked_at = ?,\\n    lock_type = ?\\nFROM (\\n  SELECT id FROM candidate\\n  WHERE pg_try_advisory_lock(#{\"('x' || substr(md5(#{_quoted_table_name_string} || '-' || id::text), 1, 16))::bit(64)::bigint\"})\\n) AS locked\\nWHERE #{adapter_class.quote_table_name(table_name)}.id = locked.id\\nRETURNING #{adapter_class.quote_table_name(table_name)}.*\\n\".squish, locked_by_id, locked_at, lock_types[lock_type.to_s]])",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "GoodJob::Lockable",
+        "class": "GoodJob::Job",
         "method": "with_hybrid_lock_claim"
       },
-      "user_input": "adapter_class.quote_table_name(table_name)",
+      "user_input": "_quoted_table_name_string",
       "confidence": "Weak",
       "cwe_id": [89],
-      "note": "Table name is quoted via adapter_class.quote_table_name; advisory lock expression uses _quoted_table_name_string (escaped); candidate SQL is Rails-generated; values are parameterized bindings."
+      "note": "Table name is quoted via quoted_table_name (Rails); advisory lock expression uses _quoted_table_name_string (escaped); candidate SQL is Rails-generated; values are parameterized bindings."
     },
     {
       "warning_type": "SQL Injection",
