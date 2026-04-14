@@ -77,7 +77,7 @@ task :release_good_job, [:version_bump] do |_t, args|
   puts "\n== Creating git commit  =="
   system! "git add lib/good_job/version.rb CHANGELOG.md Gemfile.lock checksums"
   system! "git commit -m \"Release good_job v#{GoodJob::VERSION}\""
-  system! "git tag v#{GoodJob::VERSION}"
+  system! "git tag -a v#{GoodJob::VERSION} -m \"v#{GoodJob::VERSION}\""
 
   require 'cgi'
   changelog_anchor = "v#{GoodJob::VERSION.delete('.')}-#{Time.now.utc.strftime('%Y-%m-%d')}"

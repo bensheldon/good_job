@@ -265,6 +265,7 @@ zh-CN:
         all_queues: 所有队列
         clear: 清除
         job_name: 任务名称
+        label: 标签
         placeholder: 按类、任务 ID、任务参数和错误文本搜索。
         queue_name: 队列名称
         search: 搜索

@@ -542,6 +542,78 @@ GoodJob can extend Active Job to provide limits on concurrently running jobs, ei
 class MyJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
 
+  # Define one or more concurrency rules. Each rule is scoped to a label,
+  # which is a value derived from the job's arguments at enqueue time and
+  # stored on the job record. Jobs must be enqueued with the matching label
+  # via `good_job_labels:` for the rule to apply.
+  #
+  # Multiple rules can be defined; they are evaluated in order and the first
+  # exceeded rule short-circuits the rest.
+  good_job_concurrency_rule(
+    # A label that scopes this rule. Can be a static String or a Lambda/Proc
+    # invoked in the context of the job instance. The rule only applies to jobs
+    # that were enqueued with this label in `good_job_labels`.
+    label: -> { arguments.first[:user_id] },
+
+    # Maximum number of unfinished jobs with this label to allow.
+    # Can be an Integer or Lambda/Proc invoked in the context of the job.
+    total_limit: 1,
+
+    # Or, if more control is needed:
+    # Maximum number of jobs with this label to be concurrently enqueued
+    # (excludes performing jobs). Can be an Integer or Lambda/Proc.
+    enqueue_limit: 2,
+
+    # Maximum number of jobs with this label to be concurrently performed
+    # (excludes enqueued jobs). Can be an Integer or Lambda/Proc.
+    perform_limit: 1,
+
+    # Maximum number of jobs with this label to be enqueued within the time
+    # period, looking backwards from now. Must be [count, period].
+    enqueue_throttle: [10, 1.minute],
+
+    # Maximum number of jobs with this label to be performed within the time
+    # period, looking backwards from now. Must be [count, period].
+    perform_throttle: [100, 1.hour],
+
+    # Note: Under heavy load, the total number of jobs may exceed the
+    # sum of `enqueue_limit` and `perform_limit` because of race conditions
+    # caused by imperfectly disjunctive states. If you need to constrain
+    # the total number of jobs, use `total_limit` instead. See #378.
+  )
+  # Additional rules
+  good_job_concurrency_rule(...)
+  good_job_concurrency_rule(...)
+
+  def perform(user_id:)
+    # do work
+  end
+end
+```
+
+Jobs must be enqueued with the matching label for rules to take effect:
+
+```ruby
+MyJob.set(good_job_labels: [current_user.id]).perform_later(user_id: current_user.id)
+```
+
+#### How concurrency controls work
+
+GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry with an incremental backoff".  The [code is readable](https://github.com/bensheldon/good_job/blob/main/lib/good_job/active_job_extensions/concurrency.rb).
+
+- "Optimistic" meaning that the implementation's performance trade-off assumes that collisions are atypical (e.g. two users enqueue the same job at the same time) rather than regular (e.g. the system enqueues thousands of colliding jobs at the same time). Depending on your concurrency requirements, you may also want to manage concurrency through the number of GoodJob threads and processes that are performing a given queue.
+- "Retry with an incremental backoff" means that when `perform_limit` is exceeded, the job will raise a `GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError` which is caught by a `retry_on` handler which re-schedules the job to execute in the near future with an incremental backoff.
+- First-in-first-out job execution order is not preserved when a job is retried with incremental back-off.
+- For pessimistic usecases that collisions are expected, use number of threads/processes (e.g., `good_job --queues "serial:1;-serial:5"`) to control concurrency. It is also a good idea to use `perform_limit` as backstop.
+
+#### Legacy: `good_job_control_concurrency_with`
+
+The original concurrency interface uses a single configuration hash and scopes limits to a concurrency _key_ (a string derived from the job) stored on the job record, rather than a label. It remains fully supported.
+
+```ruby
+class MyJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
   good_job_control_concurrency_with(
     # Maximum number of unfinished jobs to allow with the concurrency key
     # Can be an Integer or Lambda/Proc that is invoked in the context of the job
@@ -567,11 +639,6 @@ class MyJob < ApplicationJob
     # the time period, looking backwards from the current time. Must be an array
     # with two elements: the number of jobs and the time period.
     perform_throttle: [100, 1.hour],
-
-    # Note: Under heavy load, the total number of jobs may exceed the
-    # sum of `enqueue_limit` and `perform_limit` because of race conditions
-    # caused by imperfectly disjunctive states. If you need to constrain
-    # the total number of jobs, use `total_limit` instead. See #378.
 
     # A unique key to be globally locked against.
     # Can be String or Lambda/Proc that is invoked in the context of the job.
@@ -605,15 +672,6 @@ When testing, the resulting concurrency key value can be inspected:
 job = MyJob.perform_later("Alice", version: 'v1')
 job.good_job_concurrency_key #=> "MyJob-default-Alice-v1"
 ```
-
-#### How concurrency controls work
-
-GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry with an incremental backoff".  The [code is readable](https://github.com/bensheldon/good_job/blob/main/lib/good_job/active_job_extensions/concurrency.rb).
-
-- "Optimistic" meaning that the implementation's performance trade-off assumes that collisions are atypical (e.g. two users enqueue the same job at the same time) rather than regular (e.g. the system enqueues thousands of colliding jobs at the same time). Depending on your concurrency requirements, you may also want to manage concurrency through the number of GoodJob threads and processes that are performing a given queue.
-- "Retry with an incremental backoff" means that when `perform_limit` is exceeded, the job will raise a `GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError` which is caught by a `retry_on` handler which re-schedules the job to execute in the near future with an incremental backoff.
-- First-in-first-out job execution order is not preserved when a job is retried with incremental back-off.
-- For pessimistic usecases that collisions are expected, use number of threads/processes (e.g., `good_job --queues "serial:1;-serial:5"`) to control concurrency. It is also a good idea to use `perform_limit` as backstop.
 
 ### Cron-style repeating/recurring jobs
 

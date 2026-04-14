@@ -265,6 +265,7 @@ ja:
         all_queues: 全てのキュー
         clear: クリア
         job_name: ジョブ名
+        label: ラベル
         placeholder: クラス名、ジョブID、ジョブパラメータ、エラーテキストで検索
         queue_name: キュー名
         search: 検索

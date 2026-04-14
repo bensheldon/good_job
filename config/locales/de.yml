@@ -265,6 +265,7 @@ de:
         all_queues: Alle Warteschlangen
         clear: Löschen
         job_name: Job-Name
+        label: Bezeichnung
         placeholder: Suche nach Klasse, Job-ID, Jobparameter und Fehlertext.
         queue_name: Warteschlangenname
         search: Suchen

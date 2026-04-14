@@ -265,6 +265,7 @@ ko:
         all_queues: 모든 큐
         clear: 지우기
         job_name: 작업 이름
+        label: 레이블
         placeholder: 클래스 이름, 작업 ID, 작업 매개변수, 오류 텍스트로 검색
         queue_name: 큐 이름
         search: 검색

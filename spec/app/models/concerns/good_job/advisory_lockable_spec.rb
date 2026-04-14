@@ -451,6 +451,196 @@ RSpec.describe GoodJob::AdvisoryLockable do
     end
   end
 
+  describe 'advisory lock cleanup' do
+    def pg_lock_count
+      PgLock.current_database.advisory_lock.owns.count
+    end
+
+    def cte_lock(record)
+      locked = record.class.order(created_at: :asc).limit(1)
+                     .where(id: record.id)
+                     .advisory_lock.first
+      record.class.record_advisory_lock(record.class.lease_connection, locked.lockable_column_key, cte: true)
+      locked
+    end
+
+    def phantom_lock(key)
+      conn = model_class.lease_connection
+      binds = [ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new)]
+      lock_sql = model_class.pg_or_jdbc_query("SELECT pg_try_advisory_lock(('x'||substr(md5($1::text), 1, 16))::bit(64)::bigint)")
+      conn.exec_query(lock_sql, 'phantom lock', binds)
+    end
+
+    it 'CTE lock and unlock fully releases' do
+      record = cte_lock(job)
+      expect(pg_lock_count).to eq(1)
+
+      record.advisory_unlock
+      expect(pg_lock_count).to eq(0)
+    end
+
+    it 'advisory_unlock cleans up phantom re-entrant CTE locks' do
+      record = cte_lock(job)
+      expect(pg_lock_count).to eq(1)
+
+      phantom_lock(job.lockable_key)
+      expect(pg_lock_count).to eq(1)
+
+      record.advisory_unlock
+      expect(pg_lock_count).to eq(0)
+    end
+
+    it 'session lock then xact lock on same key: unlock leaves no lingering locks' do
+      key = job.lockable_key
+
+      job.advisory_lock!
+      expect(pg_lock_count).to eq(1)
+
+      model_class.transaction do
+        model_class.advisory_lock_key(key, function: 'pg_advisory_xact_lock')
+        expect(pg_lock_count).to eq(1)
+      end
+
+      expect(pg_lock_count).to eq(1)
+
+      job.advisory_unlock
+      expect(pg_lock_count).to eq(0)
+    end
+
+    it 'session and xact lock on same key inside transaction: no lingering locks after unlock and commit' do
+      key = job.lockable_key
+
+      model_class.transaction do
+        job.advisory_lock!
+        expect(pg_lock_count).to eq(1)
+
+        model_class.advisory_lock_key(key, function: 'pg_advisory_xact_lock')
+        expect(pg_lock_count).to eq(1)
+
+        job.advisory_unlock
+        expect(pg_lock_count).to eq(1)
+      end
+
+      expect(pg_lock_count).to eq(0)
+    end
+
+    it 'mixed lock types across keys with phantom re-entrancy: all cleaned up' do
+      job.advisory_lock!
+      expect(pg_lock_count).to eq(1)
+
+      cte_lock(another_job)
+      phantom_lock(another_job.lockable_key)
+      expect(pg_lock_count).to eq(2)
+
+      model_class.transaction do
+        model_class.advisory_lock_key('xact-key', function: 'pg_advisory_xact_lock')
+        expect(pg_lock_count).to eq(3)
+      end
+      expect(pg_lock_count).to eq(2)
+
+      job.advisory_unlock
+      expect(pg_lock_count).to eq(1)
+      expect(job.owns_advisory_lock?).to be false
+
+      another_job.advisory_unlock
+      expect(pg_lock_count).to eq(0)
+      expect(another_job.owns_advisory_lock?).to be false
+    end
+
+    it 'CTE session lock then xact lock then unlock inside transaction: no lingering locks' do
+      key = job.lockable_key
+
+      cte_lock(job)
+      expect(pg_lock_count).to eq(1)
+
+      model_class.transaction do
+        model_class.advisory_lock_key(key, function: 'pg_advisory_xact_lock')
+        expect(pg_lock_count).to eq(1)
+
+        job.advisory_unlock
+        expect(pg_lock_count).to eq(1)
+      end
+
+      expect(pg_lock_count).to eq(0)
+
+      # JRuby's JDBC adapter does not support set_notice_receiver, so Postgres
+      # WARNING messages are not captured into POSTGRES_NOTICES.
+      unless Concurrent.on_jruby?
+        own_lock_warnings = POSTGRES_NOTICES.select { |n| n.include?("you don't own a lock") }
+        expect(own_lock_warnings.size).to eq(1)
+        POSTGRES_NOTICES.reject! { |n| n.include?("you don't own a lock") }
+      end
+    end
+
+    it 'CTE session lock with phantom, then xact lock, then unlock inside transaction: no lingering locks' do
+      key = job.lockable_key
+
+      cte_lock(job)
+      phantom_lock(key)
+      expect(pg_lock_count).to eq(1)
+
+      model_class.transaction do
+        model_class.advisory_lock_key(key, function: 'pg_advisory_xact_lock')
+        expect(pg_lock_count).to eq(1)
+
+        job.advisory_unlock
+        expect(pg_lock_count).to eq(1)
+      end
+
+      expect(pg_lock_count).to eq(0)
+
+      # JRuby's JDBC adapter does not support set_notice_receiver, so Postgres
+      # WARNING messages are not captured into POSTGRES_NOTICES.
+      unless Concurrent.on_jruby?
+        own_lock_warnings = POSTGRES_NOTICES.select { |n| n.include?("you don't own a lock") }
+        expect(own_lock_warnings.size).to eq(1)
+        POSTGRES_NOTICES.reject! { |n| n.include?("you don't own a lock") }
+      end
+    end
+
+    it 'nested transactions with multiple xact locks on different keys: no lingering locks' do
+      job_key = job.lockable_key
+      another_job_key = another_job.lockable_key
+
+      job.advisory_lock!
+      expect(pg_lock_count).to eq(1)
+
+      model_class.transaction do
+        model_class.advisory_lock_key(job_key, function: 'pg_advisory_xact_lock')
+        expect(pg_lock_count).to eq(1)
+
+        model_class.transaction(requires_new: true) do
+          model_class.advisory_lock_key(another_job_key, function: 'pg_advisory_xact_lock')
+          expect(pg_lock_count).to eq(2)
+
+          another_job.advisory_lock!
+          expect(pg_lock_count).to eq(2)
+        end
+        expect(pg_lock_count).to eq(2)
+
+        another_job.advisory_unlock
+        expect(pg_lock_count).to eq(2)
+      end
+      expect(pg_lock_count).to eq(1)
+
+      job.advisory_unlock
+      expect(pg_lock_count).to eq(0)
+
+      own_lock_warnings = POSTGRES_NOTICES.select { |n| n.include?("you don't own a lock") }
+      POSTGRES_NOTICES.reject! { |n| n.include?("you don't own a lock") }
+      expect(own_lock_warnings).to be_empty
+    end
+
+    it 'advisory_unlock_session releases all locks' do
+      job.advisory_lock!
+      another_job.advisory_lock!
+      expect(pg_lock_count).to eq(2)
+
+      model_class.advisory_unlock_session
+      expect(pg_lock_count).to eq(0)
+    end
+  end
+
   describe 'create_with_advisory_lock' do
     it 'causes the job to be saved and locked' do
       job = model_class.new

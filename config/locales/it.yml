@@ -265,6 +265,7 @@ it:
         all_queues: Tutte le code
         clear: Cancella
         job_name: Nome job
+        label: Etichetta
         placeholder: Cerca per classe, ID job, parametri job e testo errore.
         queue_name: Nome coda
         search: Cerca
