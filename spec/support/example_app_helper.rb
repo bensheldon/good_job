@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
 require 'fileutils'
+require 'tmpdir'
 
 module ExampleAppHelper
   def setup_example_app
     FileUtils.rm_rf(example_app_path)
-
-    # Rails will not install within a directory containing `bin/rails`
-    Rails.root.join("../bin/rails").rename(Rails.root.join("../bin/_rails")) if Rails.root.join("../bin/rails").exist?
 
     root_path = example_app_path.join('..')
     FileUtils.cd(root_path) do
@@ -43,7 +41,6 @@ module ExampleAppHelper
   end
 
   def teardown_example_app
-    Rails.root.join("../bin/_rails").rename(Rails.root.join("../bin/rails"))
     FileUtils.rm_rf(example_app_path)
   end
 
@@ -103,7 +100,7 @@ module ExampleAppHelper
   end
 
   def example_app_path
-    Rails.root.join('../tmp', app_name)
+    Pathname.new(Dir.tmpdir).join(app_name)
   end
 
   def app_name
