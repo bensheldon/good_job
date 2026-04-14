@@ -113,7 +113,8 @@ RSpec.describe 'Schedule Integration' do
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       scheduler.create_thread
 
-      sleep_until(max: 10, increments_of: 0.5) do
+      max_wait = Concurrent.on_jruby? ? 20 : 10
+      sleep_until(max: max_wait, increments_of: 0.5) do
         GoodJob::Job.unfinished.none?
       end
       scheduler.shutdown
