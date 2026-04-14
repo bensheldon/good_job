@@ -110,12 +110,6 @@ RSpec.describe GoodJob::AdvisoryLockable do
       end
 
       it 'supports uuid_v5 hash strategy' do
-        begin
-          ActiveRecord::Base.lease_connection.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
-        rescue ActiveRecord::StatementInvalid
-          skip "uuid-ossp extension not available"
-        end
-
         described_class.hash_function = "uuid_v5"
 
         query = model_class.order(priority: :desc).limit(1).advisory_lock
