@@ -265,6 +265,7 @@ es:
         all_queues: Todas las colas
         clear: Limpiar
         job_name: Nombre de la tarea
+        label: Etiqueta
         placeholder: Buscar por clase, id de tarea, parámetros y mensaje de error.
         queue_name: Nombre de la cola
         search: Buscar

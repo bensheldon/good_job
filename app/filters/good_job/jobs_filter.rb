@@ -26,6 +26,7 @@ module GoodJob
       base_query
         .merge(filter_by_job_class(filter_params[:job_class]))
         .merge(filter_by_queue_name(filter_params[:queue_name]))
+        .merge(filter_by_label(filter_params[:label]))
         .merge(filter_by_search_query(filter_params[:query]))
         .merge(filter_by_cron_key(filter_params[:cron_key]))
         .merge(filter_by_finished_since(filter_params[:finished_since]))
@@ -61,6 +62,12 @@ module GoodJob
       return {} if queue_name.blank?
 
       GoodJob::Job.where(queue_name: queue_name)
+    end
+
+    def filter_by_label(label)
+      return {} if label.blank?
+
+      GoodJob::Job.labeled(label)
     end
 
     def filter_by_search_query(query)

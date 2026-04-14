@@ -52,6 +52,7 @@ module GoodJob
     def to_params(override = {})
       {
         job_class: params[:job_class],
+        label: params[:label],
         limit: params[:limit],
         queue_name: params[:queue_name],
         query: params[:query],

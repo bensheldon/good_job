@@ -265,6 +265,7 @@ pt-BR:
         all_queues: Todas as filas
         clear: Limpar
         job_name: Nome da Tarefa
+        label: Rótulo
         placeholder: Pesquisar por classe, ID da tarefa, parâmetros da tarefa e texto de erro.
         queue_name: Nome da Fila
         search: Pesquisar
