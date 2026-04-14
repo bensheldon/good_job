@@ -1,5 +1,32 @@
 # Changelog
 
+## [v4.16.0](https://github.com/bensheldon/good_job/tree/v4.16.0) (2026-04-14)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.15.0...v4.16.0)
+
+**Implemented enhancements:**
+
+- Allow filtering by label on dashboard [\#1739](https://github.com/bensheldon/good_job/pull/1739) ([bensheldon](https://github.com/bensheldon))
+- Allow multiple concurrency rules per job via labels [\#1700](https://github.com/bensheldon/good_job/pull/1700) ([bscofield](https://github.com/bscofield))
+
+**Fixed bugs:**
+
+- Fix advisory lock connection stickiness in block contexts [\#1736](https://github.com/bensheldon/good_job/pull/1736) ([bensheldon](https://github.com/bensheldon))
+- Add JRuby 10 to testing matrix [\#1559](https://github.com/bensheldon/good_job/pull/1559) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Job duration misreported if interrupted [\#1723](https://github.com/bensheldon/good_job/issues/1723)
+
+**Merged pull requests:**
+
+- Use annotated git tag in release script [\#1741](https://github.com/bensheldon/good_job/pull/1741) ([bensheldon](https://github.com/bensheldon))
+- Double single-thread scheduler integration test timeout on JRuby [\#1738](https://github.com/bensheldon/good_job/pull/1738) ([bensheldon](https://github.com/bensheldon))
+- Fix JRuby test flakes for scheduler timeout and interrupted execution duration [\#1737](https://github.com/bensheldon/good_job/pull/1737) ([bensheldon](https://github.com/bensheldon))
+- Count Advisory Locks and refactor advisory lock lifecycle [\#1735](https://github.com/bensheldon/good_job/pull/1735) ([bensheldon](https://github.com/bensheldon))
+- Show interrupted execution recovery duration in dashboard [\#1733](https://github.com/bensheldon/good_job/pull/1733) ([bensheldon](https://github.com/bensheldon))
+- chore: use `merge` to avoid mutate the query object [\#1717](https://github.com/bensheldon/good_job/pull/1717) ([luizkowalski](https://github.com/luizkowalski))
+
 ## [v4.15.0](https://github.com/bensheldon/good_job/tree/v4.15.0) (2026-04-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.2...v4.15.0)
