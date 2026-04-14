@@ -144,6 +144,7 @@ fr:
         application_trace: Application Trace
         full_trace: Full Trace
         in_queue: Dans la file d'attente
+        recovery: récupération
         runtime: Durée
         title: Exécutions
       force_discard:

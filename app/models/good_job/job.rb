@@ -4,7 +4,7 @@ module GoodJob
   # Active Record model that represents an +ActiveJob+ job.
   class Job < BaseRecord
     include AdvisoryLockable
-    include Lockable
+    include Job::Lockable
     include ErrorEvents
     include Filterable
     include Reportable
@@ -160,7 +160,12 @@ module GoodJob
     scope :dequeueing_ordered, (lambda do |parsed_queues|
       relation = self
       relation = relation.queue_ordered(parsed_queues[:include]) if parsed_queues && parsed_queues[:ordered_queues] && parsed_queues[:include]
-      relation = relation.priority_ordered.creation_ordered
+
+      relation = if GoodJob.configuration.dequeue_query_sort == :scheduled_at
+                   relation.priority_ordered.schedule_ordered.order(:id)
+                 else
+                   relation.priority_ordered.creation_ordered
+                 end
 
       relation
     end)
@@ -270,7 +275,7 @@ module GoodJob
       end
 
       def historic_finished_at_index_migrated?
-        return true unless connection.index_name_exists?(:good_jobs, :index_good_jobs_jobs_on_finished_at)
+        return true if connection.index_name_exists?(:good_jobs, "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished")
 
         migration_pending_warning!
         false
@@ -360,27 +365,19 @@ module GoodJob
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
     def self.perform_with_advisory_lock(lock_id:, parsed_queues: nil, queue_select_limit: nil)
-      result = nil
-
-      job = unfinished.dequeueing_ordered(parsed_queues)
-                      .only_scheduled
-                      .exclude_paused
-                      .limit(1)
-                      .with_advisory_lock_claim(select_limit: queue_select_limit)
-
-      if job&.executable?
-        yield(job) if block_given?
-        result = job.perform(lock_id: lock_id)
-      else
-        job&.advisory_unlock
-        job = nil
-        yield(nil) if block_given?
+      unfinished.dequeueing_ordered(parsed_queues)
+                .only_scheduled
+                .exclude_paused
+                .limit(1)
+                .with_advisory_lock_claim(select_limit: queue_select_limit) do |job|
+        if job&.executable?
+          yield(job) if block_given?
+          job.perform(lock_id: lock_id)
+        else
+          yield(nil) if block_given?
+          nil
+        end
       end
-
-      result
-    ensure
-      job&.advisory_unlock
-      job&.run_callbacks(:perform_unlocked)
     end
 
     # Dispatches to the appropriate perform method based on lock_strategy.
@@ -406,24 +403,20 @@ module GoodJob
     # @yield [Job, nil] The claimed job, or nil if none found
     # @return [ExecutionResult, nil]
     def self.perform_with_skip_locked(lock_id:, parsed_queues: nil)
-      result = nil
-
-      job = unfinished.where(locked_by_id: nil)
-                      .dequeueing_ordered(parsed_queues)
-                      .only_scheduled
-                      .exclude_paused
-                      .limit(1)
-                      .with_skip_locked_claim(locked_by_id: lock_id, locked_at: Time.current, lock_type: :skiplocked)
-
-      if job
-        yield(job) if block_given?
-        result = job.perform(lock_id: lock_id, already_claimed: true)
-      elsif block_given?
-        yield(nil)
+      unfinished.where(locked_by_id: nil)
+                .dequeueing_ordered(parsed_queues)
+                .only_scheduled
+                .exclude_paused
+                .limit(1)
+                .with_skip_locked_claim(locked_by_id: lock_id, locked_at: Time.current, lock_type: :skiplocked) do |job|
+        if job
+          yield(job) if block_given?
+          job.perform(lock_id: lock_id, already_claimed: true)
+        else
+          yield(nil) if block_given?
+          nil
+        end
       end
-
-      job&.run_callbacks(:perform_unlocked)
-      result
     end
 
     # Claims and performs a job using SELECT FOR UPDATE SKIP LOCKED combined with
@@ -433,27 +426,20 @@ module GoodJob
     # @yield [Job, nil] The claimed job, or nil if none found
     # @return [ExecutionResult, nil]
     def self.perform_with_hybrid_lock(lock_id:, parsed_queues: nil)
-      result = nil
-
-      lease_connection # sticky connection; advisory lock must outlive this statement
-      job = unfinished.where(locked_by_id: nil)
-                      .dequeueing_ordered(parsed_queues)
-                      .only_scheduled
-                      .exclude_paused
-                      .limit(1)
-                      .with_hybrid_lock_claim(locked_by_id: lock_id, locked_at: Time.current, lock_type: :hybrid)
-
-      if job
-        yield(job) if block_given?
-        result = job.perform(lock_id: lock_id, already_claimed: true)
-      elsif block_given?
-        yield(nil)
+      unfinished.where(locked_by_id: nil)
+                .dequeueing_ordered(parsed_queues)
+                .only_scheduled
+                .exclude_paused
+                .limit(1)
+                .with_hybrid_lock_claim(locked_by_id: lock_id, locked_at: Time.current, lock_type: :hybrid) do |job|
+        if job
+          yield(job) if block_given?
+          job.perform(lock_id: lock_id, already_claimed: true)
+        else
+          yield(nil) if block_given?
+          nil
+        end
       end
-
-      result
-    ensure
-      job&.advisory_unlock # release session-level advisory lock
-      job&.run_callbacks(:perform_unlocked)
     end
 
     # Fetches the scheduled execution time of the next eligible Execution(s).
@@ -771,13 +757,13 @@ module GoodJob
 
             interrupt_error_string = self.class.format_error(GoodJob::InterruptError.new("Interrupted after starting perform at '#{existing_performed_at}'"))
             self.error = interrupt_error_string
-            self.error_event = :interrupted
+            self.error_event = ErrorEvents::INTERRUPTED
             monotonic_duration = (::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - monotonic_start).seconds
 
             execution_attrs = {
               error: interrupt_error_string,
               finished_at: job_performed_at,
-              error_event: :interrupted,
+              error_event: error_event,
               duration: monotonic_duration,
             }
             executions.where(finished_at: nil).where.not(performed_at: nil).update_all(execution_attrs) # rubocop:disable Rails/SkipsModelValidations
@@ -808,6 +794,7 @@ module GoodJob
 
           ActiveSupport::Notifications.instrument("perform_job.good_job", { job: self, execution: execution, process_id: current_thread.process_id, thread_name: current_thread.thread_name }) do |instrument_payload|
             value = ActiveJob::Base.execute(active_job_data)
+            active_job = current_thread.active_job
 
             if value.is_a?(Exception)
               handled_error = value
@@ -817,13 +804,13 @@ module GoodJob
             error_event = if !handled_error
                             nil
                           elsif handled_error == current_thread.error_on_discard
-                            :discarded
+                            ErrorEvents::DISCARDED
                           elsif handled_error == current_thread.error_on_retry
-                            :retried
+                            ErrorEvents::RETRIED
                           elsif handled_error == current_thread.error_on_retry_stopped
-                            :retry_stopped
+                            ErrorEvents::RETRY_STOPPED
                           elsif handled_error
-                            :handled
+                            ErrorEvents::HANDLED
                           end
 
             instrument_payload.merge!(
@@ -833,14 +820,15 @@ module GoodJob
               retried: current_thread.retried_job.present?,
               error_event: error_event
             )
-            ExecutionResult.new(value: value, handled_error: handled_error, error_event: error_event, retried_job: current_thread.retried_job)
+            ExecutionResult.new(value: value, active_job: active_job, handled_error: handled_error, error_event: error_event, retried_job: current_thread.retried_job)
           rescue StandardError => e
+            active_job ||= current_thread.active_job
             error_event = if e.is_a?(GoodJob::InterruptError)
-                            :interrupted
+                            ErrorEvents::INTERRUPTED
                           elsif e == current_thread.error_on_retry_stopped
-                            :retry_stopped
+                            ErrorEvents::RETRY_STOPPED
                           else
-                            :unhandled
+                            ErrorEvents::UNHANDLED
                           end
 
             instrument_payload.merge!(
@@ -848,7 +836,7 @@ module GoodJob
               unhandled_error: e,
               error_event: error_event
             )
-            ExecutionResult.new(value: nil, unhandled_error: e, error_event: error_event)
+            ExecutionResult.new(value: nil, active_job: active_job, unhandled_error: e, error_event: error_event)
           end
         end
 
@@ -885,8 +873,7 @@ module GoodJob
         end
 
         assign_attributes(job_attributes)
-        preserve_unhandled = result.unhandled_error && (GoodJob.retry_on_unhandled_error || GoodJob.preserve_job_records == :on_unhandled_error)
-        if finished_at.blank? || GoodJob.preserve_job_records == true || reenqueued || preserve_unhandled || cron_key.present?
+        if finished_at.blank? || cron_key.present? || preserve_job_record?(result)
           transaction do
             execution.save!
             save!
@@ -971,6 +958,19 @@ module GoodJob
         job_data["good_job_concurrency_key"] = concurrency_key if concurrency_key
         job_data["good_job_labels"] = Array(labels) if labels.present?
       end
+    end
+
+    def preserve_job_record?(result)
+      return true if GoodJob.preserve_job_records == true
+      return true if result.unhandled_error && GoodJob.preserve_job_records == :on_unhandled_error
+      return true if GoodJob.preserve_job_records.respond_to?(:call) && begin
+        GoodJob.preserve_job_records.call(result.active_job, result.handled_error || result.unhandled_error, result.error_event)
+      rescue StandardError => e
+        GoodJob._on_thread_error(e)
+        true
+      end
+
+      false
     end
   end
 end

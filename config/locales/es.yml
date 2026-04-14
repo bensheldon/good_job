@@ -144,6 +144,7 @@ es:
         application_trace: Traza de la aplicación
         full_trace: Traza completa
         in_queue: en cola
+        recovery: recuperación
         runtime: en ejecución
         title: Ejecuciones
       force_discard:

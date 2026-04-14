@@ -168,6 +168,7 @@ uk:
         application_trace: Application Trace
         full_trace: Full Trace
         in_queue: у черзі
+        recovery: відновлення
         runtime: час виконання
         title: Виконання
       force_discard:

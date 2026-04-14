@@ -80,9 +80,12 @@ module GoodJob
   #   Whether to preserve job records in the database after they have finished (default: +true+).
   #   If you want to preserve jobs for latter inspection, set this to +true+.
   #   If you want to preserve only jobs that finished with error for latter inspection, set this to +:on_unhandled_error+.
+  #   If you want to preserve jobs based on the error event, set this to a lambda that takes the error_event argument.
   #   If you do not want to preserve jobs, set this to +false+.
   #   When using GoodJob's cron functionality, job records will be preserved for a brief time to prevent duplicate jobs.
-  #   @return [Boolean, Symbol, nil]
+  #   @example Preserve only jobs that were discarded
+  #     GoodJob.preserve_job_records = ->(active_job, exception, error_event) { error_event == :discarded }
+  #   @return [Boolean, Symbol, Proc, nil]
   mattr_accessor :preserve_job_records, default: true
 
   # @!attribute [rw] retry_on_unhandled_error
@@ -294,7 +297,8 @@ module GoodJob
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    GoodJob::Job.lock_type_migrated?
+    GoodJob::Job.lock_type_migrated? &&
+      GoodJob::Job.connection.index_name_exists?(:good_jobs, "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished")
   end
 
   # Pause job execution for a given queue or job class.

@@ -64,8 +64,8 @@ platforms :ruby do
     gem "rubocop-rails"
     gem "rubocop-rspec"
     gem "rubocop-rspec_rails"
-    gem "sorbet"
-    gem "sorbet-runtime"
+    gem "sorbet", platforms: [:mri, :windows]
+    gem "sorbet-runtime", platforms: [:mri, :windows]
     gem "spoom", require: false
     gem "tapioca", require: false
   end

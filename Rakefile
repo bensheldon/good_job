@@ -48,6 +48,16 @@ task :release_good_job, [:version_bump] do |_t, args|
   puts "\n== Updating Gemfile.lock version =="
   system! "bundle update --conservative good_job"
 
+  # If this fails, the lockfile needs to be regenerated using JRuby so that
+  # JRuby-specific platforms and gems (jdbc-postgres) are resolved. Run with a
+  # JRuby runtime:
+  #
+  #   bundle lock --add-platform java --add-platform ruby --add-platform darwin --add-platform linux --add-platform aarch64-linux --add-platform arm64-darwin --add-platform x86_64-linux
+  #
+  # For example, using mise:
+  #
+  #   MISE_RUBY_VERSION=jruby-10.0.2.0 mise exec ruby -- bundle lock --add-platform java --add-platform ruby --add-platform darwin --add-platform linux --add-platform aarch64-linux --add-platform arm64-darwin --add-platform x86_64-linux
+  #
   puts "\n== Verifying Gemfile.lock =="
   gemfile_lock = File.read(File.join(File.dirname(__FILE__), 'Gemfile.lock'))
   unless gemfile_lock.include?("jdbc-postgres")

@@ -8,7 +8,12 @@ ActiveSupport.on_load :active_record do
     sql = "SET application_name = #{quote(thread_name)}"
 
     # Necessary because of https://github.com/rails/rails/pull/51083/files#r1496720821
-    @raw_connection ? @raw_connection.query(sql) : exec_query(sql, "Set application name")
+    # JDBC raw connections don't have #query, fall back to exec_query (safe after checkout)
+    if @raw_connection.respond_to?(:query)
+      @raw_connection.query(sql)
+    else
+      exec_query(sql, "Set application name")
+    end
   }
 end
 
@@ -162,6 +167,21 @@ class PgLock < GoodJob::BaseRecord
         database = (SELECT oid FROM pg_database WHERE datname = current_database())
         AND pid = pg_backend_pid()
         AND locktype = 'advisory'
+    SQL
+  end
+
+  # Returns an array of hashes with classid, objid, objsubid, pid, granted for each
+  # advisory lock held by the connection. Multiple rows for the same classid/objid
+  # indicate re-entrant (double) lock acquisition.
+  def self.advisory_lock_details_for(connection)
+    connection.execute(<<~SQL.squish).to_a
+      SELECT classid, objid, objsubid, pid, granted
+      FROM pg_locks
+      WHERE
+        database = (SELECT oid FROM pg_database WHERE datname = current_database())
+        AND pid = pg_backend_pid()
+        AND locktype = 'advisory'
+      ORDER BY classid, objid
     SQL
   end
 
