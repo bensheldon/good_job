@@ -89,14 +89,14 @@ RSpec.describe GoodJob::AdvisoryLockable do
       end
 
       it 'can be customized with `GoodJob::AdvisoryLockable.hash_function`' do
-        allow(GoodJob::AdvisoryLockable).to receive(:hash_function).and_return("sha256")
+        allow(described_class).to receive(:hash_function).and_return("sha256")
         query = model_class.order(priority: :desc).limit(2).advisory_lock
 
         expect(query.to_sql).to include("encode(digest(('good_jobs' || '-' || \"rows\".\"active_job_id\"::text)::text, 'sha256'), 'hex')")
       end
 
       it 'supports hashtext hash strategy' do
-        GoodJob::AdvisoryLockable.hash_function = "hashtext"
+        described_class.hash_function = "hashtext"
 
         query = model_class.order(priority: :desc).limit(1).advisory_lock
         expect(query.to_sql).to include("hashtext(('good_jobs' || '-' || \"rows\".\"active_job_id\"::text)::text)")
@@ -106,11 +106,11 @@ RSpec.describe GoodJob::AdvisoryLockable do
         expect(locked_job.advisory_unlock).to be(true)
         expect(locked_job).not_to be_advisory_locked
       ensure
-        GoodJob::AdvisoryLockable.hash_function = "md5"
+        described_class.hash_function = "md5"
       end
 
       it 'supports uuid_v5 hash strategy' do
-        GoodJob::AdvisoryLockable.hash_function = "uuid_v5"
+        described_class.hash_function = "uuid_v5"
 
         query = model_class.order(priority: :desc).limit(1).advisory_lock
         expect(query.to_sql).to include("uuid_generate_v5('6ba7b810-9dad-11d1-80b4-00c04fd430c8'::uuid, ('good_jobs' || '-' || \"rows\".\"active_job_id\"::text)::text)")
@@ -120,7 +120,7 @@ RSpec.describe GoodJob::AdvisoryLockable do
         expect(locked_job.advisory_unlock).to be(true)
         expect(locked_job).not_to be_advisory_locked
       ensure
-        GoodJob::AdvisoryLockable.hash_function = "md5"
+        described_class.hash_function = "md5"
       end
     end
 

@@ -31,10 +31,12 @@ module GoodJob
     # @example
     #   GoodJob::AdvisoryLockable.hash_function = "sha256"
     class << self
-      attr_writer :hash_function
+      def hash_function=(value)
+        @_hash_function = value
+      end
 
       def hash_function
-        @hash_function ||= "md5"
+        @_hash_function ||= "md5"
       end
     end
 
