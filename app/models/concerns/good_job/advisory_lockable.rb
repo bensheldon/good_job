@@ -339,13 +339,13 @@ module GoodJob
       # PostgreSQL extensions required) and good bit distribution—not for any
       # cryptographic property.
       #
-      # The hash function can be configured globally via +GoodJob::AdvisoryLockable.hash_function=+.
+      # The hash function can be configured globally via +GoodJob::GoodJob::AdvisoryLockable.hash_function=+.
       # - "md5" (default): no extensions required.
       # - "hashtext": PostgreSQL's internal 32-bit hash; no extensions required.
       # - "uuid_v5": requires the uuid-ossp extension.
       # - sha* (e.g. "sha256"): requires the pgcrypto extension.
       def advisory_lock_bigint_sql(value_sql)
-        case AdvisoryLockable.hash_function.to_s.downcase
+        case GoodJob::AdvisoryLockable.hash_function.to_s.downcase
         when "md5"
           # md5 produces 32 hex chars; take first 16 (64 bits) and interpret as bigint
           "('x' || substr(md5(#{value_sql}), 1, 16))::bit(64)::bigint"
@@ -360,7 +360,7 @@ module GoodJob
           "('x' || substr(replace(uuid_generate_v5('6ba7b810-9dad-11d1-80b4-00c04fd430c8'::uuid, (#{value_sql})::text)::text, '-', ''), 1, 16))::bit(64)::bigint"
         else
           # pgcrypto's digest() supports sha1, sha224, sha256, sha384, sha512
-          "('x' || substr(encode(digest((#{value_sql})::text, '#{AdvisoryLockable.hash_function}'), 'hex'), 1, 16))::bit(64)::bigint"
+          "('x' || substr(encode(digest((#{value_sql})::text, '#{GoodJob::AdvisoryLockable.hash_function}'), 'hex'), 1, 16))::bit(64)::bigint"
         end
       end
 
