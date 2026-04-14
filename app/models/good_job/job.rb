@@ -210,6 +210,10 @@ module GoodJob
       end
     end)
 
+    scope :labeled, (lambda do |labels|
+      where(Arel::Nodes::InfixOperation.new('&&', arel_table[:labels], Arel.sql(sanitize_sql_array(["ARRAY[?]::text[]", Array(labels)])))) if labels.present?
+    end)
+
     class << self
       # Parse a string representing a group of queues into a more readable data
       # structure.
