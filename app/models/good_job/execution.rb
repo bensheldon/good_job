@@ -48,6 +48,12 @@ module GoodJob # :nodoc:
       end
     end
 
+    def interrupted_duration
+      return unless error_event == "interrupted" && finished_at && performed_at
+
+      finished_at - performed_at
+    end
+
     def display_serialized_params
       serialized_params.merge({
                                 _good_job_execution: attributes.except('serialized_params'),

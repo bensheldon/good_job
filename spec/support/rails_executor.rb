@@ -13,16 +13,12 @@ RSpec.configure do |config|
   config.around do |example|
     next example.run if example.metadata[:without_executor]
 
+    run_example = -> { GoodJob::BaseRecord.uncached { example.run } }
+
     if Rails.application.executor.respond_to?(:perform)
-      Rails.application.executor.perform do
-        ActiveRecord::Base.connection.disable_query_cache!
-        example.run
-      end
+      Rails.application.executor.perform(&run_example)
     else
-      Rails.application.executor.wrap do
-        ActiveRecord::Base.connection.disable_query_cache!
-        example.run
-      end
+      Rails.application.executor.wrap(&run_example)
     end
   end
 end

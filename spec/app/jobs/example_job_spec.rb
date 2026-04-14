@@ -63,7 +63,10 @@ describe ExampleJob do
         expect(execution.error).to be_present
         expect(execution.error_backtrace.count).to be > 100
 
-        if RUBY_VERSION >= "3.4"
+        if RUBY_PLATFORM.include?('java')
+          # JRuby backtrace format omits the class name prefix
+          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:44:in 'perform'"])
+        elsif RUBY_VERSION >= "3.4"
           expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:44:in 'ExampleJob#perform'"])
         else
           expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:44:in `perform'"])

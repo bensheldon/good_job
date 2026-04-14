@@ -8,7 +8,12 @@ ActiveSupport.on_load :active_record do
     sql = "SET application_name = #{quote(thread_name)}"
 
     # Necessary because of https://github.com/rails/rails/pull/51083/files#r1496720821
-    @raw_connection ? @raw_connection.query(sql) : exec_query(sql, "Set application name")
+    # JDBC raw connections don't have #query, fall back to exec_query (safe after checkout)
+    if @raw_connection.respond_to?(:query)
+      @raw_connection.query(sql)
+    else
+      exec_query(sql, "Set application name")
+    end
   }
 end
 
@@ -134,14 +139,14 @@ ActiveSupport.on_load :active_record do
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend PostgresXidExtension
 end
 
-class PgStatActivity < ActiveRecord::Base
+class PgStatActivity < GoodJob::BaseRecord
   include GoodJob::OverridableConnection
 
   self.table_name = 'pg_stat_activity'
   self.primary_key = 'datid'
 end
 
-class PgLock < ActiveRecord::Base
+class PgLock < GoodJob::BaseRecord
   include GoodJob::OverridableConnection
 
   self.table_name = 'pg_locks'
@@ -162,6 +167,21 @@ class PgLock < ActiveRecord::Base
         database = (SELECT oid FROM pg_database WHERE datname = current_database())
         AND pid = pg_backend_pid()
         AND locktype = 'advisory'
+    SQL
+  end
+
+  # Returns an array of hashes with classid, objid, objsubid, pid, granted for each
+  # advisory lock held by the connection. Multiple rows for the same classid/objid
+  # indicate re-entrant (double) lock acquisition.
+  def self.advisory_lock_details_for(connection)
+    connection.execute(<<~SQL.squish).to_a
+      SELECT classid, objid, objsubid, pid, granted
+      FROM pg_locks
+      WHERE
+        database = (SELECT oid FROM pg_database WHERE datname = current_database())
+        AND pid = pg_backend_pid()
+        AND locktype = 'advisory'
+      ORDER BY classid, objid
     SQL
   end
 
@@ -214,13 +234,13 @@ class PgLock < ActiveRecord::Base
       ActiveRecord::Relation::QueryAttribute.new('classid', classid, ActiveRecord::Type::String.new),
       ActiveRecord::Relation::QueryAttribute.new('objid', objid, ActiveRecord::Type::String.new),
     ]
-    self.class.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', binds).first['unlocked']
+    self.class.lease_connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Advisory Unlock', binds).first['unlocked']
   end
 
   def unlock!
     query = <<~SQL.squish
       SELECT pg_terminate_backend(#{self[:pid]}) AS terminated
     SQL
-    self.class.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Terminate Backend Lock', []).first['terminated']
+    self.class.lease_connection.exec_query(GoodJob::Job.pg_or_jdbc_query(query), 'PgLock Terminate Backend Lock', []).first['terminated']
   end
 end

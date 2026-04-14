@@ -144,6 +144,7 @@ ja:
         application_trace: アプリケーショントレース
         full_trace: フルトレース
         in_queue: キュー内
+        recovery: 復旧
         runtime: 実行時間
         title: 実行
       force_discard:

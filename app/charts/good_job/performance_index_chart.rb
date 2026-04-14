@@ -23,7 +23,7 @@ module GoodJob
         ORDER BY timestamp ASC
       SQL
 
-      executions_data = GoodJob::Job.connection.exec_query(GoodJob::Job.pg_or_jdbc_query(sum_query), "GoodJob Performance Chart", start_end_binds)
+      executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(sum_query), "GoodJob Performance Chart", start_end_binds) }
 
       job_names = executions_data.reject { |d| d['sum'].nil? }.map { |d| d['job_class'] || BaseFilter::EMPTY }.uniq
       labels = []

@@ -5,44 +5,44 @@
 # Please instead update this file by running `bin/tapioca gem rubocop-capybara`.
 
 
-# source://rubocop-capybara//lib/rubocop/capybara/plugin.rb#5
+# pkg:gem/rubocop-capybara#lib/rubocop/capybara/plugin.rb:5
 module RuboCop; end
 
-# source://rubocop-capybara//lib/rubocop/capybara/plugin.rb#6
+# pkg:gem/rubocop-capybara#lib/rubocop/capybara/plugin.rb:6
 module RuboCop::Capybara; end
 
 # A plugin that integrates RuboCop Capybara with RuboCop's plugin system.
 #
-# source://rubocop-capybara//lib/rubocop/capybara/plugin.rb#8
+# pkg:gem/rubocop-capybara#lib/rubocop/capybara/plugin.rb:8
 class RuboCop::Capybara::Plugin < ::LintRoller::Plugin
   # :nocov:
   #
-  # source://rubocop-capybara//lib/rubocop/capybara/plugin.rb#10
+  # pkg:gem/rubocop-capybara#lib/rubocop/capybara/plugin.rb:10
   def about; end
 
-  # source://rubocop-capybara//lib/rubocop/capybara/plugin.rb#24
+  # pkg:gem/rubocop-capybara#lib/rubocop/capybara/plugin.rb:24
   def rules(_context); end
 
   # :nocov:
   #
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/capybara/plugin.rb#20
+  # pkg:gem/rubocop-capybara#lib/rubocop/capybara/plugin.rb:20
   def supported?(context); end
 end
 
 # Version information for the Capybara RuboCop plugin.
 #
-# source://rubocop-capybara//lib/rubocop/capybara/version.rb#6
+# pkg:gem/rubocop-capybara#lib/rubocop/capybara/version.rb:6
 module RuboCop::Capybara::Version; end
 
-# source://rubocop-capybara//lib/rubocop/capybara/version.rb#7
+# pkg:gem/rubocop-capybara#lib/rubocop/capybara/version.rb:7
 RuboCop::Capybara::Version::STRING = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#4
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:4
 module RuboCop::Cop; end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#5
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:5
 module RuboCop::Cop::Capybara; end
 
 # Specify the exact target to click on.
@@ -59,23 +59,23 @@ module RuboCop::Cop::Capybara; end
 #   click_link('foo')
 #   click_button('foo')
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/ambiguous_click.rb#20
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/ambiguous_click.rb:20
 class RuboCop::Cop::Capybara::AmbiguousClick < ::RuboCop::Cop::Base
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/ambiguous_click.rb#24
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/ambiguous_click.rb:24
   def on_send(node); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/ambiguous_click.rb#21
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/ambiguous_click.rb:21
 RuboCop::Cop::Capybara::AmbiguousClick::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/ambiguous_click.rb#22
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/ambiguous_click.rb:22
 RuboCop::Cop::Capybara::AmbiguousClick::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Help methods for capybara.
 #
 # @api private
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#8
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:8
 module RuboCop::Cop::Capybara::CapybaraHelp
   private
 
@@ -88,7 +88,7 @@ module RuboCop::Cop::Capybara::CapybaraHelp
   # @param selector [String]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#71
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:71
   def common_attributes?(selector); end
 
   # @api private
@@ -96,7 +96,7 @@ module RuboCop::Cop::Capybara::CapybaraHelp
   # @param option [Symbol]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#135
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:135
   def include_option?(node, option); end
 
   # @api private
@@ -106,55 +106,55 @@ module RuboCop::Cop::Capybara::CapybaraHelp
   # @param attrs [Array<String>]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#80
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:80
   def replaceable_attributes?(attrs); end
 
   # @api private
-  # @param node [RuboCop::AST::SendNode]
-  # @param element [String]
   # @param attrs [Array<String>]
+  # @param element [String]
+  # @param node [RuboCop::AST::SendNode]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#118
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:118
   def replaceable_element?(node, element, attrs); end
 
   # @api private
-  # @param node [RuboCop::AST::SendNode]
-  # @param locator [String]
   # @param element [String]
+  # @param locator [String]
+  # @param node [RuboCop::AST::SendNode]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#55
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:55
   def replaceable_option?(node, locator, element); end
 
   # @api private
-  # @param pseudo_class [String]
   # @param locator [String]
+  # @param pseudo_class [String]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#95
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:95
   def replaceable_pseudo_class?(pseudo_class, locator); end
 
   # @api private
   # @param locator [String]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#106
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:106
   def replaceable_pseudo_class_not?(locator); end
 
   # @api private
   # @param locator [String]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#86
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:86
   def replaceable_pseudo_classes?(locator); end
 
   # @api private
-  # @param node [RuboCop::AST::SendNode]
   # @param attrs [Array<String>]
+  # @param node [RuboCop::AST::SendNode]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#128
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:128
   def replaceable_to_link?(node, attrs); end
 
   class << self
@@ -167,7 +167,7 @@ module RuboCop::Cop::Capybara::CapybaraHelp
     # @param selector [String]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#71
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:71
     def common_attributes?(selector); end
 
     # @api private
@@ -175,7 +175,7 @@ module RuboCop::Cop::Capybara::CapybaraHelp
     # @param option [Symbol]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#135
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:135
     def include_option?(node, option); end
 
     # @api private
@@ -185,87 +185,87 @@ module RuboCop::Cop::Capybara::CapybaraHelp
     # @param attrs [Array<String>]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#80
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:80
     def replaceable_attributes?(attrs); end
 
     # @api private
-    # @param node [RuboCop::AST::SendNode]
-    # @param element [String]
     # @param attrs [Array<String>]
+    # @param element [String]
+    # @param node [RuboCop::AST::SendNode]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#118
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:118
     def replaceable_element?(node, element, attrs); end
 
     # @api private
-    # @param node [RuboCop::AST::SendNode]
-    # @param locator [String]
     # @param element [String]
+    # @param locator [String]
+    # @param node [RuboCop::AST::SendNode]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#55
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:55
     def replaceable_option?(node, locator, element); end
 
     # @api private
-    # @param pseudo_class [String]
     # @param locator [String]
+    # @param pseudo_class [String]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#95
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:95
     def replaceable_pseudo_class?(pseudo_class, locator); end
 
     # @api private
     # @param locator [String]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#106
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:106
     def replaceable_pseudo_class_not?(locator); end
 
     # @api private
     # @param locator [String]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#86
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:86
     def replaceable_pseudo_classes?(locator); end
 
     # @api private
-    # @param node [RuboCop::AST::SendNode]
     # @param attrs [Array<String>]
+    # @param node [RuboCop::AST::SendNode]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#128
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:128
     def replaceable_to_link?(node, attrs); end
   end
 end
 
 # @api private
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#9
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:9
 RuboCop::Cop::Capybara::CapybaraHelp::CAPYBARA_MATCHERS = T.let(T.unsafe(nil), Array)
 
 # @api private
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#19
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:19
 RuboCop::Cop::Capybara::CapybaraHelp::COMMON_OPTIONS = T.let(T.unsafe(nil), Array)
 
 # @api private
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#16
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:16
 RuboCop::Cop::Capybara::CapybaraHelp::NEGATIVE_MATCHERS = T.let(T.unsafe(nil), Set)
 
 # @api private
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#14
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:14
 RuboCop::Cop::Capybara::CapybaraHelp::POSITIVE_MATCHERS = T.let(T.unsafe(nil), Set)
 
 # @api private
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#22
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:22
 RuboCop::Cop::Capybara::CapybaraHelp::SPECIFIC_OPTIONS = T.let(T.unsafe(nil), Hash)
 
 # @api private
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/capybara_help.rb#45
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/capybara_help.rb:45
 RuboCop::Cop::Capybara::CapybaraHelp::SPECIFIC_PSEUDO_CLASSES = T.let(T.unsafe(nil), Array)
 
 # Checks for methods of button or link clicks.
@@ -302,65 +302,65 @@ RuboCop::Cop::Capybara::CapybaraHelp::SPECIFIC_PSEUDO_CLASSES = T.let(T.unsafe(n
 #   click_link('foo')
 #   click_button('foo')
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#41
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:41
 class RuboCop::Cop::Capybara::ClickLinkOrButtonStyle < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::ConfigurableEnforcedStyle
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#52
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:52
   def on_send(node); end
 
   private
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#81
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:81
   def link_or_button_method?(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#60
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:60
   def offense?(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#65
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:65
   def offense_message(node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#77
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:77
   def strict_method?(node); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#49
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:49
 RuboCop::Cop::Capybara::ClickLinkOrButtonStyle::CLICK_LINK_OR_BUTTON = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#46
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:46
 RuboCop::Cop::Capybara::ClickLinkOrButtonStyle::MSG_CLICK_LINK_OR_BUTTON = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#44
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:44
 RuboCop::Cop::Capybara::ClickLinkOrButtonStyle::MSG_STRICT = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#50
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:50
 RuboCop::Cop::Capybara::ClickLinkOrButtonStyle::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/click_link_or_button_style.rb#48
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/click_link_or_button_style.rb:48
 RuboCop::Cop::Capybara::ClickLinkOrButtonStyle::STRICT_METHODS = T.let(T.unsafe(nil), Array)
 
 # Css selector parser.
 #
 # @api private
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb#8
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb:8
 class RuboCop::Cop::Capybara::CssAttributesParser
   # @api private
   # @return [CssAttributesParser] a new instance of CssAttributesParser
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb#9
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb:9
   def initialize(selector); end
 
   # @api private
   # @return [Array<String>]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb#18
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb:18
   def parse; end
 
   private
@@ -374,17 +374,17 @@ class RuboCop::Cop::Capybara::CssAttributesParser
   # @param value [String]
   # @return [Boolean, String]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb#61
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb:61
   def normalize_value(value); end
 
   # @api private
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb#42
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb:42
   def on_bracket_end; end
 
   # @api private
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb#33
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_attributes_parser.rb:33
   def on_bracket_start; end
 end
 
@@ -392,7 +392,7 @@ end
 #
 # @api private
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#8
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:8
 module RuboCop::Cop::Capybara::CssSelector
   private
 
@@ -403,7 +403,7 @@ module RuboCop::Cop::Capybara::CssSelector
   # @param selector [String]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#48
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:48
   def attribute?(selector); end
 
   # @api private
@@ -415,7 +415,7 @@ module RuboCop::Cop::Capybara::CssSelector
   # @param selector [String]
   # @return [Array<String>]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#59
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:59
   def attributes(selector); end
 
   # @api private
@@ -427,7 +427,7 @@ module RuboCop::Cop::Capybara::CssSelector
   # @param selector [String]
   # @return [Array<String>]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#39
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:39
   def classes(selector); end
 
   # @api private
@@ -438,7 +438,7 @@ module RuboCop::Cop::Capybara::CssSelector
   # @param selector [String]
   # @return [String]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#17
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:17
   def id(selector); end
 
   # @api private
@@ -448,7 +448,7 @@ module RuboCop::Cop::Capybara::CssSelector
   # @param selector [String]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#28
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:28
   def id?(selector); end
 
   # @api private
@@ -458,7 +458,7 @@ module RuboCop::Cop::Capybara::CssSelector
   # @param selector [String]
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#82
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:82
   def multiple_selectors?(selector); end
 
   # @api private
@@ -468,7 +468,7 @@ module RuboCop::Cop::Capybara::CssSelector
   # @param selector [String]
   # @return [Array<String>]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#68
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:68
   def pseudo_classes(selector); end
 
   class << self
@@ -479,7 +479,7 @@ module RuboCop::Cop::Capybara::CssSelector
     # @param selector [String]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#48
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:48
     def attribute?(selector); end
 
     # @api private
@@ -491,7 +491,7 @@ module RuboCop::Cop::Capybara::CssSelector
     # @param selector [String]
     # @return [Array<String>]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#59
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:59
     def attributes(selector); end
 
     # @api private
@@ -503,7 +503,7 @@ module RuboCop::Cop::Capybara::CssSelector
     # @param selector [String]
     # @return [Array<String>]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#39
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:39
     def classes(selector); end
 
     # @api private
@@ -514,7 +514,7 @@ module RuboCop::Cop::Capybara::CssSelector
     # @param selector [String]
     # @return [String]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#17
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:17
     def id(selector); end
 
     # @api private
@@ -524,7 +524,7 @@ module RuboCop::Cop::Capybara::CssSelector
     # @param selector [String]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#28
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:28
     def id?(selector); end
 
     # @api private
@@ -534,7 +534,7 @@ module RuboCop::Cop::Capybara::CssSelector
     # @param selector [String]
     # @return [Boolean]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#82
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:82
     def multiple_selectors?(selector); end
 
     # @api private
@@ -544,7 +544,7 @@ module RuboCop::Cop::Capybara::CssSelector
     # @param selector [String]
     # @return [Array<String>]
     #
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/mixin/css_selector.rb#68
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/mixin/css_selector.rb:68
     def pseudo_classes(selector); end
   end
 end
@@ -572,28 +572,28 @@ end
 #   # bad (does not support autocorrection when `match` with a variable)
 #   expect(page).to match(variable)
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#29
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:29
 class RuboCop::Cop::Capybara::CurrentPathExpectation < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
   extend ::RuboCop::Cop::AutoCorrector
 
   # Supported matchers: eq(...) / match(/regexp/) / match('regexp')
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#46
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:46
   def as_is_matcher(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#40
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:40
   def expectation_set_on_current_path(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#63
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:63
   def on_send(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#53
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:53
   def regexp_node_matcher(param0 = T.unsafe(nil)); end
 
   private
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#113
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:113
   def add_argument_parentheses(corrector, arg_node); end
 
   # `have_current_path` with no options will include the querystring
@@ -601,36 +601,36 @@ class RuboCop::Cop::Capybara::CurrentPathExpectation < ::RuboCop::Cop::Base
   # This ensures the option `ignore_query: true` is added
   # except when `match` matcher.
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#131
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:131
   def add_ignore_query_options(corrector, node, matcher_node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#75
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:75
   def autocorrect(corrector, node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#99
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:99
   def convert_regexp_node_to_literal(corrector, matcher_node, regexp_node); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#123
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:123
   def method_call_with_no_parentheses?(arg_node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#105
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:105
   def regexp_node_to_regexp_expr(regexp_node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#86
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:86
   def rewrite_expectation(corrector, node, to_symbol, matcher_node); end
 
   class << self
-    # source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#59
+    # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:59
     def autocorrect_incompatible_with; end
   end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#33
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:33
 RuboCop::Cop::Capybara::CurrentPathExpectation::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/current_path_expectation.rb#37
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/current_path_expectation.rb:37
 RuboCop::Cop::Capybara::CurrentPathExpectation::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Enforces use of `first` instead of `all` with `first` or `[0]`.
@@ -646,36 +646,36 @@ RuboCop::Cop::Capybara::CurrentPathExpectation::RESTRICT_ON_SEND = T.let(T.unsaf
 #   # good
 #   first('a')
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/find_all_first.rb#19
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/find_all_first.rb:19
 class RuboCop::Cop::Capybara::FindAllFirst < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/find_all_first.rb#27
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/find_all_first.rb:27
   def find_all_first?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/find_all_first.rb#35
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/find_all_first.rb:35
   def include_match_first?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/find_all_first.rb#39
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/find_all_first.rb:39
   def on_send(node); end
 
   private
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/find_all_first.rb#46
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/find_all_first.rb:46
   def on_all_first(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/find_all_first.rb#59
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/find_all_first.rb:59
   def on_match_first(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/find_all_first.rb#70
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/find_all_first.rb:70
   def replaced_hash(hash); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/find_all_first.rb#23
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/find_all_first.rb:23
 RuboCop::Cop::Capybara::FindAllFirst::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/find_all_first.rb#24
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/find_all_first.rb:24
 RuboCop::Cop::Capybara::FindAllFirst::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Checks for usage of deprecated style methods.
@@ -701,26 +701,26 @@ RuboCop::Cop::Capybara::FindAllFirst::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Ar
 #   # good
 #   expect(page).to match_style(display: 'block')
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/match_style.rb#31
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/match_style.rb:31
 class RuboCop::Cop::Capybara::MatchStyle < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/match_style.rb#42
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/match_style.rb:42
   def on_send(node); end
 
   private
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/match_style.rb#52
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/match_style.rb:52
   def message(node); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/match_style.rb#34
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/match_style.rb:34
 RuboCop::Cop::Capybara::MatchStyle::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/match_style.rb#36
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/match_style.rb:36
 RuboCop::Cop::Capybara::MatchStyle::PREFERRED_METHOD = T.let(T.unsafe(nil), Hash)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/match_style.rb#35
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/match_style.rb:35
 RuboCop::Cop::Capybara::MatchStyle::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Enforces use of `have_no_*` or `not_to` for negated expectations.
@@ -742,45 +742,45 @@ RuboCop::Cop::Capybara::MatchStyle::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Arra
 #   expect(page).not_to have_selector 'a'
 #   expect(page).not_to have_css('a')
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#26
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:26
 class RuboCop::Cop::Capybara::NegationMatcher < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::ConfigurableEnforcedStyle
   include ::RuboCop::Cop::Capybara::CapybaraHelp
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#41
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:41
   def have_no?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#35
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:35
   def not_to?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#46
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:46
   def on_send(node); end
 
   private
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#70
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:70
   def message(matcher); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#60
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:60
   def offense?(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#66
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:66
   def offense_range(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#89
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:89
   def replaced_matcher(matcher); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#76
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:76
   def replaced_runner; end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#31
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:31
 RuboCop::Cop::Capybara::NegationMatcher::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher.rb#32
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher.rb:32
 RuboCop::Cop::Capybara::NegationMatcher::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Set)
 
 # Do not allow negative matchers to be used immediately after `visit`.
@@ -806,71 +806,71 @@ RuboCop::Cop::Capybara::NegationMatcher::RESTRICT_ON_SEND = T.let(T.unsafe(nil),
 #   expect(page).to have_css('a')
 #   expect(page).not_to have_link('bar')
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher_after_visit.rb#29
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher_after_visit.rb:29
 class RuboCop::Cop::Capybara::NegationMatcherAfterVisit < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::Capybara::CapybaraHelp
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher_after_visit.rb#36
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher_after_visit.rb:36
   def negation_matcher?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher_after_visit.rb#43
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher_after_visit.rb:43
   def on_send(node); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher_after_visit.rb#32
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher_after_visit.rb:32
 RuboCop::Cop::Capybara::NegationMatcherAfterVisit::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/negation_matcher_after_visit.rb#33
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/negation_matcher_after_visit.rb:33
 RuboCop::Cop::Capybara::NegationMatcherAfterVisit::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#6
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:6
 module RuboCop::Cop::Capybara::RSpec; end
 
 # A helper for `explicit` style
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#108
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:108
 module RuboCop::Cop::Capybara::RSpec::ExplicitHelper
   extend ::RuboCop::AST::NodePattern::Macros
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#138
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:138
   def predicate_matcher?(param0 = T.unsafe(nil)); end
 
   private
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#124
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:124
   def allowed_explicit_matchers; end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#128
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:128
   def check_explicit(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#162
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:162
   def corrector_explicit(corrector, to_node, actual, matcher); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#156
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:156
   def message_explicit(matcher); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#169
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:169
   def move_predicate(corrector, actual, matcher); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#149
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:149
   def predicate_matcher_name?(name); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#181
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:181
   def replacement_matcher(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#176
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:176
   def to_predicate_method(matcher); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#113
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:113
 RuboCop::Cop::Capybara::RSpec::ExplicitHelper::BUILT_IN_MATCHERS = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#118
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:118
 RuboCop::Cop::Capybara::RSpec::ExplicitHelper::INFLECTED_MATCHER = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#111
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:111
 RuboCop::Cop::Capybara::RSpec::ExplicitHelper::MSG_EXPLICIT = T.let(T.unsafe(nil), String)
 
 # Use `have_css` or `have_xpath` instead of `have_selector`.
@@ -900,96 +900,96 @@ RuboCop::Cop::Capybara::RSpec::ExplicitHelper::MSG_EXPLICIT = T.let(T.unsafe(nil
 #   # good
 #   expect(foo).to have_xpath('bar')
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#36
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:36
 class RuboCop::Cop::Capybara::RSpec::HaveSelector < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#44
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:44
   def on_send(node); end
 
   private
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#81
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:81
   def default_selector; end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#66
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:66
   def deletion_range(first_argument, second_argument); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#62
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:62
   def message_typed(type); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#77
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:77
   def message_untyped; end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#53
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:53
   def on_select_with_type(node, type); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#71
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:71
   def on_select_without_type(node); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#40
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:40
 RuboCop::Cop::Capybara::RSpec::HaveSelector::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#41
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:41
 RuboCop::Cop::Capybara::RSpec::HaveSelector::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/have_selector.rb#42
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/have_selector.rb:42
 RuboCop::Cop::Capybara::RSpec::HaveSelector::SELECTORS = T.let(T.unsafe(nil), Array)
 
 # A helper for `inflected` style
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#8
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:8
 module RuboCop::Cop::Capybara::RSpec::InflectedHelper
   extend ::RuboCop::AST::NodePattern::Macros
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#46
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:46
   def be_bool?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#51
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:51
   def be_boolthy?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#32
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:32
   def predicate_in_actual?(param0 = T.unsafe(nil)); end
 
   private
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#55
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:55
   def boolean_matcher?(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#19
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:19
   def check_inflected(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#67
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:67
   def message_inflected(predicate); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#63
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:63
   def predicate?(sym); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#77
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:77
   def remove_predicate(corrector, predicate); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#85
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:85
   def rewrite_matcher(corrector, predicate, matcher); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#73
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:73
   def to_predicate_matcher(name); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#94
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:94
   def true?(to_symbol, matcher); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#11
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:11
 RuboCop::Cop::Capybara::RSpec::InflectedHelper::EXPLICIT_MATCHER = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#14
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:14
 RuboCop::Cop::Capybara::RSpec::InflectedHelper::MSG_INFLECTED = T.let(T.unsafe(nil), String)
 
 # Prefer using predicate matcher over using predicate method directly.
@@ -998,6 +998,25 @@ RuboCop::Cop::Capybara::RSpec::InflectedHelper::MSG_INFLECTED = T.let(T.unsafe(n
 # This cop recommends to use the predicate matcher instead of using
 # predicate method directly.
 #
+# @example Strict: false, EnforcedStyle: explicit
+#   # bad
+#   expect(foo).to match_style(bar: 'baz')
+#
+#   # good - the above code is rewritten to it by this cop
+#   expect(foo.matches_style?(bar: 'baz')).to be_truthy
+# @example Strict: false, EnforcedStyle: inflected
+#   # bad
+#   expect(foo.matches_style?(bar: 'baz')).to be_truthy
+#   expect(foo.matches_style?(bar: 'baz')).to be(true)
+#
+#   # good
+#   expect(foo).to match_style(bar: 'baz')
+# @example Strict: true, EnforcedStyle: explicit
+#   # bad
+#   expect(foo).to match_style(bar: 'baz')
+#
+#   # good - the above code is rewritten to it by this cop
+#   expect(foo.matches_style?(bar: 'baz')).to be(true)
 # @example Strict: true, EnforcedStyle: inflected (default)
 #   # bad
 #   expect(foo.matches_css?(bar: 'baz')).to be_truthy
@@ -1013,34 +1032,15 @@ RuboCop::Cop::Capybara::RSpec::InflectedHelper::MSG_INFLECTED = T.let(T.unsafe(n
 #
 #   # also good - It checks "true" strictly.
 #   expect(foo.matches_style?(bar: 'baz')).to be(true)
-# @example Strict: false, EnforcedStyle: inflected
-#   # bad
-#   expect(foo.matches_style?(bar: 'baz')).to be_truthy
-#   expect(foo.matches_style?(bar: 'baz')).to be(true)
 #
-#   # good
-#   expect(foo).to match_style(bar: 'baz')
-# @example Strict: true, EnforcedStyle: explicit
-#   # bad
-#   expect(foo).to match_style(bar: 'baz')
-#
-#   # good - the above code is rewritten to it by this cop
-#   expect(foo.matches_style?(bar: 'baz')).to be(true)
-# @example Strict: false, EnforcedStyle: explicit
-#   # bad
-#   expect(foo).to match_style(bar: 'baz')
-#
-#   # good - the above code is rewritten to it by this cop
-#   expect(foo.matches_style?(bar: 'baz')).to be_truthy
-#
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#244
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:244
 class RuboCop::Cop::Capybara::RSpec::PredicateMatcher < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::ConfigurableEnforcedStyle
   include ::RuboCop::Cop::Capybara::RSpec::InflectedHelper
   include ::RuboCop::Cop::Capybara::RSpec::ExplicitHelper
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#252
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:252
   def on_send(node); end
 
   private
@@ -1051,11 +1051,11 @@ class RuboCop::Cop::Capybara::RSpec::PredicateMatcher < ::RuboCop::Cop::Base
   #   foo 1, 2
   #   ^^^^^
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#270
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:270
   def args_loc(send_node); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/rspec/predicate_matcher.rb#250
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/rspec/predicate_matcher.rb:250
 RuboCop::Cop::Capybara::RSpec::PredicateMatcher::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Checks for redundant `within find(...)` calls.
@@ -1081,32 +1081,32 @@ RuboCop::Cop::Capybara::RSpec::PredicateMatcher::RESTRICT_ON_SEND = T.let(T.unsa
 #   # ...
 #   end
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/redundant_within_find.rb#29
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/redundant_within_find.rb:29
 class RuboCop::Cop::Capybara::RedundantWithinFind < ::RuboCop::Cop::Base
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/redundant_within_find.rb#41
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/redundant_within_find.rb:41
   def on_send(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/redundant_within_find.rb#36
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/redundant_within_find.rb:36
   def within_find(param0 = T.unsafe(nil)); end
 
   private
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/redundant_within_find.rb#51
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/redundant_within_find.rb:51
   def msg(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/redundant_within_find.rb#55
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/redundant_within_find.rb:55
   def replaced(node); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/redundant_within_find.rb#33
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/redundant_within_find.rb:33
 RuboCop::Cop::Capybara::RedundantWithinFind::FIND_METHODS = T.let(T.unsafe(nil), Set)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/redundant_within_find.rb#31
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/redundant_within_find.rb:31
 RuboCop::Cop::Capybara::RedundantWithinFind::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/redundant_within_find.rb#32
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/redundant_within_find.rb:32
 RuboCop::Cop::Capybara::RedundantWithinFind::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Checks for there is a more specific actions offered by Capybara.
@@ -1125,54 +1125,54 @@ RuboCop::Cop::Capybara::RedundantWithinFind::RESTRICT_ON_SEND = T.let(T.unsafe(n
 #   click_link(exact_text: 'foo')
 #   find('div').click_button
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#22
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:22
 class RuboCop::Cop::Capybara::SpecificActions < ::RuboCop::Cop::Base
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#31
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:31
   def click_on_selector(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#35
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:35
   def on_send(node); end
 
   private
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#87
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:87
   def good_action(action); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#73
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:73
   def last_selector(arg); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#81
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:81
   def message(action, selector); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#77
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:77
   def offense_range(node, receiver); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#57
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:57
   def replaceable?(node, arg, action); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#63
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:63
   def replaceable_attributes?(selector); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#53
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:53
   def specific_action(selector); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#69
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:69
   def supported_selector?(selector); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#23
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:23
 RuboCop::Cop::Capybara::SpecificActions::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#24
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:24
 RuboCop::Cop::Capybara::SpecificActions::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_actions.rb#25
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_actions.rb:25
 RuboCop::Cop::Capybara::SpecificActions::SPECIFIC_ACTION = T.let(T.unsafe(nil), Hash)
 
 # Checks if there is a more specific finder offered by Capybara.
@@ -1187,68 +1187,68 @@ RuboCop::Cop::Capybara::SpecificActions::SPECIFIC_ACTION = T.let(T.unsafe(nil), 
 #   # good
 #   find_by_id('some-id')
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#18
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:18
 class RuboCop::Cop::Capybara::SpecificFinders < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
   extend ::RuboCop::Cop::AutoCorrector
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#31
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:31
   def class_options(param0); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#26
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:26
   def find_argument(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#35
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:35
   def on_send(node); end
 
   private
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#99
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:99
   def append_options(classes, options); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#68
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:68
   def attribute?(arg); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#89
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:89
   def autocorrect_classes(corrector, node, classes); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#84
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:84
   def deletion_range(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#126
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:126
   def end_pos(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#104
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:104
   def keyword_argument_class(classes); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#122
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:122
   def offense_range(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#48
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:48
   def on_attr(node, sym, arg); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#56
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:56
   def on_id(node, sym, arg); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#64
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:64
   def on_sym_id(node, sym, id); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#73
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:73
   def register_offense(node, sym, id, classes = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#109
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:109
   def replaced_arguments(arg, id); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#114
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:114
   def to_options(attrs); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#22
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:22
 RuboCop::Cop::Capybara::SpecificFinders::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_finders.rb#23
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_finders.rb:23
 RuboCop::Cop::Capybara::SpecificFinders::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 # Checks for there is a more specific matcher offered by Capybara.
@@ -1273,46 +1273,46 @@ RuboCop::Cop::Capybara::SpecificFinders::RESTRICT_ON_SEND = T.let(T.unsafe(nil),
 #   expect(page).to have_select
 #   expect(page).to have_field(with: 'foo')
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#28
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:28
 class RuboCop::Cop::Capybara::SpecificMatcher < ::RuboCop::Cop::Base
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#41
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:41
   def first_argument(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#50
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:50
   def on_send(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#46
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:46
   def text_with_regexp?(param0); end
 
   private
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#86
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:86
   def good_matcher(node, matcher); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#80
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:80
   def message(node, matcher); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#67
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:67
   def replaceable?(node, arg, matcher); end
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#74
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:74
   def replaceable_attributes?(selector); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#62
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:62
   def specific_matcher(arg); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#29
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:29
 RuboCop::Cop::Capybara::SpecificMatcher::MSG = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#30
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:30
 RuboCop::Cop::Capybara::SpecificMatcher::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/specific_matcher.rb#32
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/specific_matcher.rb:32
 RuboCop::Cop::Capybara::SpecificMatcher::SPECIFIC_MATCHER = T.let(T.unsafe(nil), Hash)
 
 # Checks for boolean visibility in Capybara finders.
@@ -1337,35 +1337,35 @@ RuboCop::Cop::Capybara::SpecificMatcher::SPECIFIC_MATCHER = T.let(T.unsafe(nil),
 #   expect(page).to have_css('.foo', visible: :all)
 #   expect(page).to have_link('my link', visible: :hidden)
 #
-# source://rubocop-capybara//lib/rubocop/cop/capybara/visibility_matcher.rb#28
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/visibility_matcher.rb:28
 class RuboCop::Cop::Capybara::VisibilityMatcher < ::RuboCop::Cop::Base
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/visibility_matcher.rb#58
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/visibility_matcher.rb:58
   def on_send(node); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/visibility_matcher.rb#54
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/visibility_matcher.rb:54
   def visible_false?(param0 = T.unsafe(nil)); end
 
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/visibility_matcher.rb#49
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/visibility_matcher.rb:49
   def visible_true?(param0 = T.unsafe(nil)); end
 
   private
 
   # @return [Boolean]
   #
-  # source://rubocop-capybara//lib/rubocop/cop/capybara/visibility_matcher.rb#65
+  # pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/visibility_matcher.rb:65
   def capybara_matcher?(method_name); end
 end
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/visibility_matcher.rb#31
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/visibility_matcher.rb:31
 RuboCop::Cop::Capybara::VisibilityMatcher::CAPYBARA_MATCHER_METHODS = T.let(T.unsafe(nil), Array)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/visibility_matcher.rb#29
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/visibility_matcher.rb:29
 RuboCop::Cop::Capybara::VisibilityMatcher::MSG_FALSE = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/visibility_matcher.rb#30
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/visibility_matcher.rb:30
 RuboCop::Cop::Capybara::VisibilityMatcher::MSG_TRUE = T.let(T.unsafe(nil), String)
 
-# source://rubocop-capybara//lib/rubocop/cop/capybara/visibility_matcher.rb#46
+# pkg:gem/rubocop-capybara#lib/rubocop/cop/capybara/visibility_matcher.rb:46
 RuboCop::Cop::Capybara::VisibilityMatcher::RESTRICT_ON_SEND = T.let(T.unsafe(nil), Array)
 
 module RuboCop::Cop::Style; end

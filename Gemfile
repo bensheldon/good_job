@@ -55,6 +55,7 @@ platforms :ruby do
     gem "brakeman"
     gem "easy_translate"
     gem "erb_lint"
+    gem "herb"
     gem "i18n-tasks"
     gem "mdl"
     gem "rubocop"
@@ -63,8 +64,8 @@ platforms :ruby do
     gem "rubocop-rails"
     gem "rubocop-rspec"
     gem "rubocop-rspec_rails"
-    gem "sorbet"
-    gem "sorbet-runtime"
+    gem "sorbet", platforms: [:mri, :windows]
+    gem "sorbet-runtime", platforms: [:mri, :windows]
     gem "spoom", require: false
     gem "tapioca", require: false
   end

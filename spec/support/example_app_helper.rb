@@ -23,7 +23,7 @@ module ExampleAppHelper
     FileUtils.cp(::Rails.root.join('config/database.yml'), "#{example_app_path}/config/database.yml")
 
     File.open("#{example_app_path}/Gemfile", 'a') do |f|
-      f.puts 'gem "good_job", path: "#{File.dirname(__FILE__)}/../../../"'
+      f.puts %{gem "good_job", path: "#{File.dirname(__FILE__)}/../../../"}
     end
   end
 
@@ -78,9 +78,9 @@ module ExampleAppHelper
     ]
     quiet do
       tables.each do |table_name|
-        ActiveRecord::Migration.drop_table(table_name) if ActiveRecord::Base.connection.table_exists?(table_name)
+        ActiveRecord::Migration.drop_table(table_name) if ActiveRecord::Base.connection_pool.with_connection { |c| c.table_exists?(table_name) }
       end
-      ActiveRecord::Base.connection.execute("TRUNCATE schema_migrations")
+      ActiveRecord::Base.connection_pool.with_connection { |c| c.execute("TRUNCATE schema_migrations") }
 
       setup_example_app
       run_in_demo_app("bin/rails db:environment:set RAILS_ENV=test")
@@ -93,9 +93,9 @@ module ExampleAppHelper
       teardown_example_app
 
       tables.each do |table_name|
-        ActiveRecord::Migration.drop_table(table_name) if ActiveRecord::Base.connection.table_exists?(table_name)
+        ActiveRecord::Migration.drop_table(table_name) if ActiveRecord::Base.connection_pool.with_connection { |c| c.table_exists?(table_name) }
       end
-      ActiveRecord::Base.connection.execute("TRUNCATE schema_migrations")
+      ActiveRecord::Base.connection_pool.with_connection { |c| c.execute("TRUNCATE schema_migrations") }
 
       run_in_demo_app("bin/rails db:schema:load db:environment:set RAILS_ENV=test")
       models.each(&:reset_column_information)

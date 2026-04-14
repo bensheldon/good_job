@@ -67,11 +67,11 @@ RSpec.describe GoodJob::Filterable do
         error_event: "retried"
       )
 
-      ActiveRecord::Base.connection.execute("SET default_text_search_config = 'pg_catalog.simple'")
+      GoodJob::BaseRecord.lease_connection.execute("SET default_text_search_config = 'pg_catalog.simple'")
       begin
         expect(model_class.search_text('running')).to include(job_with_stemmed_word)
       ensure
-        ActiveRecord::Base.connection.execute("SET default_text_search_config = 'pg_catalog.english'")
+        GoodJob::BaseRecord.lease_connection.execute("SET default_text_search_config = 'pg_catalog.english'")
       end
     end
   end

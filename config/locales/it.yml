@@ -144,6 +144,7 @@ it:
         application_trace: Application Trace
         full_trace: Full Trace
         in_queue: in coda
+        recovery: ripristino
         runtime: tempo di esecuzione
         title: Esecuzioni
       force_discard:
