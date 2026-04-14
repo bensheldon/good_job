@@ -23,17 +23,27 @@ module GoodJob
     # database session.
     RecordAlreadyAdvisoryLockedError = Class.new(StandardError)
 
+    # Global hash function used to convert advisory lock key strings to bigints.
+    # Defaults to "md5", which requires no PostgreSQL extensions.
+    # Alternative sha* functions (e.g. "sha256") require the pgcrypto extension.
+    # See +advisory_lock_bigint_sql+ for details on how this value is used.
+    #
+    # @example
+    #   GoodJob::AdvisoryLockable.hash_function = "sha256"
+    class << self
+      attr_writer :hash_function
+
+      def hash_function
+        @hash_function ||= "md5"
+      end
+    end
+
     included do
       # Default column to be used when creating Advisory Locks
       class_attribute :advisory_lockable_column, instance_accessor: false, default: nil
 
       # Default Postgres function to be used for Advisory Locks
       class_attribute :advisory_lockable_function, default: "pg_try_advisory_lock"
-
-      # Default hash function used to convert the advisory lock key string to a bigint.
-      # The default "md5" requires no PostgreSQL extensions; sha* functions require pgcrypto.
-      # See +advisory_lock_bigint_sql+ for details on how this value is used.
-      class_attribute :advisory_lockable_hash_function, default: "md5"
 
       # Rails < 7.2 does not have lease_connection as a class method.
       define_singleton_method(:lease_connection) { connection } unless respond_to?(:lease_connection)
@@ -329,16 +339,16 @@ module GoodJob
       # PostgreSQL extensions required) and good bit distribution—not for any
       # cryptographic property.
       #
-      # The hash function can be configured via +advisory_lockable_hash_function+.
+      # The hash function can be configured globally via +GoodJob::AdvisoryLockable.hash_function=+.
       # Functions other than "md5" (e.g. "sha256") require the pgcrypto extension.
       def advisory_lock_bigint_sql(value_sql)
-        case advisory_lockable_hash_function.to_s.downcase
+        case AdvisoryLockable.hash_function.to_s.downcase
         when "md5"
           # md5 produces 32 hex chars; take first 16 (64 bits) and interpret as bigint
           "('x' || substr(md5(#{value_sql}), 1, 16))::bit(64)::bigint"
         else
           # pgcrypto's digest() supports sha1, sha224, sha256, sha384, sha512
-          "('x' || substr(encode(digest((#{value_sql})::text, '#{advisory_lockable_hash_function}'), 'hex'), 1, 16))::bit(64)::bigint"
+          "('x' || substr(encode(digest((#{value_sql})::text, '#{AdvisoryLockable.hash_function}'), 'hex'), 1, 16))::bit(64)::bigint"
         end
       end
 
