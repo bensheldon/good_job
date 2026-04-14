@@ -1,5 +1,60 @@
 # Changelog
 
+## [v4.15.0](https://github.com/bensheldon/good_job/tree/v4.15.0) (2026-04-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.2...v4.15.0)
+
+**Implemented enhancements:**
+
+- Add opt-in "FOR NO KEY UPDATE SKIP LOCKED" job lock strategy and hybrid strategy for online migration [\#1731](https://github.com/bensheldon/good_job/pull/1731) ([bensheldon](https://github.com/bensheldon))
+- Allow ordering by scheduled\_at instead of created\_at when dequeueing job [\#1645](https://github.com/bensheldon/good_job/pull/1645) ([lsylvester](https://github.com/lsylvester))
+- Allow `GoodJob.preserve_job_records` to take a lambda that is callable after each job executes [\#1640](https://github.com/bensheldon/good_job/pull/1640) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Fix JRuby in development lockfile, with test [\#1734](https://github.com/bensheldon/good_job/pull/1734) ([bensheldon](https://github.com/bensheldon))
+- Add herb to linter [\#1732](https://github.com/bensheldon/good_job/pull/1732) ([bensheldon](https://github.com/bensheldon))
+- Update development dependencies; apply Rubocop to\_h lints [\#1728](https://github.com/bensheldon/good_job/pull/1728) ([bensheldon](https://github.com/bensheldon))
+
+## [v4.14.2](https://github.com/bensheldon/good_job/tree/v4.14.2) (2026-04-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.1...v4.14.2)
+
+**Closed issues:**
+
+- Incompatible with permanent\_connection\_checkout = :disallowed [\#1729](https://github.com/bensheldon/good_job/issues/1729)
+
+**Merged pull requests:**
+
+- Replace Base.connection with lease\_connection and with\_connection throughout [\#1730](https://github.com/bensheldon/good_job/pull/1730) ([bensheldon](https://github.com/bensheldon))
+
+## [v4.14.1](https://github.com/bensheldon/good_job/tree/v4.14.1) (2026-04-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.14.0...v4.14.1)
+
+**Fixed bugs:**
+
+- Fix N+1 queries on cron entries dashboard index page [\#1727](https://github.com/bensheldon/good_job/pull/1727) ([clinejj](https://github.com/clinejj))
+
+## [v4.14.0](https://github.com/bensheldon/good_job/tree/v4.14.0) (2026-03-31)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.3...v4.14.0)
+
+**Implemented enhancements:**
+
+- Consider using pg\_cron for Cron-style repeating/recurring jobs [\#328](https://github.com/bensheldon/good_job/issues/328)
+- Add Batch.enqueue\_all for bulk-enqueuing multiple batches [\#1726](https://github.com/bensheldon/good_job/pull/1726) ([AliOsm](https://github.com/AliOsm))
+- Allow perform\_all\_later to enqueue to Batches [\#1720](https://github.com/bensheldon/good_job/pull/1720) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- perform\_all\_later not intercepted by Batch [\#1719](https://github.com/bensheldon/good_job/issues/1719)
+- Deprecate and drop :on\_unhandled\_error option [\#1706](https://github.com/bensheldon/good_job/issues/1706)
+
+**Merged pull requests:**
+
+- Bump actions/upload-artifact from 6 to 7 [\#1718](https://github.com/bensheldon/good_job/pull/1718) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.13.3](https://github.com/bensheldon/good_job/tree/v4.13.3) (2026-02-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.13.2...v4.13.3)

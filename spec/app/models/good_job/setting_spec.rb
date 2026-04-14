@@ -60,6 +60,24 @@ RSpec.describe GoodJob::Setting do
     end
   end
 
+  describe '.cron_keys_enabled' do
+    it 'resolves enabled state for multiple keys in bulk' do
+      described_class.cron_key_disable(:job_a)
+
+      result = described_class.cron_keys_enabled([[:job_a, true], [:job_b, true]])
+
+      expect(result).to eq("job_a" => false, "job_b" => true)
+    end
+
+    it 'respects enabled_by_default=false for opt-in keys' do
+      described_class.cron_key_enable(:opt_in_job)
+
+      result = described_class.cron_keys_enabled([[:opt_in_job, false], [:other_job, false]])
+
+      expect(result).to eq("opt_in_job" => true, "other_job" => false)
+    end
+  end
+
   describe 'cron_key_enabled setting' do
     describe '.cron_key_enable' do
       it 'inserts values into a json array' do

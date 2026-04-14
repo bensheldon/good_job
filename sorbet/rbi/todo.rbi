@@ -5,6 +5,7 @@
 # typed: false
 
 module ::ACTIVE_EVENT; end
+module ::ConcurrencyJob; end
 module ::CustomError; end
 module ::DONE; end
 module ::DiscardableError; end
@@ -48,3 +49,10 @@ module GoodJob::Job::ERROR_EVENT_RETRIED; end
 module Rails::Server; end
 module ::AutoloadModule; end
 module ::AutoloadModule::Error; end
+module UnhandledErrorJob; end
+module DiscardedErrorJob; end
+module RetryStoppedErrorJob; end
+module ::BLOCKING_LATCH; end
+module ::BlockingJob; end
+module ::LockCapturingJob; end
+

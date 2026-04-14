@@ -54,10 +54,11 @@ module GoodJob # :nodoc:
     # Send a message via Postgres NOTIFY
     # @param message [#to_json]
     def self.notify(message)
-      connection = ::GoodJob::Job.connection
-      connection.exec_query <<~SQL.squish
-        NOTIFY #{CHANNEL}, #{connection.quote(message.to_json)}
-      SQL
+      ::GoodJob::Job.connection_pool.with_connection do |connection|
+        connection.exec_query <<~SQL.squish
+          NOTIFY #{CHANNEL}, #{connection.quote(message.to_json)}
+        SQL
+      end
     end
 
     # List of recipients that will receive notifications.

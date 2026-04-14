@@ -5,38 +5,38 @@
 # Please instead update this file by running `bin/tapioca gem matrix`.
 
 
-# source://matrix//lib/matrix.rb#17
+# pkg:gem/matrix#lib/matrix.rb:17
 module ExceptionForMatrix; end
 
-# source://matrix//lib/matrix.rb#18
+# pkg:gem/matrix#lib/matrix.rb:18
 class ExceptionForMatrix::ErrDimensionMismatch < ::StandardError
   # @return [ErrDimensionMismatch] a new instance of ErrDimensionMismatch
   #
-  # source://matrix//lib/matrix.rb#19
+  # pkg:gem/matrix#lib/matrix.rb:19
   def initialize(val = T.unsafe(nil)); end
 end
 
-# source://matrix//lib/matrix.rb#28
+# pkg:gem/matrix#lib/matrix.rb:28
 class ExceptionForMatrix::ErrNotRegular < ::StandardError
   # @return [ErrNotRegular] a new instance of ErrNotRegular
   #
-  # source://matrix//lib/matrix.rb#29
+  # pkg:gem/matrix#lib/matrix.rb:29
   def initialize(val = T.unsafe(nil)); end
 end
 
-# source://matrix//lib/matrix.rb#38
+# pkg:gem/matrix#lib/matrix.rb:38
 class ExceptionForMatrix::ErrOperationNotDefined < ::StandardError
   # @return [ErrOperationNotDefined] a new instance of ErrOperationNotDefined
   #
-  # source://matrix//lib/matrix.rb#39
+  # pkg:gem/matrix#lib/matrix.rb:39
   def initialize(vals); end
 end
 
-# source://matrix//lib/matrix.rb#48
+# pkg:gem/matrix#lib/matrix.rb:48
 class ExceptionForMatrix::ErrOperationNotImplemented < ::StandardError
   # @return [ErrOperationNotImplemented] a new instance of ErrOperationNotImplemented
   #
-  # source://matrix//lib/matrix.rb#49
+  # pkg:gem/matrix#lib/matrix.rb:49
   def initialize(vals); end
 end
 
@@ -45,7 +45,7 @@ end
 # and determining their mathematical properties such as trace, rank, inverse, determinant,
 # or eigensystem.
 #
-# source://matrix//lib/matrix/version.rb#3
+# pkg:gem/matrix#lib/matrix/version.rb:3
 class Matrix
   include ::Enumerable
   include ::ExceptionForMatrix
@@ -56,7 +56,7 @@ class Matrix
   #
   # @return [Matrix] a new instance of Matrix
   #
-  # source://matrix//lib/matrix.rb#322
+  # pkg:gem/matrix#lib/matrix.rb:322
   def initialize(rows, column_count = T.unsafe(nil)); end
 
   # Matrix multiplication.
@@ -64,7 +64,7 @@ class Matrix
   #   #  => 2 4
   #   #     6 8
   #
-  # source://matrix//lib/matrix.rb#1058
+  # pkg:gem/matrix#lib/matrix.rb:1058
   def *(m); end
 
   # Matrix exponentiation.
@@ -76,7 +76,7 @@ class Matrix
   #   #  => 67 96
   #   #     48 99
   #
-  # source://matrix//lib/matrix.rb#1238
+  # pkg:gem/matrix#lib/matrix.rb:1238
   def **(exp); end
 
   # Matrix addition.
@@ -86,10 +86,10 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#1093
+  # pkg:gem/matrix#lib/matrix.rb:1093
   def +(m); end
 
-  # source://matrix//lib/matrix.rb#1284
+  # pkg:gem/matrix#lib/matrix.rb:1284
   def +@; end
 
   # Matrix subtraction.
@@ -99,7 +99,7 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#1120
+  # pkg:gem/matrix#lib/matrix.rb:1120
   def -(m); end
 
   # Unary matrix negation.
@@ -108,7 +108,7 @@ class Matrix
   #   # => -1 -5
   #   #    -4 -2
   #
-  # source://matrix//lib/matrix.rb#1293
+  # pkg:gem/matrix#lib/matrix.rb:1293
   def -@; end
 
   # Matrix division (multiplication by the inverse).
@@ -116,17 +116,17 @@ class Matrix
   #   #  => -7  1
   #   #     -3 -6
   #
-  # source://matrix//lib/matrix.rb#1147
+  # pkg:gem/matrix#lib/matrix.rb:1147
   def /(other); end
 
   # Returns whether the two matrices contain equal elements.
   #
-  # source://matrix//lib/matrix.rb#1021
+  # pkg:gem/matrix#lib/matrix.rb:1021
   def ==(other); end
 
   # Returns element (+i+,+j+) of the matrix.  That is: row +i+, column +j+.
   #
-  # source://matrix//lib/matrix.rb#337
+  # pkg:gem/matrix#lib/matrix.rb:337
   def [](i, j); end
 
   # :call-seq:
@@ -139,12 +139,12 @@ class Matrix
   #
   # @raise [FrozenError]
   #
-  # source://matrix//lib/matrix.rb#351
+  # pkg:gem/matrix#lib/matrix.rb:351
   def []=(i, j, v); end
 
   # Returns the absolute value elementwise
   #
-  # source://matrix//lib/matrix.rb#1300
+  # pkg:gem/matrix#lib/matrix.rb:1300
   def abs; end
 
   # Returns the adjoint of the matrix.
@@ -153,7 +153,7 @@ class Matrix
   #   #  => -i 2
   #   #      1 i
   #
-  # source://matrix//lib/matrix.rb#1597
+  # pkg:gem/matrix#lib/matrix.rb:1597
   def adjoint; end
 
   # Returns the adjugate of the matrix.
@@ -164,7 +164,7 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#793
+  # pkg:gem/matrix#lib/matrix.rb:793
   def adjugate; end
 
   # Returns +true+ if this is an antisymmetric matrix.
@@ -173,7 +173,7 @@ class Matrix
   # @raise [ErrDimensionMismatch]
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#973
+  # pkg:gem/matrix#lib/matrix.rb:973
   def antisymmetric?; end
 
   # The coerce method provides support for Ruby type coercion.
@@ -182,7 +182,7 @@ class Matrix
   # type between the two operands of the operator.
   # See also Numeric#coerce.
   #
-  # source://matrix//lib/matrix.rb#1650
+  # pkg:gem/matrix#lib/matrix.rb:1650
   def coerce(other); end
 
   # Returns the (row, column) cofactor which is obtained by multiplying
@@ -193,7 +193,7 @@ class Matrix
   #
   # @raise [RuntimeError]
   #
-  # source://matrix//lib/matrix.rb#778
+  # pkg:gem/matrix#lib/matrix.rb:778
   def cofactor(row, column); end
 
   # Returns the Laplace expansion along given row or column.
@@ -206,7 +206,7 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#828
+  # pkg:gem/matrix#lib/matrix.rb:828
   def cofactor_expansion(row: T.unsafe(nil), column: T.unsafe(nil)); end
 
   # Returns a matrix that is the result of iteration of the given block over all
@@ -223,7 +223,7 @@ class Matrix
   #   #  => 1  4
   #   #     9 16
   #
-  # source://matrix//lib/matrix.rb#508
+  # pkg:gem/matrix#lib/matrix.rb:508
   def collect(which = T.unsafe(nil), &block); end
 
   # Invokes the given block for each element of matrix, replacing the element with the value
@@ -239,29 +239,29 @@ class Matrix
   #
   # @raise [FrozenError]
   #
-  # source://matrix//lib/matrix.rb#526
+  # pkg:gem/matrix#lib/matrix.rb:526
   def collect!(which = T.unsafe(nil)); end
 
   # Returns column vector number +j+ of the matrix as a Vector (starting at 0
   # like an array).  When a block is given, the elements of that vector are
   # iterated.
   #
-  # source://matrix//lib/matrix.rb#477
+  # pkg:gem/matrix#lib/matrix.rb:477
   def column(j); end
 
   # Returns the number of columns.
   #
-  # source://matrix//lib/matrix.rb#456
+  # pkg:gem/matrix#lib/matrix.rb:456
   def column_count; end
 
   # Returns the number of columns.
   #
-  # source://matrix//lib/matrix.rb#457
+  # pkg:gem/matrix#lib/matrix.rb:457
   def column_size; end
 
   # Returns an array of the column vectors of the matrix.  See Vector.
   #
-  # source://matrix//lib/matrix.rb#1671
+  # pkg:gem/matrix#lib/matrix.rb:1671
   def column_vectors; end
 
   # :call-seq:
@@ -274,12 +274,12 @@ class Matrix
   #   y = Matrix[[1, 2], [3, 4]]
   #   x.combine(y) {|a, b| a - b} # => Matrix[[5, 4], [1, 0]]
   #
-  # source://matrix//lib/matrix.rb#315
+  # pkg:gem/matrix#lib/matrix.rb:315
   def combine(*matrices, &block); end
 
   # Returns element (+i+,+j+) of the matrix.  That is: row +i+, column +j+.
   #
-  # source://matrix//lib/matrix.rb#341
+  # pkg:gem/matrix#lib/matrix.rb:341
   def component(i, j); end
 
   # Returns the conjugate of the matrix.
@@ -290,7 +290,7 @@ class Matrix
   #   #  => 1-2i  -i  0
   #   #        1   2  3
   #
-  # source://matrix//lib/matrix.rb#1588
+  # pkg:gem/matrix#lib/matrix.rb:1588
   def conj; end
 
   # Returns the conjugate of the matrix.
@@ -301,7 +301,7 @@ class Matrix
   #   #  => 1-2i  -i  0
   #   #        1   2  3
   #
-  # source://matrix//lib/matrix.rb#1585
+  # pkg:gem/matrix#lib/matrix.rb:1585
   def conjugate; end
 
   # Returns the determinant of the matrix.
@@ -315,12 +315,12 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#1356
+  # pkg:gem/matrix#lib/matrix.rb:1356
   def det; end
 
   # deprecated; use Matrix#determinant
   #
-  # source://matrix//lib/matrix.rb#1403
+  # pkg:gem/matrix#lib/matrix.rb:1403
   def det_e; end
 
   # Returns the determinant of the matrix.
@@ -334,12 +334,12 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#1318
+  # pkg:gem/matrix#lib/matrix.rb:1318
   def determinant; end
 
   # deprecated; use Matrix#determinant
   #
-  # source://matrix//lib/matrix.rb#1399
+  # pkg:gem/matrix#lib/matrix.rb:1399
   def determinant_e; end
 
   # Returns +true+ if this is a diagonal matrix.
@@ -348,7 +348,7 @@ class Matrix
   # @raise [ErrDimensionMismatch]
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#839
+  # pkg:gem/matrix#lib/matrix.rb:839
   def diagonal?; end
 
   # Yields all elements of the matrix, starting with those of the first row,
@@ -366,7 +366,7 @@ class Matrix
   #       # => prints the numbers 1 to 4
   #     Matrix[ [1,2], [3,4] ].each(:strict_lower).to_a # => [3]
   #
-  # source://matrix//lib/matrix.rb#556
+  # pkg:gem/matrix#lib/matrix.rb:556
   def each(which = T.unsafe(nil), &block); end
 
   # Same as #each, but the row index and column index in addition to the element
@@ -380,7 +380,7 @@ class Matrix
   #     #    3 at 1, 0
   #     #    4 at 1, 1
   #
-  # source://matrix//lib/matrix.rb#616
+  # pkg:gem/matrix#lib/matrix.rb:616
   def each_with_index(which = T.unsafe(nil)); end
 
   # Returns the Eigensystem of the matrix; see +EigenvalueDecomposition+.
@@ -392,7 +392,7 @@ class Matrix
   #
   # This is not supported for Complex matrices
   #
-  # source://matrix//lib/matrix.rb#1555
+  # pkg:gem/matrix#lib/matrix.rb:1555
   def eigen; end
 
   # Returns the Eigensystem of the matrix; see +EigenvalueDecomposition+.
@@ -404,33 +404,33 @@ class Matrix
   #
   # This is not supported for Complex matrices
   #
-  # source://matrix//lib/matrix.rb#1552
+  # pkg:gem/matrix#lib/matrix.rb:1552
   def eigensystem; end
 
   # Returns element (+i+,+j+) of the matrix.  That is: row +i+, column +j+.
   #
-  # source://matrix//lib/matrix.rb#340
+  # pkg:gem/matrix#lib/matrix.rb:340
   def element(i, j); end
 
   # Deprecated.
   #
   # Use <code>map(&:to_f)</code>
   #
-  # source://matrix//lib/matrix.rb#1694
+  # pkg:gem/matrix#lib/matrix.rb:1694
   def elements_to_f; end
 
   # Deprecated.
   #
   # Use <code>map(&:to_i)</code>
   #
-  # source://matrix//lib/matrix.rb#1702
+  # pkg:gem/matrix#lib/matrix.rb:1702
   def elements_to_i; end
 
   # Deprecated.
   #
   # Use <code>map(&:to_r)</code>
   #
-  # source://matrix//lib/matrix.rb#1710
+  # pkg:gem/matrix#lib/matrix.rb:1710
   def elements_to_r; end
 
   # Returns +true+ if this is an empty matrix, i.e. if the number of rows
@@ -438,7 +438,7 @@ class Matrix
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#848
+  # pkg:gem/matrix#lib/matrix.rb:848
   def empty?; end
 
   # Hadamard product
@@ -446,12 +446,12 @@ class Matrix
   #    #  => 1  4
   #    #     9  8
   #
-  # source://matrix//lib/matrix.rb#1170
+  # pkg:gem/matrix#lib/matrix.rb:1170
   def entrywise_product(m); end
 
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#1027
+  # pkg:gem/matrix#lib/matrix.rb:1027
   def eql?(other); end
 
   # :call-seq:
@@ -467,7 +467,7 @@ class Matrix
   #
   # @raise [ArgumentError]
   #
-  # source://matrix//lib/matrix.rb#695
+  # pkg:gem/matrix#lib/matrix.rb:695
   def find_index(*args); end
 
   # Returns the submatrix obtained by deleting the specified row and column.
@@ -479,10 +479,10 @@ class Matrix
   #
   # @raise [RuntimeError]
   #
-  # source://matrix//lib/matrix.rb#751
+  # pkg:gem/matrix#lib/matrix.rb:751
   def first_minor(row, column); end
 
-  # source://matrix//lib/matrix.rb#534
+  # pkg:gem/matrix#lib/matrix.rb:534
   def freeze; end
 
   # Hadamard product
@@ -490,12 +490,12 @@ class Matrix
   #    #  => 1  4
   #    #     9  8
   #
-  # source://matrix//lib/matrix.rb#1167
+  # pkg:gem/matrix#lib/matrix.rb:1167
   def hadamard_product(m); end
 
   # Returns a hash-code for the matrix.
   #
-  # source://matrix//lib/matrix.rb#1044
+  # pkg:gem/matrix#lib/matrix.rb:1044
   def hash; end
 
   # Returns +true+ if this is an hermitian matrix.
@@ -504,7 +504,7 @@ class Matrix
   # @raise [ErrDimensionMismatch]
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#856
+  # pkg:gem/matrix#lib/matrix.rb:856
   def hermitian?; end
 
   # Returns a new matrix resulting by stacking horizontally
@@ -514,7 +514,7 @@ class Matrix
   #   y = Matrix[[5, 6], [7, 8]]
   #   x.hstack(y) # => Matrix[[1, 2, 5, 6], [3, 4, 7, 8]]
   #
-  # source://matrix//lib/matrix.rb#1413
+  # pkg:gem/matrix#lib/matrix.rb:1413
   def hstack(*matrices); end
 
   # Returns the imaginary part of the matrix.
@@ -525,7 +525,7 @@ class Matrix
   #   #  =>   2i  i  0
   #   #        0  0  0
   #
-  # source://matrix//lib/matrix.rb#1613
+  # pkg:gem/matrix#lib/matrix.rb:1613
   def imag; end
 
   # Returns the imaginary part of the matrix.
@@ -536,7 +536,7 @@ class Matrix
   #   #  =>   2i  i  0
   #   #        0  0  0
   #
-  # source://matrix//lib/matrix.rb#1610
+  # pkg:gem/matrix#lib/matrix.rb:1610
   def imaginary; end
 
   # :call-seq:
@@ -552,12 +552,12 @@ class Matrix
   #
   # @raise [ArgumentError]
   #
-  # source://matrix//lib/matrix.rb#679
+  # pkg:gem/matrix#lib/matrix.rb:679
   def index(*args); end
 
   # Overrides Object#inspect
   #
-  # source://matrix//lib/matrix.rb#1735
+  # pkg:gem/matrix#lib/matrix.rb:1735
   def inspect; end
 
   # Returns the inverse of the matrix.
@@ -567,7 +567,7 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#1182
+  # pkg:gem/matrix#lib/matrix.rb:1182
   def inv; end
 
   # Returns the inverse of the matrix.
@@ -577,7 +577,7 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#1178
+  # pkg:gem/matrix#lib/matrix.rb:1178
   def inverse; end
 
   # Returns the Laplace expansion along given row or column.
@@ -590,14 +590,14 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#810
+  # pkg:gem/matrix#lib/matrix.rb:810
   def laplace_expansion(row: T.unsafe(nil), column: T.unsafe(nil)); end
 
   # Returns +true+ if this is a lower triangular matrix.
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#866
+  # pkg:gem/matrix#lib/matrix.rb:866
   def lower_triangular?; end
 
   # Returns the LUP decomposition of the matrix; see +LUPDecomposition+.
@@ -609,7 +609,7 @@ class Matrix
   #   l * u == p * a      # => true
   #   a.lup.solve([2, 5]) # => Vector[(1/1), (1/2)]
   #
-  # source://matrix//lib/matrix.rb#1567
+  # pkg:gem/matrix#lib/matrix.rb:1567
   def lup; end
 
   # Returns the LUP decomposition of the matrix; see +LUPDecomposition+.
@@ -621,7 +621,7 @@ class Matrix
   #   l * u == p * a      # => true
   #   a.lup.solve([2, 5]) # => Vector[(1/1), (1/2)]
   #
-  # source://matrix//lib/matrix.rb#1570
+  # pkg:gem/matrix#lib/matrix.rb:1570
   def lup_decomposition; end
 
   # Returns a matrix that is the result of iteration of the given block over all
@@ -638,7 +638,7 @@ class Matrix
   #   #  => 1  4
   #   #     9 16
   #
-  # source://matrix//lib/matrix.rb#512
+  # pkg:gem/matrix#lib/matrix.rb:512
   def map(which = T.unsafe(nil), &block); end
 
   # Invokes the given block for each element of matrix, replacing the element with the value
@@ -654,7 +654,7 @@ class Matrix
   #
   # @raise [FrozenError]
   #
-  # source://matrix//lib/matrix.rb#532
+  # pkg:gem/matrix#lib/matrix.rb:532
   def map!(which = T.unsafe(nil)); end
 
   # Returns a section of the matrix.  The parameters are either:
@@ -669,7 +669,7 @@ class Matrix
   # row or column (-1 is the last element). Returns nil if the starting
   # row or column is greater than row_count or column_count respectively.
   #
-  # source://matrix//lib/matrix.rb#710
+  # pkg:gem/matrix#lib/matrix.rb:710
   def minor(*param); end
 
   # Returns +true+ if this is a normal matrix.
@@ -678,7 +678,7 @@ class Matrix
   # @raise [ErrDimensionMismatch]
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#874
+  # pkg:gem/matrix#lib/matrix.rb:874
   def normal?; end
 
   # Returns +true+ if this is an orthogonal matrix
@@ -687,7 +687,7 @@ class Matrix
   # @raise [ErrDimensionMismatch]
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#892
+  # pkg:gem/matrix#lib/matrix.rb:892
   def orthogonal?; end
 
   # Returns +true+ if this is a permutation matrix
@@ -696,7 +696,7 @@ class Matrix
   # @raise [ErrDimensionMismatch]
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#911
+  # pkg:gem/matrix#lib/matrix.rb:911
   def permutation?; end
 
   # Returns the rank of the matrix.
@@ -707,12 +707,12 @@ class Matrix
   #   Matrix[[7,6], [3,9]].rank
   #   #  => 2
   #
-  # source://matrix//lib/matrix.rb#1426
+  # pkg:gem/matrix#lib/matrix.rb:1426
   def rank; end
 
   # deprecated; use Matrix#rank
   #
-  # source://matrix//lib/matrix.rb#1457
+  # pkg:gem/matrix#lib/matrix.rb:1457
   def rank_e; end
 
   # Returns the real part of the matrix.
@@ -723,14 +723,14 @@ class Matrix
   #   #  =>    1  0  0
   #   #        1  2  3
   #
-  # source://matrix//lib/matrix.rb#1624
+  # pkg:gem/matrix#lib/matrix.rb:1624
   def real; end
 
   # Returns +true+ if all entries of the matrix are real.
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#932
+  # pkg:gem/matrix#lib/matrix.rb:932
   def real?; end
 
   # Returns an array containing matrices corresponding to the real and imaginary
@@ -738,7 +738,7 @@ class Matrix
   #
   #   m.rect == [m.real, m.imag]  # ==> true for all matrices m
   #
-  # source://matrix//lib/matrix.rb#1634
+  # pkg:gem/matrix#lib/matrix.rb:1634
   def rect; end
 
   # Returns an array containing matrices corresponding to the real and imaginary
@@ -746,14 +746,14 @@ class Matrix
   #
   #   m.rect == [m.real, m.imag]  # ==> true for all matrices m
   #
-  # source://matrix//lib/matrix.rb#1637
+  # pkg:gem/matrix#lib/matrix.rb:1637
   def rectangular; end
 
   # Returns +true+ if this is a regular (i.e. non-singular) matrix.
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#939
+  # pkg:gem/matrix#lib/matrix.rb:939
   def regular?; end
 
   # Returns a new matrix with rotated elements.
@@ -767,41 +767,41 @@ class Matrix
   #   r = m.rotate_entries(:clockwise)
   #   #  => Matrix[[3, 1], [4, 2]]
   #
-  # source://matrix//lib/matrix.rb#1474
+  # pkg:gem/matrix#lib/matrix.rb:1474
   def rotate_entries(rotation = T.unsafe(nil)); end
 
   # Returns a matrix with entries rounded to the given precision
   # (see Float#round)
   #
-  # source://matrix//lib/matrix.rb#1494
+  # pkg:gem/matrix#lib/matrix.rb:1494
   def round(ndigits = T.unsafe(nil)); end
 
   # Returns row vector number +i+ of the matrix as a Vector (starting at 0 like
   # an array).  When a block is given, the elements of that vector are iterated.
   #
-  # source://matrix//lib/matrix.rb#463
+  # pkg:gem/matrix#lib/matrix.rb:463
   def row(i, &block); end
 
   # Returns the number of rows.
   #
-  # source://matrix//lib/matrix.rb#448
+  # pkg:gem/matrix#lib/matrix.rb:448
   def row_count; end
 
   # Returns the number of rows.
   #
-  # source://matrix//lib/matrix.rb#452
+  # pkg:gem/matrix#lib/matrix.rb:452
   def row_size; end
 
   # Returns an array of the row vectors of the matrix.  See Vector.
   #
-  # source://matrix//lib/matrix.rb#1662
+  # pkg:gem/matrix#lib/matrix.rb:1662
   def row_vectors; end
 
   # Returns +true+ if this is a singular matrix.
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#946
+  # pkg:gem/matrix#lib/matrix.rb:946
   def singular?; end
 
   # Returns +true+ if this is an antisymmetric matrix.
@@ -810,14 +810,14 @@ class Matrix
   # @raise [ErrDimensionMismatch]
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#980
+  # pkg:gem/matrix#lib/matrix.rb:980
   def skew_symmetric?; end
 
   # Returns +true+ if this is a square matrix.
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#953
+  # pkg:gem/matrix#lib/matrix.rb:953
   def square?; end
 
   # Returns +true+ if this is a symmetric matrix.
@@ -826,7 +826,7 @@ class Matrix
   # @raise [ErrDimensionMismatch]
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#961
+  # pkg:gem/matrix#lib/matrix.rb:961
   def symmetric?; end
 
   # Returns the transpose of the matrix.
@@ -838,22 +838,22 @@ class Matrix
   #   #  => 1 3 5
   #   #     2 4 6
   #
-  # source://matrix//lib/matrix.rb#1525
+  # pkg:gem/matrix#lib/matrix.rb:1525
   def t; end
 
   # Returns an array of arrays that describe the rows of the matrix.
   #
-  # source://matrix//lib/matrix.rb#1687
+  # pkg:gem/matrix#lib/matrix.rb:1687
   def to_a; end
 
   # Explicit conversion to a Matrix. Returns self
   #
-  # source://matrix//lib/matrix.rb#1680
+  # pkg:gem/matrix#lib/matrix.rb:1680
   def to_matrix; end
 
   # Overrides Object#to_s
   #
-  # source://matrix//lib/matrix.rb#1722
+  # pkg:gem/matrix#lib/matrix.rb:1722
   def to_s; end
 
   # Returns the trace (sum of diagonal elements) of the matrix.
@@ -862,7 +862,7 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#1509
+  # pkg:gem/matrix#lib/matrix.rb:1509
   def tr; end
 
   # Returns the trace (sum of diagonal elements) of the matrix.
@@ -871,7 +871,7 @@ class Matrix
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#1503
+  # pkg:gem/matrix#lib/matrix.rb:1503
   def trace; end
 
   # Returns the transpose of the matrix.
@@ -883,7 +883,7 @@ class Matrix
   #   #  => 1 3 5
   #   #     2 4 6
   #
-  # source://matrix//lib/matrix.rb#1521
+  # pkg:gem/matrix#lib/matrix.rb:1521
   def transpose; end
 
   # Returns +true+ if this is a unitary matrix
@@ -892,14 +892,14 @@ class Matrix
   # @raise [ErrDimensionMismatch]
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#986
+  # pkg:gem/matrix#lib/matrix.rb:986
   def unitary?; end
 
   # Returns +true+ if this is an upper triangular matrix.
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#1003
+  # pkg:gem/matrix#lib/matrix.rb:1003
   def upper_triangular?; end
 
   # Returns a new matrix resulting by stacking vertically
@@ -909,34 +909,34 @@ class Matrix
   #   y = Matrix[[5, 6], [7, 8]]
   #   x.vstack(y) # => Matrix[[1, 2], [3, 4], [5, 6], [7, 8]]
   #
-  # source://matrix//lib/matrix.rb#1535
+  # pkg:gem/matrix#lib/matrix.rb:1535
   def vstack(*matrices); end
 
   # Returns +true+ if this is a matrix with only zero elements
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#1010
+  # pkg:gem/matrix#lib/matrix.rb:1010
   def zero?; end
 
   protected
 
-  # source://matrix//lib/matrix.rb#1258
+  # pkg:gem/matrix#lib/matrix.rb:1258
   def power_int(exp); end
 
   # Returns the value of attribute rows.
   #
-  # source://matrix//lib/matrix.rb#69
+  # pkg:gem/matrix#lib/matrix.rb:69
   def rows; end
 
   private
 
-  # source://matrix//lib/matrix.rb#376
+  # pkg:gem/matrix#lib/matrix.rb:376
   def check_int(val, direction); end
 
   # Returns range or nil
   #
-  # source://matrix//lib/matrix.rb#370
+  # pkg:gem/matrix#lib/matrix.rb:370
   def check_range(val, direction); end
 
   # Private. Use Matrix#determinant
@@ -949,26 +949,26 @@ class Matrix
   # with smaller bignums (if any), while a matrix of Float will usually have
   # intermediate results with better precision.
   #
-  # source://matrix//lib/matrix.rb#1369
+  # pkg:gem/matrix#lib/matrix.rb:1369
   def determinant_bareiss; end
 
   # Called for dup & clone.
   #
-  # source://matrix//lib/matrix.rb#1036
+  # pkg:gem/matrix#lib/matrix.rb:1036
   def initialize_copy(m); end
 
-  # source://matrix//lib/matrix.rb#1184
+  # pkg:gem/matrix#lib/matrix.rb:1184
   def inverse_from(src); end
 
-  # source://matrix//lib/matrix.rb#330
+  # pkg:gem/matrix#lib/matrix.rb:330
   def new_matrix(rows, column_count = T.unsafe(nil)); end
 
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#432
+  # pkg:gem/matrix#lib/matrix.rb:432
   def set_col_range(row, col_range, value); end
 
-  # source://matrix//lib/matrix.rb#425
+  # pkg:gem/matrix#lib/matrix.rb:425
   def set_column_vector(row_range, col, value); end
 
   # :call-seq:
@@ -981,7 +981,7 @@ class Matrix
   #
   # @raise [FrozenError]
   #
-  # source://matrix//lib/matrix.rb#366
+  # pkg:gem/matrix#lib/matrix.rb:366
   def set_component(i, j, v); end
 
   # :call-seq:
@@ -994,18 +994,18 @@ class Matrix
   #
   # @raise [FrozenError]
   #
-  # source://matrix//lib/matrix.rb#365
+  # pkg:gem/matrix#lib/matrix.rb:365
   def set_element(i, j, v); end
 
-  # source://matrix//lib/matrix.rb#387
+  # pkg:gem/matrix#lib/matrix.rb:387
   def set_row_and_col_range(row_range, col_range, value); end
 
-  # source://matrix//lib/matrix.rb#411
+  # pkg:gem/matrix#lib/matrix.rb:411
   def set_row_range(row_range, col, value); end
 
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#381
+  # pkg:gem/matrix#lib/matrix.rb:381
   def set_value(row, col, value); end
 
   class << self
@@ -1014,7 +1014,7 @@ class Matrix
     #   #  => 1 0
     #   #     0 1
     #
-    # source://matrix//lib/matrix.rb#176
+    # pkg:gem/matrix#lib/matrix.rb:176
     def I(n); end
 
     # Creates a matrix where each argument is a row.
@@ -1022,7 +1022,7 @@ class Matrix
     #   #   =>  25 93
     #   #       -1 66
     #
-    # source://matrix//lib/matrix.rb#78
+    # pkg:gem/matrix#lib/matrix.rb:78
     def [](*rows); end
 
     # Creates a matrix of size +row_count+ x +column_count+.
@@ -1037,7 +1037,7 @@ class Matrix
     #
     # @raise [ArgumentError]
     #
-    # source://matrix//lib/matrix.rb#123
+    # pkg:gem/matrix#lib/matrix.rb:123
     def build(row_count, column_count = T.unsafe(nil)); end
 
     # Creates a single-column matrix where the values of that column are as given
@@ -1047,7 +1047,7 @@ class Matrix
     #   #     5
     #   #     6
     #
-    # source://matrix//lib/matrix.rb#209
+    # pkg:gem/matrix#lib/matrix.rb:209
     def column_vector(column); end
 
     # Creates a matrix using +columns+ as an array of column vectors.
@@ -1055,7 +1055,7 @@ class Matrix
     #   #   =>  25 -1
     #   #       93 66
     #
-    # source://matrix//lib/matrix.rb#108
+    # pkg:gem/matrix#lib/matrix.rb:108
     def columns(columns); end
 
     # :call-seq:
@@ -1067,7 +1067,7 @@ class Matrix
     #   y = Matrix[[1, 2], [3, 4]]
     #   Matrix.combine(x, y) {|a, b| a - b} # => Matrix[[5, 4], [1, 0]]
     #
-    # source://matrix//lib/matrix.rb#288
+    # pkg:gem/matrix#lib/matrix.rb:288
     def combine(*matrices); end
 
     # Creates a matrix where the diagonal elements are composed of +values+.
@@ -1076,7 +1076,7 @@ class Matrix
     #   #      0  5  0
     #   #      0  0 -3
     #
-    # source://matrix//lib/matrix.rb#143
+    # pkg:gem/matrix#lib/matrix.rb:143
     def diagonal(*values); end
 
     # Creates a empty matrix of +row_count+ x +column_count+.
@@ -1093,7 +1093,7 @@ class Matrix
     #
     # @raise [ArgumentError]
     #
-    # source://matrix//lib/matrix.rb#227
+    # pkg:gem/matrix#lib/matrix.rb:227
     def empty(row_count = T.unsafe(nil), column_count = T.unsafe(nil)); end
 
     # Create a matrix by stacking matrices horizontally
@@ -1102,7 +1102,7 @@ class Matrix
     #   y = Matrix[[5, 6], [7, 8]]
     #   Matrix.hstack(x, y) # => Matrix[[1, 2, 5, 6], [3, 4, 7, 8]]
     #
-    # source://matrix//lib/matrix.rb#262
+    # pkg:gem/matrix#lib/matrix.rb:262
     def hstack(x, *matrices); end
 
     # Creates an +n+ by +n+ identity matrix.
@@ -1110,7 +1110,7 @@ class Matrix
     #   #  => 1 0
     #   #     0 1
     #
-    # source://matrix//lib/matrix.rb#171
+    # pkg:gem/matrix#lib/matrix.rb:171
     def identity(n); end
 
     # Creates a single-row matrix where the values of that row are as given in
@@ -1118,7 +1118,7 @@ class Matrix
     #   Matrix.row_vector([4,5,6])
     #   #  => 4 5 6
     #
-    # source://matrix//lib/matrix.rb#196
+    # pkg:gem/matrix#lib/matrix.rb:196
     def row_vector(row); end
 
     # Creates a matrix where +rows+ is an array of arrays, each of which is a row
@@ -1128,7 +1128,7 @@ class Matrix
     #   #   =>  25 93
     #   #       -1 66
     #
-    # source://matrix//lib/matrix.rb#90
+    # pkg:gem/matrix#lib/matrix.rb:90
     def rows(rows, copy = T.unsafe(nil)); end
 
     # Creates an +n+ by +n+ diagonal matrix where each diagonal element is
@@ -1137,7 +1137,7 @@ class Matrix
     #   #  => 5 0
     #   #     0 5
     #
-    # source://matrix//lib/matrix.rb#161
+    # pkg:gem/matrix#lib/matrix.rb:161
     def scalar(n, value); end
 
     # Creates an +n+ by +n+ identity matrix.
@@ -1145,7 +1145,7 @@ class Matrix
     #   #  => 1 0
     #   #     0 1
     #
-    # source://matrix//lib/matrix.rb#175
+    # pkg:gem/matrix#lib/matrix.rb:175
     def unit(n); end
 
     # Create a matrix by stacking matrices vertically
@@ -1154,7 +1154,7 @@ class Matrix
     #   y = Matrix[[5, 6], [7, 8]]
     #   Matrix.vstack(x, y) # => Matrix[[1, 2], [3, 4], [5, 6], [7, 8]]
     #
-    # source://matrix//lib/matrix.rb#241
+    # pkg:gem/matrix#lib/matrix.rb:241
     def vstack(x, *matrices); end
 
     # Creates a zero matrix.
@@ -1162,34 +1162,34 @@ class Matrix
     #   #  => 0 0
     #   #     0 0
     #
-    # source://matrix//lib/matrix.rb#185
+    # pkg:gem/matrix#lib/matrix.rb:185
     def zero(row_count, column_count = T.unsafe(nil)); end
 
     private
 
-    # source://matrix//lib/matrix.rb#68
+    # pkg:gem/matrix#lib/matrix.rb:68
     def new(*_arg0); end
   end
 end
 
-# source://matrix//lib/matrix.rb#1770
+# pkg:gem/matrix#lib/matrix.rb:1770
 module Matrix::CoercionHelper
   private
 
   # Applies the operator +oper+ with argument +obj+
   # through coercion of +obj+
   #
-  # source://matrix//lib/matrix.rb#1775
+  # pkg:gem/matrix#lib/matrix.rb:1775
   def apply_through_coercion(obj, oper); end
 
   class << self
-    # source://matrix//lib/matrix.rb#1822
+    # pkg:gem/matrix#lib/matrix.rb:1822
     def check_int(val, count, kind); end
 
     # Returns `nil` for non Ranges
     # Checks range validity, return canonical range with 0 <= begin <= end < count
     #
-    # source://matrix//lib/matrix.rb#1812
+    # pkg:gem/matrix#lib/matrix.rb:1812
     def check_range(val, count, kind); end
 
     # Helper method to coerce a value into a specific class.
@@ -1199,24 +1199,24 @@ module Matrix::CoercionHelper
     #
     # @raise [TypeError]
     #
-    # source://matrix//lib/matrix.rb#1789
+    # pkg:gem/matrix#lib/matrix.rb:1789
     def coerce_to(obj, cls, meth); end
 
-    # source://matrix//lib/matrix.rb#1802
+    # pkg:gem/matrix#lib/matrix.rb:1802
     def coerce_to_int(obj); end
 
-    # source://matrix//lib/matrix.rb#1806
+    # pkg:gem/matrix#lib/matrix.rb:1806
     def coerce_to_matrix(obj); end
   end
 end
 
 # Private helper modules
 #
-# source://matrix//lib/matrix.rb#1745
+# pkg:gem/matrix#lib/matrix.rb:1745
 module Matrix::ConversionHelper
   private
 
-  # source://matrix//lib/matrix.rb#1750
+  # pkg:gem/matrix#lib/matrix.rb:1750
   def convert_to_array(obj, copy = T.unsafe(nil)); end
 end
 
@@ -1230,94 +1230,94 @@ end
 #
 # If A is symmetric, then V is orthogonal and thus A = V*D*V.t
 #
-# source://matrix//lib/matrix/eigenvalue_decomposition.rb#16
+# pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:16
 class Matrix::EigenvalueDecomposition
   # Constructs the eigenvalue decomposition for a square matrix +A+
   #
   # @raise [TypeError]
   # @return [EigenvalueDecomposition] a new instance of EigenvalueDecomposition
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#20
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:20
   def initialize(a); end
 
   # Returns the block diagonal eigenvalue matrix +D+
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#77
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:77
   def d; end
 
   # Returns the block diagonal eigenvalue matrix +D+
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#74
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:74
   def eigenvalue_matrix; end
 
   # Returns the eigenvalues in an array
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#60
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:60
   def eigenvalues; end
 
   # Returns the eigenvector matrix +V+
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#44
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:44
   def eigenvector_matrix; end
 
   # Returns the inverse of the eigenvector matrix +V+
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#51
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:51
   def eigenvector_matrix_inv; end
 
   # Returns an array of the eigenvectors
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#68
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:68
   def eigenvectors; end
 
   # Returns [eigenvector_matrix, eigenvalue_matrix, eigenvector_matrix_inv]
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#84
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:84
   def to_a; end
 
   # Returns [eigenvector_matrix, eigenvalue_matrix, eigenvector_matrix_inv]
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#81
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:81
   def to_ary; end
 
   # Returns the eigenvector matrix +V+
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#47
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:47
   def v; end
 
   # Returns the inverse of the eigenvector matrix +V+
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#56
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:56
   def v_inv; end
 
   private
 
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#87
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:87
   def build_eigenvectors; end
 
   # Complex scalar division.
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#103
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:103
   def cdiv(xr, xi, yr, yi); end
 
   # Symmetric tridiagonal QL algorithm.
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#236
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:236
   def diagonalize; end
 
   # Nonsymmetric reduction from Hessenberg to real Schur form.
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#447
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:447
   def hessenberg_to_real_schur; end
 
   # Nonsymmetric reduction to Hessenberg form.
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#355
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:355
   def reduce_to_hessenberg; end
 
   # Symmetric Householder reduction to tridiagonal form.
   #
-  # source://matrix//lib/matrix/eigenvalue_decomposition.rb#118
+  # pkg:gem/matrix#lib/matrix/eigenvalue_decomposition.rb:118
   def tridiagonalize; end
 end
 
@@ -1331,105 +1331,105 @@ end
 # LU decomposition is in the solution of square systems of simultaneous
 # linear equations.  This will fail if singular? returns true.
 #
-# source://matrix//lib/matrix/lup_decomposition.rb#17
+# pkg:gem/matrix#lib/matrix/lup_decomposition.rb:17
 class Matrix::LUPDecomposition
   include ::Matrix::ConversionHelper
 
   # @raise [TypeError]
   # @return [LUPDecomposition] a new instance of LUPDecomposition
   #
-  # source://matrix//lib/matrix/lup_decomposition.rb#154
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:154
   def initialize(a); end
 
   # Returns the determinant of +A+, calculated efficiently
   # from the factorization.
   #
-  # source://matrix//lib/matrix/lup_decomposition.rb#79
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:79
   def det; end
 
   # Returns the determinant of +A+, calculated efficiently
   # from the factorization.
   #
-  # source://matrix//lib/matrix/lup_decomposition.rb#89
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:89
   def determinant; end
 
-  # source://matrix//lib/matrix/lup_decomposition.rb#22
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:22
   def l; end
 
   # Returns the permutation matrix +P+
   #
-  # source://matrix//lib/matrix/lup_decomposition.rb#48
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:48
   def p; end
 
   # Returns the pivoting indices
   #
-  # source://matrix//lib/matrix/lup_decomposition.rb#63
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:63
   def pivots; end
 
   # Returns +true+ if +U+, and hence +A+, is singular.
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix/lup_decomposition.rb#67
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:67
   def singular?; end
 
   # Returns +m+ so that <tt>A*m = b</tt>,
   # or equivalently so that <tt>L*U*m = P*b</tt>
   # +b+ can be a Matrix or a Vector
   #
-  # source://matrix//lib/matrix/lup_decomposition.rb#95
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:95
   def solve(b); end
 
   # Returns +L+, +U+, +P+ in an array
   #
-  # source://matrix//lib/matrix/lup_decomposition.rb#59
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:59
   def to_a; end
 
   # Returns +L+, +U+, +P+ in an array
   #
-  # source://matrix//lib/matrix/lup_decomposition.rb#56
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:56
   def to_ary; end
 
   # Returns the upper triangular factor +U+
   #
-  # source://matrix//lib/matrix/lup_decomposition.rb#36
+  # pkg:gem/matrix#lib/matrix/lup_decomposition.rb:36
   def u; end
 end
 
-# source://matrix//lib/matrix.rb#666
+# pkg:gem/matrix#lib/matrix.rb:666
 Matrix::SELECTORS = T.let(T.unsafe(nil), Hash)
 
 # Private CLASS
 #
-# source://matrix//lib/matrix.rb#1835
+# pkg:gem/matrix#lib/matrix.rb:1835
 class Matrix::Scalar < ::Numeric
   include ::ExceptionForMatrix
   include ::Matrix::CoercionHelper
 
   # @return [Scalar] a new instance of Scalar
   #
-  # source://matrix//lib/matrix.rb#1839
+  # pkg:gem/matrix#lib/matrix.rb:1839
   def initialize(value); end
 
-  # source://matrix//lib/matrix.rb#1866
+  # pkg:gem/matrix#lib/matrix.rb:1866
   def *(other); end
 
-  # source://matrix//lib/matrix.rb#1890
+  # pkg:gem/matrix#lib/matrix.rb:1890
   def **(other); end
 
   # ARITHMETIC
   #
-  # source://matrix//lib/matrix.rb#1844
+  # pkg:gem/matrix#lib/matrix.rb:1844
   def +(other); end
 
-  # source://matrix//lib/matrix.rb#1855
+  # pkg:gem/matrix#lib/matrix.rb:1855
   def -(other); end
 
-  # source://matrix//lib/matrix.rb#1877
+  # pkg:gem/matrix#lib/matrix.rb:1877
   def /(other); end
 end
 
-# source://matrix//lib/matrix/version.rb#4
+# pkg:gem/matrix#lib/matrix/version.rb:4
 Matrix::VERSION = T.let(T.unsafe(nil), String)
 
 # The +Vector+ class represents a mathematical vector, which is useful in its own right, and
@@ -1491,7 +1491,7 @@ Matrix::VERSION = T.let(T.unsafe(nil), String)
 # * #to_s
 # * #inspect
 #
-# source://matrix//lib/matrix.rb#1968
+# pkg:gem/matrix#lib/matrix.rb:1968
 class Vector
   include ::ExceptionForMatrix
   include ::Enumerable
@@ -1502,38 +1502,38 @@ class Vector
   #
   # @return [Vector] a new instance of Vector
   #
-  # source://matrix//lib/matrix.rb#2022
+  # pkg:gem/matrix#lib/matrix.rb:2022
   def initialize(array); end
 
   # Multiplies the vector by +x+, where +x+ is a number or a matrix.
   #
-  # source://matrix//lib/matrix.rb#2224
+  # pkg:gem/matrix#lib/matrix.rb:2224
   def *(x); end
 
   # Vector addition.
   #
-  # source://matrix//lib/matrix.rb#2241
+  # pkg:gem/matrix#lib/matrix.rb:2241
   def +(v); end
 
-  # source://matrix//lib/matrix.rb#2289
+  # pkg:gem/matrix#lib/matrix.rb:2289
   def +@; end
 
   # Vector subtraction.
   #
-  # source://matrix//lib/matrix.rb#2259
+  # pkg:gem/matrix#lib/matrix.rb:2259
   def -(v); end
 
-  # source://matrix//lib/matrix.rb#2293
+  # pkg:gem/matrix#lib/matrix.rb:2293
   def -@; end
 
   # Vector division.
   #
-  # source://matrix//lib/matrix.rb#2277
+  # pkg:gem/matrix#lib/matrix.rb:2277
   def /(x); end
 
   # Returns whether the two vectors have the same elements in the same order.
   #
-  # source://matrix//lib/matrix.rb#2200
+  # pkg:gem/matrix#lib/matrix.rb:2200
   def ==(other); end
 
   # :call-seq:
@@ -1542,7 +1542,7 @@ class Vector
   #
   # Returns element or elements of the vector.
   #
-  # source://matrix//lib/matrix.rb#2036
+  # pkg:gem/matrix#lib/matrix.rb:2036
   def [](i); end
 
   # :call-seq:
@@ -1555,7 +1555,7 @@ class Vector
   #
   # @raise [FrozenError]
   #
-  # source://matrix//lib/matrix.rb#2051
+  # pkg:gem/matrix#lib/matrix.rb:2051
   def []=(i, v); end
 
   # Returns an angle with another vector. Result is within the [0..Math::PI].
@@ -1564,7 +1564,7 @@ class Vector
   #
   # @raise [TypeError]
   #
-  # source://matrix//lib/matrix.rb#2409
+  # pkg:gem/matrix#lib/matrix.rb:2409
   def angle_with(v); end
 
   # The coerce method provides support for Ruby type coercion.
@@ -1573,19 +1573,19 @@ class Vector
   # type between the two operands of the operator.
   # See also Numeric#coerce.
   #
-  # source://matrix//lib/matrix.rb#2469
+  # pkg:gem/matrix#lib/matrix.rb:2469
   def coerce(other); end
 
   # Like Array#collect.
   #
-  # source://matrix//lib/matrix.rb#2353
+  # pkg:gem/matrix#lib/matrix.rb:2353
   def collect(&block); end
 
   # Like Array#collect!
   #
   # @raise [FrozenError]
   #
-  # source://matrix//lib/matrix.rb#2363
+  # pkg:gem/matrix#lib/matrix.rb:2363
   def collect!(&block); end
 
   # Collects (as in Enumerable#collect) over the elements of this vector and +v+
@@ -1593,7 +1593,7 @@ class Vector
   #
   # @raise [TypeError]
   #
-  # source://matrix//lib/matrix.rb#2125
+  # pkg:gem/matrix#lib/matrix.rb:2125
   def collect2(v); end
 
   # :call-seq:
@@ -1602,12 +1602,12 @@ class Vector
   #
   # Returns element or elements of the vector.
   #
-  # source://matrix//lib/matrix.rb#2040
+  # pkg:gem/matrix#lib/matrix.rb:2040
   def component(i); end
 
   # Creates a single-row matrix from this vector.
   #
-  # source://matrix//lib/matrix.rb#2429
+  # pkg:gem/matrix#lib/matrix.rb:2429
   def covector; end
 
   # Returns the cross product of this vector with the others.
@@ -1623,7 +1623,7 @@ class Vector
   #
   # @raise [ErrOperationNotDefined]
   #
-  # source://matrix//lib/matrix.rb#2348
+  # pkg:gem/matrix#lib/matrix.rb:2348
   def cross(*vs); end
 
   # Returns the cross product of this vector with the others.
@@ -1639,7 +1639,7 @@ class Vector
   #
   # @raise [ErrOperationNotDefined]
   #
-  # source://matrix//lib/matrix.rb#2328
+  # pkg:gem/matrix#lib/matrix.rb:2328
   def cross_product(*vs); end
 
   # Returns the inner product of this vector with the other.
@@ -1647,19 +1647,19 @@ class Vector
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#2314
+  # pkg:gem/matrix#lib/matrix.rb:2314
   def dot(v); end
 
   # Iterate over the elements of this vector
   #
-  # source://matrix//lib/matrix.rb#2102
+  # pkg:gem/matrix#lib/matrix.rb:2102
   def each(&block); end
 
   # Iterate over the elements of this vector and +v+ in conjunction.
   #
   # @raise [TypeError]
   #
-  # source://matrix//lib/matrix.rb#2111
+  # pkg:gem/matrix#lib/matrix.rb:2111
   def each2(v); end
 
   # :call-seq:
@@ -1668,31 +1668,31 @@ class Vector
   #
   # Returns element or elements of the vector.
   #
-  # source://matrix//lib/matrix.rb#2039
+  # pkg:gem/matrix#lib/matrix.rb:2039
   def element(i); end
 
-  # source://matrix//lib/matrix.rb#2447
+  # pkg:gem/matrix#lib/matrix.rb:2447
   def elements_to_f; end
 
-  # source://matrix//lib/matrix.rb#2452
+  # pkg:gem/matrix#lib/matrix.rb:2452
   def elements_to_i; end
 
-  # source://matrix//lib/matrix.rb#2457
+  # pkg:gem/matrix#lib/matrix.rb:2457
   def elements_to_r; end
 
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#2205
+  # pkg:gem/matrix#lib/matrix.rb:2205
   def eql?(other); end
 
   # Makes the matrix frozen and Ractor-shareable
   #
-  # source://matrix//lib/matrix.rb#2179
+  # pkg:gem/matrix#lib/matrix.rb:2179
   def freeze; end
 
   # Returns a hash-code for the vector.
   #
-  # source://matrix//lib/matrix.rb#2213
+  # pkg:gem/matrix#lib/matrix.rb:2213
   def hash; end
 
   # Returns whether all of vectors are linearly independent.
@@ -1705,7 +1705,7 @@ class Vector
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#2165
+  # pkg:gem/matrix#lib/matrix.rb:2165
   def independent?(*vs); end
 
   # Returns the inner product of this vector with the other.
@@ -1713,41 +1713,41 @@ class Vector
   #
   # @raise [ErrDimensionMismatch]
   #
-  # source://matrix//lib/matrix.rb#2305
+  # pkg:gem/matrix#lib/matrix.rb:2305
   def inner_product(v); end
 
   # Overrides Object#inspect
   #
-  # source://matrix//lib/matrix.rb#2492
+  # pkg:gem/matrix#lib/matrix.rb:2492
   def inspect; end
 
   # Returns the modulus (Pythagorean distance) of the vector.
   #   Vector[5,8,2].r # => 9.643650761
   #
-  # source://matrix//lib/matrix.rb#2375
+  # pkg:gem/matrix#lib/matrix.rb:2375
   def magnitude; end
 
   # Like Array#collect.
   #
-  # source://matrix//lib/matrix.rb#2358
+  # pkg:gem/matrix#lib/matrix.rb:2358
   def map(&block); end
 
   # Like Array#collect!
   #
   # @raise [FrozenError]
   #
-  # source://matrix//lib/matrix.rb#2369
+  # pkg:gem/matrix#lib/matrix.rb:2369
   def map!(&block); end
 
   # Like Vector#collect2, but returns a Vector instead of an Array.
   #
-  # source://matrix//lib/matrix.rb#2384
+  # pkg:gem/matrix#lib/matrix.rb:2384
   def map2(v, &block); end
 
   # Returns the modulus (Pythagorean distance) of the vector.
   #   Vector[5,8,2].r # => 9.643650761
   #
-  # source://matrix//lib/matrix.rb#2379
+  # pkg:gem/matrix#lib/matrix.rb:2379
   def norm; end
 
   # Returns a new vector with the same direction but with norm 1.
@@ -1757,60 +1757,60 @@ class Vector
   #
   # @raise [ZeroVectorError]
   #
-  # source://matrix//lib/matrix.rb#2398
+  # pkg:gem/matrix#lib/matrix.rb:2398
   def normalize; end
 
   # Returns the modulus (Pythagorean distance) of the vector.
   #   Vector[5,8,2].r # => 9.643650761
   #
-  # source://matrix//lib/matrix.rb#2378
+  # pkg:gem/matrix#lib/matrix.rb:2378
   def r; end
 
   # Returns a vector with entries rounded to the given precision
   # (see Float#round)
   #
-  # source://matrix//lib/matrix.rb#2084
+  # pkg:gem/matrix#lib/matrix.rb:2084
   def round(ndigits = T.unsafe(nil)); end
 
   # Returns the number of elements in the vector.
   #
-  # source://matrix//lib/matrix.rb#2091
+  # pkg:gem/matrix#lib/matrix.rb:2091
   def size; end
 
   # Returns the elements of the vector in an array.
   #
-  # source://matrix//lib/matrix.rb#2436
+  # pkg:gem/matrix#lib/matrix.rb:2436
   def to_a; end
 
   # Return a single-column matrix from this vector
   #
-  # source://matrix//lib/matrix.rb#2443
+  # pkg:gem/matrix#lib/matrix.rb:2443
   def to_matrix; end
 
   # Overrides Object#to_s
   #
-  # source://matrix//lib/matrix.rb#2485
+  # pkg:gem/matrix#lib/matrix.rb:2485
   def to_s; end
 
   # Returns whether all elements are zero.
   #
   # @return [Boolean]
   #
-  # source://matrix//lib/matrix.rb#2172
+  # pkg:gem/matrix#lib/matrix.rb:2172
   def zero?; end
 
   protected
 
   # Returns the value of attribute elements.
   #
-  # source://matrix//lib/matrix.rb#1976
+  # pkg:gem/matrix#lib/matrix.rb:1976
   def elements; end
 
   private
 
   # Called for dup & clone.
   #
-  # source://matrix//lib/matrix.rb#2187
+  # pkg:gem/matrix#lib/matrix.rb:2187
   def initialize_copy(v); end
 
   # :call-seq:
@@ -1823,7 +1823,7 @@ class Vector
   #
   # @raise [FrozenError]
   #
-  # source://matrix//lib/matrix.rb#2062
+  # pkg:gem/matrix#lib/matrix.rb:2062
   def set_component(i, v); end
 
   # :call-seq:
@@ -1836,20 +1836,20 @@ class Vector
   #
   # @raise [FrozenError]
   #
-  # source://matrix//lib/matrix.rb#2061
+  # pkg:gem/matrix#lib/matrix.rb:2061
   def set_element(i, v); end
 
-  # source://matrix//lib/matrix.rb#2069
+  # pkg:gem/matrix#lib/matrix.rb:2069
   def set_range(range, value); end
 
-  # source://matrix//lib/matrix.rb#2065
+  # pkg:gem/matrix#lib/matrix.rb:2065
   def set_value(index, value); end
 
   class << self
     # Creates a Vector from a list of elements.
     #   Vector[7, 4, ...]
     #
-    # source://matrix//lib/matrix.rb#1983
+    # pkg:gem/matrix#lib/matrix.rb:1983
     def [](*array); end
 
     # Returns a standard basis +n+-vector, where k is the index.
@@ -1858,13 +1858,13 @@ class Vector
     #
     # @raise [ArgumentError]
     #
-    # source://matrix//lib/matrix.rb#2000
+    # pkg:gem/matrix#lib/matrix.rb:2000
     def basis(size:, index:); end
 
     # Creates a vector from an Array.  The optional second argument specifies
     # whether the array itself or a copy is used internally.
     #
-    # source://matrix//lib/matrix.rb#1991
+    # pkg:gem/matrix#lib/matrix.rb:1991
     def elements(array, copy = T.unsafe(nil)); end
 
     # Returns whether all of vectors are linearly independent.
@@ -1877,7 +1877,7 @@ class Vector
     #
     # @return [Boolean]
     #
-    # source://matrix//lib/matrix.rb#2147
+    # pkg:gem/matrix#lib/matrix.rb:2147
     def independent?(*vs); end
 
     # Return a zero vector.
@@ -1886,15 +1886,15 @@ class Vector
     #
     # @raise [ArgumentError]
     #
-    # source://matrix//lib/matrix.rb#2013
+    # pkg:gem/matrix#lib/matrix.rb:2013
     def zero(size); end
 
     private
 
-    # source://matrix//lib/matrix.rb#1975
+    # pkg:gem/matrix#lib/matrix.rb:1975
     def new(*_arg0); end
   end
 end
 
-# source://matrix//lib/matrix.rb#2390
+# pkg:gem/matrix#lib/matrix.rb:2390
 class Vector::ZeroVectorError < ::StandardError; end

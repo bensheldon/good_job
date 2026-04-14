@@ -7,7 +7,7 @@
 
 # Performance benchmarking library
 #
-# source://benchmark-ips//lib/benchmark/timing.rb#1
+# pkg:gem/benchmark-ips#lib/benchmark/timing.rb:1
 module Benchmark
   extend ::Benchmark::Compare
   extend ::Benchmark::IPS
@@ -61,14 +61,14 @@ end
 #
 # The first report is considered the baseline against which other reports are compared.
 #
-# source://benchmark-ips//lib/benchmark/compare.rb#51
+# pkg:gem/benchmark-ips#lib/benchmark/compare.rb:51
 module Benchmark::Compare
   # Compare between reports, prints out facts of each report:
   # runtime, comparative speed difference.
   #
   # @param entries [Array<Report::Entry>] Reports to compare.
   #
-  # source://benchmark-ips//lib/benchmark/compare.rb#56
+  # pkg:gem/benchmark-ips#lib/benchmark/compare.rb:56
   def compare(*entries, order: T.unsafe(nil)); end
 end
 
@@ -78,7 +78,7 @@ end
 #
 # @see {https://github.com/evanphx/benchmark-ips}
 #
-# source://benchmark-ips//lib/benchmark/ips/stats/stats_metric.rb#2
+# pkg:gem/benchmark-ips#lib/benchmark/ips/stats/stats_metric.rb:2
 module Benchmark::IPS
   # Measure code in block, each code's benchmarked result will display in
   # iteration per second with standard deviation in given time.
@@ -88,7 +88,7 @@ module Benchmark::IPS
   # @return [Report]
   # @yield [job]
   #
-  # source://benchmark-ips//lib/benchmark/ips.rb#33
+  # pkg:gem/benchmark-ips#lib/benchmark/ips.rb:33
   def ips(*args); end
 
   # Quickly compare multiple methods on the same object.
@@ -102,10 +102,10 @@ module Benchmark::IPS
   # @option opts
   # @option opts
   # @param methods [Symbol...] A list of method names (as symbols) to compare.
-  # @param receiver [Object] The object on which to call the methods. Defaults to Kernel.
   # @param opts [Hash] Additional options for customizing the benchmark.
+  # @param receiver [Object] The object on which to call the methods. Defaults to Kernel.
   #
-  # source://benchmark-ips//lib/benchmark/ips.rb#93
+  # pkg:gem/benchmark-ips#lib/benchmark/ips.rb:93
   def ips_quick(*methods, on: T.unsafe(nil), **opts); end
 
   class << self
@@ -114,189 +114,189 @@ module Benchmark::IPS
     #    :human format narrows precision and scales results for readability
     #    :raw format displays 6 places of precision and exact iteration counts
     #
-    # source://benchmark-ips//lib/benchmark/ips.rb#109
+    # pkg:gem/benchmark-ips#lib/benchmark/ips.rb:109
     def options; end
   end
 end
 
 # CODENAME of current version.
 #
-# source://benchmark-ips//lib/benchmark/ips.rb#26
+# pkg:gem/benchmark-ips#lib/benchmark/ips.rb:26
 Benchmark::IPS::CODENAME = T.let(T.unsafe(nil), String)
 
-# source://benchmark-ips//lib/benchmark/ips.rb#113
+# pkg:gem/benchmark-ips#lib/benchmark/ips.rb:113
 module Benchmark::IPS::Helpers
   private
 
-  # source://benchmark-ips//lib/benchmark/ips.rb#126
+  # pkg:gem/benchmark-ips#lib/benchmark/ips.rb:126
   def humanize_duration(duration_ns); end
 
-  # source://benchmark-ips//lib/benchmark/ips.rb#116
+  # pkg:gem/benchmark-ips#lib/benchmark/ips.rb:116
   def scale(value); end
 
   class << self
-    # source://benchmark-ips//lib/benchmark/ips.rb#137
+    # pkg:gem/benchmark-ips#lib/benchmark/ips.rb:137
     def humanize_duration(duration_ns); end
 
-    # source://benchmark-ips//lib/benchmark/ips.rb#124
+    # pkg:gem/benchmark-ips#lib/benchmark/ips.rb:124
     def scale(value); end
   end
 end
 
-# source://benchmark-ips//lib/benchmark/ips.rb#114
+# pkg:gem/benchmark-ips#lib/benchmark/ips.rb:114
 Benchmark::IPS::Helpers::SUFFIXES = T.let(T.unsafe(nil), Array)
 
 # Benchmark jobs.
 #
-# source://benchmark-ips//lib/benchmark/ips/job/entry.rb#4
+# pkg:gem/benchmark-ips#lib/benchmark/ips/job/entry.rb:4
 class Benchmark::IPS::Job
   # Instantiate the Benchmark::IPS::Job.
   #
   # @return [Job] a new instance of Job
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#67
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:67
   def initialize(opts = T.unsafe(nil)); end
 
   # @return [Boolean]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#241
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:241
   def all_results_have_been_run?; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#245
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:245
   def clear_held_results; end
 
   # Determining whether to run comparison utility.
   #
   # @return [Boolean] true if needs to run compare.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#20
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:20
   def compare; end
 
   # Run comparison utility.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#124
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:124
   def compare!(order: T.unsafe(nil)); end
 
   # Return true if job needs to be compared.
   #
   # @return [Boolean] Need to compare?
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#119
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:119
   def compare?; end
 
   # Confidence.
   #
   # @return [Integer]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#52
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:52
   def confidence; end
 
   # Confidence.
   #
   # @return [Integer]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#52
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:52
   def confidence=(_arg0); end
 
   # Job configuration options, set +@warmup+ and +@time+.
   #
-  # @option opts
-  # @option opts
   # @option iterations
-  # @param opts [Hash] a customizable set of options
+  # @option opts
+  # @option opts
   # @param iterations [Hash] a customizable set of options
+  # @param opts [Hash] a customizable set of options
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#95
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:95
   def config(opts); end
 
   # Create report by add entry to +@full_report+.
   #
+  # @param cycles [Integer] Number of Cycles.
+  # @param iter [Integer] Iterations.
   # @param label [String] Report item label.
   # @param measured_us [Integer] Measured time in microsecond.
-  # @param iter [Integer] Iterations.
   # @param samples [Array<Float>] Sampled iterations per second.
-  # @param cycles [Integer] Number of Cycles.
   # @return [Report::Entry] Entry with data.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#392
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:392
   def create_report(label, measured_us, iter, samples, cycles); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#364
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:364
   def create_stats(samples); end
 
   # Calculate the cycles needed to run for approx 100ms,
   # given the number of iterations to run the given time.
   #
-  # @param time_msec [Float] Each iteration's time in ms.
   # @param iters [Integer] Iterations.
+  # @param time_msec [Float] Each iteration's time in ms.
   # @return [Integer] Cycles per 100ms.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#193
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:193
   def cycles_per_100ms(time_msec, iters); end
 
   # Report object containing information about the run.
   #
   # @return [Report] the report object.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#28
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:28
   def full_report; end
 
   # Generate json from +@full_report+.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#381
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:381
   def generate_json; end
 
   # Determining whether to hold results between Ruby invocations
   #
   # @return [Boolean]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#24
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:24
   def hold; end
 
   # Hold after each iteration.
   #
   # @param held_path [String] File name to store hold file.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#137
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:137
   def hold!(held_path); end
 
   # Determining whether to hold results between Ruby invocations
   #
   # @return [Boolean]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#24
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:24
   def hold=(_arg0); end
 
   # Return true if results are held while multiple Ruby invocations
   #
   # @return [Boolean] Need to hold results between multiple Ruby invocations?
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#131
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:131
   def hold?; end
 
   # Registers the given label and block pair in the job list.
   #
+  # @param blk [Proc] Code to be benchmarked.
   # @param label [String] Label of benchmarked code.
   # @param str [String] Code to be benchmarked.
-  # @param blk [Proc] Code to be benchmarked.
   # @raise [ArgumentError] Raises if str and blk are both present.
   # @raise [ArgumentError] Raises if str and blk are both absent.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#175
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:175
   def item(label = T.unsafe(nil), str = T.unsafe(nil), &blk); end
 
   # Warmup and calculation iterations.
   #
   # @return [Integer]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#44
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:44
   def iterations; end
 
   # Warmup and calculation iterations.
   #
   # @return [Integer]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#44
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:44
   def iterations=(_arg0); end
 
   # Calculate the iterations per second given the number
@@ -306,63 +306,63 @@ class Benchmark::IPS::Job
   # @param time_us [Integer] Time in microsecond.
   # @return [Float] Iteration per second.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#211
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:211
   def iterations_per_sec(cycles, time_us); end
 
   # Generate json to given path, defaults to "data.json".
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#165
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:165
   def json!(path = T.unsafe(nil)); end
 
   # Return true if job needs to generate json.
   #
   # @return [Boolean] Need to generate json?
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#160
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:160
   def json?; end
 
   # Two-element arrays, consisting of label and block pairs.
   #
   # @return [Array<Entry>] list of entries
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#16
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:16
   def list; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#215
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:215
   def load_held_results; end
 
   # Silence output
   #
   # @return [Boolean]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#56
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:56
   def quiet; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#105
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:105
   def quiet=(val); end
 
   # Registers the given label and block pair in the job list.
   #
+  # @param blk [Proc] Code to be benchmarked.
   # @param label [String] Label of benchmarked code.
   # @param str [String] Code to be benchmarked.
-  # @param blk [Proc] Code to be benchmarked.
   # @raise [ArgumentError] Raises if str and blk are both present.
   # @raise [ArgumentError] Raises if str and blk are both absent.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#186
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:186
   def report(label = T.unsafe(nil), str = T.unsafe(nil), &blk); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#249
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:249
   def run; end
 
   # Run calculation.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#312
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:312
   def run_benchmark; end
 
   # Run comparison of entries in +@full_report+.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#376
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:376
   def run_comparison; end
 
   # Return true if items are to be run one at a time.
@@ -370,12 +370,12 @@ class Benchmark::IPS::Job
   #
   # @return [Boolean] Run just a single item?
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#154
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:154
   def run_single?; end
 
   # Run warmup.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#267
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:267
   def run_warmup; end
 
   # Save interim results. Similar to hold, but all reports are run
@@ -384,100 +384,100 @@ class Benchmark::IPS::Job
   #
   # @param held_path [String] File name to store hold file.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#146
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:146
   def save!(held_path); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#226
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:226
   def save_held_results; end
 
   # Statistics model.
   #
   # @return [Object]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#48
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:48
   def stats; end
 
   # Statistics model.
   #
   # @return [Object]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#48
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:48
   def stats=(_arg0); end
 
   # Suite
   #
   # @return [Benchmark::IPS::MultiReport]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#62
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:62
   def suite; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#113
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:113
   def suite=(suite); end
 
   # Calculation time setter and getter (in seconds).
   #
   # @return [Integer]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#40
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:40
   def time; end
 
   # Calculation time setter and getter (in seconds).
   #
   # @return [Integer]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#40
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:40
   def time=(_arg0); end
 
   # Calculate the time difference of before and after in microseconds.
   #
-  # @param before [Time] time.
   # @param after [Time] time.
+  # @param before [Time] time.
   # @return [Float] Time difference of before and after.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#202
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:202
   def time_us(before, after); end
 
   # Storing Iterations in time period.
   #
   # @return [Hash]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#32
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:32
   def timing; end
 
   # Warmup time setter and getter (in seconds).
   #
   # @return [Integer]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#36
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:36
   def warmup; end
 
   # Warmup time setter and getter (in seconds).
   #
   # @return [Integer]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job.rb#36
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:36
   def warmup=(_arg0); end
 end
 
 # Entries in Benchmark Jobs.
 #
-# source://benchmark-ips//lib/benchmark/ips/job/entry.rb#6
+# pkg:gem/benchmark-ips#lib/benchmark/ips/job/entry.rb:6
 class Benchmark::IPS::Job::Entry
   # Instantiate the Benchmark::IPS::Job::Entry.
   #
-  # @param label [#to_s] Label of Benchmarked code.
   # @param action [String, Proc] Code to be benchmarked.
+  # @param label [#to_s] Label of Benchmarked code.
   # @raise [ArgumentError] Raises when action is not String or not responding to +call+.
   # @return [Entry] a new instance of Entry
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/entry.rb#11
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/entry.rb:11
   def initialize(label, action); end
 
   # The benchmarking action.
   #
   # @return [String, Proc] Code to be called, could be String / Proc.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/entry.rb#41
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/entry.rb:41
   def action; end
 
   # Call action by given times.
@@ -485,13 +485,13 @@ class Benchmark::IPS::Job::Entry
   # @param times [Integer] Times to call +@action+.
   # @return [Integer] Number of times the +@action+ has been called.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/entry.rb#46
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/entry.rb:46
   def call_times(times); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/entry.rb#50
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/entry.rb:50
   def compile_block; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/entry.rb#66
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/entry.rb:66
   def compile_block_with_manual_loop; end
 
   # Compile code into +call_times+ method.
@@ -499,129 +499,129 @@ class Benchmark::IPS::Job::Entry
   # @param str [String] Code to be compiled.
   # @return [Symbol] :call_times.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/entry.rb#79
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/entry.rb:79
   def compile_string(str); end
 
   # The label of benchmarking action.
   #
   # @return [#to_s] Label of action.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/entry.rb#37
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/entry.rb:37
   def label; end
 end
 
 # The percentage of the expected runtime to allow
 # before reporting a weird runtime
 #
-# source://benchmark-ips//lib/benchmark/ips/job.rb#11
+# pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:11
 Benchmark::IPS::Job::MAX_TIME_SKEW = T.let(T.unsafe(nil), Float)
 
 # Microseconds per 100 millisecond.
 #
-# source://benchmark-ips//lib/benchmark/ips/job.rb#6
+# pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:6
 Benchmark::IPS::Job::MICROSECONDS_PER_100MS = T.let(T.unsafe(nil), Integer)
 
 # Microseconds per second.
 #
-# source://benchmark-ips//lib/benchmark/ips/job.rb#8
+# pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:8
 Benchmark::IPS::Job::MICROSECONDS_PER_SECOND = T.let(T.unsafe(nil), Integer)
 
-# source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#4
+# pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:4
 class Benchmark::IPS::Job::MultiReport
   # @param out [Array<StreamReport>] list of reports to send output
   # @return [MultiReport] a new instance of MultiReport
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#32
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:32
   def initialize(out = T.unsafe(nil)); end
 
   # @param report [StreamReport] report to accept input?
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#21
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:21
   def <<(report); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#57
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:57
   def add_report(item, caller); end
 
   # @return [Boolean]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#8
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:8
   def empty?; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#61
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:61
   def footer; end
 
   # Returns the value of attribute out.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#6
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:6
   def out; end
 
   # Sets the attribute out
   #
   # @param value the value to set the attribute out to.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#6
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:6
   def out=(_arg0); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#16
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:16
   def quiet!; end
 
   # @return [Boolean]
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#12
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:12
   def quiet?; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#53
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:53
   def running(label, warmup); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#49
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:49
   def start_running; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#37
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:37
   def start_warming; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#41
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:41
   def warming(label, warmup); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/multi_report.rb#45
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/multi_report.rb:45
   def warmup_stats(warmup_time_us, timing); end
 end
 
-# source://benchmark-ips//lib/benchmark/ips/job.rb#12
+# pkg:gem/benchmark-ips#lib/benchmark/ips/job.rb:12
 Benchmark::IPS::Job::POW_2_30 = T.let(T.unsafe(nil), Integer)
 
-# source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#4
+# pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:4
 class Benchmark::IPS::Job::StreamReport
   # @return [StreamReport] a new instance of StreamReport
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#5
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:5
   def initialize(stream = T.unsafe(nil)); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#34
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:34
   def add_report(item, caller); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#39
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:39
   def footer; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#32
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:32
   def running(label, _warmup); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#15
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:15
   def start_running; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#10
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:10
   def start_warming; end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#19
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:19
   def warming(label, _warmup); end
 
-  # source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#23
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:23
   def warmup_stats(_warmup_time_us, timing); end
 
   private
 
   # @return [Symbol] format used for benchmarking
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#48
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:48
   def format; end
 
   # Add padding to label's right if label's length < 20,
@@ -629,32 +629,32 @@ class Benchmark::IPS::Job::StreamReport
   #
   # @return [String] Right justified label.
   #
-  # source://benchmark-ips//lib/benchmark/ips/job/stream_report.rb#55
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/job/stream_report.rb:55
   def rjust(label); end
 end
 
 # Report contains benchmarking entries.
 # Perform operations like add new entry, run comparison between entries.
 #
-# source://benchmark-ips//lib/benchmark/ips/report.rb#8
+# pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:8
 class Benchmark::IPS::Report
   # Instantiate the Report.
   #
   # @return [Report] a new instance of Report
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#137
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:137
   def initialize; end
 
   # Add entry to report.
   #
-  # @param label [String] Entry label.
-  # @param microseconds [Integer] Measured time in microsecond.
   # @param iters [Integer] Iterations.
-  # @param stats [Object] Statistical results.
+  # @param label [String] Entry label.
   # @param measurement_cycle [Integer] Number of cycles.
+  # @param microseconds [Integer] Measured time in microsecond.
+  # @param stats [Object] Statistical results.
   # @return [Report::Entry] Last added entry.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#149
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:149
   def add_entry(label, microseconds, iters, stats, measurement_cycle); end
 
   # Entries data in array for generate json.
@@ -668,43 +668,43 @@ class Benchmark::IPS::Report
   #
   # @return [Array<Hash<Symbol,String|Float|Integer>] Array of hashes] Array<Hash<Symbol,String|Float|Integer>] Array of hashes
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#165
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:165
   def data; end
 
   # Entry to represent each benchmarked code in Report.
   #
   # @return [Array<Report::Entry>] Entries in Report.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#134
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:134
   def entries; end
 
   # Generate json from Report#data to given path.
   #
   # @param path [String] path to generate json.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#187
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:187
   def generate_json(path); end
 
   # Run comparison of entries.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#181
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:181
   def run_comparison(order); end
 end
 
 # Represents benchmarking code data for Report.
 #
-# source://benchmark-ips//lib/benchmark/ips/report.rb#11
+# pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:11
 class Benchmark::IPS::Report::Entry
   # Instantiate the Benchmark::IPS::Report::Entry.
   #
-  # @param label [#to_s] Label of entry.
-  # @param us [Integer] Measured time in microsecond.
-  # @param iters [Integer] Iterations.
-  # @param stats [Object] Statistics.
   # @param cycles [Integer] Number of Cycles.
+  # @param iters [Integer] Iterations.
+  # @param label [#to_s] Label of entry.
+  # @param stats [Object] Statistics.
+  # @param us [Integer] Measured time in microsecond.
   # @return [Entry] a new instance of Entry
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#18
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:18
   def initialize(label, us, iters, stats, cycles); end
 
   # Return Entry body text with left padding.
@@ -713,147 +713,147 @@ class Benchmark::IPS::Report::Entry
   #
   # @return [String] Left justified body.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#88
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:88
   def body; end
 
   # Print entry to current standard output ($stdout).
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#125
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:125
   def display; end
 
   # Return entry's standard deviation of iteration per second in percentage.
   #
   # @return [Float] +@ips_sd+ in percentage.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#78
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:78
   def error_percentage; end
 
   # Return header with padding if +@label+ is < length of 20.
   #
   # @return [String] Right justified header (+@label+).
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#114
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:114
   def header; end
 
   # LEGACY: Iterations per second.
   #
   # @return [Float] number of iterations per second.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#45
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:45
   def ips; end
 
   # LEGACY: Standard deviation of iteration per second.
   #
   # @return [Float] standard deviation of iteration per second.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#51
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:51
   def ips_sd; end
 
   # Number of Iterations.
   #
   # @return [Integer] number of iterations.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#37
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:37
   def iterations; end
 
   # Label of entry.
   #
   # @return [String] the label of entry.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#29
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:29
   def label; end
 
   # Number of Cycles.
   #
   # @return [Integer] number of cycles.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#61
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:61
   def measurement_cycle; end
 
   # Measured time in microsecond.
   #
   # @return [Integer] number of microseconds.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#33
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:33
   def microseconds; end
 
   # Return entry's microseconds in seconds.
   #
   # @return [Float] +@microseconds+ in seconds.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#82
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:82
   def runtime; end
 
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#55
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:55
   def samples; end
 
   # Return entry's microseconds in seconds.
   #
   # @return [Float] +@microseconds+ in seconds.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#72
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:72
   def seconds; end
 
   # Control if the total time the job took is reported.
   # Typically this value is not significant because it's very
   # close to the expected time, so it's suppressed by default.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#66
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:66
   def show_total_time!; end
 
   # Statistical summary of samples.
   #
   # @return [Object] statisical summary.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#41
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:41
   def stats; end
 
   # Return string representation of Entry object.
   #
   # @return [String] Header and body.
   #
-  # source://benchmark-ips//lib/benchmark/ips/report.rb#120
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/report.rb:120
   def to_s; end
 end
 
-# source://benchmark-ips//lib/benchmark/ips/stats/stats_metric.rb#3
+# pkg:gem/benchmark-ips#lib/benchmark/ips/stats/stats_metric.rb:3
 module Benchmark::IPS::Stats; end
 
-# source://benchmark-ips//lib/benchmark/ips/stats/bootstrap.rb#5
+# pkg:gem/benchmark-ips#lib/benchmark/ips/stats/bootstrap.rb:5
 class Benchmark::IPS::Stats::Bootstrap
   include ::Benchmark::IPS::Stats::StatsMetric
 
   # @return [Bootstrap] a new instance of Bootstrap
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/bootstrap.rb#9
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/bootstrap.rb:9
   def initialize(samples, confidence); end
 
   # Average stat value
   #
   # @return [Float] central_tendency
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/bootstrap.rb#22
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/bootstrap.rb:22
   def central_tendency; end
 
   # Returns the value of attribute data.
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/bootstrap.rb#7
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/bootstrap.rb:7
   def data; end
 
-  # source://benchmark-ips//lib/benchmark/ips/stats/bootstrap.rb#44
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/bootstrap.rb:44
   def dependencies; end
 
   # Returns the value of attribute error.
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/bootstrap.rb#7
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/bootstrap.rb:7
   def error; end
 
-  # source://benchmark-ips//lib/benchmark/ips/stats/bootstrap.rb#40
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/bootstrap.rb:40
   def footer; end
 
   # Returns the value of attribute samples.
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/bootstrap.rb#7
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/bootstrap.rb:7
   def samples; end
 
   # Determines how much slower this stat is than the baseline stat
@@ -861,40 +861,40 @@ class Benchmark::IPS::Stats::Bootstrap
   #
   # @param baseline [SD|Bootstrap] faster baseline
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/bootstrap.rb#30
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/bootstrap.rb:30
   def slowdown(baseline); end
 
-  # source://benchmark-ips//lib/benchmark/ips/stats/bootstrap.rb#36
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/bootstrap.rb:36
   def speedup(baseline); end
 end
 
-# source://benchmark-ips//lib/benchmark/ips/stats/sd.rb#5
+# pkg:gem/benchmark-ips#lib/benchmark/ips/stats/sd.rb:5
 class Benchmark::IPS::Stats::SD
   include ::Benchmark::IPS::Stats::StatsMetric
 
   # @return [SD] a new instance of SD
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/sd.rb#9
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/sd.rb:9
   def initialize(samples); end
 
   # Average stat value
   #
   # @return [Float] central_tendency
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/sd.rb#17
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/sd.rb:17
   def central_tendency; end
 
   # Returns the value of attribute error.
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/sd.rb#7
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/sd.rb:7
   def error; end
 
-  # source://benchmark-ips//lib/benchmark/ips/stats/sd.rb#37
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/sd.rb:37
   def footer; end
 
   # Returns the value of attribute samples.
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/sd.rb#7
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/sd.rb:7
   def samples; end
 
   # Determines how much slower this stat is than the baseline stat
@@ -902,44 +902,44 @@ class Benchmark::IPS::Stats::SD
   #
   # @param baseline [SD|Bootstrap] faster baseline
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/sd.rb#25
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/sd.rb:25
   def slowdown(baseline); end
 
-  # source://benchmark-ips//lib/benchmark/ips/stats/sd.rb#33
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/sd.rb:33
   def speedup(baseline); end
 end
 
-# source://benchmark-ips//lib/benchmark/ips/stats/stats_metric.rb#4
+# pkg:gem/benchmark-ips#lib/benchmark/ips/stats/stats_metric.rb:4
 module Benchmark::IPS::Stats::StatsMetric
   # Return entry's standard deviation of iteration per second in percentage.
   #
   # @return [Float] +@ips_sd+ in percentage.
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/stats_metric.rb#7
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/stats_metric.rb:7
   def error_percentage; end
 
   # @return [Boolean]
   #
-  # source://benchmark-ips//lib/benchmark/ips/stats/stats_metric.rb#11
+  # pkg:gem/benchmark-ips#lib/benchmark/ips/stats/stats_metric.rb:11
   def overlaps?(baseline); end
 end
 
 # Benchmark-ips Gem version.
 #
-# source://benchmark-ips//lib/benchmark/ips.rb#23
+# pkg:gem/benchmark-ips#lib/benchmark/ips.rb:23
 Benchmark::IPS::VERSION = T.let(T.unsafe(nil), String)
 
 # Perform calculations on Timing results.
 #
-# source://benchmark-ips//lib/benchmark/timing.rb#3
+# pkg:gem/benchmark-ips#lib/benchmark/timing.rb:3
 module Benchmark::Timing
   class << self
-    # source://benchmark-ips//lib/benchmark/timing.rb#54
+    # pkg:gem/benchmark-ips#lib/benchmark/timing.rb:54
     def add_second(t, s); end
 
     # Recycle used objects by starting Garbage Collector.
     #
-    # source://benchmark-ips//lib/benchmark/timing.rb#35
+    # pkg:gem/benchmark-ips#lib/benchmark/timing.rb:35
     def clean_env; end
 
     # Calculate (arithmetic) mean of given samples.
@@ -947,22 +947,22 @@ module Benchmark::Timing
     # @param samples [Array] Samples to calculate mean.
     # @return [Float] Mean of given samples.
     #
-    # source://benchmark-ips//lib/benchmark/timing.rb#10
+    # pkg:gem/benchmark-ips#lib/benchmark/timing.rb:10
     def mean(samples); end
 
-    # source://benchmark-ips//lib/benchmark/timing.rb#49
+    # pkg:gem/benchmark-ips#lib/benchmark/timing.rb:49
     def now; end
 
     # Calculate standard deviation of given samples.
     #
-    # @param samples [Array] Samples to calculate standard deviation.
     # @param m [Float] Optional mean (Expected value).
+    # @param samples [Array] Samples to calculate standard deviation.
     # @return [Float] standard deviation of given samples.
     #
-    # source://benchmark-ips//lib/benchmark/timing.rb#30
+    # pkg:gem/benchmark-ips#lib/benchmark/timing.rb:30
     def stddev(samples, m = T.unsafe(nil)); end
 
-    # source://benchmark-ips//lib/benchmark/timing.rb#59
+    # pkg:gem/benchmark-ips#lib/benchmark/timing.rb:59
     def time_us(before, after); end
 
     # Calculate variance of given samples.
@@ -970,12 +970,12 @@ module Benchmark::Timing
     # @param m [Float] Optional mean (Expected value).
     # @return [Float] Variance of given samples.
     #
-    # source://benchmark-ips//lib/benchmark/timing.rb#18
+    # pkg:gem/benchmark-ips#lib/benchmark/timing.rb:18
     def variance(samples, m = T.unsafe(nil)); end
   end
 end
 
 # Microseconds per second.
 #
-# source://benchmark-ips//lib/benchmark/timing.rb#5
+# pkg:gem/benchmark-ips#lib/benchmark/timing.rb:5
 Benchmark::Timing::MICROSECONDS_PER_SECOND = T.let(T.unsafe(nil), Integer)
