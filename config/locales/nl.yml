@@ -265,6 +265,7 @@ nl:
         all_queues: Alle wachtrijen
         clear: Duidelijk
         job_name: Taak naam
+        label: Label
         placeholder: Zoek op klasse, taak-ID, taakparameters en fouttekst.
         queue_name: Wachtrij naam
         search: Zoekopdracht

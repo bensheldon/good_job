@@ -31,6 +31,11 @@
           </select>
         </div>
 
+        <div class="me-md-2 mb-2 mb-md-0">
+          <%= label_tag "label_filter", t(".label"), class: "visually-hidden" %>
+          <%= text_field_tag "label", params[:label], id: "label_filter", class: "form-control form-control-sm", placeholder: t(".label"), autocomplete: "off" %>
+        </div>
+
         <div class="me-md-2 mb-2 mb-md-0 flex-fill">
           <%= label_tag "query", t(".search"), class: "visually-hidden" %>
           <%= search_field_tag "query", params[:query], class: "form-control form-control-sm", placeholder: t(".placeholder"), autocomplete: "off" %>
@@ -39,7 +44,7 @@
         <div class="d-flex flex-col align-items-end">
           <div>
             <%= form.submit t(".search"), name: nil, class: "btn btn-primary btn-sm" %>
-            <%= link_to filter.to_params(job_class: nil, state: nil, queue_name: nil, query: nil), class: "btn btn-secondary btn-sm" do %>
+            <%= link_to filter.to_params(job_class: nil, label: nil, state: nil, queue_name: nil, query: nil), class: "btn btn-secondary btn-sm" do %>
               <%= t ".clear" %>
             <% end %>
           </div>

@@ -120,6 +120,41 @@ describe 'Jobs', :js, :without_executor do
 
         expect(page).to have_css('[role=row]', count: 1)
       end
+
+      it "can filter by label" do
+        labeled_job = ExampleJob.set(wait: 10.minutes, good_job_labels: ["urgent"]).perform_later
+        GoodJob::Job.order(created_at: :asc).last
+
+        visit good_job.jobs_path
+        wait_for_turbo_load
+
+        fill_in "label_filter", with: "urgent"
+        click_button "Search"
+
+        expect(page).to have_current_path(/label=urgent/)
+
+        table = page.find("[role=table]")
+        expect(table).to have_css("[role=row]", count: 1)
+        expect(table).to have_content(labeled_job.job_id)
+      end
+
+      it "can filter by label via badge link" do
+        labeled_job = ExampleJob.set(wait: 10.minutes, good_job_labels: ["urgent"]).perform_later
+        GoodJob::Job.order(created_at: :asc).last
+
+        visit good_job.jobs_path
+        wait_for_turbo_load
+
+        within("##{dom_id(GoodJob::Job.find_by(active_job_id: labeled_job.job_id))}") do
+          click_link "urgent"
+        end
+
+        expect(page).to have_current_path(/label=urgent/)
+
+        table = page.find("[role=table]")
+        expect(table).to have_css("[role=row]", count: 1)
+        expect(table).to have_content(labeled_job.job_id)
+      end
     end
 
     it 'can retry discarded jobs' do
