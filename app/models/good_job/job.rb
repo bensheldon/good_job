@@ -4,7 +4,7 @@ module GoodJob
   # Active Record model that represents an +ActiveJob+ job.
   class Job < BaseRecord
     include AdvisoryLockable
-    include Lockable
+    include Job::Lockable
     include ErrorEvents
     include Filterable
     include Reportable
@@ -361,27 +361,19 @@ module GoodJob
     #   raised, if any (if the job raised, then the second array entry will be
     #   +nil+). If there were no jobs to execute, returns +nil+.
     def self.perform_with_advisory_lock(lock_id:, parsed_queues: nil, queue_select_limit: nil)
-      result = nil
-
-      job = unfinished.dequeueing_ordered(parsed_queues)
-                      .only_scheduled
-                      .exclude_paused
-                      .limit(1)
-                      .with_advisory_lock_claim(select_limit: queue_select_limit)
-
-      if job&.executable?
-        yield(job) if block_given?
-        result = job.perform(lock_id: lock_id)
-      else
-        job&.advisory_unlock
-        job = nil
-        yield(nil) if block_given?
+      unfinished.dequeueing_ordered(parsed_queues)
+                .only_scheduled
+                .exclude_paused
+                .limit(1)
+                .with_advisory_lock_claim(select_limit: queue_select_limit) do |job|
+        if job&.executable?
+          yield(job) if block_given?
+          job.perform(lock_id: lock_id)
+        else
+          yield(nil) if block_given?
+          nil
+        end
       end
-
-      result
-    ensure
-      job&.advisory_unlock
-      job&.run_callbacks(:perform_unlocked)
     end
 
     # Dispatches to the appropriate perform method based on lock_strategy.
@@ -407,24 +399,20 @@ module GoodJob
     # @yield [Job, nil] The claimed job, or nil if none found
     # @return [ExecutionResult, nil]
     def self.perform_with_skip_locked(lock_id:, parsed_queues: nil)
-      result = nil
-
-      job = unfinished.where(locked_by_id: nil)
-                      .dequeueing_ordered(parsed_queues)
-                      .only_scheduled
-                      .exclude_paused
-                      .limit(1)
-                      .with_skip_locked_claim(locked_by_id: lock_id, locked_at: Time.current, lock_type: :skiplocked)
-
-      if job
-        yield(job) if block_given?
-        result = job.perform(lock_id: lock_id, already_claimed: true)
-      elsif block_given?
-        yield(nil)
+      unfinished.where(locked_by_id: nil)
+                .dequeueing_ordered(parsed_queues)
+                .only_scheduled
+                .exclude_paused
+                .limit(1)
+                .with_skip_locked_claim(locked_by_id: lock_id, locked_at: Time.current, lock_type: :skiplocked) do |job|
+        if job
+          yield(job) if block_given?
+          job.perform(lock_id: lock_id, already_claimed: true)
+        else
+          yield(nil) if block_given?
+          nil
+        end
       end
-
-      job&.run_callbacks(:perform_unlocked)
-      result
     end
 
     # Claims and performs a job using SELECT FOR UPDATE SKIP LOCKED combined with
@@ -434,27 +422,20 @@ module GoodJob
     # @yield [Job, nil] The claimed job, or nil if none found
     # @return [ExecutionResult, nil]
     def self.perform_with_hybrid_lock(lock_id:, parsed_queues: nil)
-      result = nil
-
-      lease_connection # sticky connection; advisory lock must outlive this statement
-      job = unfinished.where(locked_by_id: nil)
-                      .dequeueing_ordered(parsed_queues)
-                      .only_scheduled
-                      .exclude_paused
-                      .limit(1)
-                      .with_hybrid_lock_claim(locked_by_id: lock_id, locked_at: Time.current, lock_type: :hybrid)
-
-      if job
-        yield(job) if block_given?
-        result = job.perform(lock_id: lock_id, already_claimed: true)
-      elsif block_given?
-        yield(nil)
+      unfinished.where(locked_by_id: nil)
+                .dequeueing_ordered(parsed_queues)
+                .only_scheduled
+                .exclude_paused
+                .limit(1)
+                .with_hybrid_lock_claim(locked_by_id: lock_id, locked_at: Time.current, lock_type: :hybrid) do |job|
+        if job
+          yield(job) if block_given?
+          job.perform(lock_id: lock_id, already_claimed: true)
+        else
+          yield(nil) if block_given?
+          nil
+        end
       end
-
-      result
-    ensure
-      job&.advisory_unlock # release session-level advisory lock
-      job&.run_callbacks(:perform_unlocked)
     end
 
     # Fetches the scheduled execution time of the next eligible Execution(s).

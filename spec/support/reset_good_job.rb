@@ -170,6 +170,21 @@ class PgLock < GoodJob::BaseRecord
     SQL
   end
 
+  # Returns an array of hashes with classid, objid, objsubid, pid, granted for each
+  # advisory lock held by the connection. Multiple rows for the same classid/objid
+  # indicate re-entrant (double) lock acquisition.
+  def self.advisory_lock_details_for(connection)
+    connection.execute(<<~SQL.squish).to_a
+      SELECT classid, objid, objsubid, pid, granted
+      FROM pg_locks
+      WHERE
+        database = (SELECT oid FROM pg_database WHERE datname = current_database())
+        AND pid = pg_backend_pid()
+        AND locktype = 'advisory'
+      ORDER BY classid, objid
+    SQL
+  end
+
   def self.debug_own_locks(connection)
     count = PgLock.override_connection(connection) do
       PgLock.current_database.advisory_lock.owns.count

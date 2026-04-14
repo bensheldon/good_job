@@ -20,7 +20,7 @@ ActiveSupport.on_load :active_record do
     count = PgLock.count_locks_for(conn)
     next if count.zero?
 
-    warning = "Connection returned to pool with #{count} advisory locks"
+    warning = "Connection returned to pool with #{count} advisory locks (conn.object_id=#{conn.object_id})"
     $stdout.puts warning
     Rails.logger.warn(warning)
     POSTGRES_NOTICES << warning
