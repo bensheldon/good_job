@@ -9,12 +9,16 @@ Rails.application.load_tasks
   db:migrate
   db:rollback
   db:prepare
+  db:schema:dump
 ].each do |task_name|
   Rake::Task[task_name].enhance do
-    puts "GoodJob: Sanitizing Rails version from schema.rb...\n"
+    puts "GoodJob: Sanitizing schema.rb...\n"
     schema_rb = Rails.root.join("db/schema.rb").to_s
     contents = File.read(schema_rb)
+    # Strip the Rails version so the schema.rb is stable across Rails upgrades.
     contents.sub!(/ActiveRecord::Schema\[\d\.\d\]/, "ActiveRecord::Schema")
+    # Strip the pg_catalog namespace because it breaks in CI sometimes.
+    contents.gsub!(/enable_extension "pg_catalog\./, 'enable_extension "')
     File.write(schema_rb, contents)
   end
 end
