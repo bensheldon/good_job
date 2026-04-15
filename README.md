@@ -1319,7 +1319,9 @@ To explain where this value is used, here is the pseudo-query that GoodJob uses 
   )
 ```
 
-By default, advisory lock keys are derived with `md5`. If you need a different hash strategy, set it globally:
+By default, advisory lock keys are derived with `md5`. The string key (e.g. `good_jobs-<active_job_id>`) is hashed and truncated to a 64-bit bigint, which is the key space PostgreSQL advisory locks operate in. `md5` is used for its wide availability — no PostgreSQL extensions required — and good bit distribution, not for any cryptographic property.
+
+If you need a different hash strategy, set it globally:
 
 ```ruby
 GoodJob::AdvisoryLockable.hash_function = "sha256"
