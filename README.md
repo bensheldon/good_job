@@ -1319,12 +1319,18 @@ To explain where this value is used, here is the pseudo-query that GoodJob uses 
   )
 ```
 
-By default, advisory lock keys are derived with `md5`. If you need a different strategy for lock key derivation, set `advisory_lockable_hash_function` on your lockable model (for example, `GoodJob::Job.advisory_lockable_hash_function = "sha256"`). Supported values are `md5`, `sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `hashtextextended`, `hashtext`, and `uuid_v5`.
+By default, advisory lock keys are derived with `md5`. If you need a different hash strategy, set it globally:
 
-- `hashtextextended` requires PostgreSQL 11+.
-- `hashtext` is available in all supported PostgreSQL versions (and documented at least since PostgreSQL 9.6).
-- `sha*` algorithms require PostgreSQL `pgcrypto` (`digest()`).
-- `uuid_v5` requires `uuid-ossp` (`uuid_generate_v5()`).
+```ruby
+GoodJob::AdvisoryLockable.hash_function = "sha256"
+```
+
+Supported values are `md5`, `sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `hashtext`, and `uuid_v5`.
+
+- `md5` (default): requires no PostgreSQL extensions.
+- `hashtext`: PostgreSQL's internal 32-bit hash; requires no extensions.
+- `sha*` algorithms require the `pgcrypto` extension (`digest()`).
+- `uuid_v5` requires the `uuid-ossp` extension (`uuid_generate_v5()`).
 
 ### Execute jobs async / in-process
 
