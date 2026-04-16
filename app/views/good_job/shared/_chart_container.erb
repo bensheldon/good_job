@@ -1,21 +1,25 @@
 <% vertical_legend = chart_data.dig(:options, :plugins, :legend, :vertical) %>
 
-<div class="container-fluid">
+<div class="container-fluid" data-controller="chart" data-chart-config-value="<%= chart_data.to_json %>" data-live-poll-region="chart">
   <div class="row d-flex">
     <% if vertical_legend %>
       <div class="row d-flex">
         <div class="col-md-10">
-          <%= render 'good_job/shared/chart', chart_data: chart_data %>
+          <div class="chart-wrapper">
+            <canvas data-chart-target="canvas"></canvas>
+          </div>
         </div>
         <div class="col-md-2 d-flex flex-column">
           <div id="chart-legend-container" class="flex-fill overflow-auto">
-            <ul id="chart-legend-ul" class="list-unstyled p-0 mx-0 py-2">
+            <ul data-chart-target="legend" class="list-unstyled p-0 mx-0 py-2">
             </ul>
           </div>
         </div>
       </div>
     <% else %>
-      <%= render 'good_job/shared/chart', chart_data: chart_data %>
+      <div class="chart-wrapper">
+        <canvas data-chart-target="canvas"></canvas>
+      </div>
     <% end %>
   </div>
 </div>
