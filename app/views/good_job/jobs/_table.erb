@@ -1,14 +1,14 @@
 <%= form_with(id: "job_action_form", method: :put, model: false, local: true) { nil } %>
 <%= form_with(id: "job_destroy_form", method: :delete, model: false, local: true) { nil } %>
 
-<%= form_with(model: false, url: mass_update_jobs_path(filter.to_params), method: :put, local: true, data: { "checkbox-toggle": "job_ids" }) do |form| %>
+<%= form_with(model: false, url: mass_update_jobs_path(filter.to_params), method: :put, local: true, data: { controller: "checkbox-toggle" }) do |form| %>
   <div class="my-3 card" data-gj-poll-replace id="jobs-table">
     <div class="list-group list-group-flush text-nowrap table-jobs" role="table">
       <header class="list-group-item bg-body-tertiary">
         <div class="row small text-muted text-uppercase align-items-center">
           <div class="col-lg-4 d-flex gap-2 flex-wrap">
             <div class="form-check d-flex flex-row px-0 mb-0">
-              <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-all": "job_ids" }) %>
+              <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-target": "all", action: "change->checkbox-toggle#toggleAll" }) %>
               <%= label_tag('toggle_job_ids', t(".toggle_all_jobs"), class: "visually-hidden") %>
             </div>
             <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'ms-1 btn btn-sm btn-outline-secondary', title: t(".actions.reschedule_all"), data: { turbo_confirm: t(".actions.confirm_reschedule_all") } do %>
@@ -50,10 +50,10 @@
           </div>
         </div>
       </header>
-      <label role="row" class="list-group-item list-group-item-warning list-group-item-action py-2 d-none" data-checkbox-toggle-show="job_ids">
+      <label role="row" class="list-group-item list-group-item-warning list-group-item-action py-2 d-none" data-checkbox-toggle-target="show">
         <div class="row">
           <div class="col-auto">
-            <%= check_box_tag "all_job_ids", 1, false, disabled: true, data: { "checkbox-toggle-show": "job_ids" } %>
+            <%= check_box_tag "all_job_ids", 1, false, disabled: true, data: { "checkbox-toggle-target": "show" } %>
           </div>
           <div class="col-auto">
             <%= t ".actions.apply_to_all", count: filter.filtered_count %>
@@ -66,7 +66,7 @@
           <%= label_tag dom_id(job, :checkbox), id: dom_id(job), role: "row", class: "list-group-item list-group-item-action py-3" do %>
             <div class="row align-items-center">
               <div class="col-lg-4 d-flex">
-                <%= check_box_tag 'job_ids[]', job.id, false, id: dom_id(job, :checkbox), data: { "checkbox-toggle-each": "job_ids" } %>
+                <%= check_box_tag 'job_ids[]', job.id, false, id: dom_id(job, :checkbox), data: { "checkbox-toggle-target": "each", action: "change->checkbox-toggle#syncAll" } %>
                 <div class="ms-2">
                   <%= tag.code link_to(job.id, job_path(job), class: "small text-muted text-decoration-none") %>
                   <%= tag.h5 tag.code(link_to(job.display_name, job_path(job), class: "text-reset text-decoration-none")), class: "text-reset mb-0" %>
