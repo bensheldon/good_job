@@ -654,8 +654,8 @@ module GoodJob
     # @return [ActiveJob::Base]
     def retry_job
       Rails.application.executor.wrap do
-        with_advisory_lock do
-          reload
+        with_appropriate_lock do |reloaded|
+          reload unless reloaded
           active_job = self.active_job(ignore_deserialization_errors: true)
 
           raise ActiveJobDeserializationError if active_job.nil?
@@ -700,7 +700,7 @@ module GoodJob
     # This action will add a {DiscardJobError} to the job's {Execution} and mark it as finished.
     # @return [void]
     def discard_job(message)
-      with_advisory_lock do
+      with_appropriate_lock do
         _discard_job(message)
       end
     end
@@ -716,8 +716,8 @@ module GoodJob
     # @param scheduled_at [DateTime, Time] When to reschedule the job
     # @return [void]
     def reschedule_job(scheduled_at = Time.current)
-      with_advisory_lock do
-        reload
+      with_appropriate_lock do |reloaded|
+        reload unless reloaded
         raise ActionForStateMismatchError if finished_at.present?
 
         update(scheduled_at: scheduled_at)
@@ -727,7 +727,7 @@ module GoodJob
     # Destroy all of a discarded or finished job's executions from the database so that it will no longer appear on the dashboard.
     # @return [void]
     def destroy_job
-      with_advisory_lock do
+      with_appropriate_lock do
         raise ActionForStateMismatchError if finished_at.blank?
 
         destroy
@@ -935,6 +935,17 @@ module GoodJob
     end
 
     private
+
+    def with_appropriate_lock
+      if self.class.effective_lock_strategy == :skiplocked
+        transaction do
+          reload(lock: "FOR NO KEY UPDATE")
+          yield true
+        end
+      else
+        advisory_lock { yield false }
+      end
+    end
 
     def _discard_job(message)
       active_job = self.active_job(ignore_deserialization_errors: true)
