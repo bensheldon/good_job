@@ -139,6 +139,26 @@ RSpec.describe GoodJob::JobsFilter do
     end
   end
 
+  describe '#next_page_params' do
+    it 'paginates correctly when jobs share the same timestamp' do
+      GoodJob::Job.update_all(created_at: Time.zone.parse('2024-01-01 12:00:00.500000')) # rubocop:disable Rails/SkipsModelValidations
+
+      first_page_filter = described_class.new(params.merge(limit: 2))
+      first_page = first_page_filter.records.to_a
+      expect(first_page.size).to eq 2
+
+      next_params = first_page_filter.next_page_params
+      expect(next_params[:after_id]).to be_present
+
+      second_page_filter = described_class.new(next_params.merge(limit: 10))
+      second_page = second_page_filter.records.to_a
+      expect(second_page).not_to be_empty
+
+      all_ids = (first_page + second_page).map(&:id)
+      expect(all_ids).to eq(all_ids.uniq)
+    end
+  end
+
   describe '#filtered_count' do
     it 'returns a count of unlimited items' do
       expect(filter.filtered_count).to eq 5
