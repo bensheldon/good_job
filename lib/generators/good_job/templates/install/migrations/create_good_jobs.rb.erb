@@ -111,5 +111,12 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       name: :index_good_jobs_for_candidate_dequeue_unlocked,
       order: { priority: "ASC NULLS LAST", scheduled_at: :asc, id: :asc },
       where: "finished_at IS NULL AND locked_by_id IS NULL"
+
+    add_index :good_jobs, :queue_name, name: :index_good_jobs_on_queue_name
+    add_index :good_jobs, :created_at, name: :index_good_jobs_on_created_at
+    add_index :good_jobs, :finished_at,
+      name: :index_good_jobs_on_discarded,
+      order: { finished_at: :desc },
+      where: "finished_at IS NOT NULL AND error IS NOT NULL"
   end
 end
