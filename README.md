@@ -134,7 +134,14 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     ```
 
 1. **In Rails' development environment**, by default, GoodJob's Adapter executes jobs `async` in a background thread pool in `rails server`.
-    - Because of Rails deferred autoloading, jobs enqueued via the `rails console` may not begin executing on a separate server process until the Rails application is fully initialized by loading a web page once.
+    - Because of Rails deferred autoloading, jobs enqueued via the `rails console` may not begin executing on a separate server process until the Rails application is fully initialized by loading a web page once. To force early initialization (so pre-existing jobs run immediately on boot), add the following to an initializer:
+
+        ```ruby
+        # config/initializers/good_job.rb
+        Rails.configuration.after_initialize do
+          ActiveJob::Base && ActiveRecord::Base
+        end
+        ```
     - Remember, only Active Job's `perform_later` sends jobs to the queue adapter; Active Job's `perform_now` executes the job immediately and does not invoke the queue adapter. GoodJob is not involved in `perform_now` jobs.
 1. **In Rails' test environment**, by default, GoodJob's Adapter executes jobs `inline` immediately in the current thread.
     - Future-scheduled jobs can be executed with `GoodJob.perform_inline` using a tool like Timecop or `ActiveSupport::Testing::TimeHelpers`.
