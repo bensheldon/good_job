@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_09_19_000301) do
+ActiveRecord::Schema.define(version: 2026_04_14_000000) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
-  enable_extension "plpgsql"
+  enable_extension "uuid-ossp"
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.integer "callback_priority"

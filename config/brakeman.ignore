@@ -24,20 +24,20 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "e3b77f1540f622502491e00b2825b0d5cb6cb3962017fa3ef18d4d463799f3fd",
+      "fingerprint": "36e67d6562e4bcca3a1203659228a37d233a1b6012c9df77f4eade772075459b",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/concerns/good_job/advisory_lockable.rb",
-      "line": 89,
+      "line": 123,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "joins(\"LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'\\n  AND pg_locks.objsubid = 1\\n  AND pg_locks.classid = ...#{_quoted_table_name_string}...\\n\".squish)",
+      "code": "joins(\"LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'\\n  AND pg_locks.objsubid = 1\\n  AND pg_locks.classid = #{advisory_lock_classid_sql(...)}\\n  AND pg_locks.objid = #{advisory_lock_objid_sql(...)}\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "GoodJob",
         "method": null
       },
-      "user_input": "_quoted_table_name_string",
+      "user_input": "advisory_lock_classid_sql(...)",
       "confidence": "Medium",
       "cwe_id": [89],
       "note": "Values are quoted identifiers and an escaped table name string; not user input."
@@ -45,20 +45,20 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "ffcbcbd3d170cb7e40cc3b7054e6157983b6ccdf7eab02bc1b0f525158b35248",
+      "fingerprint": "3923f99345d151f54b98b1089f407cfd4f9142a92147aadf5f430fa614554db4",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/concerns/good_job/advisory_lockable.rb",
-      "line": 89,
+      "line": 123,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "joins(\"LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'\\n  AND pg_locks.objsubid = 1\\n  AND pg_locks.classid = ...#{_quoted_table_name_string}...\\n\".squish)",
+      "code": "joins(\"LEFT JOIN pg_locks ON pg_locks.locktype = 'advisory'\\n  AND pg_locks.objsubid = 1\\n  AND pg_locks.classid = #{advisory_lock_classid_sql(...)}\\n  AND pg_locks.objid = #{advisory_lock_objid_sql(...)}\\n\".squish)",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "GoodJob::AdvisoryLockable",
         "method": null
       },
-      "user_input": "_quoted_table_name_string",
+      "user_input": "advisory_lock_classid_sql(...)",
       "confidence": "Medium",
       "cwe_id": [89],
       "note": "Values are quoted identifiers and an escaped table name string; not user input."
@@ -134,5 +134,5 @@
       "note": ""
     }
   ],
-  "brakeman_version": "7.1.1"
+  "brakeman_version": "8.0.4"
 }
