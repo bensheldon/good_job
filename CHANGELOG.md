@@ -1,5 +1,47 @@
 # Changelog
 
+## [v4.18.0](https://github.com/bensheldon/good_job/tree/v4.18.0) (2026-04-17)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.17.0...v4.18.0)
+
+**Implemented enhancements:**
+
+- Make bulk action buttons responsive to job state filter [\#1751](https://github.com/bensheldon/good_job/pull/1751) ([bensheldon](https://github.com/bensheldon))
+- Introduce GoodJob::InterruptedError string for interrupted execution records [\#1750](https://github.com/bensheldon/good_job/pull/1750) ([bensheldon](https://github.com/bensheldon))
+- Add GoodJob.handled\_exceptions config; include NotImplementedError by default [\#1748](https://github.com/bensheldon/good_job/pull/1748) ([bensheldon](https://github.com/bensheldon))
+- Allow adding the currently executing job to a batch [\#1746](https://github.com/bensheldon/good_job/pull/1746) ([bensheldon](https://github.com/bensheldon))
+- Show split enabled/paused badge for cron schedules in navbar [\#1744](https://github.com/bensheldon/good_job/pull/1744) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- Fix dashboard pagination omitting jobs created in the same second [\#1749](https://github.com/bensheldon/good_job/pull/1749) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- 4.15.0 crashes Tapioca with direct database access while requiring gems [\#1752](https://github.com/bensheldon/good_job/issues/1752)
+- Dashboard omits jobs on the next page when they were created the same second as the preceding job [\#1725](https://github.com/bensheldon/good_job/issues/1725)
+- `ActiveRecord::DuplicateMigrationVersionError` [\#1708](https://github.com/bensheldon/good_job/issues/1708)
+- Adding to Process\_state in Dashboard [\#1702](https://github.com/bensheldon/good_job/issues/1702)
+- jobs\#index perf Issue: ORDER BY uses wrong column for existing index [\#1675](https://github.com/bensheldon/good_job/issues/1675)
+- `NotImplementedError` is always retried [\#1670](https://github.com/bensheldon/good_job/issues/1670)
+- Job retry action doesn't work [\#1624](https://github.com/bensheldon/good_job/issues/1624)
+- Adapt `AdvisoryLockable` to use more secure algorithm instead of MD5 [\#1623](https://github.com/bensheldon/good_job/issues/1623)
+- Labels based on arguments [\#1622](https://github.com/bensheldon/good_job/issues/1622)
+- How to start batches from cron jobs? \(create a batch within a job and add the current job to the batch\) [\#1611](https://github.com/bensheldon/good_job/issues/1611)
+- What's the best way to auto truncate good\_job\_executions table [\#1607](https://github.com/bensheldon/good_job/issues/1607)
+- Is the description of GOOD\_JOB\_EXECUTION\_MODE in the readme correct? [\#1584](https://github.com/bensheldon/good_job/issues/1584)
+- Cron dashboard does not distinguish enabled/disabled jobs [\#1552](https://github.com/bensheldon/good_job/issues/1552)
+- The Cron count in the Dashboard should show enabled and disabled counts [\#1313](https://github.com/bensheldon/good_job/issues/1313)
+- Recording accurate job durations [\#1053](https://github.com/bensheldon/good_job/issues/1053)
+- Jobs won't start until ActiveRecord loaded - gotcha in development environment [\#930](https://github.com/bensheldon/good_job/issues/930)
+- Feature Request: Setting specific default locale for good job [\#921](https://github.com/bensheldon/good_job/issues/921)
+- Avoid querying through `serialized_params` [\#876](https://github.com/bensheldon/good_job/issues/876)
+- Allow separate \*\_keys for execution/enqueue/rate limits [\#753](https://github.com/bensheldon/good_job/issues/753)
+
+**Merged pull requests:**
+
+- Document initializer workaround for deferred autoloading in development [\#1747](https://github.com/bensheldon/good_job/pull/1747) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.17.0](https://github.com/bensheldon/good_job/tree/v4.17.0) (2026-04-17)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.16.0...v4.17.0)
