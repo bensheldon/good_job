@@ -1,5 +1,19 @@
 # Changelog
 
+## [v4.17.0](https://github.com/bensheldon/good_job/tree/v4.17.0) (2026-04-17)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.16.0...v4.17.0)
+
+**Implemented enhancements:**
+
+- Introduce advisory lock key customization support methods [\#1722](https://github.com/bensheldon/good_job/pull/1722) ([amkisko](https://github.com/amkisko))
+
+**Merged pull requests:**
+
+- Convert UI JavaScript modules to Stimulus controllers [\#1743](https://github.com/bensheldon/good_job/pull/1743) ([bensheldon](https://github.com/bensheldon))
+- Development: Strip pg\_catalog namespace from enable\_extension in schema.rb [\#1742](https://github.com/bensheldon/good_job/pull/1742) ([bensheldon](https://github.com/bensheldon))
+- Use system tmpdir for generator specs to eliminate bin/rails rename workaround [\#1740](https://github.com/bensheldon/good_job/pull/1740) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.16.0](https://github.com/bensheldon/good_job/tree/v4.16.0) (2026-04-14)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.15.0...v4.16.0)
