@@ -821,7 +821,7 @@ module GoodJob
               error_event: error_event
             )
             ExecutionResult.new(value: value, active_job: active_job, handled_error: handled_error, error_event: error_event, retried_job: current_thread.retried_job)
-          rescue StandardError => e
+          rescue *GoodJob.handled_exception_classes => e
             active_job ||= current_thread.active_job
             error_event = if e.is_a?(GoodJob::InterruptError)
                             ErrorEvents::INTERRUPTED

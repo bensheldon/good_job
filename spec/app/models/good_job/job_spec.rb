@@ -1125,6 +1125,45 @@ RSpec.describe GoodJob::Job do
         end
       end
 
+      context 'when GoodJob.handled_exceptions includes a non-StandardError class' do
+        before do
+          TestJob.define_method(:perform) { |*_args, **_kwargs| raise NotImplementedError, "Not implemented" }
+        end
+
+        it 'rescues the exception and returns an unhandled_error result' do
+          result = good_job.perform(lock_id: process_id)
+
+          expect(result.value).to be_nil
+          expect(result.unhandled_error).to be_a(NotImplementedError)
+        end
+
+        it 'discards the job by default (retry_on_unhandled_error is false)' do
+          allow(GoodJob).to receive(:preserve_job_records).and_return(false)
+
+          good_job.perform(lock_id: process_id)
+          expect { good_job.reload }.to raise_error ActiveRecord::RecordNotFound
+        end
+
+        it 'retries the job when retry_on_unhandled_error is true' do
+          allow(GoodJob).to receive_messages(retry_on_unhandled_error: true, preserve_job_records: true)
+
+          good_job.perform(lock_id: process_id)
+
+          expect(good_job.reload).to have_attributes(
+            error: /NotImplementedError/,
+            performed_at: nil,
+            finished_at: nil
+          )
+        end
+      end
+
+      context 'when ActiveJob raises an exception not in GoodJob.handled_exceptions' do
+        it 'propagates the exception' do
+          allow(ActiveJob::Base).to receive(:execute).and_raise(ScriptError, "not handled")
+          expect { good_job.perform(lock_id: process_id) }.to raise_error(ScriptError, "not handled")
+        end
+      end
+
       context 'when Discrete' do
         before do
           ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)

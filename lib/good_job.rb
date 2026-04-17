@@ -90,12 +90,28 @@ module GoodJob
 
   # @!attribute [rw] retry_on_unhandled_error
   #   @!scope class
-  #   Whether to re-perform a job when a type of +StandardError+ is raised to GoodJob (default: +false+).
-  #   If +true+, causes jobs to be re-queued and retried if they raise an instance of +StandardError+.
-  #   If +false+, jobs will be discarded or marked as finished if they raise an instance of +StandardError+.
-  #   Instances of +Exception+, like +SIGINT+, will *always* be retried, regardless of this attribute's value.
+  #   Whether to re-perform a job when a handled (rescued) error is raised to GoodJob (default: +false+).
+  #   If +true+, causes jobs to be re-queued and retried if they raise an instance of a handled exception.
+  #   If +false+, jobs will be discarded or marked as finished if they raise an instance of a handled exception.
+  #   @see GoodJob.handled_exceptions
   #   @return [Boolean, nil]
   mattr_accessor :retry_on_unhandled_error, default: false
+
+  # @!attribute [rw] handled_exceptions
+  #   @!scope class
+  #   Exception classes that GoodJob will rescue during job execution (default: +[StandardError]+).
+  #   Accepts class objects or strings that will be constantized at runtime.
+  #   Exceptions not in this list will propagate and crash the executing thread.
+  #   @example Also rescue ScriptError
+  #     GoodJob.handled_exceptions = [StandardError, NotImplementedError, ScriptError]
+  #   @return [Array<Class, String>]
+  mattr_accessor :handled_exceptions, default: [StandardError, NotImplementedError]
+
+  # Resolved exception classes from {handled_exceptions}.
+  # @return [Array<Class>]
+  def self.handled_exception_classes
+    handled_exceptions.map { |e| e.is_a?(String) ? e.constantize : e }
+  end
 
   # @!attribute [rw] on_thread_error
   #   @!scope class
