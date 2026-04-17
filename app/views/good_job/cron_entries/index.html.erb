@@ -49,9 +49,9 @@
           <div class="col-6 col-lg-1 text-wrap small">
             <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.status" %></div>
             <% if @enabled_states[cron_entry.key.to_s] %>
-              <span class="text-success"><%= t "good_job.models.cron.states.active" %></span>
+              <span class="badge text-bg-success rounded-pill"><%= t "good_job.models.cron.states.active" %></span>
             <% else %>
-              <span class="text-muted"><%= t "good_job.models.cron.states.paused" %></span>
+              <span class="badge text-bg-warning rounded-pill"><%= t "good_job.models.cron.states.paused" %></span>
             <% end %>
           </div>
           <div class="col-lg-2 d-flex gap-3 justify-content-end">

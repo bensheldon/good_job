@@ -30,7 +30,9 @@
         <li class="nav-item">
           <%= link_to cron_entries_path, class: ["nav-link", ("active" if controller_name == 'cron_entries')] do %>
             <%= t(".cron_schedules") %>
-            <span data-async-values-target="value" data-async-values-key="cron_entries_count" class="badge text-bg-secondary rounded-pill d-none" id="navbar_cron_entries_count" data-turbo-permanent></span>
+            <span class="badge-group rounded-pill" id="navbar_cron_entries_count" data-turbo-permanent>
+              <span data-async-values-target="value" data-async-values-key="cron_entries_enabled_count" class="badge text-bg-secondary d-none"></span><span data-async-values-target="value" data-async-values-key="cron_entries_paused_count" data-async-values-zero-class="d-none" class="badge text-bg-warning d-none"></span>
+            </span>
         <% end %>
         </li>
         <li class="nav-item">

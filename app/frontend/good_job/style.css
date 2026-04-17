@@ -64,3 +64,38 @@
   height: 1rem;
   width: 1rem;
 }
+
+.badge-group {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.badge-group > .badge {
+  position: relative;
+  flex: 1 1 auto;
+}
+
+.badge-group > .badge:has(+ .badge:not(.d-none)) {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.badge-group > .badge:not(.d-none) + .badge:not(.d-none) {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.badge-group.rounded-pill > .badge {
+  border-radius: 50rem !important;
+}
+
+.badge-group.rounded-pill > .badge:has(+ .badge:not(.d-none)) {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.badge-group.rounded-pill > .badge:not(.d-none) + .badge:not(.d-none) {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
