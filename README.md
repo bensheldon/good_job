@@ -142,6 +142,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
           ActiveJob::Base && ActiveRecord::Base
         end
         ```
+
     - Remember, only Active Job's `perform_later` sends jobs to the queue adapter; Active Job's `perform_now` executes the job immediately and does not invoke the queue adapter. GoodJob is not involved in `perform_now` jobs.
 1. **In Rails' test environment**, by default, GoodJob's Adapter executes jobs `inline` immediately in the current thread.
     - Future-scheduled jobs can be executed with `GoodJob.perform_inline` using a tool like Timecop or `ActiveSupport::Testing::TimeHelpers`.
