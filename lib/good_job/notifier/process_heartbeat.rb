@@ -23,10 +23,8 @@ module GoodJob # :nodoc:
 
       def refresh_process
         Rails.application.executor.wrap do
-          GoodJob::Process.override_connection(connection) do
-            GoodJob::Process.with_logger_silenced do
-              @capsule.tracker.renew
-            end
+          GoodJob::Process.with_logger_silenced do
+            @capsule.tracker.renew
           end
         end
       end
