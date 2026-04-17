@@ -34,19 +34,30 @@ module GoodJob
     self.implicit_order_column = 'created_at'
     self.ignored_columns += %w[is_discrete retried_good_job_id]
 
-    lock_type_enum = {
-      advisory: 0,
-      skiplocked: 1,
-      hybrid: 2,
-    }
-    # Declare the attribute explicitly so the enum can be defined even before the
-    # lock_type column migration has run (zero-downtime deployment safety).
-    attribute :lock_type, :integer
-    if Gem::Version.new(Rails.version) >= Gem::Version.new('7.1.0.a')
-      enum :lock_type, lock_type_enum, validate: { allow_nil: true }, scopes: false
-    else
-      enum lock_type: lock_type_enum, _scopes: false
+    module LockTypeAccessor
+      LOCK_TYPES = { "advisory" => 0, "skiplocked" => 1, "hybrid" => 2 }.freeze
+
+      def self.included(klass)
+        klass.define_singleton_method(:lock_types) { LockTypeAccessor::LOCK_TYPES }
+      end
+
+      def lock_type
+        return nil unless has_attribute?(:lock_type)
+
+        LockTypeAccessor::LOCK_TYPES.key(read_attribute(:lock_type))
+      end
+
+      def lock_type=(value)
+        return unless has_attribute?(:lock_type)
+
+        write_attribute(:lock_type, case value
+                                    when Symbol then LockTypeAccessor::LOCK_TYPES[value.to_s]
+                                    when String then LockTypeAccessor::LOCK_TYPES[value]
+                                    else value
+                                    end)
+      end
     end
+    include LockTypeAccessor
 
     define_model_callbacks :perform
     define_model_callbacks :perform_unlocked, only: :after
@@ -295,6 +306,11 @@ module GoodJob
         return @_lock_type_column_exists if defined?(@_lock_type_column_exists)
 
         @_lock_type_column_exists = connection_pool.with_connection { |conn| conn.column_exists?(:good_jobs, :lock_type) }
+      end
+
+      def reset_column_information
+        remove_instance_variable(:@_lock_type_column_exists) if instance_variable_defined?(:@_lock_type_column_exists)
+        super
       end
 
       # Returns the effective lock strategy, falling back to :advisory if the
