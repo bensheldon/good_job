@@ -7,6 +7,16 @@ module GoodJob
     # We can't rely on +config.action_controller.include_all_helpers = true+ in the host app.
     include IconsHelper
 
+    def job_action_states
+      {
+        reschedule: %w[scheduled retried queued],
+        retry: %w[discarded],
+        discard: %w[scheduled retried queued],
+        force_discard: %w[running],
+        destroy: %w[discarded succeeded],
+      }
+    end
+
     def format_duration(sec)
       return unless sec
       return "" if sec.is_a?(String) # pg interval support added in Rails 6.1
