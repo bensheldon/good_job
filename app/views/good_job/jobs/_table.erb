@@ -11,29 +11,43 @@
               <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-target": "all", action: "change->checkbox-toggle#toggleAll" }) %>
               <%= label_tag('toggle_job_ids', t(".toggle_all_jobs"), class: "visually-hidden") %>
             </div>
-            <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'ms-1 btn btn-sm btn-outline-secondary', title: t(".actions.reschedule_all"), data: { turbo_confirm: t(".actions.confirm_reschedule_all") } do %>
-              <span class="me-1"><%= render_icon "skip_forward" %></span> <%= t "good_job.actions.reschedule" %>
+            <% if filter.params[:state].nil? || filter.params[:state].in?(%w[scheduled retried]) %>
+              <%= form.button type: 'submit', name: 'mass_action', value: 'reschedule', class: 'ms-1 btn btn-sm btn-outline-secondary', title: t(".actions.reschedule_all"), data: { turbo_confirm: t(".actions.confirm_reschedule_all") } do %>
+                <span class="me-1"><%= render_icon "skip_forward" %></span> <%= t "good_job.actions.reschedule" %>
+              <% end %>
             <% end %>
 
-            <%= form.button type: 'submit', name: 'mass_action', value: 'retry', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.retry_all"), data: { turbo_confirm: t(".actions.confirm_retry_all") } do %>
-              <span class="me-1"><%= render_icon "arrow_clockwise" %></span> <%= t "good_job.actions.retry" %>
+            <% if filter.params[:state].nil? || filter.params[:state] == 'discarded' %>
+              <%= form.button type: 'submit', name: 'mass_action', value: 'retry', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.retry_all"), data: { turbo_confirm: t(".actions.confirm_retry_all") } do %>
+                <span class="me-1"><%= render_icon "arrow_clockwise" %></span> <%= t "good_job.actions.retry" %>
+              <% end %>
             <% end %>
 
-            <div class="btn-group" role="group">
+            <% if filter.params[:state].nil? %>
+              <div class="btn-group" role="group">
+                <%= form.button type: 'submit', name: 'mass_action', value: 'discard', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.discard_all"), data: { turbo_confirm: t(".actions.confirm_discard_all") } do %>
+                  <span class="me-1"><%= render_icon "stop" %></span> <%= t "good_job.actions.discard" %>
+                <% end %>
+                <button id="destroy-dropdown-toggle" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                  <span class="visually-hidden"><%= t ".toggle_actions" %></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="destroy-dropdown-toggle">
+                  <li>
+                    <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn dropdown-item', title: t(".actions.destroy_all"), data: { turbo_confirm: t(".actions.confirm_destroy_all") } do %>
+                      <span class="me-1"><%= render_icon "trash" %></span> <%= t "good_job.actions.destroy" %>
+                    <% end %>
+                  </li>
+                </ul>
+              </div>
+            <% elsif filter.params[:state].in?(%w[scheduled retried queued]) %>
               <%= form.button type: 'submit', name: 'mass_action', value: 'discard', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.discard_all"), data: { turbo_confirm: t(".actions.confirm_discard_all") } do %>
                 <span class="me-1"><%= render_icon "stop" %></span> <%= t "good_job.actions.discard" %>
               <% end %>
-              <button id="destroy-dropdown-toggle" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                <span class="visually-hidden"><%= t ".toggle_actions" %></span>
-              </button>
-              <ul class="dropdown-menu" aria-labelledby="destroy-dropdown-toggle">
-                <li>
-                  <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn dropdown-item', title: t(".actions.destroy_all"), data: { turbo_confirm: t(".actions.confirm_destroy_all") } do %>
-                    <span class="me-1"><%= render_icon "trash" %></span> <%= t "good_job.actions.destroy" %>
-                  <% end %>
-                </li>
-              </ul>
-            </div>
+            <% elsif filter.params[:state].in?(%w[discarded succeeded]) %>
+              <%= form.button type: 'submit', name: 'mass_action', value: 'destroy', class: 'btn btn-sm btn-outline-secondary', title: t(".actions.destroy_all"), data: { turbo_confirm: t(".actions.confirm_destroy_all") } do %>
+                <span class="me-1"><%= render_icon "trash" %></span> <%= t "good_job.actions.destroy" %>
+              <% end %>
+            <% end %>
 
           </div>
           <div class="d-none d-lg-block col-lg-1 text-lg-center"><%= t "good_job.models.job.queue" %></div>
