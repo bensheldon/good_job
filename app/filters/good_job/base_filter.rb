@@ -13,8 +13,8 @@ module GoodJob
     end
 
     def records
+      after_id = params[:after_id]
       after_at = params[:after_at].present? ? Time.zone.parse(params[:after_at]) : nil
-      after_id = params[:after_id] if after_at
       limit = params.fetch(:limit, DEFAULT_LIMIT)
 
       query_for_records.display_all(
@@ -76,10 +76,11 @@ module GoodJob
 
     def next_page_params
       order_column = ordered_by.first
+      last_record = records.last
 
       {
-        after_at: records.last&.send(order_column),
-        after_id: records.last&.id,
+        after_at: last_record&.send(order_column)&.iso8601(6),
+        after_id: last_record&.id,
       }.merge(to_params)
     end
 
