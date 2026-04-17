@@ -755,7 +755,7 @@ module GoodJob
           if existing_performed_at
             current_thread.execution_interrupted = existing_performed_at
 
-            interrupt_error_string = self.class.format_error(GoodJob::InterruptError.new("Interrupted after starting perform at '#{existing_performed_at}'"))
+            interrupt_error_string = self.class.format_error(GoodJob::InterruptedError.new("Interrupted after starting perform at '#{existing_performed_at}'"))
             self.error = interrupt_error_string
             self.error_event = ErrorEvents::INTERRUPTED
             monotonic_duration = (::Process.clock_gettime(::Process::CLOCK_MONOTONIC) - monotonic_start).seconds

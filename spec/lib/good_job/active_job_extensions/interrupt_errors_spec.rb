@@ -55,7 +55,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::InterruptErrors do
         performed_at: be_present,
         finished_at: be_present,
         duration: duration_matcher,
-        error: start_with('GoodJob::InterruptError: Interrupted after starting perform at'),
+        error: start_with('GoodJob::InterruptedError: Interrupted after starting perform at'),
         error_event: "interrupted"
       )
 
