@@ -45,6 +45,8 @@ module ::SomeClass; end
 module ::ErrorJob::Error; end
 module ::TestRecord; end
 module ::WrapperJob; end
+module ::ChildJob; end
+module ::ParentJob; end
 module GoodJob::Job::ERROR_EVENT_INTERRUPTED; end
 module GoodJob::Job::ERROR_EVENT_RETRIED; end
 module Rails::Server; end
