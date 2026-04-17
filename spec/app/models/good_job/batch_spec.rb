@@ -256,6 +256,21 @@ describe GoodJob::Batch do
       expect(batch).to be_persisted
       expect(batch.active_jobs.count).to eq 2
     end
+
+    it 'adds an already-enqueued job by updating its batch_id' do
+      active_job = TestJob.perform_later
+      good_job = GoodJob::Job.find_by(active_job_id: active_job.job_id)
+
+      GoodJob::CurrentThread.job = good_job
+      batch.add(active_job)
+
+      expect(good_job.batch_id).to eq batch.id
+      expect(good_job.batch&.id).to eq batch.id
+      expect(GoodJob::CurrentThread.job.batch_id).to eq batch.id
+      expect(GoodJob::CurrentThread.job.batch&.id).to eq batch.id
+    ensure
+      GoodJob::CurrentThread.job = nil
+    end
   end
 
   describe '#enqueue' do

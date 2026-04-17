@@ -277,9 +277,16 @@ module GoodJob
 
       if persisted_jobs.any?
         job_ids = persisted_jobs.map(&:provider_job_id)
-        GoodJob::Job.where(id: job_ids, batch_id: nil).update_all(batch_id: id) # rubocop:disable Rails/SkipsModelValidations
 
-        CurrentThread.job.batch_id = id if CurrentThread.job && job_ids.include?(CurrentThread.job.id)
+        if CurrentThread.job && job_ids.include?(CurrentThread.job.id)
+          CurrentThread.job.batch_id = id
+          CurrentThread.job.save!
+          other_job_ids = job_ids - [CurrentThread.job.id]
+        else
+          other_job_ids = job_ids
+        end
+
+        GoodJob::Job.where(id: other_job_ids).update_all(batch_id: id) if other_job_ids.any? # rubocop:disable Rails/SkipsModelValidations
       end
 
       buffer.active_jobs

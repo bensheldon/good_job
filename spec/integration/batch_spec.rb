@@ -350,9 +350,11 @@ RSpec.describe 'Batches' do
           new_batch = GoodJob::Batch.new(on_finish: 'BatchCallbackJob')
           new_batch.add(self)
 
-          # Check that the batch extension accessor
-          # shows the updated batch.
+          # Check that the batch extension accessor and the underlying
+          # GoodJob::Job record both reflect the updated batch.
           RESULTS << batch&.id
+          RESULTS << GoodJob::CurrentThread.job.batch_id
+          RESULTS << GoodJob::CurrentThread.job.batch&.id
 
           new_batch.add(ChildJob.new)
           new_batch.enqueue
@@ -366,7 +368,7 @@ RSpec.describe 'Batches' do
 
       parent_good_job = GoodJob::Job.find_by(active_job_id: parent_active_job.job_id)
       expect(parent_good_job.batch_id).to be_present
-      expect(RESULTS).to eq [parent_good_job.batch_id]
+      expect(RESULTS).to eq [parent_good_job.batch_id, parent_good_job.batch_id, parent_good_job.batch_id]
 
       child_good_job = GoodJob::Job.where(job_class: 'ChildJob').first
       expect(child_good_job.batch_id).to eq parent_good_job.batch_id
@@ -382,9 +384,10 @@ RSpec.describe 'Batches' do
         include GoodJob::ActiveJobExtensions::Batches
 
         def perform
-          new_batch = GoodJob::Batch.new
+          new_batch = GoodJob::Batch.new(on_finish: 'BatchCallbackJob')
           new_batch.add(self)
           RESULTS << batch&.id
+          new_batch.enqueue
         end
       end)
 
@@ -394,6 +397,10 @@ RSpec.describe 'Batches' do
 
       parent_good_job = GoodJob::Job.where(job_class: 'ParentJob').first
       expect(RESULTS.first).to eq parent_good_job.batch_id
+
+      batch = GoodJob::Batch.find(parent_good_job.batch_id)
+      expect(batch).to be_finished
+      expect(GoodJob::Job.where(job_class: 'BatchCallbackJob').count).to eq 1
     end
   end
 
