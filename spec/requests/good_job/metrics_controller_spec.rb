@@ -12,6 +12,8 @@ describe GoodJob::MetricsController do
           jobs_count: '0',
           batches_count: '0',
           cron_entries_count: '1',
+          cron_entries_enabled_count: '1',
+          cron_entries_paused_count: '0',
           pauses_count: '0',
           processes_count: '0',
           discarded_count: '0',
