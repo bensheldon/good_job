@@ -119,5 +119,8 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
       order: { finished_at: :desc },
       where: "finished_at IS NOT NULL AND error IS NOT NULL"
     add_index :good_jobs, [:scheduled_at, :queue_name], name: :index_good_jobs_on_scheduled_at_and_queue_name
+    add_index :good_jobs, :id,
+      name: :index_good_jobs_on_unfinished_or_errored,
+      where: "finished_at IS NULL OR error IS NOT NULL"
   end
 end

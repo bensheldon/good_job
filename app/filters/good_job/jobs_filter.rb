@@ -16,7 +16,7 @@ module GoodJob
           'retried' => query.retried.count,
           'queued' => query.queued.count,
           'running' => query.running.count,
-          'succeeded' => query.succeeded.count,
+          'succeeded' => succeeded_count(query),
           'discarded' => query.discarded.count,
         }
       end
@@ -34,7 +34,11 @@ module GoodJob
     end
 
     def filtered_count
-      @_filtered_count ||= filtered_query.unscope(:select).count
+      @_filtered_count ||= if params[:state] == 'succeeded'
+                             succeeded_count(filtered_query(params.except(:state)))
+                           else
+                             filtered_query.unscope(:select).count
+                           end
     end
 
     def ordered_by
@@ -51,6 +55,15 @@ module GoodJob
     end
 
     private
+
+    # Count of succeeded jobs computed as `total - (unfinished OR errored)`.
+    # The complement set is typically tiny (< 1% of rows), and `index_good_jobs_on_unfinished_or_errored`
+    # covers it exactly, so this is an index-only scan instead of a full-table scan through `succeeded`.
+    # Clamped at 0 to guard against the two counts drifting across a concurrent insert burst.
+    def succeeded_count(query)
+      base = query.unscope(:select)
+      (base.count - base.where('finished_at IS NULL OR error IS NOT NULL').count).clamp(0..)
+    end
 
     def filter_by_job_class(job_class)
       return {} if job_class.blank?
