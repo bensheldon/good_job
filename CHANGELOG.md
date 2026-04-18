@@ -1,5 +1,23 @@
 # Changelog
 
+## [v4.18.1](https://github.com/bensheldon/good_job/tree/v4.18.1) (2026-04-18)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.18.0...v4.18.1)
+
+**Implemented enhancements:**
+
+- Add an ActiveJob extension for throttling [\#315](https://github.com/bensheldon/good_job/issues/315)
+
+**Fixed bugs:**
+
+- Make job lifecycle methods lock-strategy-aware [\#1756](https://github.com/bensheldon/good_job/pull/1756) ([bensheldon](https://github.com/bensheldon))
+- Fix concurrent PG connection access in ProcessHeartbeat\#refresh\_process [\#1755](https://github.com/bensheldon/good_job/pull/1755) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- Job stuck in queued state and never picked up [\#1590](https://github.com/bensheldon/good_job/issues/1590)
+- Refactor the Notifier to be more of a generic Reactor [\#811](https://github.com/bensheldon/good_job/issues/811)
+
 ## [v4.18.0](https://github.com/bensheldon/good_job/tree/v4.18.0) (2026-04-17)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.17.0...v4.18.0)
@@ -14,6 +32,7 @@
 
 **Fixed bugs:**
 
+- Replace AR attributes API with explicit accessors; add breaking migration guardrails [\#1753](https://github.com/bensheldon/good_job/pull/1753) ([bensheldon](https://github.com/bensheldon))
 - Fix dashboard pagination omitting jobs created in the same second [\#1749](https://github.com/bensheldon/good_job/pull/1749) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
