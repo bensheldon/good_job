@@ -8,6 +8,25 @@ module GoodJob
     end
 
     def data
+      binds = start_end_binds
+      start_time, end_time = binds.map(&:value)
+
+      # Align the inner range predicate to the same hour buckets the outer generate_series
+      # produces. Doing the truncation in SQL (rather than in Ruby with beginning_of_hour)
+      # keeps both sides on the same grid even when the app's time zone has a fractional
+      # offset from UTC (e.g. IST +05:30). AR serializes Time binds as UTC, so the outer
+      # date_trunc operates in UTC, and this predicate must match that.
+      pushdown = <<~SQL.squish
+        "good_jobs"."scheduled_at" >= date_trunc('hour', ?::timestamp)
+        AND "good_jobs"."scheduled_at" < date_trunc('hour', ?::timestamp) + interval '1 hour'
+      SQL
+
+      inner_sql = @filter.filtered_query
+                         .except(:select, :order)
+                         .where(pushdown, start_time, end_time)
+                         .select(:queue_name, :scheduled_at)
+                         .to_sql
+
       count_query = <<~SQL.squish
         SELECT *
         FROM generate_series(
@@ -20,15 +39,13 @@ module GoodJob
               date_trunc('hour', scheduled_at) AS scheduled_at,
               queue_name,
               count(*) AS count
-            FROM (
-              #{@filter.filtered_query.except(:select, :order).select(:queue_name, :scheduled_at).to_sql}
-            ) sources
+            FROM (#{inner_sql}) sources
             GROUP BY date_trunc('hour', scheduled_at), queue_name
         ) sources ON sources.scheduled_at = timestamp
         ORDER BY timestamp ASC
       SQL
 
-      executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(count_query), "GoodJob Dashboard Chart", start_end_binds) }
+      executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(count_query), "GoodJob Dashboard Chart", binds) }
 
       queue_names = executions_data.reject { |d| d['count'].nil? }.map { |d| d['queue_name'] || BaseFilter::EMPTY }.uniq
       labels = []
