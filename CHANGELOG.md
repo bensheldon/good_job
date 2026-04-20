@@ -1,5 +1,23 @@
 # Changelog
 
+## [v4.18.2](https://github.com/bensheldon/good_job/tree/v4.18.2) (2026-04-20)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.18.1...v4.18.2)
+
+**Implemented enhancements:**
+
+- Add dashboard indexes for queue\_name, created\_at, and discarded jobs [\#1754](https://github.com/bensheldon/good_job/pull/1754) ([AliOsm](https://github.com/AliOsm))
+
+**Fixed bugs:**
+
+- ArgumentError: GoodJob::Job\(...\) is not an ActiveRecord::Relation [\#1759](https://github.com/bensheldon/good_job/issues/1759)
+- Fix ArgumentError when using perform\_throttle without a label [\#1760](https://github.com/bensheldon/good_job/pull/1760) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Speed up succeeded count via complement subtraction [\#1758](https://github.com/bensheldon/good_job/pull/1758) ([AliOsm](https://github.com/AliOsm))
+- Speed up ScheduledByQueueChart with inner-query pushdown and \(scheduled\_at, queue\_name\) index [\#1757](https://github.com/bensheldon/good_job/pull/1757) ([AliOsm](https://github.com/AliOsm))
+
 ## [v4.18.1](https://github.com/bensheldon/good_job/tree/v4.18.1) (2026-04-18)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.18.0...v4.18.1)
