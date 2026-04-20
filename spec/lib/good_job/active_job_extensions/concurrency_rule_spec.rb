@@ -136,6 +136,23 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
     end
 
+    context 'with a perform throttle rule without a label' do
+      let(:test_rule) { { perform_throttle: [1, 1.minute] } }
+
+      before do
+        allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+        stub_job_class(test_rule)
+      end
+
+      it 'does not perform if throttle period has not passed' do
+        TestJob.perform_later(name: "Alice")
+        TestJob.perform_later(name: "Alice")
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.finished.count).to eq 1
+      end
+    end
+
     context 'with a multipart rule' do
       let(:test_rule) { { label: -> { arguments.first[:name] }, enqueue_throttle: [1, 1.minute], perform_limit: 0 } }
 
