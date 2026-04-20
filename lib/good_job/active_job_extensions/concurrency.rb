@@ -86,7 +86,7 @@ module GoodJob
           elsif @config.key?(:key) && key.present?
             GoodJob::Job.where(concurrency_key: key)
           else
-            GoodJob::Job
+            GoodJob::Job.all
           end
         end
 
