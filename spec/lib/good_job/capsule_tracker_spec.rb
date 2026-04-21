@@ -18,8 +18,6 @@ describe GoodJob::CapsuleTracker do
         tracker.unregister(with_advisory_lock: true)
 
         expect(GoodJob::Process.count).to eq 0
-
-        Rails.logger.warn("DONE WITH TEST")
       end
 
       it 'takes an advisory lock even when process already exists' do
@@ -79,6 +77,131 @@ describe GoodJob::CapsuleTracker do
         expect(GoodJob::Process.count).to eq 0
         expect(tracker.locks).to eq(0)
         expect(tracker).not_to be_advisory_locked
+      end
+    end
+
+    context 'when used with an advisory_lock_connection' do
+      # Use explicit checkout so we own the connection lifecycle (lease_connection is sticky and
+      # returned to the pool by Rails at unpredictable points, which would leak advisory locks).
+      let(:lock_connection) { GoodJob::Process.connection_pool.checkout }
+
+      after { GoodJob::Process.connection_pool.checkin(lock_connection) }
+
+      it 'takes the advisory lock on the specified connection and releases it on unregister' do
+        tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+
+        process = GoodJob::Process.last
+        expect(process.lock_type).to eq('advisory')
+        expect(PgLock.advisory_lock_details_for(lock_connection)).not_to be_empty
+
+        tracker.unregister(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+
+        expect(GoodJob::Process.count).to eq 0
+        expect(PgLock.advisory_lock_details_for(lock_connection)).to be_empty
+      end
+
+      it 'does not release the advisory lock when unregistered with a different connection' do
+        other_connection = GoodJob::Process.connection_pool.checkout
+        begin
+          # Two registrations so the record isn't destroyed when we call unregister once
+          tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+          tracker.register
+
+          process = GoodJob::Process.last
+          expect(process.lock_type).to eq('advisory')
+          expect(PgLock.advisory_lock_details_for(lock_connection)).not_to be_empty
+
+          tracker.unregister(with_advisory_lock: true, advisory_lock_connection: other_connection)
+
+          # Lock and record should be unchanged — wrong connection was rejected
+          process.reload
+          expect(process.lock_type).to eq('advisory')
+          expect(tracker).to be_advisory_locked
+          expect(PgLock.advisory_lock_details_for(lock_connection)).not_to be_empty
+        ensure
+          GoodJob::Process.connection_pool.checkin(other_connection)
+          tracker.unregister(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+          tracker.unregister
+        end
+      end
+
+      it 'destroys the process record when the original lock connection has been disconnected' do
+        other_connection = GoodJob::Process.connection_pool.checkout
+        begin
+          tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+
+          process = GoodJob::Process.last
+          expect(process.lock_type).to eq('advisory')
+
+          # Simulate the original connection going inactive (e.g. network drop, server restart).
+          # advisory_locked? will return false, so unregister skips the advisory_unlock call —
+          # in production the lock is already gone because the connection closed. Here we must
+          # release it manually in ensure since the connection is only mocked as inactive.
+          allow(lock_connection).to receive(:active?).and_return(false)
+
+          expect(tracker).not_to be_advisory_locked
+
+          # Unregister with a new connection as would happen after reconnect
+          tracker.unregister(with_advisory_lock: true, advisory_lock_connection: other_connection)
+
+          expect(GoodJob::Process.count).to eq 0
+          expect(tracker.locks).to eq 0
+        ensure
+          GoodJob::Process.connection_pool.checkin(other_connection)
+          # Unstub and release the lock the tracker skipped (simulated disconnect)
+          allow(lock_connection).to receive(:active?).and_call_original
+          lock_connection.execute("SELECT pg_advisory_unlock_all()")
+        end
+      end
+
+      context 'with nested registrations' do
+        it 'maintains the process when the inner advisory lock dies but the outer non-advisory registration is still active' do
+          # register { register(advisory: true) {} }
+          tracker.register do
+            tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection) do
+              expect(GoodJob::Process.last.lock_type).to eq('advisory')
+              allow(lock_connection).to receive(:active?).and_return(false)
+              # inner unregister skips advisory_unlock (dead connection), decrements locks to 1
+            end
+
+            # outer registration still holds — process must still exist
+            expect(GoodJob::Process.count).to eq 1
+
+            allow(lock_connection).to receive(:active?).and_call_original
+            lock_connection.execute("SELECT pg_advisory_unlock_all()")
+          end
+
+          expect(GoodJob::Process.count).to eq 0
+        end
+
+        it 'maintains the process when the advisory lock dies while an inner non-advisory registration is still active' do
+          # register(advisory: true) { register {} }
+          # Keep active? mocked through the outer unregister so it doesn't try to advisory_unlock
+          # a lock that's already gone. Release manually in ensure afterward.
+          begin
+            tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection) do
+              allow(lock_connection).to receive(:active?).and_return(false)
+
+              tracker.register do
+                expect(GoodJob::Process.count).to eq 1
+                # inner unregister detects the dead advisory lock and downgrades lock_type to nil
+                # so cleanup on other processes won't incorrectly delete this record
+              end
+
+              process = GoodJob::Process.last
+              expect(process.lock_type).to be_nil
+
+              # outer advisory registration still holds the registration — process must still exist
+              expect(GoodJob::Process.count).to eq 1
+              # active? stays mocked so outer unregister sees advisory_locked? = false → record.destroy
+            end
+
+            expect(GoodJob::Process.count).to eq 0
+          ensure
+            allow(lock_connection).to receive(:active?).and_call_original
+            lock_connection.execute("SELECT pg_advisory_unlock_all()")
+          end
+        end
       end
     end
 
