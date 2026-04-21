@@ -105,7 +105,7 @@ module GoodJob
     method_option :queue_select_limit,
                   type: :numeric,
                   banner: 'COUNT',
-                  desc: "The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: nil)"
+                  desc: "The number of queued jobs to select when polling for a job to run. (env var: GOOD_JOB_QUEUE_SELECT_LIMIT, default: 1000)"
 
     def start
       set_up_application!
