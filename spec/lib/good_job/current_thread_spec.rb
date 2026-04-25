@@ -34,6 +34,23 @@ RSpec.describe GoodJob::CurrentThread do
         expect(described_class.send(accessor)).to eq 'apple'
       end
 
+      it 'can isolate values across fibers' do
+        original_isolation_level = ActiveSupport::IsolatedExecutionState.isolation_level
+        ActiveSupport::IsolatedExecutionState.isolation_level = :fiber
+
+        described_class.send :"#{accessor}=", 'apple'
+
+        fiber_value = Fiber.new do
+          described_class.send :"#{accessor}=", 'bear'
+          described_class.send(accessor)
+        end.resume
+
+        expect(fiber_value).to eq 'bear'
+        expect(described_class.send(accessor)).to eq 'apple'
+      ensure
+        ActiveSupport::IsolatedExecutionState.isolation_level = original_isolation_level
+      end
+
       it 'is resettable' do
         described_class.send :"#{accessor}=", 'apple'
         described_class.reset

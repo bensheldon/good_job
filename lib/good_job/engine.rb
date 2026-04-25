@@ -58,7 +58,7 @@ module GoodJob
       # This hooks into the hookable places during Rails boot, which is unfortunately not Rails.application.initialized?
       # If an Adapter is initialized during boot, we want to want to start async executors once the framework dependencies have loaded.
       # When exactly that happens is out of our control because gems or application code may touch things earlier than expected.
-      # For example, as of Rails 6.1, if an ActiveRecord model is touched during boot, that triggers ActiveRecord to load,
+      # For example, if an ActiveRecord model is touched during boot, that triggers ActiveRecord to load,
       # which touches DestroyAssociationAsyncJob, which loads ActiveJob, which may initialize a GoodJob::Adapter, all of which
       # happens _before_ ActiveRecord finishes loading. GoodJob will deadlock if an async executor is started in the middle of
       # ActiveRecord loading.

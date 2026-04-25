@@ -42,13 +42,13 @@ Gem::Specification.new do |spec|
     "--quiet"
   ]
 
-  spec.required_ruby_version = ">= 3.0.0"
+  spec.required_ruby_version = ">= 3.2.0"
 
-  spec.add_dependency "activejob", ">= 6.1.0"
-  spec.add_dependency "activerecord", ">= 6.1.0"
+  spec.add_dependency "activejob", ">= 7.0.0"
+  spec.add_dependency "activerecord", ">= 7.0.0"
   spec.add_dependency "concurrent-ruby", ">= 1.3.1"
   spec.add_dependency "fugit", ">= 1.11.0"
-  spec.add_dependency "railties", ">= 6.1.0"
+  spec.add_dependency "railties", ">= 7.0.0"
   spec.add_dependency "thor", ">= 1.0.0"
 
   spec.add_development_dependency "capybara"

@@ -173,8 +173,8 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
 
 ## Compatibility
 
-- **Ruby on Rails:** 6.1+
-- **Ruby:** Ruby 3.0+. JRuby 9.4+
+- **Ruby on Rails:** 7.0+
+- **Ruby:** Ruby 3.2+. JRuby 10+
 - **Postgres:** 10.0+
 
 ## Configuration
@@ -965,7 +965,7 @@ To upgrade:
 
 Notable changes:
 
-- Only supports Rails 6.1+, CRuby 3.0+ and JRuby 9.4+. Rails 6.0 is no longer supported. CRuby 2.6 and 2.7 are no longer supported. JRuby 9.3 is no longer supported.
+- Only supports Rails 7.0+, CRuby 3.2+ and JRuby 10+. Rails 6.x is no longer supported. CRuby 3.0 and 3.1 are no longer supported. JRuby 9.4 is no longer supported.
 - Changes job `priority` to give smaller numbers higher priority (default: `0`), in accordance with Active Job's definition of priority.
 - Enqueues and executes jobs via the `GoodJob::Job` model instead of `GoodJob::Execution`
 - Setting `config.good_job.cleanup_interval_jobs`, `GOOD_JOB_CLEANUP_INTERVAL_JOBS`, `config.good_job.cleanup_interval_seconds`, or `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` to `nil` or `""` no longer disables count- or time-based cleanups. Set to `false` to disable, or `-1` to run a cleanup after every job execution.
@@ -1904,10 +1904,10 @@ The gemfiles in `gemfiles/` can be used to run tests against different rails ver
 
 ```bash
 # Install dependencies
-BUNDLE_GEMFILE=gemfiles/rails_6.1.gemfile bundle install
+BUNDLE_GEMFILE=gemfiles/rails_7.0.gemfile bundle install
 
 # Run the tests
-BUNDLE_GEMFILE=gemfiles/rails_6.1.gemfile bin/rspec
+BUNDLE_GEMFILE=gemfiles/rails_7.0.gemfile bin/rspec
 ```
 
 ### Release
