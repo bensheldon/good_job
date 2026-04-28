@@ -37,7 +37,8 @@
               <div class="col-4 col-lg-1 text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.labels" %></div>
                 <% job.labels&.each do |label| %>
-                  <span class="badge rounded-pill text-bg-secondary font-monospace"><%= label %></span>
+                  <% truncated = truncate(label, length: 15) %>
+                  <%= tag.span truncated, class: "badge rounded-pill text-bg-secondary font-monospace", **(truncated != label ? { title: label, data: { bs_toggle: "tooltip" } } : {}) %>
                 <% end %>
               </div>
               <div class="col-4 col-lg-1 text-lg-end">

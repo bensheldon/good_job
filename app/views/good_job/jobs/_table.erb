@@ -104,7 +104,8 @@
               <div class="col-4 col-lg-1 text-wrap text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.labels" %></div>
                 <% job.labels&.each do |label| %>
-                  <%= link_to label, filter.to_params(label: label), class: "badge rounded-pill text-bg-secondary font-monospace text-decoration-none" %>
+                  <% truncated = truncate(label, length: 15) %>
+                  <%= link_to truncated, filter.to_params(label: label), class: "badge rounded-pill text-bg-secondary font-monospace text-decoration-none", **(truncated != label ? { title: label, data: { bs_toggle: "tooltip" } } : {}) %>
                 <% end %>
               </div>
               <div class="col-4 col-lg-1 text-lg-end">
