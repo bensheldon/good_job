@@ -709,6 +709,12 @@ RSpec.describe GoodJob::Job do
           %(ORDER BY (CASE WHEN "good_jobs"."queue_name" = 'one' THEN 0 WHEN "good_jobs"."queue_name" = 'two' THEN 1 WHEN "good_jobs"."queue_name" = 'three' THEN 2 ELSE 3 END))
         )
       end
+
+      it "can be merged into a query that joins good_job_executions without ambiguity" do
+        expect do
+          GoodJob::Execution.joins(:job).merge(described_class.queue_ordered(%w{one two})).to_a
+        end.not_to raise_error
+      end
     end
 
     describe '.priority_ordered' do
