@@ -188,7 +188,7 @@ module GoodJob
     # @return [ActiveRecord::Relation]
     scope :queue_ordered, (lambda do |queues|
       clauses = queues.map.with_index do |queue_name, index|
-        sanitize_sql_array(["WHEN queue_name = ? THEN ?", queue_name, index])
+        sanitize_sql_array(["WHEN #{quoted_table_name}.queue_name = ? THEN ?", queue_name, index])
       end
       order(Arel.sql("(CASE #{clauses.join(' ')} ELSE #{queues.size} END)"))
     end)
