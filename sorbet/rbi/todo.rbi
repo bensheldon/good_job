@@ -35,6 +35,7 @@ module ::THREAD_JOBS; end
 module ::TestError; end
 module ::AnotherTestJob; end
 module ::TestJob; end
+module ::ThrottledJob; end
 module ::SuccessJob; end
 module ::WAIT_EVENT; end
 module ::TestJob::Error; end
