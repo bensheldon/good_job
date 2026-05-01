@@ -706,7 +706,7 @@ RSpec.describe GoodJob::Job do
       it "produces SQL to order by queue order" do
         query_sql = described_class.queue_ordered(%w{one two three}).to_sql
         expect(query_sql).to include(
-          %(ORDER BY (CASE WHEN "good_jobs".queue_name = 'one' THEN 0 WHEN "good_jobs".queue_name = 'two' THEN 1 WHEN "good_jobs".queue_name = 'three' THEN 2 ELSE 3 END))
+          %(ORDER BY (CASE WHEN "good_jobs"."queue_name" = 'one' THEN 0 WHEN "good_jobs"."queue_name" = 'two' THEN 1 WHEN "good_jobs"."queue_name" = 'three' THEN 2 ELSE 3 END))
         )
       end
     end
