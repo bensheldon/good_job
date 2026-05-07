@@ -5,9 +5,9 @@ module GoodJob
   module Filterable
     extend ActiveSupport::Concern
 
-    # Bounds each to_tsvector() input so the combined tsvector stays under
-    # PG's ~1 MB limit (PG::ProgramLimitExceeded: "string is too long for
-    # tsvector").
+    # Caps the largest free-form columns (error, serialized_params->>'arguments')
+    # fed to to_tsvector() so the combined tsvector stays under PG's ~1 MB limit
+    # (PG::ProgramLimitExceeded: "string is too long for tsvector").
     MAX_SEARCH_COLUMN_CHARS = 262_144
 
     included do

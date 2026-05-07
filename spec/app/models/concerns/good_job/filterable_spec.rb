@@ -56,7 +56,7 @@ RSpec.describe GoodJob::Filterable do
     it 'does not raise when the error column exceeds the tsvector size limit' do
       # Many distinct tokens — repeated tokens collapse via tsvector dedup.
       oversized_error = "BoomError: #{Array.new(200_000) { |i| "w#{i}" }.join(' ')}"
-      model_class.create!(
+      oversized_job = model_class.create!(
         active_job_id: SecureRandom.uuid,
         queue_name: "default",
         job_class: "ExampleJob",
@@ -67,6 +67,7 @@ RSpec.describe GoodJob::Filterable do
       )
 
       expect { model_class.search_text('anything').to_a }.not_to raise_error
+      expect(model_class.search_text('BoomError')).to include(oversized_job)
     end
 
     it 'is chainable and reversible' do
