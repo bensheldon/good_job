@@ -5,6 +5,11 @@ module GoodJob
   module Filterable
     extend ActiveSupport::Concern
 
+    # Bounds each to_tsvector() input so the combined tsvector stays under
+    # PG's ~1 MB limit (PG::ProgramLimitExceeded: "string is too long for
+    # tsvector").
+    MAX_SEARCH_COLUMN_CHARS = 262_144
+
     included do
       # Get records in display order with optional keyset pagination.
       # @!method display_all(ordered_by: ["created_at", "desc"], after_at: nil, after_id: nil)
@@ -65,7 +70,7 @@ module GoodJob
         next if query.blank?
 
         # TODO: turn this into proper bind parameters in Arel
-        tsvector = "(to_tsvector('english', id::text) || to_tsvector('english', COALESCE(active_job_id::text, '')) || to_tsvector('english', serialized_params) || to_tsvector('english', COALESCE(serialized_params->>'arguments', '')) || to_tsvector('english', COALESCE(error, '')) || to_tsvector('english', COALESCE(array_to_string(labels, ' '), '')))"
+        tsvector = "(to_tsvector('english', id::text) || to_tsvector('english', COALESCE(active_job_id::text, '')) || to_tsvector('english', serialized_params) || to_tsvector('english', COALESCE(LEFT(serialized_params->>'arguments', #{MAX_SEARCH_COLUMN_CHARS}), '')) || to_tsvector('english', COALESCE(LEFT(error, #{MAX_SEARCH_COLUMN_CHARS}), '')) || to_tsvector('english', COALESCE(array_to_string(labels, ' '), '')))"
         to_tsquery_function = database_supports_websearch_to_tsquery? ? 'websearch_to_tsquery' : 'plainto_tsquery'
         where("#{tsvector} @@ #{to_tsquery_function}('english', CAST(? AS text))", query)
           .order(sanitize_sql_for_order([Arel.sql("ts_rank(#{tsvector}, #{to_tsquery_function}('english', CAST(? AS text)))"), query]) => 'DESC')
