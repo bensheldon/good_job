@@ -388,7 +388,7 @@ module GoodJob
     def enable_pauses
       return options[:enable_pauses] unless options[:enable_pauses].nil?
       return rails_config[:enable_pauses] unless rails_config[:enable_pauses].nil?
-      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PAUSES']) unless env['GOOD_JOB_ENABLE_PAUSE'].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PAUSES']) unless env['GOOD_JOB_ENABLE_PAUSES'].nil?
 
       DEFAULT_ENABLE_PAUSES
     end
