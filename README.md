@@ -726,7 +726,7 @@ config.good_job.cron = {
 
 ### Bulk enqueue
 
-GoodJob's Bulk-enqueue functionality can buffer and enqueue multiple jobs at once, using a single INSERT statement. This can more performant when enqueuing a large number of jobs.
+GoodJob's Bulk-enqueue functionality can buffer and enqueue multiple jobs at once, using a single INSERT statement. This can be more performant when enqueuing a large number of jobs.
 
 ```ruby
 # Capture jobs using `.perform_later`:
