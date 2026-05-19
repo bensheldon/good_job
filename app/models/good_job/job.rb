@@ -286,14 +286,14 @@ module GoodJob
       end
 
       def historic_finished_at_index_migrated?
-        return true if connection.index_name_exists?(:good_jobs, "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished")
+        return true if connection.index_name_exists?(table_name, "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished")
 
         migration_pending_warning!
         false
       end
 
       def lock_type_migrated?
-        return true if connection.index_name_exists?(:good_jobs, :index_good_jobs_for_candidate_dequeue_unlocked)
+        return true if connection.index_name_exists?(table_name, :index_good_jobs_for_candidate_dequeue_unlocked)
 
         migration_pending_warning!
         false
@@ -305,7 +305,7 @@ module GoodJob
       def lock_type_column_exists?
         return @_lock_type_column_exists if defined?(@_lock_type_column_exists)
 
-        @_lock_type_column_exists = connection_pool.with_connection { |conn| conn.column_exists?(:good_jobs, :lock_type) }
+        @_lock_type_column_exists = connection_pool.with_connection { |conn| conn.column_exists?(table_name, :lock_type) }
       end
 
       def reset_column_information
