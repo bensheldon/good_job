@@ -19,7 +19,7 @@ module GoodJob
 
     def format_duration(sec)
       return unless sec
-      return "" if sec.is_a?(String) # Legacy pg intervals may be strings.
+      return "" if sec.is_a?(String) # pg interval support added in Rails 6.1
 
       if sec < 1
         t 'good_job.duration.milliseconds', ms: (sec * 1000).floor
@@ -48,12 +48,12 @@ module GoodJob
       super(count, **translate_hash('good_job.number.format'))
     end
 
-    def translate_hash(key, **)
-      translation_exists?(key, **) ? translate(key, **) : {}
+    def translate_hash(key, **options)
+      translation_exists?(key, **options) ? translate(key, **options) : {}
     end
 
-    def translation_exists?(key, **)
-      I18n.exists?(scope_key_by_partial(key), **)
+    def translation_exists?(key, **options)
+      I18n.exists?(scope_key_by_partial(key), **options)
     end
   end
 end

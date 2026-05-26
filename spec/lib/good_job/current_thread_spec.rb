@@ -34,7 +34,7 @@ RSpec.describe GoodJob::CurrentThread do
         expect(described_class.send(accessor)).to eq 'apple'
       end
 
-      it 'can isolate values across fibers' do
+      it 'can isolate values across fibers', skip: !GoodJob::SafeState::ISOLATED_EXECUTION_STATE_AVAILABLE do
         original_isolation_level = ActiveSupport::IsolatedExecutionState.isolation_level
         ActiveSupport::IsolatedExecutionState.isolation_level = :fiber
 

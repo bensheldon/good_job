@@ -217,7 +217,7 @@ module GoodJob
     end
 
     # @return [Array<ActiveJob::Base>] Active jobs added to the batch
-    def enqueue(active_jobs = [], **properties, &)
+    def enqueue(active_jobs = [], **properties, &block)
       assign_properties(properties)
       if record.new_record?
         record.save!
@@ -235,7 +235,7 @@ module GoodJob
         end
       end
 
-      active_jobs = add(active_jobs, &)
+      active_jobs = add(active_jobs, &block)
 
       Rails.application.executor.wrap do
         buffer = GoodJob::Adapter::InlineBuffer.capture do
@@ -397,7 +397,7 @@ module GoodJob
             good_job.created_at = current_time
             good_job.updated_at = current_time
 
-            # Set batch_id directly; can't use execution-local state for multi-batch bulk.
+            # Set batch_id directly — can't use thread-local for multi-batch bulk
             good_job.batch_id = batch.id
             good_job.batch_callback_id = nil
 

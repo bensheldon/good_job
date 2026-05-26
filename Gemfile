@@ -17,6 +17,7 @@ gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'pg', platforms: [:mri, :windows]
 
 rails_versions = {
+  "6.1" => { github: "rails/rails", branch: "6-1-stable" }, # https://github.com/bensheldon/good_job/issues/1280
   "7.0" => { github: "rails/rails", branch: "7-0-stable" }, # Ruby 3.4 requires bigdecimal which rails doesn't declare
   "7.1" => "~> 7.1.0",
   "7.2" => "~> 7.2.0",
@@ -25,6 +26,11 @@ rails_versions = {
   "head" => { github: "rails/rails", branch: "main" },
 }
 gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", "8.1")]
+
+# Ruby 4.0 has moved this gem to a bundled gem. Rails 6.1 doesn't declare it.
+install_if -> { ENV["RAILS_VERSION"] == "6.1" } do
+  gem "benchmark"
+end
 
 platforms :ruby do
   gem "bootsnap"

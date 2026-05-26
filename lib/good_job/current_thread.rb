@@ -3,10 +3,10 @@
 require 'active_support/core_ext/module/attribute_accessors_per_thread'
 
 module GoodJob
-  # Execution-local attributes for passing values from Instrumentation.
+  # Thread-local attributes for passing values from Instrumentation.
   # (Cannot use ActiveSupport::CurrentAttributes because ActiveJob resets it)
   module CurrentThread
-    # Resettable accessors for execution-local values.
+    # Resettable accessors for thread-local values.
     ACCESSORS = %i[
       active_job
       cron_at
@@ -20,9 +20,9 @@ module GoodJob
       retry_now
     ].freeze
 
-    # @!attribute [rw] active_job
+    # @!attribute [rw] cron_at
     #   @!scope class
-    #   Active Job
+    #   Cron At
     #   @return [ActiveJob::Base, nil]
     thread_mattr_accessor :active_job
 
@@ -56,7 +56,7 @@ module GoodJob
     #   @return [Exception, nil]
     thread_mattr_accessor :error_on_retry_stopped
 
-    # @!attribute [rw] job
+    # @!attribute [rw] jobs
     #   @!scope class
     #   Execution
     #   @return [GoodJob::Job, nil]

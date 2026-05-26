@@ -4,7 +4,7 @@ require "concurrent/executor/thread_pool_executor"
 require "concurrent/executor/timer_set"
 require "concurrent/scheduled_task"
 require "concurrent/utility/processor_counter"
-require "active_support/isolated_execution_state"
+require "good_job/safe_state"
 
 module GoodJob # :nodoc:
   #
@@ -285,7 +285,7 @@ module GoodJob # :nodoc:
         Thread.current.name = Thread.current.name.sub("-worker-", "-thread-") if Thread.current.name
 
         begin
-          ActiveSupport::IsolatedExecutionState[:good_job_scheduler] = thr_scheduler
+          GoodJob::SafeState[:good_job_scheduler] = thr_scheduler
           Thread.current.priority = -3 if thr_scheduler.lower_thread_priority
 
           Rails.application.reloader.wrap do
@@ -294,7 +294,7 @@ module GoodJob # :nodoc:
             end
           end
         ensure
-          ActiveSupport::IsolatedExecutionState.delete(:good_job_scheduler)
+          GoodJob::SafeState.delete(:good_job_scheduler)
         end
       end
       future.add_observer(self, :task_observer)

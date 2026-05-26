@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'active_support/isolated_execution_state'
+require 'good_job/safe_state'
 
 module GoodJob
   # Provides methods for determining the status of the
@@ -13,7 +13,7 @@ module GoodJob
       # Whether the current job execution thread is in a running state.
       # @return [Boolean]
       def current_thread_running?
-        scheduler = ActiveSupport::IsolatedExecutionState[:good_job_scheduler]
+        scheduler = GoodJob::SafeState[:good_job_scheduler]
         scheduler ? scheduler.running? : true
       end
 
@@ -21,7 +21,7 @@ module GoodJob
       # (the opposite of running).
       # @return [Boolean]
       def current_thread_shutting_down?
-        scheduler = ActiveSupport::IsolatedExecutionState[:good_job_scheduler]
+        scheduler = GoodJob::SafeState[:good_job_scheduler]
         scheduler && !scheduler.running?
       end
     end

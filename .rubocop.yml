@@ -13,8 +13,8 @@ inherit_mode:
     - Include
 
 AllCops:
-  TargetRubyVersion: 3.2
-  TargetRailsVersion: 7.0
+  TargetRubyVersion: 3.0
+  TargetRailsVersion: 6.0
   DisplayCopNames: true
   DisplayStyleGuide: true
   Include:
