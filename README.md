@@ -1292,7 +1292,7 @@ The recommended way to monitor the queue in production is:
 
 GoodJob’s advisory locking strategy uses a materialized CTE (Common Table Expression). This strategy can be non-performant when querying a very large queue of executable jobs (100,000+) because the database query must materialize all executable jobs before acquiring an advisory lock.
 
-GoodJob offers an optional optimization to limit the number of jobs that are queried: Queue Select Limit.
+GoodJob's Queue Select Limit restricts how many jobs are materialized per advisory lock cycle. **It defaults to `1000` — no configuration needed.** Override it if your deployment requires a different value:
 
 ```none
 # CLI option
@@ -1305,7 +1305,7 @@ config.good_job.queue_select_limit = 1000
 GOOD_JOB_QUEUE_SELECT_LIMIT=1000
 ```
 
-The Queue Select Limit value should be set to a rough upper-bound that exceeds all GoodJob execution threads / database connections. `1000` is a number that likely exceeds the available database connections on most PaaS offerings, but still offers a performance boost for GoodJob when executing very large queues.
+The default of `1000` is a rough upper-bound that exceeds the available database connections on most PaaS offerings, while still offering a significant performance boost for GoodJob when executing very large queues.
 
 To explain where this value is used, here is the pseudo-query that GoodJob uses to find executable jobs:
 
@@ -1318,7 +1318,7 @@ To explain where this value is used, here is the pseudo-query that GoodJob uses 
       FROM good_jobs
       WHERE (scheduled_at <= NOW() OR scheduled_at IS NULL) AND finished_at IS NULL
       ORDER BY priority DESC NULLS LAST, created_at ASC
-      [LIMIT 1000] -- <= introduced when queue_select_limit is set
+      [LIMIT 1000] -- <= applied by default; configurable via queue_select_limit
     )
     SELECT id
     FROM rows
