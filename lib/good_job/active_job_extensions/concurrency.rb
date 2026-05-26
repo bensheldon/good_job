@@ -16,52 +16,66 @@ module GoodJob
       ThrottleExceededError = Class.new(ConcurrencyExceededError)
 
       class Rule
+        attr_reader :label, :total_limit, :enqueue_limit, :perform_limit, :enqueue_throttle, :perform_throttle
+
         def initialize(config)
-          @config = config
+          @label = config[:label]
+          @key = config.key?(:key) ? config[:key] : GoodJob::NONE
+          @total_limit = config[:total_limit]
+          @enqueue_limit = config[:enqueue_limit]
+          @perform_limit = config[:perform_limit]
+          @enqueue_throttle = config[:enqueue_throttle]
+          @perform_throttle = config[:perform_throttle]
+        end
+
+        def key
+          @key.equal?(GoodJob::NONE) ? nil : @key
         end
 
         def evaluate(job, stage)
-          key = key(job)
-          label = label(job)
-          return nil if key.blank? && label.blank?
+          resolved_key = resolve_key(job)
+          resolved_label = resolve_label(job)
+          return nil if resolved_key.blank? && resolved_label.blank?
 
           if stage == :enqueue
-            enqueue_limit = limit(job, :enqueue_limit) || limit(job, :total_limit)
-            enqueue_throttle = throttle(job, :enqueue_throttle)
+            enqueue_limit = resolve_limit(job, @enqueue_limit) || resolve_limit(job, @total_limit)
+            enqueue_throttle = resolve_throttle(job, @enqueue_throttle)
             return nil unless enqueue_limit || enqueue_throttle
 
-            check_enqueue(enqueue_limit, enqueue_throttle, job, key, label, enqueue_limit_flag: @config[:enqueue_limit].present?)
+            check_enqueue(enqueue_limit, enqueue_throttle, job, resolved_key, resolved_label, enqueue_limit_flag: @enqueue_limit.present?)
           elsif stage == :perform
-            perform_limit = limit(job, :perform_limit) || limit(job, :total_limit)
-            perform_throttle = throttle(job, :perform_throttle)
+            perform_limit = resolve_limit(job, @perform_limit) || resolve_limit(job, @total_limit)
+            perform_throttle = resolve_throttle(job, @perform_throttle)
             return nil unless perform_limit || perform_throttle
 
-            check_perform(perform_limit, perform_throttle, job, key, label)
+            check_perform(perform_limit, perform_throttle, job, resolved_key, resolved_label)
           end
         end
 
-        def key(job)
-          key_spec = @config[:key]
-          if key_spec.blank?
-            "label:#{label(job)}"
+        private
+
+        def key_explicit?
+          !@key.equal?(GoodJob::NONE)
+        end
+
+        def resolve_key(job)
+          if key.blank?
+            "label:#{resolve_label(job)}"
           else
-            key_value = key_spec.respond_to?(:call) ? job.instance_exec(&key_spec) : key_spec
+            key_value = @key.respond_to?(:call) ? job.instance_exec(&@key) : @key
             raise TypeError, "Concurrency key must be a String; was a #{key_value.class}" if key_value.present? && VALID_TYPES.none? { |type| key_value.is_a?(type) }
 
             key_value
           end
         end
 
-        def label(job)
-          label_spec = @config[:label]
+        def resolve_label(job)
+          return if @label.blank?
 
-          return if label_spec.blank?
-
-          label_spec.respond_to?(:call) ? job.instance_exec(&label_spec) : label_spec
+          @label.respond_to?(:call) ? job.instance_exec(&@label) : @label
         end
 
-        def limit(job, limit_name)
-          value = @config[limit_name]
+        def resolve_limit(job, value)
           return nil if value.nil?
 
           value = job.instance_exec(&value) if value.respond_to?(:call)
@@ -69,8 +83,7 @@ module GoodJob
           value
         end
 
-        def throttle(job, throttle_name)
-          value = @config[throttle_name]
+        def resolve_throttle(job, value)
           return nil if value.nil?
 
           value = job.instance_exec(&value) if value.respond_to?(:call)
@@ -78,12 +91,10 @@ module GoodJob
           value
         end
 
-        private
-
         def query_scope(label, key)
           if label.present?
             GoodJob::Job.labeled(label)
-          elsif @config.key?(:key) && key.present?
+          elsif key_explicit? && key.present?
             GoodJob::Job.where(concurrency_key: key)
           else
             GoodJob::Job.all
