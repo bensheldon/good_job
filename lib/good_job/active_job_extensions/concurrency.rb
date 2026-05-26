@@ -269,16 +269,48 @@ module GoodJob
       end
 
       class_methods do
-        def good_job_control_concurrency_with(config)
-          self.good_job_concurrency_config = config
+        def good_job_control_concurrency_with(
+          total_limit: NONE,
+          enqueue_limit: NONE,
+          perform_limit: NONE,
+          enqueue_throttle: NONE,
+          perform_throttle: NONE,
+          key: NONE
+        )
+          self.good_job_concurrency_config = {
+            total_limit: total_limit,
+            enqueue_limit: enqueue_limit,
+            perform_limit: perform_limit,
+            enqueue_throttle: enqueue_throttle,
+            perform_throttle: perform_throttle,
+            key: key,
+          }.reject { |_key, value| value.equal?(NONE) }
         end
 
         # Define a concurrency rule. Rules are appended to the class-level
-        # `good_job_concurrency_rules` array. Each rule is a Hash that may
+        # `good_job_concurrency_rules` array. Each rule uses keyword arguments that may
         # include keys such as :label, :key (optional lock key), and
         # stage-specific settings like :enqueue_limit, :enqueue_throttle,
-        # :perform_limit, :perform_throttle, and :total_limit/:total_throttle.
-        def good_job_concurrency_rule(rule)
+        # :perform_limit, :perform_throttle, and :total_limit.
+        def good_job_concurrency_rule(
+          label: NONE,
+          key: NONE,
+          total_limit: NONE,
+          enqueue_limit: NONE,
+          perform_limit: NONE,
+          enqueue_throttle: NONE,
+          perform_throttle: NONE
+        )
+          rule = {
+            label: label,
+            key: key,
+            total_limit: total_limit,
+            enqueue_limit: enqueue_limit,
+            perform_limit: perform_limit,
+            enqueue_throttle: enqueue_throttle,
+            perform_throttle: perform_throttle,
+          }.reject { |_key, value| value.equal?(NONE) }
+
           self.good_job_concurrency_rules = Array(good_job_concurrency_rules) + [Rule.new(rule)]
         end
       end

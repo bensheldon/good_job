@@ -11,7 +11,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     stub_const class_name, (Class.new(ActiveJob::Base) do
       include GoodJob::ActiveJobExtensions::Concurrency
 
-      good_job_concurrency_rule(rule)
+      good_job_concurrency_rule(**rule)
 
       def perform(name:)
       end
