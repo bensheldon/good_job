@@ -140,9 +140,7 @@ module GoodJob # :nodoc:
 
     # Cleans up inactive process records from the database.
     # @return [void]
-    def cleanup
-      GoodJob::Process.cleanup
-    end
+    delegate :cleanup, to: :'GoodJob::Process'
 
     # Refreshes the process record in the database.
     # @param silent [Boolean] Whether to silence logging.
