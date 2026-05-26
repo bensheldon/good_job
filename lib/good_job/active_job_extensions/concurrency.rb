@@ -237,7 +237,7 @@ module GoodJob
           if job.class.good_job_concurrency_config.present?
             job.good_job_concurrency_key ||= job._good_job_concurrency_key
             legacy_key = job.good_job_concurrency_key
-            rules = [Rule.new(**job.class.good_job_concurrency_config.merge(key: legacy_key)), *rules] if legacy_key.present?
+            rules = [Rule.new(**job.class.good_job_concurrency_config, key: legacy_key), *rules] if legacy_key.present?
           end
 
           exceeded = nil
@@ -262,7 +262,7 @@ module GoodJob
 
           if job.class.good_job_concurrency_config.present?
             legacy_key = job.good_job_concurrency_key
-            rules = [Rule.new(**job.class.good_job_concurrency_config.merge(key: legacy_key)), *rules] if legacy_key.present?
+            rules = [Rule.new(**job.class.good_job_concurrency_config, key: legacy_key), *rules] if legacy_key.present?
           end
 
           exceeded = nil
