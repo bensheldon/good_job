@@ -178,4 +178,41 @@ RSpec.describe 'Lock strategy integration' do
       }
     end
   end
+
+  describe 'perform_throttle with ordered queues' do
+    before do
+      stub_const 'ThrottledJob', (Class.new(ActiveJob::Base) do
+        include GoodJob::ActiveJobExtensions::Concurrency
+
+        good_job_control_concurrency_with(
+          perform_throttle: -> { [10, 1.minute] },
+          key: -> { 'shared-key' }
+        )
+
+        def perform
+          RUN_JOBS << provider_job_id
+        end
+      end)
+      ThrottledJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+    end
+
+    shared_examples 'performs throttled jobs without error' do |strategy|
+      it "#{strategy}: performs a throttled job dequeued by an ordered-queue worker" do
+        GoodJob.configuration.options[:lock_strategy] = strategy
+
+        ThrottledJob.set(queue: 'default').perform_later
+
+        expect { GoodJob.perform_inline('+default,other') }.not_to raise_error
+
+        job = GoodJob::Job.last
+        expect(job.finished_at).to be_present
+        expect(job.error).to be_nil
+        expect(RUN_JOBS.size).to eq 1
+      end
+    end
+
+    it_behaves_like 'performs throttled jobs without error', :advisory
+    it_behaves_like 'performs throttled jobs without error', :skiplocked
+    it_behaves_like 'performs throttled jobs without error', :hybrid
+  end
 end

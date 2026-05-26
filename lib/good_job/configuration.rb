@@ -39,6 +39,8 @@ module GoodJob
     DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT = false
     # Default enable_pauses setting
     DEFAULT_ENABLE_PAUSES = false
+    # Default number of candidate jobs to query when polling
+    DEFAULT_QUEUE_SELECT_LIMIT = 1_000
     # Valid dequeue query sorts
     DEQUEUE_QUERY_SORTS = [:created_at, :scheduled_at].freeze
     # Valid lock strategies
@@ -242,13 +244,14 @@ module GoodJob
     # This limit is intended to avoid locking a large number of rows when selecting eligible jobs
     # from the queue. This value should be higher than the total number of threads across all good_job
     # processes to ensure a thread can retrieve an eligible and unlocked job.
-    # @return [Integer, nil]
+    # @return [Integer]
     def queue_select_limit
       (
         options[:queue_select_limit] ||
           rails_config[:queue_select_limit] ||
-          env['GOOD_JOB_QUEUE_SELECT_LIMIT']
-      )&.to_i
+          env['GOOD_JOB_QUEUE_SELECT_LIMIT'] ||
+          DEFAULT_QUEUE_SELECT_LIMIT
+      ).to_i
     end
 
     # The number of seconds that a good_job process will idle with out running a job before exiting
@@ -388,7 +391,7 @@ module GoodJob
     def enable_pauses
       return options[:enable_pauses] unless options[:enable_pauses].nil?
       return rails_config[:enable_pauses] unless rails_config[:enable_pauses].nil?
-      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PAUSES']) unless env['GOOD_JOB_ENABLE_PAUSE'].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PAUSES']) unless env['GOOD_JOB_ENABLE_PAUSES'].nil?
 
       DEFAULT_ENABLE_PAUSES
     end

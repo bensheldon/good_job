@@ -90,25 +90,25 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "c837568c590d9608a8bb9927b31b9597aaacc72053b6482e1a54bd02aa0dd2d7",
+      "fingerprint": "c57f2525e5d0780a0bcb460502f1b3ebceb9992885466f45b4035ab670c628d9",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/models/good_job/job.rb",
-      "line": 162,
+      "line": 194,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"(CASE #{queues.map.with_index do\n sanitize_sql_array([\"WHEN queue_name = ? THEN ?\", queue_name, index])\n end.join(\" \")} ELSE #{queues.size} END)\")",
+      "code": "Arel.sql(\"(CASE #{queues.map.with_index do\n sanitize_sql_array([\"WHEN #{\"#{quoted_table_name}.#{adapter_class.quote_column_name(\"queue_name\")}\"} = ? THEN ?\", queue_name, index])\n end.join(\" \")} ELSE #{queues.size} END)\")",
       "render_path": null,
       "location": {
         "type": "method",
         "class": "Job",
         "method": null
       },
-      "user_input": "queues.map.with_index do\n sanitize_sql_array([\"WHEN queue_name = ? THEN ?\", queue_name, index])\n end.join(\" \")",
+      "user_input": "queues.map.with_index do\n sanitize_sql_array([\"WHEN #{\"#{quoted_table_name}.#{adapter_class.quote_column_name(\"queue_name\")}\"} = ? THEN ?\", queue_name, index])\n end.join(\" \")",
       "confidence": "Medium",
       "cwe_id": [
         89
       ],
-      "note": "Developer provided value, queue_name, is sanitized."
+      "note": "Developer provided value, queue_name, is sanitized; identifier is quoted via Rails quoted_table_name and quote_column_name."
     },
     {
       "warning_type": "Command Injection",
