@@ -5,31 +5,30 @@ module GoodJob
   # Uses ActiveSupport::IsolatedExecutionState on Rails 7.0+ (which respects
   # config.active_support.isolation_level = :fiber for Fiber-aware servers).
   # Falls back to Thread.current on older Rails.
-  module SafeContext
-    ISOLATED_EXECUTION_STATE_AVAILABLE = defined?(ActiveSupport::IsolatedExecutionState)
-
+  module SafeState
     def self.[](key)
-      if ISOLATED_EXECUTION_STATE_AVAILABLE
-        ActiveSupport::IsolatedExecutionState[key]
-      else
-        Thread.current[key]
-      end
+      state[key]
     end
 
     def self.[]=(key, value)
-      if ISOLATED_EXECUTION_STATE_AVAILABLE
-        ActiveSupport::IsolatedExecutionState[key] = value
-      else
-        Thread.current[key] = value
-      end
+      state[key] = value
     end
 
     def self.delete(key)
-      if ISOLATED_EXECUTION_STATE_AVAILABLE
+      if defined?(ActiveSupport::IsolatedExecutionState)
         ActiveSupport::IsolatedExecutionState.delete(key)
       else
         Thread.current[key] = nil
       end
     end
+
+    def self.state
+      if defined?(ActiveSupport::IsolatedExecutionState)
+        ActiveSupport::IsolatedExecutionState
+      else
+        Thread.current
+      end
+    end
+    private_class_method :state
   end
 end

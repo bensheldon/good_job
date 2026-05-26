@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'good_job/safe_state'
-
 module GoodJob
   # Provides methods for determining the status of the
   # current job execution thread. This is useful for determining

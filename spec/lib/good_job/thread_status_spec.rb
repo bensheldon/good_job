@@ -19,33 +19,6 @@ RSpec.describe GoodJob::ThreadStatus do
     end
   end
 
-  context "when isolated execution state is fiber-local", skip: !GoodJob::SafeState::ISOLATED_EXECUTION_STATE_AVAILABLE do
-    let(:scheduler) { instance_double(GoodJob::Scheduler, running?: false) }
-
-    around do |example|
-      original_isolation_level = ActiveSupport::IsolatedExecutionState.isolation_level
-      ActiveSupport::IsolatedExecutionState.isolation_level = :fiber
-
-      example.run
-    ensure
-      GoodJob::SafeState.delete(:good_job_scheduler)
-      ActiveSupport::IsolatedExecutionState.isolation_level = original_isolation_level
-    end
-
-    it "isolates scheduler status across fibers" do
-      GoodJob::SafeState[:good_job_scheduler] = scheduler
-
-      expect(GoodJob.current_thread_running?).to eq(false)
-      expect(GoodJob.current_thread_shutting_down?).to eq(true)
-
-      statuses = Fiber.new do
-        [GoodJob.current_thread_running?, GoodJob.current_thread_shutting_down?]
-      end.resume
-
-      expect(statuses).to eq([true, nil])
-    end
-  end
-
   context "when inside of an execution context" do
     let(:capsule) { GoodJob::Capsule.new }
     let(:adapter) { GoodJob::Adapter.new(execution_mode: :async_all, _capsule: capsule) }

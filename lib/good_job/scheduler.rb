@@ -4,7 +4,6 @@ require "concurrent/executor/thread_pool_executor"
 require "concurrent/executor/timer_set"
 require "concurrent/scheduled_task"
 require "concurrent/utility/processor_counter"
-require "good_job/safe_state"
 
 module GoodJob # :nodoc:
   #
@@ -283,18 +282,13 @@ module GoodJob # :nodoc:
     def create_task(delay = 0, fanout: false)
       future = Concurrent::ScheduledTask.new(delay, args: [self, performer], executor: executor, timer_set: timer_set) do |thr_scheduler, thr_performer|
         Thread.current.name = Thread.current.name.sub("-worker-", "-thread-") if Thread.current.name
+        GoodJob::SafeState[:good_job_scheduler] = thr_scheduler
+        Thread.current.priority = -3 if thr_scheduler.lower_thread_priority
 
-        begin
-          GoodJob::SafeState[:good_job_scheduler] = thr_scheduler
-          Thread.current.priority = -3 if thr_scheduler.lower_thread_priority
-
-          Rails.application.reloader.wrap do
-            thr_performer.next do |found|
-              thr_scheduler.create_thread({ fanout: fanout }) if found && fanout
-            end
+        Rails.application.reloader.wrap do
+          thr_performer.next do |found|
+            thr_scheduler.create_thread({ fanout: fanout }) if found && fanout
           end
-        ensure
-          GoodJob::SafeState.delete(:good_job_scheduler)
         end
       end
       future.add_observer(self, :task_observer)
@@ -304,14 +298,14 @@ module GoodJob # :nodoc:
     # @param name [String]
     # @param payload [Hash]
     # @return [void]
-    def instrument(name, payload = {}, &)
+    def instrument(name, payload = {}, &block)
       payload = payload.reverse_merge({
                                         scheduler: self,
                                         process_id: GoodJob::CurrentThread.process_id,
                                         thread_name: GoodJob::CurrentThread.thread_name,
                                       })
 
-      ActiveSupport::Notifications.instrument("#{name}.good_job", payload, &)
+      ActiveSupport::Notifications.instrument("#{name}.good_job", payload, &block)
     end
 
     def cache_count
