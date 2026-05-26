@@ -117,7 +117,7 @@ jobs:
           # Ruby 3.4 + older PG (covers Ruby 3.4 and PG compatibility)
           - { ruby: 3.4, gemfile: rails_7.2, pg: 10 }
           # JRuby 10 targets Ruby 3.4
-          - { ruby: jruby-10, gemfile: rails_7.2, pg: 18 }
+          - { ruby: jruby-10.0, gemfile: rails_7.2, pg: 18 }
 
     env:
       PGHOST: localhost
