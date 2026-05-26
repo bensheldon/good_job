@@ -15,7 +15,14 @@ function setupPopovers() {
   })
 }
 
+function setupTooltips() {
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach((el) => {
+    new bootstrap.Tooltip(el)
+  })
+}
+
 window.document.addEventListener("turbo:load", function() {
   showToasts();
   setupPopovers();
+  setupTooltips();
 });

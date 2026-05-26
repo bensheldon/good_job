@@ -59,7 +59,7 @@ module GoodJob
           record = unscoped.find_by_sql([sql, locked_by_id, locked_at, lock_types[lock_type.to_s]]).first
 
           begin
-            yield(record)
+            unscoped { yield(record) }
           ensure
             record.update(locked_by_id: nil, locked_at: nil, lock_type: nil) if record && !record.destroyed? && record.locked_by_id.present?
             record&.run_callbacks(:perform_unlocked)
@@ -103,7 +103,7 @@ module GoodJob
           record_advisory_lock(lease_connection, record.lockable_column_key, cte: true) if record
 
           begin
-            yield(record)
+            unscoped { yield(record) }
           ensure
             if record
               record.advisory_unlock

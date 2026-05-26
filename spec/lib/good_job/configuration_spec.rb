@@ -354,4 +354,34 @@ RSpec.describe GoodJob::Configuration do
       expect(configuration.advisory_lock_heartbeat).to be true
     end
   end
+
+  describe '#queue_select_limit' do
+    it 'defaults to 1000' do
+      configuration = described_class.new({})
+      expect(configuration.queue_select_limit).to eq 1000
+    end
+
+    context 'when option is given' do
+      it 'uses option value' do
+        configuration = described_class.new({ queue_select_limit: 100 })
+        expect(configuration.queue_select_limit).to eq 100
+      end
+    end
+
+    context 'when rails config is set' do
+      it 'uses rails config value' do
+        allow(Rails.application.config).to receive(:good_job).and_return({ queue_select_limit: 500 })
+        configuration = described_class.new({})
+        expect(configuration.queue_select_limit).to eq 500
+      end
+    end
+
+    context 'when environment variable is set' do
+      it 'uses environment variable' do
+        stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_QUEUE_SELECT_LIMIT' => '2000' })
+        configuration = described_class.new({})
+        expect(configuration.queue_select_limit).to eq 2000
+      end
+    end
+  end
 end
