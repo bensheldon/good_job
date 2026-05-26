@@ -11,7 +11,7 @@ module GoodJob
       # Whether the current job execution thread is in a running state.
       # @return [Boolean]
       def current_thread_running?
-        scheduler = Thread.current[:good_job_scheduler]
+        scheduler = GoodJob::SafeState[:good_job_scheduler]
         scheduler ? scheduler.running? : true
       end
 
@@ -19,7 +19,7 @@ module GoodJob
       # (the opposite of running).
       # @return [Boolean]
       def current_thread_shutting_down?
-        scheduler = Thread.current[:good_job_scheduler]
+        scheduler = GoodJob::SafeState[:good_job_scheduler]
         scheduler && !scheduler.running?
       end
     end
