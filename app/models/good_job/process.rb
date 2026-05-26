@@ -151,6 +151,8 @@ module GoodJob # :nodoc:
     end
 
     def stale?
+      return true if updated_at.nil?
+
       updated_at < STALE_INTERVAL.ago
     end
 
