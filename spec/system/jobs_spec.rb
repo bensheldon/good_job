@@ -155,6 +155,17 @@ describe 'Jobs', :js, :without_executor do
         expect(table).to have_css("[role=row]", count: 1)
         expect(table).to have_content(labeled_job.job_id)
       end
+
+      it "renders long labels truncated with a tooltip showing the full label" do
+        long_label = "a_very_long_label_that_exceeds_the_badge_width"
+        ExampleJob.set(wait: 10.minutes, good_job_labels: [long_label]).perform_later
+
+        visit good_job.jobs_path
+        wait_for_turbo_load
+
+        expect(page).to have_css("a.badge[data-bs-toggle='tooltip']", text: "a_very_long_...")
+        expect(page).to have_css("a.badge[data-bs-original-title='#{long_label}']")
+      end
     end
 
     it 'can retry discarded jobs' do
