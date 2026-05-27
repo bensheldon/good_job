@@ -1,5 +1,39 @@
 # Changelog
 
+## [v4.18.3](https://github.com/bensheldon/good_job/tree/v4.18.3) (2026-05-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.18.2...v4.18.3)
+
+**Implemented enhancements:**
+
+- Truncate long labels in dashboard badges [\#1766](https://github.com/bensheldon/good_job/pull/1766) ([MahmoudBakr23](https://github.com/MahmoudBakr23))
+- Set default queue\_select\_limit to 1000 [\#1762](https://github.com/bensheldon/good_job/pull/1762) ([MahmoudBakr23](https://github.com/MahmoudBakr23))
+
+**Fixed bugs:**
+
+- Use table\_name instead of hardcoding :good\_jobs in schema introspection [\#1774](https://github.com/bensheldon/good_job/pull/1774) ([eidarus](https://github.com/eidarus))
+- Fix incorrect ENV variable guard for GOOD\_JOB\_ENABLE\_PAUSES [\#1772](https://github.com/bensheldon/good_job/pull/1772) ([jqr](https://github.com/jqr))
+- Fix `PG::ProgramLimitExceeded` in jobs index search for large error payloads [\#1769](https://github.com/bensheldon/good_job/pull/1769) ([createdbypete](https://github.com/createdbypete))
+- Fix PG::AmbiguousColumn in skiplocked/hybrid claim with ordered queues + concurrency rules [\#1768](https://github.com/bensheldon/good_job/pull/1768) ([createdbypete](https://github.com/createdbypete))
+- Make execution state completely Fiber-safe via Rails isolated execution state [\#1765](https://github.com/bensheldon/good_job/pull/1765) ([ollym](https://github.com/ollym))
+- Handle nil updated\_at in stale? method [\#1764](https://github.com/bensheldon/good_job/pull/1764) ([gavinballard](https://github.com/gavinballard))
+
+**Closed issues:**
+
+- enable\_pauses ENV var check has singular/plural mismatch [\#1771](https://github.com/bensheldon/good_job/issues/1771)
+- Raises `PG::AmbiguousColumn` under hybrid lock strategy on ordered queues with throttle [\#1767](https://github.com/bensheldon/good_job/issues/1767)
+- Handle long labels more gracefully [\#1674](https://github.com/bensheldon/good_job/issues/1674)
+- Drop Duplicate index [\#1661](https://github.com/bensheldon/good_job/issues/1661)
+- Job runner process enters a loop on create\_listen\_task - stale check fails [\#1649](https://github.com/bensheldon/good_job/issues/1649)
+- Set a default queue\_select\_limit [\#1596](https://github.com/bensheldon/good_job/issues/1596)
+
+**Merged pull requests:**
+
+- Prune CI test matrix to boundary Ruby versions per Rails version [\#1777](https://github.com/bensheldon/good_job/pull/1777) ([bensheldon](https://github.com/bensheldon))
+- Refactor Concurrency::Rule to use explicit ivars instead of options hash [\#1776](https://github.com/bensheldon/good_job/pull/1776) ([bensheldon](https://github.com/bensheldon))
+- Fix typo in README.md [\#1773](https://github.com/bensheldon/good_job/pull/1773) ([NobodysNightmare](https://github.com/NobodysNightmare))
+- Use explicit keyword arguments for concurrency controls [\#1770](https://github.com/bensheldon/good_job/pull/1770) ([bdewater-thatch](https://github.com/bdewater-thatch))
+
 ## [v4.18.2](https://github.com/bensheldon/good_job/tree/v4.18.2) (2026-04-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.18.1...v4.18.2)
@@ -83,10 +117,6 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.16.0...v4.17.0)
 
-**Implemented enhancements:**
-
-- Introduce advisory lock key customization support methods [\#1722](https://github.com/bensheldon/good_job/pull/1722) ([amkisko](https://github.com/amkisko))
-
 **Merged pull requests:**
 
 - Convert UI JavaScript modules to Stimulus controllers [\#1743](https://github.com/bensheldon/good_job/pull/1743) ([bensheldon](https://github.com/bensheldon))
@@ -102,11 +132,6 @@
 - Allow filtering by label on dashboard [\#1739](https://github.com/bensheldon/good_job/pull/1739) ([bensheldon](https://github.com/bensheldon))
 - Allow multiple concurrency rules per job via labels [\#1700](https://github.com/bensheldon/good_job/pull/1700) ([bscofield](https://github.com/bscofield))
 
-**Fixed bugs:**
-
-- Fix advisory lock connection stickiness in block contexts [\#1736](https://github.com/bensheldon/good_job/pull/1736) ([bensheldon](https://github.com/bensheldon))
-- Add JRuby 10 to testing matrix [\#1559](https://github.com/bensheldon/good_job/pull/1559) ([bensheldon](https://github.com/bensheldon))
-
 **Closed issues:**
 
 - Job duration misreported if interrupted [\#1723](https://github.com/bensheldon/good_job/issues/1723)
@@ -116,7 +141,6 @@
 - Use annotated git tag in release script [\#1741](https://github.com/bensheldon/good_job/pull/1741) ([bensheldon](https://github.com/bensheldon))
 - Double single-thread scheduler integration test timeout on JRuby [\#1738](https://github.com/bensheldon/good_job/pull/1738) ([bensheldon](https://github.com/bensheldon))
 - Fix JRuby test flakes for scheduler timeout and interrupted execution duration [\#1737](https://github.com/bensheldon/good_job/pull/1737) ([bensheldon](https://github.com/bensheldon))
-- Count Advisory Locks and refactor advisory lock lifecycle [\#1735](https://github.com/bensheldon/good_job/pull/1735) ([bensheldon](https://github.com/bensheldon))
 - Show interrupted execution recovery duration in dashboard [\#1733](https://github.com/bensheldon/good_job/pull/1733) ([bensheldon](https://github.com/bensheldon))
 - chore: use `merge` to avoid mutate the query object [\#1717](https://github.com/bensheldon/good_job/pull/1717) ([luizkowalski](https://github.com/luizkowalski))
 
@@ -132,7 +156,6 @@
 
 **Merged pull requests:**
 
-- Fix JRuby in development lockfile, with test [\#1734](https://github.com/bensheldon/good_job/pull/1734) ([bensheldon](https://github.com/bensheldon))
 - Add herb to linter [\#1732](https://github.com/bensheldon/good_job/pull/1732) ([bensheldon](https://github.com/bensheldon))
 - Update development dependencies; apply Rubocop to\_h lints [\#1728](https://github.com/bensheldon/good_job/pull/1728) ([bensheldon](https://github.com/bensheldon))
 
@@ -194,7 +217,6 @@
 
 **Fixed bugs:**
 
-- Check for graceful shutdown inside job cleanup loops [\#1711](https://github.com/bensheldon/good_job/pull/1711) ([bdewater-thatch](https://github.com/bdewater-thatch))
 - Add title to Good Job Dashboard layout [\#1701](https://github.com/bensheldon/good_job/pull/1701) ([mockdeep](https://github.com/mockdeep))
 
 **Closed issues:**
@@ -290,7 +312,6 @@
 **Merged pull requests:**
 
 - Update sorbet/tapioca [\#1681](https://github.com/bensheldon/good_job/pull/1681) ([bensheldon](https://github.com/bensheldon))
-- Remove obsolete property from tests [\#1676](https://github.com/bensheldon/good_job/pull/1676) ([RDIL](https://github.com/RDIL))
 - Bump actions/checkout from 4 to 5 [\#1673](https://github.com/bensheldon/good_job/pull/1673) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v4.11.2](https://github.com/bensheldon/good_job/tree/v4.11.2) (2025-08-06)
@@ -412,10 +433,6 @@
 ## [v4.9.1](https://github.com/bensheldon/good_job/tree/v4.9.1) (2025-03-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.9.0...v4.9.1)
-
-**Implemented enhancements:**
-
-- Order Dashboard jobs in more "natural" order [\#1604](https://github.com/bensheldon/good_job/pull/1604) ([francois](https://github.com/francois))
 
 **Fixed bugs:**
 
@@ -3015,7 +3032,6 @@
 
 **Fixed bugs:**
 
-- Transactions in "aborting" threads do not commit; causes GoodJob::Process record not destroyed on exit [\#489](https://github.com/bensheldon/good_job/issues/489)
 - Deserialize ActiveJob arguments when manually retrying a job [\#513](https://github.com/bensheldon/good_job/pull/513) ([bensheldon](https://github.com/bensheldon))
 
 **Closed issues:**
