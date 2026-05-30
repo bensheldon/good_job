@@ -341,8 +341,8 @@ module GoodJob
   # @param job_class [String, nil] Job class name to check
   # @param label [String, nil] Label to check
   # @return [Boolean]
-  def self.paused?(queue: nil, job_class: nil, label: nil)
-    GoodJob::Setting.paused?(queue: queue, job_class: job_class, label: label)
+  def self.paused?(active_job: nil, queue: nil, job_class: nil, label: nil)
+    GoodJob::Setting.paused?(active_job: active_job, queue: queue, job_class: job_class, label: label)
   end
 
   # Get a list of all paused queues and job classes
