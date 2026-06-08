@@ -60,28 +60,35 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
 
       it "does not enqueue if enqueue concurrency limit is exceeded for a particular key" do
-        allow(TestJob.logger.formatter).to receive(:call).and_call_original
+        abort_events = []
+        enqueue_events = []
+        enqueue_callback = ->(*args) { enqueue_events << ActiveSupport::Notifications::Event.new(*args) }
+        abort_callback = ->(*args) { abort_events << ActiveSupport::Notifications::Event.new(*args) }
 
-        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be_present
-        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be_present
+        ActiveSupport::Notifications.subscribed(enqueue_callback, "enqueue.active_job") do
+          ActiveSupport::Notifications.subscribed(abort_callback, "enqueue_concurrency_limit_exceeded.good_job") do
+            expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be_present
+            expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be_present
 
-        # Third usage of key does not enqueue
-        expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be false
+            # Third usage of key does not enqueue
+            expect(TestJob.set(good_job_labels: "testlabel").perform_later(name: "Alice")).to be false
 
-        # Usage of different key does enqueue
-        expect(TestJob.set(good_job_labels: "otherlabel").perform_later(name: "Bob")).to be_present
+            # Usage of different key does enqueue
+            expect(TestJob.set(good_job_labels: "otherlabel").perform_later(name: "Bob")).to be_present
+          end
+        end
 
         expect(GoodJob::Job.labeled("testlabel").count).to eq 2
         expect(GoodJob::Job.labeled("otherlabel").count).to eq 1
 
-        expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'label:testlabel' has reached its enqueue limit of 2 jobs/)).exactly(:once)
-        if RUBY_VERSION >= "3.4"
-          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {name: "Alice"}/)).exactly(:twice)
-          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {name: "Bob"}/)).exactly(:once)
-        else
-          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
-          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
-        end
+        expect(abort_events.size).to eq 1
+        expect(abort_events.first.payload).to include(key: 'label:testlabel', limit: 2)
+        expect(abort_events.first.payload[:job]).to be_a(TestJob)
+
+        # Aborted enqueues must not be logged as successfully enqueued (regression: PR #820).
+        successful = enqueue_events.reject { |e| e.payload[:aborted] }
+        expect(successful.count { |e| e.payload[:job].arguments == [{ name: "Alice" }] }).to eq 2
+        expect(successful.count { |e| e.payload[:job].arguments == [{ name: "Bob" }] }).to eq 1
       end
 
       it 'excludes jobs that are already executing/locked' do
@@ -286,28 +293,35 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         end
 
         it "does not enqueue if enqueue concurrency limit is exceeded for a particular key" do
-          allow(TestJob.logger.formatter).to receive(:call).and_call_original
+          abort_events = []
+          enqueue_events = []
+          enqueue_callback = ->(*args) { enqueue_events << ActiveSupport::Notifications::Event.new(*args) }
+          abort_callback = ->(*args) { abort_events << ActiveSupport::Notifications::Event.new(*args) }
 
-          expect(TestJob.perform_later(name: "Alice")).to be_present
-          expect(TestJob.perform_later(name: "Alice")).to be_present
+          ActiveSupport::Notifications.subscribed(enqueue_callback, "enqueue.active_job") do
+            ActiveSupport::Notifications.subscribed(abort_callback, "enqueue_concurrency_limit_exceeded.good_job") do
+              expect(TestJob.perform_later(name: "Alice")).to be_present
+              expect(TestJob.perform_later(name: "Alice")).to be_present
 
-          # Third usage of key does not enqueue
-          expect(TestJob.perform_later(name: "Alice")).to be false
+              # Third usage of key does not enqueue
+              expect(TestJob.perform_later(name: "Alice")).to be false
 
-          # Usage of different key does enqueue
-          expect(TestJob.perform_later(name: "Bob")).to be_present
+              # Usage of different key does enqueue
+              expect(TestJob.perform_later(name: "Bob")).to be_present
+            end
+          end
 
           expect(GoodJob::Job.where(concurrency_key: "Alice").count).to eq 2
           expect(GoodJob::Job.where(concurrency_key: "Bob").count).to eq 1
 
-          expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Aborted enqueue of TestJob \(Job ID: .*\) because the concurrency key 'Alice' has reached its enqueue limit of 2 jobs/)).exactly(:once)
-          if RUBY_VERSION >= "3.4"
-            expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {name: "Alice"}/)).exactly(:twice)
-            expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {name: "Bob"}/)).exactly(:once)
-          else
-            expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Alice"}/)).exactly(:twice)
-            expect(TestJob.logger.formatter).to have_received(:call).with("INFO", anything, anything, a_string_matching(/Enqueued TestJob \(Job ID: .*\) to \(default\) with arguments: {:name=>"Bob"}/)).exactly(:once)
-          end
+          expect(abort_events.size).to eq 1
+          expect(abort_events.first.payload).to include(key: 'Alice', limit: 2)
+          expect(abort_events.first.payload[:job]).to be_a(TestJob)
+
+          # Aborted enqueues must not be logged as successfully enqueued (regression: PR #820).
+          successful = enqueue_events.reject { |e| e.payload[:aborted] }
+          expect(successful.count { |e| e.payload[:job].arguments == [{ name: "Alice" }] }).to eq 2
+          expect(successful.count { |e| e.payload[:job].arguments == [{ name: "Bob" }] }).to eq 1
         end
 
         it 'excludes jobs that are already executing/locked' do

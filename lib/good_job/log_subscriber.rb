@@ -154,6 +154,28 @@ module GoodJob
     end
 
     # @!macro notification_responder
+    def enqueue_concurrency_limit_exceeded(event)
+      job = event.payload[:job]
+      key = event.payload[:key]
+      limit = event.payload[:limit]
+
+      info do
+        "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its enqueue limit of #{limit} #{'job'.pluralize(limit)}"
+      end
+    end
+
+    # @!macro notification_responder
+    def enqueue_concurrency_throttle_exceeded(event)
+      job = event.payload[:job]
+      key = event.payload[:key]
+      limit = event.payload[:limit]
+
+      info do
+        "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its throttle limit of #{limit} #{'job'.pluralize(limit)}"
+      end
+    end
+
+    # @!macro notification_responder
     def systemd_watchdog_start(event)
       interval = event.payload[:interval]
 
