@@ -120,7 +120,10 @@ module GoodJob
                                       end
 
                 if (enqueue_concurrency + 1) > limit
-                  job.logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its enqueue limit of #{limit} #{'job'.pluralize(limit)}"
+                  ActiveSupport::Notifications.instrument(
+                    "enqueue_concurrency_limit_exceeded.good_job",
+                    { job: job, key: key, limit: limit }
+                  )
                   exceeded = :limit
                   next
                 end
@@ -134,7 +137,10 @@ module GoodJob
                                          .count
 
                 if (enqueued_within_period + 1) > throttle_limit
-                  job.logger.info "Aborted enqueue of #{job.class.name} (Job ID: #{job.job_id}) because the concurrency key '#{key}' has reached its throttle limit of #{throttle_limit} #{'job'.pluralize(throttle_limit)}"
+                  ActiveSupport::Notifications.instrument(
+                    "enqueue_concurrency_throttle_exceeded.good_job",
+                    { job: job, key: key, limit: throttle_limit }
+                  )
                   exceeded = :throttle
                   next
                 end
