@@ -6,8 +6,8 @@
 .chart-range-selection {
   position: absolute;
   pointer-events: none;
-  background-color: rgba(13, 110, 253, 0.2);
-  border: 1px solid rgba(13, 110, 253, 0.75);
+  background-color: rgba(var(--bs-primary-rgb), 0.2);
+  border: 1px solid rgba(var(--bs-primary-rgb), 0.75);
 }
 
 .chart-range-control > .btn {

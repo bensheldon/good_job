@@ -10,7 +10,7 @@ module GoodJob
     def data
       binds = time_series_binds
       start_time, end_time = binds.first(2).map(&:value)
-      bucket_sql = time_series_bucket_sql(:scheduled_at)
+      bucket_sql = time_series_bucket_sql("scheduled_at")
 
       pushdown = <<~SQL.squish
         "good_jobs"."scheduled_at" >= ?::timestamp

@@ -38,9 +38,6 @@ module GoodJob
       [2.days, CHART_RANGE_OPTIONS.fetch("24h")],
       [MAX_CHART_RANGE, CHART_RANGE_OPTIONS.fetch("7d")],
     ].freeze
-    TIME_SERIES_BUCKET_COLUMNS = {
-      scheduled_at: "scheduled_at",
-    }.freeze
 
     attr_reader :params
 
@@ -94,6 +91,7 @@ module GoodJob
       timestamp.in_time_zone.strftime(chart_range.fetch(:label_format))
     end
 
+    # Keep this order in sync with the $1/$2/$3 placeholders in chart SQL.
     def time_series_binds
       [
         ActiveRecord::Relation::QueryAttribute.new('start_time', time_series_start_time, ActiveRecord::Type::DateTime.new),
@@ -103,11 +101,11 @@ module GoodJob
     end
 
     def time_series_bucket_sql(column_name)
-      column_sql = TIME_SERIES_BUCKET_COLUMNS.fetch(column_name)
-      origin_sql = "$1::timestamp"
+      column_sql = GoodJob::Job.adapter_class.quote_column_name(column_name)
+
       <<~SQL.squish
-        #{origin_sql} +
-        FLOOR(EXTRACT(EPOCH FROM (#{column_sql} - #{origin_sql})) / $3::integer) *
+        $1::timestamp +
+        FLOOR(EXTRACT(EPOCH FROM (#{column_sql} - $1::timestamp)) / $3::integer) *
         $3::integer * INTERVAL '1 second'
       SQL
     end

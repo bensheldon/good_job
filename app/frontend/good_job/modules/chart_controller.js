@@ -220,6 +220,8 @@ export default class extends Controller {
     const firstIndex = this.#timestampIndexForPixel(Math.min(startX, currentX))
     const lastIndex = this.#timestampIndexForPixel(Math.max(startX, currentX))
     const timestamps = this.goodJobChart.timestamps
+
+    // Select bucket timestamps so custom ranges stay aligned with the chart.
     const startTime = new Date(timestamps[firstIndex])
     const endTime = new Date(timestamps[lastIndex])
 
