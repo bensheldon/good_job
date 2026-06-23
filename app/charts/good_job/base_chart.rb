@@ -9,28 +9,24 @@ module GoodJob
       "1h" => {
         label: "1h",
         duration: 1.hour,
-        interval: "5 minutes",
         interval_seconds: 5.minutes.to_i,
         label_format: "%H:%M",
       },
       "6h" => {
         label: "6h",
         duration: 6.hours,
-        interval: "15 minutes",
         interval_seconds: 15.minutes.to_i,
         label_format: "%H:%M",
       },
       "24h" => {
         label: "24h",
         duration: 1.day,
-        interval: "1 hour",
         interval_seconds: 1.hour.to_i,
         label_format: "%H:%M",
       },
       "7d" => {
         label: "7d",
         duration: 7.days,
-        interval: "6 hours",
         interval_seconds: 6.hours.to_i,
         label_format: "%b %-d %H:%M",
       },
@@ -42,6 +38,9 @@ module GoodJob
       [2.days, CHART_RANGE_OPTIONS.fetch("24h")],
       [MAX_CHART_RANGE, CHART_RANGE_OPTIONS.fetch("7d")],
     ].freeze
+    TIME_SERIES_BUCKET_COLUMNS = {
+      scheduled_at: "scheduled_at",
+    }.freeze
 
     attr_reader :params
 
@@ -67,10 +66,6 @@ module GoodJob
       lightness = '50'
 
       "hsl(#{hue}, #{saturation}%, #{lightness}%)"
-    end
-
-    def chart_interval
-      chart_range.fetch(:interval)
     end
 
     def chart_interval_seconds
@@ -99,19 +94,21 @@ module GoodJob
       timestamp.in_time_zone.strftime(chart_range.fetch(:label_format))
     end
 
-    def time_series_start_end_binds
+    def time_series_binds
       [
         ActiveRecord::Relation::QueryAttribute.new('start_time', time_series_start_time, ActiveRecord::Type::DateTime.new),
         ActiveRecord::Relation::QueryAttribute.new('end_time', time_series_end_time, ActiveRecord::Type::DateTime.new),
+        ActiveRecord::Relation::QueryAttribute.new('interval_seconds', chart_interval_seconds, ActiveRecord::Type::Integer.new),
       ]
     end
 
     def time_series_bucket_sql(column_name)
-      origin = "$1::timestamp"
+      column_sql = TIME_SERIES_BUCKET_COLUMNS.fetch(column_name)
+      origin_sql = "$1::timestamp"
       <<~SQL.squish
-        #{origin} +
-        FLOOR(EXTRACT(EPOCH FROM (#{column_name} - #{origin})) / #{chart_interval_seconds}) *
-        #{chart_interval_seconds} * INTERVAL '1 second'
+        #{origin_sql} +
+        FLOOR(EXTRACT(EPOCH FROM (#{column_sql} - #{origin_sql})) / $3::integer) *
+        $3::integer * INTERVAL '1 second'
       SQL
     end
 

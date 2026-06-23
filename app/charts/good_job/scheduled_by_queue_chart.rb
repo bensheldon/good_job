@@ -8,18 +8,18 @@ module GoodJob
     end
 
     def data
-      binds = time_series_start_end_binds
-      start_time, end_time = binds.map(&:value)
-      bucket_sql = time_series_bucket_sql("scheduled_at")
+      binds = time_series_binds
+      start_time, end_time = binds.first(2).map(&:value)
+      bucket_sql = time_series_bucket_sql(:scheduled_at)
 
       pushdown = <<~SQL.squish
         "good_jobs"."scheduled_at" >= ?::timestamp
-        AND "good_jobs"."scheduled_at" < ?::timestamp + '#{chart_interval}'::interval
+        AND "good_jobs"."scheduled_at" < ?::timestamp + ?::integer * INTERVAL '1 second'
       SQL
 
       inner_sql = @filter.filtered_query
                          .except(:select, :order)
-                         .where(pushdown, start_time, end_time)
+                         .where(pushdown, start_time, end_time, chart_interval_seconds)
                          .select(:queue_name, :scheduled_at)
                          .to_sql
 
@@ -28,7 +28,7 @@ module GoodJob
         FROM generate_series(
           $1::timestamp,
           $2::timestamp,
-          '#{chart_interval}'::interval
+          $3::integer * INTERVAL '1 second'
         ) timestamp
         LEFT JOIN (
           SELECT
