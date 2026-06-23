@@ -258,6 +258,18 @@ en:
       boolean:
         'false': 'No'
         'true': 'Yes'
+      chart_container:
+        custom_range: Custom
+        custom_range_hint: drag on chart
+        open_time_ranges: Open chart time ranges
+        quick_ranges: Quick ranges
+        range_options:
+          1h: Last 1 hour
+          6h: Last 6 hours
+          24h: Last 24 hours
+          7d: Last 7 days
+        reset_range: Reset chart time range
+        time_range: Chart time range
       error: Error
       filter:
         all: All

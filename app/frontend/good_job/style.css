@@ -3,6 +3,44 @@
   height: 200px;
 }
 
+.chart-range-selection {
+  position: absolute;
+  pointer-events: none;
+  background-color: rgba(13, 110, 253, 0.2);
+  border: 1px solid rgba(13, 110, 253, 0.75);
+}
+
+.chart-range-control > .btn {
+  align-items: center;
+  display: inline-flex;
+}
+
+.chart-range-date {
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.chart-range-key,
+.chart-range-option-key {
+  justify-content: center;
+  min-width: 2.5rem;
+}
+
+.chart-range-menu {
+  min-width: 14rem;
+}
+
+.chart-range-menu-item {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.chart-range-menu li.active .chart-range-menu-item {
+  background-color: var(--bs-primary-bg-subtle);
+  color: var(--bs-primary-text-emphasis);
+}
+
 .legend-item-color-box {
   display: inline-block;
   flex-shrink: 0;

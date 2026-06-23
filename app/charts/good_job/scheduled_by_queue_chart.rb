@@ -3,22 +3,18 @@
 module GoodJob
   class ScheduledByQueueChart < BaseChart
     def initialize(filter)
-      super()
+      super(filter.params)
       @filter = filter
     end
 
     def data
-      binds = start_end_binds
+      binds = time_series_start_end_binds
       start_time, end_time = binds.map(&:value)
+      bucket_sql = time_series_bucket_sql("scheduled_at")
 
-      # Align the inner range predicate to the same hour buckets the outer generate_series
-      # produces. Doing the truncation in SQL (rather than in Ruby with beginning_of_hour)
-      # keeps both sides on the same grid even when the app's time zone has a fractional
-      # offset from UTC (e.g. IST +05:30). AR serializes Time binds as UTC, so the outer
-      # date_trunc operates in UTC, and this predicate must match that.
       pushdown = <<~SQL.squish
-        "good_jobs"."scheduled_at" >= date_trunc('hour', ?::timestamp)
-        AND "good_jobs"."scheduled_at" < date_trunc('hour', ?::timestamp) + interval '1 hour'
+        "good_jobs"."scheduled_at" >= ?::timestamp
+        AND "good_jobs"."scheduled_at" < ?::timestamp + '#{chart_interval}'::interval
       SQL
 
       inner_sql = @filter.filtered_query
@@ -30,17 +26,17 @@ module GoodJob
       count_query = <<~SQL.squish
         SELECT *
         FROM generate_series(
-          date_trunc('hour', $1::timestamp),
-          date_trunc('hour', $2::timestamp),
-          '1 hour'
+          $1::timestamp,
+          $2::timestamp,
+          '#{chart_interval}'::interval
         ) timestamp
         LEFT JOIN (
           SELECT
-              date_trunc('hour', scheduled_at) AS scheduled_at,
+              #{bucket_sql} AS scheduled_at,
               queue_name,
               count(*) AS count
             FROM (#{inner_sql}) sources
-            GROUP BY date_trunc('hour', scheduled_at), queue_name
+            GROUP BY #{bucket_sql}, queue_name
         ) sources ON sources.scheduled_at = timestamp
         ORDER BY timestamp ASC
       SQL
@@ -49,8 +45,10 @@ module GoodJob
 
       queue_names = executions_data.reject { |d| d['count'].nil? }.map { |d| d['queue_name'] || BaseFilter::EMPTY }.uniq
       labels = []
+      timestamps = []
       queues_data = executions_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
-        labels << timestamp.in_time_zone.strftime('%H:%M')
+        labels << chart_timestamp_label(timestamp)
+        timestamps << timestamp.in_time_zone.iso8601
         queue_names.each do |queue_name|
           (hash[queue_name] ||= []) << values.find { |d| d['queue_name'] == queue_name }&.[]('count')
         end
@@ -77,6 +75,7 @@ module GoodJob
             },
           },
         },
+        goodJob: chart_metadata(timestamps),
       }
     end
   end

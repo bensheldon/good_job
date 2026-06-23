@@ -3,32 +3,45 @@
 module GoodJob
   class PerformanceIndexChart < BaseChart
     def data
-      table_name = GoodJob::Execution.table_name
+      binds = time_series_start_end_binds
+      start_time, end_time = binds.map(&:value)
+      bucket_sql = time_series_bucket_sql("scheduled_at")
+
+      pushdown = <<~SQL.squish
+        scheduled_at >= ?::timestamp
+        AND scheduled_at < ?::timestamp + '#{chart_interval}'::interval
+      SQL
+
+      inner_sql = GoodJob::Execution.where(pushdown, start_time, end_time)
+                                    .select(:job_class, :scheduled_at, :duration)
+                                    .to_sql
 
       sum_query = <<~SQL.squish
         SELECT *
         FROM generate_series(
-          date_trunc('hour', $1::timestamp),
-          date_trunc('hour', $2::timestamp),
-          '1 hour'
+          $1::timestamp,
+          $2::timestamp,
+          '#{chart_interval}'::interval
         ) timestamp
         LEFT JOIN (
           SELECT
-              date_trunc('hour', scheduled_at) AS scheduled_at,
+              #{bucket_sql} AS scheduled_at,
               job_class,
               SUM(duration) AS sum
-            FROM #{table_name} sources
-            GROUP BY date_trunc('hour', scheduled_at), job_class
+            FROM (#{inner_sql}) sources
+            GROUP BY #{bucket_sql}, job_class
         ) sources ON sources.scheduled_at = timestamp
         ORDER BY timestamp ASC
       SQL
 
-      executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(sum_query), "GoodJob Performance Chart", start_end_binds) }
+      executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(sum_query), "GoodJob Performance Chart", binds) }
 
       job_names = executions_data.reject { |d| d['sum'].nil? }.map { |d| d['job_class'] || BaseFilter::EMPTY }.uniq
       labels = []
+      timestamps = []
       jobs_data = executions_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
-        labels << timestamp.in_time_zone.strftime('%H:%M')
+        labels << chart_timestamp_label(timestamp)
+        timestamps << timestamp.in_time_zone.iso8601
         job_names.each do |job_class|
           sum = values.find { |d| d['job_class'] == job_class }&.[]('sum')
           duration = sum ? ActiveSupport::Duration.parse(sum).to_f : 0
@@ -66,6 +79,7 @@ module GoodJob
             },
           },
         },
+        goodJob: chart_metadata(timestamps),
       }
     end
   end
