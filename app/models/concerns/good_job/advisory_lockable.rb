@@ -490,7 +490,7 @@ module GoodJob
       # New version expects keyword arguments for the name while the old version expects a positional argument.
       # This method creates a new Arel::Table instance with the correct parameters.
       def arel_table_for(name)
-        AREL_TABLE_NEW_KWARGS ? arel_table.new(name: name) : arel_table.new(name)
+        AREL_TABLE_NEW_KWARGS ? Arel::Table.new(name: name) : Arel::Table.new(name)
       end
 
       # Executes a single pg_advisory_unlock call and updates bookkeeping.
