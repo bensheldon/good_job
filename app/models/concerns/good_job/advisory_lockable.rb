@@ -357,7 +357,7 @@ module GoodJob
           primary_key_for_select = primary_key.to_sym
           column_for_select = column.to_sym
 
-          cte_table = Arel::Table.new(:rows)
+          cte_table = arel_table_for(:rows)
           cte_query = original_query.except(:limit)
           cte_query = if primary_key_for_select == column_for_select
                         cte_query.select(primary_key_for_select)
@@ -484,6 +484,16 @@ module GoodJob
       end
 
       private
+
+      # Arel::Table.new has different parameters depending on Rails version.
+      # This method creates a new Arel::Table instance with the correct parameters.
+      # New version expects keyword arguments for the name while the old version expects a positional argument.
+      def arel_table_for(name)
+        arel_table = Arel::Table
+        parameters = arel_table.instance_method(:initialize).parameters
+
+        parameters.first.any?(:req) ? arel_table.new(name) : arel_table.new(name: name)
+      end
 
       # Executes a single pg_advisory_unlock call and updates bookkeeping.
       # Used by {.advisory_unlock_key} and {.advisory_unlock_key!} to avoid
