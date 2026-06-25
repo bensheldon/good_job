@@ -207,6 +207,7 @@ module GoodJob
     end
 
     ADVISORY_LOCK_COUNTS = AdvisoryLockCounter.new
+    AREL_TABLE_NEW_KWARGS = Arel::Table.instance_method(:initialize).parameters.any? { |type, name| type == :key && name == :name }
 
     included do
       # Default column to be used when creating Advisory Locks
@@ -486,13 +487,10 @@ module GoodJob
       private
 
       # Arel::Table.new has different parameters depending on Rails version.
-      # This method creates a new Arel::Table instance with the correct parameters.
       # New version expects keyword arguments for the name while the old version expects a positional argument.
+      # This method creates a new Arel::Table instance with the correct parameters.
       def arel_table_for(name)
-        arel_table = Arel::Table
-        parameters = arel_table.instance_method(:initialize).parameters
-
-        parameters.first.any?(:req) ? arel_table.new(name) : arel_table.new(name: name)
+        AREL_TABLE_NEW_KWARGS ? arel_table.new(name: name) : arel_table.new(name)
       end
 
       # Executes a single pg_advisory_unlock call and updates bookkeeping.
