@@ -1,8 +1,21 @@
 # Changelog
 
+## [v4.19.1](https://github.com/bensheldon/good_job/tree/v4.19.1) (2026-06-25)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.19.0...v4.19.1)
+
+**Fixed bugs:**
+
+- Support Rails Edge version of Arel::Table [\#1783](https://github.com/bensheldon/good_job/pull/1783) ([luizkowalski](https://github.com/luizkowalski))
+- Emit ActiveSupport::Notifications for concurrency-aborted enqueues [\#1779](https://github.com/bensheldon/good_job/pull/1779) ([bdewater-thatch](https://github.com/bdewater-thatch))
+
+**Closed issues:**
+
+- The probe server doesn't handle SIGINT/SIGTERM [\#1632](https://github.com/bensheldon/good_job/issues/1632)
+
 ## [v4.19.0](https://github.com/bensheldon/good_job/tree/v4.19.0) (2026-05-27)
 
-[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.18.2...v4.19.0)
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.18.3...v4.19.0)
 
 **Implemented enhancements:**
 
@@ -18,6 +31,17 @@
 - Make execution state completely Fiber-safe via Rails isolated execution state [\#1765](https://github.com/bensheldon/good_job/pull/1765) ([ollym](https://github.com/ollym))
 - Handle nil updated\_at in stale? method [\#1764](https://github.com/bensheldon/good_job/pull/1764) ([gavinballard](https://github.com/gavinballard))
 
+**Merged pull requests:**
+
+- Prune CI test matrix to boundary Ruby versions per Rails version [\#1777](https://github.com/bensheldon/good_job/pull/1777) ([bensheldon](https://github.com/bensheldon))
+- Refactor Concurrency::Rule to use explicit ivars instead of options hash [\#1776](https://github.com/bensheldon/good_job/pull/1776) ([bensheldon](https://github.com/bensheldon))
+- Fix typo in README.md [\#1773](https://github.com/bensheldon/good_job/pull/1773) ([NobodysNightmare](https://github.com/NobodysNightmare))
+- Use explicit keyword arguments for concurrency controls [\#1770](https://github.com/bensheldon/good_job/pull/1770) ([bdewater-thatch](https://github.com/bdewater-thatch))
+
+## [v4.18.3](https://github.com/bensheldon/good_job/tree/v4.18.3) (2026-05-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.18.2...v4.18.3)
+
 **Closed issues:**
 
 - enable\_pauses ENV var check has singular/plural mismatch [\#1771](https://github.com/bensheldon/good_job/issues/1771)
@@ -26,13 +50,6 @@
 - Drop Duplicate index [\#1661](https://github.com/bensheldon/good_job/issues/1661)
 - Job runner process enters a loop on create\_listen\_task - stale check fails [\#1649](https://github.com/bensheldon/good_job/issues/1649)
 - Set a default queue\_select\_limit [\#1596](https://github.com/bensheldon/good_job/issues/1596)
-
-**Merged pull requests:**
-
-- Prune CI test matrix to boundary Ruby versions per Rails version [\#1777](https://github.com/bensheldon/good_job/pull/1777) ([bensheldon](https://github.com/bensheldon))
-- Refactor Concurrency::Rule to use explicit ivars instead of options hash [\#1776](https://github.com/bensheldon/good_job/pull/1776) ([bensheldon](https://github.com/bensheldon))
-- Fix typo in README.md [\#1773](https://github.com/bensheldon/good_job/pull/1773) ([NobodysNightmare](https://github.com/NobodysNightmare))
-- Use explicit keyword arguments for concurrency controls [\#1770](https://github.com/bensheldon/good_job/pull/1770) ([bdewater-thatch](https://github.com/bdewater-thatch))
 
 ## [v4.18.2](https://github.com/bensheldon/good_job/tree/v4.18.2) (2026-04-20)
 
