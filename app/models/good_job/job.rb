@@ -360,6 +360,7 @@ module GoodJob
       current_job = CurrentThread.job
 
       if reenqueued_current_job
+        execution_args[:created_at] = current_job.created_at
         execution_args[:batch_id] = current_job.batch_id
         execution_args[:batch_callback_id] = current_job.batch_callback_id
         execution_args[:cron_key] = current_job.cron_key
