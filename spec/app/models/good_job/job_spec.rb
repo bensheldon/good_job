@@ -182,11 +182,22 @@ RSpec.describe GoodJob::Job do
           expect(executions[1].finished_at).to be < executions[2].finished_at
         end
 
-        it 'preserves the original created_at across retries' do
-          TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
-          job.update!(created_at: 1.hour.ago)
+        describe "created_at behavior" do
+          it "dequeue_query_sort = :created_at resets created_at" do
+            allow(GoodJob.configuration).to receive(:dequeue_query_sort).and_return(:created_at)
+            TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+            job.update!(created_at: 1.hour.ago)
 
-          expect { job.retry_job }.not_to change { job.reload.created_at }
+            expect { job.retry_job }.to change { job.reload.created_at }
+          end
+
+          it "dequeue_query_sort = :scheduled_at preserves created_at" do
+            allow(GoodJob.configuration).to receive(:dequeue_query_sort).and_return(:scheduled_at)
+            TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+            job.update!(created_at: 1.hour.ago)
+
+            expect { job.retry_job }.not_to change { job.reload.created_at }
+          end
         end
       end
     end
