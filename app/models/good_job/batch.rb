@@ -197,6 +197,12 @@ module GoodJob
       new _record: BatchRecord.find(id)
     end
 
+    # Required by GlobalID::Locator.fetch/locate_many, which query with
+    # `ignore_missing: true` and thus call `.where(id: ids)` instead of `.find(id)`.
+    def self.where(id:)
+      BatchRecord.where(id: id).map { |record| new(_record: record) }
+    end
+
     # Helper method to enqueue jobs and assign them to a batch
     def self.within_thread(batch_id: nil, batch_callback_id: nil)
       original_batch_id = current_batch_id
