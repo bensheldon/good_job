@@ -602,6 +602,7 @@ DEPENDENCIES
   puma
   rack-mini-profiler
   rails (~> 8.1.0)
+  rbs (< 4.0.3)
   rbtrace
   rdoc
   rspec-rails

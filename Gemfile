@@ -16,6 +16,10 @@ gemspec
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'pg', platforms: [:mri, :windows]
 
+# rbs 4.0.3 added a native extension with no jruby-compatible (java platform) build,
+# breaking installs on JRuby. Remove once rbs ships a stable release with a java build.
+gem 'rbs', '< 4.0.3', platforms: [:jruby]
+
 rails_versions = {
   "6.1" => { github: "rails/rails", branch: "6-1-stable" }, # https://github.com/bensheldon/good_job/issues/1280
   "7.0" => { github: "rails/rails", branch: "7-0-stable" }, # Ruby 3.4 requires bigdecimal which rails doesn't declare
