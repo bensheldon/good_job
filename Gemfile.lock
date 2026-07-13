@@ -197,7 +197,6 @@ GEM
       concurrent-ruby (~> 1.1)
       webrick (~> 1.7)
       websocket-driver (~> 0.7)
-    ffi (1.17.4)
     ffi (1.17.4-aarch64-linux-gnu)
     ffi (1.17.4-arm-linux-gnu)
     ffi (1.17.4-arm64-darwin)
@@ -602,7 +601,7 @@ DEPENDENCIES
   puma
   rack-mini-profiler
   rails (~> 8.1.0)
-  rbs (< 4.0.3)
+  rbs (= 4.1.0.pre.2)
   rbtrace
   rdoc
   rspec-rails
