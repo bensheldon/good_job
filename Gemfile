@@ -16,6 +16,12 @@ gemspec
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'pg', platforms: [:mri, :windows]
 
+# rdoc >= 8.0 hard-depends on rbs, whose native extension doesn't build on JRuby
+# (github.com/ruby/rdoc/issues/1746). rbs only ships a working (precompiled java
+# platform) build starting with this prerelease. Remove once rbs ships a stable
+# release with JRuby support.
+gem 'rbs', '4.1.0.pre.2', platforms: [:jruby]
+
 rails_versions = {
   "6.1" => { github: "rails/rails", branch: "6-1-stable" }, # https://github.com/bensheldon/good_job/issues/1280
   "7.0" => { github: "rails/rails", branch: "7-0-stable" }, # Ruby 3.4 requires bigdecimal which rails doesn't declare
