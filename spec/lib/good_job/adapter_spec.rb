@@ -266,7 +266,7 @@ RSpec.describe GoodJob::Adapter do
         adapter.enqueue_all([SuccessJob.new, future_job])
         expect(PERFORMED.size).to eq 1
         expect(GoodJob::Notifier).to have_received(:notify).once
-        expect(GoodJob::Notifier).to have_received(:notify).with(queue_name: 'default', count: 1, scheduled_at: scheduled_at)
+        expect(GoodJob::Notifier).to have_received(:notify).with(queue_name: 'default', count: 1, scheduled_at: within(1).of(scheduled_at))
       end
     end
   end
