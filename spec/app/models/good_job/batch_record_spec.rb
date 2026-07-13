@@ -48,6 +48,13 @@ describe GoodJob::BatchRecord do
           def self.find(_id)
             new
           end
+
+          # GlobalID::Locator.fetch (used by Rails' ActiveJob::Arguments#deserialize_global_id
+          # on Rails main) queries with `ignore_missing: true`, which calls `.where(id: ids)`
+          # instead of `.find(id)`.
+          def self.where(id:)
+            Array(id).map { new }
+          end
         end)
       end
 
@@ -56,6 +63,7 @@ describe GoodJob::BatchRecord do
         record = described_class.create(serialized_properties: { 'record' => instance })
 
         allow(SomeClass).to receive(:find).and_raise(ActiveRecord::RecordNotFound)
+        allow(SomeClass).to receive(:where).and_raise(ActiveRecord::RecordNotFound)
 
         expect(record.display_attributes["properties"]).to eq(
           "_aj_symbol_keys" => [],
