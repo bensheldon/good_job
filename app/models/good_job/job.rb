@@ -327,8 +327,11 @@ module GoodJob
       new(**enqueue_args(active_job, scheduled_at: scheduled_at))
     end
 
-    # Construct arguments for GoodJob::Execution from an ActiveJob instance.
+    # Construct arguments for GoodJob::Job from an ActiveJob instance.
     def self.enqueue_args(active_job, scheduled_at: nil)
+      reenqueued_current_job = CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
+      current_job = CurrentThread.job
+
       execution_args = {
         id: active_job.job_id,
         active_job_id: active_job.job_id,
@@ -336,15 +339,16 @@ module GoodJob
         queue_name: active_job.queue_name.presence || DEFAULT_QUEUE_NAME,
         priority: active_job.priority || DEFAULT_PRIORITY,
         serialized_params: active_job.serialize,
-        created_at: Time.current,
       }
 
+      now = Time.current
+      execution_args[:created_at] = now if !reenqueued_current_job || GoodJob.configuration.dequeue_query_sort == :created_at
       execution_args[:scheduled_at] = if scheduled_at
                                         scheduled_at
                                       elsif active_job.scheduled_at
                                         Time.zone.at(active_job.scheduled_at)
                                       else
-                                        execution_args[:created_at]
+                                        now
                                       end
 
       execution_args[:concurrency_key] = active_job.good_job_concurrency_key if active_job.respond_to?(:good_job_concurrency_key)
@@ -355,9 +359,6 @@ module GoodJob
         labels.tap(&:compact!).tap(&:uniq!)
         execution_args[:labels] = labels
       end
-
-      reenqueued_current_job = CurrentThread.active_job_id && CurrentThread.active_job_id == active_job.job_id
-      current_job = CurrentThread.job
 
       if reenqueued_current_job
         execution_args[:batch_id] = current_job.batch_id

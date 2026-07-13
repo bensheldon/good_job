@@ -315,7 +315,6 @@ Available configuration options are:
 - `cleanup_preserved_jobs_before_seconds_ago` (integer) number of seconds to preserve jobs when using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `1209600` (14 days). Can also be set with  the environment variable `GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO`.
 - `cleanup_interval_jobs` (integer) Number of jobs a Scheduler will execute before cleaning up preserved jobs. Defaults to `1000`. Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_JOBS` and disabled with `0`).
 - `cleanup_interval_seconds` (integer) Number of seconds a Scheduler will wait before cleaning up preserved jobs. Defaults to `600` (10 minutes). Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` and disabled with `0`).
-- `inline_execution_respects_schedule` (boolean) Opt-in to future behavior of inline execution respecting scheduled jobs. Defaults to `false`.
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
 - `preserve_job_records` (boolean, symbol, or lambda) keeps job records in your database even after jobs are completed. If set to `true`, all job records are preserved. If set to `:on_unhandled_error`, only jobs that finished with an unhandled error are preserved. If set to a lambda, the lambda will be called with the error_event (e.g., `:discarded`, `:retry_stopped`, or `:unhandled`) and should return a boolean indicating whether to preserve the job. (Default: `true`)
 - `advisory_lock_heartbeat` (boolean) whether to use an advisory lock for the purpose of determining whether an execeution process is active. (Default `true` in Development; `false` in other environments)
@@ -339,6 +338,9 @@ Available configuration options are:
     ```
 
 - `enable_pauses` (boolean) whether job processing can be paused. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_PAUSES`.
+- `dequeue_query_sort` (symbol) sets the sort order used when querying for the next job(s) to execute. Defaults to `:created_at`. It can be any one of:
+    - `:created_at` sorts by priority, then job creation order. This is the default, but no longer best matches GoodJob's contemporary data model.
+    - `:scheduled_at` sorts by priority, then `scheduled_at`, then `id`, which better matches GoodJob's contemporary data model. This will become the default/only behavior in a future major release.
 
 By default, GoodJob configures the following execution modes per environment:
 
@@ -1505,9 +1507,7 @@ It is also possible to manually trigger a cleanup of preserved job records:
 
 By default, GoodJob uses its inline adapter in the test environment; the inline adapter is designed for the test environment. When enqueuing a job with GoodJob's inline adapter, the job will be executed immediately on the current thread; unhandled exceptions will be raised.
 
-In GoodJob 2.0, the inline adapter will execute future scheduled jobs immediately. In the next major release, GoodJob 3.0, the inline adapter will not execute future scheduled jobs and instead enqueue them in the database.
-
-To opt into this behavior immediately set: `config.good_job.inline_execution_respects_schedule = true`
+The inline adapter respects scheduled jobs: jobs scheduled for the future are enqueued in the database rather than executed immediately.
 
 To perform jobs inline at any time, use `GoodJob.perform_inline`. For example, using time helpers within an integration test:
 

@@ -177,10 +177,6 @@ module GoodJob
       end
     end
 
-    def inline_execution_respects_schedule?
-      !!rails_config[:inline_execution_respects_schedule]
-    end
-
     # The maximum number of future-scheduled jobs to store in memory.
     # Storing future-scheduled jobs in memory reduces execution latency
     # at the cost of increased memory usage. 10,000 stored jobs = ~20MB.
@@ -439,6 +435,7 @@ module GoodJob
       Rails.env.development?
     end
 
+    # TODO: Remove :created_at and this option entirely in the next major version; :scheduled_at will become the only behavior.
     def dequeue_query_sort
       (options[:dequeue_query_sort] || rails_config[:dequeue_query_sort] || :created_at).to_sym
     end
