@@ -174,28 +174,44 @@ describe GoodJob::CapsuleTracker do
           expect(GoodJob::Process.count).to eq 0
         end
 
-        it 'maintains the process when the advisory lock dies while an inner non-advisory registration is still active' do
+        it 'does not touch the advisory lock connection when a non-advisory registration is unregistered' do
           # register(advisory: true) { register {} }
-          # Keep active? mocked through the outer unregister so it doesn't try to advisory_unlock
-          # a lock that's already gone. Release manually in ensure afterward.
-
+          # Non-advisory registrations happen on job-execution threads; they must never ping
+          # the advisory lock connection, which is owned by the Notifier's LISTEN thread and
+          # is not safe to use concurrently.
           tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection) do
-            allow(lock_connection).to receive(:active?).and_return(false)
+            active_calls = 0
+            allow(lock_connection).to receive(:active?).and_wrap_original do |original, *args|
+              active_calls += 1
+              original.call(*args)
+            end
 
             tracker.register do
               expect(GoodJob::Process.count).to eq 1
-              # inner unregister detects the dead advisory lock and downgrades lock_type to nil
-              # so cleanup on other processes won't incorrectly delete this record
             end
 
-            process = GoodJob::Process.last
-            expect(process.lock_type).to be_nil
-
-            # outer advisory registration still holds the registration — process must still exist
-            expect(GoodJob::Process.count).to eq 1
-            # active? stays mocked so outer unregister sees advisory_locked? = false → record.destroy
+            expect(active_calls).to eq 0
+            expect(GoodJob::Process.last.lock_type).to eq('advisory')
           end
 
+          expect(GoodJob::Process.count).to eq 0
+        end
+
+        it 'downgrades lock_type when an advisory unregister finds a dead lock connection while other registrations remain' do
+          tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+          tracker.register
+
+          # Simulate the lock connection dying: the advisory unregister cannot unlock, but
+          # must downgrade lock_type so the record is treated as heartbeat-liveness and
+          # cleanup on other processes won't incorrectly delete it.
+          allow(lock_connection).to receive(:active?).and_return(false)
+          tracker.unregister(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+
+          process = GoodJob::Process.last
+          expect(process.lock_type).to be_nil
+          expect(GoodJob::Process.count).to eq 1
+
+          tracker.unregister
           expect(GoodJob::Process.count).to eq 0
         ensure
           allow(lock_connection).to receive(:active?).and_call_original

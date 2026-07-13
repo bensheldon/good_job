@@ -211,7 +211,7 @@ class PgLock < GoodJob::BaseRecord
 
     output << "\nAdvisory Locks:"
     PgLock.current_database.advisory_lock.owns.includes(:pg_stat_activity).all.each do |pg_lock| # rubocop:disable Rails/FindEach
-      output << "  - #{pg_lock.pid}: #{pg_stat_activity&.application_name}"
+      output << "  - #{pg_lock.pid}: #{pg_lock.pg_stat_activity&.application_name}"
     end
 
     output.join("\n")

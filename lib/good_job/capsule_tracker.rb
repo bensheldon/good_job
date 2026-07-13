@@ -125,10 +125,13 @@ module GoodJob # :nodoc:
           @record.update(lock_type: nil)
           @advisory_locked = false
           @advisory_locked_connection = nil
-        elsif @advisory_locked && !advisory_locked?
+        elsif with_advisory_lock && @advisory_locked && !advisory_locked?
           # Advisory lock was dropped (e.g. connection died) while other registrations are still
           # active. Downgrade lock_type so the record is treated as heartbeat-liveness rather
           # than advisory-liveness, preventing cleanup from incorrectly deleting it.
+          # Only checked on advisory unregisters: checking liveness pings the advisory lock
+          # connection, which is owned by the thread that passes it (e.g. the Notifier's
+          # LISTEN thread) and must not be touched from job-execution threads.
           @record&.update(lock_type: nil)
           @advisory_locked = false
           @advisory_locked_connection = nil
