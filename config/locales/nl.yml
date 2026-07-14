@@ -246,6 +246,7 @@ nl:
       range:
         custom_range: Aangepast
         custom_range_hint: slepen op grafiek
+        end_time: Eindtijd
         open_time_ranges: Tijdsbereiken voor prestaties openen
         quick_ranges: Snelle bereiken
         range_options:
@@ -254,6 +255,7 @@ nl:
           6h: Afgelopen 6 uur
           7d: Afgelopen 7 dagen
         reset_range: Tijdsbereik voor prestaties opnieuw instellen
+        start_time: Starttijd
         time_range: Tijdsbereik voor prestaties
       show:
         slow: Traag

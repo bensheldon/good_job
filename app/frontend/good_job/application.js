@@ -12,6 +12,8 @@ import AsyncValuesController from "async_values_controller";
 Stimulus.register("async-values", AsyncValuesController);
 import ChartController from "chart_controller";
 Stimulus.register("chart", ChartController);
+import PerformanceRangeController from "performance_range_controller";
+Stimulus.register("performance-range", PerformanceRangeController);
 import LivePollController from "live_poll_controller";
 Stimulus.register("live-poll", LivePollController);
 import CheckboxToggleController from "checkbox_toggle_controller";

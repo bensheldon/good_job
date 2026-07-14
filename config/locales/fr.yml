@@ -246,6 +246,7 @@ fr:
       range:
         custom_range: Personnalisé
         custom_range_hint: faire glisser sur le graphique
+        end_time: Heure de fin
         open_time_ranges: Ouvrir les plages horaires de performance
         quick_ranges: Plages rapides
         range_options:
@@ -254,6 +255,7 @@ fr:
           6h: Dernières 6 heures
           7d: 7 derniers jours
         reset_range: Réinitialiser la plage horaire de performance
+        start_time: Heure de début
         time_range: Plage horaire de performance
       show:
         slow: Lent

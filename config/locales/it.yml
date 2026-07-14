@@ -246,6 +246,7 @@ it:
       range:
         custom_range: Personalizzato
         custom_range_hint: trascina sul grafico
+        end_time: Ora di fine
         open_time_ranges: Apri intervalli di tempo delle prestazioni
         quick_ranges: Intervalli rapidi
         range_options:
@@ -254,6 +255,7 @@ it:
           6h: Ultime 6 ore
           7d: Ultimi 7 giorni
         reset_range: Reimposta intervallo di tempo delle prestazioni
+        start_time: Ora di inizio
         time_range: Intervallo di tempo delle prestazioni
       show:
         slow: Lento

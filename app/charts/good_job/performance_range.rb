@@ -5,11 +5,13 @@ module GoodJob
     PARAMETER_KEYS = %w[chart_range chart_start chart_end].freeze
     DEFAULT_KEY = "24h"
     MAXIMUM = 24.hours * 31
-    # Restrict custom bounds to portable four-digit years supported by Ruby,
-    # Rails, PostgreSQL, and browser Date without extended-year syntax.
-    MINIMUM_TIMESTAMP = Time.utc(1000, 1, 1).freeze
-    MAXIMUM_TIMESTAMP = Time.utc(9999, 12, 31, 23, 59, 59).freeze
+    # Restrict custom bounds to portable four-digit years in the timezone used by the page.
+    MINIMUM_YEAR = 1000
+    MAXIMUM_YEAR = 9999
+    MINIMUM_LOCAL_VALUE = "1000-01-01T00:00:00"
+    MAXIMUM_LOCAL_VALUE = "9999-12-31T23:59:59"
     TIMESTAMP_PATTERN = /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})\z/
+    LOCAL_TIMESTAMP_PATTERN = /\A(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?\z/
 
     OPTIONS = {
       "1h" => {
@@ -65,6 +67,12 @@ module GoodJob
       timestamp.in_time_zone.strftime(label_format)
     end
 
+    def canonical_timestamp(timestamp)
+      timestamp = timestamp.in_time_zone
+      # ISO 8601 cannot preserve the sub-minute historical offsets present in some IANA zones.
+      timestamp.utc_offset.remainder(60).zero? ? timestamp.iso8601 : timestamp.utc.iso8601
+    end
+
     def custom?
       key.nil?
     end
@@ -77,14 +85,18 @@ module GoodJob
       range_label(end_time)
     end
 
+    def end_local_value
+      local_value(end_time)
+    end
+
     def navigation_params
       return to_params unless key
 
       # A preset is a relative definition; navigation also carries this evaluated instance.
       {
         "chart_range" => key,
-        "chart_start" => start_time.iso8601,
-        "chart_end" => end_time.iso8601,
+        "chart_start" => canonical_timestamp(start_time),
+        "chart_end" => canonical_timestamp(end_time),
       }
     end
 
@@ -101,6 +113,10 @@ module GoodJob
 
     def start_label
       range_label(start_time)
+    end
+
+    def start_local_value
+      local_value(start_time)
     end
 
     # Keep this order in sync with the $1/$2/$3 placeholders in PerformanceIndexChart.
@@ -143,13 +159,18 @@ module GoodJob
 
     def parse_time(parameter_key, value)
       return if @repeated_parameter_keys.include?(parameter_key)
-      return unless value.is_a?(String) && TIMESTAMP_PATTERN.match?(value)
+      return unless value.is_a?(String)
 
-      timestamp = Time.iso8601(value)
+      timestamp = if TIMESTAMP_PATTERN.match?(value)
+                    Time.iso8601(value)
+                  elsif (local_match = LOCAL_TIMESTAMP_PATTERN.match(value))
+                    parse_local_time(parameter_key, local_match)
+                  end
+      return unless timestamp
       return unless timestamp.to_f.finite?
 
       timestamp = timestamp.in_time_zone.change(usec: 0)
-      return unless timestamp.between?(MINIMUM_TIMESTAMP, MAXIMUM_TIMESTAMP)
+      return unless timestamp.year.between?(MINIMUM_YEAR, MAXIMUM_YEAR)
 
       timestamp
     rescue ArgumentError, RangeError
@@ -171,6 +192,29 @@ module GoodJob
       ActiveRecord::Relation::QueryAttribute.new(name, value, type)
     end
 
+    def local_value(time)
+      time.in_time_zone.strftime("%Y-%m-%dT%H:%M:%S")
+    end
+
+    def parse_local_time(parameter_key, match)
+      components = match.captures
+      components[-1] ||= "0"
+      numeric_components = components.map { |component| Integer(component, 10) }
+      local_time = Time.utc(*numeric_components)
+      normalized_value = format("%04d-%02d-%02dT%02d:%02d:%02d", *numeric_components)
+      return unless local_time.strftime("%Y-%m-%dT%H:%M:%S") == normalized_value
+
+      periods = Time.zone.tzinfo.periods_for_local(local_time)
+      return if periods.empty?
+
+      # A local input cannot carry an offset. Include both repeated fall-back occurrences
+      # by resolving starts to the earlier instant and ends to the later instant.
+      instants = periods.map do |period|
+        (local_time - period.utc_total_offset).in_time_zone
+      end
+      parameter_key == "chart_end" ? instants.max : instants.min
+    end
+
     def range_label(time)
       time.in_time_zone.strftime("%b %-d, %H:%M:%S")
     end
@@ -189,8 +233,8 @@ module GoodJob
         else
           @key = nil
           @canonical_params = {
-            "chart_start" => start_time.iso8601,
-            "chart_end" => end_time.iso8601,
+            "chart_start" => canonical_timestamp(start_time),
+            "chart_end" => canonical_timestamp(end_time),
           }
           options = CUSTOM_INTERVALS.find { |duration, _options| end_time - start_time <= duration }&.last
           options ||= CUSTOM_INTERVALS.last.last

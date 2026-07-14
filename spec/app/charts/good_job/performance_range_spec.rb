@@ -16,6 +16,8 @@ RSpec.describe GoodJob::PerformanceRange do
       expect(range.end_time).to eq(Time.zone.parse("2024-01-01 12:34:56 UTC"))
       expect(range.start_label).to eq("Dec 31, 12:34:56")
       expect(range.end_label).to eq("Jan 1, 12:34:56")
+      expect(range.start_local_value).to eq("2023-12-31T12:34:56")
+      expect(range.end_local_value).to eq("2024-01-01T12:34:56")
       expect(range.to_params).to eq({})
       expect(range.navigation_params).to eq(
         "chart_range" => "24h",
@@ -134,6 +136,72 @@ RSpec.describe GoodJob::PerformanceRange do
                                                          ])
     end
 
+    it "interprets native local values in the page timezone and canonicalizes them once" do
+      Time.use_zone("America/St_Johns") do
+        submitted_parameters = {
+          "chart_start" => "2024-01-01T10:03:17",
+          "chart_end" => "2024-01-01T11:07",
+        }
+        range = described_class.new(submitted_parameters.symbolize_keys)
+
+        expect(range.start_time.iso8601).to eq("2024-01-01T10:03:17-03:30")
+        expect(range.end_time.iso8601).to eq("2024-01-01T11:07:00-03:30")
+        expect(range.start_local_value).to eq("2024-01-01T10:03:17")
+        expect(range.end_local_value).to eq("2024-01-01T11:07:00")
+        expect(range.to_params).to eq(
+          "chart_start" => "2024-01-01T10:03:17-03:30",
+          "chart_end" => "2024-01-01T11:07:00-03:30"
+        )
+        expect(range.canonical_parameters?(submitted_parameters)).to be(false)
+
+        canonical_range = described_class.new(range.to_params.symbolize_keys)
+        expect(canonical_range.canonical_parameters?(range.to_params)).to be(true)
+        expect(canonical_range.start_time).to eq(range.start_time)
+        expect(canonical_range.end_time).to eq(range.end_time)
+      end
+    end
+
+    it "rejects nonexistent local times and explicitly spans both fall-back occurrences" do
+      Time.use_zone("America/New_York") do
+        [
+          { chart_start: "2024-03-10T02:30:00", chart_end: "2024-03-10T04:00:00" },
+          { chart_start: "2024-03-10T01:00:00", chart_end: "2024-03-10T02:30:00" },
+        ].each do |parameters|
+          expect(described_class.new(parameters)).to be_default
+        end
+
+        range = described_class.new(
+          chart_start: "2024-11-03T01:15:00",
+          chart_end: "2024-11-03T01:45:00"
+        )
+
+        expect(range.start_time.iso8601).to eq("2024-11-03T01:15:00-04:00")
+        expect(range.end_time.iso8601).to eq("2024-11-03T01:45:00-05:00")
+        expect(range.end_time - range.start_time).to eq(90.minutes.to_i)
+      end
+    end
+
+    it "round-trips the native four-digit-year bounds in a non-UTC timezone" do
+      Time.use_zone("America/Toronto") do
+        minimum_range = described_class.new(
+          chart_start: "1000-01-01T00:00:00",
+          chart_end: "1000-01-01T00:00:01"
+        )
+        maximum_range = described_class.new(
+          chart_start: "9999-12-31T23:59:58",
+          chart_end: "9999-12-31T23:59:59"
+        )
+
+        [minimum_range, maximum_range].each do |range|
+          canonical_range = described_class.new(range.to_params.symbolize_keys)
+
+          expect(canonical_range.canonical_parameters?(range.to_params)).to be(true)
+          expect(canonical_range.start_local_value).to eq(range.start_local_value)
+          expect(canonical_range.end_local_value).to eq(range.end_local_value)
+        end
+      end
+    end
+
     it "falls back to default state for non-scalar, non-finite, non-strict, extreme, and incomplete inputs" do
       invalid_parameters = [
         { chart_start: ["2024-01-01T10:00:00Z"], chart_end: "2024-01-01T11:00:00Z" },
@@ -141,6 +209,7 @@ RSpec.describe GoodJob::PerformanceRange do
         { chart_start: 1, chart_end: "2024-01-01T11:00:00Z" },
         { chart_start: "NaN", chart_end: "Infinity" },
         { chart_start: "2024-01-01 10:00:00 UTC", chart_end: "2024-01-01T11:00:00Z" },
+        { chart_start: "2024-02-30T10:00:00", chart_end: "2024-02-30T11:00:00" },
         { chart_start: "0999-12-31T23:59:59Z", chart_end: "1000-01-01T00:00:01Z" },
         { chart_start: "9999-12-31T23:59:58Z", chart_end: "10000-01-01T00:00:00Z" },
         { chart_start: "not-a-time", chart_end: "2024-01-01T11:00:00Z" },

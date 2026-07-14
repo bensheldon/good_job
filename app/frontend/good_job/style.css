@@ -37,8 +37,32 @@
 }
 
 .performance-range-date {
+  cursor: pointer;
   gap: 0.25rem;
   font-weight: 600;
+  position: relative;
+}
+
+.performance-range-native-input {
+  cursor: pointer;
+  height: 100%;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 1;
+}
+
+.performance-range-date:focus-within {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.125rem var(--bs-body-bg);
+  outline: 0.1875rem solid var(--bs-primary);
+  outline-offset: 0.125rem;
+  z-index: 2;
+}
+
+.performance-range-date:has(.performance-range-native-input:invalid) {
+  border-color: var(--bs-danger);
 }
 
 .performance-range-selector {

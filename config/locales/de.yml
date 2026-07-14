@@ -246,6 +246,7 @@ de:
       range:
         custom_range: Benutzerdefiniert
         custom_range_hint: im Diagramm ziehen
+        end_time: Endzeit
         open_time_ranges: Leistungszeiträume öffnen
         quick_ranges: Schnellauswahl
         range_options:
@@ -254,6 +255,7 @@ de:
           6h: Letzte 6 Stunden
           7d: Letzte 7 Tage
         reset_range: Leistungszeitraum zurücksetzen
+        start_time: Startzeit
         time_range: Leistungszeitraum
       show:
         slow: Langsam

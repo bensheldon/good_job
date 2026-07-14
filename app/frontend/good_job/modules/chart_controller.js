@@ -143,12 +143,14 @@ export default class extends Controller {
 
     if (Math.abs(this.rangeSelectionCurrentX - this.rangeSelectionStartX) < MINIMUM_RANGE_SELECTION_WIDTH) return
 
-    const [startTime, endTime] = this.#selectedRange()
-    if (!startTime || !endTime || startTime >= endTime) return
+    const [startParameter, endParameter] = this.#selectedRange()
+    const startTime = new Date(startParameter).getTime()
+    const endTime = new Date(endParameter).getTime()
+    if (!startParameter || !endParameter || startTime >= endTime) return
 
     const url = new URL(window.location.href)
-    url.searchParams.set("chart_start", startTime.toISOString())
-    url.searchParams.set("chart_end", endTime.toISOString())
+    url.searchParams.set("chart_start", startParameter)
+    url.searchParams.set("chart_end", endParameter)
     url.searchParams.delete("chart_range")
     url.searchParams.delete("after_at")
     url.searchParams.delete("after_id")
@@ -224,13 +226,14 @@ export default class extends Controller {
     // Clamp partial edge buckets to the exact page range so drag selection cannot
     // widen the half-open interval represented by the toolbar and server query.
     const firstBucketStart = new Date(timestamps[firstIndex]).getTime()
-    const lastBucketEnd = new Date(timestamps[lastIndex]).getTime() + (this.goodJobChart.interval_seconds * 1000)
     const rangeStart = new Date(this.goodJobChart.range_start).getTime()
     const rangeEnd = new Date(this.goodJobChart.range_end).getTime()
-    const startTime = new Date(Math.max(firstBucketStart, rangeStart))
-    const endTime = new Date(Math.min(lastBucketEnd, rangeEnd))
+    const nextTimestamp = timestamps[lastIndex + 1]
+    const startParameter = firstBucketStart < rangeStart ? this.goodJobChart.range_start : timestamps[firstIndex]
+    const endParameter = nextTimestamp && new Date(nextTimestamp).getTime() < rangeEnd ?
+      nextTimestamp : this.goodJobChart.range_end
 
-    return [startTime, endTime]
+    return [startParameter, endParameter]
   }
 
   #timestampIndexForPixel(pixel) {

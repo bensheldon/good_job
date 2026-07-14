@@ -246,6 +246,7 @@ ja:
       range:
         custom_range: カスタム
         custom_range_hint: グラフ上でドラッグ
+        end_time: 終了時刻
         open_time_ranges: パフォーマンスの時間範囲を開く
         quick_ranges: クイック範囲
         range_options:
@@ -254,6 +255,7 @@ ja:
           6h: 過去6時間
           7d: 過去7日間
         reset_range: パフォーマンスの時間範囲をリセット
+        start_time: 開始時刻
         time_range: パフォーマンスの時間範囲
       show:
         slow: 遅い

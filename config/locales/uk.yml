@@ -272,6 +272,7 @@ uk:
       range:
         custom_range: Користувацький
         custom_range_hint: перетягніть на діаграмі
+        end_time: Час завершення
         open_time_ranges: Відкрити часові діапазони продуктивності
         quick_ranges: Швидкі діапазони
         range_options:
@@ -280,6 +281,7 @@ uk:
           6h: Останні 6 годин
           7d: Останні 7 днів
         reset_range: Скинути часовий діапазон продуктивності
+        start_time: Час початку
         time_range: Часовий діапазон продуктивності
       show:
         slow: Повільно

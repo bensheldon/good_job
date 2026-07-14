@@ -37,7 +37,7 @@ module GoodJob
       timestamps = []
       jobs_data = executions_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
         labels << @range.chart_timestamp_label(timestamp)
-        timestamps << timestamp.in_time_zone.iso8601
+        timestamps << @range.canonical_timestamp(timestamp)
         job_names.each do |job_class|
           sum = values.find { |d| d['job_class'] == job_class }&.[]('sum')
           duration = sum ? ActiveSupport::Duration.parse(sum).to_f : 0
@@ -77,8 +77,8 @@ module GoodJob
         },
         goodJob: {
           interval_seconds: @range.interval_seconds,
-          range_end: @range.end_time.iso8601,
-          range_start: @range.start_time.iso8601,
+          range_end: @range.canonical_timestamp(@range.end_time),
+          range_start: @range.canonical_timestamp(@range.start_time),
           time_series: true,
           timestamps: timestamps,
         },

@@ -59,6 +59,26 @@ RSpec.describe GoodJob::PerformanceIndexChart do
         expect(data.dig(:data, :labels).count).to eq(14)
       end
     end
+
+    context "when the native range reaches the four-digit upper bound in a negative-offset timezone" do
+      let(:params) do
+        {
+          chart_start: "9999-12-31T23:54:59",
+          chart_end: "9999-12-31T23:59:59",
+        }
+      end
+
+      it "emits draggable boundaries in the strict canonical parameter grammar" do
+        Time.use_zone("America/Toronto") do
+          metadata = chart.data.fetch(:goodJob)
+          draggable_boundaries = metadata.fetch_values(:range_start, :range_end) + metadata.fetch(:timestamps)
+
+          expect(draggable_boundaries).to all(match(GoodJob::PerformanceRange::TIMESTAMP_PATTERN))
+          expect(metadata.fetch(:range_end)).to eq("9999-12-31T23:59:59-05:00")
+          expect(draggable_boundaries).not_to include(a_string_starting_with("+010000"))
+        end
+      end
+    end
   end
 
   def create_execution(job_class:, scheduled_at:)

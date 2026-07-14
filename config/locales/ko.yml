@@ -246,6 +246,7 @@ ko:
       range:
         custom_range: 사용자 지정
         custom_range_hint: 차트에서 드래그
+        end_time: 종료 시간
         open_time_ranges: 성능 시간 범위 열기
         quick_ranges: 빠른 범위
         range_options:
@@ -254,6 +255,7 @@ ko:
           6h: 최근 6시간
           7d: 최근 7일
         reset_range: 성능 시간 범위 재설정
+        start_time: 시작 시간
         time_range: 성능 시간 범위
       show:
         slow: 느림

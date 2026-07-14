@@ -246,6 +246,7 @@ en:
       range:
         custom_range: Custom
         custom_range_hint: drag on chart
+        end_time: End time
         open_time_ranges: Open performance time ranges
         quick_ranges: Quick ranges
         range_options:
@@ -254,6 +255,7 @@ en:
           6h: Last 6 hours
           7d: Last 7 days
         reset_range: Reset performance time range
+        start_time: Start time
         time_range: Performance time range
       show:
         slow: Slow

@@ -50,6 +50,48 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
       expect(response.body.scan("No executions in this time range.").count).to eq(2)
     end
 
+    it "canonicalizes native local values in the page timezone and then renders" do
+      Time.use_zone("America/St_Johns") do
+        get :index, params: {
+          chart_start: "2024-01-01T10:03:17",
+          chart_end: "2024-01-01T11:07:42",
+        }
+
+        query = Rack::Utils.parse_query(URI.parse(response.location).query)
+
+        expect(response).to have_http_status(:redirect)
+        expect(query).to eq(
+          "chart_start" => "2024-01-01T10:03:17-03:30",
+          "chart_end" => "2024-01-01T11:07:42-03:30"
+        )
+
+        get :index, params: query
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("America/St_Johns")
+        start_input = Capybara.string(response.body).find("input[name='chart_start']")
+        expect(start_input["aria-label"]).to eq("Start time")
+        expect(start_input["value"]).to eq("2024-01-01T10:03:17")
+      end
+    end
+
+    it "rejects nonexistent local endpoint times without redirecting twice" do
+      Time.use_zone("America/New_York") do
+        [
+          { chart_start: "2024-03-10T02:30:00", chart_end: "2024-03-10T04:00:00" },
+          { chart_start: "2024-03-10T01:00:00", chart_end: "2024-03-10T02:30:00" },
+        ].each do |parameters|
+          get :index, params: parameters
+
+          expect(response).to have_http_status(:redirect)
+          expect(URI.parse(response.location).query).to be_nil
+
+          get :index
+          expect(response).to have_http_status(:ok)
+        end
+      end
+    end
+
     it "redirects unsafe range shapes and values once to a rendered default state" do
       invalid_parameters = [
         { chart_start: ["2024-01-01T10:00:00Z"], chart_end: "2024-01-01T11:00:00Z" },
