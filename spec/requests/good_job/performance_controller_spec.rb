@@ -70,6 +70,23 @@ RSpec.describe GoodJob::PerformanceController do
 
       expect(response).to have_http_status(:ok)
     end
+
+    it "strips transient timezone state without changing exact endpoints" do
+      get good_job.performance_index_path, params: {
+        chart_start: "2024-01-01T10:03:17Z",
+        chart_end: "2024-01-01T11:07:42Z",
+        chart_time_zone: "Missing/Zone",
+      }
+
+      redirect_uri = URI.parse(response.location)
+
+      expect(response).to have_http_status(:redirect)
+      expect(redirect_uri.path).to eq(good_job.performance_index_path(locale: nil))
+      expect(Rack::Utils.parse_query(redirect_uri.query)).to eq(
+        "chart_start" => "2024-01-01T10:03:17Z",
+        "chart_end" => "2024-01-01T11:07:42Z"
+      )
+    end
   end
 
   def expect_range_links(preset_path:, reset_path:)

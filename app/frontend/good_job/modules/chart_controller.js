@@ -49,6 +49,7 @@ export default class extends Controller {
   #renderChart(animate = true) {
     const {goodJob, ...chartData} = this.configValue
     this.goodJobChart = goodJob || {}
+    this.#localizeTimeSeriesLabels(chartData)
 
     chartData.options ||= {}
 
@@ -91,6 +92,37 @@ export default class extends Controller {
 
     const ctx = this.canvasTarget.getContext('2d')
     this.chart = new Chart(ctx, chartData)
+  }
+
+  #localizeTimeSeriesLabels(chartData) {
+    if (!this.goodJobChart.time_series) return
+
+    try {
+      const timestamps = this.goodJobChart.timestamps
+      const boundaryTimestamps = [this.goodJobChart.range_start, this.goodJobChart.range_end]
+      const dates = [...boundaryTimestamps, ...timestamps].map(timestamp => new Date(timestamp))
+      const representable = dates.every(date => {
+        const year = date.getFullYear()
+        return Number.isFinite(date.getTime()) && year >= 1000 && year <= 9999
+      })
+      if (!representable) return
+
+      const options = {
+        hour: "2-digit",
+        hourCycle: "h23",
+        minute: "2-digit",
+      }
+      if (this.goodJobChart.timestamp_label_style === "date_time") {
+        options.day = "numeric"
+        options.month = "short"
+      }
+      const formatter = new Intl.DateTimeFormat(document.documentElement.lang, options)
+      if (!formatter.resolvedOptions().timeZone) return
+
+      chartData.data.labels = dates.slice(boundaryTimestamps.length).map(date => formatter.format(date))
+    } catch (_error) {
+      // Preserve application-zone labels when browser localization is unavailable.
+    }
   }
 
   #connectRangeSelection() {

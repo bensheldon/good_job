@@ -257,6 +257,7 @@ pt-BR:
         reset_range: Redefinir intervalo de tempo de desempenho
         start_time: Horário de início
         time_range: Intervalo de tempo de desempenho
+        time_zone: 'Fuso horário:'
       show:
         slow: Lento
         title: Desempenho

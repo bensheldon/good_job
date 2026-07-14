@@ -257,6 +257,7 @@ nl:
         reset_range: Tijdsbereik voor prestaties opnieuw instellen
         start_time: Starttijd
         time_range: Tijdsbereik voor prestaties
+        time_zone: 'Tijdzone:'
       show:
         slow: Traag
         title: Prestaties

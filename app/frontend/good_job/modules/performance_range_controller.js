@@ -2,36 +2,56 @@ import { Controller } from "stimulus"
 
 // Enhances the Performance range form while leaving parsing and validation authoritative on the server.
 export default class extends Controller {
-  static targets = ["endInput", "endLabel", "startInput", "startLabel"]
+  static targets = [
+    "endCanonicalInput",
+    "endInput",
+    "endLabel",
+    "startCanonicalInput",
+    "startInput",
+    "startLabel",
+    "timeZoneInput",
+    "timeZoneLabel",
+  ]
   static values = {
+    applicationTimeZone: String,
+    endFallback: String,
+    endLabel: String,
+    endTimestamp: String,
     maximum: String,
     minimum: String,
+    startFallback: String,
+    startLabel: String,
+    startTimestamp: String,
   }
 
-  // Synchronize native constraints and rendered labels after Turbo navigation.
+  // Rebuild from immutable server values so Turbo cache restoration cannot apply localization twice.
   connect() {
-    this.formatter = new Intl.DateTimeFormat(document.documentElement.lang, {
-      day: "numeric",
-      hour: "2-digit",
-      hourCycle: "h23",
-      minute: "2-digit",
-      month: "short",
-      second: "2-digit",
-      timeZone: "UTC",
-    })
-    this.reciprocalConstraints = this.startInputTarget.valueAsNumber < this.endInputTarget.valueAsNumber
+    this.#restoreApplicationTimeZoneFallback()
+    this.#configureFormatter()
+    this.#enhanceBrowserTimeZone()
+
+    this.backwardClockTransition = this.#crossesBackwardClockTransition()
+    this.reciprocalConstraints =
+      !this.backwardClockTransition &&
+      this.startInputTarget.valueAsNumber < this.endInputTarget.valueAsNumber
     this.constrain()
   }
 
-  // Prevent the native controls from accepting equal or reversed range endpoints.
+  // Remember which civil endpoint must be resolved in the browser timezone by the server.
+  edit(event) {
+    if (this.browserTimeZone) event.currentTarget.dataset.performanceRangeEdited = "true"
+  }
+
+  // Prevent the native controls from accepting equal or reversed ordinary wall-clock endpoints.
   constrain() {
     const startMilliseconds = this.#civilMilliseconds(this.startInputTarget.value)
     const endMilliseconds = this.#civilMilliseconds(this.endInputTarget.value)
 
-    // Offset-free native fields cannot order repeated wall-clock values. Preserve an exact
-    // server-resolved fold interval until the edited values become ordinarily ordered.
+    // Offset-free native fields cannot order repeated wall-clock values. Keep a known backward
+    // transition relaxed; otherwise restore reciprocal constraints once edits are ordered.
     if (
       !this.reciprocalConstraints &&
+      !this.backwardClockTransition &&
       startMilliseconds !== null &&
       endMilliseconds !== null &&
       startMilliseconds < endMilliseconds
@@ -54,16 +74,44 @@ export default class extends Controller {
       this.startInputTarget.max = this.maximumValue
       this.endInputTarget.min = this.minimumValue
     }
-    this.startLabelTarget.textContent = this.#formatLabel(this.startInputTarget.value)
-    this.endLabelTarget.textContent = this.#formatLabel(this.endInputTarget.value)
+
+    if (this.formatter) {
+      this.startLabelTarget.textContent = this.#formatLabel(this.startInputTarget.value)
+      this.endLabelTarget.textContent = this.#formatLabel(this.endInputTarget.value)
+    }
   }
 
-  // Navigate only after a committed native edit leaves both endpoints valid.
+  // Prepare every submission path, including an implicit submit that bypasses endpoint change.
+  prepareSubmission() {
+    if (this.browserTimeZone) {
+      const endpointPairs = [
+        [this.startInputTarget, this.startCanonicalInputTarget],
+        [this.endInputTarget, this.endCanonicalInputTarget],
+      ]
+      let edited = false
+
+      endpointPairs.forEach(([input, canonicalInput]) => {
+        if (input.dataset.performanceRangeEdited !== "true") return
+
+        canonicalInput.value = input.value
+        edited = true
+      })
+
+      if (edited) {
+        this.timeZoneInputTarget.value = this.browserTimeZone
+        this.timeZoneInputTarget.disabled = false
+      }
+    }
+  }
+
+  // Submit exact untouched endpoints and browser-local civil values only for edited endpoints.
   submitRange() {
-    if (this.element.checkValidity()) this.element.requestSubmit()
+    if (!this.element.checkValidity()) return
+
+    this.element.requestSubmit()
   }
 
-  // Open the browser picker from a click on the compact rendered field when supported.
+  // Open the browser picker from a click on the rendered field when supported.
   openPicker(event) {
     const input = event.currentTarget
     if (typeof input.showPicker !== "function") return
@@ -75,6 +123,90 @@ export default class extends Controller {
     } catch (_error) {
       // Let the input's native click behavior continue when showPicker is unavailable here.
     }
+  }
+
+  #restoreApplicationTimeZoneFallback() {
+    this.browserTimeZone = null
+    this.startInputTarget.name = "chart_start"
+    this.endInputTarget.name = "chart_end"
+    this.startInputTarget.value = this.startFallbackValue
+    this.endInputTarget.value = this.endFallbackValue
+    delete this.startInputTarget.dataset.performanceRangeEdited
+    delete this.endInputTarget.dataset.performanceRangeEdited
+
+    this.startCanonicalInputTarget.value = this.startTimestampValue
+    this.startCanonicalInputTarget.disabled = true
+    this.endCanonicalInputTarget.value = this.endTimestampValue
+    this.endCanonicalInputTarget.disabled = true
+    this.timeZoneInputTarget.value = ""
+    this.timeZoneInputTarget.disabled = true
+
+    this.startLabelTarget.textContent = this.startLabelValue
+    this.endLabelTarget.textContent = this.endLabelValue
+    this.timeZoneLabelTarget.textContent = this.applicationTimeZoneValue
+  }
+
+  #configureFormatter() {
+    this.formatter = null
+
+    try {
+      // The input already represents a wall clock. UTC prevents Intl from shifting it again.
+      this.formatter = new Intl.DateTimeFormat(document.documentElement.lang, {
+        day: "numeric",
+        hour: "2-digit",
+        hourCycle: "h23",
+        minute: "2-digit",
+        month: "short",
+        second: "2-digit",
+        timeZone: "UTC",
+      })
+    } catch (_error) {
+      // Server-rendered application-zone values and labels remain accurate without Intl.
+    }
+  }
+
+  #enhanceBrowserTimeZone() {
+    if (!this.formatter) return
+
+    try {
+      const browserTimeZone = new Intl.DateTimeFormat().resolvedOptions().timeZone
+      const startValue = this.#browserLocalValue(this.startTimestampValue)
+      const endValue = this.#browserLocalValue(this.endTimestampValue)
+      if (!browserTimeZone || !startValue || !endValue) return
+
+      this.startInputTarget.value = startValue
+      this.endInputTarget.value = endValue
+      this.startInputTarget.removeAttribute("name")
+      this.endInputTarget.removeAttribute("name")
+      this.startCanonicalInputTarget.disabled = false
+      this.endCanonicalInputTarget.disabled = false
+      this.timeZoneLabelTarget.textContent = browserTimeZone
+      this.browserTimeZone = browserTimeZone
+    } catch (_error) {
+      // Keep the whole control in its application-zone fallback when enhancement is unavailable.
+    }
+  }
+
+  #browserLocalValue(timestamp) {
+    const date = new Date(timestamp)
+    if (!Number.isFinite(date.getTime())) return null
+
+    const year = date.getFullYear()
+    if (year < 1000 || year > 9999) return null
+
+    return [
+      String(year).padStart(4, "0"),
+      "-",
+      String(date.getMonth() + 1).padStart(2, "0"),
+      "-",
+      String(date.getDate()).padStart(2, "0"),
+      "T",
+      String(date.getHours()).padStart(2, "0"),
+      ":",
+      String(date.getMinutes()).padStart(2, "0"),
+      ":",
+      String(date.getSeconds()).padStart(2, "0"),
+    ].join("")
   }
 
   // Convert a wall-clock value to a browser-zone-independent civil timestamp.
@@ -96,13 +228,23 @@ export default class extends Controller {
     return this.#localValue(milliseconds) === normalized ? milliseconds : null
   }
 
-  // Format the compact display without applying the browser's timezone.
+  // Native civil fields cannot express the repeated hour in a backward clock transition.
+  #crossesBackwardClockTransition() {
+    const exactStart = new Date(this.startTimestampValue).getTime()
+    const exactEnd = new Date(this.endTimestampValue).getTime()
+    const civilStart = this.#civilMilliseconds(this.startInputTarget.value)
+    const civilEnd = this.#civilMilliseconds(this.endInputTarget.value)
+    if (![exactStart, exactEnd, civilStart, civilEnd].every(Number.isFinite)) return false
+
+    return exactEnd - exactStart > civilEnd - civilStart
+  }
+
   #formatLabel(value) {
     const milliseconds = this.#civilMilliseconds(value)
     return milliseconds === null ? "—" : this.formatter.format(new Date(milliseconds))
   }
 
-  // Move a local value by whole seconds and clamp it to the four-digit-year bounds.
+  // Move a civil value by whole seconds and clamp it to the four-digit-year bounds.
   #offsetLocal(value, seconds, fallback) {
     const milliseconds = this.#civilMilliseconds(value)
     if (milliseconds === null) return fallback

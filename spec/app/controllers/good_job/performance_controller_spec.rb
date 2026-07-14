@@ -75,6 +75,54 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
       end
     end
 
+    it "renders the application-zone range form before JavaScript enhancement" do
+      Time.use_zone("America/St_Johns") do
+        get :index, params: {
+          chart_start: "2024-01-01T06:33:17-03:30",
+          chart_end: "2024-01-01T07:37:42-03:30",
+        }
+
+        page = Capybara.string(response.body)
+        form = page.find("form[data-controller='performance-range']")
+        start_input = page.find("input[type='datetime-local'][name='chart_start']")
+        end_input = page.find("input[type='datetime-local'][name='chart_end']")
+        start_canonical = page.find("input[type='hidden'][name='chart_start'][disabled]", visible: :all)
+        end_canonical = page.find("input[type='hidden'][name='chart_end'][disabled]", visible: :all)
+        time_zone_input = page.find("input[type='hidden'][name='chart_time_zone'][disabled]", visible: :all)
+
+        expect(response).to have_http_status(:ok)
+        expect(form["data-action"]).to eq("submit->performance-range#prepareSubmission")
+        expect(start_input["value"]).to eq("2024-01-01T06:33:17")
+        expect(end_input["value"]).to eq("2024-01-01T07:37:42")
+        expect(start_canonical["value"]).to eq("2024-01-01T06:33:17-03:30")
+        expect(end_canonical["value"]).to eq("2024-01-01T07:37:42-03:30")
+        expect(time_zone_input["value"]).to be_blank
+        expect(page).to have_css("#performance-range-time-zone > span:first-child", text: "Time zone:")
+        expect(page).to have_css("[data-performance-range-target='timeZoneLabel']", text: "America/St_Johns")
+        expect(page).to have_link("Last 1 hour", href: performance_index_path(chart_range: "1h", locale: nil))
+        expect(page.find("a.performance-range-reset")[:href]).to eq(performance_index_path(locale: nil))
+        expect(page).to have_no_css("a.performance-range-reset.disabled")
+      end
+    end
+
+    it "canonicalizes browser-local edits and removes the transient timezone" do
+      Time.use_zone("UTC") do
+        get :index, params: {
+          chart_start: "2024-01-01T10:03:17",
+          chart_end: "2024-01-01T11:07:42",
+          chart_time_zone: "America/St_Johns",
+        }
+
+        query = Rack::Utils.parse_query(URI.parse(response.location).query)
+
+        expect(response).to have_http_status(:redirect)
+        expect(query).to eq(
+          "chart_start" => "2024-01-01T13:33:17Z",
+          "chart_end" => "2024-01-01T14:37:42Z"
+        )
+      end
+    end
+
     it "rejects nonexistent local endpoint times without redirecting twice" do
       Time.use_zone("America/New_York") do
         [

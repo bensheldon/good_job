@@ -257,6 +257,7 @@ zh-CN:
         reset_range: 重置性能时间范围
         start_time: 开始时间
         time_range: 性能时间范围
+        time_zone: 时区：
       show:
         slow: 慢
         title: 性能

@@ -257,6 +257,7 @@ it:
         reset_range: Reimposta intervallo di tempo delle prestazioni
         start_time: Ora di inizio
         time_range: Intervallo di tempo delle prestazioni
+        time_zone: 'Fuso orario:'
       show:
         slow: Lento
         title: Prestazioni

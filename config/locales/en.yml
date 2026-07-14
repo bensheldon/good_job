@@ -257,6 +257,7 @@ en:
         reset_range: Reset performance time range
         start_time: Start time
         time_range: Performance time range
+        time_zone: 'Time zone:'
       show:
         slow: Slow
         title: Performance

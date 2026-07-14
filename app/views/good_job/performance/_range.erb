@@ -2,29 +2,53 @@
 <% reset_range_label = t(".reset_range") %>
 <% reset_range_path = range_context.any? ? "#{range_path}?#{range_context.to_query}" : range_path %>
 <% time_zone_label = Time.zone.name %>
+<% range_form_data = {
+  action: "submit->performance-range#prepareSubmission",
+  controller: "performance-range",
+  performance_range_application_time_zone_value: time_zone_label,
+  performance_range_end_fallback_value: performance_range.end_local_value,
+  performance_range_end_label_value: performance_range.end_label,
+  performance_range_end_timestamp_value: performance_range.canonical_timestamp(performance_range.end_time),
+  performance_range_maximum_value: GoodJob::PerformanceRange::MAXIMUM_LOCAL_VALUE,
+  performance_range_minimum_value: GoodJob::PerformanceRange::MINIMUM_LOCAL_VALUE,
+  performance_range_start_fallback_value: performance_range.start_local_value,
+  performance_range_start_label_value: performance_range.start_label,
+  performance_range_start_timestamp_value: performance_range.canonical_timestamp(performance_range.start_time),
+} %>
 
-<div class="performance-range-toolbar d-flex flex-wrap align-items-center justify-content-end gap-2 my-3">
-  <span class="performance-range-label small text-body-secondary" id="performance-range-time-zone">
-    <%= t ".time_range" %> (<%= time_zone_label %>)
-  </span>
-  <%= tag.form action: range_path, method: "get", class: "performance-range-control", aria: { label: t(".time_range") }, data: { controller: "performance-range", performance_range_minimum_value: GoodJob::PerformanceRange::MINIMUM_LOCAL_VALUE, performance_range_maximum_value: GoodJob::PerformanceRange::MAXIMUM_LOCAL_VALUE } do %>
-    <% if range_context["locale"] %>
-      <%= hidden_field_tag "locale", range_context["locale"] %>
-    <% end %>
-    <label class="performance-range-state performance-range-date" title="<%= t(".start_time") %> (<%= time_zone_label %>)">
+<%= tag.form(
+      action: range_path,
+      method: "get",
+      class: "performance-range-toolbar mb-3",
+      aria: { describedby: "performance-range-time-zone", labelledby: "performance-range-name" },
+      data: range_form_data
+    ) do %>
+  <span class="visually-hidden" id="performance-range-name"><%= t ".time_range" %></span>
+  <div class="performance-range-time-zone small text-body-secondary mb-2" id="performance-range-time-zone">
+    <span><%= t ".time_zone" %></span>
+    <span data-performance-range-target="timeZoneLabel"><%= time_zone_label %></span>
+  </div>
+  <% if range_context["locale"] %>
+    <%= hidden_field_tag "locale", range_context["locale"] %>
+  <% end %>
+  <%= hidden_field_tag "chart_start", performance_range.canonical_timestamp(performance_range.start_time), disabled: true, id: nil, data: { performance_range_target: "startCanonicalInput" } %>
+  <%= hidden_field_tag "chart_end", performance_range.canonical_timestamp(performance_range.end_time), disabled: true, id: nil, data: { performance_range_target: "endCanonicalInput" } %>
+  <%= hidden_field_tag GoodJob::PerformanceRange::TIME_ZONE_PARAMETER_KEY, nil, disabled: true, id: nil, data: { performance_range_target: "timeZoneInput" } %>
+  <div class="performance-range-control">
+    <label class="performance-range-state performance-range-date" title="<%= t ".start_time" %>">
       <%= render_icon "clock", class: "me-1" %>
       <span data-performance-range-target="startLabel"><%= performance_range.start_label %></span>
-      <%= datetime_local_field_tag "chart_start", performance_range.start_local_value, min: GoodJob::PerformanceRange::MINIMUM_LOCAL_VALUE, max: GoodJob::PerformanceRange::MAXIMUM_LOCAL_VALUE, step: 1, required: true, class: "performance-range-native-input", aria: { describedby: "performance-range-time-zone", label: t(".start_time") }, data: { performance_range_target: "startInput", action: "input->performance-range#constrain change->performance-range#constrain change->performance-range#submitRange click->performance-range#openPicker" } %>
+      <%= datetime_local_field_tag "chart_start", performance_range.start_local_value, min: GoodJob::PerformanceRange::MINIMUM_LOCAL_VALUE, max: GoodJob::PerformanceRange::MAXIMUM_LOCAL_VALUE, step: 1, required: true, class: "performance-range-native-input", aria: { describedby: "performance-range-time-zone", label: t(".start_time") }, data: { performance_range_target: "startInput", action: "input->performance-range#edit input->performance-range#constrain change->performance-range#constrain change->performance-range#submitRange click->performance-range#openPicker" } %>
     </label>
-    <label class="performance-range-state performance-range-date" title="<%= t(".end_time") %> (<%= time_zone_label %>)">
+    <label class="performance-range-state performance-range-date" title="<%= t ".end_time" %>">
       <span data-performance-range-target="endLabel"><%= performance_range.end_label %></span>
-      <%= datetime_local_field_tag "chart_end", performance_range.end_local_value, min: GoodJob::PerformanceRange::MINIMUM_LOCAL_VALUE, max: GoodJob::PerformanceRange::MAXIMUM_LOCAL_VALUE, step: 1, required: true, class: "performance-range-native-input", aria: { describedby: "performance-range-time-zone", label: t(".end_time") }, data: { performance_range_target: "endInput", action: "input->performance-range#constrain change->performance-range#constrain change->performance-range#submitRange click->performance-range#openPicker" } %>
+      <%= datetime_local_field_tag "chart_end", performance_range.end_local_value, min: GoodJob::PerformanceRange::MINIMUM_LOCAL_VALUE, max: GoodJob::PerformanceRange::MAXIMUM_LOCAL_VALUE, step: 1, required: true, class: "performance-range-native-input", aria: { describedby: "performance-range-time-zone", label: t(".end_time") }, data: { performance_range_target: "endInput", action: "input->performance-range#edit input->performance-range#constrain change->performance-range#constrain change->performance-range#submitRange click->performance-range#openPicker" } %>
     </label>
     <div class="performance-range-selector">
       <span class="performance-range-state performance-range-key">
         <%= range_badge_label %>
       </span>
-      <button class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split performance-range-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="<%= t ".open_time_ranges" %>">
+      <button class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split performance-range-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="<%= t ".open_time_ranges" %>">
         <span class="visually-hidden"><%= t ".open_time_ranges" %></span>
       </button>
       <ul class="dropdown-menu dropdown-menu-end performance-range-menu">
@@ -57,9 +81,9 @@
         </li>
       </ul>
     </div>
-    <%= link_to reset_range_path, class: ["btn", "btn-sm", "btn-outline-secondary", "performance-range-reset", ("disabled" if performance_range.default?)], aria: { disabled: performance_range.default?, label: reset_range_label }, tabindex: ("-1" if performance_range.default?), title: reset_range_label do %>
+    <%= link_to reset_range_path, class: ["btn", "btn-outline-secondary", "performance-range-reset", ("disabled" if performance_range.default?)], aria: { disabled: performance_range.default?, label: reset_range_label }, tabindex: ("-1" if performance_range.default?), title: reset_range_label do %>
       <%= render_icon "arrow_clockwise" %>
       <span class="visually-hidden"><%= reset_range_label %></span>
     <% end %>
-  <% end %>
-</div>
+  </div>
+<% end %>

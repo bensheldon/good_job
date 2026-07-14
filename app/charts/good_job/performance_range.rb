@@ -3,8 +3,11 @@
 module GoodJob
   class PerformanceRange
     PARAMETER_KEYS = %w[chart_range chart_start chart_end].freeze
+    TIME_ZONE_PARAMETER_KEY = "chart_time_zone"
+    INPUT_PARAMETER_KEYS = [*PARAMETER_KEYS, TIME_ZONE_PARAMETER_KEY].freeze
     DEFAULT_KEY = "24h"
     MAXIMUM = 24.hours * 31
+    MAXIMUM_TIME_ZONE_LENGTH = 255
     # Restrict custom bounds to portable four-digit years in the timezone used by the page.
     MINIMUM_YEAR = 1000
     MAXIMUM_YEAR = 9999
@@ -19,24 +22,28 @@ module GoodJob
         duration: 1.hour,
         interval_seconds: 5.minutes.to_i,
         label_format: "%H:%M",
+        label_style: "time",
       },
       "6h" => {
         label: "6h",
         duration: 6.hours,
         interval_seconds: 15.minutes.to_i,
         label_format: "%H:%M",
+        label_style: "time",
       },
       "24h" => {
         label: "24h",
         duration: 24.hours,
         interval_seconds: 1.hour.to_i,
         label_format: "%H:%M",
+        label_style: "time",
       },
       "7d" => {
         label: "7d",
         duration: 24.hours * 7,
         interval_seconds: 6.hours.to_i,
         label_format: "%b %-d %H:%M",
+        label_style: "date_time",
       },
     }.freeze
 
@@ -47,11 +54,12 @@ module GoodJob
       [MAXIMUM, OPTIONS.fetch("7d")],
     ].freeze
 
-    attr_reader :end_time, :interval_seconds, :key, :label_format, :start_time
+    attr_reader :end_time, :interval_seconds, :key, :label_format, :label_style, :start_time
 
     def initialize(params = nil, query_string: nil, **parameter_keywords)
       @params = params || parameter_keywords
       @repeated_parameter_keys = repeated_parameter_keys(query_string)
+      @local_time_zone = local_time_zone
       resolve
     end
 
@@ -60,7 +68,7 @@ module GoodJob
     end
 
     def canonical_parameters?(query_parameters)
-      query_parameters.slice(*PARAMETER_KEYS) == to_params
+      query_parameters.slice(*INPUT_PARAMETER_KEYS) == to_params
     end
 
     def chart_timestamp_label(timestamp)
@@ -181,11 +189,11 @@ module GoodJob
       return [] if query_string.blank?
 
       keys = URI.decode_www_form(query_string).filter_map do |key, _value|
-        key if PARAMETER_KEYS.include?(key)
+        key if INPUT_PARAMETER_KEYS.include?(key)
       end
       keys.tally.select { |_key, count| count > 1 }.keys
     rescue ArgumentError
-      PARAMETER_KEYS
+      INPUT_PARAMETER_KEYS
     end
 
     def query_attribute(name, value, type)
@@ -197,6 +205,8 @@ module GoodJob
     end
 
     def parse_local_time(parameter_key, match)
+      return unless @local_time_zone
+
       components = match.captures
       components[-1] ||= "0"
       numeric_components = components.map { |component| Integer(component, 10) }
@@ -204,7 +214,7 @@ module GoodJob
       normalized_value = format("%04d-%02d-%02dT%02d:%02d:%02d", *numeric_components)
       return unless local_time.strftime("%Y-%m-%dT%H:%M:%S") == normalized_value
 
-      periods = Time.zone.tzinfo.periods_for_local(local_time)
+      periods = @local_time_zone.tzinfo.periods_for_local(local_time)
       return if periods.empty?
 
       # A local input cannot carry an offset. Include both repeated fall-back occurrences
@@ -213,6 +223,20 @@ module GoodJob
         (local_time - period.utc_total_offset).in_time_zone
       end
       parameter_key == "chart_end" ? instants.max : instants.min
+    end
+
+    def local_time_zone
+      return if @repeated_parameter_keys.include?(TIME_ZONE_PARAMETER_KEY)
+
+      value = @params[TIME_ZONE_PARAMETER_KEY] || @params[TIME_ZONE_PARAMETER_KEY.to_sym]
+      return Time.zone if value.nil?
+      return unless value.is_a?(String) && value.bytesize <= MAXIMUM_TIME_ZONE_LENGTH
+      return unless /\A[A-Za-z0-9._+-]+(?:\/[A-Za-z0-9._+-]+)*\z/.match?(value)
+
+      tzinfo = TZInfo::Timezone.get(value)
+      ActiveSupport::TimeZone.create(value, nil, tzinfo)
+    rescue TZInfo::InvalidTimezoneIdentifier
+      nil
     end
 
     def range_label(time)
@@ -255,6 +279,7 @@ module GoodJob
 
       @interval_seconds = options.fetch(:interval_seconds)
       @label_format = options.fetch(:label_format)
+      @label_style = options.fetch(:label_style)
     end
 
     def preset_key

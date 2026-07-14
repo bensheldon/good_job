@@ -161,6 +161,91 @@ RSpec.describe GoodJob::PerformanceRange do
       end
     end
 
+    it "resolves edited local values in a validated browser timezone and strips transient state" do
+      Time.use_zone("UTC") do
+        submitted_parameters = {
+          "chart_start" => "2024-01-01T10:03:17",
+          "chart_end" => "2024-01-01T11:07:42",
+          "chart_time_zone" => "America/St_Johns",
+        }
+        range = described_class.new(submitted_parameters.symbolize_keys)
+
+        expect(range.start_time).to eq(Time.iso8601("2024-01-01T10:03:17-03:30"))
+        expect(range.end_time).to eq(Time.iso8601("2024-01-01T11:07:42-03:30"))
+        expect(range.to_params).to eq(
+          "chart_start" => "2024-01-01T13:33:17Z",
+          "chart_end" => "2024-01-01T14:37:42Z"
+        )
+        expect(range.canonical_parameters?(submitted_parameters)).to be(false)
+      end
+    end
+
+    it "uses browser-zone gap and fold rules independently of the application timezone" do
+      Time.use_zone("UTC") do
+        gap = described_class.new(
+          chart_start: "2024-03-10T02:30:00",
+          chart_end: "2024-03-10T04:00:00",
+          chart_time_zone: "America/New_York"
+        )
+        fold = described_class.new(
+          chart_start: "2024-11-03T01:15:00",
+          chart_end: "2024-11-03T01:45:00",
+          chart_time_zone: "America/New_York"
+        )
+
+        expect(gap).to be_default
+        expect(fold.start_time).to eq(Time.iso8601("2024-11-03T01:15:00-04:00"))
+        expect(fold.end_time).to eq(Time.iso8601("2024-11-03T01:45:00-05:00"))
+        expect(fold.end_time - fold.start_time).to eq(90.minutes.to_i)
+      end
+    end
+
+    it "rejects invalid, oversized, structured, and repeated browser timezone state" do
+      base_parameters = {
+        chart_start: "2024-01-01T10:03:17",
+        chart_end: "2024-01-01T11:07:42",
+      }
+      invalid_values = [
+        "Missing/Zone",
+        "A" * (described_class::MAXIMUM_TIME_ZONE_LENGTH + 1),
+        ["America/Toronto"],
+        { name: "America/Toronto" },
+      ]
+
+      invalid_values.each do |value|
+        expect(described_class.new(**base_parameters, chart_time_zone: value)).to be_default
+      end
+
+      exact = described_class.new(
+        chart_start: "2024-01-01T10:03:17Z",
+        chart_end: "2024-01-01T11:07:42Z",
+        chart_time_zone: "Missing/Zone"
+      )
+      expect(exact.to_params).to eq(
+        "chart_start" => "2024-01-01T10:03:17Z",
+        "chart_end" => "2024-01-01T11:07:42Z"
+      )
+      exact_with_zone = {
+        "chart_start" => "2024-01-01T10:03:17Z",
+        "chart_end" => "2024-01-01T11:07:42Z",
+        "chart_time_zone" => "Missing/Zone",
+      }
+      expect(exact.canonical_parameters?(exact_with_zone)).to be(false)
+
+      query_string = URI.encode_www_form([
+                                           ["chart_start", base_parameters.fetch(:chart_start)],
+                                           ["chart_end", base_parameters.fetch(:chart_end)],
+                                           ["chart_time_zone", "America/Toronto"],
+                                           ["chart_time_zone", "UTC"],
+                                         ])
+      repeated = described_class.new(
+        base_parameters.merge(chart_time_zone: "UTC"),
+        query_string: query_string
+      )
+
+      expect(repeated).to be_default
+    end
+
     it "rejects nonexistent local times and explicitly spans both fall-back occurrences" do
       Time.use_zone("America/New_York") do
         [

@@ -257,6 +257,7 @@ de:
         reset_range: Leistungszeitraum zurücksetzen
         start_time: Startzeit
         time_range: Leistungszeitraum
+        time_zone: 'Zeitzone:'
       show:
         slow: Langsam
         title: Leistung

@@ -12,11 +12,12 @@
 
 .performance-range-control {
   align-items: stretch;
-  display: inline-flex;
+  display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
-  justify-content: flex-end;
+  justify-content: flex-start;
   max-width: 100%;
+  width: 100%;
 }
 
 .performance-range-state,
@@ -28,11 +29,11 @@
 .performance-range-state {
   background-color: var(--bs-body-bg);
   border: var(--bs-border-width) solid var(--bs-border-color);
-  border-radius: var(--bs-border-radius-sm);
+  border-radius: var(--bs-border-radius);
   color: var(--bs-body-color);
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: 1.5;
-  padding: 0.25rem 0.5rem;
+  padding: 0.375rem 0.75rem;
   white-space: nowrap;
 }
 
@@ -128,21 +129,6 @@
   .performance-range-control {
     gap: 0.125rem;
     width: 100%;
-  }
-
-  .performance-range-state {
-    font-size: 0.75rem;
-    padding-left: 0.3rem;
-    padding-right: 0.3rem;
-  }
-
-  .performance-range-control .btn {
-    padding-left: 0.375rem;
-    padding-right: 0.375rem;
-  }
-
-  .performance-range-key {
-    min-width: 2rem;
   }
 }
 

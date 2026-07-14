@@ -257,6 +257,7 @@ tr:
         reset_range: Performans zaman aralığını sıfırla
         start_time: Başlangıç zamanı
         time_range: Performans zaman aralığı
+        time_zone: 'Saat dilimi:'
       show:
         slow: Yavaş
         title: Performans

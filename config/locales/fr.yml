@@ -257,6 +257,7 @@ fr:
         reset_range: Réinitialiser la plage horaire de performance
         start_time: Heure de début
         time_range: Plage horaire de performance
+        time_zone: 'Fuseau horaire :'
       show:
         slow: Lent
         title: Performance

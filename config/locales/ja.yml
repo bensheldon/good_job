@@ -257,6 +257,7 @@ ja:
         reset_range: パフォーマンスの時間範囲をリセット
         start_time: 開始時刻
         time_range: パフォーマンスの時間範囲
+        time_zone: 'タイムゾーン:'
       show:
         slow: 遅い
         title: パフォーマンス
