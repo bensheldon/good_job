@@ -319,7 +319,7 @@ describe 'Performance Page', :js do
           chart_start: "2004-07-01T00:00:00Z",
           chart_end: "2024-07-01T00:00:00Z",
         },
-        bucket_size: "365d",
+        bucket_size: "~1y",
         style: "date_time_year",
       },
     ]
