@@ -168,18 +168,23 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
       end
     end
 
-    it "redirects over-maximum custom input to its clamped canonical bounds" do
+    it "renders custom input longer than 31 days without truncating its bounds" do
       get :index, params: {
         chart_start: "2023-01-01T00:00:00Z",
         chart_end: "2024-01-01T00:00:00Z",
       }
 
-      query = Rack::Utils.parse_query(URI.parse(response.location).query)
+      range = controller.instance_variable_get(:@performance_range)
 
-      expect(response).to have_http_status(:redirect)
-      expect(query).to eq(
-        "chart_start" => "2023-12-01T00:00:00Z",
+      expect(response).to have_http_status(:ok)
+      expect(range.to_params).to eq(
+        "chart_start" => "2023-01-01T00:00:00Z",
         "chart_end" => "2024-01-01T00:00:00Z"
+      )
+      expect(range.interval_seconds).to eq(14.days.to_i)
+      expect(Capybara.string(response.body)).to have_css(
+        ".performance-chart-bucket-size",
+        text: "Chart bucket size: 14d"
       )
     end
 
@@ -206,27 +211,20 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
       expect(Rack::Utils.parse_query(URI.parse(response.location).query)).to eq("chart_range" => "1h")
     end
 
-    it "clamps fall-DST input to 31 elapsed days and renders its canonical range" do
+    it "renders a long fall-DST range without truncating elapsed time" do
       Time.use_zone("America/New_York") do
         get :index, params: {
           chart_start: "2024-09-01T00:00:00-04:00",
           chart_end: "2024-11-04T00:00:00-05:00",
         }
 
-        query = Rack::Utils.parse_query(URI.parse(response.location).query)
-
-        expect(response).to have_http_status(:redirect)
-        expect(query).to eq(
-          "chart_start" => "2024-10-04T01:00:00-04:00",
-          "chart_end" => "2024-11-04T00:00:00-05:00"
-        )
-
-        get :index, params: query
-
         range = controller.instance_variable_get(:@performance_range)
+
         expect(response).to have_http_status(:ok)
-        expect(range.end_time - range.start_time).to eq((24.hours * 31).to_i)
-        expect(range.interval_seconds).to eq(6.hours.to_i)
+        expect(range.start_time.iso8601).to eq("2024-09-01T00:00:00-04:00")
+        expect(range.end_time.iso8601).to eq("2024-11-04T00:00:00-05:00")
+        expect(range.end_time - range.start_time).to eq((64.days + 1.hour).to_i)
+        expect(range.interval_seconds).to eq(3.days.to_i)
       end
     end
   end
@@ -258,6 +256,7 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Performance time range")
+      expect(Capybara.string(response.body)).to have_no_css(".performance-chart-bucket-size")
       expect(chart_data.dig(:data, :datasets, 0, :data).sum).to eq(1)
     end
 

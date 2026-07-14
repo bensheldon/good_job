@@ -34,6 +34,18 @@ module GoodJob
       end
     end
 
+    def format_performance_bucket_size(seconds)
+      if seconds >= 1.day
+        "#{seconds / 1.day.to_i}d"
+      elsif (seconds % 1.hour.to_i).zero?
+        "#{seconds / 1.hour.to_i}h"
+      elsif (seconds % 1.minute.to_i).zero?
+        "#{seconds / 1.minute.to_i}m"
+      else
+        "#{seconds}s"
+      end
+    end
+
     def relative_time(timestamp, **options)
       options = options.reverse_merge({ scope: "good_job.datetime.distance_in_words" })
       text = t("good_job.helpers.relative_time.#{timestamp.future? ? 'future' : 'past'}", time: time_ago_in_words(timestamp, **options))

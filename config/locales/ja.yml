@@ -235,6 +235,7 @@ ja:
     performance:
       index:
         average_duration: 平均所要時間
+        chart_bucket_size: 'グラフの集計間隔: %{size}'
         chart_title: 合計実行時間（秒）
         executions: 実行回数
         job_class: ジョブクラス

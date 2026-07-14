@@ -235,6 +235,7 @@ de:
     performance:
       index:
         average_duration: Durchschnittliche Dauer
+        chart_bucket_size: 'Größe des Diagrammintervalls: %{size}'
         chart_title: Gesamtausführungszeit in Sekunden
         executions: Ausführungen
         job_class: Job-Klasse

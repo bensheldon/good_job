@@ -235,6 +235,7 @@ en:
     performance:
       index:
         average_duration: Average duration
+        chart_bucket_size: 'Chart bucket size: %{size}'
         chart_title: Total job execution time in seconds
         executions: Executions
         job_class: Job class

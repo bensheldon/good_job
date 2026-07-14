@@ -261,6 +261,7 @@ ru:
     performance:
       index:
         average_duration: Средняя продолжительность
+        chart_bucket_size: 'Интервал агрегации на диаграмме: %{size}'
         chart_title: Общее время выполнения в секундах
         executions: Выполнения
         job_class: Класс задачи

@@ -17,6 +17,7 @@ export default class extends Controller {
     endFallback: String,
     endLabel: String,
     endTimestamp: String,
+    labelStyle: String,
     maximum: String,
     minimum: String,
     startFallback: String,
@@ -31,6 +32,7 @@ export default class extends Controller {
     this.#enhanceBrowserTimeZone()
 
     this.backwardClockTransition = this.#crossesBackwardClockTransition()
+    this.#configureExactFormatter()
     this.reciprocalConstraints =
       !this.backwardClockTransition &&
       this.startInputTarget.valueAsNumber < this.endInputTarget.valueAsNumber
@@ -76,8 +78,14 @@ export default class extends Controller {
     }
 
     if (this.formatter) {
-      this.startLabelTarget.textContent = this.#formatLabel(this.startInputTarget.value)
-      this.endLabelTarget.textContent = this.#formatLabel(this.endInputTarget.value)
+      this.startLabelTarget.textContent = this.#formatEndpointLabel(
+        this.startInputTarget,
+        this.startTimestampValue,
+      )
+      this.endLabelTarget.textContent = this.#formatEndpointLabel(
+        this.endInputTarget,
+        this.endTimestampValue,
+      )
     }
   }
 
@@ -159,9 +167,33 @@ export default class extends Controller {
         month: "short",
         second: "2-digit",
         timeZone: "UTC",
+        ...(this.labelStyleValue === "date_time_year" ? { year: "numeric" } : {}),
       })
     } catch (_error) {
       // Server-rendered application-zone values and labels remain accurate without Intl.
+    }
+  }
+
+  #configureExactFormatter() {
+    this.exactFormatter = null
+    if (!this.backwardClockTransition) return
+
+    for (const timeZoneName of ["shortOffset", "short"]) {
+      try {
+        this.exactFormatter = new Intl.DateTimeFormat(document.documentElement.lang, {
+          day: "numeric",
+          hour: "2-digit",
+          hourCycle: "h23",
+          minute: "2-digit",
+          month: "short",
+          second: "2-digit",
+          timeZoneName,
+          ...(this.labelStyleValue === "date_time_year" ? { year: "numeric" } : {}),
+        })
+        return
+      } catch (_error) {
+        // Try the next supported timezone-name representation.
+      }
     }
   }
 
@@ -242,6 +274,18 @@ export default class extends Controller {
   #formatLabel(value) {
     const milliseconds = this.#civilMilliseconds(value)
     return milliseconds === null ? "—" : this.formatter.format(new Date(milliseconds))
+  }
+
+  #formatEndpointLabel(input, timestamp) {
+    if (
+      this.exactFormatter &&
+      input.dataset.performanceRangeEdited !== "true"
+    ) {
+      const date = new Date(timestamp)
+      if (Number.isFinite(date.getTime())) return this.exactFormatter.format(date)
+    }
+
+    return this.#formatLabel(input.value)
   }
 
   // Move a civil value by whole seconds and clamp it to the four-digit-year bounds.

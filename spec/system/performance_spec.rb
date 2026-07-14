@@ -304,6 +304,98 @@ describe 'Performance Page', :js do
     end
   end
 
+  it "localizes sub-minute and multi-year chart labels at their required precision" do
+    examples = [
+      {
+        params: {
+          chart_start: "2024-01-01T10:00:01Z",
+          chart_end: "2024-01-01T10:00:46Z",
+        },
+        bucket_size: "2s",
+        style: "time_seconds",
+      },
+      {
+        params: {
+          chart_start: "2004-07-01T00:00:00Z",
+          chart_end: "2024-07-01T00:00:00Z",
+        },
+        bucket_size: "365d",
+        style: "date_time_year",
+      },
+    ]
+
+    with_browser_time_zone("America/St_Johns") do
+      examples.each do |example|
+        visit good_job.performance_index_path(example.fetch(:params))
+
+        label_state = page.evaluate_script(<<~JAVASCRIPT)
+          (() => {
+            const chartElement = document.querySelector("[data-chart-target='canvas']")
+            const chart = Chart.getChart(chartElement)
+            const metadata = JSON.parse(document.querySelector("[data-chart-config-value]").dataset.chartConfigValue).goodJob
+            const options = {
+              hour: "2-digit",
+              hourCycle: "h23",
+              minute: "2-digit",
+            }
+            if (metadata.timestamp_label_style === "time_seconds") options.second = "2-digit"
+            if (["date_time", "date_time_year"].includes(metadata.timestamp_label_style)) {
+              options.day = "numeric"
+              options.month = "short"
+            }
+            if (metadata.timestamp_label_style === "date_time_year") options.year = "numeric"
+
+            return {
+              actual: chart.data.labels[0],
+              coordinateCount: metadata.timestamps.length,
+              expected: new Intl.DateTimeFormat(document.documentElement.lang, options).format(new Date(metadata.timestamps[0])),
+              labelStyle: metadata.timestamp_label_style,
+            }
+          })()
+        JAVASCRIPT
+
+        expect(label_state.fetch("actual")).to eq(label_state.fetch("expected"))
+        expect(label_state.fetch("coordinateCount")).to be <= GoodJob::PerformanceRange::MAXIMUM_TIME_SERIES_COORDINATES
+        expect(label_state.fetch("labelStyle")).to eq(example.fetch(:style))
+        expect(page).to have_css(
+          ".performance-chart-bucket-size",
+          text: "Chart bucket size: #{example.fetch(:bucket_size)}"
+        )
+
+        next unless example.fetch(:style) == "date_time_year"
+
+        endpoint_labels = all(".performance-range-date").map(&:text)
+        expect(endpoint_labels.first).to include("2004")
+        expect(endpoint_labels.last).to include("2024")
+      end
+    end
+  end
+
+  it "disambiguates repeated fall-back chart ticks and exact endpoints in browser time" do
+    with_time_zone("America/New_York") do
+      with_browser_time_zone("America/New_York") do
+        visit good_job.performance_index_path(
+          chart_start: "2024-11-03T00:45:00-04:00",
+          chart_end: "2024-11-03T01:45:00-05:00"
+        )
+
+        label_state = page.evaluate_script(<<~JAVASCRIPT)
+          (() => {
+            const chart = Chart.getChart(document.querySelector("[data-chart-target='canvas']"))
+            return {
+              chartLabels: chart.data.labels,
+              endpointLabels: Array.from(document.querySelectorAll(".performance-range-date"), element => element.innerText.trim()),
+            }
+          })()
+        JAVASCRIPT
+
+        expect(label_state.fetch("chartLabels")).to include("01:00 GMT-4", "01:00 GMT-5")
+        expect(label_state.dig("endpointLabels", 0)).to include("GMT-4")
+        expect(label_state.dig("endpointLabels", 1)).to include("GMT-5")
+      end
+    end
+  end
+
   it "prepares browser-local edits submitted directly through the form" do
     with_browser_time_zone("America/St_Johns") do
       visit good_job.performance_index_path(

@@ -235,6 +235,7 @@ zh-CN:
     performance:
       index:
         average_duration: 平均时长
+        chart_bucket_size: 图表聚合间隔：%{size}
         chart_title: 任务总执行时间（秒）
         executions: 执行次数
         job_class: 任务 Class

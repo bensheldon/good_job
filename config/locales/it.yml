@@ -235,6 +235,7 @@ it:
     performance:
       index:
         average_duration: Durata media
+        chart_bucket_size: 'Dimensione dell’intervallo del grafico: %{size}'
         chart_title: Tempo totale di esecuzione in secondi
         executions: Esecuzioni
         job_class: Classe del job

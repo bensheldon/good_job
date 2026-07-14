@@ -261,6 +261,7 @@ uk:
     performance:
       index:
         average_duration: Середня тривалість
+        chart_bucket_size: 'Часова деталізація діаграми: %{size}'
         chart_title: Загальний час виконання в секундах
         executions: Виконання
         job_class: Клас завдання

@@ -17,7 +17,7 @@ module GoodJob
         FROM generate_series(
           $1::timestamp,
           $2::timestamp,
-          $3::integer * INTERVAL '1 second'
+          $3::bigint * INTERVAL '1 second'
         ) timestamp
         LEFT JOIN (
           SELECT
@@ -33,10 +33,10 @@ module GoodJob
       executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(sum_query), "GoodJob Performance Chart", binds) }
 
       job_names = executions_data.reject { |d| d['sum'].nil? }.map { |d| d['job_class'] || BaseFilter::EMPTY }.uniq
-      labels = []
+      timestamp_values = []
       timestamps = []
       jobs_data = executions_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
-        labels << @range.chart_timestamp_label(timestamp)
+        timestamp_values << timestamp
         timestamps << @range.canonical_timestamp(timestamp)
         job_names.each do |job_class|
           sum = values.find { |d| d['job_class'] == job_class }&.[]('sum')
@@ -44,6 +44,7 @@ module GoodJob
           (hash[job_class] ||= []) << duration
         end
       end
+      labels = @range.chart_timestamp_labels(timestamp_values)
 
       {
         type: "line",

@@ -235,6 +235,7 @@ fr:
     performance:
       index:
         average_duration: Durée moyenne
+        chart_bucket_size: 'Taille de l’intervalle du graphique : %{size}'
         chart_title: Temps total d'exécution des tâches en secondes
         executions: Exécutions
         job_class: Classe de tâche

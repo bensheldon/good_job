@@ -112,17 +112,66 @@ export default class extends Controller {
         hourCycle: "h23",
         minute: "2-digit",
       }
-      if (this.goodJobChart.timestamp_label_style === "date_time") {
+      if (this.goodJobChart.timestamp_label_style === "time_seconds") {
+        options.second = "2-digit"
+      }
+      if (["date_time", "date_time_year"].includes(this.goodJobChart.timestamp_label_style)) {
         options.day = "numeric"
         options.month = "short"
+      }
+      if (this.goodJobChart.timestamp_label_style === "date_time_year") {
+        options.year = "numeric"
       }
       const formatter = new Intl.DateTimeFormat(document.documentElement.lang, options)
       if (!formatter.resolvedOptions().timeZone) return
 
-      chartData.data.labels = dates.slice(boundaryTimestamps.length).map(date => formatter.format(date))
+      const chartDates = dates.slice(boundaryTimestamps.length)
+      const labels = chartDates.map(date => formatter.format(date))
+      const timeZoneFormatter = this.#timeZoneFormatter()
+      if (!timeZoneFormatter) {
+        chartData.data.labels = labels
+        return
+      }
+
+      const timeZoneNames = chartDates.map(date => this.#timeZoneName(timeZoneFormatter, date))
+      const groupedIndices = labels.reduce((groups, label, index) => {
+        const indices = groups.get(label) || []
+        indices.push(index)
+        groups.set(label, indices)
+        return groups
+      }, new Map())
+
+      groupedIndices.forEach(indices => {
+        if (indices.length < 2) return
+
+        const names = indices.map(index => timeZoneNames[index]).filter(Boolean)
+        if (new Set(names).size < 2) return
+
+        indices.forEach(index => {
+          if (timeZoneNames[index]) labels[index] = `${labels[index]} ${timeZoneNames[index]}`
+        })
+      })
+
+      chartData.data.labels = labels
     } catch (_error) {
       // Preserve application-zone labels when browser localization is unavailable.
     }
+  }
+
+  #timeZoneFormatter() {
+    for (const timeZoneName of ["shortOffset", "short"]) {
+      try {
+        return new Intl.DateTimeFormat(document.documentElement.lang, { timeZoneName })
+      } catch (_error) {
+        // Try the next supported timezone-name representation.
+      }
+    }
+
+    return null
+  }
+
+  #timeZoneName(formatter, date) {
+    return formatter.formatToParts(date).find(part => part.type === "timeZoneName")?.value
   }
 
   #connectRangeSelection() {

@@ -6,7 +6,7 @@ module GoodJob
     TIME_ZONE_PARAMETER_KEY = "chart_time_zone"
     INPUT_PARAMETER_KEYS = [*PARAMETER_KEYS, TIME_ZONE_PARAMETER_KEY].freeze
     DEFAULT_KEY = "24h"
-    MAXIMUM = 24.hours * 31
+    MAXIMUM_TIME_SERIES_COORDINATES = 30
     MAXIMUM_TIME_ZONE_LENGTH = 255
     # Restrict custom bounds to portable four-digit years in the timezone used by the page.
     MINIMUM_YEAR = 1000
@@ -47,12 +47,16 @@ module GoodJob
       },
     }.freeze
 
-    CUSTOM_INTERVALS = [
-      [2.hours, OPTIONS.fetch("1h")],
-      [12.hours, OPTIONS.fetch("6h")],
-      [48.hours, OPTIONS.fetch("24h")],
-      [MAXIMUM, OPTIONS.fetch("7d")],
-    ].freeze
+    # All candidates become integer seconds. The 30-day and 365-day scales are fixed elapsed
+    # durations for readable long-range charts, not calendar month or year aggregation.
+    SEMANTIC_INTERVALS = [
+      *[1, 2, 5, 10, 15, 30].map(&:seconds),
+      *[1, 2, 5, 10, 15, 30].map(&:minutes),
+      *[1, 2, 3, 6, 12].map(&:hours),
+      *[1, 2, 3, 5, 7, 14].map(&:days),
+      *[1, 2, 3, 6].map { |multiple| multiple * 30.days },
+      *[1, 2, 5, 10, 20, 50, 100, 200, 500].map { |multiple| multiple * 365.days },
+    ].map(&:to_i).uniq.sort.freeze
 
     attr_reader :end_time, :interval_seconds, :key, :label_format, :label_style, :start_time
 
@@ -73,6 +77,23 @@ module GoodJob
 
     def chart_timestamp_label(timestamp)
       timestamp.in_time_zone.strftime(label_format)
+    end
+
+    def chart_timestamp_labels(timestamps)
+      labels = timestamps.map { |timestamp| chart_timestamp_label(timestamp) }
+
+      labels.each_index.group_by { |index| labels[index] }.each_value do |indices|
+        next unless indices.many?
+
+        offsets = indices.map { |index| timestamps[index].in_time_zone.formatted_offset }
+        next unless offsets.uniq.many?
+
+        indices.zip(offsets).each do |index, offset|
+          labels[index] = "#{labels[index]} #{offset}"
+        end
+      end
+
+      labels
     end
 
     def canonical_timestamp(timestamp)
@@ -132,7 +153,7 @@ module GoodJob
       [
         query_attribute("series_start_time", series_start_time, ActiveRecord::Type::DateTime.new),
         query_attribute("series_end_time", series_end_time, ActiveRecord::Type::DateTime.new),
-        query_attribute("interval_seconds", interval_seconds, ActiveRecord::Type::Integer.new),
+        query_attribute("interval_seconds", interval_seconds, ActiveRecord::Type::Integer.new(limit: 8)),
       ]
     end
 
@@ -141,9 +162,13 @@ module GoodJob
 
       <<~SQL.squish
         $1::timestamp +
-        FLOOR(EXTRACT(EPOCH FROM (#{column_sql} - $1::timestamp)) / $3::integer) *
-        $3::integer * INTERVAL '1 second'
+        FLOOR(EXTRACT(EPOCH FROM (#{column_sql} - $1::timestamp)) / $3::bigint) *
+        $3::bigint * INTERVAL '1 second'
       SQL
+    end
+
+    def time_series_coordinate_count
+      coordinate_count(interval_seconds)
     end
 
     def to_params
@@ -152,8 +177,15 @@ module GoodJob
 
     private
 
-    def align_time(time)
-      Time.at((time.to_f / interval_seconds).floor * interval_seconds).utc
+    def align_time(time, interval = interval_seconds)
+      Time.at(time.to_r.div(interval) * interval).utc
+    end
+
+    def coordinate_count(interval)
+      first_coordinate = align_time(start_time, interval)
+      last_coordinate = align_time(end_time - Rational(1, 1_000_000), interval)
+
+      ((last_coordinate.to_i - first_coordinate.to_i) / interval) + 1
     end
 
     def custom_times
@@ -161,8 +193,27 @@ module GoodJob
       parsed_end = parse_time("chart_end", @params[:chart_end])
       return unless parsed_start && parsed_end && parsed_start < parsed_end
 
-      parsed_start = parsed_end - MAXIMUM if parsed_end - parsed_start > MAXIMUM
       [parsed_start, parsed_end]
+    end
+
+    def custom_interval_seconds
+      SEMANTIC_INTERVALS.find do |interval|
+        coordinate_count(interval) <= MAXIMUM_TIME_SERIES_COORDINATES
+      end || raise(RangeError, "No safe Performance chart interval for the selected range")
+    end
+
+    def custom_label_options
+      elapsed_seconds = end_time - start_time
+
+      if elapsed_seconds >= 365.days
+        { label_format: "%b %-d, %Y %H:%M", label_style: "date_time_year" }
+      elsif elapsed_seconds > 24.hours
+        { label_format: "%b %-d %H:%M", label_style: "date_time" }
+      elsif interval_seconds < 1.minute
+        { label_format: "%H:%M:%S", label_style: "time_seconds" }
+      else
+        { label_format: "%H:%M", label_style: "time" }
+      end
     end
 
     def parse_time(parameter_key, value)
@@ -240,7 +291,15 @@ module GoodJob
     end
 
     def range_label(time)
-      time.in_time_zone.strftime("%b %-d, %H:%M:%S")
+      local_time = time.in_time_zone
+      format = label_style == "date_time_year" ? "%b %-d, %Y %H:%M:%S" : "%b %-d, %H:%M:%S"
+      label = local_time.strftime(format)
+
+      backward_clock_transition? ? "#{label} #{local_time.formatted_offset}" : label
+    end
+
+    def backward_clock_transition?
+      @_backward_clock_transition ||= end_time.in_time_zone.utc_offset < start_time.in_time_zone.utc_offset
     end
 
     def resolve
@@ -260,8 +319,8 @@ module GoodJob
             "chart_start" => canonical_timestamp(start_time),
             "chart_end" => canonical_timestamp(end_time),
           }
-          options = CUSTOM_INTERVALS.find { |duration, _options| end_time - start_time <= duration }&.last
-          options ||= CUSTOM_INTERVALS.last.last
+          @interval_seconds = custom_interval_seconds
+          options = custom_label_options
         end
       elsif range_key
         @key = range_key
@@ -277,7 +336,7 @@ module GoodJob
         @canonical_params = {}
       end
 
-      @interval_seconds = options.fetch(:interval_seconds)
+      @interval_seconds ||= options.fetch(:interval_seconds)
       @label_format = options.fetch(:label_format)
       @label_style = options.fetch(:label_style)
     end
@@ -290,7 +349,7 @@ module GoodJob
     end
 
     def series_end_time
-      align_time(end_time - 0.000001)
+      align_time(end_time - Rational(1, 1_000_000))
     end
 
     def series_start_time

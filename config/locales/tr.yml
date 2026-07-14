@@ -235,6 +235,7 @@ tr:
     performance:
       index:
         average_duration: Ortalama süre
+        chart_bucket_size: 'Grafiğin zaman ayrıntı düzeyi: %{size}'
         chart_title: Toplam yürütme süresi (saniye)
         executions: Yürütmeler
         job_class: İş sınıfı
