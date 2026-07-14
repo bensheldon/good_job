@@ -2,8 +2,12 @@
 
 module GoodJob
   class PerformanceController < ApplicationController
+    before_action :set_performance_range
+
     def index
-      @performances = GoodJob::Execution.group(:job_class).select("
+      executions = @performance_range.apply(GoodJob::Execution)
+
+      @performances = executions.group(:job_class).select("
         job_class,
         COUNT(*) AS executions_count,
         AVG(duration) AS avg_duration,
@@ -11,18 +15,33 @@ module GoodJob
         MAX(duration) AS max_duration
       ").order(:job_class)
 
-      @queue_performances = GoodJob::Execution.group(:queue_name).select("
+      @queue_performances = executions.group(:queue_name).select("
         queue_name,
         COUNT(*) AS executions_count,
         AVG(duration) AS avg_duration,
         MIN(duration) AS min_duration,
         MAX(duration) AS max_duration
       ").order(:queue_name)
+
+      @chart_data = GoodJob::PerformanceIndexChart.new(@performance_range).data
     end
 
     def show
       representative_job = GoodJob::Job.find_by!(job_class: params[:id])
       @job_class = representative_job.job_class
+      @chart_data = GoodJob::PerformanceShowChart.new(@job_class, @performance_range).data
+    end
+
+    private
+
+    def set_performance_range
+      locale = request.query_parameters["locale"]
+      @performance_range_context = locale.is_a?(String) ? { "locale" => locale } : {}
+      @performance_range = GoodJob::PerformanceRange.new(params, query_string: request.query_string)
+      return if @performance_range.canonical_parameters?(request.query_parameters)
+
+      canonical_query = @performance_range_context.merge(@performance_range.to_params)
+      redirect_to [request.path, canonical_query.to_query.presence].compact.join("?")
     end
   end
 end

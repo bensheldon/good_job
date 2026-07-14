@@ -240,8 +240,21 @@ fr:
         job_class: Classe de tâche
         maximum_duration: Durée maximale
         minimum_duration: Durée minimale
+        no_executions: Aucune exécution dans cette plage horaire.
         queue_name: Nom de la file
         title: Performance
+      range:
+        custom_range: Personnalisé
+        custom_range_hint: faire glisser sur le graphique
+        open_time_ranges: Ouvrir les plages horaires de performance
+        quick_ranges: Plages rapides
+        range_options:
+          1h: Dernière heure
+          24h: Dernières 24 heures
+          6h: Dernières 6 heures
+          7d: 7 derniers jours
+        reset_range: Réinitialiser la plage horaire de performance
+        time_range: Plage horaire de performance
       show:
         slow: Lent
         title: Performance

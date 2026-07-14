@@ -221,9 +221,14 @@ export default class extends Controller {
     const lastIndex = this.#timestampIndexForPixel(Math.max(startX, currentX))
     const timestamps = this.goodJobChart.timestamps
 
-    // Select bucket timestamps so custom ranges stay aligned with the chart.
-    const startTime = new Date(timestamps[firstIndex])
-    const endTime = new Date(timestamps[lastIndex])
+    // Clamp partial edge buckets to the exact page range so drag selection cannot
+    // widen the half-open interval represented by the toolbar and server query.
+    const firstBucketStart = new Date(timestamps[firstIndex]).getTime()
+    const lastBucketEnd = new Date(timestamps[lastIndex]).getTime() + (this.goodJobChart.interval_seconds * 1000)
+    const rangeStart = new Date(this.goodJobChart.range_start).getTime()
+    const rangeEnd = new Date(this.goodJobChart.range_end).getTime()
+    const startTime = new Date(Math.max(firstBucketStart, rangeStart))
+    const endTime = new Date(Math.min(lastBucketEnd, rangeEnd))
 
     return [startTime, endTime]
   }

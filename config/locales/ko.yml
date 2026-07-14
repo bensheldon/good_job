@@ -240,8 +240,21 @@ ko:
         job_class: 작업 클래스
         maximum_duration: 최대 소요 시간
         minimum_duration: 최소 소요 시간
+        no_executions: 이 시간 범위에 실행이 없습니다.
         queue_name: 큐 이름
         title: 성능
+      range:
+        custom_range: 사용자 지정
+        custom_range_hint: 차트에서 드래그
+        open_time_ranges: 성능 시간 범위 열기
+        quick_ranges: 빠른 범위
+        range_options:
+          1h: 최근 1시간
+          24h: 최근 24시간
+          6h: 최근 6시간
+          7d: 최근 7일
+        reset_range: 성능 시간 범위 재설정
+        time_range: 성능 시간 범위
       show:
         slow: 느림
         title: 성능

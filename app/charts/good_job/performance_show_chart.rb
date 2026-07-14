@@ -12,9 +12,10 @@ module GoodJob
       10**8 # About 3 years
     ].freeze
 
-    def initialize(job_class)
+    def initialize(job_class, range = GoodJob::PerformanceRange.new)
       super()
       @job_class = job_class
+      @range = range
     end
 
     def data
@@ -27,7 +28,7 @@ module GoodJob
           COUNT(WIDTH_BUCKET(duration, ARRAY[#{interval_entries}])) AS count
         FROM #{table_name} sources
         WHERE
-          scheduled_at > $1::timestamp
+          scheduled_at >= $1::timestamp
           AND scheduled_at < $2::timestamp
           AND job_class = $3
           AND duration IS NOT NULL
@@ -35,7 +36,7 @@ module GoodJob
       SQL
 
       binds = [
-        *start_end_binds,
+        *@range.start_end_binds,
         @job_class,
       ]
       labels = BUCKET_INTERVALS.map { |interval| GoodJob::ApplicationController.helpers.format_duration(interval) }

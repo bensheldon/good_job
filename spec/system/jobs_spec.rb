@@ -12,60 +12,6 @@ describe 'Jobs', :js, :without_executor do
     expect(page).to have_content 'GoodJob 👍'
   end
 
-  it 'can select and reset a chart range' do
-    visit good_job.jobs_path
-
-    click_button "Open chart time ranges"
-    click_link "Last 1 hour"
-
-    expect(page).to have_current_path(/chart_range=1h/)
-    expect(page).to have_css(".chart-range-key", text: "1h")
-
-    find("a[aria-label='Reset chart time range']").click
-
-    expect(page).to have_no_current_path(/chart_range=/)
-    expect(page).to have_css(".chart-range-key", text: "24h")
-    expect(page).to have_css("a[aria-label='Reset chart time range'].disabled")
-  end
-
-  it 'can reset a custom chart range' do
-    visit good_job.jobs_path(chart_start: "2024-01-01T10:00:00Z", chart_end: "2024-01-01T11:00:00Z")
-
-    expect(page).to have_css(".chart-range-date", text: "Jan 1, 10:00")
-    expect(page).to have_css(".chart-range-date", text: "Jan 1, 11:00")
-    expect(page).to have_css(".chart-range-key", text: "Custom")
-
-    click_button "Open chart time ranges"
-    expect(page).to have_css(".chart-range-menu li.active", text: "Custom")
-    expect(page).to have_content("drag on chart")
-
-    find("a[aria-label='Reset chart time range']").click
-
-    expect(page).to have_no_current_path(/chart_start=/)
-    expect(page).to have_no_current_path(/chart_end=/)
-    expect(page).to have_css(".chart-range-key", text: "24h")
-    expect(page).to have_css("a[aria-label='Reset chart time range'].disabled")
-  end
-
-  it 'can select a custom chart range by dragging the chart' do
-    visit good_job.jobs_path
-
-    chart_area = page.evaluate_script("Chart.getChart(document.querySelector('[data-chart-target=\"canvas\"]')).chartArea")
-    canvas_rect = page.evaluate_script("document.querySelector('[data-chart-target=\"canvas\"]').getBoundingClientRect().toJSON()")
-    y = canvas_rect.fetch("y") + ((chart_area.fetch("top") + chart_area.fetch("bottom")) / 2)
-    start_x = canvas_rect.fetch("x") + chart_area.fetch("left") + (chart_area.fetch("width") * 0.35)
-    end_x = canvas_rect.fetch("x") + chart_area.fetch("left") + (chart_area.fetch("width") * 0.55)
-
-    page.driver.browser.mouse.move(x: start_x, y: y)
-    page.driver.browser.mouse.down
-    page.driver.browser.mouse.move(x: end_x, y: y, steps: 5)
-    page.driver.browser.mouse.up
-
-    expect(page).to have_current_path(/chart_start=/)
-    expect(page).to have_current_path(/chart_end=/)
-    expect(page).to have_css(".chart-range-key", text: "Custom")
-  end
-
   it 'renders each top-level page successfully' do
     visit good_job.jobs_path
     expect(page).to have_content 'GoodJob 👍'

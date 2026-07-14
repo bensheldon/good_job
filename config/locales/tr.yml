@@ -240,8 +240,21 @@ tr:
         job_class: İş sınıfı
         maximum_duration: Maksimum süre
         minimum_duration: Minimum süre
+        no_executions: Bu zaman aralığında yürütme yok.
         queue_name: Kuyruk adı
         title: Performans
+      range:
+        custom_range: Özel
+        custom_range_hint: grafik üzerinde sürükleyin
+        open_time_ranges: Performans zaman aralıklarını aç
+        quick_ranges: Hızlı aralıklar
+        range_options:
+          1h: Son 1 saat
+          24h: Son 24 saat
+          6h: Son 6 saat
+          7d: Son 7 gün
+        reset_range: Performans zaman aralığını sıfırla
+        time_range: Performans zaman aralığı
       show:
         slow: Yavaş
         title: Performans

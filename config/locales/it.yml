@@ -240,8 +240,21 @@ it:
         job_class: Classe del job
         maximum_duration: Durata massima
         minimum_duration: Durata minima
+        no_executions: Nessuna esecuzione in questo intervallo di tempo.
         queue_name: Nome della coda
         title: Prestazioni
+      range:
+        custom_range: Personalizzato
+        custom_range_hint: trascina sul grafico
+        open_time_ranges: Apri intervalli di tempo delle prestazioni
+        quick_ranges: Intervalli rapidi
+        range_options:
+          1h: Ultima ora
+          24h: Ultime 24 ore
+          6h: Ultime 6 ore
+          7d: Ultimi 7 giorni
+        reset_range: Reimposta intervallo di tempo delle prestazioni
+        time_range: Intervallo di tempo delle prestazioni
       show:
         slow: Lento
         title: Prestazioni

@@ -3,40 +3,44 @@
 module GoodJob
   class ScheduledByQueueChart < BaseChart
     def initialize(filter)
-      super(filter.params)
+      super()
       @filter = filter
     end
 
     def data
-      binds = time_series_binds
-      start_time, end_time = binds.first(2).map(&:value)
-      bucket_sql = time_series_bucket_sql("scheduled_at")
+      binds = start_end_binds
+      start_time, end_time = binds.map(&:value)
 
+      # Align the inner range predicate to the same hour buckets the outer generate_series
+      # produces. Doing the truncation in SQL (rather than in Ruby with beginning_of_hour)
+      # keeps both sides on the same grid even when the app's time zone has a fractional
+      # offset from UTC (e.g. IST +05:30). AR serializes Time binds as UTC, so the outer
+      # date_trunc operates in UTC, and this predicate must match that.
       pushdown = <<~SQL.squish
-        "good_jobs"."scheduled_at" >= ?::timestamp
-        AND "good_jobs"."scheduled_at" < ?::timestamp + ?::integer * INTERVAL '1 second'
+        "good_jobs"."scheduled_at" >= date_trunc('hour', ?::timestamp)
+        AND "good_jobs"."scheduled_at" < date_trunc('hour', ?::timestamp) + interval '1 hour'
       SQL
 
       inner_sql = @filter.filtered_query
                          .except(:select, :order)
-                         .where(pushdown, start_time, end_time, chart_interval_seconds)
+                         .where(pushdown, start_time, end_time)
                          .select(:queue_name, :scheduled_at)
                          .to_sql
 
       count_query = <<~SQL.squish
         SELECT *
         FROM generate_series(
-          $1::timestamp,
-          $2::timestamp,
-          $3::integer * INTERVAL '1 second'
+          date_trunc('hour', $1::timestamp),
+          date_trunc('hour', $2::timestamp),
+          '1 hour'
         ) timestamp
         LEFT JOIN (
           SELECT
-              #{bucket_sql} AS scheduled_at,
+              date_trunc('hour', scheduled_at) AS scheduled_at,
               queue_name,
               count(*) AS count
             FROM (#{inner_sql}) sources
-            GROUP BY #{bucket_sql}, queue_name
+            GROUP BY date_trunc('hour', scheduled_at), queue_name
         ) sources ON sources.scheduled_at = timestamp
         ORDER BY timestamp ASC
       SQL
@@ -45,10 +49,8 @@ module GoodJob
 
       queue_names = executions_data.reject { |d| d['count'].nil? }.map { |d| d['queue_name'] || BaseFilter::EMPTY }.uniq
       labels = []
-      timestamps = []
       queues_data = executions_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
-        labels << chart_timestamp_label(timestamp)
-        timestamps << timestamp.in_time_zone.iso8601
+        labels << timestamp.in_time_zone.strftime('%H:%M')
         queue_names.each do |queue_name|
           (hash[queue_name] ||= []) << values.find { |d| d['queue_name'] == queue_name }&.[]('count')
         end
@@ -75,7 +77,6 @@ module GoodJob
             },
           },
         },
-        goodJob: chart_metadata(timestamps),
       }
     end
   end

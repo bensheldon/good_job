@@ -1,0 +1,57 @@
+<% range_badge_label = performance_range.key || t(".custom_range") %>
+<% reset_range_label = t(".reset_range") %>
+<% reset_range_path = range_context.any? ? "#{range_path}?#{range_context.to_query}" : range_path %>
+
+<div class="performance-range-toolbar d-flex flex-wrap align-items-center justify-content-end gap-2 my-3">
+  <span class="performance-range-label small text-body-secondary"><%= t ".time_range" %></span>
+  <div class="performance-range-control" role="group" aria-label="<%= t ".time_range" %>">
+    <span class="performance-range-state performance-range-date">
+      <%= render_icon "clock", class: "me-1" %>
+      <%= performance_range.start_label %>
+    </span>
+    <span class="performance-range-state performance-range-date">
+      <%= performance_range.end_label %>
+    </span>
+    <div class="performance-range-selector">
+      <span class="performance-range-state performance-range-key">
+        <%= range_badge_label %>
+      </span>
+      <button class="btn btn-sm btn-outline-secondary dropdown-toggle dropdown-toggle-split performance-range-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="<%= t ".open_time_ranges" %>">
+        <span class="visually-hidden"><%= t ".open_time_ranges" %></span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end performance-range-menu">
+        <li><h6 class="dropdown-header"><%= t ".quick_ranges" %></h6></li>
+        <% performance_range.options.each do |range| %>
+          <% active = performance_range.key == range[:key] %>
+          <% preset_range_path = "#{range_path}?#{range_context.merge('chart_range' => range[:key]).to_query}" %>
+          <li>
+            <%= link_to preset_range_path, class: ["dropdown-item", "performance-range-menu-item", ("active" if active)], aria: { current: ("page" if active) } do %>
+              <span class="performance-range-option-key"><%= range[:label] %></span>
+              <span class="flex-grow-1"><%= t ".range_options.#{range[:key]}" %></span>
+              <% if active %>
+                <%= render_icon "check", class: "ms-2" %>
+              <% end %>
+            <% end %>
+          </li>
+        <% end %>
+        <li><hr class="dropdown-divider"></li>
+        <li class="<%= "active" if performance_range.custom? %>">
+          <%= tag.span class: "dropdown-item-text performance-range-menu-item", aria: { current: ("page" if performance_range.custom?) } do %>
+            <span class="performance-range-option-key">#</span>
+            <span class="flex-grow-1"><%= t ".custom_range" %></span>
+            <% if local_assigns[:drag_enabled] %>
+              <small class="text-body-secondary"><%= t ".custom_range_hint" %></small>
+            <% end %>
+            <% if performance_range.custom? %>
+              <%= render_icon "check", class: "ms-2" %>
+            <% end %>
+          <% end %>
+        </li>
+      </ul>
+    </div>
+    <%= link_to reset_range_path, class: ["btn", "btn-sm", "btn-outline-secondary", "performance-range-reset", ("disabled" if performance_range.default?)], aria: { disabled: performance_range.default?, label: reset_range_label }, tabindex: ("-1" if performance_range.default?), title: reset_range_label do %>
+      <%= render_icon "arrow_clockwise" %>
+      <span class="visually-hidden"><%= reset_range_label %></span>
+    <% end %>
+  </div>
+</div>

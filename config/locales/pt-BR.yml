@@ -240,8 +240,21 @@ pt-BR:
         job_class: Classe do trabalho
         maximum_duration: Duração máxima
         minimum_duration: Duração mínima
+        no_executions: Nenhuma execução neste intervalo de tempo.
         queue_name: Nome da fila
         title: Desempenho
+      range:
+        custom_range: Personalizado
+        custom_range_hint: arraste no gráfico
+        open_time_ranges: Abrir intervalos de tempo de desempenho
+        quick_ranges: Intervalos rápidos
+        range_options:
+          1h: Última hora
+          24h: Últimas 24 horas
+          6h: Últimas 6 horas
+          7d: Últimos 7 dias
+        reset_range: Redefinir intervalo de tempo de desempenho
+        time_range: Intervalo de tempo de desempenho
       show:
         slow: Lento
         title: Desempenho

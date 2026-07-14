@@ -240,8 +240,21 @@ ja:
         job_class: ジョブクラス
         maximum_duration: 最大所要時間
         minimum_duration: 最小所要時間
+        no_executions: この時間範囲には実行がありません。
         queue_name: キュー名
         title: パフォーマンス
+      range:
+        custom_range: カスタム
+        custom_range_hint: グラフ上でドラッグ
+        open_time_ranges: パフォーマンスの時間範囲を開く
+        quick_ranges: クイック範囲
+        range_options:
+          1h: 過去1時間
+          24h: 過去24時間
+          6h: 過去6時間
+          7d: 過去7日間
+        reset_range: パフォーマンスの時間範囲をリセット
+        time_range: パフォーマンスの時間範囲
       show:
         slow: 遅い
         title: パフォーマンス

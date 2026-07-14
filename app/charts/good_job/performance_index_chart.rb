@@ -2,19 +2,15 @@
 
 module GoodJob
   class PerformanceIndexChart < BaseChart
+    def initialize(range = GoodJob::PerformanceRange.new)
+      super()
+      @range = range
+    end
+
     def data
-      binds = time_series_binds
-      start_time, end_time = binds.first(2).map(&:value)
-      bucket_sql = time_series_bucket_sql("scheduled_at")
-
-      pushdown = <<~SQL.squish
-        scheduled_at >= ?::timestamp
-        AND scheduled_at < ?::timestamp + ?::integer * INTERVAL '1 second'
-      SQL
-
-      inner_sql = GoodJob::Execution.where(pushdown, start_time, end_time, chart_interval_seconds)
-                                    .select(:job_class, :scheduled_at, :duration)
-                                    .to_sql
+      binds = @range.time_series_binds
+      bucket_sql = @range.time_series_bucket_sql("scheduled_at")
+      inner_sql = @range.apply(GoodJob::Execution).select(:job_class, :scheduled_at, :duration).to_sql
 
       sum_query = <<~SQL.squish
         SELECT *
@@ -40,7 +36,7 @@ module GoodJob
       labels = []
       timestamps = []
       jobs_data = executions_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
-        labels << chart_timestamp_label(timestamp)
+        labels << @range.chart_timestamp_label(timestamp)
         timestamps << timestamp.in_time_zone.iso8601
         job_names.each do |job_class|
           sum = values.find { |d| d['job_class'] == job_class }&.[]('sum')
@@ -79,7 +75,13 @@ module GoodJob
             },
           },
         },
-        goodJob: chart_metadata(timestamps),
+        goodJob: {
+          interval_seconds: @range.interval_seconds,
+          range_end: @range.end_time.iso8601,
+          range_start: @range.start_time.iso8601,
+          time_series: true,
+          timestamps: timestamps,
+        },
       }
     end
   end

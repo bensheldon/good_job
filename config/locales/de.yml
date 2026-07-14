@@ -240,8 +240,21 @@ de:
         job_class: Job-Klasse
         maximum_duration: Maximale Dauer
         minimum_duration: Minimale Dauer
+        no_executions: Keine Ausführungen in diesem Zeitraum.
         queue_name: Warteschlangenname
         title: Leistung
+      range:
+        custom_range: Benutzerdefiniert
+        custom_range_hint: im Diagramm ziehen
+        open_time_ranges: Leistungszeiträume öffnen
+        quick_ranges: Schnellauswahl
+        range_options:
+          1h: Letzte Stunde
+          24h: Letzte 24 Stunden
+          6h: Letzte 6 Stunden
+          7d: Letzte 7 Tage
+        reset_range: Leistungszeitraum zurücksetzen
+        time_range: Leistungszeitraum
       show:
         slow: Langsam
         title: Leistung

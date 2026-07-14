@@ -240,8 +240,21 @@ es:
         job_class: Clase de trabajo
         maximum_duration: Duración máxima
         minimum_duration: Duración mínima
+        no_executions: No hay ejecuciones en este intervalo de tiempo.
         queue_name: Nombre de la cola
         title: Rendimiento
+      range:
+        custom_range: Personalizado
+        custom_range_hint: arrastrar en el gráfico
+        open_time_ranges: Abrir intervalos de tiempo de rendimiento
+        quick_ranges: Intervalos rápidos
+        range_options:
+          1h: Última hora
+          24h: Últimas 24 horas
+          6h: Últimas 6 horas
+          7d: Últimos 7 días
+        reset_range: Restablecer intervalo de tiempo de rendimiento
+        time_range: Intervalo de tiempo de rendimiento
       show:
         slow: Lento
         title: Rendimiento

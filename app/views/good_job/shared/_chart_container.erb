@@ -1,62 +1,6 @@
 <% vertical_legend = chart_data.dig(:options, :plugins, :legend, :vertical) %>
-<% chart_metadata = chart_data[:goodJob] || {} %>
-<% chart_ranges = chart_metadata[:ranges] || [] %>
-<% chart_query_params = request.query_parameters.except("chart_start", "chart_end", "after_at", "after_id") %>
-<% default_chart_query_params = chart_query_params.except("chart_range") %>
-<% range_badge_label = chart_metadata[:range_key] || t(".custom_range", default: "Custom") %>
-<% reset_range_label = t(".reset_range", default: "Reset chart time range") %>
 
 <div class="container-fluid" data-controller="chart" data-chart-config-value="<%= chart_data.to_json %>" data-live-poll-region="chart">
-  <% if chart_metadata[:time_series] && chart_ranges.any? %>
-    <div class="chart-range-toolbar d-flex justify-content-end mb-2">
-      <div class="btn-group btn-group-sm chart-range-control" role="group" aria-label="<%= t(".time_range", default: "Chart time range") %>">
-        <span class="btn btn-outline-secondary disabled chart-range-date" aria-disabled="true">
-          <%= render_icon "clock", class: "me-1" %>
-          <%= chart_metadata[:start_label] %>
-        </span>
-        <span class="btn btn-outline-secondary disabled chart-range-date" aria-disabled="true">
-          <%= chart_metadata[:end_label] %>
-        </span>
-        <span class="btn btn-primary disabled chart-range-key" aria-disabled="true">
-          <%= range_badge_label %>
-        </span>
-        <button class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="<%= t(".open_time_ranges", default: "Open chart time ranges") %>">
-          <span class="visually-hidden"><%= t(".open_time_ranges", default: "Open chart time ranges") %></span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end chart-range-menu">
-          <li><h6 class="dropdown-header"><%= t(".quick_ranges", default: "Quick ranges") %></h6></li>
-          <% chart_ranges.each do |range| %>
-            <% active = chart_metadata[:range_key] == range[:key] %>
-            <li>
-              <%= link_to chart_query_params.merge("chart_range" => range[:key]), class: ["dropdown-item", "chart-range-menu-item", ("active" if active)], aria: { current: ("page" if active) } do %>
-                <span class="chart-range-option-key"><%= range[:label] %></span>
-                <span class="flex-grow-1"><%= t(".range_options.#{range[:key]}", default: range[:label]) %></span>
-                <% if active %>
-                  <%= render_icon "check", class: "ms-2" %>
-                <% end %>
-              <% end %>
-            </li>
-          <% end %>
-          <li><hr class="dropdown-divider"></li>
-          <li class="<%= "active" if chart_metadata[:custom_range] %>">
-            <%= tag.span class: "dropdown-item-text chart-range-menu-item", aria: { current: ("page" if chart_metadata[:custom_range]) } do %>
-              <span class="chart-range-option-key">#</span>
-              <span class="flex-grow-1"><%= t(".custom_range", default: "Custom") %></span>
-              <small class="text-body-secondary"><%= t(".custom_range_hint", default: "drag on chart") %></small>
-              <% if chart_metadata[:custom_range] %>
-                <%= render_icon "check", class: "ms-2" %>
-              <% end %>
-            <% end %>
-          </li>
-        </ul>
-        <%= link_to default_chart_query_params, class: ["btn", "btn-outline-secondary", ("disabled" if chart_metadata[:default_range])], aria: { disabled: chart_metadata[:default_range], label: reset_range_label }, tabindex: ("-1" if chart_metadata[:default_range]), title: reset_range_label do %>
-          <%= render_icon "arrow_clockwise" %>
-          <span class="visually-hidden"><%= reset_range_label %></span>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-
   <div class="row d-flex">
     <% if vertical_legend %>
       <div class="row d-flex">
