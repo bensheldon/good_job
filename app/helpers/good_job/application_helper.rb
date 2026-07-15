@@ -36,17 +36,17 @@ module GoodJob
 
     def format_performance_bucket_size(seconds)
       if seconds >= 365.days && (seconds % 365.days.to_i).zero?
-        "~#{seconds / 365.days.to_i}y"
+        t "good_job.performance.range.bucket_size.years", count: seconds / 365.days.to_i
       elsif seconds >= 30.days && (seconds % 30.days.to_i).zero?
-        "~#{seconds / 30.days.to_i}mo"
-      elsif seconds >= 1.day
-        "#{seconds / 1.day.to_i}d"
+        t "good_job.performance.range.bucket_size.months", count: seconds / 30.days.to_i
+      elsif seconds >= 1.day && (seconds % 1.day.to_i).zero?
+        t "good_job.performance.range.bucket_size.days", count: seconds / 1.day.to_i
       elsif (seconds % 1.hour.to_i).zero?
-        "#{seconds / 1.hour.to_i}h"
+        t "good_job.performance.range.bucket_size.hours", count: seconds / 1.hour.to_i
       elsif (seconds % 1.minute.to_i).zero?
-        "#{seconds / 1.minute.to_i}m"
+        t "good_job.performance.range.bucket_size.minutes", count: seconds / 1.minute.to_i
       else
-        "#{seconds}s"
+        t "good_job.performance.range.bucket_size.seconds", count: seconds
       end
     end
 

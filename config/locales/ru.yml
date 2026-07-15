@@ -261,7 +261,6 @@ ru:
     performance:
       index:
         average_duration: Средняя продолжительность
-        chart_bucket_size: 'Интервал агрегации на диаграмме: %{size}'
         chart_title: Общее время выполнения в секундах
         executions: Выполнения
         job_class: Класс задачи
@@ -271,6 +270,14 @@ ru:
         queue_name: Название очереди
         title: Производительность
       range:
+        bucket_size:
+          days: "%{count} д"
+          hours: "%{count}ч"
+          minutes: "%{count}м"
+          months: "~%{count} мес"
+          seconds: "%{count}с"
+          years: "~%{count} г"
+        chart_bucket_size: 'Интервал агрегации на диаграмме: %{size}'
         custom_range: Пользовательский
         custom_range_hint: перетащите на графике
         end_time: Время окончания

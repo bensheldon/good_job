@@ -235,7 +235,6 @@ fr:
     performance:
       index:
         average_duration: Durée moyenne
-        chart_bucket_size: 'Taille de l’intervalle du graphique : %{size}'
         chart_title: Temps total d'exécution des tâches en secondes
         executions: Exécutions
         job_class: Classe de tâche
@@ -245,6 +244,14 @@ fr:
         queue_name: Nom de la file
         title: Performance
       range:
+        bucket_size:
+          days: "%{count}j"
+          hours: "%{count}h"
+          minutes: "%{count}m"
+          months: "~%{count} mois"
+          seconds: "%{count}s"
+          years: "~%{count} an"
+        chart_bucket_size: 'Taille de l’intervalle du graphique : %{size}'
         custom_range: Personnalisé
         custom_range_hint: faire glisser sur le graphique
         end_time: Heure de fin

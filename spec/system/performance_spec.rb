@@ -572,6 +572,80 @@ describe 'Performance Page', :js do
     end
   end
 
+  it "re-engages reciprocal ordering constraints after editing away from a loaded fall-back range" do
+    with_time_zone("America/New_York") do
+      with_browser_time_zone("America/New_York") do
+        visit good_job.performance_index_path(
+          chart_start: "2024-11-03T01:15:00-04:00",
+          chart_end: "2024-11-03T01:45:00-05:00"
+        )
+
+        page.execute_script(<<~JAVASCRIPT)
+          const start = document.querySelector("[data-performance-range-target='startInput']")
+          const end = document.querySelector("[data-performance-range-target='endInput']")
+          start.value = "2024-07-01T10:00:00"
+          start.dispatchEvent(new Event("input", { bubbles: true }))
+          end.value = "2024-07-01T11:00:00"
+          end.dispatchEvent(new Event("input", { bubbles: true }))
+        JAVASCRIPT
+
+        field_state = page.evaluate_script(<<~JAVASCRIPT)
+          (() => {
+            const start = document.querySelector("[data-performance-range-target='startInput']")
+            const end = document.querySelector("[data-performance-range-target='endInput']")
+            return { startMaximum: start.max, endMinimum: end.min }
+          })()
+        JAVASCRIPT
+
+        expect(field_state.fetch("startMaximum")).to eq("2024-07-01T10:59:59")
+        expect(field_state.fetch("endMinimum")).to eq("2024-07-01T10:00:01")
+      end
+    end
+  end
+
+  it "does not lock a still-untouched fall-back endpoint into a stale reciprocal bound" do
+    with_time_zone("America/New_York") do
+      with_browser_time_zone("America/New_York") do
+        visit good_job.performance_index_path(
+          chart_start: "2024-11-03T00:30:00-04:00",
+          chart_end: "2024-11-03T01:15:00-05:00"
+        )
+
+        # A single edit that naively civil-sorts before the untouched end value must not
+        # permanently latch a reciprocal bound derived from that still-ambiguous end value.
+        page.execute_script(<<~JAVASCRIPT)
+          const start = document.querySelector("[data-performance-range-target='startInput']")
+          start.value = "2024-11-03T01:10:00"
+          start.dispatchEvent(new Event("input", { bubbles: true }))
+        JAVASCRIPT
+
+        # Widening start past the untouched end's stale civil value must remain a legitimate,
+        # accepted edit rather than being rejected by a bound computed from that stale value.
+        page.execute_script(<<~JAVASCRIPT)
+          const start = document.querySelector("[data-performance-range-target='startInput']")
+          start.value = "2024-11-03T01:30:00"
+          start.dispatchEvent(new Event("input", { bubbles: true }))
+        JAVASCRIPT
+
+        field_state = page.evaluate_script(<<~JAVASCRIPT)
+          (() => {
+            const start = document.querySelector("[data-performance-range-target='startInput']")
+            const end = document.querySelector("[data-performance-range-target='endInput']")
+            return {
+              endMinimum: end.min,
+              formValid: start.form.checkValidity(),
+              startMaximum: start.max,
+            }
+          })()
+        JAVASCRIPT
+
+        expect(field_state.fetch("startMaximum")).to eq("9999-12-31T23:59:59")
+        expect(field_state.fetch("endMinimum")).to eq("1000-01-01T00:00:00")
+        expect(field_state.fetch("formValid")).to be(true)
+      end
+    end
+  end
+
   it "rejects a browser-local endpoint in a DST gap" do
     with_browser_time_zone("America/New_York") do
       visit good_job.performance_index_path(
@@ -588,6 +662,49 @@ describe 'Performance Page', :js do
 
       expect(page).to have_no_current_path(/chart_(?:range|start|end|time_zone)=/)
       expect(page).to have_css(".performance-range-key", text: "24h")
+    end
+  end
+
+  it "keeps both endpoints in one consistent zone when only one is near the four-digit year boundary" do
+    # Both zones hold a fixed, DST-free offset from UTC deep into the future, so the local year
+    # each one renders for a given instant is deterministic. Pass the zone explicitly (rather than
+    # relying on the global Time.zone) so this computation is independent of request-thread state.
+    phoenix = ActiveSupport::TimeZone["America/Phoenix"]
+
+    with_time_zone("America/Phoenix") do
+      with_browser_time_zone("Asia/Tokyo") do
+        # America/Phoenix (UTC-7) renders this instant with a year-9999 local date.
+        # Asia/Tokyo (UTC+9) renders the same instant with a year-10000 local date, which falls
+        # outside the four-digit year bound even though chart_start is far from any boundary.
+        start_instant = Time.iso8601("9990-01-01T00:00:00Z")
+        end_instant = Time.iso8601("9999-12-31T20:00:00Z")
+
+        visit good_job.performance_index_path(
+          chart_start: start_instant.iso8601,
+          chart_end: end_instant.iso8601
+        )
+
+        field_state = page.evaluate_script(<<~JAVASCRIPT)
+          (() => {
+            const start = document.querySelector("[data-performance-range-target='startInput']")
+            const end = document.querySelector("[data-performance-range-target='endInput']")
+            return {
+              endHasName: end.hasAttribute("name"),
+              endValue: end.value,
+              startHasName: start.hasAttribute("name"),
+              startValue: start.value,
+              timeZoneLabel: document.querySelector("[data-performance-range-target='timeZoneLabel']").textContent,
+            }
+          })()
+        JAVASCRIPT
+
+        expect(end_instant.in_time_zone(phoenix).year).to eq(9999)
+        expect(field_state.fetch("startValue")).to eq(start_instant.in_time_zone(phoenix).strftime("%Y-%m-%dT%H:%M"))
+        expect(field_state.fetch("endValue")).to eq(end_instant.in_time_zone(phoenix).strftime("%Y-%m-%dT%H:%M"))
+        expect(field_state.fetch("startHasName")).to be(true)
+        expect(field_state.fetch("endHasName")).to be(true)
+        expect(field_state.fetch("timeZoneLabel")).to eq(phoenix.name)
+      end
     end
   end
 

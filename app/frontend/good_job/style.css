@@ -40,7 +40,6 @@
 .performance-range-date {
   cursor: pointer;
   gap: 0.25rem;
-  font-weight: 600;
   position: relative;
 }
 
@@ -66,23 +65,7 @@
   border-color: var(--bs-danger);
 }
 
-.performance-range-selector {
-  display: inline-flex;
-  position: relative;
-}
-
-.performance-range-key {
-  background-color: var(--bs-primary-bg-subtle);
-  border-color: var(--bs-primary-border-subtle);
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0;
-  color: var(--bs-primary-text-emphasis);
-  font-weight: 600;
-}
-
 .performance-range-toggle {
-  border-bottom-left-radius: 0;
-  border-top-left-radius: 0;
   margin-left: calc(-1 * var(--bs-border-width));
 }
 
@@ -95,10 +78,6 @@
   z-index: 2;
 }
 
-.performance-range-reload {
-  flex: 0 0 auto;
-}
-
 .performance-range-key,
 .performance-range-option-key {
   justify-content: center;
@@ -107,17 +86,6 @@
 
 .performance-range-menu {
   min-width: 14rem;
-}
-
-.performance-range-menu-item {
-  align-items: center;
-  display: flex;
-  gap: 0.5rem;
-}
-
-.performance-range-menu li.active .performance-range-menu-item {
-  background-color: var(--bs-primary-bg-subtle);
-  color: var(--bs-primary-text-emphasis);
 }
 
 .performance-name {

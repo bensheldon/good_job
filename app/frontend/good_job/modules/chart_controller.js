@@ -1,4 +1,5 @@
 import { Controller } from "stimulus"
+import { buildTimeZoneNameFormatter } from "timezone_name_formatter"
 
 const MINIMUM_RANGE_SELECTION_WIDTH = 8
 
@@ -26,11 +27,14 @@ const generateListItem = (item) => {
   return li;
 }
 
-export default class extends Controller {
+export default class ChartController extends Controller {
   static values = {
     config: Object,
   }
   static targets = ["canvas", "legend"]
+  static LABEL_STYLE_DATE_TIME = "date_time"
+  static LABEL_STYLE_DATE_TIME_YEAR = "date_time_year"
+  static LABEL_STYLE_TIME_SECONDS = "time_seconds"
 
   connect() {
     this.#renderChart()
@@ -112,14 +116,14 @@ export default class extends Controller {
         hourCycle: "h23",
         minute: "2-digit",
       }
-      if (this.goodJobChart.timestamp_label_style === "time_seconds") {
+      if (this.goodJobChart.timestamp_label_style === ChartController.LABEL_STYLE_TIME_SECONDS) {
         options.second = "2-digit"
       }
-      if (["date_time", "date_time_year"].includes(this.goodJobChart.timestamp_label_style)) {
+      if ([ChartController.LABEL_STYLE_DATE_TIME, ChartController.LABEL_STYLE_DATE_TIME_YEAR].includes(this.goodJobChart.timestamp_label_style)) {
         options.day = "numeric"
         options.month = "short"
       }
-      if (this.goodJobChart.timestamp_label_style === "date_time_year") {
+      if (this.goodJobChart.timestamp_label_style === ChartController.LABEL_STYLE_DATE_TIME_YEAR) {
         options.year = "numeric"
       }
       const formatter = new Intl.DateTimeFormat(document.documentElement.lang, options)
@@ -127,7 +131,7 @@ export default class extends Controller {
 
       const chartDates = dates.slice(boundaryTimestamps.length)
       const labels = chartDates.map(date => formatter.format(date))
-      const timeZoneFormatter = this.#timeZoneFormatter()
+      const timeZoneFormatter = buildTimeZoneNameFormatter(document.documentElement.lang)
       if (!timeZoneFormatter) {
         chartData.data.labels = labels
         return
@@ -156,18 +160,6 @@ export default class extends Controller {
     } catch (_error) {
       // Preserve application-zone labels when browser localization is unavailable.
     }
-  }
-
-  #timeZoneFormatter() {
-    for (const timeZoneName of ["shortOffset", "short"]) {
-      try {
-        return new Intl.DateTimeFormat(document.documentElement.lang, { timeZoneName })
-      } catch (_error) {
-        // Try the next supported timezone-name representation.
-      }
-    }
-
-    return null
   }
 
   #timeZoneName(formatter, date) {

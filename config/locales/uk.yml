@@ -261,7 +261,6 @@ uk:
     performance:
       index:
         average_duration: Середня тривалість
-        chart_bucket_size: 'Часова деталізація діаграми: %{size}'
         chart_title: Загальний час виконання в секундах
         executions: Виконання
         job_class: Клас завдання
@@ -271,6 +270,14 @@ uk:
         queue_name: Назва черги
         title: Продуктивність
       range:
+        bucket_size:
+          days: "%{count} д"
+          hours: "%{count}г"
+          minutes: "%{count}хв"
+          months: "~%{count} міс"
+          seconds: "%{count}с"
+          years: "~%{count} р"
+        chart_bucket_size: 'Часова деталізація діаграми: %{size}'
         custom_range: Користувацький
         custom_range_hint: перетягніть на діаграмі
         end_time: Час завершення

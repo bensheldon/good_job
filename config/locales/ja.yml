@@ -235,7 +235,6 @@ ja:
     performance:
       index:
         average_duration: 平均所要時間
-        chart_bucket_size: 'グラフの集計間隔: %{size}'
         chart_title: 合計実行時間（秒）
         executions: 実行回数
         job_class: ジョブクラス
@@ -245,6 +244,14 @@ ja:
         queue_name: キュー名
         title: パフォーマンス
       range:
+        bucket_size:
+          days: "%{count}日"
+          hours: "%{count}時間"
+          minutes: "%{count}分"
+          months: 約%{count}ヶ月
+          seconds: "%{count}秒"
+          years: 約%{count}年
+        chart_bucket_size: 'グラフの集計間隔: %{size}'
         custom_range: カスタム
         custom_range_hint: グラフ上でドラッグ
         end_time: 終了時刻

@@ -2,11 +2,7 @@
   <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
 </div>
 
-<%= render "range", performance_range: @performance_range, drag_enabled: true, range_context: @performance_range_context, range_path: performance_index_path(locale: nil) %>
-
-<p class="performance-chart-bucket-size small text-body-secondary mb-2">
-  <%= t ".chart_bucket_size", size: format_performance_bucket_size(@performance_range.interval_seconds) %>
-</p>
+<%= render "range", performance_range: @performance_range, drag_enabled: true, range_context: @performance_range_context, range_path: performance_index_path(locale: nil), bucket_size: format_performance_bucket_size(@performance_range.interval_seconds) %>
 
 <%= render 'good_job/shared/chart_container', chart_data: @chart_data %>
 

@@ -235,7 +235,6 @@ tr:
     performance:
       index:
         average_duration: Ortalama süre
-        chart_bucket_size: 'Grafiğin zaman ayrıntı düzeyi: %{size}'
         chart_title: Toplam yürütme süresi (saniye)
         executions: Yürütmeler
         job_class: İş sınıfı
@@ -245,6 +244,14 @@ tr:
         queue_name: Kuyruk adı
         title: Performans
       range:
+        bucket_size:
+          days: "%{count}g"
+          hours: "%{count}sa"
+          minutes: "%{count}dk"
+          months: "~%{count} ay"
+          seconds: "%{count}sn"
+          years: "~%{count}y"
+        chart_bucket_size: 'Grafiğin zaman ayrıntı düzeyi: %{size}'
         custom_range: Özel
         custom_range_hint: grafik üzerinde sürükleyin
         end_time: Bitiş zamanı

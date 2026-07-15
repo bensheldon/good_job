@@ -294,6 +294,18 @@ RSpec.describe GoodJob::PerformanceRange do
       end
     end
 
+    it "uses date-inclusive chart labels for a custom range of exactly 24 elapsed hours" do
+      range = described_class.new(
+        chart_start: "2024-01-01T10:00:00Z",
+        chart_end: "2024-01-02T10:00:00Z"
+      )
+
+      expect(range.key).to be_nil
+      expect(range.label_style).to eq("date_time")
+      expect(range.chart_timestamp_label(range.start_time)).to eq("Jan 1 10:00")
+      expect(range.chart_timestamp_label(range.end_time)).to eq("Jan 2 10:00")
+    end
+
     it "includes years in long custom endpoint labels" do
       range = described_class.new(
         chart_start: "2004-07-01T00:00:00Z",
@@ -479,6 +491,17 @@ RSpec.describe GoodJob::PerformanceRange do
       expect(sub_minute_range.chart_timestamp_label(sub_minute_range.start_time)).to eq("10:00:01")
       expect(multi_year_range.label_style).to eq("date_time_year")
       expect(multi_year_range.chart_timestamp_label(multi_year_range.start_time)).to eq("Jan 1, 2004 00:00")
+    end
+
+    it "falls back to the coarsest interval instead of raising when no candidate fits" do
+      stub_const("#{described_class}::MAXIMUM_TIME_SERIES_COORDINATES", 0)
+      range = described_class.new(
+        chart_start: "1000-01-01T00:00:00Z",
+        chart_end: "9999-12-31T23:59:59Z"
+      )
+
+      expect { range.interval_seconds }.not_to raise_error
+      expect(range.interval_seconds).to eq(described_class::SEMANTIC_INTERVALS.last)
     end
 
     it "bounds the widest four-digit range with the final fixed elapsed candidate" do

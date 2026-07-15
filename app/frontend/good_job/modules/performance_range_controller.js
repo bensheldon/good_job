@@ -1,4 +1,6 @@
 import { Controller } from "stimulus"
+import { buildTimeZoneNameFormatter } from "timezone_name_formatter"
+import ChartController from "chart_controller"
 
 // Enhances the Performance range form while leaving parsing and validation authoritative on the server.
 export default class extends Controller {
@@ -14,6 +16,7 @@ export default class extends Controller {
   ]
   static values = {
     applicationTimeZone: String,
+    applicationTimeZoneIdentifier: String,
     endFallback: String,
     endLabel: String,
     endTimestamp: String,
@@ -31,6 +34,8 @@ export default class extends Controller {
     this.#configureFormatter()
     this.#enhanceBrowserTimeZone()
 
+    this.loadedStartValue = this.startInputTarget.value
+    this.loadedEndValue = this.endInputTarget.value
     this.backwardClockTransition = this.#crossesBackwardClockTransition()
     this.#configureExactFormatter()
     this.reciprocalConstraints =
@@ -49,11 +54,19 @@ export default class extends Controller {
     const startMilliseconds = this.#civilMilliseconds(this.startInputTarget.value)
     const endMilliseconds = this.#civilMilliseconds(this.endInputTarget.value)
 
-    // Offset-free native fields cannot order repeated wall-clock values. Keep a known backward
-    // transition relaxed; otherwise restore reciprocal constraints once edits are ordered.
+    // Offset-free native fields cannot order repeated wall-clock values. A reciprocal bound is
+    // only trustworthy once BOTH endpoints have moved away from their loaded values: deriving a
+    // bound from a single still-untouched endpoint of a known backward transition would apply
+    // plain civil-string arithmetic to a value that may represent either fold occurrence. Track
+    // this against the live field values (not the edited-tracking dataset flag, which is gated on
+    // browser-zone enhancement and can otherwise never fire) so the relaxation always lifts once
+    // the user has actually replaced both endpoints.
+    const bothEndpointsChanged =
+      this.startInputTarget.value !== this.loadedStartValue &&
+      this.endInputTarget.value !== this.loadedEndValue
     if (
       !this.reciprocalConstraints &&
-      !this.backwardClockTransition &&
+      !(this.backwardClockTransition && !bothEndpointsChanged) &&
       startMilliseconds !== null &&
       endMilliseconds !== null &&
       startMilliseconds < endMilliseconds
@@ -167,7 +180,7 @@ export default class extends Controller {
         month: "short",
         second: "2-digit",
         timeZone: "UTC",
-        ...(this.labelStyleValue === "date_time_year" ? { year: "numeric" } : {}),
+        ...(this.labelStyleValue === ChartController.LABEL_STYLE_DATE_TIME_YEAR ? { year: "numeric" } : {}),
       })
     } catch (_error) {
       // Server-rendered application-zone values and labels remain accurate without Intl.
@@ -178,23 +191,20 @@ export default class extends Controller {
     this.exactFormatter = null
     if (!this.backwardClockTransition) return
 
-    for (const timeZoneName of ["shortOffset", "short"]) {
-      try {
-        this.exactFormatter = new Intl.DateTimeFormat(document.documentElement.lang, {
-          day: "numeric",
-          hour: "2-digit",
-          hourCycle: "h23",
-          minute: "2-digit",
-          month: "short",
-          second: "2-digit",
-          timeZoneName,
-          ...(this.labelStyleValue === "date_time_year" ? { year: "numeric" } : {}),
-        })
-        return
-      } catch (_error) {
-        // Try the next supported timezone-name representation.
-      }
-    }
+    // Render in whichever zone the fields are actually displaying — the browser zone once
+    // enhancement has activated, otherwise the application zone the fallback values came from.
+    // Without this override the formatter defaults to the runtime's own zone, which only
+    // coincidentally matches the displayed fields when enhancement is active.
+    this.exactFormatter = buildTimeZoneNameFormatter(document.documentElement.lang, {
+      day: "numeric",
+      hour: "2-digit",
+      hourCycle: "h23",
+      minute: "2-digit",
+      month: "short",
+      second: "2-digit",
+      timeZone: this.browserTimeZone || this.applicationTimeZoneIdentifierValue,
+      ...(this.labelStyleValue === ChartController.LABEL_STYLE_DATE_TIME_YEAR ? { year: "numeric" } : {}),
+    })
   }
 
   #enhanceBrowserTimeZone() {
@@ -261,6 +271,10 @@ export default class extends Controller {
   }
 
   // Native civil fields cannot express the repeated hour in a backward clock transition.
+  // Intentionally checks the zone currently displayed in the inputs (browser zone after
+  // #enhanceBrowserTimeZone, application zone otherwise), not the server's Time.zone: the
+  // Ruby counterpart, GoodJob::PerformanceRange#backward_clock_transition?, makes the same
+  // check for its own (server-rendered) zone. Each must use its own zone, not the other's.
   #crossesBackwardClockTransition() {
     const exactStart = new Date(this.startTimestampValue).getTime()
     const exactEnd = new Date(this.endTimestampValue).getTime()

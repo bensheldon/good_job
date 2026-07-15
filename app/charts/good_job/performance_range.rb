@@ -215,9 +215,11 @@ module GoodJob
     end
 
     def custom_interval_seconds
+      # Fall back to the coarsest interval rather than raising: MINIMUM_YEAR/MAXIMUM_YEAR bound the
+      # widest possible range today, but nothing enforces that bound against SEMANTIC_INTERVALS.last.
       SEMANTIC_INTERVALS.find do |interval|
         coordinate_count(interval) <= MAXIMUM_TIME_SERIES_COORDINATES
-      end || raise(RangeError, "No safe Performance chart interval for the selected range")
+      end || SEMANTIC_INTERVALS.last
     end
 
     def custom_label_options
@@ -225,7 +227,7 @@ module GoodJob
 
       if elapsed_seconds >= 365.days
         { label_format: "%b %-d, %Y %H:%M", label_style: "date_time_year" }
-      elsif elapsed_seconds > 24.hours
+      elsif elapsed_seconds >= 24.hours
         { label_format: "%b %-d %H:%M", label_style: "date_time" }
       elsif interval_seconds < 1.minute
         { label_format: "%H:%M:%S", label_style: "time_seconds" }
@@ -316,6 +318,11 @@ module GoodJob
       backward_clock_transition? ? "#{label} #{local_time.formatted_offset}" : label
     end
 
+    # Intentionally checks Time.zone (the server-rendered zone), not @local_time_zone: this backs
+    # the initial server-rendered label, before any browser-zone enhancement. The client mirrors
+    # this same concept for its own currently-displayed zone in
+    # performance_range_controller.js#crossesBackwardClockTransition — keep both in sync in spirit
+    # (elapsed exact time vs. elapsed civil time) but each must use its own zone, not the other's.
     def backward_clock_transition?
       @_backward_clock_transition ||= end_time.in_time_zone.utc_offset < start_time.in_time_zone.utc_offset
     end
@@ -337,18 +344,12 @@ module GoodJob
           @interval_seconds = custom_interval_seconds
           options = custom_label_options
         end
-      elsif range_key
-        @key = range_key
-        options = OPTIONS.fetch(key)
-        @end_time = current_end_time
-        @start_time = end_time - options.fetch(:duration)
-        @canonical_params = { "chart_range" => key }
       else
-        @key = DEFAULT_KEY
+        @key = range_key || DEFAULT_KEY
         options = OPTIONS.fetch(key)
         @end_time = current_end_time
         @start_time = end_time - options.fetch(:duration)
-        @canonical_params = {}
+        @canonical_params = range_key ? { "chart_range" => key } : {}
       end
 
       @interval_seconds ||= options.fetch(:interval_seconds)

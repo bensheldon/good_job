@@ -235,7 +235,6 @@ es:
     performance:
       index:
         average_duration: Duración promedio
-        chart_bucket_size: 'Tamaño del intervalo del gráfico: %{size}'
         chart_title: Tiempo total de ejecución del trabajo en segundos
         executions: Ejecuciones
         job_class: Clase de trabajo
@@ -245,6 +244,14 @@ es:
         queue_name: Nombre de la cola
         title: Rendimiento
       range:
+        bucket_size:
+          days: "%{count}d"
+          hours: "%{count}h"
+          minutes: "%{count}m"
+          months: "~%{count} mes"
+          seconds: "%{count}s"
+          years: "~%{count}a"
+        chart_bucket_size: 'Tamaño del intervalo del gráfico: %{size}'
         custom_range: Personalizado
         custom_range_hint: arrastrar en el gráfico
         end_time: Hora de fin

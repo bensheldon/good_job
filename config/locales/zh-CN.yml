@@ -235,7 +235,6 @@ zh-CN:
     performance:
       index:
         average_duration: 平均时长
-        chart_bucket_size: 图表聚合间隔：%{size}
         chart_title: 任务总执行时间（秒）
         executions: 执行次数
         job_class: 任务 Class
@@ -245,6 +244,14 @@ zh-CN:
         queue_name: 队列名称
         title: 性能
       range:
+        bucket_size:
+          days: "%{count}天"
+          hours: "%{count}小时"
+          minutes: "%{count}分"
+          months: 约%{count}月
+          seconds: "%{count}秒"
+          years: 约%{count}年
+        chart_bucket_size: 图表聚合间隔：%{size}
         custom_range: 自定义
         custom_range_hint: 在图表上拖动
         end_time: 结束时间

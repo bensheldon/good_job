@@ -235,7 +235,6 @@ en:
     performance:
       index:
         average_duration: Average duration
-        chart_bucket_size: 'Chart bucket size: %{size}'
         chart_title: Total job execution time in seconds
         executions: Executions
         job_class: Job class
@@ -245,6 +244,14 @@ en:
         queue_name: Queue name
         title: Performance
       range:
+        bucket_size:
+          days: "%{count}d"
+          hours: "%{count}h"
+          minutes: "%{count}m"
+          months: "~%{count}mo"
+          seconds: "%{count}s"
+          years: "~%{count}y"
+        chart_bucket_size: 'Chart bucket size: %{size}'
         custom_range: Custom
         custom_range_hint: drag on chart
         end_time: End time

@@ -235,7 +235,6 @@ pt-BR:
     performance:
       index:
         average_duration: Duração média
-        chart_bucket_size: 'Granularidade temporal do gráfico: %{size}'
         chart_title: Tempo total de execução em segundos
         executions: Execuções
         job_class: Classe do trabalho
@@ -245,6 +244,14 @@ pt-BR:
         queue_name: Nome da fila
         title: Desempenho
       range:
+        bucket_size:
+          days: "%{count}d"
+          hours: "%{count}h"
+          minutes: "%{count}m"
+          months: "~%{count} mês"
+          seconds: "%{count}s"
+          years: "~%{count}a"
+        chart_bucket_size: 'Granularidade temporal do gráfico: %{size}'
         custom_range: Personalizado
         custom_range_hint: arraste no gráfico
         end_time: Horário de término

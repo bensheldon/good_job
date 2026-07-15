@@ -235,7 +235,6 @@ de:
     performance:
       index:
         average_duration: Durchschnittliche Dauer
-        chart_bucket_size: 'Größe des Diagrammintervalls: %{size}'
         chart_title: Gesamtausführungszeit in Sekunden
         executions: Ausführungen
         job_class: Job-Klasse
@@ -245,6 +244,14 @@ de:
         queue_name: Warteschlangenname
         title: Leistung
       range:
+        bucket_size:
+          days: "%{count} T"
+          hours: "%{count}h"
+          minutes: "%{count}m"
+          months: "~%{count} Mon"
+          seconds: "%{count}s"
+          years: "~%{count} J"
+        chart_bucket_size: 'Größe des Diagrammintervalls: %{size}'
         custom_range: Benutzerdefiniert
         custom_range_hint: im Diagramm ziehen
         end_time: Endzeit
