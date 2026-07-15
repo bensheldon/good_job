@@ -255,7 +255,7 @@ tr:
           24h: Son 24 saat
           6h: Son 6 saat
           7d: Son 7 gün
-        reset_range: Performans zaman aralığını sıfırla
+        reload_range: Performans verilerini yeniden yükle
         start_time: Başlangıç zamanı
         time_range: Performans zaman aralığı
         time_zone: 'Saat dilimi:'

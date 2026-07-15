@@ -100,8 +100,15 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
         expect(page).to have_css("#performance-range-time-zone > span:first-child", text: "Time zone:")
         expect(page).to have_css("[data-performance-range-target='timeZoneLabel']", text: "America/St_Johns")
         expect(page).to have_link("Last 1 hour", href: performance_index_path(chart_range: "1h", locale: nil))
-        expect(page.find("a.performance-range-reset")[:href]).to eq(performance_index_path(locale: nil))
-        expect(page).to have_no_css("a.performance-range-reset.disabled")
+        expect(page.find("a.performance-range-reload")[:href]).to eq(
+          performance_index_path(
+            chart_start: "2024-01-01T06:33:17-03:30",
+            chart_end: "2024-01-01T07:37:42-03:30",
+            locale: nil
+          )
+        )
+        expect(page.find("a.performance-range-reload")["data-turbo"]).to eq("false")
+        expect(page).to have_no_css("a.performance-range-reload.disabled")
       end
     end
 

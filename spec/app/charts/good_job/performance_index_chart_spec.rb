@@ -14,8 +14,14 @@ RSpec.describe GoodJob::PerformanceIndexChart do
     end
 
     it "returns time-series chart metadata for the default range" do
+      allow(GoodJob::Job).to receive(:pg_or_jdbc_query).and_call_original
+
       data = chart.data
 
+      expect(GoodJob::Job).to have_received(:pg_or_jdbc_query).once do |query|
+        expect(query.scan(/\$\d+/)).to eq(%w[$1 $2 $3])
+        expect(query.gsub(/\$\d+/, "?").count("?")).to eq(3)
+      end
       expect(data.dig(:goodJob, :time_series)).to be(true)
       expect(data.dig(:goodJob, :interval_seconds)).to eq(1.hour.to_i)
       expect(data.dig(:goodJob, :timestamps).count).to eq(25)

@@ -255,7 +255,7 @@ fr:
           24h: Dernières 24 heures
           6h: Dernières 6 heures
           7d: 7 derniers jours
-        reset_range: Réinitialiser la plage horaire de performance
+        reload_range: Recharger les données de performance
         start_time: Heure de début
         time_range: Plage horaire de performance
         time_zone: 'Fuseau horaire :'

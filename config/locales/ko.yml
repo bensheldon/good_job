@@ -255,7 +255,7 @@ ko:
           24h: 최근 24시간
           6h: 최근 6시간
           7d: 최근 7일
-        reset_range: 성능 시간 범위 재설정
+        reload_range: 성능 데이터 새로고침
         start_time: 시작 시간
         time_range: 성능 시간 범위
         time_zone: '시간대:'

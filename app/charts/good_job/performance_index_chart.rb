@@ -9,24 +9,39 @@ module GoodJob
 
     def data
       binds = @range.time_series_binds
-      bucket_sql = @range.time_series_bucket_sql("scheduled_at")
+      bucket_sql = @range.time_series_bucket_sql(
+        "scheduled_at",
+        start_expression: "range_parameters.series_start_time",
+        interval_expression: "range_parameters.interval_seconds"
+      )
       inner_sql = @range.apply(GoodJob::Execution).select(:job_class, :scheduled_at, :duration).to_sql
 
+      # Keep each bind placeholder single-use because JDBC binds every converted occurrence.
       sum_query = <<~SQL.squish
-        SELECT *
-        FROM generate_series(
-          $1::timestamp,
-          $2::timestamp,
-          $3::bigint * INTERVAL '1 second'
-        ) timestamp
-        LEFT JOIN (
+        WITH range_parameters AS (
           SELECT
-              #{bucket_sql} AS scheduled_at,
-              job_class,
-              SUM(duration) AS sum
-            FROM (#{inner_sql}) sources
-            GROUP BY #{bucket_sql}, job_class
-        ) sources ON sources.scheduled_at = timestamp
+            $1::timestamp AS series_start_time,
+            $2::timestamp AS series_end_time,
+            $3::bigint AS interval_seconds
+        ), timestamps AS (
+          SELECT generate_series(
+            series_start_time,
+            series_end_time,
+            interval_seconds * INTERVAL '1 second'
+          ) AS timestamp
+          FROM range_parameters
+        ), sources AS (
+          SELECT
+            #{bucket_sql} AS scheduled_at,
+            job_class,
+            SUM(duration) AS sum
+          FROM (#{inner_sql}) executions
+          CROSS JOIN range_parameters
+          GROUP BY #{bucket_sql}, job_class
+        )
+        SELECT *
+        FROM timestamps
+        LEFT JOIN sources ON sources.scheduled_at = timestamps.timestamp
         ORDER BY timestamp ASC
       SQL
 

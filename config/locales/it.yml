@@ -255,7 +255,7 @@ it:
           24h: Ultime 24 ore
           6h: Ultime 6 ore
           7d: Ultimi 7 giorni
-        reset_range: Reimposta intervallo di tempo delle prestazioni
+        reload_range: Ricarica i dati sulle prestazioni
         start_time: Ora di inizio
         time_range: Intervallo di tempo delle prestazioni
         time_zone: 'Fuso orario:'

@@ -24,6 +24,11 @@ RSpec.describe GoodJob::PerformanceRange do
         "chart_start" => "2023-12-31T12:34:56Z",
         "chart_end" => "2024-01-01T12:34:56Z"
       )
+      expect(range.custom_params).to eq(
+        "chart_start" => "2023-12-31T12:34:56Z",
+        "chart_end" => "2024-01-01T12:34:56Z"
+      )
+      expect(range.reload_params).to eq({})
       expect(range).to be_default
     end
 
@@ -34,6 +39,7 @@ RSpec.describe GoodJob::PerformanceRange do
       expect(range.interval_seconds).to eq(5.minutes.to_i)
       expect(range.start_time).to eq(Time.zone.parse("2024-01-01 11:34:56 UTC"))
       expect(range.to_params).to eq("chart_range" => "1h")
+      expect(range.reload_params).to eq("chart_range" => "1h")
       expect(range).not_to be_default
     end
 
@@ -68,6 +74,11 @@ RSpec.describe GoodJob::PerformanceRange do
         "chart_end" => "2024-01-01T11:03:17Z"
       )
       expect(range.navigation_params).to eq(range.to_params)
+      expect(range.custom_params).to eq(
+        "chart_start" => "2024-01-01T10:03:17Z",
+        "chart_end" => "2024-01-01T11:03:17Z"
+      )
+      expect(range.reload_params).to eq("chart_range" => "1h")
     end
 
     it "drops an inconsistent anchored preset identity while preserving its safe custom bounds" do
@@ -85,6 +96,7 @@ RSpec.describe GoodJob::PerformanceRange do
         "chart_start" => "2024-01-01T10:03:17Z",
         "chart_end" => "2024-01-01T12:03:17Z"
       )
+      expect(range.reload_params).to eq(range.to_params)
       expect(range.canonical_parameters?(parameters.stringify_keys)).to be(false)
     end
 
@@ -477,10 +489,14 @@ RSpec.describe GoodJob::PerformanceRange do
 
       expect(range.start_time).to eq(Time.iso8601("1000-01-01T00:00:00Z"))
       expect(range.end_time).to eq(Time.iso8601("9999-12-31T23:59:59Z"))
+      allow(range.start_time).to receive(:to_r).and_raise("extreme rational epoch is not portable")
       expect(range.interval_seconds).to eq(500 * 365.days.to_i)
       expect(range.interval_seconds).to eq(described_class::SEMANTIC_INTERVALS.last)
       expect(range.time_series_coordinate_count).to eq(19)
       expect(range.time_series_coordinate_count).to be <= described_class::MAXIMUM_TIME_SERIES_COORDINATES
+      expect(range.time_series_binds.first(2).map(&:value_for_database)).to eq(
+        [Time.iso8601("0970-08-31T00:00:00Z"), Time.iso8601("9964-09-09T00:00:00Z")]
+      )
       expect(range.time_series_binds.last.value_for_database).to eq(range.interval_seconds)
     end
   end

@@ -255,7 +255,7 @@ pt-BR:
           24h: Últimas 24 horas
           6h: Últimas 6 horas
           7d: Últimos 7 dias
-        reset_range: Redefinir intervalo de tempo de desempenho
+        reload_range: Recarregar dados de desempenho
         start_time: Horário de início
         time_range: Intervalo de tempo de desempenho
         time_zone: 'Fuso horário:'

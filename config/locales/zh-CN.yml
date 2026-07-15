@@ -255,7 +255,7 @@ zh-CN:
           24h: 过去 24 小时
           6h: 过去 6 小时
           7d: 过去 7 天
-        reset_range: 重置性能时间范围
+        reload_range: 重新加载性能数据
         start_time: 开始时间
         time_range: 性能时间范围
         time_zone: 时区：

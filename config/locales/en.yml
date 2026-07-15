@@ -255,7 +255,7 @@ en:
           24h: Last 24 hours
           6h: Last 6 hours
           7d: Last 7 days
-        reset_range: Reset performance time range
+        reload_range: Reload performance data
         start_time: Start time
         time_range: Performance time range
         time_zone: 'Time zone:'

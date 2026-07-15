@@ -255,7 +255,7 @@ de:
           24h: Letzte 24 Stunden
           6h: Letzte 6 Stunden
           7d: Letzte 7 Tage
-        reset_range: Leistungszeitraum zurücksetzen
+        reload_range: Leistungsdaten neu laden
         start_time: Startzeit
         time_range: Leistungszeitraum
         time_zone: 'Zeitzone:'

@@ -1,6 +1,8 @@
 <% range_badge_label = performance_range.key || t(".custom_range") %>
-<% reset_range_label = t(".reset_range") %>
-<% reset_range_path = range_context.any? ? "#{range_path}?#{range_context.to_query}" : range_path %>
+<% reload_range_label = t(".reload_range") %>
+<% reload_range_query = range_context.merge(performance_range.reload_params).to_query %>
+<% reload_range_path = reload_range_query.present? ? "#{range_path}?#{reload_range_query}" : range_path %>
+<% custom_range_path = "#{range_path}?#{range_context.merge(performance_range.custom_params).to_query}" %>
 <% time_zone_label = Time.zone.name %>
 <% range_form_data = {
   action: "submit->performance-range#prepareSubmission",
@@ -69,7 +71,7 @@
         <% end %>
         <li><hr class="dropdown-divider"></li>
         <li class="<%= "active" if performance_range.custom? %>">
-          <%= tag.span class: "dropdown-item-text performance-range-menu-item", aria: { current: ("page" if performance_range.custom?) } do %>
+          <%= link_to custom_range_path, class: %w[dropdown-item performance-range-menu-item performance-range-custom], aria: { current: ("page" if performance_range.custom?) } do %>
             <span class="performance-range-option-key">#</span>
             <span class="flex-grow-1"><%= t ".custom_range" %></span>
             <% if local_assigns[:drag_enabled] %>
@@ -82,9 +84,9 @@
         </li>
       </ul>
     </div>
-    <%= link_to reset_range_path, class: ["btn", "btn-outline-secondary", "performance-range-reset", ("disabled" if performance_range.default?)], aria: { disabled: performance_range.default?, label: reset_range_label }, tabindex: ("-1" if performance_range.default?), title: reset_range_label do %>
+    <%= link_to reload_range_path, class: %w[btn btn-outline-secondary performance-range-reload], aria: { label: reload_range_label }, data: { turbo: false }, title: reload_range_label do %>
       <%= render_icon "arrow_clockwise" %>
-      <span class="visually-hidden"><%= reset_range_label %></span>
+      <span class="visually-hidden"><%= reload_range_label %></span>
     <% end %>
   </div>
 <% end %>

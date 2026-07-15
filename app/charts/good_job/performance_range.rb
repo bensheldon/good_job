@@ -106,6 +106,13 @@ module GoodJob
       key.nil?
     end
 
+    def custom_params
+      {
+        "chart_start" => canonical_timestamp(start_time),
+        "chart_end" => canonical_timestamp(end_time),
+      }
+    end
+
     def default?
       to_params.empty?
     end
@@ -133,6 +140,12 @@ module GoodJob
       OPTIONS.map { |option_key, option| { key: option_key, label: option.fetch(:label) } }
     end
 
+    def reload_params
+      return to_params if custom? || default?
+
+      { "chart_range" => key }
+    end
+
     def start_end_binds
       [
         query_attribute("start_time", start_time, ActiveRecord::Type::DateTime.new),
@@ -157,13 +170,13 @@ module GoodJob
       ]
     end
 
-    def time_series_bucket_sql(column_name)
+    def time_series_bucket_sql(column_name, start_expression:, interval_expression:)
       column_sql = GoodJob::Job.adapter_class.quote_column_name(column_name)
 
       <<~SQL.squish
-        $1::timestamp +
-        FLOOR(EXTRACT(EPOCH FROM (#{column_sql} - $1::timestamp)) / $3::bigint) *
-        $3::bigint * INTERVAL '1 second'
+        #{start_expression} +
+        FLOOR(EXTRACT(EPOCH FROM (#{column_sql} - #{start_expression})) / #{interval_expression}) *
+        #{interval_expression} * INTERVAL '1 second'
       SQL
     end
 
@@ -178,14 +191,19 @@ module GoodJob
     private
 
     def align_time(time, interval = interval_seconds)
-      Time.at(time.to_r.div(interval) * interval).utc
+      # JRuby can misreport rational epochs for extreme years even when integer seconds are correct.
+      (time - (time.to_i % interval) - time.subsec).utc
+    end
+
+    def aligned_epoch_seconds(time, interval)
+      time.to_i.div(interval) * interval
     end
 
     def coordinate_count(interval)
-      first_coordinate = align_time(start_time, interval)
-      last_coordinate = align_time(end_time - Rational(1, 1_000_000), interval)
+      first_coordinate = aligned_epoch_seconds(start_time, interval)
+      last_coordinate = aligned_epoch_seconds(end_time - Rational(1, 1_000_000), interval)
 
-      ((last_coordinate.to_i - first_coordinate.to_i) / interval) + 1
+      ((last_coordinate - first_coordinate) / interval) + 1
     end
 
     def custom_times
@@ -315,10 +333,7 @@ module GoodJob
           options = OPTIONS.fetch(key)
         else
           @key = nil
-          @canonical_params = {
-            "chart_start" => canonical_timestamp(start_time),
-            "chart_end" => canonical_timestamp(end_time),
-          }
+          @canonical_params = custom_params
           @interval_seconds = custom_interval_seconds
           options = custom_label_options
         end

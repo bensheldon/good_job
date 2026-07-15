@@ -255,7 +255,7 @@ nl:
           24h: Afgelopen 24 uur
           6h: Afgelopen 6 uur
           7d: Afgelopen 7 dagen
-        reset_range: Tijdsbereik voor prestaties opnieuw instellen
+        reload_range: Prestatiegegevens opnieuw laden
         start_time: Starttijd
         time_range: Tijdsbereik voor prestaties
         time_zone: 'Tijdzone:'

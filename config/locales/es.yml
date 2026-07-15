@@ -255,7 +255,7 @@ es:
           24h: Últimas 24 horas
           6h: Últimas 6 horas
           7d: Últimos 7 días
-        reset_range: Restablecer intervalo de tiempo de rendimiento
+        reload_range: Volver a cargar los datos de rendimiento
         start_time: Hora de inicio
         time_range: Intervalo de tiempo de rendimiento
         time_zone: 'Zona horaria:'

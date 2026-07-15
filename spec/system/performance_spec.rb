@@ -28,23 +28,64 @@ describe 'Performance Page', :js do
     expect(page).to have_content 'ExampleJob'
   end
 
-  it 'can select and reset a chart range on the index' do
-    ExampleJob.perform_later
-    GoodJob.perform_inline
+  it 'can select and reload a chart range on the index' do
+    initial_time = Time.zone.parse("2024-01-01 12:34:56 UTC")
 
-    visit good_job.performance_index_path
+    Timecop.freeze(initial_time) do
+      ExampleJob.perform_later
+      GoodJob.perform_inline
 
-    click_button "Open performance time ranges"
-    click_link "Last 1 hour"
+      visit good_job.performance_index_path
 
-    expect(page).to have_current_path(/chart_range=1h/)
-    expect(page).to have_css(".performance-range-key", text: "1h")
+      expect(page).to have_link("Reload performance data", href: good_job.performance_index_path)
+      expect(page).to have_no_css("a.performance-range-reload.disabled")
 
-    find("a[aria-label='Reset performance time range']").click
+      click_button "Open performance time ranges"
+      click_link "Last 1 hour"
 
-    expect(page).to have_no_current_path(/chart_range=/)
-    expect(page).to have_css(".performance-range-key", text: "24h")
-    expect(page).to have_css("a[aria-label='Reset performance time range'].disabled")
+      expect(page).to have_current_path(/chart_range=1h/)
+      expect(page).to have_css(".performance-range-key", text: "1h")
+      initial_dates = all(".performance-range-date").map(&:text)
+
+      Timecop.travel(initial_time + 12.seconds)
+      find("a[aria-label='Reload performance data']").click
+
+      query = Rack::Utils.parse_query(URI.parse(page.current_url).query)
+      expect(query).to eq("chart_range" => "1h")
+      expect(page).to have_css(".performance-range-key", text: "1h")
+      expect(all(".performance-range-date").map(&:text)).not_to eq(initial_dates)
+    end
+  end
+
+  it "converts preset index and show ranges to exact custom ranges without changing the display" do
+    Timecop.freeze(Time.zone.parse("2024-01-01 12:34:56 UTC")) do
+      ExampleJob.perform_later
+      GoodJob.perform_inline
+
+      exact_range = {
+        chart_start: "2024-01-01T10:03:17Z",
+        chart_end: "2024-01-01T11:03:17Z",
+        locale: "de",
+      }
+
+      [
+        good_job.performance_index_path(chart_range: "1h", **exact_range),
+        good_job.performance_path("ExampleJob", chart_range: "1h", **exact_range),
+      ].each do |path|
+        visit path
+        initial_dates = all(".performance-range-date").map(&:text)
+        initial_chart_config = find("[data-chart-config-value]")["data-chart-config-value"]
+
+        click_button "Leistungszeiträume öffnen"
+        find("a.performance-range-custom").click
+
+        query = Rack::Utils.parse_query(URI.parse(page.current_url).query)
+        expect(query).to eq(exact_range.stringify_keys)
+        expect(page).to have_css(".performance-range-key", text: "Benutzerdefiniert")
+        expect(all(".performance-range-date").map(&:text)).to eq(initial_dates)
+        expect(find("[data-chart-config-value]")["data-chart-config-value"]).to eq(initial_chart_config)
+      end
+    end
   end
 
   it "presents standard-size range controls with accessible, start-aligned narrow wrapping" do
@@ -628,7 +669,7 @@ describe 'Performance Page', :js do
     expect(page).to have_content("No executions in this time range.", count: 2)
   end
 
-  it 'preserves exact preset bounds and identity on show until reset establishes a fresh window' do
+  it 'preserves exact preset bounds and identity on show until reload establishes a fresh window' do
     initial_time = Time.zone.parse("2024-01-01 12:34:56.500 UTC")
 
     Timecop.freeze(initial_time) do
@@ -666,9 +707,9 @@ describe 'Performance Page', :js do
       expect(page).to have_css(".performance-range-key", text: "24h")
       expect(show_config.dig("data", "datasets", 0, "data").sum).to eq(1)
 
-      find("a[aria-label='Reset performance time range']").click
+      find("a[aria-label='Reload performance data']").click
 
-      expect(page).to have_no_current_path(/chart_(?:range|start|end)=/)
+      expect(Rack::Utils.parse_query(URI.parse(page.current_url).query)).to eq("chart_range" => "24h")
       expect(page).to have_css(".performance-range-key", text: "24h")
       expect(all(".performance-range-date").map(&:text)).not_to eq(index_dates)
     end
