@@ -2,6 +2,8 @@
 
 require "active_support/core_ext/numeric/time"
 
+require_relative "configuration/validator"
+
 module GoodJob
   #
   # +GoodJob::Configuration+ provides normalized configuration information to
@@ -105,6 +107,12 @@ module GoodJob
       self.class.validate_execution_mode(execution_mode)
       self.class.validate_dequeue_query_sort(dequeue_query_sort)
     end
+
+    # +valid?+ checks whether the configuration is valid, e.g. whether Cron
+    # entries reference Job classes that exist. Intended to be used in a
+    # test, for example: +expect(GoodJob.configuration).to be_valid+
+    # +errors+ contains any errors from the most recent call to +valid?+.
+    delegate :valid?, :errors, to: :validator
 
     # Specifies how and where jobs should be executed. See {Adapter#initialize}
     # for more details on possible values.
@@ -441,6 +449,10 @@ module GoodJob
     end
 
     private
+
+    def validator
+      @_validator ||= Validator.new(self)
+    end
 
     def rails_config
       Rails.application.config.good_job
