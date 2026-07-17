@@ -122,5 +122,8 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
     add_index :good_jobs, :id,
       name: :index_good_jobs_on_unfinished_or_errored,
       where: "finished_at IS NULL OR error IS NOT NULL"
+    add_index :good_jobs, [:job_class, :finished_at],
+      name: :index_good_jobs_on_discarded_job_class,
+      where: "finished_at IS NOT NULL AND error IS NOT NULL"
   end
 end
