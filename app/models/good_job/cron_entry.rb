@@ -13,6 +13,15 @@ module GoodJob # :nodoc:
 
     attr_reader :params
 
+    VALUE_TYPES = {
+      args: Array,
+      kwargs: Hash,
+      set: Hash,
+    }.freeze
+
+    validate :validate_job_class
+    validate :validate_value_types
+
     def self.all(configuration: nil)
       configuration ||= GoodJob.configuration
       configuration.cron_entries
@@ -126,8 +135,7 @@ module GoodJob # :nodoc:
         current_thread.cron_at = cron_at
 
         I18n.with_locale(I18n.default_locale) do
-          job_klass = job_class_value
-          job_klass = job_klass.constantize if job_klass.is_a?(String)
+          job_klass = resolve_job_class
           next unless job_klass.is_a?(Class)
 
           configured_job = job_klass.set(set_value)
@@ -174,6 +182,28 @@ module GoodJob # :nodoc:
     end
 
     private
+
+    def validate_job_class
+      return if job_class.blank? || job_class.is_a?(Class) || job_class.respond_to?(:call)
+
+      resolve_job_class
+    rescue NameError
+      errors.add(:class, "'#{job_class}' does not exist")
+    end
+
+    def validate_value_types
+      VALUE_TYPES.each do |attribute, type|
+        value = public_send(attribute)
+        next if value.blank? || value.respond_to?(:call) || value.is_a?(type)
+
+        errors.add(attribute, "must be a #{type}")
+      end
+    end
+
+    def resolve_job_class
+      value = job_class_value
+      value.is_a?(String) ? value.constantize : value
+    end
 
     def cron
       params.fetch(:cron)
