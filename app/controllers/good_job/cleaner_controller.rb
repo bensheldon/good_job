@@ -23,7 +23,7 @@ module GoodJob
         GoodJob::Job.discarded
                     .select(<<~SQL.squish)
                       job_class,
-                      count(id) AS failed,
+                      COUNT(*) AS failed,
                       COUNT(*) FILTER (WHERE "finished_at" > NOW() - INTERVAL '1 HOUR') AS last_1_hour,
                       COUNT(*) FILTER (WHERE "finished_at" > NOW() - INTERVAL '3 HOURS') AS last_3_hours,
                       COUNT(*) FILTER (WHERE "finished_at" > NOW() - INTERVAL '24 HOURS') AS last_24_hours,
