@@ -222,13 +222,16 @@ module GoodJob
       # Rails < 7.2 does not have adapter_class as a class method, and adapter
       # quoting methods (quote_table_name, quote_column_name) are instance-only.
       # Provide a proxy that responds to those methods by delegating to a connection.
+      # The proxy must resolve connection_pool at call time rather than capturing
+      # the pool object: a pool captured before a fork (e.g. Puma with preload_app!)
+      # is discarded in the child process and raises when used.
       unless respond_to?(:adapter_class)
         define_singleton_method(:adapter_class) do
           @_adapter_class ||= begin
-            pool = connection_pool
+            klass = self
             proxy = Object.new
-            proxy.define_singleton_method(:quote_table_name) { |name| pool.with_connection { |c| c.quote_table_name(name) } }
-            proxy.define_singleton_method(:quote_column_name) { |name| pool.with_connection { |c| c.quote_column_name(name) } }
+            proxy.define_singleton_method(:quote_table_name) { |name| klass.connection_pool.with_connection { |c| c.quote_table_name(name) } }
+            proxy.define_singleton_method(:quote_column_name) { |name| klass.connection_pool.with_connection { |c| c.quote_column_name(name) } }
             proxy
           end
         end
