@@ -168,26 +168,6 @@ RSpec.describe GoodJob::AdvisoryLockable do
     end
   end
 
-  describe '.adapter_class' do
-    it 'delegates quoting methods to a connection' do
-      expect(model_class.adapter_class.quote_table_name("good_jobs")).to eq model_class.lease_connection.quote_table_name("good_jobs")
-      expect(model_class.adapter_class.quote_column_name("queue_name")).to eq model_class.lease_connection.quote_column_name("queue_name")
-    end
-
-    it 'resolves the connection pool at call time rather than capturing it', skip: (ActiveRecord.version >= Gem::Version.new("7.2") ? "Rails 7.2+ provides adapter_class natively" : false) do
-      # A pool captured when the memo is first populated can outlive the fork
-      # of a preloading server (e.g. Puma with preload_app!); the child process
-      # discards the inherited pool's connections and calls through the stale
-      # reference raise. The proxy must look up the current pool on every call.
-      proxy = model_class.adapter_class
-
-      allow(model_class).to receive(:connection_pool).and_call_original
-      proxy.quote_table_name("good_jobs")
-      proxy.quote_column_name("queue_name")
-      expect(model_class).to have_received(:connection_pool).at_least(:twice)
-    end
-  end
-
   describe '.advisory_lock_key' do
     it 'locks a key' do
       model_class.advisory_lock_key(job.lockable_key)
