@@ -31,6 +31,55 @@ describe GoodJob::CronEntry do
     end
   end
 
+  describe '#valid?' do
+    it 'is valid when the class exists' do
+      expect(entry).to be_valid
+    end
+
+    it 'is valid when the class is a Class' do
+      entry = described_class.new(params.merge(class: TestJob))
+      expect(entry).to be_valid
+    end
+
+    it 'is valid when the class is a callable' do
+      entry = described_class.new(params.merge(class: -> { "TestJob" }))
+      expect(entry).to be_valid
+    end
+
+    it 'is invalid when the class does not exist' do
+      entry = described_class.new(params.merge(class: "NonexistentJob"))
+
+      expect(entry).not_to be_valid
+      expect(entry.errors[:class]).to include(/NonexistentJob/)
+    end
+
+    it 'is valid when args, kwargs, and set are callables' do
+      entry = described_class.new(params.merge(args: -> { [42] }, kwargs: -> { {} }, set: -> { {} }))
+      expect(entry).to be_valid
+    end
+
+    it 'is invalid when args is not an Array' do
+      entry = described_class.new(params.merge(args: { name: "Alice" }))
+
+      expect(entry).not_to be_valid
+      expect(entry.errors[:args]).to include(/must be a/)
+    end
+
+    it 'is invalid when kwargs is not a Hash' do
+      entry = described_class.new(params.merge(kwargs: [42]))
+
+      expect(entry).not_to be_valid
+      expect(entry.errors[:kwargs]).to include(/must be a/)
+    end
+
+    it 'is invalid when set is not a Hash' do
+      entry = described_class.new(params.merge(set: [42]))
+
+      expect(entry).not_to be_valid
+      expect(entry.errors[:set]).to include(/must be a/)
+    end
+  end
+
   describe '#all' do
     it 'returns all entries' do
       expect(described_class.all).to be_a(Array)
