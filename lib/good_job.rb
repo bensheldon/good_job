@@ -316,7 +316,7 @@ module GoodJob
   # @return [Boolean]
   def self.migrated?
     GoodJob::Job.lock_type_migrated? &&
-      GoodJob::Job.connection.index_name_exists?(:good_jobs, "index_good_jobs_on_unfinished_or_errored")
+      GoodJob::Job.connection.index_name_exists?(:good_job_executions, "index_good_job_executions_on_scheduled_at")
   end
 
   # Pause job execution for a given queue or job class.
