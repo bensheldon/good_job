@@ -1,5 +1,27 @@
 # Changelog
 
+## [v4.19.2](https://github.com/bensheldon/good_job/tree/v4.19.2) (2026-07-20)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.19.1...v4.19.2)
+
+**Fixed bugs:**
+
+- Resolve connection pool at call time in the `adapter_class` shim [\#1798](https://github.com/bensheldon/good_job/pull/1798) ([DaisyOli](https://github.com/DaisyOli))
+- Add GoodJob::Batch.where\(id:\) for GlobalID::Locator.fetch [\#1792](https://github.com/bensheldon/good_job/pull/1792) ([bensheldon](https://github.com/bensheldon))
+- Preserve created\_at when a job is retried [\#1789](https://github.com/bensheldon/good_job/pull/1789) ([ollym](https://github.com/ollym))
+
+**Closed issues:**
+
+- Memoized `adapter_class` proxy captures the pre-fork connection pool, crashing the Notifier in forked Puma workers \(Rails \< 7.2 + `preload_app!`\) [\#1797](https://github.com/bensheldon/good_job/issues/1797)
+- created\_at is reset every time a job is retried [\#1788](https://github.com/bensheldon/good_job/issues/1788)
+
+**Merged pull requests:**
+
+- Fix JRuby CI failure installing `rbs` gem [\#1794](https://github.com/bensheldon/good_job/pull/1794) ([bensheldon](https://github.com/bensheldon))
+- Fix flaky scheduled\_at precision comparison in adapter\_spec [\#1793](https://github.com/bensheldon/good_job/pull/1793) ([bensheldon](https://github.com/bensheldon))
+- Remove inline\_execution\_respects\_schedule config [\#1791](https://github.com/bensheldon/good_job/pull/1791) ([bensheldon](https://github.com/bensheldon))
+- Bump actions/checkout from 6 to 7 [\#1787](https://github.com/bensheldon/good_job/pull/1787) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.19.1](https://github.com/bensheldon/good_job/tree/v4.19.1) (2026-06-25)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.19.0...v4.19.1)
@@ -134,6 +156,10 @@
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.16.0...v4.17.0)
 
+**Implemented enhancements:**
+
+- Introduce advisory lock key customization support methods [\#1722](https://github.com/bensheldon/good_job/pull/1722) ([amkisko](https://github.com/amkisko))
+
 **Merged pull requests:**
 
 - Convert UI JavaScript modules to Stimulus controllers [\#1743](https://github.com/bensheldon/good_job/pull/1743) ([bensheldon](https://github.com/bensheldon))
@@ -149,6 +175,11 @@
 - Allow filtering by label on dashboard [\#1739](https://github.com/bensheldon/good_job/pull/1739) ([bensheldon](https://github.com/bensheldon))
 - Allow multiple concurrency rules per job via labels [\#1700](https://github.com/bensheldon/good_job/pull/1700) ([bscofield](https://github.com/bscofield))
 
+**Fixed bugs:**
+
+- Fix advisory lock connection stickiness in block contexts [\#1736](https://github.com/bensheldon/good_job/pull/1736) ([bensheldon](https://github.com/bensheldon))
+- Add JRuby 10 to testing matrix [\#1559](https://github.com/bensheldon/good_job/pull/1559) ([bensheldon](https://github.com/bensheldon))
+
 **Closed issues:**
 
 - Job duration misreported if interrupted [\#1723](https://github.com/bensheldon/good_job/issues/1723)
@@ -158,6 +189,7 @@
 - Use annotated git tag in release script [\#1741](https://github.com/bensheldon/good_job/pull/1741) ([bensheldon](https://github.com/bensheldon))
 - Double single-thread scheduler integration test timeout on JRuby [\#1738](https://github.com/bensheldon/good_job/pull/1738) ([bensheldon](https://github.com/bensheldon))
 - Fix JRuby test flakes for scheduler timeout and interrupted execution duration [\#1737](https://github.com/bensheldon/good_job/pull/1737) ([bensheldon](https://github.com/bensheldon))
+- Count Advisory Locks and refactor advisory lock lifecycle [\#1735](https://github.com/bensheldon/good_job/pull/1735) ([bensheldon](https://github.com/bensheldon))
 - Show interrupted execution recovery duration in dashboard [\#1733](https://github.com/bensheldon/good_job/pull/1733) ([bensheldon](https://github.com/bensheldon))
 - chore: use `merge` to avoid mutate the query object [\#1717](https://github.com/bensheldon/good_job/pull/1717) ([luizkowalski](https://github.com/luizkowalski))
 
@@ -173,6 +205,7 @@
 
 **Merged pull requests:**
 
+- Fix JRuby in development lockfile, with test [\#1734](https://github.com/bensheldon/good_job/pull/1734) ([bensheldon](https://github.com/bensheldon))
 - Add herb to linter [\#1732](https://github.com/bensheldon/good_job/pull/1732) ([bensheldon](https://github.com/bensheldon))
 - Update development dependencies; apply Rubocop to\_h lints [\#1728](https://github.com/bensheldon/good_job/pull/1728) ([bensheldon](https://github.com/bensheldon))
 
@@ -234,6 +267,7 @@
 
 **Fixed bugs:**
 
+- Check for graceful shutdown inside job cleanup loops [\#1711](https://github.com/bensheldon/good_job/pull/1711) ([bdewater-thatch](https://github.com/bdewater-thatch))
 - Add title to Good Job Dashboard layout [\#1701](https://github.com/bensheldon/good_job/pull/1701) ([mockdeep](https://github.com/mockdeep))
 
 **Closed issues:**
@@ -329,6 +363,7 @@
 **Merged pull requests:**
 
 - Update sorbet/tapioca [\#1681](https://github.com/bensheldon/good_job/pull/1681) ([bensheldon](https://github.com/bensheldon))
+- Remove obsolete property from tests [\#1676](https://github.com/bensheldon/good_job/pull/1676) ([RDIL](https://github.com/RDIL))
 - Bump actions/checkout from 4 to 5 [\#1673](https://github.com/bensheldon/good_job/pull/1673) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v4.11.2](https://github.com/bensheldon/good_job/tree/v4.11.2) (2025-08-06)
@@ -450,6 +485,10 @@
 ## [v4.9.1](https://github.com/bensheldon/good_job/tree/v4.9.1) (2025-03-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.9.0...v4.9.1)
+
+**Implemented enhancements:**
+
+- Order Dashboard jobs in more "natural" order [\#1604](https://github.com/bensheldon/good_job/pull/1604) ([francois](https://github.com/francois))
 
 **Fixed bugs:**
 
@@ -1936,7 +1975,6 @@
 - In tests, directly use `connection.truncate_tables` instead of  `ActiveRecord::Tasks::DatabaseTasks.truncate_all` [\#918](https://github.com/bensheldon/good_job/pull/918) ([bensheldon](https://github.com/bensheldon))
 - Use `GoodJob.capsule` in CLI instead of creating a new Capsule [\#916](https://github.com/bensheldon/good_job/pull/916) ([bensheldon](https://github.com/bensheldon))
 - Fix lint: missing fr and nl translations; readme whitespace [\#914](https://github.com/bensheldon/good_job/pull/914) ([bensheldon](https://github.com/bensheldon))
-- Switches from Chrome to Chromium to support Apple M1/Arm CPUs [\#910](https://github.com/bensheldon/good_job/pull/910) ([ckdake](https://github.com/ckdake))
 - Bump erb\_lint from 0.3.1 to 0.4.0 [\#906](https://github.com/bensheldon/good_job/pull/906) ([dependabot[bot]](https://github.com/apps/dependabot))
 
 ## [v3.15.0](https://github.com/bensheldon/good_job/tree/v3.15.0) (2023-04-02)
