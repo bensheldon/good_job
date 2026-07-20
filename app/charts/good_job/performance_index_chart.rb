@@ -18,12 +18,15 @@ module GoodJob
               job_class,
               SUM(duration) AS sum
             FROM #{table_name} sources
+            WHERE scheduled_at >= date_trunc('hour', $3::timestamp)
+              AND scheduled_at < date_trunc('hour', $4::timestamp) + interval '1 hour'
             GROUP BY date_trunc('hour', scheduled_at), job_class
         ) sources ON sources.scheduled_at = timestamp
         ORDER BY timestamp ASC
       SQL
 
-      executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(sum_query), "GoodJob Performance Chart", start_end_binds) }
+      binds = start_end_binds
+      executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(sum_query), "GoodJob Performance Chart", binds + binds) }
 
       job_names = executions_data.reject { |d| d['sum'].nil? }.map { |d| d['job_class'] || BaseFilter::EMPTY }.uniq
       labels = []
