@@ -266,8 +266,32 @@ ru:
         job_class: Класс задачи
         maximum_duration: Максимальная продолжительность
         minimum_duration: Минимальная продолжительность
+        no_executions: Нет выполнений за этот период.
         queue_name: Название очереди
         title: Производительность
+      range:
+        bucket_size:
+          days: "%{count} д"
+          hours: "%{count}ч"
+          minutes: "%{count}м"
+          months: "~%{count} мес"
+          seconds: "%{count}с"
+          years: "~%{count} г"
+        chart_bucket_size: 'Интервал агрегации на диаграмме: %{size}'
+        custom_range: Пользовательский
+        custom_range_hint: перетащите на графике
+        end_time: Время окончания
+        open_time_ranges: Открыть диапазоны времени производительности
+        quick_ranges: Быстрые диапазоны
+        range_options:
+          1h: За последний час
+          24h: Последние 24 часа
+          6h: Последние 6 часов
+          7d: Последние 7 дней
+        reload_range: Перезагрузить данные о производительности
+        start_time: Время начала
+        time_range: Диапазон времени производительности
+        time_zone: 'Часовой пояс:'
       show:
         slow: Медленно
         title: Производительность

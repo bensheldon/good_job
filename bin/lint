@@ -64,7 +64,7 @@ FileUtils.chdir GEM_ROOT do
   system! "bundle exec mdl --style .mdstyle.rb README.md"
 
   puts "\n== i18n-tasks health =="
-  system! "bin/i18n-tasks health  "
+  system! "bin/i18n-tasks health"
 
   puts "\n== Brakeman =="
   system! "bundle exec brakeman --no-pager"

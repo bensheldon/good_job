@@ -240,8 +240,32 @@ en:
         job_class: Job class
         maximum_duration: Maximum duration
         minimum_duration: Minimum duration
+        no_executions: No executions in this time range.
         queue_name: Queue name
         title: Performance
+      range:
+        bucket_size:
+          days: "%{count}d"
+          hours: "%{count}h"
+          minutes: "%{count}m"
+          months: "~%{count}mo"
+          seconds: "%{count}s"
+          years: "~%{count}y"
+        chart_bucket_size: 'Chart bucket size: %{size}'
+        custom_range: Custom
+        custom_range_hint: drag on chart
+        end_time: End time
+        open_time_ranges: Open performance time ranges
+        quick_ranges: Quick ranges
+        range_options:
+          1h: Last 1 hour
+          24h: Last 24 hours
+          6h: Last 6 hours
+          7d: Last 7 days
+        reload_range: Reload performance data
+        start_time: Start time
+        time_range: Performance time range
+        time_zone: 'Time zone:'
       show:
         slow: Slow
         title: Performance

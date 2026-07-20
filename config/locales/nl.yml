@@ -240,8 +240,32 @@ nl:
         job_class: Taakklasse
         maximum_duration: Maximale duur
         minimum_duration: Minimale duur
+        no_executions: Geen uitvoeringen in dit tijdsbereik.
         queue_name: Wachtrijnaam
         title: Prestaties
+      range:
+        bucket_size:
+          days: "%{count}d"
+          hours: "%{count}u"
+          minutes: "%{count}m"
+          months: "~%{count} mnd"
+          seconds: "%{count}s"
+          years: "~%{count}j"
+        chart_bucket_size: 'Tijdsinterval per datapunt: %{size}'
+        custom_range: Aangepast
+        custom_range_hint: slepen op grafiek
+        end_time: Eindtijd
+        open_time_ranges: Tijdsbereiken voor prestaties openen
+        quick_ranges: Snelle bereiken
+        range_options:
+          1h: Afgelopen uur
+          24h: Afgelopen 24 uur
+          6h: Afgelopen 6 uur
+          7d: Afgelopen 7 dagen
+        reload_range: Prestatiegegevens opnieuw laden
+        start_time: Starttijd
+        time_range: Tijdsbereik voor prestaties
+        time_zone: 'Tijdzone:'
       show:
         slow: Traag
         title: Prestaties

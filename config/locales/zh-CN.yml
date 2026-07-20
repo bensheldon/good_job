@@ -240,8 +240,32 @@ zh-CN:
         job_class: 任务 Class
         maximum_duration: 最大时长
         minimum_duration: 最小时长
+        no_executions: 此时间范围内没有执行记录。
         queue_name: 队列名称
         title: 性能
+      range:
+        bucket_size:
+          days: "%{count}天"
+          hours: "%{count}小时"
+          minutes: "%{count}分"
+          months: 约%{count}月
+          seconds: "%{count}秒"
+          years: 约%{count}年
+        chart_bucket_size: 图表聚合间隔：%{size}
+        custom_range: 自定义
+        custom_range_hint: 在图表上拖动
+        end_time: 结束时间
+        open_time_ranges: 打开性能时间范围
+        quick_ranges: 快速范围
+        range_options:
+          1h: 过去 1 小时
+          24h: 过去 24 小时
+          6h: 过去 6 小时
+          7d: 过去 7 天
+        reload_range: 重新加载性能数据
+        start_time: 开始时间
+        time_range: 性能时间范围
+        time_zone: 时区：
       show:
         slow: 慢
         title: 性能

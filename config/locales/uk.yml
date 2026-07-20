@@ -266,8 +266,32 @@ uk:
         job_class: Клас завдання
         maximum_duration: Максимальна тривалість
         minimum_duration: Мінімальна тривалість
+        no_executions: Немає виконань за цей період.
         queue_name: Назва черги
         title: Продуктивність
+      range:
+        bucket_size:
+          days: "%{count} д"
+          hours: "%{count}г"
+          minutes: "%{count}хв"
+          months: "~%{count} міс"
+          seconds: "%{count}с"
+          years: "~%{count} р"
+        chart_bucket_size: 'Часова деталізація діаграми: %{size}'
+        custom_range: Користувацький
+        custom_range_hint: перетягніть на діаграмі
+        end_time: Час завершення
+        open_time_ranges: Відкрити часові діапазони продуктивності
+        quick_ranges: Швидкі діапазони
+        range_options:
+          1h: За останню годину
+          24h: Останні 24 години
+          6h: Останні 6 годин
+          7d: Останні 7 днів
+        reload_range: Перезавантажити дані про продуктивність
+        start_time: Час початку
+        time_range: Часовий діапазон продуктивності
+        time_zone: 'Часовий пояс:'
       show:
         slow: Повільно
         title: Продуктивність
