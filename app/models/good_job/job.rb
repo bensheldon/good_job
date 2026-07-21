@@ -287,14 +287,20 @@ module GoodJob
       end
 
       def historic_finished_at_index_migrated?
-        return true if connection.index_name_exists?(table_name, "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished")
+        index_exists = connection_pool.with_connection do |connection|
+          connection.index_name_exists?(table_name, "index_good_jobs_on_queue_name_priority_scheduled_at_unfinished")
+        end
+        return true if index_exists
 
         migration_pending_warning!
         false
       end
 
       def lock_type_migrated?
-        return true if connection.index_name_exists?(table_name, :index_good_jobs_for_candidate_dequeue_unlocked)
+        index_exists = connection_pool.with_connection do |connection|
+          connection.index_name_exists?(table_name, :index_good_jobs_for_candidate_dequeue_unlocked)
+        end
+        return true if index_exists
 
         migration_pending_warning!
         false
