@@ -101,10 +101,22 @@ module GoodJob
       setting.save!
     end
 
-    def self.paused?(queue: nil, job_class: nil, label: nil)
-      raise ArgumentError, "Must provide at most one of queue, job_class, or label" if [queue, job_class, label].many?(&:present?)
+    def self.paused?(active_job: nil, queue: nil, job_class: nil, label: nil)
+      raise ArgumentError, "Must provide at most one of active_job, queue, job_class, or label" if [active_job, queue, job_class, label].many?(&:present?)
 
-      if queue
+      if active_job
+        pauses = paused
+
+        return :queue_name_paused if pauses[:queues].include?(active_job.queue_name.to_s)
+        return :job_class_paused if pauses[:job_classes].include?(active_job.class.to_s)
+
+        labels = active_job.respond_to?(:good_job_labels) ? Array(active_job.good_job_labels) : []
+        labels = labels.filter_map { |label| label.to_s.presence }.uniq
+
+        return :label_paused if (labels & pauses[:labels]).any?
+
+        false
+      elsif queue
         queue.in? paused(:queues)
       elsif job_class
         job_class.in? paused(:job_classes)
@@ -116,7 +128,7 @@ module GoodJob
     end
 
     def self.paused(type = nil)
-      setting = find_by(key: PAUSES)
+      setting = uncached { find_by(key: PAUSES) }
       pauses = setting&.value&.deep_dup || { "queues" => [], "job_classes" => [], "labels" => [] }
       pauses = pauses.with_indifferent_access
 

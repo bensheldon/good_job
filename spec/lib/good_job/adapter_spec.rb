@@ -278,8 +278,51 @@ RSpec.describe GoodJob::Adapter do
   end
 
   describe '#stopping?' do
-    it 'is callable' do
+    it 'is callable without a job argument for Rails <= 8.1 compatibility' do
       expect { adapter.stopping? }.not_to raise_error
+    end
+
+    it 'returns :stopping when the current thread is shutting down' do
+      allow(GoodJob).to receive(:current_thread_shutting_down?).and_return(true)
+
+      expect(adapter.stopping?).to eq(:stopping)
+    end
+
+    it 'returns :force_discarded when the current GoodJob job is finished' do
+      GoodJob::CurrentThread.within do |current_thread|
+        current_thread.job = GoodJob::Job.new(finished_at: Time.current)
+
+        expect(adapter.stopping?).to eq(:force_discarded)
+      end
+    end
+
+    context 'with pauses enabled' do
+      before do
+        allow(GoodJob.configuration).to receive(:enable_pauses).and_return(true)
+      end
+
+      it 'delegates pause evaluation to the settings store when a job argument is provided' do
+        allow(GoodJob::Setting).to receive(:paused?).with(active_job: active_job).and_return(:queue_name_paused)
+
+        expect(adapter.stopping?(active_job)).to eq(:queue_name_paused)
+      end
+
+      it 'returns false when Rails does not provide an Active Job argument' do
+        GoodJob::Setting.pause(queue: "critical")
+        allow(GoodJob::Setting).to receive(:paused?).and_call_original
+
+        expect(adapter.stopping?).to be false
+        expect(GoodJob::Setting).not_to have_received(:paused?)
+      end
+    end
+
+    it 'ignores pauses when pauses are disabled' do
+      allow(GoodJob.configuration).to receive(:enable_pauses).and_return(false)
+      GoodJob::Setting.pause(queue: "default")
+      allow(GoodJob::Setting).to receive(:paused?).and_call_original
+
+      expect(adapter.stopping?(active_job)).to be false
+      expect(GoodJob::Setting).not_to have_received(:paused?)
     end
   end
 
