@@ -101,6 +101,67 @@ module GoodJob
     end
 
     # @!macro notification_responder
+    def cluster_start(event)
+      subprocesses = event.payload[:subprocesses]
+
+      info do
+        "GoodJob #{GoodJob::VERSION} started supervisor with subprocesses=#{subprocesses}."
+      end
+    end
+
+    # @!macro notification_responder
+    def cluster_spawn(event)
+      pid = event.payload[:pid]
+
+      info do
+        "GoodJob supervisor forked subprocess (PID: #{pid})."
+      end
+    end
+
+    # @!macro notification_responder
+    def cluster_reap(event)
+      pid = event.payload[:pid]
+
+      info do
+        "GoodJob supervisor reaped subprocess (PID: #{pid})."
+      end
+    end
+
+    # @!macro notification_responder
+    def cluster_shutdown(event) # rubocop:disable Lint/UnusedMethodArgument
+      info do
+        "GoodJob supervisor is shut down."
+      end
+    end
+
+    # @!macro notification_responder
+    def subprocess_start(event)
+      pid = event.payload[:pid]
+
+      info do
+        "GoodJob started subprocess (PID: #{pid})."
+      end
+    end
+
+    # @!macro notification_responder
+    def subprocess_shutdown_start(event)
+      pid = event.payload[:pid]
+
+      info do
+        "GoodJob shutting down subprocess (PID: #{pid})..."
+      end
+    end
+
+    # @!macro notification_responder
+    def subprocess_shutdown(event)
+      pid = event.payload[:pid]
+
+      info do
+        "GoodJob subprocess is shut down (PID: #{pid})."
+      end
+    end
+
+    # @!macro notification_responder
     def perform_job(event)
       job = event.payload[:job]
       process_id = event.payload[:process_id]

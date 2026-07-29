@@ -15,6 +15,17 @@ module GoodJob
       end
     end
 
+    # Rack app for a supervisor in cluster mode; reports cluster-wide health
+    # instead of the current process's (empty) scheduler/notifier state.
+    # @param supervisor [GoodJob::Supervisor]
+    # @return [#call]
+    def self.cluster_app(supervisor)
+      ::Rack::Builder.new do
+        use GoodJob::ProbeServer::ClusterHealthcheckMiddleware, supervisor
+        run GoodJob::ProbeServer::NotFoundApp
+      end
+    end
+
     def initialize(port:, handler: nil, app: nil)
       app ||= self.class.default_app
       @handler = build_handler(port: port, handler: handler, app: app)

@@ -109,6 +109,8 @@ RSpec.describe GoodJob::CLI do
             probe_handler: nil,
             options: {},
             daemonize?: false,
+            cluster?: false,
+            subprocesses: 0,
             shutdown_timeout: 100,
             idle_timeout: 100
           )
@@ -154,6 +156,47 @@ RSpec.describe GoodJob::CLI do
 
         sleep_until { cli_thread.fulfilled? }
         expect(systemd).to have_received(:stop)
+      end
+    end
+
+    describe 'cluster mode' do
+      context 'when subprocesses is set and fork is available' do
+        let(:supervisor) { instance_double GoodJob::Supervisor, start: nil }
+
+        before do
+          allow(GoodJob).to receive(:configuration).and_return(GoodJob::Configuration.new({ subprocesses: 2 }))
+          allow(Process).to receive(:respond_to?).and_call_original
+          allow(Process).to receive(:respond_to?).with(:fork).and_return(true)
+          allow(GoodJob::Supervisor).to receive(:new).and_return(supervisor)
+        end
+
+        it 'starts a supervisor instead of the capsule' do
+          cli = described_class.new([], {}, {})
+          cli.start
+
+          expect(GoodJob::Supervisor).to have_received(:new)
+          expect(supervisor).to have_received(:start)
+          expect(capsule_mock).not_to have_received(:start)
+        end
+      end
+
+      context 'when subprocesses is set but fork is unavailable' do
+        before do
+          allow(Kernel).to receive(:loop)
+          allow(GoodJob).to receive(:configuration).and_return(GoodJob::Configuration.new({ subprocesses: 2 }))
+          allow(Process).to receive(:respond_to?).and_call_original
+          allow(Process).to receive(:respond_to?).with(:fork).and_return(false)
+        end
+
+        it 'warns and runs the capsule in a single process' do
+          allow(GoodJob.logger).to receive(:warn)
+
+          cli = described_class.new([], {}, {})
+          cli.start
+
+          expect(GoodJob.logger).to have_received(:warn).with(/does not support forking/)
+          expect(capsule_mock).to have_received(:start)
+        end
       end
     end
   end

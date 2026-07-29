@@ -70,6 +70,10 @@ module GoodJob
                   type: :numeric,
                   banner: 'COUNT',
                   desc: "Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)"
+    method_option :subprocesses,
+                  type: :numeric,
+                  banner: 'COUNT',
+                  desc: "Number of subprocesses to fork and supervise in cluster mode. 0 runs in the current process. (env var: GOOD_JOB_SUBPROCESSES, default: 0)"
     method_option :poll_interval,
                   type: :numeric,
                   banner: 'SECONDS',
@@ -111,11 +115,26 @@ module GoodJob
       set_up_application!
       GoodJob.configuration.options.merge!(options.symbolize_keys)
       configuration = GoodJob.configuration
-      capsule = GoodJob.capsule
       systemd = GoodJob::SystemdService.new
 
       Daemon.new(pidfile: configuration.pidfile).daemonize if configuration.daemonize?
 
+      if configuration.cluster?
+        # In cluster mode the supervisor forks and supervises subprocesses,
+        # each running its own capsule; it runs no capsule itself. The
+        # supervisor owns its own signal handling and blocks until shut down.
+        supervisor = GoodJob::Supervisor.new(configuration)
+        systemd.start
+        supervisor.start
+        systemd.stop
+        return
+      elsif configuration.subprocesses >= 1
+        GoodJob.logger.warn(
+          "GOOD_JOB_SUBPROCESSES was set to #{configuration.subprocesses}, but this platform does not support forking; GoodJob will run in a single process."
+        )
+      end
+
+      capsule = GoodJob.capsule
       capsule.start
       systemd.start
 
