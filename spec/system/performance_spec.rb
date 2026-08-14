@@ -815,10 +815,11 @@ describe 'Performance Page', :js do
       Timecop.travel(initial_time + 12.seconds)
       click_link 'ExampleJob'
 
+      expect(page).to have_css 'h2', text: 'Performance - ExampleJob'
+
       show_query = Rack::Utils.parse_query(URI.parse(page.current_url).query)
       show_config = JSON.parse(find("[data-chart-config-value]")["data-chart-config-value"])
 
-      expect(page).to have_css 'h2', text: 'Performance - ExampleJob'
       expect(show_query).to eq(expected_navigation)
       expect(all(".performance-range-date").map(&:text)).to eq(index_dates)
       expect(page).to have_css(".performance-range-key", text: "24h")
@@ -826,6 +827,7 @@ describe 'Performance Page', :js do
 
       find("a[aria-label='Reload performance data']").click
 
+      expect(page).to have_current_path(/chart_range=24h/)
       expect(Rack::Utils.parse_query(URI.parse(page.current_url).query)).to eq("chart_range" => "24h")
       expect(page).to have_css(".performance-range-key", text: "24h")
       expect(all(".performance-range-date").map(&:text)).not_to eq(index_dates)
