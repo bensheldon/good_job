@@ -240,8 +240,32 @@ it:
         job_class: Classe del job
         maximum_duration: Durata massima
         minimum_duration: Durata minima
+        no_executions: Nessuna esecuzione in questo intervallo di tempo.
         queue_name: Nome della coda
         title: Prestazioni
+      range:
+        bucket_size:
+          days: "%{count}g"
+          hours: "%{count}h"
+          minutes: "%{count}m"
+          months: "~%{count} mese"
+          seconds: "%{count}s"
+          years: "~%{count}a"
+        chart_bucket_size: 'Dimensione dell’intervallo del grafico: %{size}'
+        custom_range: Personalizzato
+        custom_range_hint: trascina sul grafico
+        end_time: Ora di fine
+        open_time_ranges: Apri intervalli di tempo delle prestazioni
+        quick_ranges: Intervalli rapidi
+        range_options:
+          1h: Ultima ora
+          24h: Ultime 24 ore
+          6h: Ultime 6 ore
+          7d: Ultimi 7 giorni
+        reload_range: Ricarica i dati sulle prestazioni
+        start_time: Ora di inizio
+        time_range: Intervallo di tempo delle prestazioni
+        time_zone: 'Fuso orario:'
       show:
         slow: Lento
         title: Prestazioni

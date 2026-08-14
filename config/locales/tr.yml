@@ -240,8 +240,32 @@ tr:
         job_class: İş sınıfı
         maximum_duration: Maksimum süre
         minimum_duration: Minimum süre
+        no_executions: Bu zaman aralığında yürütme yok.
         queue_name: Kuyruk adı
         title: Performans
+      range:
+        bucket_size:
+          days: "%{count}g"
+          hours: "%{count}sa"
+          minutes: "%{count}dk"
+          months: "~%{count} ay"
+          seconds: "%{count}sn"
+          years: "~%{count}y"
+        chart_bucket_size: 'Grafiğin zaman ayrıntı düzeyi: %{size}'
+        custom_range: Özel
+        custom_range_hint: grafik üzerinde sürükleyin
+        end_time: Bitiş zamanı
+        open_time_ranges: Performans zaman aralıklarını aç
+        quick_ranges: Hızlı aralıklar
+        range_options:
+          1h: Son 1 saat
+          24h: Son 24 saat
+          6h: Son 6 saat
+          7d: Son 7 gün
+        reload_range: Performans verilerini yeniden yükle
+        start_time: Başlangıç zamanı
+        time_range: Performans zaman aralığı
+        time_zone: 'Saat dilimi:'
       show:
         slow: Yavaş
         title: Performans

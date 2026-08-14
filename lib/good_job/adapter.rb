@@ -224,13 +224,18 @@ module GoodJob
       end
     end
 
-    # Whether the current job execution thread is shutting down.
-    # This is intended to be called from within the context of a performing job.
-    # Jobs can call this while performing via `queue_adapter.stopping?` to support
-    # job continuations/iterations.
-    # @return [Boolean]
-    def stopping?
-      GoodJob.current_thread_shutting_down?
+    # Whether the current job execution thread is shutting down or the current job
+    # is paused. This is intended to be called from within the context of a
+    # performing job. Jobs can call this while performing via
+    # `queue_adapter.stopping?` to support job continuations/iterations.
+    # @param active_job [ActiveJob::Base, nil]
+    # @return [Symbol, false]
+    def stopping?(active_job = nil)
+      return :stopping if GoodJob.current_thread_shutting_down?
+      return :force_discarded if CurrentThread.job&.finished_at
+      return GoodJob::Setting.paused?(active_job: active_job) if GoodJob.configuration.enable_pauses && active_job
+
+      false
     end
 
     # Shut down the thread pool executors.

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_04_18_000005) do
+ActiveRecord::Schema.define(version: 2026_07_17_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pg_stat_statements"
@@ -101,6 +101,7 @@ ActiveRecord::Schema.define(version: 2026_04_18_000005) do
     t.index ["cron_key", "cron_at"], name: "index_good_jobs_on_cron_key_and_cron_at_cond", unique: true, where: "(cron_key IS NOT NULL)"
     t.index ["finished_at"], name: "index_good_jobs_jobs_on_finished_at_only", where: "(finished_at IS NOT NULL)"
     t.index ["finished_at"], name: "index_good_jobs_on_discarded", order: { finished_at: :desc }, where: "(finished_at IS NOT NULL AND error IS NOT NULL)"
+    t.index ["job_class", "finished_at"], name: "index_good_jobs_on_discarded_job_class", where: "(finished_at IS NOT NULL AND error IS NOT NULL)"
     t.index ["job_class"], name: "index_good_jobs_on_job_class"
     t.index ["labels"], name: "index_good_jobs_on_labels", where: "(labels IS NOT NULL)", using: :gin
     t.index ["locked_by_id"], name: "index_good_jobs_on_locked_by_id", where: "(locked_by_id IS NOT NULL)"

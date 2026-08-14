@@ -108,7 +108,10 @@ module GoodJob
       self.class.validate_dequeue_query_sort(dequeue_query_sort)
     end
 
-    # Whether the configuration passes validations
+    # +valid?+ checks whether the configuration is valid, e.g. whether Cron
+    # entries reference Job classes that exist. Intended to be used in a
+    # test, for example: +expect(GoodJob.configuration).to be_valid+
+    # +errors+ contains any errors from the most recent call to +valid?+.
     delegate :valid?, :errors, to: :validator
 
     # Specifies how and where jobs should be executed. See {Adapter#initialize}

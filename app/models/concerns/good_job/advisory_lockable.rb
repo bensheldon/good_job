@@ -225,10 +225,10 @@ module GoodJob
       unless respond_to?(:adapter_class)
         define_singleton_method(:adapter_class) do
           @_adapter_class ||= begin
-            pool = connection_pool
+            klass = self
             proxy = Object.new
-            proxy.define_singleton_method(:quote_table_name) { |name| pool.with_connection { |c| c.quote_table_name(name) } }
-            proxy.define_singleton_method(:quote_column_name) { |name| pool.with_connection { |c| c.quote_column_name(name) } }
+            proxy.define_singleton_method(:quote_table_name) { |name| klass.connection_pool.with_connection { |c| c.quote_table_name(name) } }
+            proxy.define_singleton_method(:quote_column_name) { |name| klass.connection_pool.with_connection { |c| c.quote_column_name(name) } }
             proxy
           end
         end

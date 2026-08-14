@@ -240,8 +240,32 @@ de:
         job_class: Job-Klasse
         maximum_duration: Maximale Dauer
         minimum_duration: Minimale Dauer
+        no_executions: Keine Ausführungen in diesem Zeitraum.
         queue_name: Warteschlangenname
         title: Leistung
+      range:
+        bucket_size:
+          days: "%{count} T"
+          hours: "%{count}h"
+          minutes: "%{count}m"
+          months: "~%{count} Mon"
+          seconds: "%{count}s"
+          years: "~%{count} J"
+        chart_bucket_size: 'Größe des Diagrammintervalls: %{size}'
+        custom_range: Benutzerdefiniert
+        custom_range_hint: im Diagramm ziehen
+        end_time: Endzeit
+        open_time_ranges: Leistungszeiträume öffnen
+        quick_ranges: Schnellauswahl
+        range_options:
+          1h: Letzte Stunde
+          24h: Letzte 24 Stunden
+          6h: Letzte 6 Stunden
+          7d: Letzte 7 Tage
+        reload_range: Leistungsdaten neu laden
+        start_time: Startzeit
+        time_range: Leistungszeitraum
+        time_zone: 'Zeitzone:'
       show:
         slow: Langsam
         title: Leistung

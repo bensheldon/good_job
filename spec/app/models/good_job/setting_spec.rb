@@ -256,10 +256,29 @@ RSpec.describe GoodJob::Setting do
     end
 
     describe '.paused?' do
+      let(:active_job_class) do
+        stub_const('PausedSettingJob', Class.new(ActiveJob::Base) do
+          include GoodJob::ActiveJobExtensions::Labels
+
+          queue_as :critical
+
+          def perform
+          end
+        end)
+      end
+      let(:active_job) do
+        active_job_class.new.tap do |job|
+          job.good_job_labels = ["important", nil, "", :urgent, "important"]
+        end
+      end
+
       it 'raises ArgumentError if multiple arguments are provided' do
-        expect { described_class.paused?(queue: "default", job_class: "MyJob") }.to raise_error(ArgumentError, "Must provide at most one of queue, job_class, or label")
-        expect { described_class.paused?(queue: "default", label: "my_label") }.to raise_error(ArgumentError, "Must provide at most one of queue, job_class, or label")
-        expect { described_class.paused?(job_class: "MyJob", label: "my_label") }.to raise_error(ArgumentError, "Must provide at most one of queue, job_class, or label")
+        error_message = "Must provide at most one of active_job, queue, job_class, or label"
+
+        expect { described_class.paused?(queue: "default", job_class: "MyJob") }.to raise_error(ArgumentError, error_message)
+        expect { described_class.paused?(queue: "default", label: "my_label") }.to raise_error(ArgumentError, error_message)
+        expect { described_class.paused?(job_class: "MyJob", label: "my_label") }.to raise_error(ArgumentError, error_message)
+        expect { described_class.paused?(active_job: active_job, queue: "default") }.to raise_error(ArgumentError, error_message)
       end
 
       it 'returns true when queue is paused' do
@@ -288,11 +307,73 @@ RSpec.describe GoodJob::Setting do
       it 'returns false when label is not paused' do
         expect(described_class.paused?(label: "important")).to be false
       end
+
+      it 'returns true when any queue, job class, or label is paused and no filter is provided' do
+        described_class.pause(queue: "default")
+
+        expect(described_class.paused?).to be true
+      end
+
+      it 'returns false when nothing is paused and no filter is provided' do
+        expect(described_class.paused?).to be false
+      end
+
+      it 'returns :queue_name_paused when an Active Job queue name is paused' do
+        described_class.pause(queue: "critical")
+
+        expect(described_class.paused?(active_job: active_job)).to eq(:queue_name_paused)
+      end
+
+      it 'returns :job_class_paused when an Active Job class is paused' do
+        described_class.pause(job_class: "PausedSettingJob")
+
+        expect(described_class.paused?(active_job: active_job)).to eq(:job_class_paused)
+      end
+
+      it 'returns :label_paused when an Active Job label is paused' do
+        described_class.pause(label: "urgent")
+
+        expect(described_class.paused?(active_job: active_job)).to eq(:label_paused)
+      end
+
+      it 'returns false when pauses do not match an Active Job' do
+        described_class.pause(queue: "default")
+        described_class.pause(job_class: "OtherJob")
+        described_class.pause(label: "low_priority")
+
+        expect(described_class.paused?(active_job: active_job)).to be false
+      end
+
+      it 'returns false when an Active Job has no GoodJob labels and only labels are paused' do
+        active_job_without_labels = stub_const('UnlabeledSettingJob', Class.new(ActiveJob::Base) do
+          queue_as :critical
+
+          def perform
+          end
+        end).new
+        described_class.pause(label: "urgent")
+
+        expect(described_class.paused?(active_job: active_job_without_labels)).to be false
+      end
     end
 
     describe '.paused' do
       it 'returns empty arrays when nothing is paused' do
         expect(described_class.paused).to eq({ queues: [], job_classes: [], labels: [] })
+      end
+
+      it 'bypasses the Active Record query cache' do
+        described_class.pause(queue: "default")
+
+        described_class.cache do
+          expect(described_class.paused(:queues)).to contain_exactly "default"
+
+          # Simulate a pause update from another execution context without clearing this
+          # thread's query cache; Rails 7.1 does not support uncached(dirties: false).
+          rails_promise { described_class.unpause(queue: "default") }.value!
+
+          expect(described_class.paused(:queues)).to eq []
+        end
       end
 
       it 'returns only queues when type is :queues' do
