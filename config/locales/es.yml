@@ -240,8 +240,32 @@ es:
         job_class: Clase de trabajo
         maximum_duration: Duración máxima
         minimum_duration: Duración mínima
+        no_executions: No hay ejecuciones en este intervalo de tiempo.
         queue_name: Nombre de la cola
         title: Rendimiento
+      range:
+        bucket_size:
+          days: "%{count}d"
+          hours: "%{count}h"
+          minutes: "%{count}m"
+          months: "~%{count} mes"
+          seconds: "%{count}s"
+          years: "~%{count}a"
+        chart_bucket_size: 'Tamaño del intervalo del gráfico: %{size}'
+        custom_range: Personalizado
+        custom_range_hint: arrastrar en el gráfico
+        end_time: Hora de fin
+        open_time_ranges: Abrir intervalos de tiempo de rendimiento
+        quick_ranges: Intervalos rápidos
+        range_options:
+          1h: Última hora
+          24h: Últimas 24 horas
+          6h: Últimas 6 horas
+          7d: Últimos 7 días
+        reload_range: Volver a cargar los datos de rendimiento
+        start_time: Hora de inicio
+        time_range: Intervalo de tiempo de rendimiento
+        time_zone: 'Zona horaria:'
       show:
         slow: Lento
         title: Rendimiento

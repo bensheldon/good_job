@@ -240,8 +240,32 @@ ko:
         job_class: 작업 클래스
         maximum_duration: 최대 소요 시간
         minimum_duration: 최소 소요 시간
+        no_executions: 이 시간 범위에 실행이 없습니다.
         queue_name: 큐 이름
         title: 성능
+      range:
+        bucket_size:
+          days: "%{count}일"
+          hours: "%{count}시간"
+          minutes: "%{count}분"
+          months: 약 %{count}개월
+          seconds: "%{count}초"
+          years: 약 %{count}년
+        chart_bucket_size: '차트 집계 간격: %{size}'
+        custom_range: 사용자 지정
+        custom_range_hint: 차트에서 드래그
+        end_time: 종료 시간
+        open_time_ranges: 성능 시간 범위 열기
+        quick_ranges: 빠른 범위
+        range_options:
+          1h: 최근 1시간
+          24h: 최근 24시간
+          6h: 최근 6시간
+          7d: 최근 7일
+        reload_range: 성능 데이터 새로고침
+        start_time: 시작 시간
+        time_range: 성능 시간 범위
+        time_zone: '시간대:'
       show:
         slow: 느림
         title: 성능

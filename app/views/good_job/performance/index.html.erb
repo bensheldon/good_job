@@ -1,8 +1,12 @@
-<div class="border-bottom">
+<div class="border-bottom mb-3">
   <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
 </div>
 
-<%= render 'good_job/shared/chart_container', chart_data: GoodJob::PerformanceIndexChart.new.data %>
+<%= render "range", performance_range: @performance_range, drag_enabled: true, range_context: @performance_range_context, range_path: performance_index_path(locale: nil), bucket_size: format_performance_bucket_size(@performance_range.interval_seconds) %>
+
+<%= render 'good_job/shared/chart_container', chart_data: @chart_data %>
+
+<% performance_range_query = @performance_range_context.merge(@performance_range.navigation_params).to_query %>
 
 <div class="my-3 card">
   <div class="list-group list-group-flush text-nowrap" role="table">
@@ -16,12 +20,16 @@
       </div>
     </header>
 
+    <% if @performances.empty? %>
+      <div role="row" class="list-group-item py-3 text-body-secondary"><%= t ".no_executions" %></div>
+    <% end %>
+
     <% @performances.each do |performance| %>
       <div role="row" class="list-group-item py-3">
         <div class="row align-items-center">
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-4 performance-name">
             <div class="d-flex gap-3 justify-content-between">
-              <%= link_to performance.job_class, performance_path(performance.job_class) %>
+              <%= link_to performance.job_class, "#{performance_path(performance.job_class, locale: nil)}?#{performance_range_query}" %>
             </div>
           </div>
           <div class="col-6 col-lg-2 text-wrap">
@@ -58,10 +66,14 @@
       </div>
     </header>
 
+    <% if @queue_performances.empty? %>
+      <div role="row" class="list-group-item py-3 text-body-secondary"><%= t ".no_executions" %></div>
+    <% end %>
+
     <% @queue_performances.each do |performance| %>
       <div role="row" class="list-group-item py-3">
         <div class="row align-items-center">
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-4 performance-name">
             <div class="d-flex gap-3 justify-content-between">
               <%= performance.queue_name %>
             </div>

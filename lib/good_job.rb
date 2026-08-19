@@ -316,6 +316,7 @@ module GoodJob
   # @return [Boolean]
   def self.migrated?
     GoodJob::Job.lock_type_migrated? &&
+      GoodJob::Job.connection.index_name_exists?(:good_jobs, "index_good_jobs_on_discarded_job_class") &&
       GoodJob::Job.connection.index_name_exists?(:good_job_executions, "index_good_job_executions_on_scheduled_at")
   end
 
@@ -341,8 +342,8 @@ module GoodJob
   # @param job_class [String, nil] Job class name to check
   # @param label [String, nil] Label to check
   # @return [Boolean]
-  def self.paused?(queue: nil, job_class: nil, label: nil)
-    GoodJob::Setting.paused?(queue: queue, job_class: job_class, label: label)
+  def self.paused?(active_job: nil, queue: nil, job_class: nil, label: nil)
+    GoodJob::Setting.paused?(active_job: active_job, queue: queue, job_class: job_class, label: label)
   end
 
   # Get a list of all paused queues and job classes

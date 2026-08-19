@@ -185,6 +185,62 @@ describe GoodJob do
 
       expect(PERFORMED.size).to eq 1
     end
+
+    it 'interrupts continuable jobs when their queue is paused at a checkpoint' do
+      skip "ActiveJob::Continuable is not available in this Rails version" unless defined?(ActiveJob::Continuable)
+      skip "ActiveJob::Continuable does not pass the job to queue_adapter.stopping? in Rails 8.1 or below" if Rails.gem_version.release < Gem::Version.new("8.2.0")
+
+      allow(described_class.configuration).to receive(:enable_pauses).and_return(true)
+      continuable_events = []
+      job_adapter = GoodJob::Adapter.new(execution_mode: :external)
+      continuable_pause_job = stub_const('ContinuablePauseJob', Class.new(ActiveJob::Base) do
+        include ActiveJob::Continuable
+
+        self.queue_adapter = job_adapter
+        self.resume_options = { wait: 0 }
+        queue_as :pausable
+
+        class << self
+          attr_accessor :pause_once
+        end
+        self.pause_once = true
+
+        define_method(:perform) do
+          step :process do |step|
+            continuable_events << :started
+            if self.class.pause_once
+              self.class.pause_once = false
+              GoodJob::Setting.pause(queue: "pausable")
+            end
+            step.checkpoint!
+            continuable_events << :completed
+          end
+        end
+      end)
+
+      continuable_pause_job.perform_later
+
+      described_class.perform_inline
+
+      job = GoodJob::Job.find_by(job_class: "ContinuablePauseJob")
+      expect(continuable_events).to eq([:started])
+      expect(job).to have_attributes(
+        performed_at: be_blank,
+        finished_at: be_blank
+      )
+      expect(job.serialized_params.dig("continuation", "current")).to eq(["process", nil])
+      expect(GoodJob::Job.exclude_paused).not_to include(job)
+
+      GoodJob::Setting.unpause(queue: "pausable")
+      described_class.perform_inline
+
+      expect(continuable_events).to eq([:started, :started, :completed])
+      expect(job.reload).to have_attributes(
+        finished_at: be_present,
+        error: be_nil,
+        error_event: nil
+      )
+    end
   end
 
   describe '#v4_ready?' do
@@ -211,6 +267,15 @@ describe GoodJob do
 
       described_class.unpause(job_class: 'MyJob')
       expect(described_class.paused).to eq({ queues: [], job_classes: [], labels: [] })
+    end
+
+    it 'can check an Active Job pause reason' do
+      active_job = instance_double(ActiveJob::Base)
+      allow(GoodJob::Setting).to receive(:paused?)
+        .with(active_job: active_job, queue: nil, job_class: nil, label: nil)
+        .and_return(:queue_name_paused)
+
+      expect(described_class.paused?(active_job: active_job)).to eq(:queue_name_paused)
     end
   end
 
