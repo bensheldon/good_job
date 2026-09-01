@@ -15,10 +15,8 @@ module GoodJob # :nodoc:
       # Registers the current process.
       def register_process
         @advisory_lock_heartbeat = GoodJob.configuration.advisory_lock_heartbeat
-        GoodJob::Process.override_connection(connection) do
-          GoodJob::Process.cleanup
-          @capsule.tracker.register(with_advisory_lock: @advisory_lock_heartbeat)
-        end
+        @capsule.tracker.cleanup
+        @capsule.tracker.register(with_advisory_lock: @advisory_lock_heartbeat, advisory_lock_connection: connection)
       end
 
       def refresh_process
@@ -31,9 +29,7 @@ module GoodJob # :nodoc:
 
       # Deregisters the current process.
       def deregister_process
-        GoodJob::Process.override_connection(connection) do
-          @capsule.tracker.unregister(with_advisory_lock: @advisory_lock_heartbeat)
-        end
+        @capsule.tracker.unregister(with_advisory_lock: @advisory_lock_heartbeat, advisory_lock_connection: connection)
       end
     end
   end
