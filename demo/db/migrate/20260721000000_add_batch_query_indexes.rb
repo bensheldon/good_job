@@ -1,0 +1,28 @@
+# frozen_string_literal: true
+
+class AddBatchQueryIndexes < ActiveRecord::Migration[8.0]
+  disable_ddl_transaction!
+
+  def change
+    add_index :good_job_batches, :finished_at,
+      name: :index_good_job_batches_on_finished_at,
+      where: "finished_at IS NOT NULL",
+      algorithm: :concurrently,
+      if_not_exists: true
+    add_index :good_job_batches, [:created_at, :id],
+      name: :index_good_job_batches_on_created_at_and_id,
+      order: { created_at: :desc, id: :desc },
+      algorithm: :concurrently,
+      if_not_exists: true
+    add_index :good_jobs, :batch_id,
+      name: :index_good_jobs_on_batch_id_unfinished,
+      where: "batch_id IS NOT NULL AND finished_at IS NULL",
+      algorithm: :concurrently,
+      if_not_exists: true
+    add_index :good_jobs, :batch_callback_id,
+      name: :index_good_jobs_on_batch_callback_id_unfinished,
+      where: "batch_callback_id IS NOT NULL AND finished_at IS NULL",
+      algorithm: :concurrently,
+      if_not_exists: true
+  end
+end
