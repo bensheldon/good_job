@@ -70,6 +70,10 @@ module GoodJob
                   type: :numeric,
                   banner: 'COUNT',
                   desc: "Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)"
+    method_option :subprocesses,
+                  type: :numeric,
+                  banner: 'COUNT',
+                  desc: "Number of subprocesses to fork and supervise in cluster mode. 0 runs in the current process. (env var: GOOD_JOB_SUBPROCESSES, default: 0)"
     method_option :poll_interval,
                   type: :numeric,
                   banner: 'SECONDS',
@@ -111,11 +115,38 @@ module GoodJob
       set_up_application!
       GoodJob.configuration.options.merge!(options.symbolize_keys)
       configuration = GoodJob.configuration
-      capsule = GoodJob.capsule
       systemd = GoodJob::SystemdService.new
 
       Daemon.new(pidfile: configuration.pidfile).daemonize if configuration.daemonize?
 
+      if configuration.cluster?
+        # A subprocess that exited because it was idle would just be replaced.
+        if configuration.idle_timeout
+          GoodJob.logger.warn(
+            "GoodJob's idle_timeout is not supported in cluster mode (subprocesses: #{configuration.subprocesses}) and will be ignored."
+          )
+        end
+
+        # In cluster mode the supervisor forks and supervises subprocesses,
+        # each running its own capsule; it runs no capsule itself. The
+        # supervisor owns its own signal handling and blocks until shut down.
+        # It returns only once every subprocess has drained, so systemd is
+        # notified from the supervisor's shutdown callback instead — otherwise
+        # systemd would not learn of the shutdown until it had already finished.
+        supervisor = GoodJob::Supervisor.new(configuration)
+        systemd.start
+        supervisor.start(on_shutdown: -> { systemd.stopping })
+        systemd.stop
+        return
+      elsif configuration.subprocesses >= 1
+        GoodJob.logger.warn(
+          "GoodJob was configured to run #{configuration.subprocesses} subprocesses, but this platform does not support forking; GoodJob will run in a single process."
+        )
+        # {MultiScheduler} flattens the pools into `;`-delimited scheduler groups this process serves.
+        GoodJob.logger.warn("GoodJob will run every queue pool in a single process as \"#{configuration.flattened_queue_string}\".") if configuration.flattened_queue_string != configuration.queue_string
+      end
+
+      capsule = GoodJob.capsule
       capsule.start
       systemd.start
 

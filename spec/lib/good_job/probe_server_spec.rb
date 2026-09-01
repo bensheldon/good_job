@@ -196,4 +196,38 @@ RSpec.describe GoodJob::ProbeServer do
       end
     end
   end
+
+  describe '#close_socket' do
+    it 'is a no-op when the server was never started' do
+      expect { described_class.new(port: port).close_socket }.not_to raise_error
+    end
+  end
+
+  describe GoodJob::ProbeServer::SimpleHandler do
+    let(:handler) { described_class.new(GoodJob::ProbeServer.default_app, port: port, logger: GoodJob.logger) }
+
+    describe '#listen' do
+      it 'binds the port without starting the thread that serves it' do
+        handler.listen
+
+        expect { TCPServer.new('0.0.0.0', port).close }.to raise_error(Errno::EADDRINUSE)
+        handler.stop
+      end
+    end
+
+    describe '#close_socket' do
+      it 'releases the port' do
+        handler.listen
+
+        handler.close_socket
+
+        expect { TCPServer.new('0.0.0.0', port).close }.not_to raise_error
+        handler.stop
+      end
+
+      it 'is a no-op when the port was never bound' do
+        expect { handler.close_socket }.not_to raise_error
+      end
+    end
+  end
 end
