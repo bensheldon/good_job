@@ -234,15 +234,28 @@ pt-BR:
         value: Valor
     performance:
       index:
-        average_duration: Duração média
-        chart_title: Tempo total de execução em segundos
+        chart_title: Latência de execução total em segundos
+        chart_title_queue: Latência na fila média em segundos
+        chart_title_total: Latência total média em segundos
+        execution_latency: Latência de execução
         executions: Execuções
         job_class: Classe do trabalho
-        maximum_duration: Duração máxima
-        minimum_duration: Duração mínima
+        jobs: Trabalhos
         no_executions: Nenhuma execução neste intervalo de tempo.
+        queue_latency: Latência na fila
         queue_name: Nome da fila
         title: Desempenho
+        total_latency: Latência total
+      latency:
+        average: méd
+        maximum: máx
+        minimum: mín
+      metric:
+        chart_metric: Métrica do gráfico
+        metric_options:
+          execution: Latência de execução
+          queue: Latência na fila
+          total: Latência total
       range:
         bucket_size:
           days: "%{count}d"
@@ -267,8 +280,11 @@ pt-BR:
         time_range: Intervalo de tempo de desempenho
         time_zone: 'Fuso horário:'
       show:
+        execution_chart_title: Latência de execução
+        queue_chart_title: Latência na fila
         slow: Lento
         title: Desempenho
+        total_chart_title: Latência total
     processes:
       index:
         cron_enabled: Agendamento ativado

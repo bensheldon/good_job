@@ -2,7 +2,9 @@
   <h2 class="pt-3 pb-2"><%= t ".title" %></h2>
 </div>
 
-<%= render "range", performance_range: @performance_range, drag_enabled: true, range_context: @performance_range_context, range_path: performance_index_path(locale: nil), bucket_size: format_performance_bucket_size(@performance_range.interval_seconds) %>
+<%= render "range", performance_range: @performance_range, drag_enabled: true, range_context: @performance_range_context.merge(@chart_metric_params), range_path: performance_index_path(locale: nil), bucket_size: format_performance_bucket_size(@performance_range.interval_seconds) %>
+
+<%= render "metric", chart_metric: @chart_metric, performance_range: @performance_range, range_context: @performance_range_context, metric_path: performance_index_path(locale: nil) %>
 
 <%= render 'good_job/shared/chart_container', chart_data: @chart_data %>
 
@@ -11,12 +13,13 @@
 <div class="my-3 card">
   <div class="list-group list-group-flush text-nowrap" role="table">
     <header class="list-group-item bg-body-tertiary">
-      <div class="row small text-muted text-uppercase align-items-center">
-        <div class="col-12 col-lg-4"><%= t ".job_class" %></div>
-        <div class="col-lg-2 d-none d-lg-block"><%= t ".executions" %></div>
-        <div class="col-lg-2 d-none d-lg-block"><%= t ".average_duration" %></div>
-        <div class="col-lg-2 d-none d-lg-block"><%= t ".minimum_duration" %></div>
-        <div class="col-lg-2 d-none d-lg-block"><%= t ".maximum_duration" %></div>
+      <div class="row performance-row small text-muted text-uppercase align-items-center">
+        <div class="col-12 col-lg-3"><%= t ".job_class" %></div>
+        <div class="col-lg d-none d-lg-block text-wrap"><%= t ".jobs" %></div>
+        <div class="col-lg d-none d-lg-block text-wrap"><%= t ".executions" %></div>
+        <div class="col-lg d-none d-lg-block text-wrap"><%= t ".queue_latency" %></div>
+        <div class="col-lg d-none d-lg-block text-wrap"><%= t ".execution_latency" %></div>
+        <div class="col-lg d-none d-lg-block text-wrap"><%= t ".total_latency" %></div>
       </div>
     </header>
 
@@ -26,28 +29,21 @@
 
     <% @performances.each do |performance| %>
       <div role="row" class="list-group-item py-3">
-        <div class="row align-items-center">
-          <div class="col-12 col-lg-4 performance-name">
-            <div class="d-flex gap-3 justify-content-between">
-              <%= link_to performance.job_class, "#{performance_path(performance.job_class, locale: nil)}?#{performance_range_query}" %>
-            </div>
+        <div class="row performance-row align-items-center">
+          <div class="col-12 col-lg-3 performance-name">
+            <%= link_to performance.job_class, "#{performance_path(performance.job_class, locale: nil)}?#{performance_range_query}" %>
           </div>
-          <div class="col-6 col-lg-2 text-wrap">
+          <div class="col-6 col-lg">
+            <div class="d-lg-none small text-muted mt-1"><%= t ".jobs" %></div>
+            <%= performance.jobs_count %>
+          </div>
+          <div class="col-6 col-lg">
             <div class="d-lg-none small text-muted mt-1"><%= t ".executions" %></div>
             <%= performance.executions_count %>
           </div>
-          <div class="col-6 col-lg-2 text-wrap">
-            <div class="d-lg-none small text-muted mt-1"><%= t ".average_duration" %></div>
-            <%= format_duration performance.avg_duration %>
-          </div>
-          <div class="col-6 col-lg-2 text-wrap">
-            <div class="d-lg-none small text-muted mt-1"><%= t ".minimum_duration" %></div>
-            <%= format_duration performance.min_duration %>
-          </div>
-          <div class="col-6 col-lg-2 text-wrap">
-            <div class="d-lg-none small text-muted mt-1"><%= t ".maximum_duration" %></div>
-            <%= format_duration performance.max_duration %>
-          </div>
+          <%= render "latency", label: t(".queue_latency"), average: performance.avg_queue, minimum: performance.min_queue, maximum: performance.max_queue %>
+          <%= render "latency", label: t(".execution_latency"), average: performance.avg_execution, minimum: performance.min_execution, maximum: performance.max_execution %>
+          <%= render "latency", label: t(".total_latency"), average: performance.avg_total, minimum: performance.min_total, maximum: performance.max_total %>
         </div>
       </div>
     <% end %>
@@ -57,12 +53,13 @@
 <div class="my-3 card">
   <div class="list-group list-group-flush text-nowrap" role="table">
     <header class="list-group-item bg-body-tertiary">
-      <div class="row small text-muted text-uppercase align-items-center">
-        <div class="col-12 col-lg-4"><%= t ".queue_name" %></div>
-        <div class="col-lg-2 d-none d-lg-block"><%= t ".executions" %></div>
-        <div class="col-lg-2 d-none d-lg-block"><%= t ".average_duration" %></div>
-        <div class="col-lg-2 d-none d-lg-block"><%= t ".minimum_duration" %></div>
-        <div class="col-lg-2 d-none d-lg-block"><%= t ".maximum_duration" %></div>
+      <div class="row performance-row small text-muted text-uppercase align-items-center">
+        <div class="col-12 col-lg-3"><%= t ".queue_name" %></div>
+        <div class="col-lg d-none d-lg-block text-wrap"><%= t ".jobs" %></div>
+        <div class="col-lg d-none d-lg-block text-wrap"><%= t ".executions" %></div>
+        <div class="col-lg d-none d-lg-block text-wrap"><%= t ".queue_latency" %></div>
+        <div class="col-lg d-none d-lg-block text-wrap"><%= t ".execution_latency" %></div>
+        <div class="col-lg d-none d-lg-block text-wrap"><%= t ".total_latency" %></div>
       </div>
     </header>
 
@@ -72,28 +69,21 @@
 
     <% @queue_performances.each do |performance| %>
       <div role="row" class="list-group-item py-3">
-        <div class="row align-items-center">
-          <div class="col-12 col-lg-4 performance-name">
-            <div class="d-flex gap-3 justify-content-between">
-              <%= performance.queue_name %>
-            </div>
+        <div class="row performance-row align-items-center">
+          <div class="col-12 col-lg-3 performance-name">
+            <%= performance.queue_name %>
           </div>
-          <div class="col-6 col-lg-2 text-wrap">
+          <div class="col-6 col-lg">
+            <div class="d-lg-none small text-muted mt-1"><%= t ".jobs" %></div>
+            <%= performance.jobs_count %>
+          </div>
+          <div class="col-6 col-lg">
             <div class="d-lg-none small text-muted mt-1"><%= t ".executions" %></div>
             <%= performance.executions_count %>
           </div>
-          <div class="col-6 col-lg-2 text-wrap">
-            <div class="d-lg-none small text-muted mt-1"><%= t ".average_duration" %></div>
-            <%= format_duration performance.avg_duration %>
-          </div>
-          <div class="col-6 col-lg-2 text-wrap">
-            <div class="d-lg-none small text-muted mt-1"><%= t ".minimum_duration" %></div>
-            <%= format_duration performance.min_duration %>
-          </div>
-          <div class="col-6 col-lg-2 text-wrap">
-            <div class="d-lg-none small text-muted mt-1"><%= t ".maximum_duration" %></div>
-            <%= format_duration performance.max_duration %>
-          </div>
+          <%= render "latency", label: t(".queue_latency"), average: performance.avg_queue, minimum: performance.min_queue, maximum: performance.max_queue %>
+          <%= render "latency", label: t(".execution_latency"), average: performance.avg_execution, minimum: performance.min_execution, maximum: performance.max_execution %>
+          <%= render "latency", label: t(".total_latency"), average: performance.avg_total, minimum: performance.min_total, maximum: performance.max_total %>
         </div>
       </div>
     <% end %>

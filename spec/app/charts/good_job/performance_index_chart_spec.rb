@@ -3,10 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe GoodJob::PerformanceIndexChart do
-  subject(:chart) { described_class.new(range) }
+  subject(:chart) { described_class.new(range, metric) }
 
   let(:range) { GoodJob::PerformanceRange.new(params) }
   let(:params) { {} }
+  let(:metric) { GoodJob::LatencyMetric.default }
 
   describe "#data" do
     around do |example|
@@ -63,6 +64,58 @@ RSpec.describe GoodJob::PerformanceIndexChart do
         expect(data.dig(:goodJob, :timestamps).first).to eq("2024-01-01T10:00:00Z")
         expect(data.dig(:goodJob, :timestamps).last).to eq("2024-01-01T11:05:00Z")
         expect(data.dig(:data, :labels).count).to eq(14)
+      end
+    end
+
+    context "with the queue time metric" do
+      let(:params) do
+        {
+          chart_start: "2024-01-01T10:00:00Z",
+          chart_end: "2024-01-01T11:00:00Z",
+        }
+      end
+      let(:metric) { GoodJob::LatencyMetric::Queue.new }
+
+      before do
+        # Both land in the leading two-minute bucket, so the bucket averages to 15s.
+        create_execution(job_class: "ExampleJob", scheduled_at: range.start_time, queue_time: 10.seconds)
+        create_execution(job_class: "ExampleJob", scheduled_at: range.start_time + 1.minute, queue_time: 20.seconds)
+      end
+
+      it "averages the wait per bucket and leaves bucketless time as a gap" do
+        data = chart.data
+        series = data.dig(:data, :datasets, 0, :data)
+
+        expect(data.dig(:options, :plugins, :title, :text)).to eq("Average queue latency in seconds")
+        expect(series.first).to eq(15.0)
+        # nil rather than 0: no executions is not the same as no waiting.
+        expect(series.compact).to eq([15.0])
+        expect(series.drop(1)).to all(be_nil)
+      end
+
+      it "draws a continuous line across the gaps" do
+        expect(chart.data.dig(:data, :datasets, 0, :spanGaps)).to be(true)
+      end
+
+      it "averages wait plus runtime when the total latency metric is selected" do
+        data = described_class.new(range, GoodJob::LatencyMetric::Total.new).data
+        series = data.dig(:data, :datasets, 0, :data)
+
+        expect(data.dig(:options, :plugins, :title, :text)).to eq("Average total latency in seconds")
+        # The 15s average wait plus the 1s each execution ran.
+        expect(series.first).to eq(16.0)
+        expect(series.drop(1)).to all(be_nil)
+        expect(data.dig(:data, :datasets, 0, :spanGaps)).to be(true)
+      end
+
+      it "still sums seconds when the duration metric is selected" do
+        data = described_class.new(range, GoodJob::LatencyMetric::Execution.new).data
+        series = data.dig(:data, :datasets, 0, :data)
+
+        expect(series.first).to eq(2.0)
+        expect(series.drop(1)).to all(eq(0))
+        # A summed series has no gaps to span.
+        expect(data.dig(:data, :datasets, 0, :spanGaps)).to be(false)
       end
     end
 
@@ -163,10 +216,10 @@ RSpec.describe GoodJob::PerformanceIndexChart do
     end
   end
 
-  def create_execution(job_class:, scheduled_at:)
+  def create_execution(job_class:, scheduled_at:, queue_time: 0)
     GoodJob::Execution.create!(
       active_job_id: SecureRandom.uuid,
-      created_at: scheduled_at,
+      created_at: scheduled_at + queue_time,
       duration: 1.second,
       job_class: job_class,
       queue_name: "default",

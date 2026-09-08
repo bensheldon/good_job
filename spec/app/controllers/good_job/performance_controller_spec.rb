@@ -40,6 +40,101 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
       expect(chart_data.dig(:data, :datasets).pluck(:label)).to contain_exactly("AtStart", "BeforeEnd")
     end
 
+    it "reports jobs, executions, and queue, execution and total latency in both tables" do
+      scheduled_at = Time.zone.parse("2024-01-01 10:30:00 UTC")
+      # One job retried once: two waits so no two aggregates coincide by accident, and a
+      # shared job id so the distinct job count differs from the execution count.
+      active_job_id = SecureRandom.uuid
+      create_execution(job_class: "SlowStart", queue_name: "slow-start", scheduled_at: scheduled_at, queue_time: 10.seconds, active_job_id: active_job_id)
+      create_execution(job_class: "SlowStart", queue_name: "slow-start", scheduled_at: scheduled_at, queue_time: 30.seconds, active_job_id: active_job_id)
+
+      get :index, params: {
+        chart_start: "2024-01-01T10:03:17Z",
+        chart_end: "2024-01-01T11:07:42Z",
+      }
+
+      performance = controller.instance_variable_get(:@performances).find { |row| row.job_class == "SlowStart" }
+      queue_performance = controller.instance_variable_get(:@queue_performances).find { |row| row.queue_name == "slow-start" }
+
+      expect(response).to have_http_status(:ok)
+      [performance, queue_performance].each do |row|
+        expect([row.jobs_count, row.executions_count]).to eq([1, 2])
+        expect([row.avg_queue, row.min_queue, row.max_queue]).to eq([20.seconds, 10.seconds, 30.seconds])
+        expect([row.avg_execution, row.min_execution, row.max_execution]).to eq([1.second, 1.second, 1.second])
+        expect([row.avg_total, row.min_total, row.max_total]).to eq([21.seconds, 11.seconds, 31.seconds])
+      end
+
+      page = Capybara.string(response.body)
+      expect(page).to have_css("[role='table']", count: 2)
+      ["Jobs", "Executions", "Queue latency", "Execution latency", "Total latency"].each do |label|
+        expect(page).to have_css("[role='table'] header", text: label, count: 2)
+      end
+      expect(page).to have_css("[role='row']", text: "SlowStart", count: 1)
+      row = page.find("[role='row']", text: "SlowStart")
+      expect(row).to have_css(".performance-name a", text: "SlowStart")
+      # Each cell carries its narrow-viewport label ahead of its values.
+      expect(row.text(normalize_ws: true)).to eq(
+        "SlowStart Jobs 1 Executions 2 " \
+        "Queue latency 20s avg 10s min 30s max " \
+        "Execution latency 1s avg 1s min 1s max " \
+        "Total latency 21s avg 11s min 31s max"
+      )
+    end
+
+    it "switches the chart metric while keeping the selected range" do
+      get :index, params: { chart_range: "1h", chart: "queue" }
+
+      chart_data = controller.instance_variable_get(:@chart_data)
+      page = Capybara.string(response.body)
+
+      expect(response).to have_http_status(:ok)
+      expect(chart_data.dig(:options, :plugins, :title, :text)).to eq("Average queue latency in seconds")
+      expect(page).to have_link("Queue latency", href: performance_index_path(chart_range: "1h", chart: "queue", locale: nil))
+      expect(page).to have_link("Execution latency", href: performance_index_path(chart_range: "1h", locale: nil))
+      expect(page).to have_link("Total latency", href: performance_index_path(chart_range: "1h", chart: "total", locale: nil))
+      expect(page).to have_css("a.btn.active", text: "Queue latency")
+      # The range toolbar has to carry the metric or switching presets silently resets it.
+      expect(page.find("a.performance-range-reload")[:href]).to eq(
+        performance_index_path(chart_range: "1h", chart: "queue", locale: nil)
+      )
+    end
+
+    it "renders the duration chart for an unrecognized metric without echoing it back" do
+      get :index, params: { chart: "bogus" }
+
+      chart_data = controller.instance_variable_get(:@chart_data)
+
+      expect(response).to have_http_status(:ok)
+      expect(chart_data.dig(:options, :plugins, :title, :text)).to eq("Total execution latency in seconds")
+      expect(response.body).not_to include("bogus")
+    end
+
+    it "preserves the chart metric through a canonical range redirect" do
+      get :index, params: {
+        chart_start: "2024-01-01T10:03:17",
+        chart_end: "2024-01-01T11:07:42",
+        chart: "queue",
+      }
+
+      expect(response).to have_http_status(:redirect)
+      expect(Rack::Utils.parse_query(URI.parse(response.location).query)).to eq(
+        "chart_start" => "2024-01-01T10:03:17Z",
+        "chart_end" => "2024-01-01T11:07:42Z",
+        "chart" => "queue"
+      )
+    end
+
+    it "keeps the chart metric out of the job class drilldown links" do
+      get :index, params: { chart_range: "1h", chart: "queue" }
+
+      drilldown_query = Rack::Utils.parse_query(
+        URI.parse(Capybara.string(response.body).find(".performance-name a")[:href]).query
+      )
+
+      expect(response).to have_http_status(:ok)
+      expect(drilldown_query.keys).to contain_exactly("chart_range", "chart_start", "chart_end")
+    end
+
     it "renders explicit empty states when the selected range has no executions" do
       get :index, params: {
         chart_start: "2020-01-01T10:03:17Z",
@@ -47,7 +142,7 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
       }
 
       expect(response).to have_http_status(:ok)
-      expect(response.body.scan("No executions in this time range.").count).to eq(2)
+      expect(Capybara.string(response.body)).to have_css("[role='row']", text: "No executions in this time range.", count: 2)
     end
 
     it "canonicalizes native local values in the page timezone and then renders" do
@@ -243,6 +338,30 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
       expect(response.body).to include('Performance - ExampleJob')
     end
 
+    it "renders a separately titled histogram for every metric" do
+      scheduled_at = Time.zone.parse("2024-01-01 10:30:00 UTC")
+      GoodJob::Execution.find_by!(job_class: "ExampleJob")
+                        .update!(scheduled_at: scheduled_at, created_at: scheduled_at + 10.seconds)
+
+      get :show, params: {
+        id: "ExampleJob",
+        chart_start: "2024-01-01T10:03:17Z",
+        chart_end: "2024-01-01T11:07:42Z",
+      }
+
+      histograms = controller.instance_variable_get(:@charts)
+      page = Capybara.string(response.body)
+
+      expect(response).to have_http_status(:ok)
+      expect(histograms.transform_values { |chart| chart.dig(:options, :plugins, :title, :text) })
+        .to eq(execution: "Execution latency", queue: "Queue latency", total: "Total latency")
+      histograms.each_value { |chart| expect(chart.dig(:data, :datasets, 0, :data).sum).to eq(1) }
+      # Distinct regions, or live polling would refresh the first chart repeatedly and never the rest.
+      %w[execution-chart queue-chart total-chart].each do |region|
+        expect(page).to have_css("[data-live-poll-region='#{region}'][data-chart-config-value]")
+      end
+    end
+
     it "raises a 404 when the job doesn't exist" do
       expect do
         get :show, params: { id: "Missing" }
@@ -259,7 +378,7 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
         chart_end: "2024-01-01T11:07:42Z",
       }
 
-      chart_data = controller.instance_variable_get(:@chart_data)
+      chart_data = controller.instance_variable_get(:@charts).fetch(:execution)
 
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Performance time range")
@@ -284,7 +403,7 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
       }
 
       range = controller.instance_variable_get(:@performance_range)
-      chart_data = controller.instance_variable_get(:@chart_data)
+      chart_data = controller.instance_variable_get(:@charts).fetch(:execution)
 
       expect(response).to have_http_status(:ok)
       expect(range.key).to eq("1h")
@@ -295,10 +414,10 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
     end
   end
 
-  def create_execution(job_class:, queue_name:, scheduled_at:)
+  def create_execution(job_class:, queue_name:, scheduled_at:, queue_time: 0, active_job_id: SecureRandom.uuid)
     GoodJob::Execution.create!(
-      active_job_id: SecureRandom.uuid,
-      created_at: scheduled_at,
+      active_job_id: active_job_id,
+      created_at: scheduled_at + queue_time,
       duration: 1.second,
       job_class: job_class,
       queue_name: queue_name,
