@@ -1,0 +1,321 @@
+---
+az:
+  good_job:
+    actions:
+      destroy: Sil
+      discard: Ləğv et
+      force_discard: Məcburi ləğv et
+      inspect: Nəzərdən keçir
+      reschedule: Yenidən planlaşdır
+      retry: Yenidən cəhd et
+    batches:
+      actions:
+        confirm_retry: Bu toplu işi yenidən icra etmək istədiyinizə əminsiniz?
+        retry: Yenidən cəhd et
+      index:
+        older_batches: Daha köhnə toplu işlər
+        title: Toplu işlər
+      jobs:
+        actions:
+          confirm_destroy: Bu tapşırığı silmək istədiyinizə əminsiniz?
+          confirm_discard: Bu tapşırığı ləğv etmək istədiyinizə əminsiniz?
+          confirm_reschedule: Bu tapşırığı yenidən planlaşdırmaq istədiyinizə əminsiniz?
+          confirm_retry: Bu tapşırığı yenidən icra etmək istədiyinizə əminsiniz?
+          destroy: Tapşırığı sil
+          discard: Tapşırığı ləğv et
+          reschedule: Tapşırığı yenidən planlaşdır
+          retry: Tapşırığı yenidən icra et
+          title: Əməliyyatlar
+        no_jobs_found: Tapşırıq tapılmadı.
+      retry:
+        notice: Toplu işin icrasına yenidən cəhd edildi
+      show:
+        attributes: Atributlar
+        batched_jobs: Toplu işdəki tapşırıqlar
+        callback_jobs: Geri çağırış tapşırıqları
+      table:
+        no_batches_found: Toplu iş tapılmadı.
+    cleaner:
+      index:
+        all: Hamısı
+        class: Sinif
+        exception: İstisna
+        grouped_by_class: Sinfə görə qruplaşdırılmış ləğv edilmiş tapşırıqlar
+        grouped_by_exception: İstisnaya görə qruplaşdırılmış ləğv edilmiş tapşırıqlar
+        last_1_hour: Son 1 saat
+        last_24_hours: Son 24 saat
+        last_3_days: Son 3 gün
+        last_3_hours: Son 3 saat
+        last_7_days: Son 7 gün
+        title: Ləğv edilmiş tapşırıqların təmizlənməsi
+        total: Cəmi
+    cron_entries:
+      actions:
+        confirm_disable: Bu cron qeydini deaktivləşdirmək istədiyinizə əminsiniz?
+        confirm_enable: Bu cron qeydini aktivləşdirmək istədiyinizə əminsiniz?
+        confirm_enqueue: Bu cron qeydini növbəyə əlavə etmək istədiyinizə əminsiniz?
+        disable: Cron qeydini deaktivləşdir
+        enable: Cron qeydini aktivləşdir
+        enqueue: Cron qeydini indi növbəyə əlavə et
+      disable:
+        notice: Cron qeydi deaktivləşdirildi.
+      enable:
+        notice: Cron qeydi aktivləşdirildi.
+      enqueue:
+        notice: Cron qeydi növbəyə əlavə edildi.
+      index:
+        no_cron_schedules_found: Cron cədvəli tapılmadı.
+        title: Cron cədvəlləri
+      show:
+        cron_entry_key: Cron qeydinin açarı
+    datetime:
+      distance_in_words:
+        about_x_hours:
+          one: təxminən 1 saat
+          other: təxminən %{count} saat
+        about_x_months:
+          one: təxminən 1 ay
+          other: təxminən %{count} ay
+        about_x_years:
+          one: təxminən 1 il
+          other: təxminən %{count} il
+        almost_x_years:
+          one: 1 ilə yaxın
+          other: "%{count} ilə yaxın"
+        half_a_minute: yarım dəqiqə
+        less_than_x_minutes:
+          one: 1 dəqiqədən az
+          other: "%{count} dəqiqədən az"
+        less_than_x_seconds:
+          one: 1 saniyədən az
+          other: "%{count} saniyədən az"
+        over_x_years:
+          one: 1 ildən çox
+          other: "%{count} ildən çox"
+        x_days:
+          one: 1 gün
+          other: "%{count} gün"
+        x_minutes:
+          one: 1 dəqiqə
+          other: "%{count} dəqiqə"
+        x_months:
+          one: 1 ay
+          other: "%{count} ay"
+        x_seconds:
+          one: 1 saniyə
+          other: "%{count} saniyə"
+        x_years:
+          one: 1 il
+          other: "%{count} il"
+    duration:
+      hours: "%{hour} saat %{min} dəq"
+      less_than_10_seconds: "%{sec} san"
+      milliseconds: "%{ms} ms"
+      minutes: "%{min} dəq %{sec} san"
+      seconds: "%{sec} san"
+    error_event:
+      discarded: Ləğv edilib
+      handled: Emal edilib
+      interrupted: Yarımçıq kəsilib
+      retried: Yenidən cəhd edilib
+      retry_stopped: Təkrar cəhd dayandırılıb
+      unhandled: Emal edilməyib
+    helpers:
+      relative_time:
+        future: "%{time} sonra"
+        past: "%{time} əvvəl"
+    jobs:
+      actions:
+        confirm_destroy: Tapşırığı silmək istədiyinizə əminsiniz?
+        confirm_discard: Tapşırığı ləğv etmək istədiyinizə əminsiniz?
+        confirm_force_discard: Bu tapşırığı məcburi ləğv etmək istədiyinizə əminsiniz? Tapşırıq ləğv edilmiş kimi işarələnəcək, lakin icrası dayandırılmayacaq. Xəta baş verərsə, yenidən cəhd edilməyəcək.
+        confirm_reschedule: Tapşırığı yenidən planlaşdırmaq istədiyinizə əminsiniz?
+        confirm_retry: Tapşırığı yenidən icra etmək istədiyinizə əminsiniz?
+        destroy: Tapşırığı sil
+        discard: Tapşırığı ləğv et
+        force_discard: Tapşırığı məcburi ləğv et
+        reschedule: Tapşırığı yenidən planlaşdır
+        retry: Tapşırığı yenidən icra et
+      destroy:
+        notice: Tapşırıq silindi
+      discard:
+        notice: Tapşırıq ləğv edildi
+      executions:
+        application_trace: Tətbiqin çağırış izi
+        full_trace: Tam çağırış izi
+        in_queue: Növbədə
+        recovery: Bərpa
+        runtime: İcra müddəti
+        title: İcralar
+      force_discard:
+        notice: Tapşırıq məcburi ləğv edildi. İcrası davam edəcək, lakin xəta baş verərsə, yenidən cəhd edilməyəcək
+      index:
+        job_pagination: Tapşırıqların səhifələnməsi
+        older_jobs: Daha köhnə tapşırıqlar
+      reschedule:
+        notice: Tapşırıq yenidən planlaşdırıldı
+      retry:
+        notice: Tapşırığın icrasına yenidən cəhd edildi
+      show:
+        jobs: Tapşırıqlar
+      table:
+        actions:
+          apply_to_all:
+            one: Mövcud 1 tapşırığa tətbiq et.
+            other: "%{count} tapşırığın hamısına tətbiq et."
+          confirm_destroy_all: Seçilmiş tapşırıqları silmək istədiyinizə əminsiniz?
+          confirm_discard_all: Seçilmiş tapşırıqları ləğv etmək istədiyinizə əminsiniz?
+          confirm_reschedule_all: Seçilmiş tapşırıqları yenidən planlaşdırmaq istədiyinizə əminsiniz?
+          confirm_retry_all: Seçilmiş tapşırıqları yenidən icra etmək istədiyinizə əminsiniz?
+          destroy_all: Hamısını sil
+          discard_all: Hamısını ləğv et
+          reschedule_all: Hamısını yenidən planlaşdır
+          retry_all: Hamısını yenidən icra et
+          title: Əməliyyatlar
+        no_jobs_found: Tapşırıq tapılmadı.
+        toggle_actions: Əməliyyatları göstər/gizlət
+        toggle_all_jobs: Bütün tapşırıqların seçimini dəyiş
+    models:
+      batch:
+        created: Yaradılıb
+        created_at: Yaradılma vaxtı
+        discarded: Ləğv edilib
+        discarded_at: Ləğv edilmə vaxtı
+        enqueued: Növbəyə əlavə edilib
+        enqueued_at: Növbəyə əlavə edilmə vaxtı
+        finished: Tamamlanıb
+        finished_at: Tamamlanma vaxtı
+        jobs: Tapşırıqlar
+        name: Ad
+      cron:
+        class: Sinif
+        last_run: Son icra
+        next_scheduled: Növbəti planlaşdırılmış icra
+        schedule: Cədvəl
+        states:
+          active: Aktiv
+          paused: Dayandırılıb
+        status: Vəziyyət
+      job:
+        arguments: Arqumentlər
+        attempts: Cəhdlər
+        labels: Etiketlər
+        priority: Prioritet
+        queue: Növbə
+    number:
+      format:
+        delimiter: "."
+        separator: ","
+      human:
+        decimal_units:
+          delimiter: "."
+          format: "%n%u"
+          precision: 3
+          separator: ","
+          units:
+            billion: mlrd
+            million: mln
+            quadrillion: kvadrilyon
+            thousand: min
+            trillion: trilyon
+            unit: ''
+    pauses:
+      index:
+        confirm_pause: "%{value} üçün icranı dayandırmaq istədiyinizə əminsiniz?"
+        confirm_unpause: "%{value} üçün icranı davam etdirmək istədiyinizə əminsiniz?"
+        disabled: GoodJob-un sınaq mərhələsində olan dayandırma funksiyası məhsuldarlığı azalda biləcəyi üçün standart olaraq deaktivdir. Aktivləşdirmək üçün parametrləri dəyişin
+        job_class: Tapşırığın sinfi
+        label: Etiket
+        pause: Dayandır
+        queue: Növbə
+        title: Dayandırmalar
+        type: Dayandırma növü
+        unpause: Davam etdir
+        value: Dəyər
+    performance:
+      index:
+        average_duration: Orta müddət
+        chart_title: Tapşırıqların saniyə ilə ümumi icra müddəti
+        executions: İcralar
+        job_class: Tapşırığın sinfi
+        maximum_duration: Ən uzun müddət
+        minimum_duration: Ən qısa müddət
+        no_executions: Bu vaxt aralığında icra yoxdur.
+        queue_name: Növbənin adı
+        title: Məhsuldarlıq
+      range:
+        bucket_size:
+          days: "%{count} gün"
+          hours: "%{count} saat"
+          minutes: "%{count} dəq"
+          months: "~%{count} ay"
+          seconds: "%{count} san"
+          years: "~%{count} il"
+        chart_bucket_size: 'Qrafikdə qruplaşdırma intervalı: %{size}'
+        custom_range: Xüsusi
+        custom_range_hint: Qrafik üzərində sürüşdürərək seçin
+        end_time: Bitmə vaxtı
+        open_time_ranges: Məhsuldarlıq üçün vaxt aralıqlarını aç
+        quick_ranges: Hazır aralıqlar
+        range_options:
+          1h: Son 1 saat
+          24h: Son 24 saat
+          6h: Son 6 saat
+          7d: Son 7 gün
+        reload_range: Məhsuldarlıq məlumatlarını yenidən yüklə
+        start_time: Başlama vaxtı
+        time_range: Məhsuldarlıq üçün vaxt aralığı
+        time_zone: 'Saat qurşağı:'
+      show:
+        slow: Yavaş
+        title: Məhsuldarlıq
+    processes:
+      index:
+        cron_enabled: Cron aktivdir
+        no_good_job_processes_found: GoodJob prosesi tapılmadı.
+        process: Proses
+        schedulers: Planlaşdırıcılar
+        started: Başlayıb
+        title: Proseslər
+        updated: Yenilənib
+    shared:
+      boolean:
+        'false': 'Xeyr'
+        'true': 'Bəli'
+      error: Xəta
+      filter:
+        all: Hamısı
+        all_jobs: Bütün tapşırıqlar
+        all_queues: Bütün növbələr
+        clear: Təmizlə
+        job_name: Tapşırığın adı
+        label: Etiket
+        placeholder: Sinif, tapşırığın id-si, tapşırığın parametrləri və xəta mətni üzrə axtar.
+        queue_name: Növbənin adı
+        search: Axtar
+      navbar:
+        batches: Toplu işlər
+        cleaner: Ləğv edilmiş tapşırıqların təmizlənməsi
+        cron_schedules: Cron
+        jobs: Tapşırıqlar
+        live_poll: Canlı yenilənmə
+        name: "GoodJob 👍"
+        pauses: Dayandırmalar
+        performance: Məhsuldarlıq
+        processes: Proseslər
+        theme:
+          auto: Avtomatik
+          dark: Tünd
+          light: Açıq
+          theme: Mövzu
+      pending_migrations: GoodJob üçün icra edilməmiş verilənlər bazası miqrasiyaları var.
+      secondary_navbar:
+        inspiration: Unutmayın, siz də yaxşı iş görürsünüz!
+        last_updated: Son yenilənmə
+    status:
+      discarded: Ləğv edilib
+      queued: Növbədə
+      retried: Yenidən cəhd edilib
+      running: İcra olunur
+      scheduled: Planlaşdırılıb
+      succeeded: Uğurla tamamlanıb
