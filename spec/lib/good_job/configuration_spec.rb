@@ -20,6 +20,16 @@ RSpec.describe GoodJob::Configuration do
 
       expect(GoodJob.logger).to have_received(:warn).with(/GoodJob is using \d+ threads/)
     end
+
+    it 'counts one reactor thread and reports potential checkouts separately', :fiber_isolation, :requires_async do
+      scheduler = GoodJob::Scheduler.new(GoodJob::JobPerformer.new('*'), fibers: 5)
+
+      allow(GoodJob.logger).to receive(:warn)
+      expect(described_class.total_estimated_threads(warn: true)).to eq GoodJob::SharedExecutor::MAX_THREADS + 1
+      expect(GoodJob.logger).to have_received(:warn).with(/up to 7 concurrent database checkouts.*Pool needs depend on connection use/)
+
+      scheduler.shutdown
+    end
   end
 
   describe '#execution_mode' do
@@ -82,6 +92,146 @@ RSpec.describe GoodJob::Configuration do
       it 'uses environment variable' do
         configuration = described_class.new({})
         expect(configuration.cleanup_discarded_jobs?).to be false
+      end
+    end
+  end
+
+  describe '#fibers' do
+    it 'defaults to nil' do
+      configuration = described_class.new({})
+      expect(configuration.fibers).to be_nil
+    end
+
+    context 'when option is given' do
+      it 'uses the option value as an Integer' do
+        configuration = described_class.new({ fibers: '25' })
+        expect(configuration.fibers).to eq 25
+      end
+    end
+
+    context 'when rails config is set' do
+      before do
+        allow(Rails.application.config).to receive(:good_job).and_return({ fibers: 50 })
+      end
+
+      it 'uses rails config value' do
+        configuration = described_class.new({})
+        expect(configuration.fibers).to eq 50
+      end
+    end
+
+    context 'when environment variable is set' do
+      before do
+        stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_FIBERS' => '100' })
+      end
+
+      it 'uses environment variable' do
+        configuration = described_class.new({})
+        expect(configuration.fibers).to eq 100
+      end
+    end
+
+    it 'is nil when set to 0 or false' do
+      expect(described_class.new({ fibers: 0 }).fibers).to be_nil
+      expect(described_class.new({ fibers: '0' }).fibers).to be_nil
+      expect(described_class.new({ fibers: false }).fibers).to be_nil
+      expect(described_class.new({ fibers: 'false' }).fibers).to be_nil
+    end
+
+    it 'treats zero as disabled from Rails config or the environment' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ fibers: 0 })
+      expect(described_class.new({}).fibers).to be_nil
+
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_FIBERS' => '0' })
+      allow(Rails.application.config).to receive(:good_job).and_return({})
+      expect(described_class.new({}).fibers).to be_nil
+    end
+
+    it 'is the default count when set to true' do
+      expect(described_class.new({ fibers: true }).fibers).to eq described_class::DEFAULT_FIBERS
+      expect(described_class.new({ fibers: 'true' }).fibers).to eq described_class::DEFAULT_FIBERS
+    end
+
+    it 'lets false and zero options override Rails config and the environment' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ fibers: 50 })
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_FIBERS' => '100' })
+
+      expect(described_class.new({ fibers: false }).fibers).to be_nil
+      expect(described_class.new({ fibers: 0 }).fibers).to be_nil
+    end
+
+    it 'raises on non-numeric values' do
+      expect { described_class.new({ fibers: 'lots' }).fibers }.to raise_error(ArgumentError, /positive integer/)
+    end
+
+    it 'raises on values that are not booleans or integers' do
+      expect { described_class.new({ fibers: 25.7 }).fibers }.to raise_error(ArgumentError, /positive integer.*25\.7/)
+      expect { described_class.new({ fibers: :true }).fibers }.to raise_error(ArgumentError, /positive integer/) # rubocop:disable Lint/BooleanSymbol
+    end
+
+    it 'parses string values as base 10' do
+      expect(described_class.new({ fibers: '010' }).fibers).to eq 10
+    end
+
+    it 'raises on negative values' do
+      expect { described_class.new({ fibers: -100 }).fibers }.to raise_error(ArgumentError, /positive integer/)
+      expect { described_class.new({ fibers: '-100' }).fibers }.to raise_error(ArgumentError, /positive integer/)
+    end
+
+    it 'raises on negative Rails config or environment values' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ fibers: -100 })
+      expect { described_class.new({}).fibers }.to raise_error(ArgumentError, /positive integer/)
+
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_FIBERS' => '-100' })
+      allow(Rails.application.config).to receive(:good_job).and_return({})
+      expect { described_class.new({}).fibers }.to raise_error(ArgumentError, /positive integer/)
+    end
+
+    it 'keeps advisory locking as the default and honors explicit skiplocked' do
+      expect(described_class.new({ fibers: 50 }).lock_strategy).to eq :advisory
+      expect(described_class.new({ fibers: 50, lock_strategy: :skiplocked }).lock_strategy).to eq :skiplocked
+      expect(described_class.new({}).lock_strategy).to eq :advisory
+    end
+
+    it 'returns the lock strategy even when fibers is invalid' do
+      expect(described_class.new({ fibers: 'junk' }).lock_strategy).to eq :advisory
+    end
+
+    { nil => nil, '' => nil, '  ' => nil, 0 => nil, '0' => nil, false => nil, 'false' => nil,
+      ' FaLsE ' => nil, true => 25, 'true' => 25, ' TrUe ' => 25, 12 => 12, ' 12 ' => 12 }.each do |value, expected|
+      [:option, :rails, :environment].each do |source| # rubocop:disable Performance/CollectionLiteralInLoop
+        next if source == :environment && !value.nil? && !value.is_a?(String)
+
+        it "normalizes #{value.inspect} from #{source}" do
+          rails = source == :rails ? { fibers: value } : {}
+          allow(Rails.application.config).to receive(:good_job).and_return(rails)
+          options = source == :option ? { fibers: value } : {}
+          env = source == :environment ? { 'GOOD_JOB_FIBERS' => value } : {}
+          expect(described_class.new(options, env: env).fibers).to eq expected
+        end
+      end
+    end
+
+    [-1, '-1', 1.5, '1.5', 'junk'].each do |value|
+      [:option, :rails, :environment].each do |source| # rubocop:disable Performance/CollectionLiteralInLoop
+        next if source == :environment && !value.is_a?(String)
+
+        it "rejects #{value.inspect} from #{source}" do
+          allow(Rails.application.config).to receive(:good_job).and_return(source == :rails ? { fibers: value } : {})
+          options = source == :option ? { fibers: value } : {}
+          env = source == :environment ? { 'GOOD_JOB_FIBERS' => value } : {}
+          expect { described_class.new(options, env: env).fibers }.to raise_error(ArgumentError, /positive integer/)
+        end
+      end
+    end
+
+    [false, 0, '', 'false', '0', 7].each do |value|
+      it "preserves precedence when the higher-priority value is #{value.inspect}" do
+        allow(Rails.application.config).to receive(:good_job).and_return({ fibers: 50 })
+        expected = value == 7 ? 7 : nil
+        expect(described_class.new({ fibers: value }, env: { 'GOOD_JOB_FIBERS' => '100' }).fibers).to eq expected
+        allow(Rails.application.config).to receive(:good_job).and_return({ fibers: value })
+        expect(described_class.new({ fibers: nil }, env: { 'GOOD_JOB_FIBERS' => '100' }).fibers).to eq expected
       end
     end
   end

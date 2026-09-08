@@ -16,6 +16,14 @@ gemspec
 gem 'activerecord-jdbcpostgresql-adapter', platforms: [:jruby]
 gem 'pg', platforms: [:mri, :windows]
 
+# Rails <= 8.1 passes positional options to JSON.parse; JSON 3 removed them.
+gem 'json', '< 3'
+
+# Optional dependency for fiber execution.
+install_if -> { RUBY_ENGINE == "ruby" && Gem.ruby_version >= Gem::Version.new("3.2") } do
+  gem 'async', ENV.fetch('GOOD_JOB_TEST_ASYNC', '>= 2.24'), require: false unless ENV['GOOD_JOB_TEST_ASYNC'] == 'absent'
+end
+
 # rdoc >= 8.0 hard-depends on rbs, whose native extension doesn't build on JRuby
 # (github.com/ruby/rdoc/issues/1746). rbs only ships a working (precompiled java
 # platform) build starting with this prerelease. Remove once rbs ships a stable
@@ -43,7 +51,8 @@ platforms :ruby do
   gem "dotenv-rails"
   gem "foreman"
   gem "gem-release"
-  gem "github_changelog_generator", require: false
+  # Exclude its transitive Async dependency from compatibility tests.
+  gem "github_changelog_generator", require: false unless ENV['GOOD_JOB_TEST_ASYNC']
   gem "rdoc", require: false
   gem "warning"
 

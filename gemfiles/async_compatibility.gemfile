@@ -1,0 +1,3 @@
+# Set GOOD_JOB_TEST_ASYNC to absent, 2.23.0, 2.24.0, 2.25.0, or >= 2.24.
+# Separate lockfile for Async compatibility tests.
+eval_gemfile '../Gemfile'

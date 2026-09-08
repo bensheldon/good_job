@@ -23,6 +23,15 @@ module TestApp
 
     config.active_job.queue_adapter = :good_job
 
+    begin
+      if defined?(ActiveSupport::IsolatedExecutionState) && GoodJob::Configuration.new({}).fibers
+        config.active_support.isolation_level = :fiber
+      end
+    rescue ArgumentError
+      # Worker startup handles invalid fiber settings.
+      nil
+    end
+
     # config.middleware.insert_before Rack::Sendfile, ActionDispatch::DebugLocks
     config.log_level = :debug
 

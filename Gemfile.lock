@@ -576,6 +576,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-explain-analyze
   activerecord-jdbcpostgresql-adapter
+  async (>= 2.24)
   benchmark
   benchmark-ips
   bootsnap
@@ -592,6 +593,7 @@ DEPENDENCIES
   good_job!
   herb
   i18n-tasks
+  json (< 3)
   kramdown
   kramdown-parser-gfm
   mdl

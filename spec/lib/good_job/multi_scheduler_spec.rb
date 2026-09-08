@@ -45,6 +45,110 @@ RSpec.describe GoodJob::MultiScheduler do
         )
         expect(elephants_scheduler.send(:performer).send(:parsed_queues)).to eq({ include: ["elephant"] })
       end
+
+      it 'converts thread queue counts with to_i, including zero' do
+        configuration = GoodJob::Configuration.new({ fibers: false, queues: 'zero:0;text:many;prefix:2jobs' })
+        scheduler = instance_double(GoodJob::Scheduler)
+        allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
+        described_class.from_configuration(configuration)
+        expect(GoodJob::Scheduler).to have_received(:new).with(anything, hash_including(max_threads: 0)).twice
+        expect(GoodJob::Scheduler).to have_received(:new).with(anything, hash_including(max_threads: 2)).once
+      end
+
+      it 'rejects invalid fiber queue sizes before creating schedulers in a CLI worker' do
+        allow(GoodJob).to receive(:cli?).and_return(true)
+
+        ['0', '-1', 'many'].each do |invalid_count|
+          configuration = GoodJob::Configuration.new({ execution_mode: :async_all, fibers: 25, queues: "valid:10;invalid:#{invalid_count}" })
+          allow(GoodJob::Scheduler).to receive(:new)
+
+          expect { described_class.from_configuration(configuration) }
+            .to raise_error(ArgumentError, /queue pool size must be a positive integer.*'#{Regexp.escape(invalid_count)}'/)
+          expect(GoodJob::Scheduler).not_to have_received(:new)
+        end
+      end
+    end
+
+    describe 'fiber counts', :fiber_isolation, :requires_async do
+      it 'uses per-queue overrides as fiber counts' do
+        configuration = GoodJob::Configuration.new({ fibers: 25, queues: 'mice:10;elephants' })
+
+        multi_scheduler = described_class.from_configuration(configuration)
+
+        expect(multi_scheduler.schedulers.map(&:stats)).to contain_exactly(
+          include(queues: 'mice', max_fibers: 10),
+          include(queues: 'elephants', max_fibers: 25)
+        )
+      end
+    end
+
+    describe 'downgraded lock strategy', :fiber_isolation, :requires_async do
+      it 'warns when :skiplocked falls back to :advisory' do
+        configuration = GoodJob::Configuration.new({ fibers: 25, lock_strategy: :skiplocked })
+        allow(GoodJob::Job).to receive(:effective_lock_strategy).and_return(:advisory)
+        allow(GoodJob.logger).to receive(:warn)
+
+        described_class.from_configuration(configuration)
+
+        expect(GoodJob.logger).to have_received(:warn).with(/downgraded to :advisory.*lock_type/m)
+      end
+
+      it 'does not warn when the configured strategy is the effective one' do
+        configuration = GoodJob::Configuration.new({ fibers: 25, lock_strategy: :skiplocked })
+        allow(GoodJob::Job).to receive(:effective_lock_strategy).and_return(:skiplocked)
+        allow(GoodJob.logger).to receive(:warn)
+
+        described_class.from_configuration(configuration)
+
+        expect(GoodJob.logger).not_to have_received(:warn).with(/downgraded/)
+      end
+
+      it 'does not warn when the database is unavailable at boot' do
+        configuration = GoodJob::Configuration.new({ fibers: 25, lock_strategy: :skiplocked })
+        allow(GoodJob::Job).to receive(:effective_lock_strategy).and_raise(ActiveRecord::ConnectionNotEstablished)
+        allow(GoodJob.logger).to receive(:warn)
+
+        expect { described_class.from_configuration(configuration) }.not_to raise_error
+        expect(GoodJob.logger).not_to have_received(:warn).with(/downgraded/)
+      end
+    end
+
+    describe 'fiber fallback' do
+      it 'caps fallback thread pools at max_threads in async mode' do
+        configuration = GoodJob::Configuration.new({ execution_mode: :async, fibers: 25, max_threads: 5, queues: 'serial:1;mice:80;elephants' })
+        allow(GoodJob::Scheduler).to receive(:validate_fiber_execution!).and_raise(ArgumentError, "fibers unsupported here")
+        allow(GoodJob.logger).to receive(:error)
+
+        multi_scheduler = described_class.from_configuration(configuration)
+
+        expect(multi_scheduler.schedulers.map(&:stats)).to contain_exactly(
+          include(queues: 'serial', max_threads: 1),
+          include(queues: 'mice', max_threads: 5),
+          include(queues: 'elephants', max_threads: 5)
+        )
+        expect(GoodJob.logger).to have_received(:error).with(/ignoring `fibers`/)
+      end
+
+      it 'raises for the CLI worker regardless of execution mode' do
+        allow(GoodJob).to receive(:cli?).and_return(true)
+        configuration = GoodJob::Configuration.new({ execution_mode: :async_all, fibers: 25 })
+        allow(GoodJob::Scheduler).to receive(:validate_fiber_execution!).and_raise(ArgumentError, "fibers unsupported here")
+
+        expect { described_class.from_configuration(configuration) }
+          .to raise_error(ArgumentError, "fibers unsupported here")
+      end
+
+      it 'falls back for an in-process worker regardless of execution mode' do
+        allow(GoodJob).to receive(:cli?).and_return(false)
+        configuration = GoodJob::Configuration.new({ execution_mode: :external, fibers: 25, max_threads: 5 })
+        allow(GoodJob::Scheduler).to receive(:validate_fiber_execution!).and_raise(ArgumentError, "fibers unsupported here")
+        allow(GoodJob.logger).to receive(:error)
+
+        multi_scheduler = described_class.from_configuration(configuration)
+
+        expect(multi_scheduler.schedulers.map(&:stats)).to contain_exactly(include(max_threads: 5))
+        expect(GoodJob.logger).to have_received(:error).with(/ignoring `fibers`/)
+      end
     end
   end
 
@@ -111,6 +215,15 @@ RSpec.describe GoodJob::MultiScheduler do
       stats = multi_scheduler.stats
       expect(stats[:schedulers].size).to eq 3
       expect(stats[:schedulers].first[:queues]).to eq '*'
+    end
+
+    it 'counts active execution threads separately from jobs' do
+      thread_scheduler = instance_double(GoodJob::Scheduler, stats: { active_threads: 2 })
+      fiber_scheduler = instance_double(GoodJob::Scheduler, stats: { active_threads: 1, active_fibers: 8 })
+      expect(described_class.new([thread_scheduler, fiber_scheduler]).stats).to include(
+        active_execution_thread_count: 3,
+        active_execution_count: 10
+      )
     end
   end
 end

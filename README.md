@@ -68,6 +68,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Production setup](#production-setup)
     - [Queue performance with Queue Select Limit](#queue-performance-with-queue-select-limit)
     - [Execute jobs async / in-process](#execute-jobs-async--in-process)
+    - [Execute jobs with fibers](#execute-jobs-with-fibers)
     - [Migrate to GoodJob from a different Active Job backend](#migrate-to-goodjob-from-a-different-active-job-backend)
     - [Monitor and preserve worked jobs](#monitor-and-preserve-worked-jobs)
     - [Write tests](#write-tests)
@@ -300,6 +301,7 @@ Available configuration options are:
     - `:async_all` executes jobs in separate threads in _any_ Rails process.
 - `queues` (string) sets queues or pools to execute jobs. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
 - `max_threads` (integer) sets the default number of threads per pool to use for working jobs. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
+- `fibers` (integer or boolean) enables [fiber execution](#execute-jobs-with-fibers). A positive integer sets concurrency per pool; `true` selects 25; `0`, `false`, or a blank string disables it. You can also set this with `GOOD_JOB_FIBERS` or `--fibers COUNT` (`true` and `false` are accepted).
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`. A poll interval of `-1` disables polling completely.
     - production default: 10 seconds (in case of a LISTEN/NOTIFY blip)
     - development default: -1, disabled (because the application is likely being restarted often and won't be running unobserved). You can enable it by setting a `poll_interval`.
@@ -1344,6 +1346,82 @@ Supported values are `md5`, `sha1`, `sha224`, `sha256`, `sha384`, `sha512`, `has
 - `sha*` algorithms require the `pgcrypto` extension (`digest()`).
 - `uuid_v5` requires the `uuid-ossp` extension (`uuid_generate_v5()`).
 
+### Execute jobs with fibers
+
+Fiber execution lets jobs share a thread while waiting on IO that yields to Ruby's fiber scheduler. Threads remain the default, with the existing Ruby, Rails, and JRuby support. The `:async` execution mode runs jobs in the web process; it does not enable fibers or require the Async gem.
+
+Fiber execution requires:
+
+- CRuby 3.2 or newer
+- Rails 7.0 or newer
+- The `async` gem, version 2.24 or newer (2.25 or newer on Ruby 4, for the `fiber_interrupt` scheduler hook)
+- `config.active_support.isolation_level = :fiber`, so each job has its own Rails execution state
+- Code reloading disabled, because the Rails reloader can block jobs sharing a thread
+
+Run CPU-heavy or blocking jobs in a separate thread worker. Fiber mode applies to every scheduler in the configured worker.
+
+#### Setup
+
+Add the optional dependency to your application's Gemfile:
+
+```ruby
+gem "async", ">= 2.25"
+```
+
+Configure a dedicated worker environment:
+
+```ruby
+config.active_support.isolation_level = :fiber
+config.cache_classes = true # Or config.enable_reloading = false on Rails 7.1+
+config.good_job.fibers = 25
+config.good_job.queues = "http:50;mail:10;other_io"
+config.good_job.lock_strategy = :skiplocked # Requires the lock_type migration below
+```
+
+Start it with `bundle exec good_job start`. The example creates three schedulers with one reactor thread each and capacities of 50, 10, and 25 jobs. GoodJob also uses utility threads.
+
+Queue counts override `fibers`, which overrides `max_threads`. `max_threads` does not limit fiber concurrency.
+
+For `fibers`, configuration options override Rails config, which overrides `GOOD_JOB_FIBERS`. Disabling values take precedence; `nil` uses the next source. Strings ignore surrounding whitespace and boolean case. Negative counts, floats, and unrecognized values raise configuration errors.
+
+#### Invalid configuration
+
+An external worker (`good_job start`) raises an error. In-process execution logs the error and falls back to threads, capping each queue at `max_threads` while keeping smaller counts such as `serial:1`. The locking strategy and Rails isolation level remain as configured.
+
+The development harness enables reloading by default, so requesting fibers uses this fallback.
+
+#### Cooperative IO
+
+Cooperative operations include Ruby's scheduler-aware `sleep` and socket IO, `Net::HTTP` on supported Ruby versions, the `pg` driver's scheduler-aware IO, and `Async::HTTP`. Support depends on library versions. Clients can still block during DNS lookups, TLS handshakes, callbacks, or native processing. Test the adapters and versions your jobs use.
+
+CPU work and blocking native calls stall every job on the reactor, even when a native extension releases the GVL. This includes work such as PDF rendering, image resizing, and large parsing tasks.
+
+#### Locking and database connections
+
+Advisory locking is the default in both modes and holds one database connection per running job.
+
+Using `:skiplocked` avoids that lease but requires `good_jobs.lock_type`. Run `bin/rails generate good_job:update` and apply the migrations. Without the column, GoodJob uses advisory locks and a fiber worker logs a warning.
+
+On Rails 7.2+, jobs using `:skiplocked` can return connections between operations and share a pool smaller than their fiber count. Transactions, RLS wrappers, database work, and permanent leases can still hold connections through an IO wait. Earlier Rails releases can hold connections for the whole job.
+
+Size the pool for measured connection use, including LISTEN/NOTIFY and other application threads. Fiber concurrency gives an upper bound on job checkouts; it does not determine the required pool size.
+
+#### Shutdown and crashes
+
+Graceful shutdown stops accepting executor tasks and finishes accepted work. After `shutdown_timeout`, forced shutdown requests Async cancellation and discards queued executor tasks. Cancelling fibers allows their database cleanup to run.
+
+Cancellation requires the reactor to regain control. CPU loops, blocking native calls, and unfinished cleanup can exceed the timeout. Use a process supervisor to enforce a final shutdown deadline.
+
+Jobs remain in PostgreSQL. A failed reactor can restart queued executor tasks; a crashed worker may need another poll and stale-process recovery before interrupted jobs can run again. Active Job retries still apply. Keep jobs idempotent: a crash after an external side effect can cause repeated execution.
+
+Exceptions escaping executor tasks, including non-`StandardError` exceptions, are reported through `GoodJob.on_thread_error` so other fibers can continue. Async cancellation, `SystemExit`, and process signals propagate: they are not contained or reported as ordinary task errors. This does not necessarily put the scheduler into the shutdown state. A process may still be unhealthy after resource exhaustion.
+
+#### Metrics
+
+Scheduler stats add `max_fibers`, `active_fibers`, and `available_fibers`. Startup notifications and the process dashboard report both thread and fiber capacity. Aggregate stats use `active_execution_thread_count` for threads and `active_execution_count` for jobs.
+
+The [fiber execution benchmark](scripts/benchmark_fiber_execution.rb) compares thread and fiber execution for IO, CPU, and blocking native workloads.
+
 ### Execute jobs async / in-process
 
 GoodJob can execute jobs "async" in the same process as the web server (e.g. `bin/rails s`). GoodJob's async execution mode offers benefits of economy by not requiring a separate job worker process, but with the tradeoff of increased complexity. Async mode can be configured in two ways:
@@ -1520,7 +1598,7 @@ _Note: Rails `travel`/`travel_to` time helpers do not have millisecond precision
 
 ### SKIP LOCKED experimental mode
 
-By default, GoodJob claims jobs using PostgreSQL advisory locks. As an alternative, GoodJob can use `SELECT FOR UPDATE SKIP LOCKED` to claim jobs, which writes the lock state directly to the `good_jobs` table rather than relying on session-level advisory locks.
+By default, GoodJob claims jobs using PostgreSQL advisory locks in both thread and fiber modes. As an alternative, GoodJob can use `SELECT FOR UPDATE SKIP LOCKED` to claim jobs, which writes the lock state directly to the `good_jobs` table rather than relying on session-level advisory locks.
 
 Two strategies are available:
 
