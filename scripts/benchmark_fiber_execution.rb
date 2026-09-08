@@ -2,7 +2,7 @@
 
 # Compares thread and fiber execution against a dedicated PostgreSQL database.
 #
-# Requires CRuby 3.2+, Rails 7.0+, and Async >= 2.24 in the development bundle.
+# Requires CRuby 3.2+, Rails 7.1+, and Async >= 2.24 in the development bundle.
 # Setup refuses a nonempty database. Use a database reserved for this benchmark.
 #
 #   bundle install

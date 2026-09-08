@@ -74,7 +74,7 @@ module GoodJob
     method_option :fibers,
                   type: :string,
                   banner: 'COUNT',
-                  desc: "Execute jobs as COUNT fibers on one reactor thread per scheduler. 'true' means 25; 'false' or 0 disables. Queue counts override COUNT, and COUNT overrides max_threads. Requires CRuby 3.2+, async >= 2.24 (>= 2.25 on Ruby 4), Rails 7.0+ with isolation_level = :fiber, and reloading disabled. (env var: GOOD_JOB_FIBERS, default: nil)"
+                  desc: "Execute jobs as COUNT fibers on one reactor thread per scheduler. 'true' means 25; 'false' or 0 disables. Queue counts override COUNT, and COUNT overrides max_threads. Requires CRuby 3.2+, async >= 2.24 (>= 2.25 on Ruby 4), Rails 7.1+ with isolation_level = :fiber, and reloading disabled. (env var: GOOD_JOB_FIBERS, default: nil)"
     method_option :poll_interval,
                   type: :numeric,
                   banner: 'SECONDS',

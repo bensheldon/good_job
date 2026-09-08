@@ -37,6 +37,9 @@ module GoodJob # :nodoc:
     MINIMUM_ASYNC_VERSION = Gem.ruby_version >= Gem::Version.new("4.0") ? "2.25" : "2.24"
     # Minimum Ruby version required for fiber execution.
     MINIMUM_RUBY_VERSION_FOR_FIBERS = "3.2"
+    # Rails 7.0's Active Record connection pool caches connections per thread, so
+    # fibers sharing the reactor thread would share (and check in) one connection.
+    MINIMUM_RAILS_VERSION_FOR_FIBERS = "7.1"
 
     # @!attribute [r] instances
     #   @!scope class
@@ -99,18 +102,20 @@ module GoodJob # :nodoc:
     # @return [void]
     def self.validate_fiber_execution!
       validate_fiber_runtime!
+      validate_fiber_rails!
 
-      raise ArgumentError, "GoodJob's fiber execution requires `config.active_support.isolation_level = :fiber` (Rails 7.0+)" unless defined?(ActiveSupport::IsolatedExecutionState) && ActiveSupport::IsolatedExecutionState.isolation_level == :fiber
+      raise ArgumentError, "GoodJob's fiber execution requires `config.active_support.isolation_level = :fiber`" unless defined?(ActiveSupport::IsolatedExecutionState) && ActiveSupport::IsolatedExecutionState.isolation_level == :fiber
 
       return unless rails_reloading_enabled?
 
       raise ArgumentError, "GoodJob's fiber execution requires code reloading to be disabled (`config.cache_classes = true`, or `config.enable_reloading = false` on Rails 7.1+). The Rails reloader can block jobs sharing a thread."
     end
 
-    # Check Ruby and +async+ support without checking Rails settings.
+    # Check Ruby, +async+, and Rails version support without checking Rails settings.
     # @return [Boolean]
     def self.fiber_execution_supported?
       validate_fiber_runtime!
+      validate_fiber_rails!
       true
     rescue ArgumentError
       false
@@ -130,6 +135,13 @@ module GoodJob # :nodoc:
       raise ArgumentError, "GoodJob's fiber execution requires the 'async' gem >= #{MINIMUM_ASYNC_VERSION}, but #{async_version || 'an unknown version'} is installed" unless async_version && Gem::Version.new(async_version) >= Gem::Version.new(MINIMUM_ASYNC_VERSION)
     end
     private_class_method :validate_fiber_runtime!
+
+    def self.validate_fiber_rails!
+      return if Rails.gem_version >= Gem::Version.new(MINIMUM_RAILS_VERSION_FOR_FIBERS)
+
+      raise ArgumentError, "GoodJob's fiber execution requires Rails #{MINIMUM_RAILS_VERSION_FOR_FIBERS}+ (earlier Active Record connection pools are not fiber-aware), but this is Rails #{Rails.version}"
+    end
+    private_class_method :validate_fiber_rails!
 
     def self.rails_reloading_enabled?
       config = Rails.application&.config

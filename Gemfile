@@ -19,10 +19,10 @@ gem 'pg', platforms: [:mri, :windows]
 # Rails <= 8.1 passes positional options to JSON.parse; JSON 3 removed them.
 gem 'json', '< 3'
 
-# Optional dependency for fiber execution.
-install_if -> { RUBY_ENGINE == "ruby" && Gem.ruby_version >= Gem::Version.new("3.2") } do
-  gem 'async', ENV.fetch('GOOD_JOB_TEST_ASYNC', '>= 2.24'), require: false unless ENV['GOOD_JOB_TEST_ASYNC'] == 'absent'
-end
+# Optional dependency for fiber execution. A plain conditional (not install_if)
+# keeps async out of dependency resolution on Rubies it does not support.
+fiber_capable_ruby = RUBY_ENGINE == "ruby" && Gem.ruby_version >= Gem::Version.new("3.2")
+gem 'async', ENV.fetch('GOOD_JOB_TEST_ASYNC', '>= 2.24'), require: false if fiber_capable_ruby && ENV['GOOD_JOB_TEST_ASYNC'] != 'absent'
 
 # rdoc >= 8.0 hard-depends on rbs, whose native extension doesn't build on JRuby
 # (github.com/ruby/rdoc/issues/1746). rbs only ships a working (precompiled java

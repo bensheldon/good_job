@@ -296,11 +296,21 @@ RSpec.describe GoodJob::Scheduler do
     it 'raises when isolation_level is not :fiber' do
       ActiveSupport::IsolatedExecutionState.isolation_level = :thread
       expect { described_class.new(performer, fibers: 5) }.to raise_error(ArgumentError, /isolation_level/)
+    ensure
+      # Restore before after-hooks run: on Rails 7.1+ connections checked out under
+      # fiber isolation are otherwise unreachable to the pool under thread isolation.
+      ActiveSupport::IsolatedExecutionState.isolation_level = :fiber
     end
 
     it 'raises when code reloading is enabled' do
       allow(Rails.application.config).to receive(:enable_reloading).and_return(true)
       expect { described_class.new(performer, fibers: 5) }.to raise_error(ArgumentError, /reloading/)
+    end
+
+    it 'raises when Rails predates fiber-aware connection pools' do
+      allow(Rails).to receive(:gem_version).and_return(Gem::Version.new('7.0.8'))
+      expect { described_class.new(performer, fibers: 5) }.to raise_error(ArgumentError, /Rails 7\.1/)
+      expect(described_class.fiber_execution_supported?).to be false
     end
 
     it 'ignores lower_thread_priority for the reactor thread' do

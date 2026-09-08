@@ -2,12 +2,12 @@
 
 RSpec.configure do |c|
   if ENV['GOOD_JOB_REQUIRE_FIBERS'] == '1'
-    raise 'GOOD_JOB_REQUIRE_FIBERS=1 requires Ruby and Async versions that support fibers' unless GoodJob::Scheduler.fiber_execution_supported?
+    raise 'GOOD_JOB_REQUIRE_FIBERS=1 requires Ruby, Rails, and Async versions that support fibers' unless GoodJob::Scheduler.fiber_execution_supported?
     raise 'GOOD_JOB_REQUIRE_FIBERS=1 requires Rails fiber isolation' unless defined?(ActiveSupport::IsolatedExecutionState)
   end
 
   unless GoodJob::Scheduler.fiber_execution_supported?
-    puts "Skipping fiber specs: unsupported Ruby or Async version"
+    puts "Skipping fiber specs: unsupported Ruby, Rails, or Async version"
     c.filter_run_excluding :requires_async
   end
 

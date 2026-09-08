@@ -1353,7 +1353,7 @@ Fiber execution lets jobs share a thread while waiting on IO that yields to Ruby
 Fiber execution requires:
 
 - CRuby 3.2 or newer
-- Rails 7.0 or newer
+- Rails 7.1 or newer, so Active Record checks out connections per fiber
 - The `async` gem, version 2.24 or newer (2.25 or newer on Ruby 4, for the `fiber_interrupt` scheduler hook)
 - `config.active_support.isolation_level = :fiber`, so each job has its own Rails execution state
 - Code reloading disabled, because the Rails reloader can block jobs sharing a thread

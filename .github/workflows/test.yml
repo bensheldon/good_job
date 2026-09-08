@@ -86,7 +86,7 @@ jobs:
           path: demo/log
 
   test:
-    name: Test - ${{ matrix.gemfile }} - Ruby ${{ matrix.ruby }} - PG ${{ matrix.pg }} - Async ${{ matrix.async_name || 'default' }}
+    name: Test - ${{ matrix.gemfile }} - Ruby ${{ matrix.ruby }} - PG ${{ matrix.pg }}${{ matrix.async_name && format(' - Async {0}', matrix.async_name) || '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
@@ -96,11 +96,10 @@ jobs:
           # Rails 6.1: lowest (Ruby 3.0) and highest (Ruby 4.0)
           - { ruby: "3.0", gemfile: rails_6.1, pg: 18 }
           - { ruby: "4.0", gemfile: rails_6.1, pg: 18 }
-          # Rails 7.0 (Ruby 3.2 is the minimum for fibers)
+          # Rails 7.0 (fiber execution requires Rails 7.1)
           - { ruby: "3.0", gemfile: rails_7.0, pg: 18 }
-          - { ruby: "3.2", gemfile: rails_7.0, pg: 18 }
           - { ruby: "4.0", gemfile: rails_7.0, pg: 18 }
-          # Rails 7.1
+          # Rails 7.1 (Ruby 3.2 is the minimum for fibers)
           - { ruby: "3.0", gemfile: rails_7.1, pg: 18 }
           - { ruby: "3.2", gemfile: rails_7.1, pg: 18 }
           - { ruby: "4.0", gemfile: rails_7.1, pg: 18 }
@@ -121,7 +120,7 @@ jobs:
           # JRuby 10 targets Ruby 3.4
           - { ruby: jruby-10.0, gemfile: rails_7.2, pg: 18 }
           # Async: minimum, latest, unsupported, and absent
-          - { ruby: "3.2", gemfile: async_compatibility, rails_version: "7.0", async: "2.24.0", async_name: minimum, pg: 18 }
+          - { ruby: "3.2", gemfile: async_compatibility, rails_version: "7.1", async: "2.24.0", async_name: minimum, pg: 18 }
           - { ruby: "4.0", gemfile: async_compatibility, async: "2.25.0", async_name: minimum, pg: 18 }
           - { ruby: "4.0", gemfile: async_compatibility, async: "2.24.0", async_name: older_ruby4, pg: 18 }
           - { ruby: "4.0", gemfile: async_compatibility, async: ">= 2.24", async_name: latest, pg: 18 }
@@ -139,7 +138,7 @@ jobs:
       BUNDLE_WITHOUT: debug:lint:demo:production
       RAILS_LOG_TO_STDOUT: false
       RAILS_VERSION: ${{ matrix.rails_version || '8.1' }}
-      GOOD_JOB_REQUIRE_FIBERS: ${{ matrix.gemfile != 'rails_6.1' && matrix.ruby != '3.0' && matrix.ruby != '3.1' && matrix.ruby != 'jruby-10.0' && matrix.async != 'absent' && matrix.async != '2.23.0' && matrix.async_name != 'older_ruby4' && '1' || '0' }}
+      GOOD_JOB_REQUIRE_FIBERS: ${{ matrix.gemfile != 'rails_6.1' && matrix.gemfile != 'rails_7.0' && matrix.ruby != '3.0' && matrix.ruby != '3.1' && matrix.ruby != 'jruby-10.0' && matrix.async != 'absent' && matrix.async != '2.23.0' && matrix.async_name != 'older_ruby4' && '1' || '0' }}
     services:
       postgres:
         image: postgres:${{ matrix.pg }}
