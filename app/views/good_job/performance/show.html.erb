@@ -4,4 +4,6 @@
 
 <%= render "range", performance_range: @performance_range, range_context: @performance_range_context, range_path: performance_path(@job_class, locale: nil) %>
 
-<%= render 'good_job/shared/chart_container', chart_data: @chart_data %>
+<% @charts.each do |metric_key, chart_data| %>
+  <%= render 'good_job/shared/chart_container', chart_data: chart_data, region: "#{metric_key.to_s.dasherize}-chart" %>
+<% end %>

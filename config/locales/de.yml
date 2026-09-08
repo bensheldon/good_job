@@ -234,15 +234,28 @@ de:
         value: Wert
     performance:
       index:
-        average_duration: Durchschnittliche Dauer
-        chart_title: Gesamtausführungszeit in Sekunden
+        chart_title: Gesamte Ausführungslatenz in Sekunden
+        chart_title_queue: Durchschnittliche Warteschlangenlatenz in Sekunden
+        chart_title_total: Durchschnittliche Gesamtlatenz in Sekunden
+        execution_latency: Ausführungslatenz
         executions: Ausführungen
         job_class: Job-Klasse
-        maximum_duration: Maximale Dauer
-        minimum_duration: Minimale Dauer
+        jobs: Jobs
         no_executions: Keine Ausführungen in diesem Zeitraum.
+        queue_latency: Warteschlangenlatenz
         queue_name: Warteschlangenname
         title: Leistung
+        total_latency: Gesamtlatenz
+      latency:
+        average: Ø
+        maximum: max
+        minimum: min
+      metric:
+        chart_metric: Diagramm-Metrik
+        metric_options:
+          execution: Ausführungslatenz
+          queue: Warteschlangenlatenz
+          total: Gesamtlatenz
       range:
         bucket_size:
           days: "%{count} T"
@@ -267,8 +280,11 @@ de:
         time_range: Leistungszeitraum
         time_zone: 'Zeitzone:'
       show:
+        execution_chart_title: Ausführungslatenz
+        queue_chart_title: Warteschlangenlatenz
         slow: Langsam
         title: Leistung
+        total_chart_title: Gesamtlatenz
     processes:
       index:
         cron_enabled: Cron aktiviert

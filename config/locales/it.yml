@@ -234,15 +234,28 @@ it:
         value: Valore
     performance:
       index:
-        average_duration: Durata media
-        chart_title: Tempo totale di esecuzione in secondi
+        chart_title: Latenza di esecuzione totale in secondi
+        chart_title_queue: Latenza in coda media in secondi
+        chart_title_total: Latenza totale media in secondi
+        execution_latency: Latenza di esecuzione
         executions: Esecuzioni
         job_class: Classe del job
-        maximum_duration: Durata massima
-        minimum_duration: Durata minima
+        jobs: Job
         no_executions: Nessuna esecuzione in questo intervallo di tempo.
+        queue_latency: Latenza in coda
         queue_name: Nome della coda
         title: Prestazioni
+        total_latency: Latenza totale
+      latency:
+        average: media
+        maximum: max
+        minimum: min
+      metric:
+        chart_metric: Metrica del grafico
+        metric_options:
+          execution: Latenza di esecuzione
+          queue: Latenza in coda
+          total: Latenza totale
       range:
         bucket_size:
           days: "%{count}g"
@@ -267,8 +280,11 @@ it:
         time_range: Intervallo di tempo delle prestazioni
         time_zone: 'Fuso orario:'
       show:
+        execution_chart_title: Latenza di esecuzione
+        queue_chart_title: Latenza in coda
         slow: Lento
         title: Prestazioni
+        total_chart_title: Latenza totale
     processes:
       index:
         cron_enabled: Cron abilitato

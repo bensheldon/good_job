@@ -28,6 +28,73 @@ describe 'Performance Page', :js do
     expect(page).to have_content 'ExampleJob'
   end
 
+  it 'switches the index chart between execution, queue, and total time' do
+    ExampleJob.perform_later
+    GoodJob.perform_inline
+
+    visit good_job.performance_index_path
+
+    # The table headers are uppercased by CSS, so assert on the rendered text.
+    expect(page).to have_content 'QUEUE LATENCY'
+    expect(chart_titles).to eq(["Total execution latency in seconds"])
+
+    click_link "Queue latency"
+    wait_for_turbo_load
+
+    # Anchored on the separator: `chart` is a prefix of chart_range/chart_start/chart_end.
+    expect(page).to have_current_path(/[?&]chart=queue/)
+    expect(page).to have_css("a.btn.active", text: "Queue latency")
+    expect(chart_titles).to eq(["Average queue latency in seconds"])
+
+    click_link "Total latency"
+    wait_for_turbo_load
+
+    expect(page).to have_current_path(/[?&]chart=total/)
+    expect(page).to have_css("a.btn.active", text: "Total latency")
+    expect(chart_titles).to eq(["Average total latency in seconds"])
+
+    click_link "Execution latency"
+    wait_for_turbo_load
+
+    expect(page).to have_no_current_path(/[?&]chart=/)
+    expect(page).to have_css("a.btn.active", text: "Execution latency")
+    expect(chart_titles).to eq(["Total execution latency in seconds"])
+  end
+
+  it 'keeps every performance column aligned with its header and labels cells on narrow viewports' do
+    ExampleJob.perform_later
+    GoodJob.perform_inline
+
+    visit good_job.performance_index_path
+
+    # The table headers are uppercased by CSS, so assert on the rendered text.
+    expect(page).to have_content 'TOTAL LATENCY'
+    expect(page).to have_no_css("[role='row'] .d-lg-none", text: "Total latency")
+    # The rows set `text-nowrap`, so an added column pushes the header onto a second
+    # line unless its label can wrap. Compare real geometry, not the grid arithmetic.
+    expect(misaligned_tables).to eq([])
+
+    with_narrow_viewport do
+      visit good_job.performance_index_path
+
+      # Narrow rows swap the uppercased header for a stacked inline label per cell.
+      expect(page).to have_css("[role='row'] .d-lg-none", text: "Total latency")
+      expect(page.evaluate_script("document.documentElement.scrollWidth > window.innerWidth")).to be(false)
+    end
+  end
+
+  it 'renders a histogram per metric on the show page' do
+    ExampleJob.perform_later
+    GoodJob.perform_inline
+
+    visit good_job.performance_index_path
+    click_link 'ExampleJob'
+    wait_for_turbo_load
+
+    expect(page).to have_css 'h2', text: 'Performance - ExampleJob'
+    expect(chart_titles).to eq(["Execution latency", "Queue latency", "Total latency"])
+  end
+
   it 'can select and reload a chart range on the index' do
     initial_time = Time.zone.parse("2024-01-01 12:34:56 UTC")
 
@@ -74,7 +141,7 @@ describe 'Performance Page', :js do
       ].each do |path|
         visit path
         initial_dates = all(".performance-range-date").map(&:text)
-        initial_chart_config = find("[data-chart-config-value]")["data-chart-config-value"]
+        initial_chart_configs = all("[data-chart-config-value]").map { |chart| chart["data-chart-config-value"] }
 
         click_button "Leistungszeiträume öffnen"
         find("a.performance-range-custom").click
@@ -83,7 +150,7 @@ describe 'Performance Page', :js do
         expect(query).to eq(exact_range.stringify_keys)
         expect(page).to have_css(".performance-range-key", text: "Benutzerdefiniert")
         expect(all(".performance-range-date").map(&:text)).to eq(initial_dates)
-        expect(find("[data-chart-config-value]")["data-chart-config-value"]).to eq(initial_chart_config)
+        expect(all("[data-chart-config-value]").map { |chart| chart["data-chart-config-value"] }).to eq(initial_chart_configs)
       end
     end
   end
@@ -816,7 +883,7 @@ describe 'Performance Page', :js do
       click_link 'ExampleJob'
 
       show_query = Rack::Utils.parse_query(URI.parse(page.current_url).query)
-      show_config = JSON.parse(find("[data-chart-config-value]")["data-chart-config-value"])
+      show_config = JSON.parse(find("[data-live-poll-region='execution-chart']")["data-chart-config-value"])
 
       expect(page).to have_css 'h2', text: 'Performance - ExampleJob'
       expect(show_query).to eq(expected_navigation)
@@ -830,6 +897,29 @@ describe 'Performance Page', :js do
       expect(page).to have_css(".performance-range-key", text: "24h")
       expect(all(".performance-range-date").map(&:text)).not_to eq(index_dates)
     end
+  end
+
+  def chart_titles
+    all("[data-chart-config-value]").map do |element|
+      JSON.parse(element["data-chart-config-value"]).dig("options", "plugins", "title", "text")
+    end
+  end
+
+  # Tables whose header cells do not start at the same offsets as their first body row,
+  # which is what a header wrapping onto a second line looks like geometrically.
+  def misaligned_tables
+    page.evaluate_script(<<~JAVASCRIPT)
+      Array.from(document.querySelectorAll("[role='table']")).flatMap((table) => {
+        const header = table.querySelector("header .row")
+        const body = table.querySelector("[role='row'] .row")
+        if (!header || !body) return []
+        const offsets = (row) => Array.from(row.children)
+          .map((cell) => Math.round(cell.getBoundingClientRect().left)).join(",")
+        const headerOffsets = offsets(header)
+        const bodyOffsets = offsets(body)
+        return headerOffsets === bodyOffsets ? [] : [`header ${headerOffsets} vs body ${bodyOffsets}`]
+      })
+    JAVASCRIPT
   end
 
   def contrast_ratio(foreground, background)

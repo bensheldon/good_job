@@ -92,6 +92,46 @@ RSpec.describe GoodJob::PerformanceController do
     end
   end
 
+  describe "chart metric navigation" do
+    it "carries the metric across every range control on the index" do
+      get good_job.performance_index_path, params: { chart_range: "1h", chart: "queue", locale: "de" }
+
+      page = Capybara.string(response.body)
+      preset_paths = page.all("a.performance-range-menu-item").pluck(:href)
+      form_metric = page.find("form[data-controller='performance-range'] input[name='chart']", visible: :all)
+
+      expect(response).to have_http_status(:ok)
+      expect(preset_paths).to include(
+        good_job.performance_index_path(chart_range: "6h", chart: "queue", locale: "de")
+      )
+      expect(page.find("a.performance-range-reload")[:href]).to eq(
+        good_job.performance_index_path(chart_range: "1h", chart: "queue", locale: "de")
+      )
+      expect(Rack::Utils.parse_query(URI.parse(page.find("a.performance-range-custom")[:href]).query).keys)
+        .to contain_exactly("chart_start", "chart_end", "chart", "locale")
+      expect(form_metric[:value]).to eq("queue")
+    end
+
+    it "does not leak the metric into show, which renders both metrics" do
+      get good_job.performance_index_path, params: { chart_range: "1h", chart: "queue" }
+
+      drilldown_uri = URI.parse(Capybara.string(response.body).find(".performance-name a")[:href])
+
+      expect(Rack::Utils.parse_query(drilldown_uri.query).keys)
+        .to contain_exactly("chart_range", "chart_start", "chart_end")
+
+      get good_job.performance_path("ExampleJob"), params: { chart: "queue" }
+
+      page = Capybara.string(response.body)
+
+      expect(response).to have_http_status(:ok)
+      expect(page).to have_css("[data-live-poll-region='execution-chart']")
+      expect(page).to have_css("[data-live-poll-region='queue-chart']")
+      expect(page).to have_css("[data-live-poll-region='total-chart']")
+      expect(page).to have_no_css("form[data-controller='performance-range'] input[name='chart']", visible: :all)
+    end
+  end
+
   describe "unsafe timestamp input" do
     it "canonicalizes repeated scalar parameters once and renders without a query exception" do
       query_string = URI.encode_www_form([
