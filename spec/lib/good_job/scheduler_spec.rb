@@ -275,4 +275,117 @@ RSpec.describe GoodJob::Scheduler do
       end
     end
   end
+
+  describe 'fiber execution', :fiber_isolation, :requires_async do
+    it 'raises when isolation_level is not :fiber' do
+      ActiveSupport::IsolatedExecutionState.isolation_level = :thread
+      expect { described_class.new(performer, fibers: 5) }.to raise_error(ArgumentError, /isolation_level/)
+    ensure
+      # Restore before after-hooks run: on Rails 7.1+ connections checked out under
+      # fiber isolation are otherwise unreachable to the pool under thread isolation.
+      ActiveSupport::IsolatedExecutionState.isolation_level = :fiber
+    end
+
+    it 'raises when code reloading is enabled' do
+      allow(Rails.application.config).to receive(:enable_reloading).and_return(true)
+      expect { described_class.new(performer, fibers: 5) }.to raise_error(ArgumentError, /reloading/)
+    end
+
+    it 'raises when Rails predates fiber-aware connection pools' do
+      allow(Rails).to receive(:gem_version).and_return(Gem::Version.new('7.0.8'))
+      expect { described_class.new(performer, fibers: 5) }.to raise_error(ArgumentError, /Rails 7\.1/)
+      expect(described_class.fiber_execution_supported?).to be false
+    end
+
+    it 'ignores lower_thread_priority for the reactor thread' do
+      priorities = Concurrent::Array.new
+      allow(performer).to receive(:next) do
+        priorities << Thread.current.priority
+        false
+      end
+
+      scheduler = described_class.new(performer, fibers: 5, lower_thread_priority: true)
+      scheduler.create_thread
+
+      wait_until { expect(priorities.size).to eq 1 }
+      expect(priorities.first).to eq 0
+
+      scheduler.shutdown
+    end
+
+    it 'includes the fiber count in the name' do
+      scheduler = described_class.new(performer, fibers: 5)
+      expect(scheduler.name).to eq('GoodJob::Scheduler(queues=* fibers=5)')
+      scheduler.shutdown
+    end
+
+    it 'executes jobs on a FiberPoolExecutor' do
+      performed_in = Concurrent::Array.new
+      allow(performer).to receive(:next) do
+        performed_in << [Thread.current.name, Fiber.current]
+        false
+      end
+
+      scheduler = described_class.new(performer, fibers: 5)
+      3.times { scheduler.create_thread }
+
+      wait_until { expect(performed_in.size).to eq 3 }
+      expect(performed_in.map(&:first)).to all(include("reactor"))
+
+      scheduler.shutdown
+      expect(scheduler.shutdown?).to be true
+    end
+
+    it 'propagates fatal errors captured by ScheduledTask without reporting them' do
+      error = SystemExit.new(1, 'fatal task error')
+      escaped = Concurrent::Array.new
+      allow(performer).to receive(:next) { raise error }
+      allow(GoodJob).to receive(:_on_thread_error)
+      scheduler = described_class.new(performer, fibers: 1)
+      executor = scheduler.send(:executor)
+      # Catch outside the real reactor so SystemExit cannot terminate the test process.
+      allow(executor).to receive(:run_reactor).and_wrap_original do |original|
+        original.call
+      rescue SystemExit => e
+        escaped << e
+      end
+
+      scheduler.create_thread
+
+      wait_until { expect(escaped).to eq [error] }
+      expect(GoodJob).not_to have_received(:_on_thread_error)
+      # Propagation does not close the executor's queue or imply scheduler shutdown.
+      expect(scheduler).not_to be_shutdown
+    ensure
+      scheduler&.shutdown
+    end
+
+    it 'reports fiber capacity separately from the reactor thread' do
+      scheduler = described_class.new(performer, fibers: 5)
+
+      expect(scheduler.stats).to include(
+        max_threads: 1,
+        active_threads: 0,
+        available_threads: 1,
+        max_fibers: 5,
+        active_fibers: 0,
+        available_fibers: 5
+      )
+
+      scheduler.shutdown
+    end
+
+    it 'instruments fiber and reactor thread capacity separately at startup' do
+      events = []
+      subscription = ActiveSupport::Notifications.subscribe("scheduler_create_pool.good_job") do |*args|
+        events << ActiveSupport::Notifications::Event.new(*args)
+      end
+
+      scheduler = described_class.new(performer, fibers: 5)
+      expect(events.last.payload).to include(max_threads: 1, max_fibers: 5)
+      scheduler.shutdown
+    ensure
+      ActiveSupport::Notifications.unsubscribe(subscription) if subscription
+    end
+  end
 end

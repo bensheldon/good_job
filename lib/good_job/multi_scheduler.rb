@@ -8,20 +8,43 @@ module GoodJob
     # @param warm_cache_on_initialize [Boolean]
     # @return [GoodJob::MultiScheduler]
     def self.from_configuration(configuration, capsule: GoodJob.capsule, warm_cache_on_initialize: false)
-      schedulers = configuration.queue_string.split(';').map(&:strip).map do |queue_string_and_max_threads|
-        queue_string, max_threads = queue_string_and_max_threads.split(':').map { |str| str.strip.presence }
-        max_threads = (max_threads || configuration.max_threads).to_i
+      queue_configurations = configuration.queue_string.split(';').map(&:strip).map do |queue_string_and_count|
+        queue_string_and_count.split(':').map { |str| str.strip.presence }
+      end
 
-        job_performer = GoodJob::JobPerformer.new(queue_string, capsule: capsule)
-        GoodJob::Scheduler.new(
-          job_performer,
-          max_threads: max_threads,
+      fibers = configuration.fibers
+      fibers_fallback = false
+      begin
+        Scheduler.validate_fiber_execution! if fibers.positive?
+      rescue ArgumentError => e
+        # Web and worker processes may share GOOD_JOB_FIBERS despite different Rails settings.
+        raise if GoodJob.cli?
+
+        GoodJob.logger.error("GoodJob: ignoring `fibers` and using a thread pool for this #{configuration.execution_mode} process: #{e.message}")
+        fibers = 0
+        fibers_fallback = true
+      end
+
+      schedulers = queue_configurations.map do |queue_string, queue_count|
+        scheduler_options = {
           max_cache: configuration.max_cache,
           warm_cache_on_initialize: warm_cache_on_initialize,
           cleanup_interval_seconds: configuration.cleanup_interval_seconds,
           cleanup_interval_jobs: configuration.cleanup_interval_jobs,
-          lower_thread_priority: configuration.lower_thread_priority
-        )
+          lower_thread_priority: configuration.lower_thread_priority,
+        }
+
+        if fibers.positive?
+          scheduler_options[:fibers] = (queue_count || fibers).to_i
+        else
+          # Fiber counts can be too large for thread pools; preserve smaller queue limits.
+          thread_count = (queue_count || configuration.max_threads).to_i
+          thread_count = [thread_count, configuration.max_threads].min if fibers_fallback
+          scheduler_options[:max_threads] = thread_count
+        end
+
+        job_performer = GoodJob::JobPerformer.new(queue_string, capsule: capsule)
+        GoodJob::Scheduler.new(job_performer, **scheduler_options)
       end
 
       new(schedulers)
@@ -103,6 +126,7 @@ module GoodJob
         total_executions_count: scheduler_stats.sum { |stats| stats.fetch(:total_executions_count, 0) },
         execution_at: scheduler_stats.map { |stats| stats.fetch(:execution_at, nil) }.compact.max,
         active_execution_thread_count: scheduler_stats.sum { |stats| stats.fetch(:active_threads, 0) },
+        active_execution_count: scheduler_stats.sum { |stats| stats.fetch(:active_fibers, stats.fetch(:active_threads, 0)) },
         check_queue_at: scheduler_stats.map { |stats| stats.fetch(:check_queue_at, nil) }.compact.max,
       }
     end

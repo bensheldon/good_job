@@ -23,6 +23,10 @@ module TestApp
 
     config.active_job.queue_adapter = :good_job
 
+    if defined?(ActiveSupport::IsolatedExecutionState) && GoodJob::Configuration.new({}).fibers.positive?
+      config.active_support.isolation_level = :fiber
+    end
+
     # config.middleware.insert_before Rack::Sendfile, ActionDispatch::DebugLocks
     config.log_level = :debug
 

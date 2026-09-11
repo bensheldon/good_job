@@ -59,7 +59,8 @@ module GoodJob
       == Configuring queues
 
       Separate multiple queues with commas; exclude queues with a leading minus;
-      separate isolated execution pools with semicolons and threads with colons.
+      separate isolated execution pools with semicolons and concurrency counts with colons.
+      Counts specify threads by default, or fibers when --fibers is enabled.
 
     DESCRIPTION
     method_option :queues,
@@ -70,6 +71,10 @@ module GoodJob
                   type: :numeric,
                   banner: 'COUNT',
                   desc: "Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)"
+    method_option :fibers,
+                  type: :numeric,
+                  banner: 'COUNT',
+                  desc: "Default number of fibers per pool to use for working jobs instead of threads. (env var: GOOD_JOB_FIBERS, default: 0)"
     method_option :poll_interval,
                   type: :numeric,
                   banner: 'SECONDS',
