@@ -145,19 +145,6 @@ module GoodJob # :nodoc:
       count.positive? ? count : 0
     end
 
-    # Defer a callback until the current task releases its capacity.
-    # +Concurrent::ScheduledTask+ observers run before that release.
-    # @return [Boolean] whether the callback was deferred
-    def defer_after_current_task(&block)
-      return false unless block
-
-      callbacks = Thread.current[:good_job_fiber_pool_executor_callbacks]
-      return false unless callbacks
-
-      callbacks << block
-      true
-    end
-
     # Fatal errors must not be contained or reported as ordinary task errors.
     # Async may handle cancellation without shutting down the executor.
     # @return [Boolean]
@@ -218,8 +205,6 @@ module GoodJob # :nodoc:
                 next unless item
 
                 args, block = item
-                callbacks = []
-                Thread.current[:good_job_fiber_pool_executor_callbacks] = callbacks
                 block.call(*args)
               rescue Exception => e # rubocop:disable Lint/RescueException
                 raise if self.class.fatal_exception?(e)
@@ -228,11 +213,6 @@ module GoodJob # :nodoc:
                 GoodJob._on_thread_error(e)
               ensure
                 @pending_count.decrement if item
-                callbacks&.each do |callback|
-                  callback.call
-                rescue StandardError => e
-                  GoodJob._on_thread_error(e)
-                end
               end
             end
 

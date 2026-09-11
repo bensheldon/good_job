@@ -33,7 +33,7 @@ RSpec.describe 'Fiber application boot' do
     JSON.parse(output.lines.find { |line| line.start_with?('BOOT_RESULT=') }.delete_prefix('BOOT_RESULT='))
   end
 
-  [nil, '', '0', 'false', ' FaLsE '].each do |value|
+  [nil, '', '0'].each do |value|
     it "boots without enabling fiber isolation for #{value.inspect}" do
       result = boot(fibers: value, reloading: true)
       expect(result['isolation']).not_to eq 'fiber'
@@ -42,20 +42,8 @@ RSpec.describe 'Fiber application boot' do
     end
   end
 
-  it 'boots development with an invalid value and falls back to capped threads' do
-    result = boot(fibers: 'junk', reloading: true, environment: 'development')
-    expect(result['schedulers'].pluck('max_threads')).to eq [1, 2]
-    expect(result['lock_strategy']).to eq 'advisory'
-  end
-
-  it 'boots the demo environment and falls back for invalid fiber configuration' do
-    result = boot(fibers: 'junk', reloading: false, environment: 'demo')
-    expect(result['schedulers'].pluck('max_threads')).to eq [1, 2]
-    expect(result['lock_strategy']).to eq 'advisory'
-  end
-
   it 'falls back in development when reloading is enabled', :fiber_isolation, :requires_async do
-    result = boot(fibers: ' TrUe ', reloading: true, environment: 'development')
+    result = boot(fibers: '25', reloading: true, environment: 'development')
     expect(result['isolation']).to eq 'fiber'
     expect(result['schedulers'].pluck('max_threads')).to eq [1, 2]
   end

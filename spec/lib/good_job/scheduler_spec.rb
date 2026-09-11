@@ -276,22 +276,6 @@ RSpec.describe GoodJob::Scheduler do
     end
   end
 
-  describe 'fibers argument coercion' do
-    it 'raises on values that are not non-negative integers' do
-      expect { described_class.new(performer, fibers: 0.5) }.to raise_error(ArgumentError, /fibers must be a non-negative integer.*0\.5/)
-      expect { described_class.new(performer, fibers: 'twenty') }.to raise_error(ArgumentError, /fibers must be a non-negative integer.*twenty/)
-      expect { described_class.new(performer, fibers: -1) }.to raise_error(ArgumentError, /fibers must be a non-negative integer/)
-    end
-
-    it 'uses a thread pool when fibers is nil, false, or zero' do
-      [nil, false, 0, '0'].each do |value|
-        scheduler = described_class.new(performer, fibers: value)
-        expect(scheduler.fibers?).to be false
-        scheduler.shutdown
-      end
-    end
-  end
-
   describe 'fiber execution', :fiber_isolation, :requires_async do
     it 'raises when isolation_level is not :fiber' do
       ActiveSupport::IsolatedExecutionState.isolation_level = :thread
@@ -329,8 +313,8 @@ RSpec.describe GoodJob::Scheduler do
       scheduler.shutdown
     end
 
-    it 'includes the coerced fiber count in the name' do
-      scheduler = described_class.new(performer, fibers: '5')
+    it 'includes the fiber count in the name' do
+      scheduler = described_class.new(performer, fibers: 5)
       expect(scheduler.name).to eq('GoodJob::Scheduler(queues=* fibers=5)')
       scheduler.shutdown
     end
@@ -374,33 +358,6 @@ RSpec.describe GoodJob::Scheduler do
       expect(scheduler).not_to be_shutdown
     ensure
       scheduler&.shutdown
-    end
-
-    it 'schedules a replacement after releasing fiber capacity' do
-      started = Concurrent::CountDownLatch.new(1)
-      executions = Concurrent::AtomicFixnum.new(0)
-      replacement_capacity = Concurrent::Array.new
-      allow(performer).to receive(:next) do
-        started.wait(5)
-        executions.increment == 1 ? true : nil
-      end
-
-      scheduler = described_class.new(performer, fibers: 1)
-      original_create_task = scheduler.method(:create_task)
-      first_task = true
-      allow(scheduler).to receive(:create_task) do |*args, **kwargs|
-        replacement_capacity << scheduler.send(:executor).ready_worker_count unless first_task
-        first_task = false
-        original_create_task.call(*args, **kwargs)
-      end
-
-      scheduler.create_thread
-      started.count_down
-
-      wait_until { expect(executions.value).to eq 2 }
-      expect(replacement_capacity).to eq [1]
-
-      scheduler.shutdown
     end
 
     it 'reports fiber capacity separately from the reactor thread' do

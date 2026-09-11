@@ -130,16 +130,6 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       wait_until { expect(completed.value).to eq 20 }
       wait_until { expect(executor.ready_worker_count).to eq 5 }
     end
-
-    it 'runs deferred callbacks after releasing fiber capacity' do
-      available_workers = Concurrent::AtomicFixnum.new(0)
-
-      executor.post do
-        expect(executor.defer_after_current_task { available_workers.value = executor.ready_worker_count }).to be true
-      end
-
-      wait_until { expect(available_workers.value).to eq 5 }
-    end
   end
 
   describe '#initialize' do

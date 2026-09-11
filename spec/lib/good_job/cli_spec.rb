@@ -17,25 +17,13 @@ RSpec.describe GoodJob::CLI do
         allow(Kernel).to receive(:loop)
       end
 
-      { '12' => 12, 'true' => 25, 'false' => nil, '0' => nil }.each do |value, expected|
-        it "parses --fibers #{value}" do
-          described_class.start(['start', '--fibers', value])
-          expect(GoodJob.configuration.fibers).to eq expected
-        end
+      it 'parses --fibers as an integer' do
+        described_class.start(['start', '--fibers', '12'])
+        expect(GoodJob.configuration.fibers).to eq 12
       end
 
-      it 'rejects an invalid count at worker startup' do
-        allow(capsule_mock).to receive(:start) { GoodJob.configuration.fibers }
-        expect { described_class.start(['start', '--fibers', 'junk']) }.to raise_error(ArgumentError, /positive integer/)
-      end
-
-      it 'rejects a missing count' do
-        allow(capsule_mock).to receive(:start) { GoodJob.configuration.fibers }
-        expect { described_class.start(['start', '--fibers']) }.to raise_error(ArgumentError, /positive integer/)
-      end
-
-      it 'lists fiber requirements in help' do
-        expect { described_class.start(%w[help start]) }.to output(/--fibers.*CRuby 3.2\+.*reloading disabled/m).to_stdout
+      it 'documents --fibers in help' do
+        expect { described_class.start(%w[help start]) }.to output(/--fibers.*GOOD_JOB_FIBERS/m).to_stdout
       end
     end
 

@@ -47,25 +47,12 @@ RSpec.describe GoodJob::MultiScheduler do
       end
 
       it 'converts thread queue counts with to_i, including zero' do
-        configuration = GoodJob::Configuration.new({ fibers: false, queues: 'zero:0;text:many;prefix:2jobs' })
+        configuration = GoodJob::Configuration.new({ queues: 'zero:0;text:many;prefix:2jobs' })
         scheduler = instance_double(GoodJob::Scheduler)
         allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
         described_class.from_configuration(configuration)
         expect(GoodJob::Scheduler).to have_received(:new).with(anything, hash_including(max_threads: 0)).twice
         expect(GoodJob::Scheduler).to have_received(:new).with(anything, hash_including(max_threads: 2)).once
-      end
-
-      it 'rejects invalid fiber queue sizes before creating schedulers in a CLI worker' do
-        allow(GoodJob).to receive(:cli?).and_return(true)
-
-        ['0', '-1', 'many'].each do |invalid_count|
-          configuration = GoodJob::Configuration.new({ execution_mode: :async_all, fibers: 25, queues: "valid:10;invalid:#{invalid_count}" })
-          allow(GoodJob::Scheduler).to receive(:new)
-
-          expect { described_class.from_configuration(configuration) }
-            .to raise_error(ArgumentError, /queue pool size must be a positive integer.*'#{Regexp.escape(invalid_count)}'/)
-          expect(GoodJob::Scheduler).not_to have_received(:new)
-        end
       end
     end
 
@@ -79,37 +66,6 @@ RSpec.describe GoodJob::MultiScheduler do
           include(queues: 'mice', max_fibers: 10),
           include(queues: 'elephants', max_fibers: 25)
         )
-      end
-    end
-
-    describe 'downgraded lock strategy', :fiber_isolation, :requires_async do
-      it 'warns when :skiplocked falls back to :advisory' do
-        configuration = GoodJob::Configuration.new({ fibers: 25, lock_strategy: :skiplocked })
-        allow(GoodJob::Job).to receive(:effective_lock_strategy).and_return(:advisory)
-        allow(GoodJob.logger).to receive(:warn)
-
-        described_class.from_configuration(configuration)
-
-        expect(GoodJob.logger).to have_received(:warn).with(/downgraded to :advisory.*lock_type/m)
-      end
-
-      it 'does not warn when the configured strategy is the effective one' do
-        configuration = GoodJob::Configuration.new({ fibers: 25, lock_strategy: :skiplocked })
-        allow(GoodJob::Job).to receive(:effective_lock_strategy).and_return(:skiplocked)
-        allow(GoodJob.logger).to receive(:warn)
-
-        described_class.from_configuration(configuration)
-
-        expect(GoodJob.logger).not_to have_received(:warn).with(/downgraded/)
-      end
-
-      it 'does not warn when the database is unavailable at boot' do
-        configuration = GoodJob::Configuration.new({ fibers: 25, lock_strategy: :skiplocked })
-        allow(GoodJob::Job).to receive(:effective_lock_strategy).and_raise(ActiveRecord::ConnectionNotEstablished)
-        allow(GoodJob.logger).to receive(:warn)
-
-        expect { described_class.from_configuration(configuration) }.not_to raise_error
-        expect(GoodJob.logger).not_to have_received(:warn).with(/downgraded/)
       end
     end
 

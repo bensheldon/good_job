@@ -72,9 +72,9 @@ module GoodJob
                   banner: 'COUNT',
                   desc: "Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)"
     method_option :fibers,
-                  type: :string,
+                  type: :numeric,
                   banner: 'COUNT',
-                  desc: "Execute jobs as COUNT fibers on one reactor thread per scheduler. 'true' means 25; 'false' or 0 disables. Queue counts override COUNT, and COUNT overrides max_threads. Requires CRuby 3.2+, async >= 2.24 (>= 2.25 on Ruby 4), Rails 7.1+ with isolation_level = :fiber, and reloading disabled. (env var: GOOD_JOB_FIBERS, default: nil)"
+                  desc: "Default number of fibers per pool to use for working jobs instead of threads. (env var: GOOD_JOB_FIBERS, default: 0)"
     method_option :poll_interval,
                   type: :numeric,
                   banner: 'SECONDS',

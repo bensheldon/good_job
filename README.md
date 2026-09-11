@@ -301,7 +301,7 @@ Available configuration options are:
     - `:async_all` executes jobs in separate threads in _any_ Rails process.
 - `queues` (string) sets queues or pools to execute jobs. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
 - `max_threads` (integer) sets the default number of threads per pool to use for working jobs. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
-- `fibers` (integer or boolean) enables [fiber execution](#execute-jobs-with-fibers). A positive integer sets concurrency per pool; `true` selects 25; `0`, `false`, or a blank string disables it. You can also set this with `GOOD_JOB_FIBERS` or `--fibers COUNT` (`true` and `false` are accepted).
+- `fibers` (integer) sets the default number of fibers per pool for [fiber execution](#execute-jobs-with-fibers). The default, `0`, executes jobs with threads. You can also set this with the environment variable `GOOD_JOB_FIBERS`.
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`. A poll interval of `-1` disables polling completely.
     - production default: 10 seconds (in case of a LISTEN/NOTIFY blip)
     - development default: -1, disabled (because the application is likely being restarted often and won't be running unobserved). You can enable it by setting a `poll_interval`.
@@ -1380,13 +1380,11 @@ config.good_job.lock_strategy = :skiplocked # Requires the lock_type migration b
 
 Start it with `bundle exec good_job start`. The example creates three schedulers with one reactor thread each and capacities of 50, 10, and 25 jobs. GoodJob also uses utility threads.
 
-Queue counts override `fibers`, which overrides `max_threads`. `max_threads` does not limit fiber concurrency.
+Like `max_threads`, `fibers` is the default count per pool, and a count in `queues` overrides it. Fiber pools do not use `max_threads`.
 
-For `fibers`, configuration options override Rails config, which overrides `GOOD_JOB_FIBERS`. Disabling values take precedence; `nil` uses the next source. Strings ignore surrounding whitespace and boolean case. Negative counts, floats, and unrecognized values raise configuration errors.
+#### Unmet requirements
 
-#### Invalid configuration
-
-An external worker (`good_job start`) raises an error. In-process execution logs the error and falls back to threads, capping each queue at `max_threads` while keeping smaller counts such as `serial:1`. The locking strategy and Rails isolation level remain as configured.
+When a requirement above is not met, an external worker (`good_job start`) raises an error. In-process execution logs the error and falls back to threads, capping each queue at `max_threads` while keeping smaller counts such as `serial:1`. The locking strategy and Rails isolation level remain as configured.
 
 The development harness enables reloading by default, so requesting fibers uses this fallback.
 
@@ -1400,7 +1398,7 @@ CPU work and blocking native calls stall every job on the reactor, even when a n
 
 Advisory locking is the default in both modes and holds one database connection per running job.
 
-Using `:skiplocked` avoids that lease but requires `good_jobs.lock_type`. Run `bin/rails generate good_job:update` and apply the migrations. Without the column, GoodJob uses advisory locks and a fiber worker logs a warning.
+Using `:skiplocked` avoids that lease but requires `good_jobs.lock_type`. Run `bin/rails generate good_job:update` and apply the migrations. Without the column, GoodJob uses advisory locks.
 
 On Rails 7.2+, jobs using `:skiplocked` can return connections between operations and share a pool smaller than their fiber count. Transactions, RLS wrappers, database work, and permanent leases can still hold connections through an IO wait. Earlier Rails releases can hold connections for the whole job.
 

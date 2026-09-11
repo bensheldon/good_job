@@ -62,18 +62,11 @@ module GoodJob # :nodoc:
     # @param cleanup_interval_seconds [Numeric, nil] number of seconds between cleaning up job records
     # @param cleanup_interval_jobs [Numeric, nil] number of executed jobs between cleaning up job records
     # @param lower_thread_priority [Boolean] whether to lower execution thread priority; ignored in fiber mode
-    # @param fibers [Integer, String, false, nil] concurrency on one reactor thread; accepts integer strings; +nil+, +false+, or +0+ uses a thread pool
+    # @param fibers [Integer, nil] number of fibers executing jobs on one reactor thread; +nil+ uses a thread pool
     def initialize(performer, max_threads: nil, max_cache: nil, warm_cache_on_initialize: false, cleanup_interval_seconds: nil, cleanup_interval_jobs: nil, lower_thread_priority: false, fibers: nil)
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
 
-      if fibers
-        fiber_count = fibers.is_a?(Integer) ? fibers : Integer(fibers.to_s, 10, exception: false)
-        raise ArgumentError, "GoodJob fibers must be a non-negative integer, but was #{fibers.inspect}" if fiber_count.nil? || fiber_count.negative?
-
-        @fibers = fiber_count.positive? ? fiber_count : nil
-      else
-        @fibers = nil
-      end
+      @fibers = fibers
       self.class.validate_fiber_execution! if @fibers
 
       @performer = performer
@@ -283,7 +276,7 @@ module GoodJob # :nodoc:
       if @cleanup_tracker.cleanup?
         cleanup
       else
-        create_task_after_capacity_release
+        create_task
       end
     end
 
@@ -338,8 +331,7 @@ module GoodJob # :nodoc:
 
       observer = lambda do |_time, _output, thread_error|
         report_thread_error(thread_error)
-        # Cache warming may fill the executor before all runnable jobs are scheduled.
-        create_task_after_capacity_release
+        create_task # If cache-warming exhausts the threads, ensure there isn't an executable task remaining
       end
       future.add_observer(observer, :call)
       future.execute
@@ -358,7 +350,7 @@ module GoodJob # :nodoc:
 
       observer = lambda do |_time, _output, thread_error|
         report_thread_error(thread_error)
-        create_task_after_capacity_release
+        create_task
       end
       future.add_observer(observer, :call)
       future.execute
@@ -391,12 +383,6 @@ module GoodJob # :nodoc:
                       ThreadPoolExecutor.new(@executor_options)
                     end
       end
-    end
-
-    # @return [void]
-    def create_task_after_capacity_release
-      deferred = fibers? && executor.defer_after_current_task { create_task }
-      create_task unless deferred
     end
 
     # @param delay [Integer]
