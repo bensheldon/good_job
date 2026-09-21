@@ -10,5 +10,12 @@ class AddIndexGoodJobsDequeueByQueue < ActiveRecord::Migration<%= migration_vers
       where: "finished_at IS NULL AND locked_by_id IS NULL",
       algorithm: :concurrently,
       if_not_exists: true
+
+    add_index :good_jobs, [:queue_name, :priority, :scheduled_at],
+      name: :index_good_jobs_dequeue_by_queue_scheduled_at,
+      order: { priority: "ASC NULLS LAST", scheduled_at: :asc },
+      where: "finished_at IS NULL AND locked_by_id IS NULL",
+      algorithm: :concurrently,
+      if_not_exists: true
   end
 end
