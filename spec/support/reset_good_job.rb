@@ -140,15 +140,11 @@ ActiveSupport.on_load :active_record do
 end
 
 class PgStatActivity < GoodJob::BaseRecord
-  include GoodJob::OverridableConnection
-
   self.table_name = 'pg_stat_activity'
   self.primary_key = 'datid'
 end
 
 class PgLock < GoodJob::BaseRecord
-  include GoodJob::OverridableConnection
-
   self.table_name = 'pg_locks'
   self.primary_key = 'objid'
 
@@ -186,31 +182,27 @@ class PgLock < GoodJob::BaseRecord
   end
 
   def self.debug_own_locks(connection)
-    count = PgLock.override_connection(connection) do
-      PgLock.current_database.advisory_lock.owns.count
-    end
+    count = count_locks_for(connection)
     return false if count.zero?
 
     output = []
     output << "There are #{count} advisory locks still open by the current database connection."
-    GoodJob::Job.include(GoodJob::OverridableConnection)
-    GoodJob::Job.override_connection(connection) do
+
+    adopt_connection(GoodJob::Job, connection) do
       GoodJob::Job.owns_advisory_locked.each.with_index do |job, index|
         output << "\nAdvisory locked GoodJob::Job:" if index.zero?
         output << "  - Job ID: #{job.id} / Active Job ID: #{job.active_job_id}"
       end
     end
 
-    GoodJob::BatchRecord.include(GoodJob::OverridableConnection)
-    GoodJob::BatchRecord.override_connection(connection) do
+    adopt_connection(GoodJob::BatchRecord, connection) do
       GoodJob::BatchRecord.owns_advisory_locked.each.with_index do |batch, index|
         output << "\nAdvisory locked GoodJob::Batch:" if index.zero?
         output << "  - BatchRecord ID: #{batch.id}"
       end
     end
 
-    GoodJob::Process.include(GoodJob::OverridableConnection)
-    GoodJob::Process.override_connection(connection) do
+    adopt_connection(GoodJob::Process, connection) do
       GoodJob::Process.owns_advisory_locked.each.with_index do |process, index|
         output << "\nAdvisory locked GoodJob::Process:" if index.zero?
         output << "  - Process ID: #{process.id}"
@@ -223,6 +215,43 @@ class PgLock < GoodJob::BaseRecord
     end
 
     output.join("\n")
+  end
+
+  # Temporarily adopts +conn+ as the active connection for +model_class+'s pool
+  # within the block, so that AR queries on that model use the given connection.
+  def self.adopt_connection(model_class, conn)
+    pool = model_class.connection_pool
+    if pool.instance_variable_defined?(:@leases) # Rails 8.0+
+      lease = pool.__send__(:connection_lease)
+      prev_conn = lease.connection
+      prev_sticky = lease.sticky
+      lease.connection = conn
+      lease.sticky = true
+      begin
+        yield
+      ensure
+        lease.connection = prev_conn
+        lease.sticky = prev_sticky
+      end
+    else # Rails 6.1–7.x
+      ctx = if defined?(ActiveSupport::IsolatedExecutionState)
+              ActiveSupport::IsolatedExecutionState.context
+            else
+              Thread.current
+            end
+      cache_key = pool.__send__(:connection_cache_key, ctx)
+      prev = pool.instance_variable_get(:@thread_cached_conns)[cache_key]
+      pool.instance_variable_get(:@thread_cached_conns)[cache_key] = conn
+      begin
+        yield
+      ensure
+        if prev
+          pool.instance_variable_get(:@thread_cached_conns)[cache_key] = prev
+        else
+          pool.instance_variable_get(:@thread_cached_conns).delete(cache_key)
+        end
+      end
+    end
   end
 
   def unlock

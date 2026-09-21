@@ -207,6 +207,7 @@ module GoodJob
     end
 
     ADVISORY_LOCK_COUNTS = AdvisoryLockCounter.new
+    private_constant :ADVISORY_LOCK_COUNTS
     AREL_TABLE_NEW_KWARGS = Arel::Table.instance_method(:initialize).parameters.any? { |type, name| type == :key && name == :name }
 
     included do
@@ -733,6 +734,18 @@ module GoodJob
     # @return [Boolean]
     def owns_advisory_lock?(key: lockable_key)
       self.class.owns_advisory_lock_key?(key)
+    end
+
+    # Tests whether +connection+ currently holds the advisory lock for this record.
+    # Checks both that the connection is still active and that the local bookkeeping
+    # records a lock acquired on it. Does not query the database.
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter, nil]
+    # @param key [String, Symbol] Advisory lock key to check
+    # @return [Boolean]
+    def advisory_lock_active_on?(connection, key: lockable_key)
+      return false unless connection&.active?
+
+      ADVISORY_LOCK_COUNTS.counts_for(connection, key).first.positive?
     end
 
     # Releases all advisory locks on the record that are held by the current
