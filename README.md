@@ -1716,7 +1716,7 @@ Note that GoodJob doesn't include WEBrick as a dependency, so you'll need to add
 gem 'webrick'
 ```
 
-If WEBrick is configured to be used, but the dependency is not found, GoodJob will log a warning and fallback to the default probe server.
+If WEBrick is configured to be used, but the dependency is not found, GoodJob will log a warning and fallback to the default probe server. This behavior is deprecated and will raise in the next release. An unsupported `probe_handler` value behaves the same way.
 
 ### Pausing Jobs
 

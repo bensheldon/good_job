@@ -33,6 +33,9 @@ rails_versions = {
 }
 gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", "8.1")]
 
+# json 3.0 changed behavior in ways that break transitive dependencies here.
+gem 'json', '< 3.0'
+
 # Ruby 4.0 has moved this gem to a bundled gem. Rails 6.1 doesn't declare it.
 install_if -> { ENV["RAILS_VERSION"] == "6.1" } do
   gem "benchmark"
