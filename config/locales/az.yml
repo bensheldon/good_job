@@ -280,8 +280,8 @@ az:
         updated: Yenilənib
     shared:
       boolean:
-        'false': 'Xeyr'
-        'true': 'Bəli'
+        'false': Xeyr
+        'true': Bəli
       error: Xəta
       filter:
         all: Hamısı
