@@ -99,7 +99,7 @@ RSpec.describe GoodJob::ProbeServer do
           ip_address = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address).first
           response = Net::HTTP.get_response(ip_address, "/", port)
 
-          expect(response["server"]).to match(/WEBrick/)
+          expect(response["server"]).to include('WEBrick')
 
           probe_server.stop
         end

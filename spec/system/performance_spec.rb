@@ -25,7 +25,7 @@ describe 'Performance Page', :js do
     visit good_job.root_path
     click_link 'Performance'
     expect(page).to have_css 'h2', text: 'Performance'
-    expect(page).to have_content 'ExampleJob'
+    expect(page).to have_text 'ExampleJob'
   end
 
   it 'can select and reload a chart range on the index' do
@@ -783,7 +783,7 @@ describe 'Performance Page', :js do
       chart_end: "2020-01-01T11:07:42Z"
     )
 
-    expect(page).to have_content("No executions in this time range.", count: 2)
+    expect(page).to have_text("No executions in this time range.", count: 2)
   end
 
   it 'preserves exact preset bounds and identity on show until reload establishes a fresh window' do

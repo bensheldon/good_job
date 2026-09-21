@@ -29,13 +29,13 @@ describe 'Cleaner Page', :js do
 
     visit '/good_job/cleaner'
 
-    expect(page).to have_content 'DeadError'
+    expect(page).to have_text 'DeadError'
 
     page.find('table#by-job-class tbody tr:first-child td:nth-child(2)').click_link '1'
 
     expect(page).to have_css 'h2', text: 'Jobs'
-    expect(page).to have_content 'Error: ExampleJob::DeadError'
+    expect(page).to have_text 'Error: ExampleJob::DeadError'
 
-    expect(find('#filter a.nav-link.active span')).to have_content '1'
+    expect(find('#filter a.nav-link.active span')).to have_text '1'
   end
 end

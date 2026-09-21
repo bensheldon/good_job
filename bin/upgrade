@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+
+# path to your application root.
+GEM_ROOT = File.expand_path('..', __dir__)
+APP_ROOT = File.expand_path('../demo', __dir__)
+# Resolve before any chdir so that re-execing works regardless of the invoking directory.
+SCRIPT_PATH = File.expand_path(__FILE__)
+
+# Platforms the lockfile must cover; see the same list in the Rakefile's release task.
+JRUBY_LOCK_PLATFORMS = %w[java ruby darwin linux aarch64-linux arm64-darwin x86_64-linux].freeze
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+def latest_mise_ruby(pattern)
+  `mise ls-remote ruby`
+    .lines
+    .map(&:strip)
+    .select { |version| version.match?(pattern) }
+    .last
+end
+
+# This script upgrades your development environment: Ruby, Rubygems/Bundler, and gem
+# dependencies. It is idempotent, so you can run it any time to catch up to the latest versions.
+
+FileUtils.chdir GEM_ROOT do
+  mise = system('which mise > /dev/null 2>&1')
+
+  if mise
+    puts "\n== Upgrading Ruby =="
+    latest_ruby = latest_mise_ruby(/\A\d+\.\d+\.\d+\z/)
+    raise "Could not determine latest Ruby version" unless latest_ruby
+
+    current_ruby = File.read('.ruby-version').strip
+    puts "Current: #{current_ruby}, Latest available: #{latest_ruby}"
+
+    if current_ruby == latest_ruby
+      puts "Ruby #{current_ruby} is already the latest stable version"
+    else
+      system!("mise install ruby@#{latest_ruby}")
+
+      File.write('.ruby-version', "#{latest_ruby}\n")
+      puts "Updated .ruby-version to #{latest_ruby}"
+
+      puts "\n== Re-executing bin/upgrade under Ruby #{latest_ruby} =="
+      exec('ruby', SCRIPT_PATH)
+    end
+  else
+    puts "\n== mise not found; skipping Ruby upgrade =="
+  end
+
+  puts "\n== Updating Rubygems and system Bundler =="
+  system! 'gem update --system'
+  system! 'gem update bundler'
+
+  puts "\n== Updating Gemfile.lock's bundler version =="
+  # `gem search` output looks like "bundler (2.7.2, 2.7.1, 2.7.0, ...)"
+  bundler_version = `gem search '^bundler$' --all`[/bundler \(([\d.]*),/, 1]
+  raise "Problem fetching bundler version" unless bundler_version
+
+  system!("bundle update --bundler #{bundler_version}")
+
+  puts "\n== Updating gem dependencies =="
+  system! 'bundle update --all'
+
+  # Bundler resolves the JRuby platform (and its gems, e.g. jdbc-postgres) out of the
+  # lockfile whenever it runs under MRI, so re-lock under JRuby to add them back.
+  if mise
+    puts "\n== Re-locking JRuby platforms =="
+    latest_jruby = latest_mise_ruby(/\Ajruby-\d+(\.\d+)+\z/)
+    raise "Could not determine latest JRuby version" unless latest_jruby
+
+    system!("mise install ruby@#{latest_jruby}")
+    add_platforms = JRUBY_LOCK_PLATFORMS.map { |platform| "--add-platform #{platform}" }.join(' ')
+    system!({ 'MISE_RUBY_VERSION' => latest_jruby }, "mise exec ruby -- bundle lock #{add_platforms}")
+  else
+    puts "\n== mise not found; skipping JRuby re-lock =="
+  end
+
+  puts "\n== Verifying Gemfile.lock =="
+  unless File.read('Gemfile.lock').include?('jdbc-postgres')
+    abort "\n== Gemfile.lock is missing JRuby's jdbc-postgres. It must be re-locked under JRuby; see the Rakefile's release task. =="
+  end
+end
+
+FileUtils.chdir APP_ROOT do
+  puts "\n== Preparing demo database =="
+  system! 'bin/rails db:prepare'
+end
+
+puts "\n== Done! Review changes to Gemfile.lock and .ruby-version before committing. =="

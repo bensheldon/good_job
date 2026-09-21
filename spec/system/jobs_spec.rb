@@ -9,21 +9,21 @@ describe 'Jobs', :js, :without_executor do
 
   it 'renders chart js' do
     visit good_job.jobs_path
-    expect(page).to have_content 'GoodJob 👍'
+    expect(page).to have_text 'GoodJob 👍'
   end
 
   it 'renders each top-level page successfully' do
     visit good_job.jobs_path
-    expect(page).to have_content 'GoodJob 👍'
+    expect(page).to have_text 'GoodJob 👍'
 
     click_link "Jobs"
-    expect(page).to have_content 'GoodJob 👍'
+    expect(page).to have_text 'GoodJob 👍'
 
     click_link "Cron"
-    expect(page).to have_content 'GoodJob 👍'
+    expect(page).to have_text 'GoodJob 👍'
 
     click_link "Processes"
-    expect(page).to have_content 'GoodJob 👍'
+    expect(page).to have_text 'GoodJob 👍'
   end
 
   describe 'Jobs' do
@@ -62,7 +62,7 @@ describe 'Jobs', :js, :without_executor do
 
         table = page.find("[role=table]")
         expect(table).to have_css("[role=row]", count: 1)
-        expect(table).to have_content(foo_queue_job.job_id)
+        expect(table).to have_text(foo_queue_job.job_id)
       end
 
       it "can filter by state" do
@@ -77,7 +77,7 @@ describe 'Jobs', :js, :without_executor do
 
         expect(page).to have_css("[role=table] [role=row]", count: 2)
         within("[role=table]") do
-          expect(page).to have_content(foo_queue_job.job_id)
+          expect(page).to have_text(foo_queue_job.job_id)
         end
       end
 
@@ -90,7 +90,7 @@ describe 'Jobs', :js, :without_executor do
 
         expect(page).to have_css("[role=table] [role=row]", count: 1)
         within("[role=table]") do
-          expect(page).to have_content(foo_queue_job.job_id)
+          expect(page).to have_text(foo_queue_job.job_id)
         end
       end
 
@@ -104,10 +104,10 @@ describe 'Jobs', :js, :without_executor do
         select "mice", from: "job_queue_filter"
         expect(page).to have_current_path(/queue_name=mice&job_class=ConfigurableQueueJob/)
 
-        expect(page).to have_content("No jobs found.")
+        expect(page).to have_text("No jobs found.")
 
         select "foo", from: "job_queue_filter"
-        expect(page).to have_content(foo_queue_job.job_id)
+        expect(page).to have_text(foo_queue_job.job_id)
       end
 
       it 'can search by argument' do
@@ -135,7 +135,7 @@ describe 'Jobs', :js, :without_executor do
 
         table = page.find("[role=table]")
         expect(table).to have_css("[role=row]", count: 1)
-        expect(table).to have_content(labeled_job.job_id)
+        expect(table).to have_text(labeled_job.job_id)
       end
 
       it "can filter by label via badge link" do
@@ -153,7 +153,7 @@ describe 'Jobs', :js, :without_executor do
 
         table = page.find("[role=table]")
         expect(table).to have_css("[role=row]", count: 1)
-        expect(table).to have_content(labeled_job.job_id)
+        expect(table).to have_text(labeled_job.job_id)
       end
 
       it "renders long labels truncated with a tooltip showing the full label" do
@@ -177,7 +177,7 @@ describe 'Jobs', :js, :without_executor do
           click_button 'Actions'
           accept_confirm { click_on 'Retry job' }
         end
-        expect(page).to have_content "Job has been retried"
+        expect(page).to have_text "Job has been retried"
       end.to change { discarded_job.reload.status }.from(:discarded).to(:queued)
     end
 
@@ -190,7 +190,7 @@ describe 'Jobs', :js, :without_executor do
           click_button 'Actions'
           accept_confirm { click_on 'Discard job' }
         end
-        expect(page).to have_content :all, "Job has been discarded"
+        expect(page).to have_text :all, "Job has been discarded"
       end.to change { unfinished_job.reload.finished_at }.from(nil).to within(1.second).of(Time.current)
     end
 
@@ -205,7 +205,7 @@ describe 'Jobs', :js, :without_executor do
           click_button 'Actions'
           accept_confirm { click_on 'Force discard' }
         end
-        expect(page).to have_content :all, "Job has been force discarded"
+        expect(page).to have_text :all, "Job has been force discarded"
       end.to change { unfinished_job.reload.finished_at }.from(nil).to within(1.second).of(Time.current)
     end
 
@@ -217,7 +217,7 @@ describe 'Jobs', :js, :without_executor do
         click_button 'Actions'
         accept_confirm { click_on 'Destroy job' }
       end
-      expect(page).to have_content "Job has been destroyed"
+      expect(page).to have_text "Job has been destroyed"
       expect { discarded_job.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
