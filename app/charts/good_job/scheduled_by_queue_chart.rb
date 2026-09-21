@@ -17,8 +17,8 @@ module GoodJob
       # offset from UTC (e.g. IST +05:30). AR serializes Time binds as UTC, so the outer
       # date_trunc operates in UTC, and this predicate must match that.
       pushdown = <<~SQL.squish
-        "#{GoodJob::Job.table_name}"."scheduled_at" >= date_trunc('hour', ?::timestamp)
-        AND "#{GoodJob::Job.table_name}"."scheduled_at" < date_trunc('hour', ?::timestamp) + interval '1 hour'
+        #{GoodJob::Job.quoted_table_name}."scheduled_at" >= date_trunc('hour', ?::timestamp)
+        AND #{GoodJob::Job.quoted_table_name}."scheduled_at" < date_trunc('hour', ?::timestamp) + interval '1 hour'
       SQL
 
       inner_sql = @filter.filtered_query

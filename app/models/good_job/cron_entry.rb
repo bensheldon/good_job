@@ -37,8 +37,8 @@ module GoodJob # :nodoc:
 
       join_clause = <<~SQL.squish
         CROSS JOIN LATERAL (
-          SELECT * FROM #{GoodJob::Job.table_name}
-          WHERE #{GoodJob::Job.table_name}.cron_key = cron_keys.cron_key
+          SELECT * FROM #{GoodJob::Job.quoted_table_name}
+          WHERE #{GoodJob::Job.quoted_table_name}.cron_key = cron_keys.cron_key
           ORDER BY cron_at DESC NULLS LAST
           LIMIT 1
         ) AS lateral_jobs
