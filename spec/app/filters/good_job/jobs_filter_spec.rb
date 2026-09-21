@@ -77,6 +77,14 @@ RSpec.describe GoodJob::JobsFilter do
       expect(filter.records.size).to eq 5
     end
 
+    it 'reuses the same relation for rendering and pagination' do
+      records = filter.records.load
+      filter.records.present?
+      filter.next_page_params
+
+      expect(filter.records).to equal(records)
+    end
+
     context 'when filtered by state' do
       before do
         params[:state] = 'running'
