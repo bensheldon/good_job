@@ -1,0 +1,12 @@
+# frozen_string_literal: true
+
+class AddIndexGoodJobExecutionsOnScheduledAt < ActiveRecord::Migration<%= migration_version %>
+  disable_ddl_transaction!
+
+  def change
+    add_index :good_job_executions, :scheduled_at,
+      name: :index_good_job_executions_on_scheduled_at,
+      algorithm: :concurrently,
+      if_not_exists: true
+  end
+end
