@@ -234,15 +234,28 @@ es:
         value: Valor
     performance:
       index:
-        average_duration: Duración promedio
-        chart_title: Tiempo total de ejecución del trabajo en segundos
+        chart_title: Latencia de ejecución total en segundos
+        chart_title_queue: Latencia en cola promedio en segundos
+        chart_title_total: Latencia total promedio en segundos
+        execution_latency: Latencia de ejecución
         executions: Ejecuciones
         job_class: Clase de trabajo
-        maximum_duration: Duración máxima
-        minimum_duration: Duración mínima
+        jobs: Trabajos
         no_executions: No hay ejecuciones en este intervalo de tiempo.
+        queue_latency: Latencia en cola
         queue_name: Nombre de la cola
         title: Rendimiento
+        total_latency: Latencia total
+      latency:
+        average: prom
+        maximum: máx
+        minimum: mín
+      metric:
+        chart_metric: Métrica del gráfico
+        metric_options:
+          execution: Latencia de ejecución
+          queue: Latencia en cola
+          total: Latencia total
       range:
         bucket_size:
           days: "%{count}d"
@@ -267,8 +280,11 @@ es:
         time_range: Intervalo de tiempo de rendimiento
         time_zone: 'Zona horaria:'
       show:
+        execution_chart_title: Latencia de ejecución
+        queue_chart_title: Latencia en cola
         slow: Lento
         title: Rendimiento
+        total_chart_title: Latencia total
     processes:
       index:
         cron_enabled: Cron habilitado

@@ -88,6 +88,11 @@
   min-width: 14rem;
 }
 
+/* Grid cells default to min-width:auto, so a wide header label would grow its column instead of wrapping. */
+.performance-row > * {
+  min-width: 0;
+}
+
 .performance-name {
   overflow-wrap: anywhere;
   white-space: normal;

@@ -260,15 +260,28 @@ ru:
         value: Значение
     performance:
       index:
-        average_duration: Средняя продолжительность
-        chart_title: Общее время выполнения в секундах
+        chart_title: Суммарная задержка выполнения в секундах
+        chart_title_queue: Средняя задержка в очереди в секундах
+        chart_title_total: Средняя общая задержка в секундах
+        execution_latency: Задержка выполнения
         executions: Выполнения
         job_class: Класс задачи
-        maximum_duration: Максимальная продолжительность
-        minimum_duration: Минимальная продолжительность
+        jobs: Задачи
         no_executions: Нет выполнений за этот период.
+        queue_latency: Задержка в очереди
         queue_name: Название очереди
         title: Производительность
+        total_latency: Общая задержка
+      latency:
+        average: сред
+        maximum: макс
+        minimum: мин
+      metric:
+        chart_metric: Метрика графика
+        metric_options:
+          execution: Задержка выполнения
+          queue: Задержка в очереди
+          total: Общая задержка
       range:
         bucket_size:
           days: "%{count} д"
@@ -293,8 +306,11 @@ ru:
         time_range: Диапазон времени производительности
         time_zone: 'Часовой пояс:'
       show:
+        execution_chart_title: Задержка выполнения
+        queue_chart_title: Задержка в очереди
         slow: Медленно
         title: Производительность
+        total_chart_title: Общая задержка
     processes:
       index:
         cron_enabled: Cron включен

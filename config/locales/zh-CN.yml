@@ -234,15 +234,28 @@ zh-CN:
         value: 值
     performance:
       index:
-        average_duration: 平均时长
-        chart_title: 任务总执行时间（秒）
+        chart_title: 任务执行延迟总和（秒）
+        chart_title_queue: 任务平均排队延迟（秒）
+        chart_title_total: 任务平均总延迟（秒）
+        execution_latency: 执行延迟
         executions: 执行次数
         job_class: 任务 Class
-        maximum_duration: 最大时长
-        minimum_duration: 最小时长
+        jobs: 任务数
         no_executions: 此时间范围内没有执行记录。
+        queue_latency: 排队延迟
         queue_name: 队列名称
         title: 性能
+        total_latency: 总延迟
+      latency:
+        average: 平均
+        maximum: 最大
+        minimum: 最小
+      metric:
+        chart_metric: 图表指标
+        metric_options:
+          execution: 执行延迟
+          queue: 排队延迟
+          total: 总延迟
       range:
         bucket_size:
           days: "%{count}天"
@@ -267,8 +280,11 @@ zh-CN:
         time_range: 性能时间范围
         time_zone: 时区：
       show:
+        execution_chart_title: 执行延迟
+        queue_chart_title: 排队延迟
         slow: 慢
         title: 性能
+        total_chart_title: 总延迟
     processes:
       index:
         cron_enabled: 定时任务已启用
