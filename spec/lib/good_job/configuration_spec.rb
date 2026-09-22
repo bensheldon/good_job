@@ -384,4 +384,107 @@ RSpec.describe GoodJob::Configuration do
       end
     end
   end
+
+  describe '#subprocesses' do
+    it 'defaults to 0' do
+      configuration = described_class.new({})
+      expect(configuration.subprocesses).to eq 0
+    end
+
+    context 'when option is given' do
+      it 'uses the option value' do
+        configuration = described_class.new({ subprocesses: 3 })
+        expect(configuration.subprocesses).to eq 3
+      end
+    end
+
+    context 'when rails config is set' do
+      it 'uses rails config value' do
+        allow(Rails.application.config).to receive(:good_job).and_return({ subprocesses: 2 })
+        configuration = described_class.new({})
+        expect(configuration.subprocesses).to eq 2
+      end
+    end
+
+    context 'when environment variable is set' do
+      it 'uses environment variable' do
+        stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_SUBPROCESSES' => '4' })
+        configuration = described_class.new({})
+        expect(configuration.subprocesses).to eq 4
+      end
+    end
+  end
+
+  describe '#cluster?' do
+    it 'is false when subprocesses is 0' do
+      configuration = described_class.new({ subprocesses: 0 })
+      expect(configuration.cluster?).to be false
+    end
+
+    context 'when subprocesses is positive' do
+      it 'is true when the platform supports fork' do
+        allow(Process).to receive(:respond_to?).and_call_original
+        allow(Process).to receive(:respond_to?).with(:fork).and_return(true)
+        configuration = described_class.new({ subprocesses: 1 })
+        expect(configuration.cluster?).to be true
+      end
+
+      it 'is false when the platform does not support fork' do
+        allow(Process).to receive(:respond_to?).and_call_original
+        allow(Process).to receive(:respond_to?).with(:fork).and_return(false)
+        configuration = described_class.new({ subprocesses: 2 })
+        expect(configuration.cluster?).to be false
+      end
+    end
+
+    context 'when the queue string has pipe-delimited pools' do
+      it 'derives the count from the number of pools' do
+        configuration = described_class.new({ queues: 'elephant:2|mice:3' })
+        expect(configuration.subprocesses).to eq(2)
+      end
+
+      it 'enables cluster mode even without a configured count' do
+        allow(Process).to receive(:respond_to?).and_call_original
+        allow(Process).to receive(:respond_to?).with(:fork).and_return(true)
+        configuration = described_class.new({ queues: 'elephant|mice' })
+        expect(configuration.cluster?).to be true
+      end
+    end
+  end
+
+  describe '#subprocess_configs' do
+    it 'returns one identical configuration per subprocess for a homogeneous queue string' do
+      configuration = described_class.new({ subprocesses: 3, queues: 'default,-mailers' })
+      configs = configuration.subprocess_configs
+
+      expect(configs.size).to eq(3)
+      expect(configs.map(&:queue_string)).to all(eq('default,-mailers'))
+    end
+
+    it 'returns one configuration per pipe-delimited pool' do
+      configuration = described_class.new({ queues: 'elephant:2|mice:3' })
+
+      expect(configuration.subprocess_configs.map(&:queue_string)).to eq(['elephant:2', 'mice:3'])
+    end
+
+    it 'warns and ignores the configured count when pipe-delimited pools are given' do
+      allow(GoodJob.logger).to receive(:warn)
+      configuration = described_class.new({ subprocesses: 5, queues: 'elephant|mice' })
+
+      expect(configuration.subprocess_configs.size).to eq(2)
+      expect(GoodJob.logger).to have_received(:warn).with(/ignored/)
+    end
+  end
+
+  describe '#flattened_queue_string' do
+    it 'rewrites pipe-delimited subprocess pools as semicolon-delimited scheduler groups' do
+      configuration = described_class.new({ queues: 'elephant:2 | mice:3' })
+      expect(configuration.flattened_queue_string).to eq('elephant:2;mice:3')
+    end
+
+    it 'is unchanged when there are no pipe-delimited pools' do
+      configuration = described_class.new({ queues: 'default,-mailers:2;mice:3' })
+      expect(configuration.flattened_queue_string).to eq('default,-mailers:2;mice:3')
+    end
+  end
 end

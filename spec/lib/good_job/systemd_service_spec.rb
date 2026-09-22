@@ -62,6 +62,34 @@ RSpec.describe GoodJob::SystemdService, :skip_if_java do
     expect(block_ran).to be(true)
   end
 
+  describe '#stopping' do
+    it 'notifies systemd that shutdown has begun while leaving the watchdog running' do
+      stub_const('ENV', ENV.to_hash.merge({ 'WATCHDOG_USEC' => '500000' }))
+
+      systemd = described_class.new
+      systemd.start
+      systemd_socket.read
+
+      systemd.stopping
+
+      expect(systemd_socket.read).to eq('STOPPING=1')
+      expect(systemd.notifying?).to be(true)
+
+      systemd.stop
+    end
+
+    it 'notifies systemd only once, even when #stop follows' do
+      allow(GoodJob::SdNotify).to receive(:stopping).and_call_original
+
+      systemd = described_class.new
+      systemd.stopping
+      systemd.stop
+
+      expect(GoodJob::SdNotify).to have_received(:stopping).once
+      expect(systemd_socket.read).to eq('STOPPING=1')
+    end
+  end
+
   it 'sends watchdog notifications when configured' do
     stub_const('ENV', ENV.to_hash.merge({ 'WATCHDOG_USEC' => '500000' }))
 

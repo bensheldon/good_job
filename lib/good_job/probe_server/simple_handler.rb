@@ -18,8 +18,22 @@ module GoodJob
         @server&.close
       end
 
+      # Closes this process's copy of the socket, for a process that inherited it across a fork.
+      def close_socket
+        @server&.close
+      end
+
       def running?
         @running.true?
+      end
+
+      # Binds the listening socket, before the thread that serves it is started, so
+      # that a process forking afterwards can reliably close its inherited copy.
+      def listen
+        @server = TCPServer.new('0.0.0.0', @port)
+        @running.make_true
+      rescue StandardError => e
+        @logger.error "Failed to start server: #{e}"
       end
 
       def build_future
@@ -29,20 +43,11 @@ module GoodJob
       private
 
       def run
-        @running.make_true
-        start_server
         handle_connections if @running.true?
       rescue StandardError => e
         @logger.error "Server encountered an error: #{e.class} - #{e}"
       ensure
         stop
-      end
-
-      def start_server
-        @server = TCPServer.new('0.0.0.0', @port)
-      rescue StandardError => e
-        @logger.error "Failed to start server: #{e}"
-        @running.make_false
       end
 
       def handle_connections
