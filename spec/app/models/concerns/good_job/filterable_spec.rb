@@ -49,6 +49,32 @@ RSpec.describe GoodJob::Filterable do
       expect(model_class.search_text('ExampleJob::ExampleError')).to include(job)
     end
 
+    it 'searches hyphenated argument values' do
+      job_with_ref = model_class.create!(
+        active_job_id: SecureRandom.uuid,
+        queue_name: "default",
+        job_class: "ExampleJob",
+        scheduled_at: Time.current,
+        serialized_params: { arguments: [{ "ad_ref" => "A-1012679" }] }
+      )
+
+      expect(model_class.search_text('A-1012679')).to include(job_with_ref)
+    end
+
+    it 'searches uri-like argument values and their parts' do
+      gid = "gid://supply-side-platform/Orders::Types::ReservationLineItem/rli_Dd2LpagvXuqaZNAZt4yu"
+      job_with_gid = model_class.create!(
+        active_job_id: SecureRandom.uuid,
+        queue_name: "default",
+        job_class: "ExampleJob",
+        scheduled_at: Time.current,
+        serialized_params: { arguments: [{ "line_item_gid" => gid }] }
+      )
+
+      expect(model_class.search_text(gid)).to include(job_with_gid)
+      expect(model_class.search_text('rli_Dd2LpagvXuqaZNAZt4yu')).to include(job_with_gid)
+    end
+
     it 'filters out non-matching records' do
       expect(model_class.search_text('ghost')).to be_empty
     end

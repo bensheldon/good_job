@@ -70,6 +70,10 @@ module GoodJob
         next if query.blank?
 
         # TODO: turn this into proper bind parameters in Arel
+        # The 'simple' vector normalizes punctuation to spaces so that compound
+        # tokens (uuids, "gid://..." strings, hyphenated values) decompose into
+        # the same terms the normalized query produces, complementing the
+        # stemmed 'english' vector.
         tsvector = <<~SQL.squish
           (
             to_tsvector('english', id::text) ||
@@ -77,12 +81,24 @@ module GoodJob
             to_tsvector('english', serialized_params) ||
             to_tsvector('english', COALESCE(LEFT(serialized_params->>'arguments', #{MAX_SEARCH_COLUMN_CHARS}), '')) ||
             to_tsvector('english', COALESCE(LEFT(error, #{MAX_SEARCH_COLUMN_CHARS}), '')) ||
-            to_tsvector('english', COALESCE(array_to_string(labels, ' '), ''))
+            to_tsvector('english', COALESCE(array_to_string(labels, ' '), '')) ||
+            to_tsvector('simple', regexp_replace(id::text, '[^[:alnum:]]+', ' ', 'g')) ||
+            to_tsvector('simple', COALESCE(regexp_replace(active_job_id::text, '[^[:alnum:]]+', ' ', 'g'), '')) ||
+            to_tsvector('simple', regexp_replace(serialized_params::text, '[^[:alnum:]]+', ' ', 'g')) ||
+            to_tsvector('simple', COALESCE(regexp_replace(LEFT(serialized_params->>'arguments', #{MAX_SEARCH_COLUMN_CHARS}), '[^[:alnum:]]+', ' ', 'g'), '')) ||
+            to_tsvector('simple', COALESCE(regexp_replace(LEFT(error, #{MAX_SEARCH_COLUMN_CHARS}), '[^[:alnum:]]+', ' ', 'g'), '')) ||
+            to_tsvector('simple', COALESCE(regexp_replace(array_to_string(labels, ' '), '[^[:alnum:]]+', ' ', 'g'), ''))
           )
         SQL
         to_tsquery_function = database_supports_websearch_to_tsquery? ? 'websearch_to_tsquery' : 'plainto_tsquery'
-        where("#{tsvector} @@ #{to_tsquery_function}('english', CAST(? AS text))", query)
-          .order(sanitize_sql_for_order([Arel.sql("ts_rank(#{tsvector}, #{to_tsquery_function}('english', CAST(? AS text)))"), query]) => 'DESC')
+        tsquery = <<~SQL.squish
+          (
+            #{to_tsquery_function}('english', CAST(? AS text)) ||
+            #{to_tsquery_function}('simple', regexp_replace(CAST(? AS text), '[^[:alnum:]]+', ' ', 'g'))
+          )
+        SQL
+        where("#{tsvector} @@ #{tsquery}", query, query)
+          .order(sanitize_sql_for_order([Arel.sql("ts_rank(#{tsvector}, #{tsquery})"), query, query]) => 'DESC')
       end)
     end
 
