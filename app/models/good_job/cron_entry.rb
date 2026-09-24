@@ -60,6 +60,8 @@ module GoodJob # :nodoc:
     def initialize(params = {})
       @params = params
 
+      raise ArgumentError, "Cron entry key must be a Symbol: #{params[:key].inspect}" unless params[:key].is_a?(Symbol)
+
       return if cron_proc?
       raise ArgumentError, "Invalid cron format: '#{cron}'" unless fugit.instance_of?(Fugit::Cron)
     end

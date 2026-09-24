@@ -7,7 +7,7 @@ describe GoodJob::CronEntry do
 
   let(:params) do
     {
-      key: 'test',
+      key: :test,
       cron: "* * * * *",
       class: "TestJob",
       args: [42],
@@ -28,6 +28,10 @@ describe GoodJob::CronEntry do
   describe '#initialize' do
     it 'raises an argument error if cron does not parse to a Fugit::Cron instance' do
       expect { described_class.new(cron: '2017-12-12') }.to raise_error(ArgumentError)
+    end
+
+    it 'raises an argument error if the key is not a Symbol' do
+      expect { described_class.new(params.merge(key: 'test')) }.to raise_error(ArgumentError, /must be a Symbol/)
     end
   end
 
@@ -98,7 +102,7 @@ describe GoodJob::CronEntry do
 
   describe '#key' do
     it 'returns the cron key' do
-      expect(entry.key).to eq('test')
+      expect(entry.key).to eq(:test)
     end
   end
 
@@ -169,12 +173,12 @@ describe GoodJob::CronEntry do
     end
 
     it 'returns the cron expression for a schedule parsed using natual language' do
-      entry = described_class.new(cron: 'every weekday at five')
+      entry = described_class.new(key: :test, cron: 'every weekday at five')
       expect(entry.display_schedule).to eq('0 5 * * 1-5')
     end
 
     it 'generates a schedule provided via a block' do
-      entry = described_class.new(cron: ->(last_run) {})
+      entry = described_class.new(key: :test, cron: ->(last_run) {})
       expect(entry.display_schedule).to eq('Lambda/Callable')
     end
   end
@@ -268,7 +272,7 @@ describe GoodJob::CronEntry do
   describe '#display_properties' do
     let(:params) do
       {
-        key: 'test',
+        key: :test,
         cron: "* * * * *",
         class: "TestJob",
         args: [42, { name: "Alice" }],
@@ -279,7 +283,7 @@ describe GoodJob::CronEntry do
 
     it 'returns a hash of properties' do
       expect(entry.display_properties).to eq({
-                                               key: 'test',
+                                               key: :test,
         cron: "* * * * *",
         class: "TestJob",
         args: [42, { name: "Alice" }],
