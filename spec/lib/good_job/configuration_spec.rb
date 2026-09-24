@@ -384,4 +384,35 @@ RSpec.describe GoodJob::Configuration do
       end
     end
   end
+
+  describe '#in_webserver?' do
+    let(:configuration) { described_class.new({}) }
+
+    before { configuration.instance_variable_set(:@_in_webserver, nil) }
+
+    it 'is true when called from a puma cluster worker boot hook' do
+      allow(configuration).to receive(:caller).and_return([
+                                                            "/opt/gems/puma-6.4.3/lib/puma/cluster/worker.rb:57:in `run'",
+                                                            "/opt/gems/puma-6.4.3/lib/puma/cluster.rb:216:in `worker'",
+                                                            "/opt/gems/puma-6.4.3/lib/puma/launcher.rb:194:in `run'",
+                                                          ])
+
+      expect(configuration.in_webserver?).to be true
+    end
+
+    it 'is true when called from the puma launcher alone' do
+      allow(configuration).to receive(:caller).and_return([
+                                                            "/opt/gems/puma-6.4.3/lib/puma/launcher.rb:194:in `run'",
+                                                            "/opt/gems/puma-6.4.3/lib/puma/cli.rb:75:in `launcher'",
+                                                          ])
+
+      expect(configuration.in_webserver?).to be true
+    end
+
+    it 'is false outside a webserver' do
+      allow(configuration).to receive(:caller).and_return(["/app/bin/rails:5:in `<main>'"])
+
+      expect(configuration.in_webserver?).to be false
+    end
+  end
 end
