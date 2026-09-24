@@ -957,11 +957,24 @@ module GoodJob
       job_error = GoodJob::Job::DiscardJobError.new(message)
 
       update_record = proc do
-        update(
-          finished_at: Time.current,
-          error: self.class.format_error(job_error),
-          error_event: :discarded
-        )
+        now = Time.current
+        error = self.class.format_error(job_error)
+
+        transaction do
+          update(
+            finished_at: now,
+            error: error,
+            error_event: :discarded
+          )
+          executions.where(finished_at: nil).find_each do |execution|
+            execution.update!(
+              finished_at: now,
+              error: error,
+              error_event: :discarded,
+              duration: (now - execution.created_at).seconds
+            )
+          end
+        end
       end
 
       if active_job.respond_to?(:instrument)
