@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+
+class AddIndexGoodJobsDequeueByQueue < ActiveRecord::Migration<%= migration_version %>
+  disable_ddl_transaction!
+
+  def change
+    add_index :good_jobs, [:queue_name, :priority, :created_at],
+      name: :index_good_jobs_dequeue_by_queue,
+      order: { priority: "ASC NULLS LAST", created_at: :asc },
+      where: "finished_at IS NULL AND locked_by_id IS NULL",
+      algorithm: :concurrently,
+      if_not_exists: true
+  end
+end
