@@ -56,7 +56,20 @@ export default class extends Controller {
       const regionName = newElement.getAttribute('data-live-poll-region')
       const originalElement = document.querySelector(`[data-live-poll-region="${regionName}"]`)
       if (originalElement) {
-        originalElement.replaceWith(newElement)
+        this.#restoreTabs(originalElement, newElement)
+      }
+    })
+  }
+
+  // Re-select any Bootstrap tabs that were active before a region is replaced
+  #restoreTabs(originalElement, newElement) {
+    const activeTargets = [...originalElement.querySelectorAll('.nav-link.active[data-bs-toggle]')]
+      .map((tab) => tab.getAttribute('data-bs-target') || tab.getAttribute('href'))
+    originalElement.replaceWith(newElement)
+    activeTargets.forEach((target) => {
+      const newTab = newElement.querySelector(`[data-bs-target="${target}"], [href="${target}"]`)
+      if (newTab) {
+        bootstrap.Tab.getOrCreateInstance(newTab).show()
       }
     })
   }
