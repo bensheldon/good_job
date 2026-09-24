@@ -173,7 +173,7 @@ module GoodJob # :nodoc:
 
       delay ||= task_interval
       @refresh_task = Concurrent::ScheduledTask.new(delay.to_f, executor: @executor) do
-        Rails.application.executor.wrap do
+        Rails.application.reloader.wrap do
           synchronize do
             next unless @locks.positive?
 

@@ -101,7 +101,7 @@ module GoodJob # :nodoc:
           # Re-schedule the next cron task before executing the current task
           thr_manager.create_task(thr_cron_entry, previously_at: thr_cron_at)
 
-          Rails.application.executor.wrap do
+          Rails.application.reloader.wrap do
             cron_entry.enqueue(thr_cron_at) if thr_cron_entry.enabled?
           end
         end
@@ -121,7 +121,7 @@ module GoodJob # :nodoc:
       time_period = @graceful_restart_period.ago..Time.current
       cron_entry.within(time_period).each do |cron_at|
         future = Concurrent::Future.new(args: [self, cron_entry, cron_at], executor: @executor) do |_thr_manager, thr_cron_entry, thr_cron_at|
-          Rails.application.executor.wrap do
+          Rails.application.reloader.wrap do
             cron_entry.enqueue(thr_cron_at) if thr_cron_entry.enabled?
           end
         end

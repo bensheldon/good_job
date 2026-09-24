@@ -227,7 +227,7 @@ module GoodJob # :nodoc:
       return if @max_cache.zero?
 
       future = Concurrent::Future.new(args: [self, @performer], executor: executor) do |thr_scheduler, thr_performer|
-        Rails.application.executor.wrap do
+        Rails.application.reloader.wrap do
           thr_performer.next_at(
             limit: @max_cache,
             now_limit: @executor_options[:max_threads]
@@ -251,7 +251,7 @@ module GoodJob # :nodoc:
       @cleanup_tracker.reset
 
       future = Concurrent::Future.new(args: [self, @performer], executor: executor) do |_thr_scheduler, thr_performer|
-        Rails.application.executor.wrap do
+        Rails.application.reloader.wrap do
           thr_performer.cleanup
         end
       end
