@@ -19,6 +19,8 @@ module GoodJob # :nodoc:
       set: Hash,
     }.freeze
 
+    validate :validate_cron_key
+    validate :validate_cron_schedule
     validate :validate_job_class
     validate :validate_value_types
 
@@ -59,20 +61,17 @@ module GoodJob # :nodoc:
 
     def initialize(params = {})
       @params = params
-
-      return if cron_proc?
-      raise ArgumentError, "Invalid cron format: '#{cron}'" unless fugit.instance_of?(Fugit::Cron)
     end
 
     def key
-      params.fetch(:key)
+      params[:key]
     end
 
     alias id key
     alias to_param key
 
     def job_class
-      params.fetch(:class)
+      params[:class]
     end
 
     def set
@@ -95,12 +94,12 @@ module GoodJob # :nodoc:
       if cron_proc?
         result = Rails.application.executor.wrap { cron.call(previously_at || last_job_at) }
         if result.is_a?(String)
-          Fugit.parse(result).next_time.to_t
+          parse_cron_string(result)&.next_time&.to_t
         else
           result
         end
       else
-        fugit.next_time.to_t
+        fugit&.next_time&.to_t
       end
     end
 
@@ -108,12 +107,12 @@ module GoodJob # :nodoc:
       if cron_proc?
         result = Rails.application.executor.wrap { cron.call(previously_at || last_job_at) }
         if result.is_a?(String)
-          Fugit.parse(result).within(period).map(&:to_t)
+          parse_cron_string(result)&.within(period)&.map(&:to_t) || []
         else
           result
         end
       else
-        fugit.within(period).map(&:to_t)
+        fugit&.within(period)&.map(&:to_t) || []
       end
     end
 
@@ -159,7 +158,7 @@ module GoodJob # :nodoc:
     end
 
     def display_schedule
-      cron_proc? ? display_property(cron) : fugit.original
+      fugit ? fugit.original : display_property(cron)
     end
 
     def jobs
@@ -182,6 +181,17 @@ module GoodJob # :nodoc:
     end
 
     private
+
+    def validate_cron_key
+      errors.add(:key, "must be a Symbol") unless key.is_a?(Symbol)
+    end
+
+    def validate_cron_schedule
+      return if cron_proc?
+      return if fugit.instance_of?(Fugit::Cron)
+
+      errors.add(:cron, "'#{cron}' is not a valid schedule")
+    end
 
     def validate_job_class
       return if job_class.blank? || job_class.is_a?(Class) || job_class.respond_to?(:call)
@@ -206,7 +216,7 @@ module GoodJob # :nodoc:
     end
 
     def cron
-      params.fetch(:cron)
+      params[:cron]
     end
 
     def cron_proc?
@@ -214,7 +224,25 @@ module GoodJob # :nodoc:
     end
 
     def fugit
-      @_fugit ||= Fugit.parse(cron)
+      @_fugit ||= parse_schedule(cron)
+    end
+
+    # Parses strictly so Fugit's natural language parser cannot turn nonsense
+    # into a misleading schedule (e.g. "every 5 hours" becomes "0 */5 * * *",
+    # running five times a day rather than every five hours).
+    def parse_schedule(schedule)
+      Fugit.parse(schedule, strict: true)
+    rescue NoMethodError => e
+      # Fugit::Nat#restrict calls Integer#match on non-interval slots; in that
+      # case there is nothing to reject and the lenient parse is equivalent.
+      raise unless e.name == :match && e.receiver.is_a?(Integer)
+
+      Fugit.parse(schedule)
+    end
+
+    def parse_cron_string(string)
+      schedule = parse_schedule(string)
+      schedule if schedule.instance_of?(Fugit::Cron)
     end
 
     def job_class_value

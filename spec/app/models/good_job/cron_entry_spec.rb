@@ -7,7 +7,7 @@ describe GoodJob::CronEntry do
 
   let(:params) do
     {
-      key: 'test',
+      key: :test,
       cron: "* * * * *",
       class: "TestJob",
       args: [42],
@@ -25,15 +25,31 @@ describe GoodJob::CronEntry do
     end)
   end
 
-  describe '#initialize' do
-    it 'raises an argument error if cron does not parse to a Fugit::Cron instance' do
-      expect { described_class.new(cron: '2017-12-12') }.to raise_error(ArgumentError)
-    end
-  end
-
   describe '#valid?' do
     it 'is valid when the class exists' do
       expect(entry).to be_valid
+    end
+
+    it 'is invalid when cron does not parse to a Fugit::Cron instance' do
+      entry = described_class.new(params.merge(cron: '2017-12-12'))
+      expect(entry).not_to be_valid
+      expect(entry.errors[:cron]).to include("'2017-12-12' is not a valid schedule")
+    end
+
+    it 'is invalid when natural language would produce a misleading schedule' do
+      entry = described_class.new(params.merge(cron: 'every 5 hours'))
+      expect(entry).not_to be_valid
+    end
+
+    it 'is valid for unambiguous natural language schedules' do
+      entry = described_class.new(params.merge(cron: 'every day at noon'))
+      expect(entry).to be_valid
+    end
+
+    it 'is invalid when the key is not a Symbol' do
+      entry = described_class.new(params.merge(key: 'test'))
+      expect(entry).not_to be_valid
+      expect(entry.errors[:key]).to include("must be a Symbol")
     end
 
     it 'is valid when the class is a Class' do
@@ -98,13 +114,19 @@ describe GoodJob::CronEntry do
 
   describe '#key' do
     it 'returns the cron key' do
-      expect(entry.key).to eq('test')
+      expect(entry.key).to eq(:test)
     end
   end
 
   describe '#next_at' do
     it 'returns a timestamp of the next time to run' do
       expect(entry.next_at).to eq(Time.current.at_beginning_of_minute + 1.minute)
+    end
+
+    it 'returns nil when the cron schedule is invalid' do
+      entry = described_class.new(params.merge(cron: 'not a schedule'))
+
+      expect(entry.next_at).to be_nil
     end
 
     context 'when the cron is a proc' do
@@ -116,12 +138,26 @@ describe GoodJob::CronEntry do
         expect(entry.next_at).to eq time_at
         expect(my_proc).to have_received(:call).with(nil)
       end
+
+      context 'when the proc returns a misleading natural language schedule' do
+        let(:my_proc) { proc { 'every 5 hours' } }
+
+        it 'returns nil' do
+          expect(entry.next_at).to be_nil
+        end
+      end
     end
   end
 
   describe '#within' do
     it 'returns an array of timestamps for the time period' do
       expect(entry.within(2.minutes.ago..Time.current)).to eq([Time.current.at_beginning_of_minute - 1.minute, Time.current.at_beginning_of_minute])
+    end
+
+    it 'returns an empty array when the cron schedule is invalid' do
+      entry = described_class.new(params.merge(cron: 'not a schedule'))
+
+      expect(entry.within(2.minutes.ago..Time.current)).to eq([])
     end
   end
 
@@ -185,7 +221,7 @@ describe GoodJob::CronEntry do
 
       entry.send(:fugit)
 
-      expect(Fugit).to have_received(:parse).with('* * * * *')
+      expect(Fugit).to have_received(:parse).with('* * * * *', strict: true)
     end
 
     it 'returns an instance of Fugit::Cron' do
@@ -268,7 +304,7 @@ describe GoodJob::CronEntry do
   describe '#display_properties' do
     let(:params) do
       {
-        key: 'test',
+        key: :test,
         cron: "* * * * *",
         class: "TestJob",
         args: [42, { name: "Alice" }],
@@ -279,7 +315,7 @@ describe GoodJob::CronEntry do
 
     it 'returns a hash of properties' do
       expect(entry.display_properties).to eq({
-                                               key: 'test',
+                                               key: :test,
         cron: "* * * * *",
         class: "TestJob",
         args: [42, { name: "Alice" }],
