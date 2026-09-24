@@ -88,6 +88,7 @@ module GoodJob # :nodoc:
     # @param previously_at [Time, nil] the last +in-memory+ scheduled time the cron task was intended to run
     def create_task(cron_entry, at: nil, previously_at: nil)
       cron_at = at || cron_entry.next_at(previously_at: previously_at)
+      return unless cron_at
 
       # ScheduledTask runs immediately if delay is <= 0.01; avoid ever scheduling the task before the intended time
       # https://github.com/ruby-concurrency/concurrent-ruby/blob/56227a4c3ebdd53b8b0976eb8296ceb7a093496f/lib/concurrent-ruby/concurrent/executor/timer_set.rb#L97

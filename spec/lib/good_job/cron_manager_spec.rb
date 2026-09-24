@@ -27,7 +27,7 @@ RSpec.describe GoodJob::CronManager do
     let(:cron_entries) do
       [
         GoodJob::CronEntry.new(
-          key: 'example',
+          key: :example,
           cron: "* * * * * *", # cron-style scheduling format by fugit gem, allows seconds resolution
           class: "TestJob", # reference the Job class with a string
           args: [42, { name: "Alice" }], # arguments to pass.  Could also allow a Proc for dynamic args, but problematic?
@@ -52,7 +52,7 @@ RSpec.describe GoodJob::CronManager do
 
       job = GoodJob::Job.first
       expect(job).to have_attributes(
-        cron_key: 'example',
+        cron_key: "example",
         priority: -10
       )
     end
@@ -87,7 +87,7 @@ RSpec.describe GoodJob::CronManager do
       let(:cron_entries) do
         [
           GoodJob::CronEntry.new(
-            key: 'example',
+            key: :example,
             cron: my_proc,
             class: "TestJob"
           ),
@@ -113,7 +113,7 @@ RSpec.describe GoodJob::CronManager do
     let(:cron_entries) do
       [
         GoodJob::CronEntry.new(
-          key: 'example',
+          key: :example,
           cron: "0 * * * * *",
           class: "TestJob"
         ),
