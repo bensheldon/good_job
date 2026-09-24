@@ -29,6 +29,14 @@ describe GoodJob::CronEntry do
     it 'raises an argument error if cron does not parse to a Fugit::Cron instance' do
       expect { described_class.new(cron: '2017-12-12') }.to raise_error(ArgumentError)
     end
+
+    it 'raises an argument error when natural language would produce a misleading schedule' do
+      expect { described_class.new(cron: 'every 5 hours') }.to raise_error(ArgumentError)
+    end
+
+    it 'accepts unambiguous natural language schedules' do
+      expect { described_class.new(cron: 'every day at noon') }.not_to raise_error
+    end
   end
 
   describe '#valid?' do
@@ -116,6 +124,14 @@ describe GoodJob::CronEntry do
         expect(entry.next_at).to eq time_at
         expect(my_proc).to have_received(:call).with(nil)
       end
+
+      context 'when the proc returns a misleading natural language schedule' do
+        let(:my_proc) { proc { 'every 5 hours' } }
+
+        it 'raises an argument error' do
+          expect { entry.next_at }.to raise_error(ArgumentError)
+        end
+      end
     end
   end
 
@@ -185,7 +201,7 @@ describe GoodJob::CronEntry do
 
       entry.send(:fugit)
 
-      expect(Fugit).to have_received(:parse).with('* * * * *')
+      expect(Fugit).to have_received(:parse).with('* * * * *', strict: true)
     end
 
     it 'returns an instance of Fugit::Cron' do
