@@ -207,7 +207,7 @@ module GoodJob # :nodoc:
           thr_connected.set
 
           begin
-            Rails.application.executor.wrap do
+            Rails.application.reloader.wrap do
               run_callbacks :listen do
                 if thr_enable_listening
                   ActiveSupport::Notifications.instrument("notifier_listen.good_job") do
@@ -219,16 +219,18 @@ module GoodJob # :nodoc:
             end
 
             while thr_executor.running? && thr_running.true?
-              Rails.application.executor.wrap { run_callbacks(:tick) }
+              Rails.application.reloader.wrap { run_callbacks(:tick) }
 
               wait_for_notify do |channel, payload|
                 next unless channel == CHANNEL
 
                 ActiveSupport::Notifications.instrument("notifier_notified.good_job", { payload: payload })
                 parsed_payload = JSON.parse(payload, symbolize_names: true)
-                thr_recipients.each do |recipient|
-                  target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
-                  target.send(method_name, parsed_payload)
+                Rails.application.reloader.wrap do
+                  thr_recipients.each do |recipient|
+                    target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
+                    target.send(method_name, parsed_payload)
+                  end
                 end
               end
 
@@ -236,7 +238,7 @@ module GoodJob # :nodoc:
             end
           end
         ensure
-          Rails.application.executor.wrap do
+          Rails.application.reloader.wrap do
             run_callbacks :unlisten do
               if thr_enable_listening
                 ActiveSupport::Notifications.instrument("notifier_unlisten.good_job") do
@@ -255,7 +257,7 @@ module GoodJob # :nodoc:
     end
 
     def with_connection
-      Rails.application.executor.wrap do
+      Rails.application.reloader.wrap do
         self.connection = ::GoodJob::Job.connection_pool.checkout.tap do |conn|
           ::GoodJob::Job.connection_pool.remove(conn)
         end

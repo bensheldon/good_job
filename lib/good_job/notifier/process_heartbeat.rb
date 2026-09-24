@@ -22,7 +22,7 @@ module GoodJob # :nodoc:
       end
 
       def refresh_process
-        Rails.application.executor.wrap do
+        Rails.application.reloader.wrap do
           GoodJob::Process.with_logger_silenced do
             @capsule.tracker.renew
           end

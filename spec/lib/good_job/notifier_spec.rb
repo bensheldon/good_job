@@ -62,6 +62,21 @@ RSpec.describe GoodJob::Notifier do
       notifier.shutdown
     end
 
+    it 'dispatches notifications inside the Rails reloader' do
+      event = Concurrent::Event.new
+      recipient = proc { |_payload| event.set }
+
+      notifier = described_class.new(recipient, enable_listening: true)
+      notifier.listening?(timeout: 5)
+
+      allow(Rails.application.reloader).to receive(:wrap).and_call_original
+      described_class.notify(true)
+      expect(event.wait(5)).to be true
+      expect(Rails.application.reloader).to have_received(:wrap).at_least(:once)
+
+      notifier.shutdown
+    end
+
     it 'loops but does not receive a command if listening is not enabled' do
       latch = Concurrent::CountDownLatch.new(1)
       recipient = proc { |_payload| latch.count_down }
