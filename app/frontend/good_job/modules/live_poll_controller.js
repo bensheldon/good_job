@@ -59,5 +59,7 @@ export default class extends Controller {
         originalElement.replaceWith(newElement)
       }
     })
+
+    document.dispatchEvent(new CustomEvent("good_job:live-poll-refreshed"))
   }
 }
