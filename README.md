@@ -47,6 +47,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         - [Extending dashboard views](#extending-dashboard-views)
     - [Job priority](#job-priority)
     - [Concurrency controls](#concurrency-controls)
+        - [Dynamic labels](#dynamic-labels)
         - [How concurrency controls work](#how-concurrency-controls-work)
     - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
     - [Bulk enqueue](#bulk-enqueue)
@@ -561,9 +562,10 @@ class MyJob < ApplicationJob
   # exceeded rule short-circuits the rest.
   good_job_concurrency_rule(
     # A label that scopes this rule. Can be a static String or a Lambda/Proc
-    # invoked in the context of the job instance. The rule only applies to jobs
-    # that were enqueued with this label in `good_job_labels`.
-    label: -> { arguments.first[:user_id] },
+    # invoked in the context of the job instance (see "Dynamic labels" below).
+    # The rule only applies to jobs that were enqueued with this label in
+    # `good_job_labels`.
+    label: "email",
 
     # Maximum number of unfinished jobs with this label to allow.
     # Can be an Integer or Lambda/Proc invoked in the context of the job.
@@ -595,7 +597,7 @@ class MyJob < ApplicationJob
   good_job_concurrency_rule(...)
   good_job_concurrency_rule(...)
 
-  def perform(user_id:)
+  def perform
     # do work
   end
 end
@@ -604,8 +606,41 @@ end
 Jobs must be enqueued with the matching label for rules to take effect:
 
 ```ruby
-MyJob.set(good_job_labels: [current_user.id]).perform_later(user_id: current_user.id)
+MyJob.set(good_job_labels: ["email"]).perform_later
 ```
+
+#### Dynamic labels
+
+A rule's `label:` can also be a Lambda/Proc that is invoked in the context of the job instance, for example to derive the label from job arguments. The lambda resolves the label to check against; the job's `good_job_labels` must still contain it for the rule to apply.
+
+Apply labels dynamically in a `before_enqueue` callback. They are stored on the job record and checked by rules that run when the job is performed:
+
+```ruby
+class MyJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
+  before_enqueue do |job|
+    job.good_job_labels = [job.arguments.first[:user_id]]
+  end
+
+  good_job_concurrency_rule(
+    label: -> { arguments.first[:user_id] },
+    perform_limit: 1
+  )
+
+  def perform(user_id:)
+    # do work
+  end
+end
+```
+
+Rules are checked when a job is enqueued and again when it is performed. Labels assigned in `before_enqueue` are present for the before-perform check, but not for checks that run at enqueue time (`enqueue_limit`, `enqueue_throttle`, and `total_limit` when no enqueue-specific limit is configured). For those, pass the label when enqueuing:
+
+```ruby
+MyJob.set(good_job_labels: [user_id]).perform_later(user_id: user_id)
+```
+
+A concurrency rule counts every unfinished job in the table that carries the resolved label, regardless of job class.
 
 #### How concurrency controls work
 
