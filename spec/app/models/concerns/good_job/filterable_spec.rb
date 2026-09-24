@@ -53,6 +53,38 @@ RSpec.describe GoodJob::Filterable do
       expect(model_class.search_text('ghost')).to be_empty
     end
 
+    context 'with identifier-like argument strings' do
+      let!(:job) do
+        model_class.create!(
+          active_job_id: SecureRandom.uuid,
+          queue_name: "default",
+          job_class: "ExampleJob",
+          scheduled_at: Time.current,
+          serialized_params: {
+            arguments: [{
+              "ad_id" => "ad_qTB3kTjQeZEmptyx8JZ5",
+              "ad_ref" => "A-1012679",
+              "line_item_gid" => "gid://supply-side-platform/Orders::Types::ReservationLineItem/rli_Dd2LpagvXuqaZNAZt4yu",
+              "purchase_order_id" => "po_8o9yOwc88sfMQWFmjE8F",
+              "_aj_ruby2_keywords" => %w[purchase_order_id line_item_gid ad_ref ad_id],
+            }],
+          }
+        )
+      end
+
+      it 'searches a nested URL-like identifier' do
+        expect(model_class.search_text('gid://supply-side-platform/Orders::Types::ReservationLineItem/rli_Dd2LpagvXuqaZNAZt4yu')).to include(job)
+      end
+
+      it 'searches a substring of an identifier' do
+        expect(model_class.search_text('rli_Dd2LpagvXuqaZNAZt4yu')).to include(job)
+      end
+
+      it 'searches an identifier with dashes' do
+        expect(model_class.search_text('A-1012679')).to include(job)
+      end
+    end
+
     it 'does not raise when the error column exceeds the tsvector size limit' do
       # Many distinct tokens — repeated tokens collapse via tsvector dedup.
       oversized_error = "BoomError: #{Array.new(200_000) { |i| "w#{i}" }.join(' ')}"

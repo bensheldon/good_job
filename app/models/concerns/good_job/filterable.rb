@@ -81,7 +81,18 @@ module GoodJob
           )
         SQL
         to_tsquery_function = database_supports_websearch_to_tsquery? ? 'websearch_to_tsquery' : 'plainto_tsquery'
-        where("#{tsvector} @@ #{to_tsquery_function}('english', CAST(? AS text))", query)
+        # Full-text tokenization does not preserve identifier-like strings (URLs, globs of
+        # numbers and letters), so also match the raw text columns as a substring.
+        text_match = <<~SQL.squish
+          (
+            id::text ILIKE :like_pattern OR
+            COALESCE(active_job_id::text, '') ILIKE :like_pattern OR
+            serialized_params::text ILIKE :like_pattern OR
+            COALESCE(error, '') ILIKE :like_pattern OR
+            COALESCE(array_to_string(labels, ' '), '') ILIKE :like_pattern
+          )
+        SQL
+        where("#{tsvector} @@ #{to_tsquery_function}('english', CAST(:query AS text)) OR #{text_match}", query: query, like_pattern: "%#{sanitize_sql_like(query)}%")
           .order(sanitize_sql_for_order([Arel.sql("ts_rank(#{tsvector}, #{to_tsquery_function}('english', CAST(? AS text)))"), query]) => 'DESC')
       end)
     end
