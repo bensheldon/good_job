@@ -1354,7 +1354,7 @@ Fiber execution requires:
 
 - CRuby 3.2 or newer
 - Rails 7.1 or newer, so Active Record checks out connections per fiber
-- The `async` gem, version 2.24 or newer (2.25 or newer on Ruby 4, for the `fiber_interrupt` scheduler hook)
+- The `async` gem, version 2.25 or newer
 - `config.active_support.isolation_level = :fiber`, so each job has its own Rails execution state
 - Code reloading disabled, because the Rails reloader can block jobs sharing a thread
 
@@ -1384,9 +1384,7 @@ Like `max_threads`, `fibers` is the default count per pool, and a count in `queu
 
 #### Unmet requirements
 
-When a requirement above is not met, an external worker (`good_job start`) raises an error. In-process execution logs the error and falls back to threads, capping each queue at `max_threads` while keeping smaller counts such as `serial:1`. The locking strategy and Rails isolation level remain as configured.
-
-The development harness enables reloading by default, so requesting fibers uses this fallback.
+When a requirement above is not met, GoodJob raises an error when it creates schedulers, in both external and in-process execution.
 
 #### Cooperative IO
 

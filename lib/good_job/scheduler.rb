@@ -33,8 +33,7 @@ module GoodJob # :nodoc:
     LOW_THREAD_PRIORITY = -3
 
     # Minimum version of the +async+ gem required for fiber execution.
-    # Ruby 4 requires Async's fiber_interrupt hook, introduced in 2.25.
-    MINIMUM_ASYNC_VERSION = Gem.ruby_version >= Gem::Version.new("4.0") ? "2.25" : "2.24"
+    MINIMUM_ASYNC_VERSION = "2.25"
     # Minimum Ruby version required for fiber execution.
     MINIMUM_RUBY_VERSION_FOR_FIBERS = "3.2"
     # Rails 7.0's Active Record connection pool caches connections per thread, so
@@ -267,7 +266,7 @@ module GoodJob # :nodoc:
       result = output.is_a?(GoodJob::ExecutionResult) ? output : nil
 
       unhandled_error = thread_error || result&.unhandled_error
-      report_thread_error(unhandled_error)
+      GoodJob._on_thread_error(unhandled_error) if unhandled_error
 
       instrument("finished_job_task", { result: output, error: thread_error, time: time })
       return unless output
@@ -330,7 +329,7 @@ module GoodJob # :nodoc:
       end
 
       observer = lambda do |_time, _output, thread_error|
-        report_thread_error(thread_error)
+        GoodJob._on_thread_error(thread_error) if thread_error
         create_task # If cache-warming exhausts the threads, ensure there isn't an executable task remaining
       end
       future.add_observer(observer, :call)
@@ -349,7 +348,7 @@ module GoodJob # :nodoc:
       end
 
       observer = lambda do |_time, _output, thread_error|
-        report_thread_error(thread_error)
+        GoodJob._on_thread_error(thread_error) if thread_error
         create_task
       end
       future.add_observer(observer, :call)
@@ -359,16 +358,6 @@ module GoodJob # :nodoc:
     private
 
     attr_reader :performer, :executor, :timer_set
-
-    # Concurrent::Future also captures Async's normal shutdown signals.
-    def report_thread_error(error)
-      return unless error
-      return if fibers? && !executor.running? &&
-                ((defined?(Async::Stop) && error.is_a?(Async::Stop)) ||
-                 (defined?(Async::Cancel) && error.is_a?(Async::Cancel)))
-
-      GoodJob._on_thread_error(error)
-    end
 
     # @return [void]
     def create_executor

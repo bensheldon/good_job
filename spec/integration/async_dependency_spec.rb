@@ -28,7 +28,7 @@ RSpec.describe 'Optional Async dependency' do
     output, status = Open3.capture2e(RbConfig.ruby, '-rbundler/setup', '-Ilib', '-e', <<~RUBY)
       require 'good_job'
       expected = ENV['GOOD_JOB_TEST_ASYNC']
-      minimum = Gem.ruby_version >= Gem::Version.new('4.0') ? '2.25' : '2.24'
+      minimum = '2.25'
       unsupported = expected == 'absent' || (expected && !expected.start_with?('>') && Gem::Version.new(expected) < Gem::Version.new(minimum))
       if expected == 'absent'
         abort 'Async unexpectedly installed' if Gem.loaded_specs.key?('async')

@@ -576,7 +576,7 @@ PLATFORMS
 DEPENDENCIES
   activerecord-explain-analyze
   activerecord-jdbcpostgresql-adapter
-  async (>= 2.24)
+  async (>= 2.25)
   benchmark
   benchmark-ips
   bootsnap

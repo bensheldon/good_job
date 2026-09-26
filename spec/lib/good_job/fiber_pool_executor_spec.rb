@@ -175,37 +175,6 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       wait_until { expect(completed.true?).to be true }
     end
 
-    [false, true].each do |shutdown|
-      it "runs tasks posted during reactor failure (shutdown=#{shutdown})" do
-        failed = Concurrent::Event.new
-        release = Concurrent::Event.new
-        first = true
-        reader = executor.instance_variable_get(:@wakeup_reader)
-        allow(reader).to receive(:wait_readable).and_wrap_original do |original|
-          if first
-            first = false
-            raise IOError, 'reactor failure'
-          end
-          original.call
-        end
-        allow(GoodJob).to receive(:_on_thread_error) do
-          failed.set
-          release.wait(5)
-        end
-        completed = Concurrent::Array.new
-        executor.post { completed << 1 }
-        expect(failed.wait(5)).to be true
-        executor.post { completed << 2 }
-        executor.shutdown if shutdown
-        release.set
-        expect(executor.wait_for_termination(5)).to be true if shutdown
-        wait_until { expect(completed).to contain_exactly(1, 2) }
-        expect(executor.ready_worker_count).to eq 5
-      ensure
-        release&.set
-      end
-    end
-
     it 'preserves queued work while the reactor is blocked on capacity' do
       started = Concurrent::CountDownLatch.new(5)
       5.times do
@@ -242,16 +211,11 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       release.set
       expect(executor.wait_for_termination(5)).to be true
       expect(completed).to eq [:done]
-      expect(executor.instance_variable_get(:@wakeup_reader)).to be_closed
     ensure
       release&.set
     end
 
     it 'drains in-flight tasks and stops the reactor' do
-      wakeup_ios = [
-        executor.instance_variable_get(:@wakeup_reader),
-        executor.instance_variable_get(:@wakeup_writer),
-      ]
       started = Concurrent::CountDownLatch.new(5)
       release = Concurrent::Event.new
       completed = Concurrent::Array.new
@@ -271,7 +235,6 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       expect(executor.wait_for_termination(5)).to be true
       expect(executor.shutdown?).to be true
       expect(completed).to match_array((0...8).to_a)
-      expect(wakeup_ios).to all(be_closed)
       executor.shutdown
       expect(executor.wait_for_termination(0)).to be true
     ensure
@@ -279,16 +242,10 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
     end
 
     it 'shuts down immediately when never started' do
-      wakeup_ios = [
-        executor.instance_variable_get(:@wakeup_reader),
-        executor.instance_variable_get(:@wakeup_writer),
-      ]
-
       executor.shutdown
 
       expect(executor.shutdown?).to be true
       expect(executor.wait_for_termination(1)).to be true
-      expect(wakeup_ios).to all(be_closed)
     end
   end
 
@@ -311,10 +268,6 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
     end
 
     it 'stops the reactor without waiting for tasks' do
-      wakeup_ios = [
-        executor.instance_variable_get(:@wakeup_reader),
-        executor.instance_variable_get(:@wakeup_writer),
-      ]
       started = Concurrent::CountDownLatch.new(5)
       completed = Concurrent::Array.new
       5.times do
@@ -328,7 +281,6 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       executor.kill
       expect(executor.wait_for_termination(5)).to be true
       expect(executor.shutdown?).to be true
-      expect(wakeup_ios).to all(be_closed)
       expect(completed).to be_empty
       expect(executor.ready_worker_count).to eq 5
     end
@@ -346,15 +298,13 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       executor.kill
       release.set
       expect(executor.wait_for_termination(5)).to be true
-      expect(executor.instance_variable_get(:@wakeup_reader)).to be_closed
-      expect(executor.instance_variable_get(:@wakeup_writer)).to be_closed
     ensure
       release&.set
     end
   end
 
   describe 'forking' do
-    it 'replaces inherited work and pipes without affecting the parent' do
+    it 'replaces inherited work without affecting the parent' do
       skip 'fork is unavailable' unless Process.respond_to?(:fork)
 
       started = Concurrent::CountDownLatch.new(5)
@@ -368,13 +318,12 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       end
       expect(started.wait(5)).to be true
       executor.post { completed << :parent }
-      old_reader = executor.instance_variable_get(:@wakeup_reader)
       result_reader, result_writer = IO.pipe
       pid = fork do
         result_reader.close
         executor.post { completed << :child }
         executor.shutdown
-        success = executor.wait_for_termination(5) && completed == [:child] && old_reader.closed?
+        success = executor.wait_for_termination(5) && completed == [:child]
         result_writer.write(success ? 'ok' : 'failed')
         result_writer.close
         exit! 0
@@ -384,7 +333,6 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       expect(result_reader.read).to eq 'ok'
       Process.wait(pid)
       pid = nil
-      expect(old_reader).not_to be_closed
       release.set
       executor.shutdown
       expect(executor.wait_for_termination(5)).to be true

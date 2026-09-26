@@ -69,42 +69,12 @@ RSpec.describe GoodJob::MultiScheduler do
       end
     end
 
-    describe 'fiber fallback' do
-      it 'caps fallback thread pools at max_threads in async mode' do
-        configuration = GoodJob::Configuration.new({ execution_mode: :async, fibers: 25, max_threads: 5, queues: 'serial:1;mice:80;elephants' })
-        allow(GoodJob::Scheduler).to receive(:validate_fiber_execution!).and_raise(ArgumentError, "fibers unsupported here")
-        allow(GoodJob.logger).to receive(:error)
+    it 'raises when fiber requirements are unmet' do
+      configuration = GoodJob::Configuration.new({ execution_mode: :async, fibers: 25 })
+      allow(GoodJob::Scheduler).to receive(:validate_fiber_execution!).and_raise(ArgumentError, "fibers unsupported here")
 
-        multi_scheduler = described_class.from_configuration(configuration)
-
-        expect(multi_scheduler.schedulers.map(&:stats)).to contain_exactly(
-          include(queues: 'serial', max_threads: 1),
-          include(queues: 'mice', max_threads: 5),
-          include(queues: 'elephants', max_threads: 5)
-        )
-        expect(GoodJob.logger).to have_received(:error).with(/ignoring `fibers`/)
-      end
-
-      it 'raises for the CLI worker regardless of execution mode' do
-        allow(GoodJob).to receive(:cli?).and_return(true)
-        configuration = GoodJob::Configuration.new({ execution_mode: :async_all, fibers: 25 })
-        allow(GoodJob::Scheduler).to receive(:validate_fiber_execution!).and_raise(ArgumentError, "fibers unsupported here")
-
-        expect { described_class.from_configuration(configuration) }
-          .to raise_error(ArgumentError, "fibers unsupported here")
-      end
-
-      it 'falls back for an in-process worker regardless of execution mode' do
-        allow(GoodJob).to receive(:cli?).and_return(false)
-        configuration = GoodJob::Configuration.new({ execution_mode: :external, fibers: 25, max_threads: 5 })
-        allow(GoodJob::Scheduler).to receive(:validate_fiber_execution!).and_raise(ArgumentError, "fibers unsupported here")
-        allow(GoodJob.logger).to receive(:error)
-
-        multi_scheduler = described_class.from_configuration(configuration)
-
-        expect(multi_scheduler.schedulers.map(&:stats)).to contain_exactly(include(max_threads: 5))
-        expect(GoodJob.logger).to have_received(:error).with(/ignoring `fibers`/)
-      end
+      expect { described_class.from_configuration(configuration) }
+        .to raise_error(ArgumentError, "fibers unsupported here")
     end
   end
 
