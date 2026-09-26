@@ -1,5 +1,33 @@
 # Changelog
 
+## [v4.19.3](https://github.com/bensheldon/good_job/tree/v4.19.3) (2026-09-21)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.19.2...v4.19.3)
+
+**Implemented enhancements:**
+
+- Add GoodJob::Configuration\#valid? to validate Cron configuration [\#1796](https://github.com/bensheldon/good_job/pull/1796) ([bensheldon](https://github.com/bensheldon))
+- Add time range controls to dashboard time-series charts [\#1782](https://github.com/bensheldon/good_job/pull/1782) ([TikiTDO](https://github.com/TikiTDO))
+- Allow Continuation jobs to be paused [\#1778](https://github.com/bensheldon/good_job/pull/1778) ([bdewater-thatch](https://github.com/bdewater-thatch))
+
+**Fixed bugs:**
+
+- Use GoodJob::Job.table\_name instead of hardcoded `good_jobs` [\#1815](https://github.com/bensheldon/good_job/pull/1815) ([gap777](https://github.com/gap777))
+
+**Closed issues:**
+
+- Hardcoded table names interfere with applications using custom table names. [\#1814](https://github.com/bensheldon/good_job/issues/1814)
+
+**Merged pull requests:**
+
+- Fix alphabetization of demo schema.rb columns [\#1818](https://github.com/bensheldon/good_job/pull/1818) ([bensheldon](https://github.com/bensheldon))
+- Pin json \< 3 as a temporary workaround [\#1817](https://github.com/bensheldon/good_job/pull/1817) ([gap777](https://github.com/gap777))
+- Add Azerbaijani locale [\#1813](https://github.com/bensheldon/good_job/pull/1813) ([jamalkamaladdin](https://github.com/jamalkamaladdin))
+- Bump github/codeql-action from 4.37.3 to 4.37.9 [\#1809](https://github.com/bensheldon/good_job/pull/1809) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Deprecate the fallback when `probe_handler` can't be used [\#1808](https://github.com/bensheldon/good_job/pull/1808) ([shouichi](https://github.com/shouichi))
+- Bump github/codeql-action from 4 to 4.37.3 [\#1802](https://github.com/bensheldon/good_job/pull/1802) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Add index for discarded jobs with job\_class [\#1795](https://github.com/bensheldon/good_job/pull/1795) ([clinejj](https://github.com/clinejj))
+
 ## [v4.19.2](https://github.com/bensheldon/good_job/tree/v4.19.2) (2026-07-20)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.19.1...v4.19.2)

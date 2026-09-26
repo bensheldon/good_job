@@ -317,7 +317,7 @@ module GoodJob
   # @return [Boolean]
   def self.migrated?
     GoodJob::Job.lock_type_migrated? &&
-      GoodJob::Job.connection.index_name_exists?(:good_jobs, "index_good_jobs_on_discarded_job_class")
+      GoodJob::Job.connection.index_name_exists?(GoodJob::Job.table_name, "index_good_jobs_on_discarded_job_class")
   end
 
   # Pause job execution for a given queue or job class.
