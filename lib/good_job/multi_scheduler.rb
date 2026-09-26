@@ -8,19 +8,23 @@ module GoodJob
     # @param warm_cache_on_initialize [Boolean]
     # @return [GoodJob::MultiScheduler]
     def self.from_configuration(configuration, capsule: GoodJob.capsule, warm_cache_on_initialize: false)
-      schedulers = configuration.queue_string.split(';').map(&:strip).map do |queue_string_and_max_threads|
-        queue_string, max_threads = queue_string_and_max_threads.split(':').map { |str| str.strip.presence }
-        max_threads = (max_threads || configuration.max_threads).to_i
+      schedulers = configuration.queue_string.split(';').map(&:strip).map do |queue_string_and_count|
+        queue_string, count = queue_string_and_count.split(':').map { |str| str.strip.presence }
+        concurrency = if configuration.fibers.positive?
+                        { fibers: (count || configuration.fibers).to_i }
+                      else
+                        { max_threads: (count || configuration.max_threads).to_i }
+                      end
 
         job_performer = GoodJob::JobPerformer.new(queue_string, capsule: capsule)
         GoodJob::Scheduler.new(
           job_performer,
-          max_threads: max_threads,
           max_cache: configuration.max_cache,
           warm_cache_on_initialize: warm_cache_on_initialize,
           cleanup_interval_seconds: configuration.cleanup_interval_seconds,
           cleanup_interval_jobs: configuration.cleanup_interval_jobs,
-          lower_thread_priority: configuration.lower_thread_priority
+          lower_thread_priority: configuration.lower_thread_priority,
+          **concurrency
         )
       end
 
@@ -103,6 +107,7 @@ module GoodJob
         total_executions_count: scheduler_stats.sum { |stats| stats.fetch(:total_executions_count, 0) },
         execution_at: scheduler_stats.map { |stats| stats.fetch(:execution_at, nil) }.compact.max,
         active_execution_thread_count: scheduler_stats.sum { |stats| stats.fetch(:active_threads, 0) },
+        active_execution_count: scheduler_stats.sum { |stats| stats.fetch(:active_fibers, stats.fetch(:active_threads, 0)) },
         check_queue_at: scheduler_stats.map { |stats| stats.fetch(:check_queue_at, nil) }.compact.max,
       }
     end

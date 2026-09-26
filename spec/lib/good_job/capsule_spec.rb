@@ -81,6 +81,16 @@ describe GoodJob::Capsule do
       expect(capsule).to be_idle
     end
 
+    it 'uses job activity when deciding whether fiber execution is idle' do
+      capsule = described_class.new
+      scheduler = instance_double(GoodJob::MultiScheduler, stats: { active_execution_count: 3 })
+      capsule.instance_variable_set(:@multi_scheduler, scheduler)
+      expect(capsule).not_to be_idle
+      allow(scheduler).to receive(:stats).and_return({ active_execution_count: 0 })
+      expect(capsule).to be_idle
+      capsule.instance_variable_set(:@multi_scheduler, nil)
+    end
+
     it 'returns false if started in last N seconds' do
       capsule = described_class.new
       capsule.start

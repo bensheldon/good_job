@@ -45,6 +45,36 @@ RSpec.describe GoodJob::MultiScheduler do
         )
         expect(elephants_scheduler.send(:performer).send(:parsed_queues)).to eq({ include: ["elephant"] })
       end
+
+      it 'converts thread queue counts with to_i, including zero' do
+        configuration = GoodJob::Configuration.new({ queues: 'zero:0;text:many;prefix:2jobs' })
+        scheduler = instance_double(GoodJob::Scheduler)
+        allow(GoodJob::Scheduler).to receive(:new).and_return(scheduler)
+        described_class.from_configuration(configuration)
+        expect(GoodJob::Scheduler).to have_received(:new).with(anything, hash_including(max_threads: 0)).twice
+        expect(GoodJob::Scheduler).to have_received(:new).with(anything, hash_including(max_threads: 2)).once
+      end
+    end
+
+    describe 'fiber counts', :fiber_isolation, :requires_async do
+      it 'uses per-queue overrides as fiber counts' do
+        configuration = GoodJob::Configuration.new({ fibers: 25, queues: 'mice:10;elephants' })
+
+        multi_scheduler = described_class.from_configuration(configuration)
+
+        expect(multi_scheduler.schedulers.map(&:stats)).to contain_exactly(
+          include(queues: 'mice', max_fibers: 10),
+          include(queues: 'elephants', max_fibers: 25)
+        )
+      end
+    end
+
+    it 'raises when fiber requirements are unmet' do
+      configuration = GoodJob::Configuration.new({ execution_mode: :async, fibers: 25 })
+      allow(GoodJob::Scheduler).to receive(:validate_fiber_execution!).and_raise(ArgumentError, "fibers unsupported here")
+
+      expect { described_class.from_configuration(configuration) }
+        .to raise_error(ArgumentError, "fibers unsupported here")
     end
   end
 
@@ -111,6 +141,15 @@ RSpec.describe GoodJob::MultiScheduler do
       stats = multi_scheduler.stats
       expect(stats[:schedulers].size).to eq 3
       expect(stats[:schedulers].first[:queues]).to eq '*'
+    end
+
+    it 'counts active execution threads separately from jobs' do
+      thread_scheduler = instance_double(GoodJob::Scheduler, stats: { active_threads: 2 })
+      fiber_scheduler = instance_double(GoodJob::Scheduler, stats: { active_threads: 1, active_fibers: 8 })
+      expect(described_class.new([thread_scheduler, fiber_scheduler]).stats).to include(
+        active_execution_thread_count: 3,
+        active_execution_count: 10
+      )
     end
   end
 end

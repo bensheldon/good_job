@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'active_model'
+
 module GoodJob
   class Configuration
     # Validates a {Configuration} instance so that misconfigurations can be

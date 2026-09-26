@@ -89,7 +89,7 @@ module GoodJob
     # @return [Boolean] Whether the capsule is idle
     def idle?(duration = nil)
       scheduler_stats = @multi_scheduler&.stats || {}
-      is_idle = scheduler_stats.fetch(:active_execution_thread_count, 0).zero?
+      is_idle = scheduler_stats.fetch(:active_execution_count, 0).zero?
 
       if is_idle && duration
         active_at = scheduler_stats.fetch(:execution_at, nil) || @started_at

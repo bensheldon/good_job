@@ -20,6 +20,12 @@ RSpec.describe GoodJob::Configuration do
 
       expect(GoodJob.logger).to have_received(:warn).with(/GoodJob is using \d+ threads/)
     end
+
+    it 'counts one thread per fiber scheduler', :fiber_isolation, :requires_async do
+      scheduler = GoodJob::Scheduler.new(GoodJob::JobPerformer.new('*'), fibers: 5)
+      expect(described_class.total_estimated_threads).to eq GoodJob::SharedExecutor::MAX_THREADS + 1
+      scheduler.shutdown
+    end
   end
 
   describe '#execution_mode' do
@@ -83,6 +89,26 @@ RSpec.describe GoodJob::Configuration do
         configuration = described_class.new({})
         expect(configuration.cleanup_discarded_jobs?).to be false
       end
+    end
+  end
+
+  describe '#fibers' do
+    it 'defaults to zero' do
+      expect(described_class.new({}).fibers).to eq 0
+    end
+
+    it 'uses the option value as an Integer' do
+      expect(described_class.new({ fibers: '25' }).fibers).to eq 25
+    end
+
+    it 'uses the rails config value' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ fibers: 50 })
+      expect(described_class.new({}).fibers).to eq 50
+    end
+
+    it 'uses the environment variable' do
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_FIBERS' => '100' })
+      expect(described_class.new({}).fibers).to eq 100
     end
   end
 
