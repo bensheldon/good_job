@@ -29,27 +29,32 @@ RSpec.describe 'Fiber application boot' do
         puts "BOOT_RESULT=#{JSON.generate(state)}"
       RUBY
     )
+    [output, status]
+  end
+
+  def boot_result(**options)
+    output, status = boot(**options)
     expect(status).to be_success, output
     JSON.parse(output.lines.find { |line| line.start_with?('BOOT_RESULT=') }.delete_prefix('BOOT_RESULT='))
   end
 
   [nil, '', '0'].each do |value|
     it "boots without enabling fiber isolation for #{value.inspect}" do
-      result = boot(fibers: value, reloading: true)
+      result = boot_result(fibers: value, reloading: true)
       expect(result['isolation']).not_to eq 'fiber'
       expect(result['schedulers'].pluck('max_fibers')).to all(be_nil)
       expect(result['schedulers'].pluck('max_threads')).to eq [1, 8]
     end
   end
 
-  it 'falls back in development when reloading is enabled', :fiber_isolation, :requires_async do
-    result = boot(fibers: '25', reloading: true, environment: 'development')
-    expect(result['isolation']).to eq 'fiber'
-    expect(result['schedulers'].pluck('max_threads')).to eq [1, 2]
+  it 'raises in development when reloading is enabled', :fiber_isolation, :requires_async do
+    output, status = boot(fibers: '25', reloading: true, environment: 'development')
+    expect(status).not_to be_success
+    expect(output).to include('requires code reloading to be disabled')
   end
 
   it 'enables fibers when reloading is disabled', :fiber_isolation, :requires_async do
-    result = boot(fibers: '25', reloading: false)
+    result = boot_result(fibers: '25', reloading: false)
     expect(result['schedulers'].pluck('max_fibers')).to eq [1, 8]
     expect(result['lock_strategy']).to eq 'advisory'
   end

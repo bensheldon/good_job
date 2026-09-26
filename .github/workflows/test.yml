@@ -120,11 +120,9 @@ jobs:
           # JRuby 10 targets Ruby 3.4
           - { ruby: jruby-10.0, gemfile: rails_7.2, pg: 18 }
           # Async: minimum, latest, unsupported, and absent
-          - { ruby: "3.2", gemfile: async_compatibility, rails_version: "7.1", async: "2.24.0", async_name: minimum, pg: 18 }
-          - { ruby: "4.0", gemfile: async_compatibility, async: "2.25.0", async_name: minimum, pg: 18 }
-          - { ruby: "4.0", gemfile: async_compatibility, async: "2.24.0", async_name: older_ruby4, pg: 18 }
-          - { ruby: "4.0", gemfile: async_compatibility, async: ">= 2.24", async_name: latest, pg: 18 }
-          - { ruby: "4.0", gemfile: async_compatibility, async: "2.23.0", async_name: older, pg: 18 }
+          - { ruby: "3.2", gemfile: async_compatibility, rails_version: "7.1", async: "2.25.0", async_name: minimum, pg: 18 }
+          - { ruby: "4.0", gemfile: async_compatibility, async: ">= 2.25", async_name: latest, pg: 18 }
+          - { ruby: "4.0", gemfile: async_compatibility, async: "2.24.0", async_name: older, pg: 18 }
           - { ruby: "4.0", gemfile: async_compatibility, async: absent, async_name: absent, pg: 18 }
 
     env:
@@ -138,7 +136,7 @@ jobs:
       BUNDLE_WITHOUT: debug:lint:demo:production
       RAILS_LOG_TO_STDOUT: false
       RAILS_VERSION: ${{ matrix.rails_version || '8.1' }}
-      GOOD_JOB_REQUIRE_FIBERS: ${{ matrix.gemfile != 'rails_6.1' && matrix.gemfile != 'rails_7.0' && matrix.ruby != '3.0' && matrix.ruby != '3.1' && matrix.ruby != 'jruby-10.0' && matrix.async != 'absent' && matrix.async != '2.23.0' && matrix.async_name != 'older_ruby4' && '1' || '0' }}
+      GOOD_JOB_REQUIRE_FIBERS: ${{ matrix.gemfile != 'rails_6.1' && matrix.gemfile != 'rails_7.0' && matrix.ruby != '3.0' && matrix.ruby != '3.1' && matrix.ruby != 'jruby-10.0' && matrix.async_name != 'absent' && matrix.async_name != 'older' && '1' || '0' }}
     services:
       postgres:
         image: postgres:${{ matrix.pg }}
@@ -170,7 +168,7 @@ jobs:
           rubygems: latest
           cache-version: ${{ matrix.async_name || 'default' }}
       - name: Resolve newest compatible Async
-        if: matrix.async == '>= 2.24'
+        if: matrix.async == '>= 2.25'
         run: bundle update async
       -  name: Print Lockfile
          run: cat ${{ env.BUNDLE_GEMFILE }}.lock
