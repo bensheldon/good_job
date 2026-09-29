@@ -110,7 +110,8 @@ module GoodJob # :nodoc:
         if result.is_a?(String)
           Fugit.parse(result).within(period).map(&:to_t)
         else
-          # A proc returning a Time is scheduled from the last job's cron_at, so #next_at already returns a missed time.
+          # A proc that returns a Time is called with the previous run's time, so when cron starts,
+          # CronManager#create_task already enqueues every run missed since the last job.
           []
         end
       else

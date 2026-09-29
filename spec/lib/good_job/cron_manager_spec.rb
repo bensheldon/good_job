@@ -159,6 +159,23 @@ RSpec.describe GoodJob::CronManager do
       expect(GoodJob::Job.count).to eq 0
     end
 
+    it "does not need to reenqueue missed times of a proc that returns a time" do
+      entry = GoodJob::CronEntry.new(key: 'example', cron: ->(last_at) { last_at ? last_at + 1.hour : Time.current }, class: "TestJob")
+      last_cron_at = 150.minutes.ago.change(usec: 0)
+      GoodJob::CurrentThread.within do |current_thread|
+        current_thread.cron_key = 'example'
+        current_thread.cron_at = last_cron_at
+        TestJob.perform_later
+      end
+
+      cron_manager = described_class.new([entry], start_on_initialize: true)
+
+      wait_until(max: 5) do
+        expect(GoodJob::Job.order(:cron_at).pluck(:cron_at)).to eq [last_cron_at, last_cron_at + 1.hour, last_cron_at + 2.hours]
+      end
+      cron_manager.shutdown
+    end
+
     it "reports an entry's error without affecting other entries" do
       failing_entry = GoodJob::CronEntry.new(key: 'failing', cron: "0 * * * * *", class: "TestJob")
       allow(failing_entry).to receive(:within).and_raise(StandardError, "within failed")

@@ -241,12 +241,12 @@ module GoodJob
     # When the cron manager starts, enqueue cron jobs that were scheduled within this period of time.
     # @return [ActiveSupport::Duration, nil]
     def cron_graceful_restart_period
-      seconds = (
+      value = (
         options[:cron_graceful_restart_period] ||
           rails_config[:cron_graceful_restart_period] ||
           env['GOOD_JOB_CRON_GRACEFUL_RESTART_PERIOD']
       ).to_i
-      seconds.positive? ? seconds.seconds : nil
+      value.positive? ? value.seconds : nil
     end
 
     # The number of queued jobs to select when polling for a job to run.

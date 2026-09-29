@@ -119,9 +119,10 @@ module GoodJob # :nodoc:
     def create_graceful_tasks(cron_entry)
       return unless @graceful_restart_period
 
-      started_at = Time.current
-      future = Concurrent::Future.new(args: [self, cron_entry, started_at], executor: @executor) do |thr_manager, thr_cron_entry, thr_started_at|
-        thr_cron_entry.within((thr_started_at - @graceful_restart_period)..thr_started_at).each do |cron_at|
+      now = Time.current
+      time_period = (now - @graceful_restart_period)..now
+      future = Concurrent::Future.new(args: [self, cron_entry, time_period], executor: @executor) do |thr_manager, thr_cron_entry, thr_time_period|
+        thr_cron_entry.within(thr_time_period).each do |cron_at|
           break unless thr_manager.running?
 
           Rails.application.executor.wrap do
@@ -138,10 +139,16 @@ module GoodJob # :nodoc:
 
     def graceful_restart?
       return false unless @graceful_restart_period
-      return true unless [false, :on_unhandled_error].include?(GoodJob.preserve_job_records)
 
-      GoodJob.logger.warn("GoodJob is ignoring cron_graceful_restart_period because GoodJob.preserve_job_records is #{GoodJob.preserve_job_records.inspect}; cron-created job records must be preserved to avoid re-enqueuing jobs that already ran.")
-      false
+      # These settings delete successfully finished jobs, so the unique index can't prevent re-enqueuing them.
+      # A lambda can't be checked in advance; like running cron on multiple processes, it must preserve cron jobs.
+      preserve = GoodJob.preserve_job_records
+      if [false, :on_unhandled_error].include?(preserve)
+        GoodJob.logger.warn("GoodJob is ignoring cron_graceful_restart_period because GoodJob.preserve_job_records is #{preserve.inspect}; cron-created job records must be preserved to avoid re-enqueuing jobs that already ran.")
+        return false
+      end
+
+      true
     end
   end
 end
