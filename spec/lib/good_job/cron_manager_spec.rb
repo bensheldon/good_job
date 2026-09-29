@@ -139,6 +139,42 @@ RSpec.describe GoodJob::CronManager do
       cron_manager.shutdown
     end
 
+    it "only attempts times after the last job" do
+      cron_entry = cron_entries.first
+      current_minute = Time.current.at_beginning_of_minute
+      GoodJob::CurrentThread.within do |current_thread|
+        current_thread.cron_key = 'example'
+        current_thread.cron_at = current_minute - 2.minutes
+        TestJob.perform_later
+      end
+      allow(cron_entry).to receive(:enqueue).and_call_original
+
+      cron_manager = described_class.new(cron_entries, start_on_initialize: true, graceful_restart_period: 5.minutes)
+
+      wait_until(max: 5) do
+        expect(GoodJob::Job.pluck(:cron_at)).to include(current_minute - 1.minute, current_minute)
+      end
+      cron_manager.shutdown
+      expect(cron_entry).not_to have_received(:enqueue).with(current_minute - 2.minutes)
+      expect(cron_entry).not_to have_received(:enqueue).with(current_minute - 3.minutes)
+    end
+
+    it "ignores jobs enqueued after starting when finding the last job" do
+      current_minute = Time.current.at_beginning_of_minute
+      GoodJob::CurrentThread.within do |current_thread|
+        current_thread.cron_key = 'example'
+        current_thread.cron_at = current_minute + 1.minute
+        TestJob.perform_later
+      end
+
+      cron_manager = described_class.new(cron_entries, start_on_initialize: true, graceful_restart_period: 5.minutes)
+
+      wait_until(max: 5) do
+        expect(GoodJob::Job.where(cron_at: ...(current_minute + 1.minute)).count).to eq 5
+      end
+      cron_manager.shutdown
+    end
+
     it "does not reenqueue jobs when job records are not preserved" do
       GoodJob.preserve_job_records = false
       allow(GoodJob.logger).to receive(:warn)

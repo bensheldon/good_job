@@ -119,10 +119,13 @@ module GoodJob # :nodoc:
     def create_graceful_tasks(cron_entry)
       return unless @graceful_restart_period
 
-      now = Time.current
-      time_period = (now - @graceful_restart_period)..now
-      future = Concurrent::Future.new(args: [self, cron_entry, time_period], executor: @executor) do |thr_manager, thr_cron_entry, thr_time_period|
-        thr_cron_entry.within(thr_time_period).each do |cron_at|
+      started_at = Time.current
+      future = Concurrent::Future.new(args: [self, cron_entry, started_at], executor: @executor) do |thr_manager, thr_cron_entry, thr_started_at|
+        # Resume after the last job from before starting, so that times which already have a job aren't attempted again
+        last_cron_at = Rails.application.executor.wrap { thr_cron_entry.jobs.where(cron_at: ..thr_started_at).maximum(:cron_at) }
+        time_period = [thr_started_at - @graceful_restart_period, last_cron_at].compact.max..thr_started_at
+
+        thr_cron_entry.within(time_period).each do |cron_at|
           break unless thr_manager.running?
 
           Rails.application.executor.wrap do
