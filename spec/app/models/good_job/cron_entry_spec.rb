@@ -185,7 +185,7 @@ describe GoodJob::CronEntry do
 
       entry.send(:fugit)
 
-      expect(Fugit).to have_received(:parse).with('* * * * *')
+      expect(Fugit).to have_received(:parse).with('* * * * *', strict: true)
     end
 
     it 'returns an instance of Fugit::Cron' do

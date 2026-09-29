@@ -214,7 +214,7 @@ module GoodJob # :nodoc:
     end
 
     def fugit
-      @_fugit ||= Fugit.parse(cron)
+      @_fugit ||= Fugit.parse(cron, strict: true)
     end
 
     def job_class_value
