@@ -487,4 +487,33 @@ RSpec.describe GoodJob::Configuration do
       expect(configuration.flattened_queue_string).to eq('default,-mailers:2;mice:3')
     end
   end
+
+  describe '#in_webserver?' do
+    let(:configuration) { described_class.new({}) }
+
+    it 'is false outside of a web server' do
+      allow(configuration).to receive(:caller).and_return(["/app/bin/good_job:5:in '<main>'"])
+      expect(configuration.in_webserver?).to be false
+    end
+
+    it 'is true in a Puma worker boot hook' do
+      worker_boot_caller = [
+        "/gems/puma-7.2.0/lib/puma/configuration.rb:340:in 'Puma::Configuration#run_hooks'",
+        "/gems/puma-7.2.0/lib/puma/cluster/worker.rb:58:in 'Puma::Cluster::Worker#run'",
+        "/gems/puma-7.2.0/lib/puma/cluster.rb:106:in 'Puma::Cluster#spawn_worker'",
+        "/gems/puma-7.2.0/lib/puma/launcher.rb:208:in 'Puma::Launcher#run'",
+      ]
+      allow(configuration).to receive(:caller).and_return(worker_boot_caller)
+      expect(configuration.in_webserver?).to be true
+    end
+
+    it 'is true in a Puma 8 request' do
+      request_caller = [
+        "/gems/puma-8.0.2/lib/puma/response.rb:78:in 'Puma::Response#handle_request'",
+        "/gems/puma-8.0.2/lib/puma/server.rb:508:in 'Puma::Server#process_client'",
+      ]
+      allow(configuration).to receive(:caller).and_return(request_caller)
+      expect(configuration.in_webserver?).to be true
+    end
+  end
 end
