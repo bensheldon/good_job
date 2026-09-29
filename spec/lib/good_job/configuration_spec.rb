@@ -287,6 +287,20 @@ RSpec.describe GoodJob::Configuration do
       allow(Rails.application.config).to receive(:good_job).and_return({ cron_graceful_restart_period: 5.minutes })
       expect(described_class.new({}).cron_graceful_restart_period).to eq 5.minutes
     end
+
+    it 'has no graceful restart period by default' do
+      expect(described_class.new({}).cron_graceful_restart_period).to be_nil
+    end
+
+    it 'converts an integer graceful restart period to a duration' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ cron_graceful_restart_period: 300 })
+      expect(described_class.new({}).cron_graceful_restart_period).to be_a(ActiveSupport::Duration).and eq(5.minutes)
+    end
+
+    it 'reads the graceful restart period from the environment in seconds' do
+      stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CRON_GRACEFUL_RESTART_PERIOD' => '300' })
+      expect(described_class.new({}).cron_graceful_restart_period).to eq 5.minutes
+    end
   end
 
   describe '#enable_listen_notify' do

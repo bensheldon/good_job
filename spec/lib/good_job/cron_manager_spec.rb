@@ -132,11 +132,48 @@ RSpec.describe GoodJob::CronManager do
     it "reenqueues jobs scheduled for the previous period" do
       cron_manager = described_class.new(cron_entries, start_on_initialize: false, graceful_restart_period: 5.minutes)
       cron_manager.start
-      cron_manager.shutdown
 
       wait_until(max: 5) do
         expect(GoodJob::Job.count).to eq 5
       end
+      cron_manager.shutdown
+    end
+
+    it "does not reenqueue jobs when job records are not preserved" do
+      GoodJob.preserve_job_records = false
+      allow(GoodJob.logger).to receive(:warn)
+
+      cron_manager = described_class.new(cron_entries, start_on_initialize: false, graceful_restart_period: 5.minutes)
+      cron_manager.start
+      cron_manager.shutdown
+
+      expect(GoodJob.logger).to have_received(:warn).with(/ignoring cron_graceful_restart_period/)
+      sleep 0.5
+      expect(GoodJob::Job.count).to eq 0
+    end
+
+    it "does not reenqueue jobs once shut down" do
+      cron_manager = described_class.new(cron_entries, start_on_initialize: false, graceful_restart_period: 5.minutes, executor: Concurrent::ImmediateExecutor.new)
+      cron_manager.create_graceful_tasks(cron_entries.first)
+
+      expect(GoodJob::Job.count).to eq 0
+    end
+
+    it "reports an entry's error without affecting other entries" do
+      failing_entry = GoodJob::CronEntry.new(key: 'failing', cron: "0 * * * * *", class: "TestJob")
+      allow(failing_entry).to receive(:within).and_raise(StandardError, "within failed")
+
+      cron_manager = described_class.new([failing_entry, *cron_entries], start_on_initialize: false, graceful_restart_period: 5.minutes)
+      cron_manager.start
+
+      wait_until(max: 5) do
+        expect(GoodJob::Job.where(cron_key: 'example').count).to eq 5
+        expect(THREAD_ERRORS.map { |_name, error, _backtrace| error.message }).to eq ["within failed"]
+      end
+      expect(cron_manager.instance_variable_get(:@tasks).keys).to contain_exactly('failing', 'example')
+
+      cron_manager.shutdown
+      THREAD_ERRORS.clear
     end
   end
 end

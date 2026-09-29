@@ -110,7 +110,8 @@ module GoodJob # :nodoc:
         if result.is_a?(String)
           Fugit.parse(result).within(period).map(&:to_t)
         else
-          result
+          # A proc returning a Time is scheduled from the last job's cron_at, so #next_at already returns a missed time.
+          []
         end
       else
         fugit.within(period).map(&:to_t)
