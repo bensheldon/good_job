@@ -72,7 +72,8 @@ module GoodJob
         def resolve_label(job)
           return if @label.blank?
 
-          @label.respond_to?(:call) ? job.instance_exec(&@label) : @label
+          label = @label.respond_to?(:call) ? job.instance_exec(&@label) : @label
+          label.to_s.strip.presence
         end
 
         def resolve_limit(job, value)
@@ -102,7 +103,7 @@ module GoodJob
         end
 
         def check_enqueue(limit, throttle, job, key, label, enqueue_limit_flag: false)
-          return nil if label.present? && job.good_job_labels.exclude?(label)
+          return nil if label.present? && job.good_job_labels.none? { |job_label| job_label.to_s.strip == label }
 
           query_scope = query_scope(label, key)
           exceeded = nil
@@ -156,7 +157,7 @@ module GoodJob
         end
 
         def check_perform(limit, throttle, job, key, label)
-          return nil if label.present? && job.good_job_labels.exclude?(label)
+          return nil if label.present? && job.good_job_labels.none? { |job_label| job_label.to_s.strip == label }
 
           query_scope = query_scope(label, key)
           exceeded = nil

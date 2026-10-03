@@ -611,7 +611,7 @@ MyJob.set(good_job_labels: ["email"]).perform_later
 
 #### Dynamic labels
 
-A rule's `label:` can also be a Lambda/Proc that is invoked in the context of the job instance, for example to derive the label from job arguments. The lambda resolves the label to check against; the job's `good_job_labels` must still contain it for the rule to apply.
+A rule's `label:` can also be a Lambda/Proc that is invoked in the context of the job instance, for example to derive the label from job arguments. The lambda resolves the label to check against; the job's `good_job_labels` must still contain it for the rule to apply. Rule labels and job labels are converted to strings and stripped of surrounding whitespace when matched, consistent with how labels are stored.
 
 Apply labels dynamically in a `before_enqueue` callback. They are stored on the job record and checked by rules that run when the job is performed:
 
@@ -620,11 +620,11 @@ class MyJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
 
   before_enqueue do |job|
-    job.good_job_labels = [job.arguments.first[:user_id]]
+    job.good_job_labels = [job.arguments.first[:user_id].to_s]
   end
 
   good_job_concurrency_rule(
-    label: -> { arguments.first[:user_id] },
+    label: -> { arguments.first[:user_id].to_s },
     perform_limit: 1
   )
 
@@ -637,10 +637,10 @@ end
 Rules are checked when a job is enqueued and again when it is performed. Labels assigned in `before_enqueue` are present for the before-perform check, but not for checks that run at enqueue time (`enqueue_limit`, `enqueue_throttle`, and `total_limit` when no enqueue-specific limit is configured). For those, pass the label when enqueuing:
 
 ```ruby
-MyJob.set(good_job_labels: [user_id]).perform_later(user_id: user_id)
+MyJob.set(good_job_labels: [user_id.to_s]).perform_later(user_id: user_id)
 ```
 
-A concurrency rule counts every unfinished job in the table that carries the resolved label, regardless of job class.
+Rules apply across job classes to jobs carrying the resolved label. `total_limit` counts unfinished jobs, `enqueue_limit` excludes claimed/performing jobs, and `perform_limit` counts running jobs. Throttles count enqueued jobs or executions within their time window, including finished ones.
 
 #### How concurrency controls work
 
