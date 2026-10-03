@@ -7,6 +7,10 @@ module GoodJob
     # We can't rely on +config.action_controller.include_all_helpers = true+ in the host app.
     include IconsHelper
 
+    # Maximum length of an individual string rendered inside serialized params
+    # and arguments on the dashboard, so very large payloads cannot stall the page.
+    MAX_DISPLAY_STRING_LENGTH = 1_000
+
     def job_action_states
       {
         reschedule: %w[scheduled retried queued],
@@ -15,6 +19,20 @@ module GoodJob
         force_discard: %w[running],
         destroy: %w[discarded succeeded],
       }
+    end
+
+    # Truncates long strings within a JSON-like structure for dashboard display.
+    def truncate_display_value(value, limit: MAX_DISPLAY_STRING_LENGTH)
+      case value
+      when String
+        value.length > limit ? "#{value.first(limit)}… [#{value.length} characters total]" : value
+      when Array
+        value.map { |element| truncate_display_value(element, limit: limit) }
+      when Hash
+        value.transform_values { |element| truncate_display_value(element, limit: limit) }
+      else
+        value
+      end
     end
 
     def format_duration(sec)
