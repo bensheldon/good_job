@@ -483,6 +483,8 @@ module GoodJob
         self_caller = caller
         self_caller.grep(%r{config.ru}).any? || # EXAMPLE: config.ru:3:in `block in <main>' OR config.ru:3:in `new_from_string'
           self_caller.grep(%r{puma/request}).any? || # EXAMPLE: puma-5.6.4/lib/puma/request.rb:76:in `handle_request'
+          self_caller.grep(%r{puma/response}).any? || # EXAMPLE: puma-8.0.2/lib/puma/response.rb:78:in 'Puma::Response#handle_request'
+          self_caller.grep(%r{/puma/(?:cluster/worker|single)\.rb:\d+:}).any? || # EXAMPLE: puma-7.2.0/lib/puma/cluster/worker.rb:58:in `run' or puma-7.2.0/lib/puma/single.rb:44:in `run'
           self_caller.grep(%{/rack/handler/}).any? || # EXAMPLE: iodine-0.7.44/lib/rack/handler/iodine.rb:13:in `start'
           (Concurrent.on_jruby? && self_caller.grep(%r{jruby/rack/rails_booter}).any?) # EXAMPLE: uri:classloader:/jruby/rack/rails_booter.rb:83:in `load_environment'
       end || false
