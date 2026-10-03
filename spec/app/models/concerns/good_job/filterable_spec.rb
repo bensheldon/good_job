@@ -70,6 +70,19 @@ RSpec.describe GoodJob::Filterable do
       expect(model_class.search_text('BoomError')).to include(oversized_job)
     end
 
+    it 'does not raise when serialized_params exceeds the tsvector size limit' do
+      oversized_job = model_class.create!(
+        active_job_id: SecureRandom.uuid,
+        queue_name: "default",
+        job_class: "ExampleJob",
+        scheduled_at: Time.current,
+        serialized_params: { arguments: [Array.new(300_000) { |i| "w#{i}" }.join(' ')] }
+      )
+
+      expect { model_class.search_text('anything').to_a }.not_to raise_error
+      expect(model_class.search_text('w42')).to include(oversized_job)
+    end
+
     it 'is chainable and reversible' do
       expect(model_class.where.not(id: nil).search_text('example_value').reverse).to include(job)
     end
