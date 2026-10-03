@@ -31,11 +31,13 @@ require_relative "good_job/daemon"
 require_relative "good_job/dependencies"
 require_relative "good_job/job_performer"
 require_relative "good_job/job_performer/metrics"
+require_relative "good_job/lifecycle_hooks"
 require_relative "good_job/log_subscriber"
 require_relative "good_job/multi_scheduler"
 require_relative "good_job/notifier"
 require_relative "good_job/poller"
 require_relative "good_job/probe_server"
+require_relative "good_job/probe_server/cluster_healthcheck_middleware"
 require_relative "good_job/probe_server/healthcheck_middleware"
 require_relative "good_job/probe_server/not_found_app"
 require_relative "good_job/probe_server/simple_handler"
@@ -43,6 +45,8 @@ require_relative "good_job/probe_server/webrick_handler"
 require_relative "good_job/safe_state"
 require_relative "good_job/scheduler"
 require_relative "good_job/shared_executor"
+require_relative "good_job/subprocess"
+require_relative "good_job/supervisor"
 require_relative "good_job/systemd_service"
 require_relative "good_job/thread_status"
 
@@ -52,6 +56,14 @@ require_relative "good_job/thread_status"
 module GoodJob
   include GoodJob::Dependencies
   include GoodJob::ThreadStatus
+  include GoodJob::LifecycleHooks
+
+  # Built-in cluster lifecycle hooks. Inherited database connections must not be
+  # shared across a fork, so they are discarded both in the supervisor before it
+  # forks and in each subprocess before it boots; fresh connections are then
+  # established lazily. Registered first so they run before any application hook.
+  before_supervisor_fork { ActiveRecord::Base.connection_handler.clear_all_connections! }
+  before_subprocess_boot { ActiveRecord::Base.connection_handler.clear_all_connections! }
 
   # Default, null, blank value placeholder.
   NONE = Module.new.freeze
@@ -315,8 +327,18 @@ module GoodJob
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
+    cron_index_definition = GoodJob::Job.connection_pool.with_connection do |connection|
+      connection.select_value(<<~SQL.squish)
+        SELECT indexdef
+        FROM pg_indexes
+        WHERE schemaname = ANY (current_schemas(false))
+          AND tablename = #{connection.quote(GoodJob::Job.table_name)}
+          AND indexname = #{connection.quote('index_good_jobs_on_cron_key_and_cron_at_cond')}
+      SQL
+    end
+
     GoodJob::Job.lock_type_migrated? &&
-      GoodJob::Job.connection.index_name_exists?(GoodJob::Job.table_name, "index_good_jobs_on_discarded_job_class")
+      cron_index_definition.to_s.include?("cron_at DESC NULLS LAST")
   end
 
   # Pause job execution for a given queue or job class.

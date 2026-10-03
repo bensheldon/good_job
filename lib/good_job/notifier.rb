@@ -226,9 +226,11 @@ module GoodJob # :nodoc:
 
                 ActiveSupport::Notifications.instrument("notifier_notified.good_job", { payload: payload })
                 parsed_payload = JSON.parse(payload, symbolize_names: true)
-                thr_recipients.each do |recipient|
-                  target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
-                  target.send(method_name, parsed_payload)
+                Rails.application.executor.wrap do
+                  thr_recipients.each do |recipient|
+                    target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
+                    target.send(method_name, parsed_payload)
+                  end
                 end
               end
 
