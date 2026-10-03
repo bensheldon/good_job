@@ -21,6 +21,22 @@ describe GoodJob::Capsule do
       capsule.shutdown
     end
 
+    it 'enqueues cron jobs' do
+      stub_const 'TestJob', (Class.new(ActiveJob::Base) do
+        def perform
+        end
+      end)
+      ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+      options = { enable_cron: true, cron: { example: { cron: '* * * * * *', class: 'TestJob' } } }
+      capsule = described_class.new(configuration: GoodJob::Configuration.new(options))
+      capsule.start
+
+      wait_until(max: 5) do
+        expect(GoodJob::Job.where(cron_key: 'example').count).to be > 0
+      end
+      capsule.shutdown
+    end
+
     it 'enqueues cron jobs from the graceful restart period' do
       stub_const 'TestJob', (Class.new(ActiveJob::Base) do
         def perform

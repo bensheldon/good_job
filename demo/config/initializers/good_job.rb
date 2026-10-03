@@ -49,7 +49,22 @@ when 'development'
     }
   end
 when 'test'
-  # test
+  # Exercised by spec/integration/supervisor_spec.rb to prove cluster lifecycle
+  # hooks fire in the right process. Writes to $stdout (not GoodJob.logger, which
+  # in test is the test.log Rails logger) so ShellOut can observe the output.
+  if ActiveModel::Type::Boolean.new.cast(ENV['GOOD_JOB_TEST_LIFECYCLE_HOOKS'])
+    GoodJob.before_supervisor_fork { $stdout.puts "[test hook] before_supervisor_fork PID=#{Process.pid}" }
+    GoodJob.before_subprocess_boot { $stdout.puts "[test hook] before_subprocess_boot PID=#{Process.pid}" }
+  end
+
+  # Holds each subprocess inside its boot hook so a spec can deterministically
+  # signal the supervisor while its subprocesses are still booting.
+  if (subprocess_boot_delay = ENV['GOOD_JOB_TEST_SUBPROCESS_BOOT_DELAY'].presence)
+    GoodJob.before_subprocess_boot do
+      $stdout.puts "[test hook] subprocess_boot_delay PID=#{Process.pid}"
+      sleep subprocess_boot_delay.to_f
+    end
+  end
 when 'demo'
   Rails.application.configure do
     config.good_job.execution_mode = :async

@@ -1,0 +1,51 @@
+# frozen_string_literal: true
+
+class ReorderGoodJobsCronIndex < ActiveRecord::Migration[8.0]
+  CURRENT_INDEX = :index_good_jobs_on_cron_key_and_cron_at_cond
+  REPLACEMENT_INDEX = :index_good_jobs_on_cron_key_and_cron_at_desc_cond
+
+  disable_ddl_transaction!
+
+  def up
+    return if cron_index_has_expected_order?
+
+    add_index :good_jobs, [:cron_key, :cron_at],
+      name: REPLACEMENT_INDEX,
+      order: { cron_at: "DESC NULLS LAST" },
+      where: "cron_key IS NOT NULL",
+      unique: true,
+      algorithm: :concurrently,
+      if_not_exists: true
+    remove_index :good_jobs, name: CURRENT_INDEX, algorithm: :concurrently, if_exists: true
+    rename_index :good_jobs, REPLACEMENT_INDEX, CURRENT_INDEX
+  end
+
+  def down
+    return if cron_index_definition && !cron_index_has_expected_order?
+
+    add_index :good_jobs, [:cron_key, :cron_at],
+      name: REPLACEMENT_INDEX,
+      where: "cron_key IS NOT NULL",
+      unique: true,
+      algorithm: :concurrently,
+      if_not_exists: true
+    remove_index :good_jobs, name: CURRENT_INDEX, algorithm: :concurrently, if_exists: true
+    rename_index :good_jobs, REPLACEMENT_INDEX, CURRENT_INDEX
+  end
+
+  private
+
+  def cron_index_has_expected_order?
+    cron_index_definition&.include?("cron_at DESC NULLS LAST")
+  end
+
+  def cron_index_definition
+    connection.select_value(<<~SQL.squish)
+      SELECT indexdef
+      FROM pg_indexes
+      WHERE schemaname = ANY (current_schemas(false))
+        AND tablename = #{connection.quote('good_jobs')}
+        AND indexname = #{connection.quote(CURRENT_INDEX.to_s)}
+    SQL
+  end
+end

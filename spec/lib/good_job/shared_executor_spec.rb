@@ -5,6 +5,20 @@ require 'rails_helper'
 RSpec.describe GoodJob::SharedExecutor do
   let(:shared_executor) { described_class.new }
 
+  describe '#post' do
+    it 'runs a task while another task is still running' do
+      blocker = Concurrent::Event.new
+      ran = Concurrent::Event.new
+      shared_executor.post { blocker.wait(5) }
+      shared_executor.post { ran.set }
+
+      expect(ran.wait(2)).to be true
+    ensure
+      blocker.set
+      shared_executor.shutdown(timeout: -1)
+    end
+  end
+
   describe '#shutdown' do
     it 'takes a timeout' do
       shared_executor.shutdown(timeout: -1)
