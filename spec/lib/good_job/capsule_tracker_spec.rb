@@ -264,6 +264,38 @@ describe GoodJob::CapsuleTracker do
       expect(tracker.locks).to eq 0
     end
 
+    it 'acquires refresh connections outside the mutex and retries on the next scheduled refresh after a checkout timeout' do
+      stub_const("GoodJob::Process::STALE_INTERVAL", 0.05.seconds)
+      refreshed = Concurrent::Event.new
+      main_thread = Thread.current
+      mutex = tracker.instance_variable_get(:@mutex)
+      timed_out = false
+      pool = GoodJob::Process.connection_pool
+
+      tracker.register
+      tracker.id_for_lock
+      allow(pool).to receive(:with_connection).and_wrap_original do |original, *args, **kwargs, &block|
+        if Thread.current != main_thread && !timed_out
+          # A notifier holding the last connection must be able to enter the mutex
+          # while this refresh is waiting for a connection.
+          available = mutex.try_lock
+          mutex.unlock if available
+          expect(available).to be true
+          timed_out = true
+          raise ActiveRecord::ConnectionTimeoutError
+        end
+        original.call(*args, **kwargs, &block)
+      end
+      allow(tracker).to receive(:renew).and_wrap_original do |original, *args, **kwargs|
+        original.call(*args, **kwargs).tap { refreshed.set }
+      end
+
+      expect(refreshed.wait(2)).to be true
+      expect(timed_out).to be true
+    ensure
+      tracker.unregister
+    end
+
     it 'removes the process when locks are zero' do
       inner_block_called = nil
       tracker.register do

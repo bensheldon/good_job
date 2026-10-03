@@ -215,6 +215,93 @@ RSpec.describe GoodJob::Notifier do
         allow(GoodJob.configuration).to receive(:advisory_lock_heartbeat).and_return(true)
       end
 
+      it 'preserves the advisory lock across a checkout timeout and lets jobs return connections while waiting to unregister' do
+        pool = GoodJob::Process.connection_pool
+        lock_connection = pool.checkout
+        pool.remove(lock_connection)
+        tracker = GoodJob::CapsuleTracker.new(executor: nil)
+        tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+        job_ready = Concurrent::Event.new
+        finish_job = Concurrent::Event.new
+        job_finished = Concurrent::Event.new
+        waiting_for_connection = Concurrent::Event.new
+        held_connections = []
+
+        job_thread = Thread.new do
+          pool.with_connection do
+            tracker.register
+            job_ready.set
+            finish_job.wait
+            tracker.unregister
+          end
+          job_finished.set
+        end
+        expect(job_ready.wait(5)).to be true
+        held_connections << pool.checkout while pool.stat[:busy] < pool.size
+
+        checkout_attempts = 0
+        allow(pool).to receive(:checkout).and_wrap_original do |original, *args|
+          if checkout_attempts < 2
+            expect(tracker.record.lock_type).to eq('advisory')
+            expect(PgLock.advisory_lock_details_for(lock_connection)).not_to be_empty
+            checkout_attempts += 1
+          end
+          unless waiting_for_connection.set?
+            waiting_for_connection.set
+            raise ActiveRecord::ConnectionTimeoutError
+          end
+          waiting_for_connection.set
+          original.call(*args)
+        end
+        notifier_thread = Thread.new do
+          notifier = described_class.allocate
+          notifier.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
+          notifier.instance_variable_set(:@advisory_lock_heartbeat, true)
+          notifier.connection = lock_connection
+          notifier.deregister_process
+        ensure
+          notifier.connection = nil
+        end
+
+        expect(waiting_for_connection.wait(5)).to be true
+        finish_job.set
+        expect(job_finished.wait(2)).to be true
+        notifier_thread.value
+        expect(checkout_attempts).to eq 2
+        expect(tracker.locks).to eq 0
+        expect(GoodJob::Process.where(id: tracker.process_id)).not_to exist
+      ensure
+        finish_job&.set
+        held_connections&.each { |conn| pool.checkin(conn) }
+        job_thread&.join
+        notifier_thread&.join
+        tracker&.unregister(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+        tracker&.unregister
+        lock_connection&.disconnect!
+      end
+
+      it 'skips a refresh checkout timeout without unregistering the process' do
+        notifier = described_class.allocate
+        tracker = instance_spy(GoodJob::CapsuleTracker)
+        notifier.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
+        allow(GoodJob::Process.connection_pool).to receive(:with_connection).and_raise(ActiveRecord::ConnectionTimeoutError)
+        expect { notifier.refresh_process }.not_to raise_error
+        expect(tracker).not_to have_received(:renew)
+        expect(tracker).not_to have_received(:unregister)
+      ensure
+        allow(GoodJob::Process.connection_pool).to receive(:with_connection).and_call_original
+      end
+
+      it 'does not retry a timeout raised after deregistration starts' do
+        notifier = described_class.allocate
+        tracker = instance_double(GoodJob::CapsuleTracker)
+        notifier.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
+        allow(tracker).to receive(:unregister).and_raise(ActiveRecord::ConnectionTimeoutError)
+
+        expect { notifier.deregister_process }.to raise_error(ActiveRecord::ConnectionTimeoutError)
+        expect(tracker).to have_received(:unregister).once
+      end
+
       it 'takes an advisory lock on the process record' do
         notifier = described_class.new(enable_listening: true)
 
