@@ -515,5 +515,23 @@ RSpec.describe GoodJob::Configuration do
       allow(configuration).to receive(:caller).and_return(request_caller)
       expect(configuration.in_webserver?).to be true
     end
+
+    it 'is true in a Puma cluster worker without the launcher in the stack' do
+      cluster_caller = [
+        "/gems/puma-6.4.3/lib/puma/cluster/worker.rb:57:in `run'",
+        "/gems/puma-6.4.3/lib/puma/cluster.rb:216:in `worker'",
+      ]
+      allow(configuration).to receive(:caller).and_return(cluster_caller)
+      expect(configuration.in_webserver?).to be true
+    end
+
+    it 'is true when called from the Puma launcher alone' do
+      launcher_caller = [
+        "/gems/puma-6.4.3/lib/puma/launcher.rb:194:in `run'",
+        "/gems/puma-6.4.3/lib/puma/cli.rb:75:in `launcher'",
+      ]
+      allow(configuration).to receive(:caller).and_return(launcher_caller)
+      expect(configuration.in_webserver?).to be true
+    end
   end
 end
