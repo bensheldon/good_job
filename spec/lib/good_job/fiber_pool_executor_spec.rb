@@ -195,6 +195,51 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
   end
 
   describe '#shutdown' do
+    [nil, 0.2].each do |timeout|
+      it "waits for replacement reactors during shutdown with timeout #{timeout.inspect}" do
+        started = Concurrent::CountDownLatch.new(5)
+        replacement_started = Concurrent::Event.new
+        release = Concurrent::Event.new
+        joining = Concurrent::Event.new
+        5.times do
+          executor.post do
+            started.count_down
+            sleep 60
+          end
+        end
+        expect(started.wait(5)).to be true
+        executor.post do
+          replacement_started.set
+          release.wait(5)
+        end
+        executor.shutdown
+        reactor = executor.instance_variable_get(:@reactor_thread)
+        allow(reactor).to receive(:join).and_wrap_original do |original, *args|
+          joining.set
+          original.call(*args)
+        end
+        waiter = Thread.new { executor.wait_for_termination(timeout) }
+        expect(joining.wait(5)).to be true
+        reactor.kill
+        expect(replacement_started.wait(5)).to be true
+
+        if timeout
+          expect(waiter.join(5)).to eq waiter
+          expect(waiter.value).to be false
+        else
+          expect(waiter.join(0.05)).to be_nil
+        end
+        release.set
+        expect(waiter.join(5)).to eq waiter
+        expect(waiter.value).to be true unless timeout
+        expect(executor.wait_for_termination(5)).to be true
+        expect(executor).to be_shutdown
+      ensure
+        release&.set
+        waiter&.join(5)
+      end
+    end
+
     it 'drains accepted work when shutdown precedes reactor startup' do
       entered = Concurrent::Event.new
       release = Concurrent::Event.new

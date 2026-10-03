@@ -49,7 +49,7 @@
     {
       "warning_type": "Dangerous Eval",
       "warning_code": 13,
-      "fingerprint": "54b7ac445eea2aa1735ae97fab1d841e15405a747ba0fdb577cf779286647534",
+      "fingerprint": "07a0aaf281a85d85c91bb71e7cf23db1e5afcd44edf57b57f3d05a69b509e931",
       "check_name": "Evaluation",
       "message": "Dynamic string evaluated as code",
       "file": "lib/good_job/log_subscriber.rb",

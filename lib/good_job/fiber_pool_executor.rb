@@ -85,8 +85,16 @@ module GoodJob # :nodoc:
     # @param timeout [Numeric, nil] seconds to wait, or +nil+ to wait forever
     # @return [Boolean] whether the executor fully stopped
     def wait_for_termination(timeout = nil)
-      thread = @mutex.synchronize { @reactor_thread }
-      thread.nil? || !thread.join(timeout).nil?
+      deadline = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) + timeout if timeout
+
+      loop do
+        thread = @mutex.synchronize { @reactor_thread }
+        return true unless thread
+
+        remaining = [deadline - ::Process.clock_gettime(::Process::CLOCK_MONOTONIC), 0].max if deadline
+        return false unless thread.join(remaining)
+        return true if @mutex.synchronize { @reactor_thread == thread }
+      end
     end
 
     # @return [Integer] available capacity after counting running and queued tasks
