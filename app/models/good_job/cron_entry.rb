@@ -109,7 +109,9 @@ module GoodJob # :nodoc:
         if result.is_a?(String)
           parse_cron_string(result)&.within(period)&.map(&:to_t) || []
         else
-          result
+          # A proc that returns a Time is called with the previous run's time, so when cron starts,
+          # CronManager#create_task already enqueues every run missed since the last job.
+          []
         end
       else
         fugit&.within(period)&.map(&:to_t) || []
