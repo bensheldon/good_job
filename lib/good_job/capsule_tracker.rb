@@ -43,7 +43,7 @@ module GoodJob # :nodoc:
     # @return [String, nil]
     def id_for_lock
       value = nil
-      synchronize do
+      synchronize(with_connection: true) do
         next if @locks.zero?
 
         if @record
@@ -71,7 +71,7 @@ module GoodJob # :nodoc:
     # @yield [void] If a block is given, the process will be unregistered after the block completes.
     # @return [void]
     def register(with_advisory_lock: false, advisory_lock_connection: nil)
-      synchronize do
+      synchronize(with_connection: with_advisory_lock) do
         if with_advisory_lock && !advisory_locked?
           if @record
             @record.advisory_lock!(connection: advisory_lock_connection)
@@ -100,7 +100,7 @@ module GoodJob # :nodoc:
     # @param advisory_lock_connection [ActiveRecord::ConnectionAdapters::AbstractAdapter, nil] Persistent connection holding the advisory lock.
     # @return [void]
     def unregister(with_advisory_lock: false, advisory_lock_connection: nil)
-      synchronize do
+      synchronize(with_connection: true) do
         return if @locks.zero?
 
         # Only advisory callers may check liveness: the LISTEN connection belongs
@@ -136,7 +136,7 @@ module GoodJob # :nodoc:
     # @param silent [Boolean] Whether to silence logging.
     # @return [void]
     def renew(silent: false)
-      synchronize do
+      synchronize(with_connection: true) do
         GoodJob::Process.with_logger_silenced(silent: silent) do
           @record&.refresh_if_stale(cleanup: true)
         end
@@ -224,8 +224,11 @@ module GoodJob # :nodoc:
     end
 
     # Synchronize must always be called from within a Rails Executor; it may deadlock if the order is reversed.
-    def synchronize(&block)
-      if @mutex.owned?
+    # Database operations must also acquire a pooled connection before the mutex.
+    def synchronize(with_connection: false, &block)
+      if with_connection
+        GoodJob::Process.connection_pool.with_connection { synchronize(&block) }
+      elsif @mutex.owned?
         yield
       else
         @mutex.synchronize(&block)

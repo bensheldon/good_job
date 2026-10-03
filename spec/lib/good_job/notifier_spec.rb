@@ -257,6 +257,7 @@ RSpec.describe GoodJob::Notifier do
           notifier = described_class.allocate
           notifier.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
           notifier.instance_variable_set(:@advisory_lock_heartbeat, true)
+          notifier.instance_variable_set(:@process_registered, true)
           notifier.connection = lock_connection
           notifier.deregister_process
         ensure
@@ -280,6 +281,48 @@ RSpec.describe GoodJob::Notifier do
         lock_connection&.disconnect!
       end
 
+      it 'preserves job registrations when notifier registration times out' do
+        tracker = GoodJob::CapsuleTracker.new(executor: nil)
+        tracker.register
+        tracker.register
+        process_id = tracker.id_for_lock
+        notifier = described_class.allocate
+        notifier.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
+        pool = GoodJob::Process.connection_pool
+        allow(pool).to receive(:with_connection).and_raise(ActiveRecord::ConnectionTimeoutError)
+
+        expect { notifier.register_process }.to raise_error(ActiveRecord::ConnectionTimeoutError)
+        # The listen task invokes unlisten callbacks even when registration fails.
+        expect { notifier.deregister_process }.not_to raise_error
+        expect(tracker.locks).to eq 2
+
+        allow(pool).to receive(:with_connection).and_call_original
+        tracker.unregister
+        expect(GoodJob::Process.where(id: process_id)).to exist
+        expect(tracker.locks).to eq 1
+        tracker.unregister
+        expect(GoodJob::Process.where(id: process_id)).not_to exist
+      ensure
+        allow(pool).to receive(:with_connection).and_call_original if pool
+        tracker&.unregister
+        tracker&.unregister
+      end
+
+      it 'unregisters a successful notifier registration only once' do
+        tracker = GoodJob::CapsuleTracker.new(executor: nil)
+        tracker.register
+        notifier = described_class.allocate
+        notifier.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
+        notifier.register_process
+        expect(tracker.locks).to eq 2
+
+        notifier.deregister_process
+        notifier.deregister_process
+        expect(tracker.locks).to eq 1
+      ensure
+        tracker&.unregister
+      end
+
       it 'skips a refresh checkout timeout without unregistering the process' do
         notifier = described_class.allocate
         tracker = instance_spy(GoodJob::CapsuleTracker)
@@ -294,6 +337,7 @@ RSpec.describe GoodJob::Notifier do
 
       it 'does not retry a timeout raised after deregistration starts' do
         notifier = described_class.allocate
+        notifier.instance_variable_set(:@process_registered, true)
         tracker = instance_double(GoodJob::CapsuleTracker)
         notifier.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
         allow(tracker).to receive(:unregister).and_raise(ActiveRecord::ConnectionTimeoutError)

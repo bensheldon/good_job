@@ -18,6 +18,7 @@ module GoodJob # :nodoc:
         GoodJob::Process.connection_pool.with_connection do
           @capsule.tracker.cleanup
           @capsule.tracker.register(with_advisory_lock: @advisory_lock_heartbeat, advisory_lock_connection: connection)
+          @process_registered = true
         end
       end
 
@@ -31,10 +32,13 @@ module GoodJob # :nodoc:
 
       # Deregisters the current process.
       def deregister_process
+        return unless @process_registered
+
         # Acquire a pooled connection before the tracker mutex: job threads need that
         # mutex to finish their registrations and return their connections to the pool.
         with_heartbeat_connection(retry_checkout: true) do
           @capsule.tracker.unregister(with_advisory_lock: @advisory_lock_heartbeat, advisory_lock_connection: connection)
+          @process_registered = false
         end
       end
 

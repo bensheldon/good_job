@@ -5,6 +5,58 @@ require 'rails_helper'
 describe GoodJob::CapsuleTracker do
   let(:tracker) { described_class.new }
 
+  describe 'connection checkout ordering' do
+    [:id_for_lock, :register, :unregister, :renew].each do |operation|
+      it "allows heartbeat renewal while #{operation} waits for a connection" do
+        tracker = described_class.new(executor: nil)
+        tracker.register
+        tracker.id_for_lock
+        tracker.record.update!(updated_at: 1.minute.ago)
+        waiting_for_connection = Concurrent::Event.new
+        allow_checkout = Concurrent::Event.new
+        heartbeat_finished = Concurrent::Event.new
+        pool = GoodJob::Process.connection_pool
+        job_thread = nil
+
+        allow(pool).to receive(:checkout).and_wrap_original do |original, *args|
+          if Thread.current == job_thread && !waiting_for_connection.set?
+            waiting_for_connection.set
+            raise 'Timed out waiting to release checkout' unless allow_checkout.wait(5)
+          end
+          original.call(*args)
+        end
+        job_thread = Thread.new do
+          Rails.application.executor.wrap do
+            if operation == :register
+              tracker.register(with_advisory_lock: true) do
+                expect(tracker).to be_advisory_locked
+              end
+            else
+              tracker.public_send(operation)
+            end
+          end
+        end
+        expect(waiting_for_connection.wait(2)).to be true
+
+        heartbeat_thread = Thread.new do
+          Rails.application.executor.wrap do
+            pool.with_connection { tracker.renew }
+          end
+          heartbeat_finished.set
+        end
+        expect(heartbeat_finished.wait(2)).to be true
+        allow_checkout.set
+        job_thread.value
+        heartbeat_thread.value
+      ensure
+        allow_checkout&.set
+        job_thread&.join
+        heartbeat_thread&.join
+        tracker&.unregister
+      end
+    end
+  end
+
   describe '#register' do
     context 'when used with an advisory lock' do
       it 'creates a Process and sets the lock_type' do
