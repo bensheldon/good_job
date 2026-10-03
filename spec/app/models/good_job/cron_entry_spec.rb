@@ -123,6 +123,14 @@ describe GoodJob::CronEntry do
     it 'returns an array of timestamps for the time period' do
       expect(entry.within(2.minutes.ago..Time.current)).to eq([Time.current.at_beginning_of_minute - 1.minute, Time.current.at_beginning_of_minute])
     end
+
+    context 'when the cron is a proc that returns a time' do
+      let(:params) { super().merge(cron: ->(_last_ran) { 1.minute.ago }) }
+
+      it 'returns an empty array' do
+        expect(entry.within(2.minutes.ago..Time.current)).to eq([])
+      end
+    end
   end
 
   describe '#enabled' do

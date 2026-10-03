@@ -296,10 +296,15 @@ module GoodJob
       cron.map { |cron_key, params| GoodJob::CronEntry.new(params.merge(key: cron_key)) }
     end
 
+    # When the cron manager starts, enqueue cron jobs that were scheduled within this period of time.
+    # @return [ActiveSupport::Duration, nil]
     def cron_graceful_restart_period
-      options[:cron_graceful_restart_period] ||
-        rails_config[:cron_graceful_restart_period] ||
-        env['GOOD_JOB_CRON_GRACEFUL_RESTART_PERIOD']
+      value = (
+        options[:cron_graceful_restart_period] ||
+          rails_config[:cron_graceful_restart_period] ||
+          env['GOOD_JOB_CRON_GRACEFUL_RESTART_PERIOD']
+      ).to_i
+      value.positive? ? value.seconds : nil
     end
 
     # The number of queued jobs to select when polling for a job to run.
