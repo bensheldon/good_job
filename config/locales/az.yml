@@ -234,15 +234,28 @@ az:
         value: Dəyər
     performance:
       index:
-        average_duration: Orta müddət
-        chart_title: Tapşırıqların saniyə ilə ümumi icra müddəti
+        chart_title: Saniyə ilə ümumi icra gecikməsi
+        chart_title_queue: Saniyə ilə orta növbə gecikməsi
+        chart_title_total: Saniyə ilə orta ümumi gecikmə
+        execution_latency: İcra gecikməsi
         executions: İcralar
         job_class: Tapşırığın sinfi
-        maximum_duration: Ən uzun müddət
-        minimum_duration: Ən qısa müddət
+        jobs: Tapşırıqlar
         no_executions: Bu vaxt aralığında icra yoxdur.
+        queue_latency: Növbə gecikməsi
         queue_name: Növbənin adı
         title: Məhsuldarlıq
+        total_latency: Ümumi gecikmə
+      latency:
+        average: orta
+        maximum: maks
+        minimum: min
+      metric:
+        chart_metric: Qrafik metrikası
+        metric_options:
+          execution: İcra gecikməsi
+          queue: Növbə gecikməsi
+          total: Ümumi gecikmə
       range:
         bucket_size:
           days: "%{count} gün"
@@ -267,8 +280,11 @@ az:
         time_range: Məhsuldarlıq üçün vaxt aralığı
         time_zone: 'Saat qurşağı:'
       show:
+        execution_chart_title: İcra gecikməsi
+        queue_chart_title: Növbə gecikməsi
         slow: Yavaş
         title: Məhsuldarlıq
+        total_chart_title: Ümumi gecikmə
     processes:
       index:
         cron_enabled: Cron aktivdir
