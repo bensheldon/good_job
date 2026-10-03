@@ -89,11 +89,11 @@ RSpec.describe GoodJob::LatencyMetric do
       measure = lambda do
         GoodJob::Execution
           .where(id: execution.id)
-          .pick(metric.to_arel.as("total"))
+          .pick(Arel.sql("EXTRACT(EPOCH FROM #{metric.expression})"))
       end
 
       expect(measure.call).to eq(execution.queue_latency + execution.runtime_latency)
-      expect(measure.call).to eq(31.seconds)
+      expect(measure.call).to eq(31)
 
       execution.update!(duration: nil)
 
@@ -173,10 +173,10 @@ RSpec.describe GoodJob::LatencyMetric do
 
       measured = GoodJob::Execution
                  .where(id: execution.id)
-                 .pick(metric.to_arel.as("queue"))
+                 .pick(Arel.sql("EXTRACT(EPOCH FROM #{metric.expression})"))
 
       expect(measured).to eq(execution.queue_latency)
-      expect(measured).to eq(30.seconds)
+      expect(measured).to eq(30)
     end
   end
 end

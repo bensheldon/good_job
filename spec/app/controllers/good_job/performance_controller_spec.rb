@@ -73,12 +73,13 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
       row = page.find("[role='row']", text: "SlowStart")
       expect(row).to have_css(".performance-name a", text: "SlowStart")
       # Each cell carries its narrow-viewport label ahead of its values.
-      expect(row.text(normalize_ws: true)).to eq(
-        "SlowStart Jobs 1 Executions 2 " \
-        "Queue latency 20s avg 10s min 30s max " \
-        "Execution latency 1s avg 1s min 1s max " \
-        "Total latency 21s avg 11s min 31s max"
-      )
+      # JRuby reads the one-second interval as a Float, which formats with a decimal.
+      expect(row.text(normalize_ws: true)).to match(Regexp.new(
+                                                      "\\ASlowStart Jobs 1 Executions 2 " \
+                                                      "Queue latency 20s avg 10s min 30s max " \
+                                                      "Execution latency 1(\\.0)?s avg 1(\\.0)?s min 1(\\.0)?s max " \
+                                                      "Total latency 21s avg 11s min 31s max\\z"
+                                                    ))
     end
 
     it "switches the chart metric while keeping the selected range" do

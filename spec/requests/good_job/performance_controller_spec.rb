@@ -128,7 +128,8 @@ RSpec.describe GoodJob::PerformanceController do
       expect(page).to have_css("[data-live-poll-region='execution-chart']")
       expect(page).to have_css("[data-live-poll-region='queue-chart']")
       expect(page).to have_css("[data-live-poll-region='total-chart']")
-      expect(page).to have_no_css("form[data-controller='performance-range'] input[name='chart']", visible: :all)
+      # `all` rather than `have_no_css`: the negated matcher raises an ArgumentError with `visible:` on Rails 6.1's Capybara.
+      expect(page.all("form[data-controller='performance-range'] input[name='chart']", visible: :all)).to be_empty
     end
   end
 
