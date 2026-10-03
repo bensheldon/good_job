@@ -45,6 +45,18 @@ RSpec.describe GoodJob::MultiScheduler do
         )
         expect(elephants_scheduler.send(:performer).send(:parsed_queues)).to eq({ include: ["elephant"] })
       end
+
+      it "serves every pipe-delimited subprocess pool when running in a single process" do
+        configuration = GoodJob::Configuration.new({ queues: 'elephant:2|mice:3' })
+        multi_scheduler = described_class.from_configuration(configuration)
+
+        expect(multi_scheduler.schedulers.map { |scheduler| scheduler.stats.slice(:queues, :max_threads) }).to eq(
+          [
+            { queues: 'elephant', max_threads: 2 },
+            { queues: 'mice', max_threads: 3 },
+          ]
+        )
+      end
     end
   end
 

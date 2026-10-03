@@ -1,5 +1,13 @@
 # Changelog
 
+## [v4.19.4](https://github.com/bensheldon/good_job/tree/v4.19.4) (2026-10-02)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.19.3...v4.19.4)
+
+**Merged pull requests:**
+
+- fix: Render batch details with JSON 3 [\#1839](https://github.com/bensheldon/good_job/pull/1839) ([luizkowalski](https://github.com/luizkowalski))
+
 ## [v4.19.3](https://github.com/bensheldon/good_job/tree/v4.19.3) (2026-09-21)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.19.2...v4.19.3)
