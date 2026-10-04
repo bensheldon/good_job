@@ -71,6 +71,10 @@ module GoodJob # :nodoc:
     # @yield [void] If a block is given, the process will be unregistered after the block completes.
     # @return [void]
     def register(with_advisory_lock: false, advisory_lock_connection: nil)
+      # Retain implicit session locks until unregister, including on Rails < 7.2
+      # where with_connection always returns a newly borrowed connection.
+      GoodJob::Process.lease_connection if with_advisory_lock && advisory_lock_connection.nil?
+
       synchronize(with_connection: with_advisory_lock) do
         if with_advisory_lock && !advisory_locked?
           if @record

@@ -72,6 +72,33 @@ describe GoodJob::CapsuleTracker do
         expect(GoodJob::Process.count).to eq 0
       end
 
+      it 'retains an implicit advisory connection when with_connection releases borrowed connections' do
+        pool = GoodJob::Process.connection_pool
+        # Rails < 7.2 returns newly borrowed connections even when code inside
+        # with_connection calls lease_connection (called connection on those versions).
+        allow(pool).to receive(:with_connection).and_wrap_original do |original, *args, **kwargs, &block|
+          already_leased = pool.active_connection?
+          begin
+            original.call(*args, **kwargs, &block)
+          ensure
+            pool.release_connection unless already_leased
+          end
+        end
+
+        thread = Thread.new do
+          Rails.application.executor.wrap do
+            tracker.register(with_advisory_lock: true) do
+              expect(tracker.record).to be_owns_advisory_lock
+            end
+          end
+        end
+        thread.value
+        expect(tracker.locks).to eq 0
+        expect(POSTGRES_NOTICES).to be_empty
+      ensure
+        thread&.join
+      end
+
       it 'takes an advisory lock even when process already exists' do
         tracker.register do
           expect(GoodJob::Process.count).to eq 0
