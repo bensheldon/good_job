@@ -23,3 +23,4 @@ For gem development and debugging information, please review the [README's Gem D
 ## Other Errata
 
 - **Active Record `attribute` cannot be used.** Calling `attribute` (the AR attributes API) necessitates a database connection when Tapioca runs its DSL compilers, which breaks Tapioca's type generation. Use explicit accessor methods instead.
+- **Use Timecop instead of Rails' time helpers in tests.** Rails' `travel_to` freezes the clock, which breaks code that depends on time advancing (e.g. `wait_until` timeouts, scheduled tasks). `Timecop.travel` moves the clock but keeps it running.
