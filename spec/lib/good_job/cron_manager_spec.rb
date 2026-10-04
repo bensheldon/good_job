@@ -110,8 +110,6 @@ RSpec.describe GoodJob::CronManager do
   end
 
   describe 'graceful restarts' do
-    include ActiveSupport::Testing::TimeHelpers
-
     let(:cron_entries) do
       [
         GoodJob::CronEntry.new(
@@ -134,7 +132,7 @@ RSpec.describe GoodJob::CronManager do
     it "reenqueues jobs scheduled for the previous period" do
       cron_manager = described_class.new(cron_entries, start_on_initialize: false, graceful_restart_period: 5.minutes)
       # Start in the middle of a minute so the live scheduler doesn't also enqueue the next run
-      travel_to(Time.current.at_beginning_of_minute + 30.seconds) do
+      Timecop.travel(Time.current.at_beginning_of_minute + 30.seconds) do
         cron_manager.start
 
         wait_until(max: 5) do
