@@ -137,6 +137,7 @@ module GoodJob # :nodoc:
     rescue ActiveRecord::RecordNotFound
       @new_record = true
       self.created_at = self.updated_at = nil
+      id_will_change!
       state_will_change!
       save
     end
