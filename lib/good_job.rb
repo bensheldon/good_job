@@ -262,6 +262,8 @@ module GoodJob
         deleted_jobs_count += deleted_jobs
       end
 
+      GoodJob::ConcurrencyClaim.cleanup_orphaned if GoodJob::ConcurrencyClaim.table_exists?
+
       batches_query = GoodJob::BatchRecord.finished_before(timestamp).limit(in_batches_of)
       batches_query = batches_query.succeeded unless include_discarded
       loop do
@@ -327,18 +329,9 @@ module GoodJob
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    cron_index_definition = GoodJob::Job.connection_pool.with_connection do |connection|
-      connection.select_value(<<~SQL.squish)
-        SELECT indexdef
-        FROM pg_indexes
-        WHERE schemaname = ANY (current_schemas(false))
-          AND tablename = #{connection.quote(GoodJob::Job.table_name)}
-          AND indexname = #{connection.quote('index_good_jobs_on_cron_key_and_cron_at_cond')}
-      SQL
+    GoodJob::ConcurrencyClaim.connection_pool.with_connection do |connection|
+      connection.table_exists?(GoodJob::ConcurrencyClaim.table_name)
     end
-
-    GoodJob::Job.lock_type_migrated? &&
-      cron_index_definition.to_s.include?("cron_at DESC NULLS LAST")
   end
 
   # Pause job execution for a given queue or job class.

@@ -13,8 +13,18 @@ NEW_OPTIONAL_COLUMNS = [
   { model: GoodJob::BatchRecord, column: :jobs_finished_at },
 ].freeze
 
+# To add a new table, append its model. The table is renamed away during the test.
+NEW_OPTIONAL_TABLES = [
+  GoodJob::ConcurrencyClaim,
+].freeze
+
 RSpec.describe 'Breaking migrations' do
   around do |example|
+    NEW_OPTIONAL_TABLES.each do |model|
+      model.connection_pool.with_connection { |c| c.rename_table(model.table_name, "#{model.table_name}_absent") }
+      model.reset_column_information
+    end
+
     dropped = []
     NEW_OPTIONAL_COLUMNS.each do |scenario|
       col = scenario[:model].columns_hash.fetch(scenario[:column].to_s)
@@ -31,6 +41,13 @@ RSpec.describe 'Breaking migrations' do
         c.add_column(scenario[:model].table_name, scenario[:column], scenario[:col_type], **scenario[:col_options]) unless c.column_exists?(scenario[:model].table_name, scenario[:column])
       end
       scenario[:model].reset_column_information
+    end
+
+    NEW_OPTIONAL_TABLES.each do |model|
+      model.connection_pool.with_connection do |c|
+        c.rename_table("#{model.table_name}_absent", model.table_name) if c.table_exists?("#{model.table_name}_absent")
+      end
+      model.reset_column_information
     end
   end
 
@@ -55,6 +72,25 @@ RSpec.describe 'Breaking migrations' do
 
     wait_until(max: 5, increments_of: 0.1) { expect(GoodJob::Job.last.finished_at).to be_present }
     scheduler.shutdown
+
+    expect(RUN_JOBS.size).to eq 1
+  end
+
+  it 'enforces concurrency limits without the concurrency claims table' do
+    expect(GoodJob::ConcurrencyClaim.table_exists?).to be false
+
+    stub_const 'LimitedJob', (Class.new(ActiveJob::Base) do
+      include GoodJob::ActiveJobExtensions::Concurrency
+
+      good_job_control_concurrency_with(perform_limit: 1, key: "limited")
+
+      def perform
+        RUN_JOBS << provider_job_id
+      end
+    end)
+
+    LimitedJob.perform_later
+    GoodJob.perform_inline
 
     expect(RUN_JOBS.size).to eq 1
   end

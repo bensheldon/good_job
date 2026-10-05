@@ -201,6 +201,181 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
     end
 
+    describe 'perform_limit: with racing claims' do
+      let(:rule) { TestJob.good_job_concurrency_rules.first }
+      let(:job_a) { TestJob.set(good_job_labels: "testlabel").perform_later(name: "A") }
+      let(:job_b) { TestJob.set(good_job_labels: "testlabel").perform_later(name: "B") }
+
+      before do
+        TestJob.good_job_concurrency_rule(perform_limit: 1, label: "testlabel")
+      end
+
+      def claim(active_job, performed_at)
+        GoodJob::Job.find_by(active_job_id: active_job.job_id).update!(performed_at: performed_at)
+      end
+
+      def performed_at(active_job)
+        GoodJob::Job.find_by(active_job_id: active_job.job_id).performed_at
+      end
+
+      def claim_states(active_job)
+        GoodJob::ConcurrencyClaim.where(active_job_id: active_job.job_id).pluck(:state)
+      end
+
+      context 'when concurrency claims are migrated' do
+        it 'rejects a job whose earlier performed_at committed after another job already passed' do
+          claim(job_b, 1.second.ago)
+          expect(rule.evaluate(job_b, :perform)).to be_nil
+
+          claim(job_a, 2.seconds.ago)
+          expect(rule.evaluate(job_a, :perform)).to eq :limit
+
+          expect(claim_states(job_b)).to eq [GoodJob::ConcurrencyClaim::GRANTED]
+          expect(claim_states(job_a)).to eq [GoodJob::ConcurrencyClaim::WAITING]
+        end
+
+        it 'allows exactly one of two jobs that claimed before either was checked' do
+          claim(job_a, 2.seconds.ago)
+          claim(job_b, 1.second.ago)
+
+          expect(rule.evaluate(job_a, :perform)).to eq :limit
+          expect(rule.evaluate(job_b, :perform)).to be_nil
+        end
+
+        it 'does not count granted claims of jobs that are no longer running' do
+          claim(job_b, 1.second.ago)
+          expect(rule.evaluate(job_b, :perform)).to be_nil
+          GoodJob::Job.find_by(active_job_id: job_b.job_id).update!(finished_at: Time.current)
+
+          claim(job_a, Time.current)
+          expect(rule.evaluate(job_a, :perform)).to be_nil
+        end
+      end
+
+      context 'when concurrency claims are not migrated' do
+        before do
+          allow(GoodJob::ConcurrencyClaim).to receive(:table_exists?).and_return(false)
+        end
+
+        it 'rejects a job whose earlier performed_at committed after another job already passed' do
+          claim(job_b, 1.second.ago)
+          expect(rule.evaluate(job_b, :perform)).to be_nil
+
+          claim(job_a, 2.seconds.ago)
+          expect(rule.evaluate(job_a, :perform)).to eq :limit
+          expect(performed_at(job_a)).to be_nil
+          expect(performed_at(job_b)).to be_present
+        end
+
+        it 'allows exactly one of two jobs that claimed before either was checked' do
+          claim(job_a, 2.seconds.ago)
+          claim(job_b, 1.second.ago)
+
+          expect(rule.evaluate(job_a, :perform)).to eq :limit
+          expect(rule.evaluate(job_b, :perform)).to be_nil
+        end
+      end
+    end
+
+    describe 'perform_limit: separate label and legacy key scopes' do
+      it 'does not share claims between a label and a legacy key with the same value' do
+        TestJob.good_job_control_concurrency_with(perform_limit: 1, key: 'label:shared')
+        TestJob.good_job_concurrency_rule(perform_limit: 1, label: 'shared')
+        TestJob.good_job_concurrency_rule(perform_limit: 1, label: 'key:shared')
+        legacy_job = TestJob.perform_later(name: 'legacy')
+        label_job = TestJob.set(good_job_labels: ['shared', 'key:shared']).perform_later(name: 'label')
+        legacy_rule = described_class::Rule.new(key: 'label:shared', perform_limit: 1)
+
+        GoodJob::Job.find_by(active_job_id: legacy_job.job_id).update!(performed_at: Time.current)
+        expect(legacy_rule.evaluate(legacy_job, :perform)).to be_nil
+
+        GoodJob::Job.find_by(active_job_id: label_job.job_id).update!(performed_at: Time.current)
+        TestJob.good_job_concurrency_rules.each do |rule|
+          expect(rule.evaluate(label_job, :perform)).to be_nil
+        end
+        expect(GoodJob::ConcurrencyClaim.where(active_job_id: legacy_job.job_id).pluck(:key)).to eq ['key:label:shared']
+        expect(GoodJob::ConcurrencyClaim.where(active_job_id: label_job.job_id).pluck(:key)).to contain_exactly('label:shared', 'label:key:shared')
+        expect(legacy_rule.evaluate(label_job, :perform)).to eq :limit
+      end
+    end
+
+    describe 'perform_limit: promotion of waiting jobs' do
+      before do
+        stub_const 'HOLD', Queue.new
+        stub_const 'ENTERED', Queue.new
+        stub_const 'HoldingJob', (Class.new(ActiveJob::Base) do
+          include GoodJob::ActiveJobExtensions::Concurrency
+
+          good_job_concurrency_rule(perform_limit: 1, label: "holding")
+          self.good_job_labels = ["holding"]
+
+          def perform
+            ENTERED << job_id
+            HOLD.pop
+          end
+        end)
+      end
+
+      it 'runs a rejected job immediately when the job holding its claim finishes' do
+        holder = HoldingJob.perform_later
+        expect(holder).to be_present
+        holder_thread = Thread.new do
+          Rails.application.executor.wrap { GoodJob::Job.perform_with_lock(lock_id: SecureRandom.uuid) }
+        end
+        Timeout.timeout(5) { ENTERED.pop }
+
+        waiter = HoldingJob.perform_later
+        Rails.application.executor.wrap { GoodJob::Job.perform_with_lock(lock_id: SecureRandom.uuid) }
+
+        waiter_record = GoodJob::Job.find_by(active_job_id: waiter.job_id)
+        expect(waiter_record.scheduled_at).to be > Time.current
+        expect(GoodJob::ConcurrencyClaim.where(active_job_id: waiter.job_id).pluck(:state)).to eq [GoodJob::ConcurrencyClaim::WAITING]
+
+        HOLD << true
+        expect(holder_thread.join(5)).to be_truthy
+        expect(holder_thread.value).to be_present
+
+        expect(waiter_record.reload.scheduled_at).to be <= Time.current
+        expect(GoodJob::ConcurrencyClaim.where(active_job_id: holder.job_id)).to be_empty
+      end
+    end
+
+    describe 'perform_limit: with both a label and a key' do
+      before do
+        TestJob.good_job_concurrency_rule(perform_limit: 1, label: "testlabel", key: -> { "custom" })
+      end
+
+      it 'claims and locks on the label, which is the counted scope' do
+        active_job = TestJob.set(good_job_labels: "testlabel").perform_later(name: "A")
+        GoodJob::Job.find_by(active_job_id: active_job.job_id).update!(performed_at: Time.current)
+
+        expect(TestJob.good_job_concurrency_rules.first.evaluate(active_job, :perform)).to be_nil
+        expect(GoodJob::ConcurrencyClaim.where(active_job_id: active_job.job_id).pluck(:key)).to eq ["label:testlabel"]
+      end
+    end
+
+    describe 'perform_limit: with multiple rules' do
+      before do
+        TestJob.good_job_concurrency_rule(perform_limit: 1, label: "first")
+        TestJob.good_job_concurrency_rule(perform_limit: 1, label: "second")
+      end
+
+      it 'releases claims granted by earlier rules and waits only on the rejecting rule' do
+        blocker = TestJob.set(good_job_labels: ["second"]).perform_later(name: "blocker")
+        GoodJob::Job.find_by(active_job_id: blocker.job_id).update!(performed_at: Time.current)
+        expect(TestJob.good_job_concurrency_rules.last.evaluate(blocker, :perform)).to be_nil
+
+        waiter = TestJob.set(good_job_labels: %w[first second]).perform_later(name: "waiter")
+        waiter_record = GoodJob::Job.find_by(active_job_id: waiter.job_id)
+        waiter_record.update!(performed_at: Time.current)
+        allow(GoodJob::CurrentThread).to receive(:job).and_return(waiter_record)
+
+        expect { waiter.run_callbacks(:perform) }.to raise_error(GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError)
+
+        expect(GoodJob::ConcurrencyClaim.where(active_job_id: waiter.job_id).pluck(:key, :state)).to eq [["label:second", GoodJob::ConcurrencyClaim::WAITING]]
+      end
+    end
+
     describe 'perform_limit: together with perform_throttle:' do
       before do
         allow(GoodJob).to receive(:preserve_job_records).and_return(true)

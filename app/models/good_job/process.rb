@@ -73,7 +73,8 @@ module GoodJob # :nodoc:
     # Deletes all inactive process records.
     def self.cleanup
       inactive.find_each do |process|
-        GoodJob::Job.where(locked_by_id: process.id).update_all(locked_by_id: nil, locked_at: nil) # rubocop:disable Rails/SkipsModelValidations
+        GoodJob::Job.release_process(process.id)
+        GoodJob::ConcurrencyClaim.release_process(process.id) if GoodJob::ConcurrencyClaim.table_exists?
         process.delete
       end
     end

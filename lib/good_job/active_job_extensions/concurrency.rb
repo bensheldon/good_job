@@ -33,8 +33,8 @@ module GoodJob
         end
 
         def evaluate(job, stage)
-          resolved_key = resolve_key(job)
           resolved_label = resolve_label(job)
+          resolved_key = resolve_key(job, resolved_label)
           return nil if resolved_key.blank? && resolved_label.blank?
 
           if stage == :enqueue
@@ -58,9 +58,9 @@ module GoodJob
           !@key.equal?(GoodJob::NONE)
         end
 
-        def resolve_key(job)
+        def resolve_key(job, label)
           if key.blank?
-            "label:#{resolve_label(job)}"
+            "label:#{label}"
           else
             key_value = @key.respond_to?(:call) ? job.instance_exec(&@key) : @key
             raise TypeError, "Concurrency key must be a String; was a #{key_value.class}" if key_value.present? && VALID_TYPES.none? { |type| key_value.is_a?(type) }
@@ -89,6 +89,17 @@ module GoodJob
           value = job.instance_exec(&value) if value.respond_to?(:call)
           value = nil unless value.present? && value.is_a?(Array) && value.size == 2
           value
+        end
+
+        # The claim key for the jobs counted by +query_scope+.
+        def scoped_key(label, key)
+          if label.present?
+            "label:#{label}"
+          elsif key_explicit? && key.present?
+            "key:#{key}"
+          else
+            "all"
+          end
         end
 
         def query_scope(label, key)
@@ -160,17 +171,37 @@ module GoodJob
 
           query_scope = query_scope(label, key)
           exceeded = nil
+          commit = false
 
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
+            # Lock on the resolved key (rather than the claim key) so that checks remain serialized
+            # with processes running earlier versions of GoodJob during a rolling deploy.
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
               if limit
-                allowed_active_job_ids = query_scope.running
-                                                    .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
-                                                    .limit(limit).pluck(:active_job_id)
-                # The current job has already been locked and will appear in the previous query
-                unless allowed_active_job_ids.include?(job.job_id)
-                  exceeded = :limit
-                  next
+                commit = true
+                if GoodJob::ConcurrencyClaim.table_exists?
+                  granted = GoodJob::ConcurrencyClaim.claim(
+                    key: scoped_key(label, key),
+                    limit: limit,
+                    scope: query_scope,
+                    active_job_id: job.job_id,
+                    locked_by_id: CurrentThread.job&.locked_by_id
+                  )
+                  unless granted
+                    exceeded = :limit
+                    next
+                  end
+                else
+                  # The current job's performed_at was committed before this check, acting as its claim on a slot.
+                  # Count the other claims rather than ranking by performed_at, because performed_at ordering
+                  # does not necessarily match commit ordering.
+                  other_running_count = query_scope.running.where.not(active_job_id: job.job_id).count
+                  if other_running_count >= limit
+                    exceeded = :limit
+                    # Release this job's claim so that the next contender for the lock does not count it.
+                    GoodJob::Job.where(active_job_id: job.job_id).update_all(performed_at: nil) # rubocop:disable Rails/SkipsModelValidations
+                    next
+                  end
                 end
               end
 
@@ -195,9 +226,9 @@ module GoodJob
               end
             end
 
-            # Rollback the transaction because it's potentially less expensive than committing it
-            # even though nothing has been altered in the transaction.
-            raise ActiveRecord::Rollback
+            # Commit claim changes made while holding the lock; otherwise rollback because it's potentially
+            # less expensive than committing it even though nothing has been altered in the transaction.
+            raise ActiveRecord::Rollback unless commit
           end
 
           exceeded
@@ -276,6 +307,9 @@ module GoodJob
             exceeded = rule.evaluate(job, :perform)
             break if exceeded
           end
+
+          # Release claims granted by earlier rules so they are not held while this job waits
+          GoodJob::ConcurrencyClaim.release_job(job.job_id) if exceeded && GoodJob::ConcurrencyClaim.table_exists?
 
           if exceeded == :limit
             raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError

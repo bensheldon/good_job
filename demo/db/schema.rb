@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2026_10_03_000003) do
+ActiveRecord::Schema.define(version: 2026_10_05_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pg_stat_statements"
@@ -33,6 +33,18 @@ ActiveRecord::Schema.define(version: 2026_10_03_000003) do
     t.datetime "updated_at", null: false
     t.index ["created_at", "id"], name: "index_good_job_batches_on_created_at_and_id", order: :desc
     t.index ["finished_at"], name: "index_good_job_batches_on_finished_at", where: "(finished_at IS NOT NULL)"
+  end
+
+  create_table "good_job_concurrency_claims", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "active_job_id", null: false
+    t.datetime "created_at", null: false
+    t.text "key", null: false
+    t.uuid "locked_by_id"
+    t.integer "state", limit: 2, null: false
+    t.index ["active_job_id"], name: "index_good_job_concurrency_claims_on_active_job_id"
+    t.index ["key", "active_job_id"], name: "index_good_job_concurrency_claims_on_key_and_active_job_id", unique: true
+    t.index ["key", "state", "created_at"], name: "index_good_job_concurrency_claims_for_promotion"
+    t.index ["locked_by_id"], name: "index_good_job_concurrency_claims_on_locked_by_id", where: "(locked_by_id IS NOT NULL)"
   end
 
   create_table "good_job_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
