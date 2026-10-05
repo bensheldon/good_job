@@ -219,7 +219,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
 
       def claim_states(active_job)
-        GoodJob::ConcurrencyClaim.where(active_job_id: active_job.job_id).pluck(:state)
+        GoodJob::ConcurrencyClaim.where(job_id: active_job.job_id).pluck(:state)
       end
 
       context 'when concurrency claims are migrated' do
@@ -293,8 +293,8 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         TestJob.good_job_concurrency_rules.each do |rule|
           expect(rule.evaluate(label_job, :perform)).to be_nil
         end
-        expect(GoodJob::ConcurrencyClaim.where(active_job_id: legacy_job.job_id).pluck(:key)).to eq ['key:label:shared']
-        expect(GoodJob::ConcurrencyClaim.where(active_job_id: label_job.job_id).pluck(:key)).to contain_exactly('label:shared', 'label:key:shared')
+        expect(GoodJob::ConcurrencyClaim.where(job_id: legacy_job.job_id).pluck(:key)).to eq ['key:label:shared']
+        expect(GoodJob::ConcurrencyClaim.where(job_id: label_job.job_id).pluck(:key)).to contain_exactly('label:shared', 'label:key:shared')
         expect(legacy_rule.evaluate(label_job, :perform)).to eq :limit
       end
     end
@@ -329,14 +329,14 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
 
         waiter_record = GoodJob::Job.find_by(active_job_id: waiter.job_id)
         expect(waiter_record.scheduled_at).to be > Time.current
-        expect(GoodJob::ConcurrencyClaim.where(active_job_id: waiter.job_id).pluck(:state)).to eq [GoodJob::ConcurrencyClaim::WAITING]
+        expect(GoodJob::ConcurrencyClaim.where(job_id: waiter.job_id).pluck(:state)).to eq [GoodJob::ConcurrencyClaim::WAITING]
 
         HOLD << true
         expect(holder_thread.join(5)).to be_truthy
         expect(holder_thread.value).to be_present
 
         expect(waiter_record.reload.scheduled_at).to be <= Time.current
-        expect(GoodJob::ConcurrencyClaim.where(active_job_id: holder.job_id)).to be_empty
+        expect(GoodJob::ConcurrencyClaim.where(job_id: holder.job_id)).to be_empty
       end
     end
 
@@ -350,7 +350,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         GoodJob::Job.find_by(active_job_id: active_job.job_id).update!(performed_at: Time.current)
 
         expect(TestJob.good_job_concurrency_rules.first.evaluate(active_job, :perform)).to be_nil
-        expect(GoodJob::ConcurrencyClaim.where(active_job_id: active_job.job_id).pluck(:key)).to eq ["label:testlabel"]
+        expect(GoodJob::ConcurrencyClaim.where(job_id: active_job.job_id).pluck(:key)).to eq ["label:testlabel"]
       end
     end
 
@@ -391,7 +391,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
         job_a = TestJob.set(good_job_labels: "testlabel").perform_later(name: "A")
         job_b = TestJob.set(good_job_labels: "testlabel").perform_later(name: "B")
         [job_a, job_b].each do |job|
-          GoodJob::ConcurrencyClaim.create!(key: "label:testlabel", active_job_id: job.job_id, state: GoodJob::ConcurrencyClaim::PROMOTED)
+          GoodJob::ConcurrencyClaim.create!(key: "label:testlabel", job_id: job.job_id, state: GoodJob::ConcurrencyClaim::PROMOTED)
           GoodJob::Job.find_by(active_job_id: job.job_id).update!(performed_at: Time.current)
         end
 
@@ -418,7 +418,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
 
         expect { waiter.run_callbacks(:perform) }.to raise_error(GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError)
 
-        expect(GoodJob::ConcurrencyClaim.where(active_job_id: waiter.job_id).pluck(:key, :state)).to eq [["label:second", GoodJob::ConcurrencyClaim::WAITING]]
+        expect(GoodJob::ConcurrencyClaim.where(job_id: waiter.job_id).pluck(:key, :state)).to eq [["label:second", GoodJob::ConcurrencyClaim::WAITING]]
       end
     end
 

@@ -8,14 +8,14 @@ class CreateGoodJobConcurrencyClaims < ActiveRecord::Migration[8.0]
 
     create_table :good_job_concurrency_claims, id: :uuid do |t|
       t.datetime :created_at, null: false
-      t.uuid :active_job_id, null: false
+      t.uuid :job_id, null: false
       t.uuid :locked_by_id
       t.integer :state, limit: 2, null: false
       t.text :key, null: false
 
-      t.index [:key, :active_job_id], unique: true
+      t.index [:key, :job_id], unique: true
       t.index [:key, :state, :created_at], name: :index_good_job_concurrency_claims_for_promotion
-      t.index :active_job_id
+      t.index :job_id
       t.index :locked_by_id, where: "locked_by_id IS NOT NULL"
     end
   end

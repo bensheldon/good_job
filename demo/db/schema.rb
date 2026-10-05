@@ -36,13 +36,13 @@ ActiveRecord::Schema.define(version: 2026_10_05_000000) do
   end
 
   create_table "good_job_concurrency_claims", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "active_job_id", null: false
     t.datetime "created_at", null: false
+    t.uuid "job_id", null: false
     t.text "key", null: false
     t.uuid "locked_by_id"
     t.integer "state", limit: 2, null: false
-    t.index ["active_job_id"], name: "index_good_job_concurrency_claims_on_active_job_id"
-    t.index ["key", "active_job_id"], name: "index_good_job_concurrency_claims_on_key_and_active_job_id", unique: true
+    t.index ["job_id"], name: "index_good_job_concurrency_claims_on_job_id"
+    t.index ["key", "job_id"], name: "index_good_job_concurrency_claims_on_key_and_job_id", unique: true
     t.index ["key", "state", "created_at"], name: "index_good_job_concurrency_claims_for_promotion"
     t.index ["locked_by_id"], name: "index_good_job_concurrency_claims_on_locked_by_id", where: "(locked_by_id IS NOT NULL)"
   end

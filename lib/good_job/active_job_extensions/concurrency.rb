@@ -189,7 +189,7 @@ module GoodJob
                     key: claim_key,
                     limit: limit,
                     scope: query_scope,
-                    active_job_id: job.job_id,
+                    job_id: job.job_id,
                     locked_by_id: CurrentThread.job&.locked_by_id
                   )
                   unless granted

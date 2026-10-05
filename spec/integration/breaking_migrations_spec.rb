@@ -13,7 +13,8 @@ NEW_OPTIONAL_COLUMNS = [
   { model: GoodJob::BatchRecord, column: :jobs_finished_at },
 ].freeze
 
-# To add a new table, append its model. The table is renamed away during the test.
+# To add a new table, append its model. The table is renamed away during the test
+# (to a short name, so that renamed index names fit Postgres' 63 character limit).
 NEW_OPTIONAL_TABLES = [
   GoodJob::ConcurrencyClaim,
 ].freeze
@@ -21,7 +22,7 @@ NEW_OPTIONAL_TABLES = [
 RSpec.describe 'Breaking migrations' do
   around do |example|
     NEW_OPTIONAL_TABLES.each do |model|
-      model.connection_pool.with_connection { |c| c.rename_table(model.table_name, "#{model.table_name}_absent") }
+      model.connection_pool.with_connection { |c| c.rename_table(model.table_name, "absent_#{NEW_OPTIONAL_TABLES.index(model)}") }
       model.reset_column_information
     end
 
@@ -45,7 +46,7 @@ RSpec.describe 'Breaking migrations' do
 
     NEW_OPTIONAL_TABLES.each do |model|
       model.connection_pool.with_connection do |c|
-        c.rename_table("#{model.table_name}_absent", model.table_name) if c.table_exists?("#{model.table_name}_absent")
+        c.rename_table("absent_#{NEW_OPTIONAL_TABLES.index(model)}", model.table_name) if c.table_exists?("absent_#{NEW_OPTIONAL_TABLES.index(model)}")
       end
       model.reset_column_information
     end

@@ -22,28 +22,28 @@ RSpec.describe GoodJob::ConcurrencyClaim do
       job_a = create_job(performed_at: Time.current)
       job_b = create_job
 
-      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: job_a.active_job_id, locked_by_id: nil)).to be true
+      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: job_a.active_job_id, locked_by_id: nil)).to be true
       job_b.update!(performed_at: Time.current)
-      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: job_b.active_job_id, locked_by_id: nil)).to be false
+      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: job_b.active_job_id, locked_by_id: nil)).to be false
 
-      expect(described_class.where(active_job_id: job_b.active_job_id).pluck(:state)).to eq [described_class::WAITING]
+      expect(described_class.where(job_id: job_b.active_job_id).pluck(:state)).to eq [described_class::WAITING]
     end
 
     it 'reuses its own existing grant and updates locked_by_id' do
       job = create_job(performed_at: Time.current)
       process_id = SecureRandom.uuid
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: job.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: job.active_job_id, locked_by_id: nil)
 
-      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: job.active_job_id, locked_by_id: process_id)).to be true
-      expect(described_class.where(active_job_id: job.active_job_id).pluck(:locked_by_id)).to eq [process_id]
+      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: job.active_job_id, locked_by_id: process_id)).to be true
+      expect(described_class.where(job_id: job.active_job_id).pluck(:locked_by_id)).to eq [process_id]
     end
 
     it 'keeps only the waiting claim for the latest key' do
       job = create_job
-      described_class.claim(key: "label:first", scope: GoodJob::Job.all, limit: 0, active_job_id: job.active_job_id, locked_by_id: nil)
-      described_class.claim(key: "label:second", scope: GoodJob::Job.all, limit: 0, active_job_id: job.active_job_id, locked_by_id: nil)
+      described_class.claim(key: "label:first", scope: GoodJob::Job.all, limit: 0, job_id: job.active_job_id, locked_by_id: nil)
+      described_class.claim(key: "label:second", scope: GoodJob::Job.all, limit: 0, job_id: job.active_job_id, locked_by_id: nil)
 
-      expect(described_class.where(active_job_id: job.active_job_id).pluck(:key, :state)).to eq [["label:second", described_class::WAITING]]
+      expect(described_class.where(job_id: job.active_job_id).pluck(:key, :state)).to eq [["label:second", described_class::WAITING]]
     end
   end
 
@@ -52,14 +52,14 @@ RSpec.describe GoodJob::ConcurrencyClaim do
       holder = create_job(performed_at: Time.current)
       first_waiter = create_job
       second_waiter = create_job
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: holder.active_job_id, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: first_waiter.active_job_id, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: second_waiter.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: holder.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: first_waiter.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: second_waiter.active_job_id, locked_by_id: nil)
 
       allow(GoodJob::Notifier).to receive(:notify)
       described_class.release_job(holder.active_job_id)
 
-      expect(described_class.where(active_job_id: holder.active_job_id)).to be_empty
+      expect(described_class.where(job_id: holder.active_job_id)).to be_empty
       expect(first_waiter.reload.scheduled_at).to be <= Time.current
       expect(second_waiter.reload.scheduled_at).to be > Time.current
       expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: "default" })
@@ -69,33 +69,33 @@ RSpec.describe GoodJob::ConcurrencyClaim do
       holder = create_job(performed_at: Time.current)
       finished_waiter = create_job(finished_at: Time.current)
       waiter = create_job
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: holder.active_job_id, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: finished_waiter.active_job_id, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: SecureRandom.uuid, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: waiter.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: holder.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: finished_waiter.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: SecureRandom.uuid, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: waiter.active_job_id, locked_by_id: nil)
 
       described_class.release_job(holder.active_job_id)
 
       expect(waiter.reload.scheduled_at).to be <= Time.current
-      expect(described_class.pluck(:active_job_id)).to eq [waiter.active_job_id]
+      expect(described_class.pluck(:job_id)).to eq [waiter.active_job_id]
     end
 
     it 'marks a waiter that is still finishing its rejected execution, which runs once rescheduled' do
       holder = create_job(performed_at: Time.current)
       waiter = create_job
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: holder.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: holder.active_job_id, locked_by_id: nil)
       waiter.update!(performed_at: Time.current)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: waiter.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: waiter.active_job_id, locked_by_id: nil)
 
       described_class.release_job(holder.active_job_id)
-      expect(described_class.find_by(active_job_id: waiter.active_job_id).state).to eq described_class::PROMOTION_PENDING
+      expect(described_class.find_by(job_id: waiter.active_job_id).state).to eq described_class::PROMOTION_PENDING
 
       # The waiter's retry reschedules it
       waiter.update!(performed_at: nil, scheduled_at: 1.hour.from_now)
       described_class.job_finished(waiter)
 
       expect(waiter.reload.scheduled_at).to be <= Time.current
-      expect(described_class.find_by(active_job_id: waiter.active_job_id).state).to eq described_class::PROMOTED
+      expect(described_class.find_by(job_id: waiter.active_job_id).state).to eq described_class::PROMOTED
     end
   end
 
@@ -106,11 +106,11 @@ RSpec.describe GoodJob::ConcurrencyClaim do
         first_waiter = create_job
         second_waiter = create_job
         holders.each do |holder|
-          described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, active_job_id: holder.active_job_id, locked_by_id: nil)
+          described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, job_id: holder.active_job_id, locked_by_id: nil)
         end
         first_waiter.update!(performed_at: Time.current) if waiter_state
         [first_waiter, second_waiter].each do |waiter|
-          described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: waiter.active_job_id, locked_by_id: nil)
+          described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: waiter.active_job_id, locked_by_id: nil)
         end
 
         described_class.release_job(holders.first.active_job_id)
@@ -122,12 +122,12 @@ RSpec.describe GoodJob::ConcurrencyClaim do
 
         expect(second_waiter.reload.scheduled_at).to be <= Time.current
         if waiter_state == :running
-          expect(described_class.find_by(active_job_id: first_waiter.active_job_id).state).to eq described_class::PROMOTION_PENDING
+          expect(described_class.find_by(job_id: first_waiter.active_job_id).state).to eq described_class::PROMOTION_PENDING
           first_waiter.update!(performed_at: nil)
           described_class.job_finished(first_waiter)
         end
         expect(first_waiter.reload.scheduled_at).to be <= Time.current
-        expect(described_class.where(active_job_id: [first_waiter.active_job_id, second_waiter.active_job_id]).pluck(:state)).to eq [described_class::PROMOTED, described_class::PROMOTED]
+        expect(described_class.where(job_id: [first_waiter.active_job_id, second_waiter.active_job_id]).pluck(:state)).to eq [described_class::PROMOTED, described_class::PROMOTED]
       end
     end
 
@@ -136,10 +136,10 @@ RSpec.describe GoodJob::ConcurrencyClaim do
       holders = Array.new(2) { create_job(performed_at: Time.current) }
       waiters = Array.new(2) { create_job }
       holders.each do |holder|
-        described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, active_job_id: holder.active_job_id, locked_by_id: process_id)
+        described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, job_id: holder.active_job_id, locked_by_id: process_id)
       end
       waiters.each do |waiter|
-        described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: waiter.active_job_id, locked_by_id: nil)
+        described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: waiter.active_job_id, locked_by_id: nil)
       end
 
       described_class.release_process(process_id)
@@ -150,30 +150,30 @@ RSpec.describe GoodJob::ConcurrencyClaim do
     it 'rechecks the limit when a promoted job retries' do
       holder = create_job(performed_at: Time.current)
       waiter = create_job
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: holder.active_job_id, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: waiter.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: holder.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: waiter.active_job_id, locked_by_id: nil)
       described_class.release_job(holder.active_job_id)
 
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: holder.active_job_id, locked_by_id: nil)
-      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: waiter.active_job_id, locked_by_id: nil)).to be false
-      expect(described_class.find_by(active_job_id: waiter.active_job_id).state).to eq described_class::WAITING
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: holder.active_job_id, locked_by_id: nil)
+      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: waiter.active_job_id, locked_by_id: nil)).to be false
+      expect(described_class.find_by(job_id: waiter.active_job_id).state).to eq described_class::WAITING
 
       holder.update!(finished_at: Time.current)
       described_class.release_job(holder.active_job_id)
-      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: waiter.active_job_id, locked_by_id: nil)).to be true
-      expect(described_class.find_by(active_job_id: waiter.active_job_id).state).to eq described_class::GRANTED
+      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: waiter.active_job_id, locked_by_id: nil)).to be true
+      expect(described_class.find_by(job_id: waiter.active_job_id).state).to eq described_class::GRANTED
     end
 
     it 'promotes the next waiter on a second release rather than the already-promoted one' do
       holders = Array.new(2) { create_job(performed_at: Time.current) }
       first_waiter = create_job
       second_waiter = create_job
-      holders.each { |holder| described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, active_job_id: holder.active_job_id, locked_by_id: nil) }
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, active_job_id: first_waiter.active_job_id, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, active_job_id: second_waiter.active_job_id, locked_by_id: nil)
+      holders.each { |holder| described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, job_id: holder.active_job_id, locked_by_id: nil) }
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, job_id: first_waiter.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, job_id: second_waiter.active_job_id, locked_by_id: nil)
 
       described_class.release_job(holders.first.active_job_id)
-      expect(described_class.find_by(active_job_id: first_waiter.active_job_id).state).to eq described_class::PROMOTED
+      expect(described_class.find_by(job_id: first_waiter.active_job_id).state).to eq described_class::PROMOTED
       expect(second_waiter.reload.scheduled_at).to be > Time.current
 
       described_class.release_job(holders.last.active_job_id)
@@ -184,24 +184,24 @@ RSpec.describe GoodJob::ConcurrencyClaim do
       holder = create_job(performed_at: Time.current)
       first_waiter = create_job
       second_waiter = create_job
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: holder.active_job_id, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: first_waiter.active_job_id, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: second_waiter.active_job_id, locked_by_id: nil)
-      first_created_at = described_class.find_by(active_job_id: first_waiter.active_job_id).created_at
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: holder.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: first_waiter.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: second_waiter.active_job_id, locked_by_id: nil)
+      first_created_at = described_class.find_by(job_id: first_waiter.active_job_id).created_at
 
       holder.update!(finished_at: Time.current)
       described_class.release_job(holder.active_job_id)
 
       # Another job takes the slot before the promoted job runs
       other = create_job(performed_at: Time.current)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: other.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: other.active_job_id, locked_by_id: nil)
       first_waiter.update!(performed_at: Time.current)
-      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: first_waiter.active_job_id, locked_by_id: nil)).to be false
+      expect(described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: first_waiter.active_job_id, locked_by_id: nil)).to be false
 
-      first_claim = described_class.find_by(active_job_id: first_waiter.active_job_id)
+      first_claim = described_class.find_by(job_id: first_waiter.active_job_id)
       expect(first_claim.state).to eq described_class::WAITING
       expect(first_claim.created_at).to eq first_created_at
-      expect(described_class.waiting.where(key: key).order(:created_at).pluck(:active_job_id)).to eq [first_waiter.active_job_id, second_waiter.active_job_id]
+      expect(described_class.waiting.where(key: key).order(:created_at).pluck(:job_id)).to eq [first_waiter.active_job_id, second_waiter.active_job_id]
     end
   end
 
@@ -210,8 +210,8 @@ RSpec.describe GoodJob::ConcurrencyClaim do
       process_id = SecureRandom.uuid
       holder = create_job(performed_at: Time.current)
       waiter = create_job
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, active_job_id: holder.active_job_id, locked_by_id: process_id)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: waiter.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: holder.active_job_id, locked_by_id: process_id)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: waiter.active_job_id, locked_by_id: nil)
 
       described_class.release_process(process_id)
 
@@ -223,8 +223,8 @@ RSpec.describe GoodJob::ConcurrencyClaim do
       process_id = SecureRandom.uuid
       holders = Array.new(2) { create_job(performed_at: Time.current) }
       waiters = Array.new(2) { create_job }
-      holders.each { |holder| described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, active_job_id: holder.active_job_id, locked_by_id: process_id) }
-      waiters.each { |waiter| described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, active_job_id: waiter.active_job_id, locked_by_id: nil) }
+      holders.each { |holder| described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, job_id: holder.active_job_id, locked_by_id: process_id) }
+      waiters.each { |waiter| described_class.claim(key: key, scope: GoodJob::Job.all, limit: 2, job_id: waiter.active_job_id, locked_by_id: nil) }
 
       described_class.release_process(process_id)
 
@@ -235,7 +235,7 @@ RSpec.describe GoodJob::ConcurrencyClaim do
   describe '.job_finished' do
     it 'sees a pending promotion committed by a concurrent promoter' do
       waiter = create_job(performed_at: Time.current)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: waiter.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: waiter.active_job_id, locked_by_id: nil)
       waiter.update!(performed_at: nil, scheduled_at: 1.hour.from_now)
 
       locked = Concurrent::Event.new
@@ -243,7 +243,7 @@ RSpec.describe GoodJob::ConcurrencyClaim do
       promoter = Thread.new do
         described_class.connection_pool.with_connection do
           described_class.transaction do
-            claim = described_class.where(active_job_id: waiter.active_job_id).lock.first
+            claim = described_class.where(job_id: waiter.active_job_id).lock.first
             claim.update_columns(state: described_class::PROMOTION_PENDING) # rubocop:disable Rails/SkipsModelValidations
             locked.set
             commit.wait(5)
@@ -261,12 +261,12 @@ RSpec.describe GoodJob::ConcurrencyClaim do
       finisher.join(5)
 
       expect(waiter.reload.scheduled_at).to be <= Time.current
-      expect(described_class.find_by(active_job_id: waiter.active_job_id).state).to eq described_class::PROMOTED
+      expect(described_class.find_by(job_id: waiter.active_job_id).state).to eq described_class::PROMOTED
     end
 
     it 'deletes all rows of a finished job' do
       job = create_job
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: job.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: job.active_job_id, locked_by_id: nil)
       job.update!(finished_at: Time.current)
 
       described_class.job_finished(job)
@@ -279,12 +279,12 @@ RSpec.describe GoodJob::ConcurrencyClaim do
     it 'deletes rows whose job is missing or finished' do
       unfinished = create_job
       finished = create_job(finished_at: Time.current)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: unfinished.active_job_id, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: finished.active_job_id, locked_by_id: nil)
-      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, active_job_id: SecureRandom.uuid, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: unfinished.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: finished.active_job_id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: SecureRandom.uuid, locked_by_id: nil)
 
       expect(described_class.cleanup_orphaned).to eq 2
-      expect(described_class.pluck(:active_job_id)).to eq [unfinished.active_job_id]
+      expect(described_class.pluck(:job_id)).to eq [unfinished.active_job_id]
     end
   end
 end
