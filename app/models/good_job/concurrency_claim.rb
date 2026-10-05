@@ -34,8 +34,8 @@ module GoodJob
       # @return [Boolean] whether the claim was granted
       def claim(key:, limit:, scope:, job_id:, locked_by_id:)
         held_count = scope.running
-                          .where.not(active_job_id: job_id)
-                          .where.not(active_job_id: where(key: key).where.not(state: GRANTED).select(:job_id))
+                          .where.not(id: job_id)
+                          .where.not(id: where(key: key).where.not(state: GRANTED).select(:job_id))
                           .count
 
         if held_count < limit
@@ -75,29 +75,29 @@ module GoodJob
       # @param job [GoodJob::Job]
       # @return [void]
       def job_finished(job)
-        release_job(job.active_job_id)
+        release_job(job.id)
 
         if job.destroyed? || job.finished_at.present?
-          where(job_id: job.active_job_id).delete_all
+          where(job_id: job.id).delete_all
           return
         end
 
         promoted = transaction do
           # Lock all of the job's claims and filter by state afterwards: a promoter that has locked a
           # claim but not yet committed PROMOTION_PENDING would not match a state condition in the query.
-          rows = where(job_id: job.active_job_id).lock.to_a.select { |row| row.state == PROMOTION_PENDING }
+          rows = where(job_id: job.id).lock.to_a.select { |row| row.state == PROMOTION_PENDING }
           next false if rows.empty?
 
           where(id: rows.map(&:id)).update_all(state: PROMOTED) # rubocop:disable Rails/SkipsModelValidations
-          schedule_now(job.active_job_id)
+          schedule_now(job.id)
         end
-        notify(job.active_job_id) if promoted
+        notify(job.id) if promoted
       end
 
       # Deletes claims whose job no longer exists or has finished.
       # @return [Integer] number of deleted rows
       def cleanup_orphaned
-        where.not(job_id: GoodJob::Job.where(finished_at: nil).where.not(active_job_id: nil).select(:active_job_id)).delete_all
+        where.not(job_id: GoodJob::Job.where(finished_at: nil).select(:id)).delete_all
       end
 
       private
@@ -119,7 +119,7 @@ module GoodJob
             claim = waiting.where(key: key).order(:created_at).lock("FOR UPDATE SKIP LOCKED").first
             next nil unless claim
 
-            job_exists = GoodJob::Job.exists?(active_job_id: claim.job_id, finished_at: nil)
+            job_exists = GoodJob::Job.exists?(id: claim.job_id, finished_at: nil)
             if !job_exists
               claim.delete
               :stale
@@ -142,13 +142,13 @@ module GoodJob
 
       # @return [Boolean] whether a queued job was updated
       def schedule_now(job_id)
-        GoodJob::Job.where(active_job_id: job_id, performed_at: nil, finished_at: nil)
+        GoodJob::Job.where(id: job_id, performed_at: nil, finished_at: nil)
                     .update_all(scheduled_at: Time.current) # rubocop:disable Rails/SkipsModelValidations
                     .positive?
       end
 
       def notify(job_id)
-        queue_name = GoodJob::Job.where(active_job_id: job_id).pick(:queue_name)
+        queue_name = GoodJob::Job.where(id: job_id).pick(:queue_name)
         GoodJob::Notifier.notify({ queue_name: queue_name }) if queue_name
       end
     end
