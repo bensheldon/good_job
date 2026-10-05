@@ -170,18 +170,23 @@ module GoodJob
           return nil if label.present? && job.good_job_labels.exclude?(label)
 
           query_scope = query_scope(label, key)
+          claim_key = scoped_key(label, key)
           exceeded = nil
           commit = false
 
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
-            # Lock on the resolved key (rather than the claim key) so that checks remain serialized
-            # with processes running earlier versions of GoodJob during a rolling deploy.
+            # Lock on the resolved key so that checks remain serialized with processes running earlier
+            # versions of GoodJob during a rolling deploy.
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
+              # Also lock on the claim key: jobs counted in the same scope (e.g. sharing a label) can resolve
+              # different keys, and their checks must be serialized. This lock is always taken last and nothing
+              # waits on another lock while holding it, so it cannot deadlock.
+              GoodJob::Job.advisory_lock_key(claim_key, function: "pg_advisory_xact_lock") if claim_key != key
               if limit
                 commit = true
                 if GoodJob::ConcurrencyClaim.table_exists?
                   granted = GoodJob::ConcurrencyClaim.claim(
-                    key: scoped_key(label, key),
+                    key: claim_key,
                     limit: limit,
                     scope: query_scope,
                     active_job_id: job.job_id,
