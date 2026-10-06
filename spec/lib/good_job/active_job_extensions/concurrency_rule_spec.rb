@@ -65,6 +65,82 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
+  describe 'labels applied in enqueue callbacks' do
+    let(:test_rule) { { label: -> { "TestJob-#{arguments.first[:name]}" }, total_limit: 1 } }
+
+    def concurrency_callbacks(klass)
+      klass._enqueue_callbacks.select { |cb| cb.filter == :_good_job_concurrency_before_enqueue }
+    end
+
+    before { stub_job_class(test_rule) }
+
+    it 'checks rules after a before_enqueue defined later applies the label' do
+      TestJob.before_enqueue { |job| job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"] }
+
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be false
+      expect(TestJob.perform_later(name: "Bob")).to be_present
+      expect(GoodJob::Job.count).to eq 2
+    end
+
+    it 'checks rules after around_enqueue callbacks in subclasses' do
+      stub_const 'ChildJob', Class.new(TestJob)
+      ChildJob.around_enqueue do |job, block|
+        job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"]
+        block.call
+      end
+
+      expect(ChildJob.perform_later(name: "Alice")).to be_present
+      expect(ChildJob.perform_later(name: "Alice")).to be false
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+    end
+
+    it 'keeps the check last in subclasses when the parent adds callbacks' do
+      stub_const 'ChildJob', Class.new(TestJob)
+      ChildJob.before_enqueue { |job| job.good_job_labels |= ["child"] }
+      TestJob.before_enqueue { |job| job.good_job_labels |= ["parent"] }
+
+      [TestJob, ChildJob].each do |klass|
+        expect(klass._enqueue_callbacks.to_a.last.filter).to eq :_good_job_concurrency_before_enqueue
+        expect(concurrency_callbacks(klass).size).to eq 1
+      end
+    end
+
+    it 'does not duplicate the callbacks being defined' do
+      expect { TestJob.around_enqueue { |_job, block| block.call } }.to change { TestJob._enqueue_callbacks.count }.by(1)
+    end
+
+    it 'respects skip_callback in subclasses' do
+      stub_const 'ChildJob', Class.new(TestJob)
+      ChildJob.skip_callback(:enqueue, :before, :_good_job_concurrency_before_enqueue)
+      TestJob.before_enqueue { |job| job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"] }
+      ChildJob.before_enqueue { |job| job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"] }
+
+      expect(concurrency_callbacks(ChildJob)).to be_empty
+      expect(ChildJob.perform_later(name: "Alice")).to be_present
+      expect(ChildJob.perform_later(name: "Alice")).to be_present
+    end
+
+    it 'keeps conditions from a conditional skip_callback' do
+      stub_const 'ChildJob', Class.new(TestJob)
+      ChildJob.skip_callback(:enqueue, :before, :_good_job_concurrency_before_enqueue, if: -> { arguments.first[:name] == "Skip" })
+      ChildJob.before_enqueue { |job| job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"] }
+
+      expect(ChildJob._enqueue_callbacks.to_a.last.filter).to eq :_good_job_concurrency_before_enqueue
+      expect(ChildJob.perform_later(name: "Skip")).to be_present
+      expect(ChildJob.perform_later(name: "Skip")).to be_present
+      expect(ChildJob.perform_later(name: "Alice")).to be_present
+      expect(ChildJob.perform_later(name: "Alice")).to be false
+    end
+
+    it 'runs prepended callbacks before the check' do
+      TestJob.before_enqueue(prepend: true) { |job| job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"] }
+
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be false
+    end
+  end
+
   describe 'label normalization' do
     let(:test_rule) { { label: -> { arguments.first[:name] }, enqueue_limit: 1, perform_limit: 0 } }
 
