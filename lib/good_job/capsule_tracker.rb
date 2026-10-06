@@ -27,6 +27,7 @@ module GoodJob # :nodoc:
       @executor = executor
       @mutex = Mutex.new
       @locks = 0
+      @advisory_locked = false
       @advisory_locked_connection = nil
       @record_id = SecureRandom.uuid
       @record = nil
@@ -42,7 +43,7 @@ module GoodJob # :nodoc:
     # @return [String, nil]
     def id_for_lock
       value = nil
-      synchronize do
+      synchronize(with_connection: true) do
         next if @locks.zero?
 
         if @record
@@ -65,25 +66,26 @@ module GoodJob # :nodoc:
 
     # Registers the current process around a job execution site.
     # +register+ is expected to be called multiple times in a process, but should be advisory locked only once (in a single thread).
-    # @param with_advisory_lock [Boolean] Whether the lock strategy should us an advisory lock; the connection must be retained to support advisory locks.
+    # @param with_advisory_lock [Boolean] Whether the lock strategy should use an advisory lock; the connection must be retained to support advisory locks.
+    # @param advisory_lock_connection [ActiveRecord::ConnectionAdapters::AbstractAdapter, nil] Persistent connection to use for advisory locking (e.g. a dedicated LISTEN connection).
     # @yield [void] If a block is given, the process will be unregistered after the block completes.
     # @return [void]
-    def register(with_advisory_lock: false)
-      synchronize do
-        if with_advisory_lock
+    def register(with_advisory_lock: false, advisory_lock_connection: nil)
+      # Retain implicit session locks until unregister, including on Rails < 7.2
+      # where with_connection always returns a newly borrowed connection.
+      GoodJob::Process.lease_connection if with_advisory_lock && advisory_lock_connection.nil?
+
+      synchronize(with_connection: with_advisory_lock) do
+        if with_advisory_lock && !advisory_locked?
           if @record
-            if !advisory_locked? || !advisory_locked_connection?
-              @record.class.transaction do
-                @record.advisory_lock!
-                @record.update(lock_type: :advisory)
-              end
-              @advisory_locked_connection = WeakRef.new(@record.class.lease_connection)
-            end
+            @record.advisory_lock!(connection: advisory_lock_connection)
+            @record.update(lock_type: :advisory)
           else
-            @record = GoodJob::Process.find_or_create_record(id: @record_id, with_advisory_lock: true)
-            @advisory_locked_connection = WeakRef.new(@record.class.lease_connection)
+            @record = GoodJob::Process.find_or_create_record(id: @record_id, with_advisory_lock: true, advisory_lock_connection: advisory_lock_connection)
             create_refresh_task
           end
+          @advisory_locked = true
+          @advisory_locked_connection = advisory_lock_connection
         end
 
         @locks += 1
@@ -93,48 +95,52 @@ module GoodJob # :nodoc:
       begin
         yield
       ensure
-        unregister(with_advisory_lock: with_advisory_lock)
+        unregister(with_advisory_lock: with_advisory_lock, advisory_lock_connection: advisory_lock_connection)
       end
     end
 
     # Unregisters the current process from the database.
-    # @param with_advisory_lock [Boolean] Whether the lock strategy should unlock an advisory lock; the connection must be able to support advisory locks.
+    # @param with_advisory_lock [Boolean] Whether the lock strategy should unlock an advisory lock.
+    # @param advisory_lock_connection [ActiveRecord::ConnectionAdapters::AbstractAdapter, nil] Persistent connection holding the advisory lock.
     # @return [void]
-    def unregister(with_advisory_lock: false)
-      synchronize do
-        if @locks.zero?
-          return
-        elsif @locks == 1
-          if @record
-            if with_advisory_lock && advisory_locked? && advisory_locked_connection?
-              @record.class.transaction do
-                @record.advisory_unlock
-                @record.destroy
-              end
-              @advisory_locked_connection = nil
-            else
-              @record.destroy
-            end
-            @record = nil
+    def unregister(with_advisory_lock: false, advisory_lock_connection: nil)
+      synchronize(with_connection: true) do
+        return if @locks.zero?
+
+        # Only advisory callers may check liveness: the LISTEN connection belongs
+        # to the notifier thread and must not be pinged by job-execution threads.
+        if with_advisory_lock && @advisory_locked
+          active = advisory_locked?
+          if !active || matches_advisory_locked_connection?(advisory_lock_connection)
+            @record.advisory_unlock(connection: advisory_lock_connection) if active
+            # Remaining jobs need heartbeat liveness once the advisory lock is gone.
+            @record&.update(lock_type: nil) if @locks > 1
+            @advisory_locked = false
+            @advisory_locked_connection = nil
           end
-          cancel_refresh_task
-        elsif with_advisory_lock && advisory_locked? && advisory_locked_connection?
-          @record.class.transaction do
-            @record.advisory_unlock
-            @record.update(lock_type: nil)
-          end
-          @advisory_locked_connection = nil
         end
 
-        @locks -= 1 unless @locks.zero?
+        if @locks == 1
+          @record&.destroy
+          @record = nil
+          @advisory_locked = false
+          @advisory_locked_connection = nil
+          cancel_refresh_task
+        end
+
+        @locks -= 1
       end
     end
+
+    # Cleans up inactive process records from the database.
+    # @return [void]
+    delegate :cleanup, to: :'GoodJob::Process'
 
     # Refreshes the process record in the database.
     # @param silent [Boolean] Whether to silence logging.
     # @return [void]
     def renew(silent: false)
-      synchronize do
+      synchronize(with_connection: true) do
         GoodJob::Process.with_logger_silenced(silent: silent) do
           @record&.refresh_if_stale(cleanup: true)
         end
@@ -142,9 +148,14 @@ module GoodJob # :nodoc:
     end
 
     # Tests whether an active advisory lock has been taken on the record.
+    # Returns false if a specific connection was stored and it is no longer alive.
     # @return [Boolean]
     def advisory_locked?
-      @advisory_locked_connection&.weakref_alive? && @advisory_locked_connection.active?
+      return false unless @advisory_locked
+      return true if @advisory_locked_connection.nil?
+      return false unless @record
+
+      @record.advisory_lock_active_on?(@advisory_locked_connection)
     end
 
     # @!visibility private
@@ -153,11 +164,6 @@ module GoodJob # :nodoc:
     end
 
     private
-
-    def advisory_locked_connection?
-      conn = @record&.class&.lease_connection
-      conn && @advisory_locked_connection&.weakref_alive? && @advisory_locked_connection.eql?(conn)
-    end
 
     def task_interval
       GoodJob::Process::STALE_INTERVAL + jitter
@@ -172,17 +178,28 @@ module GoodJob # :nodoc:
       return unless @executor
 
       delay ||= task_interval
-      @refresh_task = Concurrent::ScheduledTask.new(delay.to_f, executor: @executor) do
+      refresh_task = Concurrent::ScheduledTask.new(delay.to_f, executor: @executor) do
         Rails.application.executor.wrap do
-          synchronize do
-            next unless @locks.positive?
-
-            @refresh_task = nil
-            create_refresh_task
-            renew(silent: true)
+          acquired = false
+          begin
+            # Match notifier/job lock ordering: acquire a connection before the mutex.
+            GoodJob::Process.connection_pool.with_connection do
+              acquired = true
+              synchronize { renew(silent: true) if @locks.positive? }
+            end
+          rescue ActiveRecord::ConnectionTimeoutError
+            raise if acquired
+          ensure
+            synchronize do
+              if @refresh_task.equal?(refresh_task)
+                @refresh_task = nil
+                create_refresh_task if @locks.positive?
+              end
+            end
           end
         end
       end
+      @refresh_task = refresh_task
       @refresh_task.add_observer(self, :task_observer)
       @refresh_task.execute
     end
@@ -199,11 +216,23 @@ module GoodJob # :nodoc:
     def ns_reset
       @record_id = SecureRandom.uuid
       @record = nil
+      @advisory_locked = false
+      @advisory_locked_connection = nil
+    end
+
+    def matches_advisory_locked_connection?(conn)
+      return true if @advisory_locked_connection.nil?
+      return false unless conn && @record
+
+      @record.advisory_lock_active_on?(conn)
     end
 
     # Synchronize must always be called from within a Rails Executor; it may deadlock if the order is reversed.
-    def synchronize(&block)
-      if @mutex.owned?
+    # Database operations must also acquire a pooled connection before the mutex.
+    def synchronize(with_connection: false, &block)
+      if with_connection
+        GoodJob::Process.connection_pool.with_connection { synchronize(&block) }
+      elsif @mutex.owned?
         yield
       else
         @mutex.synchronize(&block)
