@@ -1,0 +1,8 @@
+<div class="btn-group btn-group-sm mb-3" role="group" aria-label="<%= t ".chart_metric" %>">
+  <% GoodJob::LatencyMetric.options.each do |metric| %>
+    <% active = metric.key == chart_metric.key %>
+    <% metric_query = range_context.merge(performance_range.to_params).merge(metric.to_params).to_query %>
+    <% option_path = metric_query.present? ? "#{metric_path}?#{metric_query}" : metric_path %>
+    <%= link_to t(".metric_options.#{metric.key}"), option_path, class: ["btn", "btn-outline-secondary", ("active" if active)], aria: { current: ("page" if active) } %>
+  <% end %>
+</div>

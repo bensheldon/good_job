@@ -28,8 +28,8 @@
       data: range_form_data
     ) do %>
   <span class="visually-hidden" id="performance-range-name"><%= t ".time_range" %></span>
-  <% if range_context["locale"] %>
-    <%= hidden_field_tag "locale", range_context["locale"] %>
+  <% range_context.each do |context_key, context_value| %>
+    <%= hidden_field_tag context_key, context_value %>
   <% end %>
   <%= hidden_field_tag "chart_start", performance_range.canonical_timestamp(performance_range.start_time), disabled: true, id: nil, data: { performance_range_target: "startCanonicalInput" } %>
   <%= hidden_field_tag "chart_end", performance_range.canonical_timestamp(performance_range.end_time), disabled: true, id: nil, data: { performance_range_target: "endCanonicalInput" } %>
