@@ -65,6 +65,38 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
+  describe 'label normalization' do
+    let(:test_rule) { { label: -> { arguments.first[:name] }, enqueue_limit: 1, perform_limit: 0 } }
+
+    before do
+      allow(GoodJob).to receive(:preserve_job_records).and_return(true)
+      stub_job_class(test_rule)
+    end
+
+    [42, :email, " email "].each do |label|
+      it "enforces enqueue and perform limits for #{label.inspect} after persistence" do
+        active_job = TestJob.set(good_job_labels: [label]).perform_later(name: label)
+        expect(active_job).to be_present
+        expect(TestJob.set(good_job_labels: [label.to_s.strip]).perform_later(name: label)).to be false
+
+        record = GoodJob::Job.find_by!(active_job_id: active_job.job_id)
+        expect(record.labels).to eq([label.to_s.strip])
+
+        GoodJob.perform_inline
+
+        expect(record.reload).not_to be_finished
+        expect(record.executions.last.error).to include('GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError')
+      end
+    end
+
+    it 'skips rules when the job does not carry the normalized label' do
+      active_job = TestJob.set(good_job_labels: ["different"]).perform_later(name: 42)
+      GoodJob.perform_inline
+
+      expect(GoodJob::Job.find_by!(active_job_id: active_job.job_id)).to be_finished
+    end
+  end
+
   describe 'rule-based throttles and perform limits' do
     context 'with an enqueue throttle rule' do
       let(:test_rule) { { label: -> { arguments.first[:name] }, enqueue_throttle: [1, 1.minute] } }

@@ -48,9 +48,10 @@ module GoodJob # :nodoc:
     def start
       ActiveSupport::Notifications.instrument("cron_manager_start.good_job", cron_entries: cron_entries) do
         @running = true
+        graceful_restart = graceful_restart?
         cron_entries.each do |cron_entry|
           create_task(cron_entry)
-          create_graceful_tasks(cron_entry) if @graceful_restart_period
+          create_graceful_tasks(cron_entry) if graceful_restart
         end
       end
     end
@@ -88,6 +89,7 @@ module GoodJob # :nodoc:
     # @param previously_at [Time, nil] the last +in-memory+ scheduled time the cron task was intended to run
     def create_task(cron_entry, at: nil, previously_at: nil)
       cron_at = at || cron_entry.next_at(previously_at: previously_at)
+      return unless cron_at
 
       # ScheduledTask runs immediately if delay is <= 0.01; avoid ever scheduling the task before the intended time
       # https://github.com/ruby-concurrency/concurrent-ruby/blob/56227a4c3ebdd53b8b0976eb8296ceb7a093496f/lib/concurrent-ruby/concurrent/executor/timer_set.rb#L97
@@ -118,17 +120,39 @@ module GoodJob # :nodoc:
     def create_graceful_tasks(cron_entry)
       return unless @graceful_restart_period
 
-      time_period = @graceful_restart_period.ago..Time.current
-      cron_entry.within(time_period).each do |cron_at|
-        future = Concurrent::Future.new(args: [self, cron_entry, cron_at], executor: @executor) do |_thr_manager, thr_cron_entry, thr_cron_at|
+      started_at = Time.current
+      future = Concurrent::Future.new(args: [self, cron_entry, started_at], executor: @executor) do |thr_manager, thr_cron_entry, thr_started_at|
+        # Resume after the last job from before starting, so that times which already have a job aren't attempted again
+        last_cron_at = Rails.application.executor.wrap { thr_cron_entry.jobs.where(cron_at: ..thr_started_at).maximum(:cron_at) }
+        time_period = [thr_started_at - @graceful_restart_period, last_cron_at].compact.max..thr_started_at
+
+        thr_cron_entry.within(time_period).each do |cron_at|
+          break unless thr_manager.running?
+
           Rails.application.executor.wrap do
-            cron_entry.enqueue(thr_cron_at) if thr_cron_entry.enabled?
+            thr_cron_entry.enqueue(cron_at) if thr_cron_entry.enabled?
           end
         end
-
-        future.add_observer(self.class, :task_observer)
-        future.execute
       end
+
+      future.add_observer(self.class, :task_observer)
+      future.execute
+    end
+
+    private
+
+    def graceful_restart?
+      return false unless @graceful_restart_period
+
+      # These settings delete successfully finished jobs, so the unique index can't prevent re-enqueuing them.
+      # A lambda can't be checked in advance; like running cron on multiple processes, it must preserve cron jobs.
+      preserve = GoodJob.preserve_job_records
+      if [false, :on_unhandled_error].include?(preserve)
+        GoodJob.logger.warn("GoodJob is ignoring cron_graceful_restart_period because GoodJob.preserve_job_records is #{preserve.inspect}; cron-created job records must be preserved to avoid re-enqueuing jobs that already ran.")
+        return false
+      end
+
+      true
     end
   end
 end

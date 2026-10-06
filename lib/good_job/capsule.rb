@@ -45,7 +45,7 @@ module GoodJob
         @notifier.recipients.push([@multi_scheduler, :create_thread])
         @poller.recipients.push(-> { @multi_scheduler.create_thread({ fanout: true }) })
 
-        @cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true, executor: @shared_executor) if configuration.enable_cron?
+        @cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true, graceful_restart_period: configuration.cron_graceful_restart_period, executor: @shared_executor) if configuration.enable_cron?
         @startable = false
         @started_at = Time.current
       end

@@ -296,6 +296,13 @@ module GoodJob
         false
       end
 
+      # Releases jobs locked by a process that is no longer running.
+      # @param locked_by_id [String] the process ID
+      # @return [void]
+      def release_process(locked_by_id)
+        where(locked_by_id: locked_by_id).update_all(locked_by_id: nil, locked_at: nil) # rubocop:disable Rails/SkipsModelValidations
+      end
+
       def lock_type_migrated?
         index_exists = connection_pool.with_connection do |connection|
           connection.index_name_exists?(table_name, :index_good_jobs_for_candidate_dequeue_unlocked)
@@ -906,6 +913,8 @@ module GoodJob
           destroy!
         end
 
+        release_concurrency_claims
+
         result
       end
     end
@@ -944,6 +953,18 @@ module GoodJob
 
     private
 
+    # Releases concurrency claims after the job's execution has been committed,
+    # promoting waiting jobs. Failures are reported but do not affect the finished job;
+    # leftover claims are removed by process and job cleanup.
+    def release_concurrency_claims
+      return unless GoodJob::ConcurrencyClaim.table_exists?
+      return unless job_class&.safe_constantize.respond_to?(:good_job_concurrency_rules)
+
+      GoodJob::ConcurrencyClaim.job_finished(self)
+    rescue StandardError => e
+      GoodJob._on_thread_error(e)
+    end
+
     def with_appropriate_lock
       if self.class.effective_lock_strategy == :skiplocked
         transaction do
@@ -963,11 +984,24 @@ module GoodJob
       job_error = GoodJob::Job::DiscardJobError.new(message)
 
       update_record = proc do
-        update(
-          finished_at: Time.current,
-          error: self.class.format_error(job_error),
-          error_event: :discarded
-        )
+        now = Time.current
+        error = self.class.format_error(job_error)
+
+        transaction do
+          update(
+            finished_at: now,
+            error: error,
+            error_event: :discarded
+          )
+          executions.where(finished_at: nil).find_each do |execution|
+            execution.update!(
+              finished_at: now,
+              error: error,
+              error_event: :discarded,
+              duration: (now - execution.created_at).seconds
+            )
+          end
+        end
       end
 
       if active_job.respond_to?(:instrument)

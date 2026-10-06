@@ -260,15 +260,28 @@ uk:
         value: Значення
     performance:
       index:
-        average_duration: Середня тривалість
-        chart_title: Загальний час виконання в секундах
+        chart_title: Сумарна затримка виконання в секундах
+        chart_title_queue: Середня затримка в черзі в секундах
+        chart_title_total: Середня загальна затримка в секундах
+        execution_latency: Затримка виконання
         executions: Виконання
         job_class: Клас завдання
-        maximum_duration: Максимальна тривалість
-        minimum_duration: Мінімальна тривалість
+        jobs: Завдання
         no_executions: Немає виконань за цей період.
+        queue_latency: Затримка в черзі
         queue_name: Назва черги
         title: Продуктивність
+        total_latency: Загальна затримка
+      latency:
+        average: сер
+        maximum: макс
+        minimum: мін
+      metric:
+        chart_metric: Метрика графіка
+        metric_options:
+          execution: Затримка виконання
+          queue: Затримка в черзі
+          total: Загальна затримка
       range:
         bucket_size:
           days: "%{count} д"
@@ -293,8 +306,11 @@ uk:
         time_range: Часовий діапазон продуктивності
         time_zone: 'Часовий пояс:'
       show:
+        execution_chart_title: Затримка виконання
+        queue_chart_title: Затримка в черзі
         slow: Повільно
         title: Продуктивність
+        total_chart_title: Загальна затримка
     processes:
       index:
         cron_enabled: Cron увімкнено

@@ -1,5 +1,45 @@
 # Changelog
 
+## [v4.20.0](https://github.com/bensheldon/good_job/tree/v4.20.0) (2026-10-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.19.4...v4.20.0)
+
+**Implemented enhancements:**
+
+- Match identifier-like strings in dashboard search [\#1831](https://github.com/bensheldon/good_job/pull/1831) ([shiaho777](https://github.com/shiaho777))
+- Add a queue-scoped index for the dequeue candidate query [\#1810](https://github.com/bensheldon/good_job/pull/1810) ([a-abdellatif98](https://github.com/a-abdellatif98))
+- Add cluster mode [\#1803](https://github.com/bensheldon/good_job/pull/1803) ([bensheldon](https://github.com/bensheldon))
+
+**Fixed bugs:**
+
+- \[dashboard\] Mismatch between page header vs graph headers [\#1601](https://github.com/bensheldon/good_job/issues/1601)
+- Add dashboard and batch indexes, remove redundant indexes, and reorder the cron index [\#1840](https://github.com/bensheldon/good_job/pull/1840) ([bensheldon](https://github.com/bensheldon))
+- Detect Puma worker boot hooks and Puma 8 requests in `in_webserver?` [\#1836](https://github.com/bensheldon/good_job/pull/1836) ([amanfredi](https://github.com/amanfredi))
+- Keep both SharedExecutor threads available on JRuby [\#1835](https://github.com/bensheldon/good_job/pull/1835) ([amanfredi](https://github.com/amanfredi))
+- Pass `cron_graceful_restart_period` to the CronManager so it takes effect [\#1833](https://github.com/bensheldon/good_job/pull/1833) ([amanfredi](https://github.com/amanfredi))
+- Wrap Notifier's NOTIFY recipient dispatch in the Rails executor [\#1830](https://github.com/bensheldon/good_job/pull/1830) ([shiaho777](https://github.com/shiaho777))
+- Preserve active backtrace tabs across live poll refreshes [\#1824](https://github.com/bensheldon/good_job/pull/1824) ([shiaho777](https://github.com/shiaho777))
+- Refetch async navbar values after a live poll refresh [\#1823](https://github.com/bensheldon/good_job/pull/1823) ([shiaho777](https://github.com/shiaho777))
+- Truncate long strings when displaying job params on the dashboard [\#1822](https://github.com/bensheldon/good_job/pull/1822) ([shiaho777](https://github.com/shiaho777))
+- Bound all search\_text documents under the tsvector size limit [\#1820](https://github.com/bensheldon/good_job/pull/1820) ([shiaho777](https://github.com/shiaho777))
+- Finish a job's unfinished executions when it is discarded [\#1819](https://github.com/bensheldon/good_job/pull/1819) ([shiaho777](https://github.com/shiaho777))
+
+**Closed issues:**
+
+- Dequeue candidate indexes don't cover queue-filtered workers — one queue's backlog degrades every other queue's claim query [\#1790](https://github.com/bensheldon/good_job/issues/1790)
+- PG: ProgramLimitExceeded during search when a job has a huge error message [\#1785](https://github.com/bensheldon/good_job/issues/1785)
+- Very large `serialized_params` caused dashboard timeout on Heroku [\#1629](https://github.com/bensheldon/good_job/issues/1629)
+- \[dashboard\] Viewing a job & live poll resets the Full Trace vs Application Trace [\#1606](https://github.com/bensheldon/good_job/issues/1606)
+- \[GoodJob\] Notifier errored: NameError: uninitialized constant GoodJob::Job in develpment [\#1571](https://github.com/bensheldon/good_job/issues/1571)
+- Bug: calling GoodJob.restart in Puma on\_worker\_boot still starts GoodJob regardless of it being in async mode or not [\#1531](https://github.com/bensheldon/good_job/issues/1531)
+- Discarding a job via the dashboard should also update the discrete\_execution [\#1093](https://github.com/bensheldon/good_job/issues/1093)
+- A copy of GoodJob::Execution has been removed from the module tree but is still active! [\#954](https://github.com/bensheldon/good_job/issues/954)
+
+**Merged pull requests:**
+
+- Wait for Turbo navigation before reading the URL in performance specs [\#1838](https://github.com/bensheldon/good_job/pull/1838) ([amanfredi](https://github.com/amanfredi))
+- Bump github/codeql-action from 4.37.9 to 4.38.2 [\#1837](https://github.com/bensheldon/good_job/pull/1837) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.19.4](https://github.com/bensheldon/good_job/tree/v4.19.4) (2026-10-02)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.19.3...v4.19.4)

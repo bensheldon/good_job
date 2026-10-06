@@ -7,8 +7,15 @@ export default class extends Controller {
   }
   static targets = ["value"]
 
+  #onLivePollRefresh = () => this.#fetch();
+
   connect() {
     this.#fetch();
+    document.addEventListener("good_job:live-poll-refreshed", this.#onLivePollRefresh);
+  }
+
+  disconnect() {
+    document.removeEventListener("good_job:live-poll-refreshed", this.#onLivePollRefresh);
   }
 
   async #fetch() {

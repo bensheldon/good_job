@@ -6,7 +6,6 @@ module GoodJob # :nodoc:
   # Active Record model that represents a GoodJob capsule/process (either async or CLI).
   class Process < BaseRecord
     include AdvisoryLockable
-    include OverridableConnection
 
     # Interval until the process record being updated
     STALE_INTERVAL = 30.seconds
@@ -73,7 +72,8 @@ module GoodJob # :nodoc:
     # Deletes all inactive process records.
     def self.cleanup
       inactive.find_each do |process|
-        GoodJob::Job.where(locked_by_id: process.id).update_all(locked_by_id: nil, locked_at: nil) # rubocop:disable Rails/SkipsModelValidations
+        GoodJob::Job.release_process(process.id)
+        GoodJob::ConcurrencyClaim.release_process(process.id) if GoodJob::ConcurrencyClaim.table_exists?
         process.delete
       end
     end
@@ -85,22 +85,25 @@ module GoodJob # :nodoc:
       0
     end
 
-    def self.find_or_create_record(id:, with_advisory_lock: false)
+    def self.find_or_create_record(id:, with_advisory_lock: false, advisory_lock_connection: nil)
       attributes = {
         id: id,
         state: process_state,
       }
-      if with_advisory_lock
-        attributes[:create_with_advisory_lock] = true
-        attributes[:lock_type] = :advisory
+      attributes[:lock_type] = :advisory if with_advisory_lock
+
+      record = nil
+      transaction do
+        record = create!(attributes)
+        record.advisory_lock!(connection: advisory_lock_connection) if with_advisory_lock
       end
-      create!(attributes)
+      record
     rescue ActiveRecord::RecordNotUnique
       find_by(id: id).tap do |existing_record|
         next unless existing_record
 
         if with_advisory_lock
-          existing_record.advisory_lock!
+          existing_record.advisory_lock!(connection: advisory_lock_connection)
           existing_record.update(lock_type: :advisory, state: process_state, updated_at: Time.current)
         else
           existing_record.update(lock_type: nil, state: process_state, updated_at: Time.current)

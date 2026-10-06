@@ -234,15 +234,28 @@ tr:
         value: Değer
     performance:
       index:
-        average_duration: Ortalama süre
-        chart_title: Toplam yürütme süresi (saniye)
+        chart_title: Toplam yürütme gecikmesi (saniye)
+        chart_title_queue: Ortalama kuyruk gecikmesi (saniye)
+        chart_title_total: Ortalama toplam gecikme (saniye)
+        execution_latency: Yürütme gecikmesi
         executions: Yürütmeler
         job_class: İş sınıfı
-        maximum_duration: Maksimum süre
-        minimum_duration: Minimum süre
+        jobs: İşler
         no_executions: Bu zaman aralığında yürütme yok.
+        queue_latency: Kuyruk gecikmesi
         queue_name: Kuyruk adı
         title: Performans
+        total_latency: Toplam gecikme
+      latency:
+        average: ort
+        maximum: maks
+        minimum: min
+      metric:
+        chart_metric: Grafik metriği
+        metric_options:
+          execution: Yürütme gecikmesi
+          queue: Kuyruk gecikmesi
+          total: Toplam gecikme
       range:
         bucket_size:
           days: "%{count}g"
@@ -267,8 +280,11 @@ tr:
         time_range: Performans zaman aralığı
         time_zone: 'Saat dilimi:'
       show:
+        execution_chart_title: Yürütme gecikmesi
+        queue_chart_title: Kuyruk gecikmesi
         slow: Yavaş
         title: Performans
+        total_chart_title: Toplam gecikme
     processes:
       index:
         cron_enabled: Cron etkin

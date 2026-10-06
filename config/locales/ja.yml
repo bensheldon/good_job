@@ -234,15 +234,28 @@ ja:
         value: 値
     performance:
       index:
-        average_duration: 平均所要時間
-        chart_title: 合計実行時間（秒）
+        chart_title: 実行レイテンシの合計（秒）
+        chart_title_queue: 平均待機レイテンシ（秒）
+        chart_title_total: 平均合計レイテンシ（秒）
+        execution_latency: 実行レイテンシ
         executions: 実行回数
         job_class: ジョブクラス
-        maximum_duration: 最大所要時間
-        minimum_duration: 最小所要時間
+        jobs: ジョブ数
         no_executions: この時間範囲には実行がありません。
+        queue_latency: 待機レイテンシ
         queue_name: キュー名
         title: パフォーマンス
+        total_latency: 合計レイテンシ
+      latency:
+        average: 平均
+        maximum: 最大
+        minimum: 最小
+      metric:
+        chart_metric: グラフの指標
+        metric_options:
+          execution: 実行レイテンシ
+          queue: 待機レイテンシ
+          total: 合計レイテンシ
       range:
         bucket_size:
           days: "%{count}日"
@@ -267,8 +280,11 @@ ja:
         time_range: パフォーマンスの時間範囲
         time_zone: 'タイムゾーン:'
       show:
+        execution_chart_title: 実行レイテンシ
+        queue_chart_title: 待機レイテンシ
         slow: 遅い
         title: パフォーマンス
+        total_chart_title: 合計レイテンシ
     processes:
       index:
         cron_enabled: Cron が有効になっている

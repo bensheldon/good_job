@@ -44,7 +44,7 @@ RSpec.describe GoodJob::Configuration::Validator do
       configuration = GoodJob::Configuration.new({ cron: cron })
 
       expect(configuration).not_to be_valid
-      expect(configuration.errors[:cron]).to include(/invalid/)
+      expect(configuration.errors[:cron]).to include(/not a valid schedule/)
     end
   end
 end

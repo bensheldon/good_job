@@ -17,4 +17,28 @@ RSpec.describe GoodJob::ApplicationHelper, type: :helper do
       end
     end
   end
+
+  describe "#truncate_display_value" do
+    it "leaves short strings unchanged" do
+      expect(helper.truncate_display_value("short")).to eq("short")
+    end
+
+    it "truncates long strings and notes the original length" do
+      result = helper.truncate_display_value("a" * 2_000, limit: 10)
+
+      expect(result).to eq("#{'a' * 10}… [2000 characters total]")
+    end
+
+    it "truncates strings nested in arrays and hashes" do
+      value = { "key" => ["a" * 2_000, { "nested" => "ok" }] }
+      result = helper.truncate_display_value(value, limit: 10)
+
+      expect(result).to eq({ "key" => ["#{'a' * 10}… [2000 characters total]", { "nested" => "ok" }] })
+    end
+
+    it "passes through other values" do
+      expect(helper.truncate_display_value(42)).to eq(42)
+      expect(helper.truncate_display_value(nil)).to be_nil
+    end
+  end
 end
