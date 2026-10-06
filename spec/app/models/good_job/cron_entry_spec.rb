@@ -251,13 +251,16 @@ describe GoodJob::CronEntry do
     end
 
     it 'enqueues a job with I18n default locale' do
-      I18n.default_locale = :nl
+      # with_locale restores the starting locale, which enqueuing within I18n.with_locale would otherwise replace
+      I18n.with_locale(I18n.locale) do
+        I18n.default_locale = :nl
 
-      I18n.with_locale(:en) { entry.enqueue }
+        I18n.with_locale(:en) { entry.enqueue }
 
-      expect(enqueued_jobs.last["locale"]).to eq("nl")
-    ensure
-      I18n.default_locale = :en
+        expect(enqueued_jobs.last["locale"]).to eq("nl")
+      ensure
+        I18n.default_locale = :en
+      end
     end
 
     it 'can handle a proc for a class value that enqueues a job directly' do
