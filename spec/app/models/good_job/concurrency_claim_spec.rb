@@ -48,6 +48,22 @@ RSpec.describe GoodJob::ConcurrencyClaim do
   end
 
   describe '.release_job' do
+    it 'touches updated_at while preserving created_at when promoting' do
+      holder = create_job(performed_at: Time.current)
+      waiter = create_job
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: holder.id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: waiter.id, locked_by_id: nil)
+      created_at = described_class.find_by(job_id: waiter.id).created_at
+
+      holder.update!(finished_at: Time.current)
+      Timecop.travel(1.minute) { described_class.release_job(holder.id) }
+
+      promoted_claim = described_class.find_by(job_id: waiter.id)
+      expect(promoted_claim.state).to eq described_class::PROMOTED
+      expect(promoted_claim.created_at).to eq created_at
+      expect(promoted_claim.updated_at).to be > created_at + 30.seconds
+    end
+
     it 'deletes grants and makes the oldest waiting job runnable' do
       holder = create_job(performed_at: Time.current)
       first_waiter = create_job
