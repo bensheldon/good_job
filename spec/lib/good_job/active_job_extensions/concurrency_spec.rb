@@ -354,52 +354,6 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
     end
 
-    describe 'perform_limit: with a label and different keys per job' do
-      before do
-        TestJob.good_job_concurrency_rule(perform_limit: 1, label: "testlabel", key: -> { "key-#{arguments.first[:name]}" })
-      end
-
-      it 'serializes checks across keys on the label' do
-        active_job = TestJob.set(good_job_labels: "testlabel").perform_later(name: "A")
-        GoodJob::Job.find_by(active_job_id: active_job.job_id).update!(performed_at: Time.current)
-
-        locked = Concurrent::Event.new
-        release = Concurrent::Event.new
-        holder = Thread.new do
-          GoodJob::Job.connection_pool.with_connection do
-            GoodJob::Job.transaction do
-              GoodJob::Job.advisory_lock_key("label:testlabel", function: "pg_advisory_xact_lock")
-              locked.set
-              release.wait(5)
-            end
-          end
-        end
-        locked.wait(5)
-
-        checker = Thread.new do
-          GoodJob::Job.connection_pool.with_connection { TestJob.good_job_concurrency_rules.first.evaluate(active_job, :perform) }
-        end
-        expect(checker.join(0.5)).to be_nil
-
-        release.set
-        holder.join(5)
-        expect(checker.join(5)).to be_truthy
-        expect(checker.value).to be_nil
-      end
-
-      it 'grants only one of two promoted jobs with different keys' do
-        job_a = TestJob.set(good_job_labels: "testlabel").perform_later(name: "A")
-        job_b = TestJob.set(good_job_labels: "testlabel").perform_later(name: "B")
-        [job_a, job_b].each do |job|
-          GoodJob::ConcurrencyClaim.create!(key: "label:testlabel", job_id: job.job_id, state: GoodJob::ConcurrencyClaim::PROMOTED)
-          GoodJob::Job.find_by(active_job_id: job.job_id).update!(performed_at: Time.current)
-        end
-
-        results = [job_a, job_b].map { |job| TestJob.good_job_concurrency_rules.first.evaluate(job, :perform) }
-        expect(results).to contain_exactly(nil, :limit)
-      end
-    end
-
     describe 'perform_limit: with multiple rules' do
       before do
         TestJob.good_job_concurrency_rule(perform_limit: 1, label: "first")

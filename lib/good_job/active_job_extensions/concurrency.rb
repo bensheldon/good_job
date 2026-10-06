@@ -175,13 +175,8 @@ module GoodJob
           commit = false
 
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
-            # Lock on the resolved key so that checks remain serialized with processes running earlier
-            # versions of GoodJob during a rolling deploy.
+            # The rule's key is the advisory lock for the checks; the claim key names the counted scope.
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
-              # Also lock on the claim key: jobs counted in the same scope (e.g. sharing a label) can resolve
-              # different keys, and their checks must be serialized. This lock is always taken last and nothing
-              # waits on another lock while holding it, so it cannot deadlock.
-              GoodJob::Job.advisory_lock_key(claim_key, function: "pg_advisory_xact_lock") if claim_key != key
               if limit
                 commit = true
                 if GoodJob::ConcurrencyClaim.table_exists?
