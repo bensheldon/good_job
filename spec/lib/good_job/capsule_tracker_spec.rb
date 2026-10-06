@@ -15,6 +15,7 @@ describe GoodJob::CapsuleTracker do
         waiting_for_connection = Concurrent::Event.new
         allow_checkout = Concurrent::Event.new
         heartbeat_finished = Concurrent::Event.new
+        start_job = Concurrent::Event.new
         pool = GoodJob::Process.connection_pool
         job_thread = nil
 
@@ -26,6 +27,8 @@ describe GoodJob::CapsuleTracker do
           original.call(*args)
         end
         job_thread = Thread.new do
+          # JRuby can run this thread before Thread.new assigns job_thread.
+          start_job.wait
           Rails.application.executor.wrap do
             if operation == :register
               tracker.register(with_advisory_lock: true) do
@@ -36,6 +39,7 @@ describe GoodJob::CapsuleTracker do
             end
           end
         end
+        start_job.set
         expect(waiting_for_connection.wait(2)).to be true
 
         heartbeat_thread = Thread.new do
@@ -49,6 +53,7 @@ describe GoodJob::CapsuleTracker do
         job_thread.value
         heartbeat_thread.value
       ensure
+        start_job&.set
         allow_checkout&.set
         job_thread&.join
         heartbeat_thread&.join
