@@ -8,7 +8,10 @@ module GoodJob
       module Prepends
         def initialize(...)
           super
-          self.good_job_labels = Array(self.class.good_job_labels.dup)
+          # Class-level labels may be Lambdas/Procs, invoked in the context of the job
+          self.good_job_labels = Array(self.class.good_job_labels).filter_map do |label|
+            label.respond_to?(:call) ? instance_exec(&label) : label
+          end
         end
 
         def enqueue(options = {})

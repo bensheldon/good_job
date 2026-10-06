@@ -615,7 +615,26 @@ Supplying both `label:` and `key:` to `good_job_concurrency_rule` is deprecated.
 
 A rule's `label:` can also be a Lambda/Proc that is invoked in the context of the job instance, for example to derive the label from job arguments. The lambda resolves the label to check against; the job's `good_job_labels` must still contain it for the rule to apply. Rule labels and job labels are converted to strings and stripped of surrounding whitespace when matched, consistent with how labels are stored.
 
-Apply labels dynamically in a `before_enqueue` callback. They are stored on the job record and checked by the rules:
+To apply a dynamic label to every job of a class, set a Lambda/Proc in the class-level `good_job_labels`. It is invoked in the context of the job when the job is initialized, so the label is present for checks at both enqueue and perform time:
+
+```ruby
+class MyJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
+  self.good_job_labels = [-> { "user-#{arguments.first[:user_id]}" }]
+
+  good_job_concurrency_rule(
+    label: -> { "user-#{arguments.first[:user_id]}" },
+    total_limit: 1
+  )
+
+  def perform(user_id:)
+    # do work
+  end
+end
+```
+
+Labels can also be applied in a `before_enqueue` callback. They are stored on the job record and checked by the rules:
 
 ```ruby
 class MyJob < ApplicationJob
