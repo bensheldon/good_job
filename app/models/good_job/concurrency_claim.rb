@@ -92,7 +92,7 @@ module GoodJob
           rows = where(job_id: job.id).lock.to_a.select { |row| row.state == PROMOTION_PENDING }
           next false if rows.empty?
 
-          where(id: rows.map(&:id)).update_all(state: PROMOTED) # rubocop:disable Rails/SkipsModelValidations
+          where(id: rows.map(&:id)).update_all(state: PROMOTED, updated_at: Time.current) # rubocop:disable Rails/SkipsModelValidations
           schedule_now(job.id)
         end
         notify(job.id) if promoted
@@ -108,11 +108,12 @@ module GoodJob
 
       def upsert_claim(key:, job_id:, locked_by_id:, state:)
         # Raw SQL because `upsert(update_only:)` requires Rails 7.0+
-        lease_connection.exec_update(sanitize_sql_array([<<~SQL.squish, key, job_id, locked_by_id, state, Time.current]))
-          INSERT INTO #{quoted_table_name} (key, job_id, locked_by_id, state, created_at)
-          VALUES (?, ?, ?, ?, ?)
+        now = Time.current
+        lease_connection.exec_update(sanitize_sql_array([<<~SQL.squish, key, job_id, locked_by_id, state, now, now]))
+          INSERT INTO #{quoted_table_name} (key, job_id, locked_by_id, state, created_at, updated_at)
+          VALUES (?, ?, ?, ?, ?, ?)
           ON CONFLICT (key, job_id)
-          DO UPDATE SET locked_by_id = EXCLUDED.locked_by_id, state = EXCLUDED.state
+          DO UPDATE SET locked_by_id = EXCLUDED.locked_by_id, state = EXCLUDED.state, updated_at = EXCLUDED.updated_at
         SQL
       end
 
@@ -129,11 +130,11 @@ module GoodJob
               claim.delete
               :stale
             elsif schedule_now(claim.job_id)
-              claim.update_columns(state: PROMOTED) # rubocop:disable Rails/SkipsModelValidations
+              claim.update_columns(state: PROMOTED, updated_at: Time.current) # rubocop:disable Rails/SkipsModelValidations
               claim.job_id
             else
               # Still finishing its rejected execution; it will run itself once it is rescheduled.
-              claim.update_columns(state: PROMOTION_PENDING) # rubocop:disable Rails/SkipsModelValidations
+              claim.update_columns(state: PROMOTION_PENDING, updated_at: Time.current) # rubocop:disable Rails/SkipsModelValidations
               nil
             end
           end

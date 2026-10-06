@@ -8,6 +8,7 @@ class CreateGoodJobConcurrencyClaims < ActiveRecord::Migration<%= migration_vers
 
     create_table :good_job_concurrency_claims, id: :uuid do |t|
       t.datetime :created_at, null: false
+      t.datetime :updated_at, null: false
       t.uuid :job_id, null: false
       t.uuid :locked_by_id
       t.integer :state, limit: 2, null: false

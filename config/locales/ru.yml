@@ -73,63 +73,63 @@ ru:
         about_x_hours:
           few: около %{count} часов
           many: около %{count} часов
-          one: около 1 часа
+          one: около %{count} часа
           other: около %{count} часа
         about_x_months:
           few: около %{count} месяцев
           many: около %{count} месяцев
-          one: около 1 месяца
+          one: около %{count} месяца
           other: около %{count} месяца
         about_x_years:
           few: около %{count} лет
           many: около %{count} лет
-          one: около 1 года
+          one: около %{count} года
           other: около %{count} лет
         almost_x_years:
           few: почти %{count} года
           many: почти %{count} лет
-          one: почти 1 год
+          one: почти %{count} год
           other: почти %{count} лет
         half_a_minute: 30 секунд
         less_than_x_minutes:
           few: меньше %{count} минут
           many: меньше %{count} минут
-          one: меньше 1 минуты
+          one: меньше %{count} минуты
           other: меньше %{count} минуты
         less_than_x_seconds:
           few: меньше %{count} секунд
           many: меньше %{count} секунд
-          one: меньше 1 секунды
+          one: меньше %{count} секунды
           other: меньше %{count} секунды
         over_x_years:
           few: больше %{count} лет
           many: больше %{count} лет
-          one: больше 1 года
+          one: больше %{count} года
           other: больше %{count} лет
         x_days:
           few: "%{count} дня"
           many: "%{count} дней"
-          one: 1 день
+          one: "%{count} день"
           other: "%{count} дня"
         x_minutes:
           few: "%{count} минуты"
           many: "%{count} минут"
-          one: 1 минута
+          one: "%{count} минута"
           other: "%{count} минуты"
         x_months:
           few: "%{count} месяца"
           many: "%{count} месяцев"
-          one: 1 месяц
+          one: "%{count} месяц"
           other: "%{count} месяца"
         x_seconds:
           few: "%{count} секунды"
           many: "%{count} секунд"
-          one: 1 секунда
+          one: "%{count} секунда"
           other: "%{count} секунды"
         x_years:
           few: "%{count} года"
           many: "%{count} лет"
-          one: 1 год
+          one: "%{count} год"
           other: "%{count} года"
     duration:
       hours: "%{hour}ч %{min}м"
@@ -185,10 +185,10 @@ ru:
       table:
         actions:
           apply_to_all:
-            few: около %{count} часов
-            many: около %{count} часов
-            one: около 1 часа
-            other: около %{count} часа
+            few: Применить ко всем %{count} заданиям.
+            many: Применить ко всем %{count} заданиям.
+            one: Применить к %{count} заданию.
+            other: Применить ко всем %{count} заданиям.
           confirm_destroy_all: Вы уверены, что хотите удалить выбранные задания?
           confirm_discard_all: Вы действительно хотите отменить выбранные задания?
           confirm_reschedule_all: Вы уверены, что хотите изменить время исполнения выбранных заданий?
