@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+
+# path to your application root.
+APP_ROOT = File.expand_path('../demo', __dir__)
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+FileUtils.chdir APP_ROOT do
+  puts "\n== Dropping test databases =="
+  system!('RAILS_ENV=test RUN_SERIALLY=1 bin/rails db:drop parallel:drop')
+end

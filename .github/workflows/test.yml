@@ -66,9 +66,17 @@ jobs:
 
       # Validate Development Environment
       - name: bin/setup
-        run: bin/rails db:test:prepare
-      - name: bin/rspec
-        run: bin/rspec --require ./spec/support/pre_documentation_formatter.rb --format PreDocumentationFormatter
+        run: |
+          bin/rails db:test:prepare
+          bin/rails parallel:create parallel:load_schema
+      - name: Restore RSpec runtime log
+        uses: actions/cache@v6
+        with:
+          path: tmp/parallel_runtime_rspec.log
+          key: parallel-runtime-devenv-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: parallel-runtime-devenv-
+      - name: bin/parallel_rspec
+        run: bin/parallel_rspec -n 2 --verbose-rerun-command spec
       # Archive
       - name: Archive system spec screenshots
         uses: actions/upload-artifact@v7
@@ -176,18 +184,35 @@ jobs:
       # Test
       - name: Set up test database
         run: bundle exec demo/bin/rails db:test:prepare
+      - name: Set up parallel test databases
+        if: ${{ !startsWith(matrix.ruby, 'jruby') }}
+        run: bundle exec rake parallel:create parallel:load_schema
+      - name: Restore RSpec runtime log
+        if: ${{ !startsWith(matrix.ruby, 'jruby') }}
+        uses: actions/cache@v6
+        with:
+          path: tmp/parallel_runtime_rspec.log
+          key: parallel-runtime-${{ matrix.gemfile }}-${{ matrix.ruby }}-${{ matrix.pg }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: parallel-runtime-${{ matrix.gemfile }}-${{ matrix.ruby }}-${{ matrix.pg }}-
+      - name: Run tests in parallel
+        if: ${{ !startsWith(matrix.ruby, 'jruby') }}
+        run: bin/parallel_rspec -n 2 --verbose-rerun-command spec
+
+      # JRuby runs serially
       - name: Run Unit tests
+        if: ${{ startsWith(matrix.ruby, 'jruby') }}
         run: |
           bundle exec rspec --exclude-pattern "spec/system/**/*_spec.rb, spec/generators/**/*_spec.rb" \
                                       --require ./spec/support/pre_documentation_formatter.rb \
                                       --format PreDocumentationFormatter
       - name: Run System tests
+        if: ${{ startsWith(matrix.ruby, 'jruby') }}
         run: |
           bundle exec rspec --require ./spec/support/pre_documentation_formatter.rb \
                                       --format PreDocumentationFormatter \
                                       spec/system
-
       - name: Run Generators tests
+        if: ${{ startsWith(matrix.ruby, 'jruby') }}
         run: |
           bundle exec rspec --require ./spec/support/pre_documentation_formatter.rb \
                                       --format PreDocumentationFormatter \

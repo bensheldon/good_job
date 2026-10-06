@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+require 'bundler/setup'
+
+# Interleaved output from the verbose formatter is unreadable without a prefix
+ARGV.unshift('--prefix-output-with-test-env-number') unless ARGV.include?('--serialize-stdout')
+
+# Balance groups by recorded runtimes (written by ParallelTests::RSpec::RuntimeLogger in .rspec_parallel)
+runtime_log = File.expand_path('../tmp/parallel_runtime_rspec.log', __dir__)
+if File.size?(runtime_log) && ARGV.none? { |arg| arg.start_with?('--group-by') }
+  ARGV.unshift('--group-by', 'runtime', '--runtime-log', runtime_log, '--allowed-missing', '100')
+end
+
+load Gem.bin_path('parallel_tests', 'parallel_rspec')
