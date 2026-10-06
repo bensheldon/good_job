@@ -5,6 +5,10 @@ module GoodJob
   # concurrency key. A job finishing releases its granted claims and
   # promotes the next waiting job for each released key so it runs immediately.
   #
+  # Promotion means "retry now", not "reserve the next slot": the promoted job is
+  # re-scheduled to run immediately and must pass the concurrency check again, so a
+  # newly enqueued job can take the slot first and overtake it.
+  #
   # References to jobs (+job_id+, the ActiveJob job ID) and processes (+locked_by_id+) are logical;
   # there are no database foreign keys.
   class ConcurrencyClaim < BaseRecord
@@ -112,7 +116,8 @@ module GoodJob
         SQL
       end
 
-      # Makes the oldest waiting job for the key runnable now.
+      # Makes the oldest waiting job for the key runnable now. This does not reserve the
+      # released slot for it; it is checked again when it runs and can be overtaken.
       def promote_next(key)
         loop do
           promoted_job_id = transaction do
