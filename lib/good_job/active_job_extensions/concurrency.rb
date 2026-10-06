@@ -266,30 +266,9 @@ module GoodJob
           wait: wait_key
         )
 
-        before_enqueue do |job|
-          # Don't attempt to enforce concurrency limits with other queue adapters.
-          next unless job.class.queue_adapter.is_a?(GoodJob::Adapter)
-
-          # Always allow jobs to be retried because the current job's execution will complete momentarily
-          next if CurrentThread.active_job_id == job.job_id
-
-          rules = job.class.good_job_concurrency_rules
-
-          # Only generate the concurrency key on the initial enqueue in case it is dynamic
-          if job.class.good_job_concurrency_config.present?
-            job.good_job_concurrency_key ||= job._good_job_concurrency_key
-            legacy_key = job.good_job_concurrency_key
-            rules = [Rule.new(job.class.good_job_concurrency_config.merge(key: legacy_key)), *rules] if legacy_key.present?
-          end
-
-          exceeded = nil
-          rules.each do |rule|
-            exceeded = rule.evaluate(job, :enqueue)
-            break if exceeded
-          end
-
-          throw :abort if exceeded
-        end
+        # Kept as the last enqueue callback (see .set_callback) so that labels applied by
+        # the job's other enqueue callbacks are present when the rules are checked.
+        before_enqueue :_good_job_concurrency_before_enqueue
 
         before_perform do |job|
           # Don't attempt to enforce concurrency limits with other queue adapters.
@@ -325,6 +304,33 @@ module GoodJob
       end
 
       class_methods do
+        # Whenever an enqueue callback is added, moves the concurrency check to the end of the
+        # enqueue callback chain. The concurrency check then runs after enqueue callbacks that are
+        # defined later in the class or its subclasses (e.g. a +before_enqueue+ that applies
+        # +good_job_labels+).
+        def set_callback(name, *filter_list, &block)
+          super
+          _good_job_concurrency_check_last if name.to_sym == :enqueue
+        end
+
+        private
+
+        def _good_job_concurrency_check_last
+          [self, *descendants].each do |klass|
+            chain = klass._enqueue_callbacks
+            # A subclass may have skipped the callback, or replaced it with a conditional copy via +skip_callback+.
+            callback = chain.find { |cb| cb.kind == :before && cb.filter == :_good_job_concurrency_before_enqueue }
+            next if callback.nil? || chain.to_a.last.equal?(callback)
+
+            chain = chain.dup
+            chain.delete(callback)
+            chain.append(callback)
+            klass._enqueue_callbacks = chain
+          end
+        end
+
+        public
+
         def good_job_control_concurrency_with(
           total_limit: NONE,
           enqueue_limit: NONE,
@@ -395,6 +401,33 @@ module GoodJob
       # @return [String] concurrency key
       def _good_job_default_concurrency_key
         self.class.name.to_s
+      end
+
+      private
+
+      def _good_job_concurrency_before_enqueue
+        # Don't attempt to enforce concurrency limits with other queue adapters.
+        return unless self.class.queue_adapter.is_a?(GoodJob::Adapter)
+
+        # Always allow jobs to be retried because the current job's execution will complete momentarily
+        return if CurrentThread.active_job_id == job_id
+
+        rules = self.class.good_job_concurrency_rules
+
+        # Only generate the concurrency key on the initial enqueue in case it is dynamic
+        if self.class.good_job_concurrency_config.present?
+          self.good_job_concurrency_key ||= _good_job_concurrency_key
+          legacy_key = good_job_concurrency_key
+          rules = [Rule.new(self.class.good_job_concurrency_config.merge(key: legacy_key)), *rules] if legacy_key.present?
+        end
+
+        exceeded = nil
+        rules.each do |rule|
+          exceeded = rule.evaluate(self, :enqueue)
+          break if exceeded
+        end
+
+        throw :abort if exceeded
       end
     end
   end

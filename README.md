@@ -615,7 +615,7 @@ Supplying both `label:` and `key:` to `good_job_concurrency_rule` is deprecated.
 
 A rule's `label:` can also be a Lambda/Proc that is invoked in the context of the job instance, for example to derive the label from job arguments. The lambda resolves the label to check against; the job's `good_job_labels` must still contain it for the rule to apply. Rule labels and job labels are converted to strings and stripped of surrounding whitespace when matched, consistent with how labels are stored.
 
-Apply labels dynamically in a `before_enqueue` callback. They are stored on the job record and checked by rules that run when the job is performed:
+Apply labels dynamically in a `before_enqueue` callback. They are stored on the job record and checked by the rules:
 
 ```ruby
 class MyJob < ApplicationJob
@@ -636,7 +636,7 @@ class MyJob < ApplicationJob
 end
 ```
 
-Rules are checked when a job is enqueued and again when it is performed. Labels assigned in `before_enqueue` are present for the before-perform check, but not for checks that run at enqueue time (`enqueue_limit`, `enqueue_throttle`, and `total_limit` when no enqueue-specific limit is configured). For those, pass the label when enqueuing:
+Rules are checked when a job is enqueued and again when it is performed. The enqueue-time check runs after the job's other `before_enqueue` and `around_enqueue` callbacks, regardless of where they are defined, so labels assigned in those callbacks are present for both checks. Labels can also be passed when enqueuing:
 
 ```ruby
 MyJob.set(good_job_labels: [user_id.to_s]).perform_later(user_id: user_id)
