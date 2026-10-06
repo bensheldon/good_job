@@ -27,7 +27,7 @@ RSpec.describe GoodJob::CronManager do
     let(:cron_entries) do
       [
         GoodJob::CronEntry.new(
-          key: 'example',
+          key: :example,
           cron: "* * * * * *", # cron-style scheduling format by fugit gem, allows seconds resolution
           class: "TestJob", # reference the Job class with a string
           args: [42, { name: "Alice" }], # arguments to pass.  Could also allow a Proc for dynamic args, but problematic?
@@ -52,7 +52,7 @@ RSpec.describe GoodJob::CronManager do
 
       job = GoodJob::Job.first
       expect(job).to have_attributes(
-        cron_key: 'example',
+        cron_key: "example",
         priority: -10
       )
     end
@@ -87,7 +87,7 @@ RSpec.describe GoodJob::CronManager do
       let(:cron_entries) do
         [
           GoodJob::CronEntry.new(
-            key: 'example',
+            key: :example,
             cron: my_proc,
             class: "TestJob"
           ),
@@ -113,7 +113,7 @@ RSpec.describe GoodJob::CronManager do
     let(:cron_entries) do
       [
         GoodJob::CronEntry.new(
-          key: 'example',
+          key: :example,
           cron: "0 * * * * *",
           class: "TestJob"
         ),
@@ -216,7 +216,7 @@ RSpec.describe GoodJob::CronManager do
     end
 
     it "reports an entry's error without affecting other entries" do
-      failing_entry = GoodJob::CronEntry.new(key: 'failing', cron: "0 * * * * *", class: "TestJob")
+      failing_entry = GoodJob::CronEntry.new(key: :failing, cron: "0 * * * * *", class: "TestJob")
       allow(failing_entry).to receive(:within).and_raise(StandardError, "within failed")
 
       cron_manager = described_class.new([failing_entry, *cron_entries], start_on_initialize: false, graceful_restart_period: 5.minutes)
@@ -226,7 +226,7 @@ RSpec.describe GoodJob::CronManager do
         expect(GoodJob::Job.where(cron_key: 'example').count).to eq 5
         expect(THREAD_ERRORS.map { |_name, error, _backtrace| error.message }).to eq ["within failed"]
       end
-      expect(cron_manager.instance_variable_get(:@tasks).keys).to contain_exactly('failing', 'example')
+      expect(cron_manager.instance_variable_get(:@tasks).keys).to contain_exactly(:failing, :example)
 
       cron_manager.shutdown
       THREAD_ERRORS.clear
