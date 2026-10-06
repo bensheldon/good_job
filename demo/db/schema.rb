@@ -41,6 +41,7 @@ ActiveRecord::Schema.define(version: 2026_10_05_000000) do
     t.text "key", null: false
     t.uuid "locked_by_id"
     t.integer "state", limit: 2, null: false
+    t.datetime "updated_at", null: false
     t.index ["job_id"], name: "index_good_job_concurrency_claims_on_job_id"
     t.index ["key", "job_id"], name: "index_good_job_concurrency_claims_on_key_and_job_id", unique: true
     t.index ["key", "state", "created_at"], name: "index_good_job_concurrency_claims_for_promotion"
