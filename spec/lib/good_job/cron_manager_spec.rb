@@ -131,12 +131,15 @@ RSpec.describe GoodJob::CronManager do
 
     it "reenqueues jobs scheduled for the previous period" do
       cron_manager = described_class.new(cron_entries, start_on_initialize: false, graceful_restart_period: 5.minutes)
-      cron_manager.start
+      # Start in the middle of a minute so the live scheduler doesn't also enqueue the next run
+      Timecop.travel(Time.current.at_beginning_of_minute + 30.seconds) do
+        cron_manager.start
 
-      wait_until(max: 5) do
-        expect(GoodJob::Job.count).to eq 5
+        wait_until(max: 5) do
+          expect(GoodJob::Job.count).to eq 5
+        end
+        cron_manager.shutdown
       end
-      cron_manager.shutdown
     end
 
     it "only attempts times after the last job" do
