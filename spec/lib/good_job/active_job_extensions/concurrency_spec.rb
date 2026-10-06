@@ -26,6 +26,45 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
+  describe 'label and key deprecation' do
+    before do
+      allow(GoodJob.deprecator).to receive(:warn)
+    end
+
+    it 'warns when a label rule declares a custom key' do
+      TestJob.good_job_concurrency_rule(label: 'email', key: 'custom', perform_limit: 1)
+      2.times do
+        TestJob.set(good_job_labels: 'email').perform_later(name: nil)
+        GoodJob.perform_inline
+      end
+
+      expect(GoodJob.deprecator).to have_received(:warn).with(/Supplying both `label:` and `key:`.*Remove `key:`/).once
+    end
+
+    it 'warns when a rule declares dynamic labels and keys' do
+      TestJob.good_job_concurrency_rule(label: -> { 'email' }, key: -> { 'custom' }, perform_limit: 1)
+
+      expect(GoodJob.deprecator).to have_received(:warn).once
+    end
+
+    it 'does not warn for label-only rules or blank custom keys' do
+      TestJob.good_job_concurrency_rule(label: 'email', perform_limit: 1)
+      TestJob.good_job_concurrency_rule(label: 'email', key: nil, perform_limit: 1)
+      TestJob.good_job_concurrency_rule(label: 'email', key: '', perform_limit: 1)
+
+      expect(GoodJob.deprecator).not_to have_received(:warn)
+    end
+
+    it 'does not warn for key-only rules or legacy key configuration' do
+      TestJob.good_job_concurrency_rule(key: 'custom', perform_limit: 1)
+      TestJob.good_job_control_concurrency_with(key: 'custom', perform_limit: 1)
+      TestJob.perform_later(name: nil)
+      GoodJob.perform_inline
+
+      expect(GoodJob.deprecator).not_to have_received(:warn)
+    end
+  end
+
   describe '.good_job_control_concurrency_with' do
     describe 'total_limit:' do
       before do
@@ -342,15 +381,52 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
 
     describe 'perform_limit: with both a label and a key' do
       before do
+        allow(GoodJob.deprecator).to receive(:warn)
         TestJob.good_job_concurrency_rule(perform_limit: 1, label: "testlabel", key: -> { "custom" })
       end
 
-      it 'claims and locks on the label, which is the counted scope' do
+      it 'uses the label for both enqueue and perform locks and claims' do
+        TestJob.good_job_concurrency_rules = []
+        TestJob.good_job_concurrency_rule(enqueue_limit: 1, perform_limit: 1, label: "testlabel", key: -> { "custom" })
+        allow(GoodJob::Job).to receive(:advisory_lock_key).and_call_original
         active_job = TestJob.set(good_job_labels: "testlabel").perform_later(name: "A")
         GoodJob::Job.find_by(active_job_id: active_job.job_id).update!(performed_at: Time.current)
 
         expect(TestJob.good_job_concurrency_rules.first.evaluate(active_job, :perform)).to be_nil
+        expect(GoodJob::Job).to have_received(:advisory_lock_key).with("label:testlabel", function: "pg_advisory_xact_lock").twice
         expect(GoodJob::ConcurrencyClaim.where(job_id: active_job.job_id).pluck(:key)).to eq ["label:testlabel"]
+      end
+
+      it 'does not evaluate the ignored custom key' do
+        rule = described_class::Rule.new(label: "testlabel", key: -> { raise 'Custom key evaluated' }, perform_limit: 1)
+        active_job = TestJob.set(good_job_labels: "testlabel").perform_later(name: nil)
+        GoodJob::Job.find_by(active_job_id: active_job.job_id).update!(performed_at: Time.current)
+
+        expect(rule.evaluate(active_job, :perform)).to be_nil
+      end
+
+      it 'grants only one of two concurrent promoted jobs with different custom keys' do
+        jobs = %w[A B].map do |name|
+          active_job = TestJob.set(good_job_labels: "testlabel").perform_later(name: name)
+          GoodJob::Job.find_by(active_job_id: active_job.job_id).update!(performed_at: Time.current)
+          GoodJob::ConcurrencyClaim.create!(key: "label:testlabel", job_id: active_job.job_id, state: GoodJob::ConcurrencyClaim::PROMOTED)
+          active_job
+        end
+        rule = described_class::Rule.new(label: "testlabel", key: -> { "key-#{arguments.first[:name]}" }, perform_limit: 1)
+        barrier = Concurrent::CyclicBarrier.new(2)
+        threads = jobs.map do |active_job|
+          Thread.new do
+            GoodJob::Job.connection_pool.with_connection do
+              raise 'Concurrent checks did not start' unless barrier.wait(5)
+
+              rule.evaluate(active_job, :perform)
+            end
+          end
+        end
+
+        expect(threads.map(&:value)).to contain_exactly(nil, :limit)
+      ensure
+        threads&.each { |thread| thread.join(5) }
       end
     end
 

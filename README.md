@@ -609,6 +609,8 @@ Jobs must be enqueued with the matching label for rules to take effect:
 MyJob.set(good_job_labels: ["email"]).perform_later
 ```
 
+Supplying both `label:` and `key:` to `good_job_concurrency_rule` is deprecated. For labelled rules, `key:` is ignored: jobs sharing the label use the same advisory lock for concurrency checks. Remove `key:` from these rules. The legacy `good_job_control_concurrency_with(key: ...)` interface remains supported.
+
 #### Dynamic labels
 
 A rule's `label:` can also be a Lambda/Proc that is invoked in the context of the job instance, for example to derive the label from job arguments. The lambda resolves the label to check against; the job's `good_job_labels` must still contain it for the rule to apply. Rule labels and job labels are converted to strings and stripped of surrounding whitespace when matched, consistent with how labels are stored.

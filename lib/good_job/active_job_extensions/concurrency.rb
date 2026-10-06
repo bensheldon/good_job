@@ -26,6 +26,10 @@ module GoodJob
           @perform_limit = config[:perform_limit]
           @enqueue_throttle = config[:enqueue_throttle]
           @perform_throttle = config[:perform_throttle]
+
+          return unless @label.present? && key.present?
+
+          GoodJob.deprecator.warn("Supplying both `label:` and `key:` arguments to `good_job_concurrency_rule` is deprecated. Locks use the `label:` value; `key:` is ignored. Remove `key:` from the rule.")
         end
 
         def key
@@ -59,7 +63,7 @@ module GoodJob
         end
 
         def resolve_key(job, label)
-          if key.blank?
+          if label.present? || key.blank?
             "label:#{label}"
           else
             key_value = @key.respond_to?(:call) ? job.instance_exec(&@key) : @key
@@ -341,7 +345,7 @@ module GoodJob
 
         # Define a concurrency rule. Rules are appended to the class-level
         # `good_job_concurrency_rules` array. Each rule uses keyword arguments that may
-        # include keys such as :label, :key (optional lock key), and
+        # include keys such as :label, :key (deprecated when combined with :label), and
         # stage-specific settings like :enqueue_limit, :enqueue_throttle,
         # :perform_limit, :perform_throttle, and :total_limit.
         def good_job_concurrency_rule(
