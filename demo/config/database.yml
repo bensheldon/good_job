@@ -25,7 +25,7 @@ default: &default
 
 development:
   <<: *default
-  database: <%= ENV["CI"] ? "good_job_test" : "good_job_development" %>
+  database: <%= ENV["CI"] ? "good_job_test#{GitWorktree.db_suffix}#{ENV["TEST_ENV_NUMBER"]}" : "good_job_development" %>
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
@@ -83,7 +83,7 @@ test:
 #
 production:
   <<: *default
-  database: <%= ENV["CI"] ? "good_job_test" : "good_job_development" %>
+  database: <%= ENV["CI"] ? "good_job_test#{GitWorktree.db_suffix}#{ENV["TEST_ENV_NUMBER"]}" : "good_job_development" %>
 
 demo:
   <<: *default
