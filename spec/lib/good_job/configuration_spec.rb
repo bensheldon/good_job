@@ -42,22 +42,24 @@ RSpec.describe GoodJob::Configuration do
     end
 
     context 'with the deprecated max_threads sources' do
+      before { allow(GoodJob.deprecator).to receive(:warn) }
+
       it 'reads and warns for the :max_threads option' do
         configuration = described_class.new({ max_threads: 4 })
-        expect(GoodJob.deprecator).to receive(:warn).with(/max_threads.*option.*deprecated/i)
         expect(configuration.threads).to eq 4
+        expect(GoodJob.deprecator).to have_received(:warn).with(/max_threads.*option.*deprecated/i)
       end
 
       it 'reads and warns for the GOOD_JOB_MAX_THREADS environment variable' do
         configuration = described_class.new({}, env: { 'GOOD_JOB_MAX_THREADS' => '6' })
-        expect(GoodJob.deprecator).to receive(:warn).with(/GOOD_JOB_MAX_THREADS.*deprecated/i)
         expect(configuration.threads).to eq 6
+        expect(GoodJob.deprecator).to have_received(:warn).with(/GOOD_JOB_MAX_THREADS.*deprecated/i)
       end
 
       it 'prefers the new sources without warning' do
         configuration = described_class.new({ threads: 8 }, env: { 'GOOD_JOB_MAX_THREADS' => '6' })
-        expect(GoodJob.deprecator).not_to receive(:warn)
         expect(configuration.threads).to eq 8
+        expect(GoodJob.deprecator).not_to have_received(:warn)
       end
     end
   end
