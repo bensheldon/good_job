@@ -114,6 +114,23 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       expect(described_class.fatal_exception?(nil)).to be false
     end
 
+    it 'preserves concurrency when a task is cancelled' do
+      executor = described_class.new(max_fibers: 2, name: "test-executor")
+      release = Concurrent::Event.new
+      executor.post { Async::Task.current.sleep(0.01) until release.set? }
+      executor.post { Async::Task.current.stop }
+      wait_until { expect(executor.ready_worker_count).to eq 1 }
+
+      ran = Concurrent::Event.new
+      executor.post { ran.set }
+
+      expect(ran.wait(1)).to be true
+    ensure
+      release&.set
+      executor&.shutdown
+      executor&.wait_for_termination(5)
+    end
+
     it 'queues tasks when all fibers are busy' do
       latch = Concurrent::CountDownLatch.new(1)
       completed = Concurrent::AtomicFixnum.new(0)

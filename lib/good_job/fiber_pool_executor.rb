@@ -130,7 +130,7 @@ module GoodJob # :nodoc:
       ::Thread.current.name = "#{name}-reactor"
       ::Thread.handle_interrupt(Object => :immediate) do
         Sync do |reactor|
-          workers = Array.new(@max_fibers) { reactor.async { work_off_queue } }
+          workers = Array.new(@max_fibers) { reactor.async { |worker| work_off_queue(worker) } }
           workers.each(&:wait)
         end
       end
@@ -143,18 +143,24 @@ module GoodJob # :nodoc:
       end
     end
 
-    def work_off_queue
+    # Each task runs in a child fiber so that cancelling it (e.g. +Async::Task.current.stop+)
+    # ends only that task, not the worker, preserving pool capacity.
+    def work_off_queue(worker)
       while (args, block = @queue.pop)
         begin
-          block.call(*args)
-        rescue Exception => e # rubocop:disable Lint/RescueException
-          raise if self.class.fatal_exception?(e)
-
-          GoodJob._on_thread_error(e)
+          worker.async { run_task(args, block) }.wait
         ensure
           @pending_count.decrement
         end
       end
+    end
+
+    def run_task(args, block)
+      block.call(*args)
+    rescue Exception => e # rubocop:disable Lint/RescueException
+      raise if self.class.fatal_exception?(e)
+
+      GoodJob._on_thread_error(e)
     end
   end
 end
