@@ -17,6 +17,7 @@ describe GoodJob::CapsuleTracker do
         heartbeat_finished = Concurrent::Event.new
         pool = GoodJob::Process.connection_pool
         job_thread = nil
+        job_thread_assigned = Concurrent::Event.new
 
         allow(pool).to receive(:checkout).and_wrap_original do |original, *args|
           if Thread.current == job_thread && !waiting_for_connection.set?
@@ -26,6 +27,8 @@ describe GoodJob::CapsuleTracker do
           original.call(*args)
         end
         job_thread = Thread.new do
+          # Avoid racing the assignment of job_thread checked in the checkout stub
+          job_thread_assigned.wait(5)
           Rails.application.executor.wrap do
             if operation == :register
               tracker.register(with_advisory_lock: true) do
@@ -36,6 +39,7 @@ describe GoodJob::CapsuleTracker do
             end
           end
         end
+        job_thread_assigned.set
         expect(waiting_for_connection.wait(2)).to be true
 
         heartbeat_thread = Thread.new do
