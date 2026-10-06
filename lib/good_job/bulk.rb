@@ -93,8 +93,7 @@ module GoodJob
 
             if adapter.respond_to?(:enqueue_all)
               unbulkable_jobs, bulkable_jobs = jobs.partition do |job|
-                job.respond_to?(:good_job_concurrency_key) && job.good_job_concurrency_key &&
-                  (job.class.good_job_concurrency_config[:enqueue_limit] || job.class.good_job_concurrency_config[:total_limit])
+                job.respond_to?(:good_job_enqueue_concurrency_controlled?) && job.good_job_enqueue_concurrency_controlled?
               end
               adapter.enqueue_all(bulkable_jobs) if bulkable_jobs.any?
             else

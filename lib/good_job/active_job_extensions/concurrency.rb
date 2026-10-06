@@ -36,6 +36,11 @@ module GoodJob
           @key.equal?(GoodJob::NONE) ? nil : @key
         end
 
+        # Whether the rule limits or throttles jobs at enqueue time.
+        def enqueue_limited?
+          @total_limit.present? || @enqueue_limit.present? || @enqueue_throttle.present?
+        end
+
         def evaluate(job, stage)
           resolved_label = resolve_label(job)
           resolved_key = resolve_key(job, resolved_label)
@@ -375,6 +380,15 @@ module GoodJob
 
           self.good_job_concurrency_rules = Array(good_job_concurrency_rules) + [Rule.new(rule)]
         end
+      end
+
+      # Whether the job is subject to enqueue-time concurrency checks
+      # and so must be enqueued individually rather than in bulk.
+      # @return [Boolean]
+      def good_job_enqueue_concurrency_controlled?
+        config = self.class.good_job_concurrency_config
+        legacy = good_job_concurrency_key.present? && (config[:enqueue_limit] || config[:total_limit]).present?
+        legacy || Array(self.class.good_job_concurrency_rules).any?(&:enqueue_limited?)
       end
 
       # Existing or dynamically generated concurrency key

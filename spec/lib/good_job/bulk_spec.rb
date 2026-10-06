@@ -117,6 +117,19 @@ describe GoodJob::Bulk do
       expect(job_2.provider_job_id).to be_nil
     end
 
+    it 'does not enqueue jobs that fail a labelled concurrency rule' do
+      TestJob.include(GoodJob::ActiveJobExtensions::Concurrency)
+
+      TestJob.good_job_labels = ['test']
+      TestJob.good_job_concurrency_rule(total_limit: 1, label: 'test')
+      job_1 = TestJob.new
+      job_2 = TestJob.new
+
+      described_class.enqueue([job_1, job_2])
+      expect(job_1.provider_job_id).to be_present
+      expect(job_2.provider_job_id).to be_nil
+    end
+
     it 'sets queue, scheduled_at, and priority' do
       described_class.enqueue do
         TestJob.set(queue: 'elephant', wait: 10.minutes, priority: 50).perform_later

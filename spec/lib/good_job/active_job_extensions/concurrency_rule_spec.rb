@@ -141,6 +141,19 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
+  describe 'dynamic class-level labels' do
+    before do
+      stub_job_class({ label: -> { "TestJob-#{arguments.first[:name]}" }, total_limit: 1 })
+      TestJob.good_job_labels = [-> { "TestJob-#{arguments.first[:name]}" }]
+    end
+
+    it 'applies the label before enqueue-time checks' do
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be false
+      expect(TestJob.perform_later(name: "Bob")).to be_present
+    end
+  end
+
   describe 'label normalization' do
     let(:test_rule) { { label: -> { arguments.first[:name] }, enqueue_limit: 1, perform_limit: 0 } }
 
