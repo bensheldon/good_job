@@ -9,7 +9,7 @@ module GitWorktree
 
   def self.name
     ENV[ENV_KEY] ||= begin
-      git_dir = `git -C #{__dir__} rev-parse --git-dir 2>/dev/null`.strip
+      git_dir = IO.popen(["git", "-C", __dir__, "rev-parse", "--git-dir"], err: File::NULL, &:read).strip
       # Use the worktree directory name (set at creation) because branches may be renamed.
       git_dir.include?("/.git/worktrees/") ? File.basename(git_dir).gsub(/[^a-zA-Z0-9_]/, "_").squeeze("_").downcase : ""
     end

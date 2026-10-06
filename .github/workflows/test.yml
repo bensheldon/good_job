@@ -66,7 +66,9 @@ jobs:
 
       # Validate Development Environment
       - name: bin/setup
-        run: bin/rails db:test:prepare parallel:create parallel:load_schema
+        run: |
+          bin/rails db:test:prepare
+          bin/rails parallel:create parallel:load_schema
       - name: Restore RSpec runtime log
         uses: actions/cache@v6
         with:
