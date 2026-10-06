@@ -14,6 +14,7 @@
 # Configure Using Gemfile
 # gem 'pg'
 #
+<% require Rails.root.join("config/git_worktree").to_s %>
 default: &default
   adapter: postgresql
   encoding: unicode
@@ -58,7 +59,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: good_job_test
+  database: good_job_test<%= GitWorktree.db_suffix %><%= ENV["TEST_ENV_NUMBER"] %>
   reaping_frequency: 0
 
 # As with config/credentials.yml, you never want to store sensitive information,
