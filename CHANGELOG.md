@@ -1,5 +1,32 @@
 # Changelog
 
+## [v4.21.0](https://github.com/bensheldon/good_job/tree/v4.21.0) (2026-10-06)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.20.0...v4.21.0)
+
+**Implemented enhancements:**
+
+- Enqueue jobs with concurrency rules individually in bulk/batch, and support Lambda class-level labels [\#1851](https://github.com/bensheldon/good_job/pull/1851) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- perform\_limit: 1 permits two same-label jobs to execute concurrently [\#1843](https://github.com/bensheldon/good_job/issues/1843)
+
+**Merged pull requests:**
+
+- Fix: Run the enqueue concurrency check always after the job's other enqueue callbacks [\#1850](https://github.com/bensheldon/good_job/pull/1850) ([bensheldon](https://github.com/bensheldon))
+- Add updated\_at to good\_job\_concurrency\_claims [\#1849](https://github.com/bensheldon/good_job/pull/1849) ([bensheldon](https://github.com/bensheldon))
+- Fix Russian/Ukrainian "one" plurals showing "1" for 21, 31, … and Russian apply\_to\_all text [\#1848](https://github.com/bensheldon/good_job/pull/1848) ([owgreen-dev](https://github.com/owgreen-dev))
+- Deprecate combining label: and key: in concurrency rules [\#1847](https://github.com/bensheldon/good_job/pull/1847) ([bensheldon](https://github.com/bensheldon))
+- Run specs in parallel with parallel\_tests [\#1845](https://github.com/bensheldon/good_job/pull/1845) ([bensheldon](https://github.com/bensheldon))
+- Fix perform\_limit race and promote waiting jobs when a concurrency claim is released [\#1844](https://github.com/bensheldon/good_job/pull/1844) ([bensheldon](https://github.com/bensheldon))
+- Fix Ukrainian x\_minutes "few" form showing "1" for every count [\#1842](https://github.com/bensheldon/good_job/pull/1842) ([owgreen-dev](https://github.com/owgreen-dev))
+- Fix flaky CronManager graceful restart spec at minute boundary [\#1841](https://github.com/bensheldon/good_job/pull/1841) ([bensheldon](https://github.com/bensheldon))
+- Validate cron entry keys and schedules instead of raising [\#1832](https://github.com/bensheldon/good_job/pull/1832) ([shiaho777](https://github.com/shiaho777))
+- Fix concurrency label matching and document dynamic labels [\#1827](https://github.com/bensheldon/good_job/pull/1827) ([shiaho777](https://github.com/shiaho777))
+- Add queue and total latency to the Performance dashboard [\#1812](https://github.com/bensheldon/good_job/pull/1812) ([dennispaagman](https://github.com/dennispaagman))
+- Remove connection overrides from process heartbeats [\#1763](https://github.com/bensheldon/good_job/pull/1763) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.20.0](https://github.com/bensheldon/good_job/tree/v4.20.0) (2026-10-03)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.19.4...v4.20.0)
