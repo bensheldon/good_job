@@ -32,8 +32,13 @@ module GoodJob # :nodoc:
     # In CRuby, this sets the thread quantum to ~12.5ms ( 100ms * 2^(-3) ).
     LOW_THREAD_PRIORITY = -3
 
+    # Maximum additional wait for cooperative cleanup after forced cancellation.
+    FIBER_CANCELLATION_TIMEOUT = 1
+
     # Minimum version of the +async+ gem required for fiber execution.
     MINIMUM_ASYNC_VERSION = "2.25"
+    # Async major upgrades must pass compatibility checks before being enabled.
+    MAXIMUM_ASYNC_VERSION = "3"
     # Minimum Ruby version required for fiber execution.
     MINIMUM_RUBY_VERSION_FOR_FIBERS = "3.2"
     # Rails 7.0's Active Record connection pool caches connections per thread, so
@@ -120,11 +125,11 @@ module GoodJob # :nodoc:
       begin
         require "async"
       rescue LoadError
-        raise ArgumentError, "GoodJob's fiber execution requires the 'async' gem. Add `gem \"async\", \">= #{MINIMUM_ASYNC_VERSION}\"` to your Gemfile."
+        raise ArgumentError, "GoodJob's fiber execution requires the 'async' gem. Add `gem \"async\", \">= #{MINIMUM_ASYNC_VERSION}\", \"< #{MAXIMUM_ASYNC_VERSION}\"` to your Gemfile."
       end
 
       async_version = defined?(Async::VERSION) ? Async::VERSION : nil
-      raise ArgumentError, "GoodJob's fiber execution requires the 'async' gem >= #{MINIMUM_ASYNC_VERSION}, but #{async_version || 'an unknown version'} is installed" unless async_version && Gem::Version.new(async_version) >= Gem::Version.new(MINIMUM_ASYNC_VERSION)
+      raise ArgumentError, "GoodJob's fiber execution requires the 'async' gem >= #{MINIMUM_ASYNC_VERSION} and < #{MAXIMUM_ASYNC_VERSION}, but #{async_version || 'an unknown version'} is installed" unless async_version && Gem::Version.new(async_version) >= Gem::Version.new(MINIMUM_ASYNC_VERSION) && Gem::Version.new(async_version) < Gem::Version.new(MAXIMUM_ASYNC_VERSION)
     end
     private_class_method :validate_fiber_runtime!
 
@@ -184,7 +189,7 @@ module GoodJob # :nodoc:
 
           instrument("scheduler_shutdown_kill", { active_job_ids: @performer.performing_active_job_ids.to_a })
           executor.kill
-          executor.wait_for_termination
+          executor.wait_for_termination(fibers? ? FIBER_CANCELLATION_TIMEOUT : nil)
         end
       end
     end
@@ -198,6 +203,8 @@ module GoodJob # :nodoc:
 
       instrument("scheduler_restart_pools") do
         shutdown(timeout: timeout)
+        raise "Cannot restart a scheduler before its executor has terminated" unless shutdown?
+
         @performer.reset_stats
         create_executor
         warm_cache
@@ -283,7 +290,7 @@ module GoodJob # :nodoc:
     # @return [Hash]
     def stats
       available_workers = executor.ready_worker_count
-      active_workers = capacity - available_workers
+      active_workers = fibers? ? executor.active_worker_count : capacity - available_workers
       max_threads = fibers? ? 1 : capacity
       active_threads = if fibers?
                          active_workers.positive? ? 1 : 0
@@ -306,7 +313,8 @@ module GoodJob # :nodoc:
           stats.merge!(
             max_fibers: capacity,
             active_fibers: active_workers,
-            available_fibers: available_workers
+            available_fibers: capacity - active_workers,
+            queued_tasks: executor.queue_length
           )
         end
       end.merge!(@performer.stats.without(:name))

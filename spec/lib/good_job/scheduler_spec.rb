@@ -313,6 +313,46 @@ RSpec.describe GoodJob::Scheduler do
       scheduler.shutdown
     end
 
+    it 'rejects untested Async major versions' do
+      stub_const('Async::VERSION', '3.0.0')
+      expect { described_class.new(performer, fibers: 1) }.to raise_error(ArgumentError, /< 3/)
+    end
+
+    it 'reports queued submissions separately from active fibers' do
+      scheduler = described_class.new(performer, fibers: 2)
+      executor = scheduler.send(:executor)
+      entered = Concurrent::Event.new
+      release = Concurrent::Event.new
+      allow(executor).to receive(:run_reactor).and_wrap_original do |original|
+        entered.set
+        release.wait(5)
+        original.call
+      end
+      scheduler.create_thread
+      expect(entered.wait(5)).to be true
+      expect(scheduler.stats).to include(active_fibers: 0, available_fibers: 2, queued_tasks: 1)
+    ensure
+      release&.set
+      scheduler&.shutdown
+    end
+
+    it 'bounds the cancellation wait and refuses to replace a stopping executor' do
+      scheduler = described_class.new(performer, fibers: 1)
+      executor = scheduler.send(:executor)
+      allow(executor).to receive_messages(shuttingdown?: true, shutdown?: false, wait_for_termination: false)
+      allow(executor).to receive(:kill)
+
+      scheduler.shutdown(timeout: 0)
+
+      expect(executor).to have_received(:wait_for_termination).with(0)
+      expect(executor).to have_received(:wait_for_termination).with(described_class::FIBER_CANCELLATION_TIMEOUT)
+      expect { scheduler.restart(timeout: 0) }.to raise_error(RuntimeError, /terminated/)
+      expect(scheduler.send(:executor)).to equal executor
+    ensure
+      RSpec::Mocks.space.proxy_for(executor).reset if executor
+      scheduler&.shutdown
+    end
+
     it 'includes the fiber count in the name' do
       scheduler = described_class.new(performer, fibers: 5)
       expect(scheduler.name).to eq('GoodJob::Scheduler(queues=* fibers=5)')

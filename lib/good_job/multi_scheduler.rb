@@ -108,6 +108,7 @@ module GoodJob
         total_executions_count: scheduler_stats.sum { |stats| stats.fetch(:total_executions_count, 0) },
         execution_at: scheduler_stats.map { |stats| stats.fetch(:execution_at, nil) }.compact.max,
         active_execution_thread_count: scheduler_stats.sum { |stats| stats.fetch(:active_threads, 0) },
+        queued_execution_count: scheduler_stats.sum { |stats| stats.fetch(:queued_tasks, 0) },
         active_execution_count: scheduler_stats.sum { |stats| stats.fetch(:active_fibers, stats.fetch(:active_threads, 0)) },
         check_queue_at: scheduler_stats.map { |stats| stats.fetch(:check_queue_at, nil) }.compact.max,
       }

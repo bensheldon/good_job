@@ -16,7 +16,7 @@ module GoodJob # :nodoc:
     # @return [String] name of the executor, used for the reactor thread name
     attr_reader :name
 
-    # @return [Integer] maximum number of concurrently executing fibers
+    # @return [Integer] maximum number of concurrently executing tasks
     attr_reader :max_fibers
 
     # @param max_fibers [Integer] maximum number of concurrently executing fibers
@@ -30,18 +30,28 @@ module GoodJob # :nodoc:
       @max_fibers = max_fibers
       @queue = ::Thread::Queue.new
       @pending_count = Concurrent::AtomicFixnum.new(0)
+      @active_count = Concurrent::AtomicFixnum.new(0)
+      # running accepts work; draining finishes it; stopping cancels it;
+      # stopped has no replacement reactor. Transitions are protected by @mutex.
+      @state = :running
       @mutex = Mutex.new
       @reactor_thread = nil
       @pid = ::Process.pid
     end
 
-    # Enqueue a task, starting the reactor on first use.
+    # Enqueue a task, starting the reactor on first use. Match Scheduler's
+    # thread pool allowance: N executing tasks plus N queued tasks, for 2N
+    # accepted, unfinished tasks. The bound limits memory use when producers
+    # race or scheduled tasks become runnable together. Admission and increment
+    # share the mutex so concurrent producers cannot exceed that allowance.
+    # Excess submissions are discarded, as with the thread pool.
     # @return [Boolean] whether the task was accepted
     def post(*args, &block)
       @mutex.synchronize do
-        return false if @queue.closed?
-
         reset_after_fork if @pid != ::Process.pid
+        return false unless @state == :running
+        return false if @pending_count.value >= @max_fibers * 2
+
         @pending_count.increment
         @queue.push([args, block])
         @reactor_thread = spawn_reactor unless @reactor_thread&.alive?
@@ -51,30 +61,35 @@ module GoodJob # :nodoc:
 
     # @return [Boolean] whether the executor is accepting new tasks
     def running?
-      !@queue.closed?
+      @mutex.synchronize { @state == :running }
     end
 
     # @return [Boolean] whether the executor is stopping but still executing tasks
     def shuttingdown?
-      @queue.closed? && reactor_alive?
+      @mutex.synchronize { @state != :running && reactor_alive_without_lock? }
     end
 
     # @return [Boolean] whether the executor has fully stopped
     def shutdown?
-      @queue.closed? && !reactor_alive?
+      @mutex.synchronize { @state != :running && !reactor_alive_without_lock? }
     end
 
     # Stop accepting tasks and finish accepted work.
     # @return [void]
     def shutdown
-      @mutex.synchronize { @queue.close }
+      @mutex.synchronize do
+        @state = reactor_alive_without_lock? ? :draining : :stopped if @state == :running
+        @queue.close
+      end
     end
 
     # Discard queued tasks and request cancellation of running fibers.
     # @return [void]
     def kill
       thread = @mutex.synchronize do
+        @state = reactor_alive_without_lock? ? :stopping : :stopped
         @queue.close
+        @pending_count.increment(-@queue.size)
         @queue.clear
         @reactor_thread
       end
@@ -97,9 +112,21 @@ module GoodJob # :nodoc:
       end
     end
 
+    # Reserve capacity for queued tasks as well as executing tasks, so scheduler
+    # wakeups do not keep submitting work already covered by accepted tasks.
     # @return [Integer] available capacity after counting running and queued tasks
     def ready_worker_count
       [@max_fibers - @pending_count.value, 0].max
+    end
+
+    # Executing tasks, excluding queued submissions and idle worker fibers.
+    def active_worker_count
+      @active_count.value
+    end
+
+    # Accepted tasks waiting for a worker.
+    def queue_length
+      [@pending_count.value - @active_count.value, 0].max
     end
 
     # Fatal errors must not be contained or reported as ordinary task errors.
@@ -110,14 +137,15 @@ module GoodJob # :nodoc:
 
     private
 
-    def reactor_alive?
-      @mutex.synchronize { @reactor_thread&.alive? } || false
+    def reactor_alive_without_lock?
+      @reactor_thread&.alive? || false
     end
 
     def reset_after_fork
       @pid = ::Process.pid
       @queue.clear
       @pending_count.value = 0
+      @active_count.value = 0
       @reactor_thread = nil
     end
 
@@ -138,8 +166,13 @@ module GoodJob # :nodoc:
       nil
     ensure
       @mutex.synchronize do
+        @active_count.value = 0
         @pending_count.value = @queue.size
-        @reactor_thread = spawn_reactor unless @queue.empty?
+        if @state != :stopping && !@queue.empty?
+          @reactor_thread = spawn_reactor
+        elsif @state != :running
+          @state = :stopped
+        end
       end
     end
 
@@ -147,20 +180,31 @@ module GoodJob # :nodoc:
     # ends only that task, not the worker, preserving pool capacity.
     def work_off_queue(worker)
       while (args, block = @queue.pop)
+        @active_count.increment
         begin
-          worker.async { run_task(args, block) }.wait
+          worker.async { |task| run_task(args, block, task) }.wait
         ensure
+          @active_count.decrement
           @pending_count.decrement
         end
       end
     end
 
-    def run_task(args, block)
+    # Capture the tree before cancellation can reparent unfinished descendants.
+    def descendants(task)
+      task.children.to_a.flat_map { |child| [child, *descendants(child)] }
+    end
+
+    def run_task(args, block, task)
       block.call(*args)
     rescue Exception => e # rubocop:disable Lint/RescueException
       raise if self.class.fatal_exception?(e)
 
       GoodJob._on_thread_error(e)
+    ensure
+      children = descendants(task)
+      task.children.to_a.each(&:stop)
+      children.each(&:wait)
     end
   end
 end

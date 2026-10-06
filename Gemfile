@@ -19,7 +19,7 @@ gem 'pg', platforms: [:mri, :windows]
 # Optional dependency for fiber execution. A plain conditional (not install_if)
 # keeps async out of dependency resolution on Rubies it does not support.
 fiber_capable_ruby = RUBY_ENGINE == "ruby" && Gem.ruby_version >= Gem::Version.new("3.2")
-gem 'async', ENV.fetch('GOOD_JOB_TEST_ASYNC', '>= 2.25'), require: false if fiber_capable_ruby && ENV['GOOD_JOB_TEST_ASYNC'] != 'absent'
+gem 'async', ENV.fetch('GOOD_JOB_TEST_ASYNC', '>= 2.25'), '< 3', require: false if fiber_capable_ruby && ENV['GOOD_JOB_TEST_ASYNC'] != 'absent'
 
 # rdoc >= 8.0 hard-depends on rbs, whose native extension doesn't build on JRuby
 # (github.com/ruby/rdoc/issues/1746). rbs only ships a working (precompiled java

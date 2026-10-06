@@ -1390,7 +1390,7 @@ Fiber execution requires:
 
 - CRuby 3.2 or newer
 - Rails 7.1 or newer, so Active Record checks out connections per fiber
-- The `async` gem, version 2.25 or newer
+- The `async` gem, version 2.25 or newer within the 2.x series
 - `config.active_support.isolation_level = :fiber`, so each job has its own Rails execution state
 - Code reloading disabled, because the Rails reloader can block jobs sharing a thread
 
@@ -1401,7 +1401,7 @@ Run CPU-heavy or blocking jobs in a separate thread worker. Fiber mode applies t
 Add the optional dependency to your application's Gemfile:
 
 ```ruby
-gem "async", ">= 2.25"
+gem "async", ">= 2.25", "< 3"
 ```
 
 Configure a dedicated worker environment:
@@ -1440,7 +1440,11 @@ Size the pool for measured connection use, including LISTEN/NOTIFY and other app
 
 #### Shutdown and crashes
 
-Graceful shutdown stops accepting executor tasks and finishes accepted work. After `shutdown_timeout`, forced shutdown requests Async cancellation and discards queued executor tasks. Cancelling fibers allows their database cleanup to run.
+Each pool accepts at most twice its fiber capacity in running and queued executor tasks. This matches the thread executor's allowance of `N` executing tasks plus `N` queued tasks (`max_threads: N`, `max_queue: N`). The bound limits memory use during concurrent submissions or bursts of scheduled work; admission checks are atomic so competing producers cannot exceed it. It does not increase execution concurrency beyond `N`. Excess submissions are discarded; jobs stay in PostgreSQL and can be picked up by an executing worker or a later poll.
+
+Await Async child tasks inside the job when their results matter. Unfinished Async children are cancelled when the executor task returns, and their cleanup finishes before its pool slot is released. This keeps work from an earlier task from continuing after the slot has been reused. Explicitly detached tasks are outside this lifecycle and are not supported as background job work.
+
+Graceful shutdown stops accepting executor tasks and finishes accepted work. After `shutdown_timeout`, forced shutdown requests Async cancellation and discards queued executor tasks. Cancelling fibers allows their database cleanup to run. GoodJob waits up to one additional second for cancellation, then returns even if the reactor is still stopping. Schedulers and capsules cannot restart until their old executors have terminated. Capsule utility execution stays alive until job cleanup finishes so process heartbeats continue.
 
 Cancellation requires the reactor to regain control. CPU loops, blocking native calls, and unfinished cleanup can exceed the timeout. Use a process supervisor to enforce a final shutdown deadline.
 
@@ -1450,7 +1454,7 @@ Exceptions escaping executor tasks, including non-`StandardError` exceptions, ar
 
 #### Metrics
 
-Scheduler stats add `max_fibers`, `active_fibers`, and `available_fibers`. Startup notifications and the process dashboard report both thread and fiber capacity. Aggregate stats use `active_execution_thread_count` for threads and `active_execution_count` for jobs.
+Scheduler stats add `max_fibers`, `active_fibers`, `available_fibers`, and `queued_tasks`. Active fibers count executing top-level executor tasks, including cache warming and cleanup, and exclude queued tasks and idle worker fibers. Available fibers are capacity minus executing tasks. Scheduler wakeups also reserve capacity for queued submissions, because those submissions already represent work waiting to execute. Keeping the counts separate distinguishes execution load from backlog. Async children do not count as additional job slots. Startup notifications and the process dashboard report both thread and fiber capacity. Aggregate stats use `active_execution_thread_count` for threads, `active_execution_count` for executing tasks, and `queued_execution_count` for queued tasks. A capsule with queued tasks is not idle.
 
 The [fiber execution benchmark](scripts/benchmark_fiber_execution.rb) compares thread and fiber execution for IO, CPU, and blocking native workloads.
 

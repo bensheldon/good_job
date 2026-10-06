@@ -131,6 +131,66 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       executor&.wait_for_termination(5)
     end
 
+    it 'bounds concurrent submissions without blocking producers' do
+      release = Concurrent::Event.new
+      accepted = Concurrent::AtomicFixnum.new(0)
+      producers = Array.new(30) do
+        Thread.new { accepted.increment if executor.post { release.wait(5) } }
+      end
+      producers.each(&:join)
+
+      expect(accepted.value).to eq 10
+      expect(executor.active_worker_count).to be <= 5
+      expect(executor.queue_length).to be >= 5
+      expect(executor.post { nil }).to be false
+      release.set
+      executor.shutdown
+      expect(executor.wait_for_termination(5)).to be true
+    ensure
+      release&.set
+    end
+
+    it 'distinguishes queued tasks from executing tasks before reactor startup' do
+      entered = Concurrent::Event.new
+      release = Concurrent::Event.new
+      allow(executor).to receive(:run_reactor).and_wrap_original do |original|
+        entered.set
+        release.wait(5)
+        original.call
+      end
+      executor.post { nil }
+      expect(entered.wait(5)).to be true
+      expect(executor.active_worker_count).to eq 0
+      expect(executor.queue_length).to eq 1
+      expect(executor.ready_worker_count).to eq 4
+    ensure
+      release&.set
+    end
+
+    it 'cancels unfinished children before releasing the job slot' do
+      executor = described_class.new(max_fibers: 1)
+      cancelled = Concurrent::Event.new
+      next_task = Concurrent::Event.new
+      executor.post do
+        Async::Task.current.async do
+          Async::Task.current.async do
+            sleep 60
+          ensure
+            sleep 0.05
+            cancelled.set
+          end
+          sleep 60
+        end
+      end
+      executor.post { next_task.set if cancelled.set? }
+      expect(next_task.wait(5)).to be true
+      executor.shutdown
+      expect(executor.wait_for_termination(5)).to be true
+    ensure
+      executor&.kill
+      executor&.wait_for_termination(5)
+    end
+
     it 'queues tasks when all fibers are busy' do
       latch = Concurrent::CountDownLatch.new(1)
       completed = Concurrent::AtomicFixnum.new(0)
@@ -141,10 +201,10 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
         end
       end
 
-      expect(accepted).to eq 20
+      expect(accepted).to eq 10
       expect(executor.ready_worker_count).to eq 0
       latch.count_down
-      wait_until { expect(completed.value).to eq 20 }
+      wait_until { expect(completed.value).to eq 10 }
       wait_until { expect(executor.ready_worker_count).to eq 5 }
     end
   end
