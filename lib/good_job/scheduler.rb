@@ -22,7 +22,7 @@ module GoodJob # :nodoc:
     DEFAULT_EXECUTOR_OPTIONS = {
       name: name,
       min_threads: 0,
-      max_threads: Configuration::DEFAULT_MAX_THREADS,
+      max_threads: Configuration::DEFAULT_THREADS,
       auto_terminate: true,
       idletime: 60,
       max_queue: Configuration::DEFAULT_MAX_THREADS,
