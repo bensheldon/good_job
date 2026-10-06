@@ -60,3 +60,7 @@ module ::BLOCKING_LATCH; end
 module ::BlockingJob; end
 module ::LockCapturingJob; end
 
+module ::ENTERED; end
+module ::HOLD; end
+module ::HoldingJob; end
+module ::LimitedJob; end

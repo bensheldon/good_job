@@ -17,7 +17,8 @@ RSpec.configure do |config|
     example.run
 
     ApplicationRecord.connection_handler.clear_active_connections!
-    ApplicationRecord.connection_pool.disconnect
+    # Force disconnection: a system test's server thread (e.g. a live poll request) may still hold a connection.
+    ApplicationRecord.connection_pool.disconnect!
     ApplicationRecord.connection_pool.with_connection do |connection|
       connection.truncate_tables(*connection.tables)
     end
