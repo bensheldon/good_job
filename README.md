@@ -47,6 +47,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         - [Extending dashboard views](#extending-dashboard-views)
     - [Job priority](#job-priority)
     - [Concurrency controls](#concurrency-controls)
+        - [Dynamic labels](#dynamic-labels)
         - [How concurrency controls work](#how-concurrency-controls-work)
     - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
     - [Bulk enqueue](#bulk-enqueue)
@@ -309,7 +310,7 @@ Available configuration options are:
 - `max_cache` (integer) sets the maximum number of scheduled jobs that will be stored in memory to reduce execution latency when also polling for scheduled jobs. Caching 10,000 scheduled jobs uses approximately 20MB of memory. You can also set this with the environment variable `GOOD_JOB_MAX_CACHE`.
 - `shutdown_timeout` (integer) number of seconds to wait for jobs to finish when shutting down before stopping the thread. Defaults to forever: `-1`. You can also set this with the environment variable `GOOD_JOB_SHUTDOWN_TIMEOUT`.
 - `enable_cron` (boolean) whether to run cron process. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_CRON`.
-- `cron_graceful_restart_period` (integer) when restarting cron, attempt to re-enqueue jobs that would have been enqueued by cron within this time period (e.g. `1.minute`). This should match the expected downtime during deploys.
+- `cron_graceful_restart_period` (integer seconds or `ActiveSupport::Duration`) when cron starts, attempt to re-enqueue jobs that would have been enqueued by cron within this time period (e.g. `1.minute`). This should match the expected downtime during deploys. Like enabling cron on multiple processes, this relies on cron-created job records being preserved to avoid re-enqueuing jobs that already ran, so it is ignored when `preserve_job_records` is `false` or `:on_unhandled_error`. It does not apply to a `cron` proc that returns a time, which already enqueues the runs it missed since its last job. Defaults to `nil` (disabled). You can also set this with the environment variable `GOOD_JOB_CRON_GRACEFUL_RESTART_PERIOD`.
 - `enable_listen_notify` (boolean) whether to enqueue and read jobs with Postgres LISTEN/NOTIFY. Defaults to `true`. You can also set this with the environment variable `GOOD_JOB_ENABLE_LISTEN_NOTIFY`.
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
 - `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`.
@@ -562,9 +563,10 @@ class MyJob < ApplicationJob
   # exceeded rule short-circuits the rest.
   good_job_concurrency_rule(
     # A label that scopes this rule. Can be a static String or a Lambda/Proc
-    # invoked in the context of the job instance. The rule only applies to jobs
-    # that were enqueued with this label in `good_job_labels`.
-    label: -> { arguments.first[:user_id] },
+    # invoked in the context of the job instance (see "Dynamic labels" below).
+    # The rule only applies to jobs that were enqueued with this label in
+    # `good_job_labels`.
+    label: "email",
 
     # Maximum number of unfinished jobs with this label to allow.
     # Can be an Integer or Lambda/Proc invoked in the context of the job.
@@ -596,7 +598,7 @@ class MyJob < ApplicationJob
   good_job_concurrency_rule(...)
   good_job_concurrency_rule(...)
 
-  def perform(user_id:)
+  def perform
     # do work
   end
 end
@@ -605,8 +607,41 @@ end
 Jobs must be enqueued with the matching label for rules to take effect:
 
 ```ruby
-MyJob.set(good_job_labels: [current_user.id]).perform_later(user_id: current_user.id)
+MyJob.set(good_job_labels: ["email"]).perform_later
 ```
+
+#### Dynamic labels
+
+A rule's `label:` can also be a Lambda/Proc that is invoked in the context of the job instance, for example to derive the label from job arguments. The lambda resolves the label to check against; the job's `good_job_labels` must still contain it for the rule to apply. Rule labels and job labels are converted to strings and stripped of surrounding whitespace when matched, consistent with how labels are stored.
+
+Apply labels dynamically in a `before_enqueue` callback. They are stored on the job record and checked by rules that run when the job is performed:
+
+```ruby
+class MyJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
+  before_enqueue do |job|
+    job.good_job_labels = [job.arguments.first[:user_id].to_s]
+  end
+
+  good_job_concurrency_rule(
+    label: -> { arguments.first[:user_id].to_s },
+    perform_limit: 1
+  )
+
+  def perform(user_id:)
+    # do work
+  end
+end
+```
+
+Rules are checked when a job is enqueued and again when it is performed. Labels assigned in `before_enqueue` are present for the before-perform check, but not for checks that run at enqueue time (`enqueue_limit`, `enqueue_throttle`, and `total_limit` when no enqueue-specific limit is configured). For those, pass the label when enqueuing:
+
+```ruby
+MyJob.set(good_job_labels: [user_id.to_s]).perform_later(user_id: user_id)
+```
+
+Rules apply across job classes to jobs carrying the resolved label. `total_limit` counts unfinished jobs, `enqueue_limit` excludes claimed/performing jobs, and `perform_limit` counts running jobs. Throttles count enqueued jobs or executions within their time window, including finished ones.
 
 #### How concurrency controls work
 
@@ -614,7 +649,8 @@ GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry 
 
 - "Optimistic" meaning that the implementation's performance trade-off assumes that collisions are atypical (e.g. two users enqueue the same job at the same time) rather than regular (e.g. the system enqueues thousands of colliding jobs at the same time). Depending on your concurrency requirements, you may also want to manage concurrency through the number of GoodJob threads and processes that are performing a given queue.
 - "Retry with an incremental backoff" means that when `perform_limit` is exceeded, the job will raise a `GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError` which is caught by a `retry_on` handler which re-schedules the job to execute in the near future with an incremental backoff.
-- First-in-first-out job execution order is not preserved when a job is retried with incremental back-off.
+- When the `good_job_concurrency_claims` table has been migrated, a job that exceeded `perform_limit` waits on the limit's key, and when a job holding that key finishes, the longest-waiting job is re-scheduled to run immediately rather than waiting for its backoff. The incremental backoff remains as a fallback.
+- First-in-first-out job execution order is not strictly preserved: a waiting job that is re-scheduled can be overtaken by a newly enqueued job, and jobs retried with incremental back-off run in backoff order.
 - For pessimistic usecases that collisions are expected, use number of threads/processes (e.g., `good_job --queues "serial:1;-serial:5"`) to control concurrency. It is also a good idea to use `perform_limit` as backstop.
 
 #### Legacy: `good_job_control_concurrency_with`

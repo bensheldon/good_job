@@ -36,7 +36,7 @@
           </div>
           <div class="col-6 col-lg-2 text-wrap small">
             <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.cron.next_scheduled" %></div>
-            <%= relative_time cron_entry.next_at %>
+            <%= relative_time(cron_entry.next_at) if cron_entry.next_at %>
           </div>
           <div class="col-6 col-lg-1 text-wrap small">
             <% last_job = @last_jobs[cron_entry.key.to_s] %>

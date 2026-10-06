@@ -29,12 +29,23 @@ module GoodJob # :nodoc:
       run_watchdog
     end
 
+    # Notify systemd that the process is stopping, without stopping the watchdog.
+    # Useful when the shutdown is driven elsewhere and the process only needs to
+    # tell systemd that it has begun; calling it more than once, or calling
+    # {#stop} afterwards, only notifies systemd once.
+    def stopping
+      return if @stopping
+
+      @stopping = true
+      GoodJob::SdNotify.stopping
+    end
+
     # Notify systemd that the process is stopping and stop pinging the watchdog
     # if currently doing so. If given a block, it will wait for the block to
     # complete before stopping watchdog notifications, so systemd has a clear
     # indication when graceful shutdown started and finished.
     def stop
-      GoodJob::SdNotify.stopping
+      stopping
 
       yield if block_given?
 

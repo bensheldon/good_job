@@ -5,9 +5,11 @@ module GoodJob
   module Filterable
     extend ActiveSupport::Concern
 
-    # Caps the largest free-form columns (error, serialized_params->>'arguments')
-    # fed to to_tsvector() so the combined tsvector stays under PG's ~1 MB limit
-    # (PG::ProgramLimitExceeded: "string is too long for tsvector").
+    # Bounds every document fed to to_tsvector() so the combined tsvector stays
+    # under PG's ~1 MB limit (PG::ProgramLimitExceeded: "string is too long for
+    # tsvector"). Free-form columns (arguments, error, labels) are truncated, and
+    # arguments are excluded from the full serialized_params document since they
+    # are covered by their own truncated term.
     MAX_SEARCH_COLUMN_CHARS = 262_144
 
     included do
@@ -74,14 +76,25 @@ module GoodJob
           (
             to_tsvector('english', id::text) ||
             to_tsvector('english', COALESCE(active_job_id::text, '')) ||
-            to_tsvector('english', serialized_params) ||
+            to_tsvector('english', serialized_params - 'arguments') ||
             to_tsvector('english', COALESCE(LEFT(serialized_params->>'arguments', #{MAX_SEARCH_COLUMN_CHARS}), '')) ||
             to_tsvector('english', COALESCE(LEFT(error, #{MAX_SEARCH_COLUMN_CHARS}), '')) ||
-            to_tsvector('english', COALESCE(array_to_string(labels, ' '), ''))
+            to_tsvector('english', COALESCE(LEFT(array_to_string(labels, ' '), #{MAX_SEARCH_COLUMN_CHARS}), ''))
           )
         SQL
         to_tsquery_function = database_supports_websearch_to_tsquery? ? 'websearch_to_tsquery' : 'plainto_tsquery'
-        where("#{tsvector} @@ #{to_tsquery_function}('english', CAST(? AS text))", query)
+        # Full-text tokenization does not preserve identifier-like strings (URLs, globs of
+        # numbers and letters), so also match the raw text columns as a substring.
+        text_match = <<~SQL.squish
+          (
+            id::text ILIKE :like_pattern OR
+            COALESCE(active_job_id::text, '') ILIKE :like_pattern OR
+            serialized_params::text ILIKE :like_pattern OR
+            COALESCE(error, '') ILIKE :like_pattern OR
+            COALESCE(array_to_string(labels, ' '), '') ILIKE :like_pattern
+          )
+        SQL
+        where("#{tsvector} @@ #{to_tsquery_function}('english', CAST(:query AS text)) OR #{text_match}", query: query, like_pattern: "%#{sanitize_sql_like(query)}%")
           .order(sanitize_sql_for_order([Arel.sql("ts_rank(#{tsvector}, #{to_tsquery_function}('english', CAST(? AS text)))"), query]) => 'DESC')
       end)
     end

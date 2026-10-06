@@ -1,6 +1,8 @@
 <% vertical_legend = chart_data.dig(:options, :plugins, :legend, :vertical) %>
+<%# Live polling replaces regions by name, so pages with more than one chart must name each. %>
+<% region = local_assigns.fetch(:region, "chart") %>
 
-<div class="container-fluid" data-controller="chart" data-chart-config-value="<%= chart_data.to_json %>" data-live-poll-region="chart">
+<div class="container-fluid" data-controller="chart" data-chart-config-value="<%= chart_data.to_json %>" data-live-poll-region="<%= region %>">
   <div class="row d-flex">
     <% if vertical_legend %>
       <div class="row d-flex">

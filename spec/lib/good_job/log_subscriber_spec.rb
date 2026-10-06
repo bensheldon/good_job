@@ -74,4 +74,36 @@ RSpec.describe GoodJob::LogSubscriber do
       expect(logs.string).to include("Aborted enqueue of MyJob (Job ID: abc-123) because the concurrency key 'mykey' has reached its throttle limit of 5 jobs")
     end
   end
+
+  describe "#cluster_reap" do
+    let(:logs) { StringIO.new }
+
+    before { described_class.loggers << Logger.new(logs) }
+
+    it 'logs the exit status of a subprocess that exited on its own' do
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", { pid: 123, status: 1, signal: nil })
+
+      subscriber.cluster_reap(event)
+      expect(logs.string).to include("reaped subprocess (PID: 123, exit status: 1)")
+    end
+
+    it 'logs the signal name of a subprocess that was signaled' do
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", { pid: 123, status: nil, signal: 9 })
+
+      subscriber.cluster_reap(event)
+      expect(logs.string).to include("reaped subprocess (PID: 123, signal: KILL)")
+    end
+  end
+
+  describe "#cluster_backoff" do
+    let(:logs) { StringIO.new }
+
+    it 'warns about the delayed replacement of a repeatedly exiting subprocess' do
+      described_class.loggers << Logger.new(logs)
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", { restart_count: 3, delay: 2 })
+
+      subscriber.cluster_backoff(event)
+      expect(logs.string).to include("delaying the replacement of a repeatedly exiting subprocess by 2 seconds (consecutive unhealthy exits: 3)")
+    end
+  end
 end

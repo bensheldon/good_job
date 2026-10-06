@@ -33,8 +33,8 @@ module GoodJob
         end
 
         def evaluate(job, stage)
-          resolved_key = resolve_key(job)
           resolved_label = resolve_label(job)
+          resolved_key = resolve_key(job, resolved_label)
           return nil if resolved_key.blank? && resolved_label.blank?
 
           if stage == :enqueue
@@ -58,9 +58,9 @@ module GoodJob
           !@key.equal?(GoodJob::NONE)
         end
 
-        def resolve_key(job)
+        def resolve_key(job, label)
           if key.blank?
-            "label:#{resolve_label(job)}"
+            "label:#{label}"
           else
             key_value = @key.respond_to?(:call) ? job.instance_exec(&@key) : @key
             raise TypeError, "Concurrency key must be a String; was a #{key_value.class}" if key_value.present? && VALID_TYPES.none? { |type| key_value.is_a?(type) }
@@ -72,7 +72,8 @@ module GoodJob
         def resolve_label(job)
           return if @label.blank?
 
-          @label.respond_to?(:call) ? job.instance_exec(&@label) : @label
+          label = @label.respond_to?(:call) ? job.instance_exec(&@label) : @label
+          label.to_s.strip.presence
         end
 
         def resolve_limit(job, value)
@@ -91,6 +92,17 @@ module GoodJob
           value
         end
 
+        # The claim key for the jobs counted by +query_scope+.
+        def scoped_key(label, key)
+          if label.present?
+            "label:#{label}"
+          elsif key_explicit? && key.present?
+            "key:#{key}"
+          else
+            "all"
+          end
+        end
+
         def query_scope(label, key)
           if label.present?
             GoodJob::Job.labeled(label)
@@ -102,7 +114,7 @@ module GoodJob
         end
 
         def check_enqueue(limit, throttle, job, key, label, enqueue_limit_flag: false)
-          return nil if label.present? && job.good_job_labels.exclude?(label)
+          return nil if label.present? && job.good_job_labels.none? { |job_label| job_label.to_s.strip == label }
 
           query_scope = query_scope(label, key)
           exceeded = nil
@@ -156,21 +168,41 @@ module GoodJob
         end
 
         def check_perform(limit, throttle, job, key, label)
-          return nil if label.present? && job.good_job_labels.exclude?(label)
+          return nil if label.present? && job.good_job_labels.none? { |job_label| job_label.to_s.strip == label }
 
           query_scope = query_scope(label, key)
+          claim_key = scoped_key(label, key)
           exceeded = nil
+          commit = false
 
           GoodJob::Job.transaction(requires_new: true, joinable: false) do
+            # The rule's key is the advisory lock for the checks; the claim key names the counted scope.
             GoodJob::Job.advisory_lock_key(key, function: "pg_advisory_xact_lock") do
               if limit
-                allowed_active_job_ids = query_scope.running
-                                                    .order(Arel.sql("COALESCE(performed_at, scheduled_at, created_at) ASC"))
-                                                    .limit(limit).pluck(:active_job_id)
-                # The current job has already been locked and will appear in the previous query
-                unless allowed_active_job_ids.include?(job.job_id)
-                  exceeded = :limit
-                  next
+                commit = true
+                if GoodJob::ConcurrencyClaim.table_exists?
+                  granted = GoodJob::ConcurrencyClaim.claim(
+                    key: claim_key,
+                    limit: limit,
+                    scope: query_scope,
+                    job_id: job.job_id,
+                    locked_by_id: CurrentThread.job&.locked_by_id
+                  )
+                  unless granted
+                    exceeded = :limit
+                    next
+                  end
+                else
+                  # The current job's performed_at was committed before this check, acting as its claim on a slot.
+                  # Count the other claims rather than ranking by performed_at, because performed_at ordering
+                  # does not necessarily match commit ordering.
+                  other_running_count = query_scope.running.where.not(active_job_id: job.job_id).count
+                  if other_running_count >= limit
+                    exceeded = :limit
+                    # Release this job's claim so that the next contender for the lock does not count it.
+                    GoodJob::Job.where(active_job_id: job.job_id).update_all(performed_at: nil) # rubocop:disable Rails/SkipsModelValidations
+                    next
+                  end
                 end
               end
 
@@ -195,9 +227,9 @@ module GoodJob
               end
             end
 
-            # Rollback the transaction because it's potentially less expensive than committing it
-            # even though nothing has been altered in the transaction.
-            raise ActiveRecord::Rollback
+            # Commit claim changes made while holding the lock; otherwise rollback because it's potentially
+            # less expensive than committing it even though nothing has been altered in the transaction.
+            raise ActiveRecord::Rollback unless commit
           end
 
           exceeded
@@ -276,6 +308,9 @@ module GoodJob
             exceeded = rule.evaluate(job, :perform)
             break if exceeded
           end
+
+          # Release claims granted by earlier rules so they are not held while this job waits
+          GoodJob::ConcurrencyClaim.release_job(job.job_id) if exceeded && GoodJob::ConcurrencyClaim.table_exists?
 
           if exceeded == :limit
             raise GoodJob::ActiveJobExtensions::Concurrency::ConcurrencyExceededError

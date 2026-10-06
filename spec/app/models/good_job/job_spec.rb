@@ -264,6 +264,27 @@ RSpec.describe GoodJob::Job do
       end
     end
 
+    context 'when a job has an unfinished execution' do
+      let!(:running_execution) do
+        job.executions.create!(
+          scheduled_at: 1.minute.ago,
+          created_at: 1.minute.ago
+        )
+      end
+
+      it 'finishes the execution with a DiscardJobError' do
+        expect do
+          job.discard_job("Discarded in test")
+        end.to change { running_execution.reload.status }.from(:running).to(:discarded)
+
+        expect(running_execution).to have_attributes(
+          error: "GoodJob::Job::DiscardJobError: Discarded in test",
+          error_event: "discarded",
+          finished_at: within(1.second).of(Time.current)
+        )
+      end
+    end
+
     context 'when a job is not in scheduled/queued state' do
       before do
         job.update! finished_at: Time.current

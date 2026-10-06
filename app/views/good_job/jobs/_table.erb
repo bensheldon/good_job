@@ -190,7 +190,7 @@
             </div>
           <% end %>
           <%= tag.div id: dom_id(job, "params"), class: "job-params list-group-item collapse small bg-dark text-light" do %>
-            <%= tag.pre JSON.pretty_generate(job.display_serialized_params) %>
+            <%= tag.pre JSON.pretty_generate(truncate_display_value(job.display_serialized_params)) %>
           <% end %>
         <% end %>
       <% else %>

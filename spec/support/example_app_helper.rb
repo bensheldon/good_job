@@ -65,6 +65,7 @@ module ExampleAppHelper
       good_job_executions
       good_job_processes
       good_job_settings
+      good_job_concurrency_claims
     ]
     models = [
       GoodJob::Job,
@@ -72,6 +73,7 @@ module ExampleAppHelper
       GoodJob::BatchRecord,
       GoodJob::Process,
       GoodJob::Setting,
+      GoodJob::ConcurrencyClaim,
     ]
     quiet do
       tables.each do |table_name|
