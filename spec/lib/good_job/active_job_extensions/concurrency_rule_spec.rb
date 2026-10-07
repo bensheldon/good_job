@@ -161,7 +161,9 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       expect(TestJob.set(good_job_labels: []).perform_later(name: "Alice")).to be false
     end
 
-    it 'applies the label to jobs enqueued in bulk' do
+    # activerecord-jdbc-adapter's ArrayEncoder calls the deprecated `ActiveRecord::Base.connection`
+    # when quoting the labels array in `insert_all`, which the test app disallows.
+    it 'applies the label to jobs enqueued in bulk', :skip_if_java do
       stub_job_class({ label: -> { "TestJob-#{arguments.first[:name]}" }, apply_label: true, perform_limit: 1 })
       GoodJob::Bulk.enqueue([TestJob.new(name: "Alice"), TestJob.new(name: "Bob")])
 
