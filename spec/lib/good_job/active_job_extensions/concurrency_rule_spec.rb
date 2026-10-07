@@ -168,6 +168,14 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       expect(GoodJob::Job.pluck(:labels)).to contain_exactly(["TestJob-Alice"], ["TestJob-Bob"])
     end
 
+    it 'performs jobs after deserializing them' do
+      stub_job_class({ label: -> { "TestJob-#{arguments.first[:name]}" }, apply_label: true, perform_limit: 1 })
+      TestJob.perform_later(name: "Alice")
+
+      expect { GoodJob.perform_inline }.not_to raise_error
+      expect(GoodJob::Job.last).to have_attributes(finished_at: be_present, error: nil, labels: ["TestJob-Alice"])
+    end
+
     it 'does not apply a nil label' do
       TestJob.perform_later(name: nil)
 
