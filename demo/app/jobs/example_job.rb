@@ -12,9 +12,8 @@ class ExampleJob < ApplicationJob
 
   retry_on(DeadError, attempts: 3) { nil }
 
-  # Label every job with its type, and perform only one slow job at a time,
+  # Perform only one job labeled "slow" at a time,
   # so the dashboard shows granted and waiting concurrency claims.
-  self.good_job_labels = [-> { arguments.first.presence || SUCCESS_TYPE }]
   good_job_concurrency_rule(label: SLOW_TYPE, perform_limit: 1)
 
   class BatchJob < ApplicationJob
@@ -36,7 +35,7 @@ class ExampleJob < ApplicationJob
   # perform limit and show granted, waiting, and promoted concurrency claims.
   class ConcurrencyExampleJob < ApplicationJob
     def perform
-      3.times { ExampleJob.perform_later(SLOW_TYPE) }
+      3.times { ExampleJob.set(good_job_labels: [SLOW_TYPE]).perform_later(SLOW_TYPE) }
     end
   end
 

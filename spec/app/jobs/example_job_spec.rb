@@ -65,11 +65,11 @@ describe ExampleJob do
 
         if RUBY_PLATFORM.include?('java')
           # JRuby backtrace format omits the class name prefix
-          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:57:in 'perform'"])
+          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:56:in 'perform'"])
         elsif RUBY_VERSION >= "3.4"
-          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:57:in 'ExampleJob#perform'"])
+          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:56:in 'ExampleJob#perform'"])
         else
-          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:57:in `perform'"])
+          expect(execution.filtered_error_backtrace).to eq(["app/jobs/example_job.rb:56:in `perform'"])
         end
       end
     end
