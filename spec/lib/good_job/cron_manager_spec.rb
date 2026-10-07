@@ -12,6 +12,17 @@ RSpec.describe GoodJob::CronManager do
         cron_manager.start
       end.to change(cron_manager, :running?).from(false).to true
     end
+
+    it 'does not raise for natural language schedules or invalid entries' do
+      cron_entries = [
+        GoodJob::CronEntry.new(key: :natural, cron: 'every 15 minutes', class: 'TestJob'),
+        GoodJob::CronEntry.new(key: :invalid, cron: '2017-12-12', class: 'TestJob'),
+      ]
+      cron_manager = described_class.new(cron_entries, start_on_initialize: false)
+
+      expect { cron_manager.start }.not_to raise_error
+      cron_manager.shutdown
+    end
   end
 
   describe '#stop' do
