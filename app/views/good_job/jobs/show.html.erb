@@ -11,6 +11,13 @@
     <div class="row align-items-center">
       <div class="col-md-5">
         <h2 class="mb-2 mb-md-0"><%= tag.code @job.display_name %></h2>
+        <% if @job.labels.present? %>
+          <div class="d-flex flex-wrap gap-1 mb-2 mb-md-0" aria-label="<%= t "good_job.models.job.labels" %>" role="group">
+            <% @job.labels.each do |label| %>
+              <%= job_label_badge(@job, label, url: jobs_path(label: label)) %>
+            <% end %>
+          </div>
+        <% end %>
       </div>
       <div class="col-6 col-md-2">
         <div class="small text-muted text-uppercase"><%= t "good_job.models.job.queue" %></div>
@@ -22,16 +29,6 @@
         <div class="small text-muted text-uppercase"><%= t "good_job.models.job.priority" %></div>
         <div class="font-monospace fw-bold small my-2"><%= tag.strong @job.priority %></div>
       </div>
-      <% if @job.labels.present? %>
-        <div class="col-6 col-md-2">
-          <div class="small text-muted text-uppercase"><%= t "good_job.models.job.labels" %></div>
-          <div class="my-2">
-            <% @job.labels.each do |label| %>
-              <%= job_label_badge(@job, label, url: jobs_path(label: label)) %>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
       <div class="col text-end">
         <div class="mb-2">
           <%= tag.span relative_time(@job.last_status_at), class: "small" %>

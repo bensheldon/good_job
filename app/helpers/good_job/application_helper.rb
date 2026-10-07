@@ -38,6 +38,8 @@ module GoodJob
       if title.present?
         options[:title] = title
         options[:data] = { bs_toggle: "tooltip" }
+        # Make unlinked badges focusable so keyboard users can reveal the tooltip
+        options[:tabindex] = 0 unless url
       end
       content = safe_join([
         (concurrency_claim_icon(state_name) if state_name),
