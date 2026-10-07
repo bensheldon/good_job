@@ -344,6 +344,13 @@ module GoodJob
           perform_throttle: NONE,
           key: NONE
         )
+          GoodJob.deprecator.warn(<<~MSG.squish)
+            `good_job_control_concurrency_with` is deprecated and will be removed in GoodJob v5,
+            along with the `good_jobs.concurrency_key` column. Replace it with a labelled
+            `good_job_concurrency_rule` and apply the label to the job.
+            See "Migrating from concurrency keys to labels" in the GoodJob README.
+          MSG
+
           self.good_job_concurrency_config = {
             total_limit: total_limit,
             enqueue_limit: enqueue_limit,
@@ -356,7 +363,7 @@ module GoodJob
 
         # Define a concurrency rule. Rules are appended to the class-level
         # `good_job_concurrency_rules` array. Each rule uses keyword arguments that may
-        # include keys such as :label, :key (deprecated when combined with :label), and
+        # include keys such as :label, :key (deprecated), and
         # stage-specific settings like :enqueue_limit, :enqueue_throttle,
         # :perform_limit, :perform_throttle, and :total_limit.
         def good_job_concurrency_rule(
@@ -377,6 +384,14 @@ module GoodJob
             enqueue_throttle: enqueue_throttle,
             perform_throttle: perform_throttle,
           }.reject { |_key, value| value.equal?(NONE) }
+
+          if rule[:label].blank? && rule[:key].present?
+            GoodJob.deprecator.warn(<<~MSG.squish)
+              Supplying `key:` without `label:` to `good_job_concurrency_rule` is deprecated and will raise in GoodJob v5,
+              when the `good_jobs.concurrency_key` column it counts jobs by will be removed. Replace `key:` with `label:`
+              and apply the label to the job. See "Migrating from concurrency keys to labels" in the GoodJob README.
+            MSG
+          end
 
           self.good_job_concurrency_rules = Array(good_job_concurrency_rules) + [Rule.new(rule)]
         end

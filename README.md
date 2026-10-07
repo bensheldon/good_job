@@ -49,6 +49,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Concurrency controls](#concurrency-controls)
         - [Dynamic labels](#dynamic-labels)
         - [How concurrency controls work](#how-concurrency-controls-work)
+        - [Migrating from concurrency keys to labels](#migrating-from-concurrency-keys-to-labels)
     - [Cron-style repeating/recurring jobs](#cron-style-repeatingrecurring-jobs)
     - [Bulk enqueue](#bulk-enqueue)
     - [Batches](#batches)
@@ -609,7 +610,7 @@ Jobs must be enqueued with the matching label for rules to take effect:
 MyJob.set(good_job_labels: ["email"]).perform_later
 ```
 
-Supplying both `label:` and `key:` to `good_job_concurrency_rule` is deprecated. For labelled rules, `key:` is ignored: jobs sharing the label use the same advisory lock for concurrency checks. Remove `key:` from these rules. The legacy `good_job_control_concurrency_with(key: ...)` interface remains supported.
+Supplying both `label:` and `key:` to `good_job_concurrency_rule` is deprecated. For labelled rules, `key:` is ignored: jobs sharing the label use the same advisory lock for concurrency checks. Remove `key:` from these rules. Rules with `key:` and no `label:` are also deprecated; see [Migrating from concurrency keys to labels](#migrating-from-concurrency-keys-to-labels).
 
 #### Dynamic labels
 
@@ -673,9 +674,31 @@ GoodJob's concurrency control strategy for `perform_limit` is "optimistic retry 
 - First-in-first-out job execution order is not strictly preserved: a waiting job that is re-scheduled can be overtaken by a newly enqueued job, and jobs retried with incremental back-off run in backoff order.
 - For pessimistic usecases that collisions are expected, use number of threads/processes (e.g., `good_job --queues "serial:1;-serial:5"`) to control concurrency. It is also a good idea to use `perform_limit` as backstop.
 
-#### Legacy: `good_job_control_concurrency_with`
+#### Migrating from concurrency keys to labels
 
-The original concurrency interface uses a single configuration hash and scopes limits to a concurrency _key_ (a string derived from the job) stored on the job record, rather than a label. It remains fully supported.
+`good_job_control_concurrency_with`, and `good_job_concurrency_rule` with `key:` and no `label:`, are deprecated and will raise in GoodJob v5, which will also remove the `good_jobs.concurrency_key` column. They scope limits to a concurrency _key_ stored in that column. Replace them with a labelled rule and apply the same value to the job as a label:
+
+```ruby
+class MyJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
+  # Before
+  good_job_control_concurrency_with(total_limit: 1, key: -> { "MyJob-#{arguments.first}" })
+
+  # After
+  self.good_job_labels = [-> { "MyJob-#{arguments.first}" }]
+  good_job_concurrency_rule(total_limit: 1, label: -> { "MyJob-#{arguments.first}" })
+end
+```
+
+- A static key becomes a static label: `self.good_job_labels = ["my-key"]` and `good_job_concurrency_rule(label: "my-key", ...)`.
+- Labels can also be applied in a `before_enqueue` callback; see [Dynamic labels](#dynamic-labels).
+- If you did not supply a `key:`, the job class name was used; use it as the label.
+- If you supplied `key: nil` to disable concurrency control in a subclass: rules are inherited, but a labelled rule only applies to jobs carrying its label, so don't apply the label in that subclass (e.g. with a Lambda label that returns `nil`).
+- `total_limit:`, `enqueue_limit:`, `perform_limit:`, `enqueue_throttle:` and `perform_throttle:` are unchanged.
+- Jobs enqueued before the change do not have the label and are not counted by the new rule, so limits may be exceeded until those jobs finish.
+
+The deprecated interface is documented below for reference:
 
 ```ruby
 class MyJob < ApplicationJob

@@ -4,6 +4,8 @@ require 'rails_helper'
 
 RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
   before do
+    # Most examples exercise the deprecated `good_job_control_concurrency_with` and `key:` interfaces
+    allow(GoodJob.deprecator).to receive(:warn)
     ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
 
     stub_const 'JOB_PERFORMED', Concurrent::AtomicBoolean.new(false)
@@ -27,10 +29,6 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
   end
 
   describe 'label and key deprecation' do
-    before do
-      allow(GoodJob.deprecator).to receive(:warn)
-    end
-
     it 'warns when a label rule declares a custom key' do
       TestJob.good_job_concurrency_rule(label: 'email', key: 'custom', perform_limit: 1)
       2.times do
@@ -55,12 +53,29 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       expect(GoodJob.deprecator).not_to have_received(:warn)
     end
 
-    it 'does not warn for key-only rules or legacy key configuration' do
+    it 'warns once when a rule declares a key without a label' do
       TestJob.good_job_concurrency_rule(key: 'custom', perform_limit: 1)
+      TestJob.perform_later(name: nil)
+      GoodJob.perform_inline
+
+      expect(GoodJob.deprecator).to have_received(:warn).with(/Supplying `key:` without `label:`.*GoodJob v5/).once
+    end
+
+    it 'warns once when using good_job_control_concurrency_with' do
       TestJob.good_job_control_concurrency_with(key: 'custom', perform_limit: 1)
       TestJob.perform_later(name: nil)
       GoodJob.perform_inline
 
+      expect(GoodJob.deprecator).to have_received(:warn).with(/`good_job_control_concurrency_with` is deprecated.*GoodJob v5/).once
+    end
+
+    it 'supports migrating a dynamic key to a label' do
+      TestJob.good_job_labels = [-> { "TestJob-#{arguments.first[:name]}" }]
+      TestJob.good_job_concurrency_rule(label: -> { "TestJob-#{arguments.first[:name]}" }, total_limit: 1)
+
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be false
+      expect(TestJob.perform_later(name: "Bob")).to be_present
       expect(GoodJob.deprecator).not_to have_received(:warn)
     end
   end
