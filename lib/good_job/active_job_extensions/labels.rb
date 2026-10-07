@@ -27,7 +27,6 @@ module GoodJob
 
         private
 
-        # Adds the labels of concurrency rules defined with +apply_label: true+.
         def _good_job_with_applied_labels(labels)
           return labels unless self.class.respond_to?(:good_job_concurrency_rules)
 
