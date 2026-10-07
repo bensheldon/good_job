@@ -26,15 +26,12 @@ rails_versions = {
   "6.1" => { github: "rails/rails", branch: "6-1-stable" }, # https://github.com/bensheldon/good_job/issues/1280
   "7.0" => { github: "rails/rails", branch: "7-0-stable" }, # Ruby 3.4 requires bigdecimal which rails doesn't declare
   "7.1" => "~> 7.1.0",
-  "7.2" => "~> 7.2.0",
+  "7.2" => "~> 7.2.4",
   "8.0" => "~> 8.0.0",
-  "8.1" => "~> 8.1.0",
+  "8.1" => "~> 8.1.4",
   "head" => { github: "rails/rails", branch: "main" },
 }
 gem 'rails', rails_versions[ENV.fetch("RAILS_VERSION", "8.1")]
-
-# json 3.0 changed behavior in ways that break transitive dependencies here.
-gem 'json', '< 3.0'
 
 # Ruby 4.0 has moved this gem to a bundled gem. Rails 6.1 doesn't declare it.
 install_if -> { ENV["RAILS_VERSION"] == "6.1" } do

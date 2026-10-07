@@ -1,5 +1,7 @@
 source "https://rubygems.org"
 
+gem "json", "< 3.0" # json 3 removed `quirks_mode`, which this ActiveSupport passes
+
 ENV["RAILS_VERSION"] = "8.0"
 
 eval_gemfile "../Gemfile"
