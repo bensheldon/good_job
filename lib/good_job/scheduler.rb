@@ -25,7 +25,7 @@ module GoodJob # :nodoc:
       max_threads: Configuration::DEFAULT_THREADS,
       auto_terminate: true,
       idletime: 60,
-      max_queue: Configuration::DEFAULT_MAX_THREADS,
+      max_queue: Configuration::DEFAULT_THREADS,
       fallback_policy: :discard,
     }.freeze
 
