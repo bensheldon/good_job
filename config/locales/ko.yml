@@ -49,6 +49,11 @@ ko:
         last_7_days: Last 7 days
         title: Discard Cleaner
         total: Total
+    concurrency_claims:
+      states:
+        granted: 허용됨
+        promoted: 승격됨
+        waiting: 대기 중
     cron_entries:
       actions:
         confirm_disable: 이 cron 엔트리를 비활성화하시겠습니까?
@@ -199,6 +204,7 @@ ko:
       job:
         arguments: 인수
         attempts: 시도 횟수
+        concurrency_claims: 동시성 클레임
         labels: 레이블
         priority: 우선순위
         queue: 큐

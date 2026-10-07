@@ -22,6 +22,16 @@
         <div class="small text-muted text-uppercase"><%= t "good_job.models.job.priority" %></div>
         <div class="font-monospace fw-bold small my-2"><%= tag.strong @job.priority %></div>
       </div>
+      <% if @job.labels.present? %>
+        <div class="col-6 col-md-2">
+          <div class="small text-muted text-uppercase"><%= t "good_job.models.job.labels" %></div>
+          <div class="my-2">
+            <% @job.labels.each do |label| %>
+              <%= job_label_badge(@job, label, url: jobs_path(label: label)) %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
       <div class="col text-end">
         <div class="mb-2">
           <%= tag.span relative_time(@job.last_status_at), class: "small" %>
@@ -82,6 +92,23 @@
 
 <%= tag.div id: dom_id(@job, "params"), class: "list-group-item collapse small bg-dark text-light" do %>
   <%= tag.pre JSON.pretty_generate(truncate_display_value(@job.display_serialized_params)) %>
+<% end %>
+
+<% if @concurrency_claims.any? %>
+  <div class="my-4">
+    <h5><%= t "good_job.models.job.concurrency_claims" %></h5>
+    <div class="list-group">
+      <% @concurrency_claims.each do |claim| %>
+        <div class="list-group-item d-flex gap-3 align-items-center justify-content-between">
+          <code class="text-break"><%= claim.key %></code>
+          <div class="d-flex gap-3 align-items-center">
+            <%= tag.span relative_time(claim.updated_at), class: "small text-muted" %>
+            <%= tag.span concurrency_claim_icon(claim.state_name) + t(claim.state_name, scope: "good_job.concurrency_claims.states"), class: "badge #{GoodJob::ApplicationHelper::CONCURRENCY_CLAIM_BADGE_CLASSES.fetch(claim.state_name)}" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
 <% end %>
 
 <%= render 'executions', executions: @job.executions.sort_by(&:number).reverse %>

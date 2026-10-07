@@ -49,6 +49,11 @@ ru:
         last_7_days: Last 7 days
         title: Discard Cleaner
         total: Total
+    concurrency_claims:
+      states:
+        granted: Предоставлена
+        promoted: Продвинута
+        waiting: Ожидает
     cron_entries:
       actions:
         confirm_disable: Вы уверены, что хотите отключить эту задачу cron?
@@ -225,6 +230,7 @@ ru:
       job:
         arguments: Параметры
         attempts: Попытки
+        concurrency_claims: Заявки на параллельность
         labels: Метки
         priority: Приоритет
         queue: Очередь исполнения

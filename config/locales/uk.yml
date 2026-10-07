@@ -49,6 +49,11 @@ uk:
         last_7_days: Last 7 days
         title: Discard Cleaner
         total: Total
+    concurrency_claims:
+      states:
+        granted: Надано
+        promoted: Просунуто
+        waiting: Очікує
     cron_entries:
       actions:
         confirm_disable: Ви впевнені, що хочете вимкнути цю cron-запис?
@@ -225,6 +230,7 @@ uk:
       job:
         arguments: Аргументи
         attempts: Спроби
+        concurrency_claims: Заявки на паралельність
         labels: Мітки
         priority: Пріоритет
         queue: Черга
