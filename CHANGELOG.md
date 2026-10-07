@@ -1,5 +1,17 @@
 # Changelog
 
+## [v4.21.1](https://github.com/bensheldon/good_job/tree/v4.21.1) (2026-10-07)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.21.0...v4.21.1)
+
+**Fixed bugs:**
+
+- Fix crash on natural language cron schedules \(v4.21.0 regression\) [\#1853](https://github.com/bensheldon/good_job/pull/1853) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- v4.21.0 regression: undefined method 'next\_time' for an instance of EtOrbi::EoTime [\#1852](https://github.com/bensheldon/good_job/issues/1852)
+
 ## [v4.21.0](https://github.com/bensheldon/good_job/tree/v4.21.0) (2026-10-06)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.20.0...v4.21.0)
