@@ -9,19 +9,30 @@ module GoodJob
         def initialize(...)
           super
           # Class-level labels may be Lambdas/Procs, invoked in the context of the job
-          self.good_job_labels = Array(self.class.good_job_labels).filter_map do |label|
+          labels = Array(self.class.good_job_labels).filter_map do |label|
             label.respond_to?(:call) ? instance_exec(&label) : label
           end
+          self.good_job_labels = _good_job_with_applied_labels(labels)
         end
 
         def enqueue(options = {})
-          self.good_job_labels = Array(options[:good_job_labels]) if options.key?(:good_job_labels)
+          self.good_job_labels = _good_job_with_applied_labels(Array(options[:good_job_labels])) if options.key?(:good_job_labels)
           super
         end
 
         def deserialize(job_data)
           super
           self.good_job_labels = job_data.delete("good_job_labels")&.dup || []
+        end
+
+        private
+
+        # Adds the labels of concurrency rules defined with +apply_label: true+.
+        def _good_job_with_applied_labels(labels)
+          return labels unless self.class.respond_to?(:good_job_concurrency_rules)
+
+          applied_labels = Array(self.class.good_job_concurrency_rules).filter_map { |rule| rule.applied_label(self) }
+          (labels + applied_labels).uniq
         end
       end
 
