@@ -22,6 +22,8 @@
     <%= tag.link rel: "stylesheet", href: frontend_static_path(:style, format: :css, locale: nil), nonce: content_security_policy_nonce, data: { turbo_track: "reload" } %>
     <%= tag.script "", src: frontend_static_path(:bootstrap, format: :js, locale: nil), nonce: content_security_policy_nonce %>
     <%= tag.script "", src: frontend_static_path(:chartjs, format: :js, locale: nil), nonce: content_security_policy_nonce %>
+    <%# Skip JSON/CSS module feature detection, which imports blob: URLs that are blocked by connect-src %>
+    <%= tag.script({ polyfillDisable: %w[css-modules json-modules] }.to_json.html_safe, type: "esms-options", nonce: content_security_policy_nonce) %>
     <%= tag.script "", src: frontend_static_path(:es_module_shims, format: :js, locale: nil), async: true, nonce: content_security_policy_nonce %>
 
     <% importmaps = GoodJob::FrontendsController.js_modules.keys.index_with { |module_name| frontend_module_path(module_name, format: :js, locale: nil) } %>
