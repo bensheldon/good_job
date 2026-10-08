@@ -567,6 +567,11 @@ class MyJob < ApplicationJob
     # `good_job_labels`.
     label: "email",
 
+    # Apply the rule's label to every job of this class (and its subclasses),
+    # so the jobs don't need to be enqueued with it. Defaults to false.
+    # A Lambda/Proc label that returns nil is not applied.
+    apply_label: true,
+
     # Maximum number of unfinished jobs with this label to allow.
     # Can be an Integer or Lambda/Proc invoked in the context of the job.
     total_limit: 1,
@@ -615,7 +620,25 @@ Supplying both `label:` and `key:` to `good_job_concurrency_rule` is deprecated.
 
 A rule's `label:` can also be a Lambda/Proc that is invoked in the context of the job instance, for example to derive the label from job arguments. The lambda resolves the label to check against; the job's `good_job_labels` must still contain it for the rule to apply. Rule labels and job labels are converted to strings and stripped of surrounding whitespace when matched, consistent with how labels are stored.
 
-To apply a dynamic label to every job of a class, set a Lambda/Proc in the class-level `good_job_labels`. It is invoked in the context of the job when the job is initialized, so the label is present for checks at both enqueue and perform time:
+To apply a rule's label to every job of a class, use `apply_label: true`. The label is resolved in the context of the job when the job is initialized, so it is present for checks at both enqueue and perform time, including for jobs enqueued in bulk. Labels passed with `MyJob.set(good_job_labels: [...])` are added to it rather than replacing it:
+
+```ruby
+class MyJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
+  good_job_concurrency_rule(
+    label: -> { "user-#{arguments.first[:user_id]}" },
+    apply_label: true,
+    total_limit: 1
+  )
+
+  def perform(user_id:)
+    # do work
+  end
+end
+```
+
+Class-level `good_job_labels` can also be Lambdas/Procs, invoked in the context of the job when it is initialized:
 
 ```ruby
 class MyJob < ApplicationJob
@@ -641,7 +664,7 @@ class MyJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
 
   before_enqueue do |job|
-    job.good_job_labels = [job.arguments.first[:user_id].to_s]
+    job.good_job_labels |= [job.arguments.first[:user_id].to_s]
   end
 
   good_job_concurrency_rule(

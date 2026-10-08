@@ -41,6 +41,15 @@ RSpec.describe GoodJob::ActiveJobExtensions::Labels do
     expect(GoodJob::Job.last.labels).to eq %w[static dynamic-Alice]
   end
 
+  it "deserializes jobs with argument-based Lambda labels" do
+    TestJob.good_job_labels = [-> { "user-#{arguments.first[:user_id]}" }]
+    TestJob.perform_later(user_id: 1)
+
+    active_job = ActiveJob::Base.deserialize(GoodJob::Job.last.active_job.serialize.merge("good_job_labels" => ["stored"]))
+    expect(active_job.good_job_labels).to eq ["stored"]
+    expect(GoodJob::Job.last.active_job.good_job_labels).to eq ["user-1"]
+  end
+
   it "doesn't leak into the serialized params" do
     TestJob.good_job_labels = %w[buffalo gopher]
     TestJob.perform_later
