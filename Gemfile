@@ -3,6 +3,9 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
+# Pin Ruby for development and the demo app (e.g. Heroku); gemfiles/ for the CI matrix set RAILS_VERSION and use their own Ruby
+ruby file: File.expand_path(".ruby-version", __dir__) unless ENV["RAILS_VERSION"]
+
 # Declare your gem's dependencies in good_job.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
