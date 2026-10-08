@@ -20,7 +20,7 @@ describe 'Pauses' do
     fill_in "Value", with: "elephant"
     click_on "Pause"
 
-    expect(page).to have_content "elephant"
+    expect(page).to have_text "elephant"
     expect(GoodJob.paused?(queue: "elephant")).to eq true
 
     ExampleJob.set(queue: "elephant").perform_later
@@ -31,7 +31,7 @@ describe 'Pauses' do
     within "li", text: "elephant" do
       accept_confirm { click_on "Resume" }
     end
-    expect(page).to have_content "Successfully unpaused"
+    expect(page).to have_text "Successfully unpaused"
     expect(GoodJob.paused?(queue: "elephant")).to eq false
 
     GoodJob.perform_inline
@@ -42,7 +42,7 @@ describe 'Pauses' do
     fill_in "Value", with: "ExampleJob"
     click_on "Pause"
 
-    expect(page).to have_content "ExampleJob"
+    expect(page).to have_text "ExampleJob"
     expect(GoodJob.paused?(job_class: "ExampleJob")).to eq true
 
     ExampleJob.set(queue: "elephant").perform_later
@@ -53,7 +53,7 @@ describe 'Pauses' do
     within "li", text: "ExampleJob" do
       accept_confirm { click_on "Resume" }
     end
-    expect(page).to have_content "Successfully unpaused"
+    expect(page).to have_text "Successfully unpaused"
     expect(GoodJob.paused?(job_class: "ExampleJob")).to eq false
 
     GoodJob.perform_inline
@@ -64,7 +64,7 @@ describe 'Pauses' do
     fill_in "Value", with: "important"
     click_on "Pause"
 
-    expect(page).to have_content "important"
+    expect(page).to have_text "important"
     expect(GoodJob.paused?(label: "important")).to eq true
 
     ExampleJob.set(good_job_labels: ["important"]).perform_later
@@ -75,7 +75,7 @@ describe 'Pauses' do
     within "li", text: "important" do
       accept_confirm { click_on "Resume" }
     end
-    expect(page).to have_content "Successfully unpaused"
+    expect(page).to have_text "Successfully unpaused"
     expect(GoodJob.paused?(label: "important")).to eq false
 
     GoodJob.perform_inline
