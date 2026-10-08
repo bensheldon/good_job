@@ -27,6 +27,11 @@ when 'development'
         cron: "*/15 * * * * *",
         class: "ExampleJob::BatchJob",
       },
+      concurrency_example: {
+        description: "Enqueue slow jobs that contend for a concurrency limit",
+        cron: "*/30 * * * * *",
+        class: "ExampleJob::ConcurrencyExampleJob",
+      },
       frequent_example: {
         description: "Enqueue an ExampleJob",
         cron: "*/5 * * * * *",
@@ -97,6 +102,11 @@ when 'demo'
         description: "Enqueue a Batch",
         cron: "*/30 * * * * *",
         class: "ExampleJob::BatchJob",
+      },
+      concurrency_example: {
+        description: "Enqueue slow jobs that contend for a concurrency limit",
+        cron: "*/30 * * * * *",
+        class: "ExampleJob::ConcurrencyExampleJob",
       },
       complex_schedule: {
         cron: -> (last_ran) { last_ran ? last_ran + 17.hours : Time.now},

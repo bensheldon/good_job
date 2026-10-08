@@ -49,6 +49,11 @@ az:
         last_7_days: Son 7 gün
         title: Ləğv edilmiş tapşırıqların təmizlənməsi
         total: Cəmi
+    concurrency_claims:
+      states:
+        granted: Verilib
+        promoted: İrəli çəkilib
+        waiting: Gözləyir
     cron_entries:
       actions:
         confirm_disable: Bu cron qeydini deaktivləşdirmək istədiyinizə əminsiniz?
@@ -199,6 +204,7 @@ az:
       job:
         arguments: Arqumentlər
         attempts: Cəhdlər
+        concurrency_claims: Paralellik iddiaları
         labels: Etiketlər
         priority: Prioritet
         queue: Növbə

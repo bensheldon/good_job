@@ -49,6 +49,11 @@ fr:
         last_7_days: Last 7 days
         title: Discard Cleaner
         total: Total
+    concurrency_claims:
+      states:
+        granted: Accordée
+        promoted: Promue
+        waiting: En attente
     cron_entries:
       actions:
         confirm_disable: Voulez-vous vraiment désactiver cette entrée cron ?
@@ -199,6 +204,7 @@ fr:
       job:
         arguments: Paramètres
         attempts: Tentatives
+        concurrency_claims: Réservations de concurrence
         labels: Étiquettes
         priority: Priorité
         queue: File d'attente

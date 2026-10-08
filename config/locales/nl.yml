@@ -49,6 +49,11 @@ nl:
         last_7_days: Last 7 days
         title: Discard Cleaner
         total: Total
+    concurrency_claims:
+      states:
+        granted: Toegekend
+        promoted: Gepromoveerd
+        waiting: Wachtend
     cron_entries:
       actions:
         confirm_disable: Weet u zekerf dat u deze cron-vermelding wilt uitschakelen?
@@ -199,6 +204,7 @@ nl:
       job:
         arguments: Argumenten
         attempts: Pogingen
+        concurrency_claims: Gelijktijdigheidsclaims
         labels: Labels
         priority: Prioriteit
         queue: Wachtrij
