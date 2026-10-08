@@ -61,7 +61,7 @@ platforms :ruby do
     gem "brakeman"
     gem "easy_translate"
     gem "erb_lint"
-    gem "herb"
+    gem "herb", require: false
     gem "i18n-tasks"
     gem "mdl"
     gem "rubocop"

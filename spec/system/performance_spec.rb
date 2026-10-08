@@ -25,7 +25,7 @@ describe 'Performance Page', :js do
     visit good_job.root_path
     click_link 'Performance'
     expect(page).to have_css 'h2', text: 'Performance'
-    expect(page).to have_content 'ExampleJob'
+    expect(page).to have_text 'ExampleJob'
   end
 
   it 'switches the index chart between execution, queue, and total time' do
@@ -35,7 +35,7 @@ describe 'Performance Page', :js do
     visit good_job.performance_index_path
 
     # The table headers are uppercased by CSS, so assert on the rendered text.
-    expect(page).to have_content 'QUEUE LATENCY'
+    expect(page).to have_text 'QUEUE LATENCY'
     expect(chart_titles).to eq(["Total execution latency in seconds"])
 
     click_link "Queue latency"
@@ -68,7 +68,7 @@ describe 'Performance Page', :js do
     visit good_job.performance_index_path
 
     # The table headers are uppercased by CSS, so assert on the rendered text.
-    expect(page).to have_content 'TOTAL LATENCY'
+    expect(page).to have_text 'TOTAL LATENCY'
     expect(page).to have_no_css("[role='row'] .d-lg-none", text: "Total latency")
     # The rows set `text-nowrap`, so an added column pushes the header onto a second
     # line unless its label can wrap. Compare real geometry, not the grid arithmetic.
@@ -851,7 +851,7 @@ describe 'Performance Page', :js do
       chart_end: "2020-01-01T11:07:42Z"
     )
 
-    expect(page).to have_content("No executions in this time range.", count: 2)
+    expect(page).to have_text("No executions in this time range.", count: 2)
   end
 
   it 'preserves exact preset bounds and identity on show until reload establishes a fresh window' do
