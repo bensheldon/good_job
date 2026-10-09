@@ -199,7 +199,8 @@ Usage:
 
 Options:
   [--queues=QUEUE_LIST]           # Queues or pools to work from. (env var: GOOD_JOB_QUEUES, default: *)
-  [--max-threads=COUNT]           # Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_MAX_THREADS, default: 5)
+  [--threads=COUNT]               # Default number of threads per pool to use for working jobs. (env var: GOOD_JOB_THREADS, default: 5)
+  [--max-threads=COUNT]           # (DEPRECATED: use --threads) (env var: GOOD_JOB_MAX_THREADS, default: 5)
   [--poll-interval=SECONDS]       # Interval between polls for available jobs in seconds (env var: GOOD_JOB_POLL_INTERVAL, default: 10)
   [--max-cache=COUNT]             # Maximum number of scheduled jobs to cache in memory (env var: GOOD_JOB_MAX_CACHE, default: 10000)
   [--shutdown-timeout=SECONDS]    # Number of seconds to wait for jobs to finish when shutting down before stopping the thread. (env var: GOOD_JOB_SHUTDOWN_TIMEOUT, default: -1 (forever))
@@ -263,7 +264,7 @@ Rails.application.configure do
   config.good_job.on_thread_error = -> (exception) { Rails.error.report(exception) }
   config.good_job.execution_mode = :async
   config.good_job.queues = '*'
-  config.good_job.max_threads = 5
+  config.good_job.threads = 5
   config.good_job.poll_interval = 30 # seconds
   config.good_job.shutdown_timeout = 25 # seconds
   config.good_job.enable_cron = true
@@ -278,7 +279,7 @@ Rails.application.configure do
     on_thread_error: -> (exception) { Rails.error.report(exception) },
     execution_mode: :async,
     queues: '*',
-    max_threads: 5,
+    threads: 5,
     poll_interval: 30,
     shutdown_timeout: 25,
     enable_cron: true,
@@ -301,7 +302,7 @@ Available configuration options are:
     - `:async` (or `:async_server`) executes jobs in separate threads within the Rails web server process (`bundle exec rails server`). It can be more economical for small workloads because you don’t need a separate machine or environment for running your jobs, but if your web server is under heavy load or your jobs require a lot of resources, you should choose `:external` instead.  When not in the Rails web server, jobs will execute in `:external` mode to ensure jobs are not executed within `rails console`, `rails db:migrate`, `rails assets:prepare`, etc.
     - `:async_all` executes jobs in separate threads in _any_ Rails process.
 - `queues` (string) sets queues or pools to execute jobs. You can also set this with the environment variable `GOOD_JOB_QUEUES`.
-- `max_threads` (integer) sets the default number of threads per pool to use for working jobs. You can also set this with the environment variable `GOOD_JOB_MAX_THREADS`.
+- `threads` (integer) sets the default number of threads per pool to use for working jobs. You can also set this with the environment variable `GOOD_JOB_THREADS`. (Formerly `max_threads` / `GOOD_JOB_MAX_THREADS`, which are deprecated but still honored.)
 - `fibers` (integer) sets the default number of fibers per pool for [fiber execution](#execute-jobs-with-fibers). The default, `0`, executes jobs with threads. You can also set this with the environment variable `GOOD_JOB_FIBERS`.
 - `poll_interval` (integer) sets the number of seconds between polls for jobs when `execution_mode` is set to `:async`. You can also set this with the environment variable `GOOD_JOB_POLL_INTERVAL`. A poll interval of `-1` disables polling completely.
     - production default: 10 seconds (in case of a LISTEN/NOTIFY blip)
@@ -569,6 +570,11 @@ class MyJob < ApplicationJob
     # `good_job_labels`.
     label: "email",
 
+    # Apply the rule's label to every job of this class (and its subclasses),
+    # so the jobs don't need to be enqueued with it. Defaults to false.
+    # A Lambda/Proc label that returns nil is not applied.
+    apply_label: true,
+
     # Maximum number of unfinished jobs with this label to allow.
     # Can be an Integer or Lambda/Proc invoked in the context of the job.
     total_limit: 1,
@@ -617,14 +623,51 @@ Supplying both `label:` and `key:` to `good_job_concurrency_rule` is deprecated.
 
 A rule's `label:` can also be a Lambda/Proc that is invoked in the context of the job instance, for example to derive the label from job arguments. The lambda resolves the label to check against; the job's `good_job_labels` must still contain it for the rule to apply. Rule labels and job labels are converted to strings and stripped of surrounding whitespace when matched, consistent with how labels are stored.
 
-Apply labels dynamically in a `before_enqueue` callback. They are stored on the job record and checked by rules that run when the job is performed:
+To apply a rule's label to every job of a class, use `apply_label: true`. The label is resolved in the context of the job when the job is initialized, so it is present for checks at both enqueue and perform time, including for jobs enqueued in bulk. Labels passed with `MyJob.set(good_job_labels: [...])` are added to it rather than replacing it:
+
+```ruby
+class MyJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
+  good_job_concurrency_rule(
+    label: -> { "user-#{arguments.first[:user_id]}" },
+    apply_label: true,
+    total_limit: 1
+  )
+
+  def perform(user_id:)
+    # do work
+  end
+end
+```
+
+Class-level `good_job_labels` can also be Lambdas/Procs, invoked in the context of the job when it is initialized:
+
+```ruby
+class MyJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
+  self.good_job_labels = [-> { "user-#{arguments.first[:user_id]}" }]
+
+  good_job_concurrency_rule(
+    label: -> { "user-#{arguments.first[:user_id]}" },
+    total_limit: 1
+  )
+
+  def perform(user_id:)
+    # do work
+  end
+end
+```
+
+Labels can also be applied in a `before_enqueue` callback. They are stored on the job record and checked by the rules:
 
 ```ruby
 class MyJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
 
   before_enqueue do |job|
-    job.good_job_labels = [job.arguments.first[:user_id].to_s]
+    job.good_job_labels |= [job.arguments.first[:user_id].to_s]
   end
 
   good_job_concurrency_rule(
@@ -638,7 +681,7 @@ class MyJob < ApplicationJob
 end
 ```
 
-Rules are checked when a job is enqueued and again when it is performed. Labels assigned in `before_enqueue` are present for the before-perform check, but not for checks that run at enqueue time (`enqueue_limit`, `enqueue_throttle`, and `total_limit` when no enqueue-specific limit is configured). For those, pass the label when enqueuing:
+Rules are checked when a job is enqueued and again when it is performed. The enqueue-time check runs after the job's other `before_enqueue` and `around_enqueue` callbacks, regardless of where they are defined, so labels assigned in those callbacks are present for both checks. Labels can also be passed when enqueuing:
 
 ```ruby
 MyJob.set(good_job_labels: [user_id.to_s]).perform_later(user_id: user_id)
@@ -1240,7 +1283,7 @@ By default, GoodJob creates a single thread execution pool that will execute job
 
     ```bash
     $ GOOD_JOB_QUEUES="transactional_messages:2;batch_processing:1;-transactional_messages,batch_processing:2;*" \
-      GOOD_JOB_MAX_THREADS=5 \
+      GOOD_JOB_THREADS=5 \
       bundle exec good_job
     ```
 
@@ -1254,9 +1297,9 @@ By default, GoodJob creates a single thread execution pool that will execute job
     # Procfile
 
     # Separate process types
-    worker: bundle exec good_job --max-threads=5
-    transactional_worker: bundle exec good_job --queues="transactional_messages" --max-threads=2
-    batch_worker: bundle exec good_job --queues="batch_processing" --max-threads=1
+    worker: bundle exec good_job --threads=5
+    transactional_worker: bundle exec good_job --queues="transactional_messages" --threads=2
+    batch_worker: bundle exec good_job --queues="batch_processing" --threads=1
     ```
 
     To optimize for CPU performance at the expense of greater memory and system resource usage, while keeping a single process type (and thus a single dyno), combine several processes and wait for them:
@@ -1265,7 +1308,7 @@ By default, GoodJob creates a single thread execution pool that will execute job
     # Procfile
 
     # Combined multi-process
-    combined_worker: bundle exec good_job --max-threads=5 & bundle exec good_job --queues="transactional_messages" --max-threads=2 & bundle exec good_job --queues="batch_processing" --max-threads=1 & wait -n
+    combined_worker: bundle exec good_job --threads=5 & bundle exec good_job --queues="transactional_messages" --threads=2 & bundle exec good_job --queues="batch_processing" --threads=1 & wait -n
     ```
 
 Keep in mind, queue operations and management is an advanced discipline. This stuff is complex, especially for heavy workloads and unique processing requirements. Good job 👍
@@ -1274,7 +1317,7 @@ Keep in mind, queue operations and management is an advanced discipline. This st
 
 GoodJob job executor processes require the following database connections:
 
-- 1 connection per execution pool thread. E.g., `--queues=mice:2;elephants:1` is 3 threads and thus 3 connections. Pool size defaults to `--max-threads`.
+- 1 connection per execution pool thread. E.g., `--queues=mice:2;elephants:1` is 3 threads and thus 3 connections. Pool size defaults to `--threads`.
 - 2 additional connections that GoodJob uses for utility functionality (e.g. LISTEN/NOTIFY, cron, etc.)
 - 1 connection per subthread, if your application makes multithreaded database queries (e.g. `load_async`) within a job.
 
@@ -1293,12 +1336,12 @@ When GoodJob runs in `:async` mode (in Rails's development environment, by defau
 - `ENV.fetch("RAILS_MAX_THREADS", 5)` is the number of threads used by the web server
 - `1` is the number of connections used by the job listener
 - `2` is the number of connections used by the cron scheduler and executor
-- `ENV.fetch("GOOD_JOB_MAX_THREADS", 5)` is the number of threads used to perform jobs
+- `ENV.fetch("GOOD_JOB_THREADS", 5)` is the number of threads used to perform jobs
 
 ```yaml
 # config/database.yml
 
-pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + 1 + 2 + ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
+pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + 1 + 2 + ENV.fetch("GOOD_JOB_THREADS", 5).to_i %>
 ```
 
 When GoodJob runs in `:external` mode (in Rails' production environment, by default), the following database pool configurations work for web servers and worker processes, respectively.
@@ -1312,7 +1355,7 @@ pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
 ```yaml
 # config/database.yml
 
-pool: <%= 1 + 2 + ENV.fetch("GOOD_JOB_MAX_THREADS", 5).to_i %>
+pool: <%= 1 + 2 + ENV.fetch("GOOD_JOB_THREADS", 5).to_i %>
 ```
 
 ### Production setup
@@ -1418,7 +1461,7 @@ config.good_job.lock_strategy = :skiplocked # Requires the lock_type migration b
 
 Start it with `bundle exec good_job start`. The example creates three schedulers with one reactor thread each and capacities of 50, 10, and 25 jobs. GoodJob also uses utility threads.
 
-Like `max_threads`, `fibers` is the default count per pool, and a count in `queues` overrides it. Fiber pools do not use `max_threads`.
+Like `threads`, `fibers` is the default count per pool, and a count in `queues` overrides it. Fiber pools do not use `threads`.
 
 #### Unmet requirements
 
@@ -1476,7 +1519,7 @@ GoodJob can execute jobs "async" in the same process as the web server (e.g. `bi
     # Or with more configuration
     config.good_job = {
       execution_mode: :async,
-      max_threads: 4,
+      threads: 4,
       poll_interval: 30
     }
     ```
@@ -1484,7 +1527,7 @@ GoodJob can execute jobs "async" in the same process as the web server (e.g. `bi
 - Or, with environment variables:
 
     ```bash
-    GOOD_JOB_EXECUTION_MODE=async GOOD_JOB_MAX_THREADS=4 GOOD_JOB_POLL_INTERVAL=30 bin/rails server
+    GOOD_JOB_EXECUTION_MODE=async GOOD_JOB_THREADS=4 GOOD_JOB_POLL_INTERVAL=30 bin/rails server
     ```
 
 Depending on your application configuration, you may need to take additional steps:
@@ -1493,7 +1536,7 @@ Depending on your application configuration, you may need to take additional ste
 
     ```yaml
     # config/database.yml
-    pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + ENV.fetch("GOOD_JOB_MAX_THREADS", 4).to_i %>
+    pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5).to_i + ENV.fetch("GOOD_JOB_THREADS", 4).to_i %>
     ```
 
 - When running Puma with workers (`WEB_CONCURRENCY > 0`) or another process-forking web server, GoodJob's threadpool schedulers should be stopped before forking, restarted after fork, and cleanly shut down on exit. Stopping GoodJob's scheduler pre-fork is recommended to ensure that GoodJob does not continue executing jobs in the parent/controller process. For example, with Puma:

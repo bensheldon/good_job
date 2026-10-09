@@ -14,7 +14,7 @@ module GoodJob
         concurrency = if configuration.fibers.positive?
                         { fibers: (count || configuration.fibers).to_i }
                       else
-                        { max_threads: (count || configuration.max_threads).to_i }
+                        { max_threads: (count || configuration.threads).to_i }
                       end
 
         job_performer = GoodJob::JobPerformer.new(queue_string, capsule: capsule)

@@ -49,6 +49,11 @@ es:
         last_7_days: Last 7 days
         title: Discard Cleaner
         total: Total
+    concurrency_claims:
+      states:
+        granted: Concedida
+        promoted: Promovida
+        waiting: En espera
     cron_entries:
       actions:
         confirm_disable: "¿Estás seguro que querés deshabilitar esta tarea programada?"
@@ -199,6 +204,7 @@ es:
       job:
         arguments: Argumentos
         attempts: Intentos
+        concurrency_claims: Reclamaciones de concurrencia
         labels: Etiquetas
         priority: Prioridad
         queue: Cola

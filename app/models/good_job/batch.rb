@@ -390,10 +390,8 @@ module GoodJob
           # Jobs with concurrency limits must be enqueued individually so the
           # before_enqueue concurrency check runs. Mirrors Bulk::Buffer#enqueue
           # partitioning (bulk.rb:95-98).
-          if active_job.respond_to?(:good_job_concurrency_key) &&
-             active_job.good_job_concurrency_key.present? &&
-             (active_job.class.good_job_concurrency_config[:enqueue_limit] ||
-               active_job.class.good_job_concurrency_config[:total_limit])
+          if active_job.respond_to?(:good_job_enqueue_concurrency_controlled?) &&
+             active_job.good_job_enqueue_concurrency_controlled?
             unbulkable << { batch: batch, active_job: active_job }
           else
             good_job = Job.build_for_enqueue(active_job)

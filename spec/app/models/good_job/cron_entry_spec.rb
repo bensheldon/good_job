@@ -36,14 +36,21 @@ describe GoodJob::CronEntry do
       expect(entry.errors[:cron]).to include("'2017-12-12' is not a valid schedule")
     end
 
-    it 'is invalid when natural language would produce a misleading schedule' do
-      entry = described_class.new(params.merge(cron: 'every 5 hours'))
-      expect(entry).not_to be_valid
-    end
-
-    it 'is valid for unambiguous natural language schedules' do
-      entry = described_class.new(params.merge(cron: 'every day at noon'))
-      expect(entry).to be_valid
+    [
+      'every 5 minutes',
+      'every 15 minutes',
+      'every 5 hours',
+      'every day at noon',
+      'every day at 2am',
+      'every monday at 9am',
+      'every weekday at 5pm',
+      'every day at 12:00 America/New_York',
+    ].each do |schedule|
+      it "is valid for the natural language schedule '#{schedule}'" do
+        entry = described_class.new(params.merge(cron: schedule))
+        expect(entry).to be_valid
+        expect(entry.next_at).to be_a(Time)
+      end
     end
 
     it 'is invalid when the key is not a Symbol' do
@@ -139,8 +146,16 @@ describe GoodJob::CronEntry do
         expect(my_proc).to have_received(:call).with(nil)
       end
 
-      context 'when the proc returns a misleading natural language schedule' do
-        let(:my_proc) { proc { 'every 5 hours' } }
+      context 'when the proc returns a natural language schedule' do
+        let(:my_proc) { proc { 'every 15 minutes' } }
+
+        it 'returns the next time' do
+          expect(entry.next_at).to be_a(Time)
+        end
+      end
+
+      context 'when the proc returns a string that is not a cron schedule' do
+        let(:my_proc) { proc { '2017-12-12' } }
 
         it 'returns nil' do
           expect(entry.next_at).to be_nil
@@ -229,7 +244,7 @@ describe GoodJob::CronEntry do
 
       entry.send(:fugit)
 
-      expect(Fugit).to have_received(:parse).with('* * * * *', strict: true)
+      expect(Fugit).to have_received(:parse).with('* * * * *')
     end
 
     it 'returns an instance of Fugit::Cron' do

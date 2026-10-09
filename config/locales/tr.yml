@@ -49,6 +49,11 @@ tr:
         last_7_days: Last 7 days
         title: Discard Cleaner
         total: Total
+    concurrency_claims:
+      states:
+        granted: Verildi
+        promoted: Öne alındı
+        waiting: Bekliyor
     cron_entries:
       actions:
         confirm_disable: Bu cron girişini devre dışı bırakmak istediğinizden emin misiniz?
@@ -199,6 +204,7 @@ tr:
       job:
         arguments: Argümanlar
         attempts: Denemeler
+        concurrency_claims: Eşzamanlılık talepleri
         labels: Etiketler
         priority: Öncelik
         queue: Kuyruk

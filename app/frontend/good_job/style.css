@@ -146,6 +146,12 @@
   width: 1rem;
 }
 
+.svg-icon.badge-icon {
+  height: 1em;
+  width: 1em;
+  vertical-align: top;
+}
+
 .badge-group {
   position: relative;
   display: inline-flex;

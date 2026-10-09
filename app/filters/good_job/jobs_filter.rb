@@ -4,6 +4,14 @@ module GoodJob
   class JobsFilter < BaseFilter
     UUID_REGEX = /\A[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}\z/i
 
+    def records
+      @_records ||= begin
+        records = super
+        records = records.preload(:concurrency_claims) if GoodJob::ConcurrencyClaim.table_exists?
+        records
+      end
+    end
+
     def state_names
       %w[scheduled retried queued running succeeded discarded]
     end

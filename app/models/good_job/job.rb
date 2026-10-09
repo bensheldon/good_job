@@ -69,6 +69,7 @@ module GoodJob
     belongs_to :callback_batch, class_name: 'GoodJob::BatchRecord', foreign_key: :batch_callback_id, inverse_of: :callback_jobs, optional: true
     belongs_to :locked_by_process, class_name: "GoodJob::Process", foreign_key: :locked_by_id, inverse_of: :locked_jobs, optional: true
     has_many :executions, class_name: 'GoodJob::Execution', foreign_key: 'active_job_id', primary_key: "id", inverse_of: :job, dependent: :delete_all
+    has_many :concurrency_claims, class_name: 'GoodJob::ConcurrencyClaim', primary_key: :id, inverse_of: false, dependent: nil
 
     before_create -> { self.id = active_job_id }, if: -> { active_job_id.present? }
 

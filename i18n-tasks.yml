@@ -94,6 +94,7 @@ search:
 ## Consider these keys used:
 ignore_unused:
  - "activerecord.attributes.*"
+ - "good_job.concurrency_claims.states.*"
  - "good_job.datetime.*"
  - "good_job.status.*"
  - "good_job.error_event.*"

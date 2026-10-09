@@ -9,7 +9,7 @@ RSpec.describe GoodJob::ActiveJobExtensions::Labels do
     stub_const 'TestJob', (Class.new(ActiveJob::Base) do
       include GoodJob::ActiveJobExtensions::Labels
 
-      def perform
+      def perform(*)
       end
     end)
   end
@@ -32,6 +32,22 @@ RSpec.describe GoodJob::ActiveJobExtensions::Labels do
     job = GoodJob::Job.last
     expect(job.labels).to eq %w[buffalo gopher]
     expect(job.active_job.good_job_labels).to eq %w[buffalo gopher]
+  end
+
+  it "resolves class-level Lambda labels in the context of the job" do
+    TestJob.good_job_labels = ["static", -> { "dynamic-#{arguments.first}" }, -> {}]
+    TestJob.perform_later("Alice")
+
+    expect(GoodJob::Job.last.labels).to eq %w[static dynamic-Alice]
+  end
+
+  it "deserializes jobs with argument-based Lambda labels" do
+    TestJob.good_job_labels = [-> { "user-#{arguments.first[:user_id]}" }]
+    TestJob.perform_later(user_id: 1)
+
+    active_job = ActiveJob::Base.deserialize(GoodJob::Job.last.active_job.serialize.merge("good_job_labels" => ["stored"]))
+    expect(active_job.good_job_labels).to eq ["stored"]
+    expect(GoodJob::Job.last.active_job.good_job_labels).to eq ["user-1"]
   end
 
   it "doesn't leak into the serialized params" do

@@ -11,6 +11,48 @@ module GoodJob
     # and arguments on the dashboard, so very large payloads cannot stall the page.
     MAX_DISPLAY_STRING_LENGTH = 1_000
 
+    CONCURRENCY_CLAIM_BADGE_CLASSES = {
+      nil => "text-bg-secondary border border-secondary",
+      granted: "text-bg-success border border-success",
+      waiting: "bg-warning-subtle text-warning-emphasis border border-warning",
+      promoted: "bg-info-subtle text-info-emphasis border border-info",
+    }.freeze
+
+    CONCURRENCY_CLAIM_ICONS = {
+      granted: "lock_fill",
+      waiting: "hourglass_split",
+      promoted: "arrow_up_circle_fill",
+    }.freeze
+
+    # Renders a job's label as a badge. Labels on which the job has a concurrency claim
+    # are colored and prefixed with an icon for the claim's state.
+    # Claims are only shown when the job's +concurrency_claims+ are already loaded.
+    def job_label_badge(job, label, url: nil)
+      claim = job.concurrency_claims.find { |job_claim| job_claim.label == label } if job.association(:concurrency_claims).loaded?
+      state_name = claim&.state_name
+      truncated_label = truncate(label, length: 15)
+      state_text = t(state_name, scope: "good_job.concurrency_claims.states") if state_name
+      title = [(label if truncated_label != label), state_text].compact.join(" · ")
+
+      options = { class: "badge font-monospace text-decoration-none #{CONCURRENCY_CLAIM_BADGE_CLASSES.fetch(state_name)}" }
+      if title.present?
+        options[:title] = title
+        options[:data] = { bs_toggle: "tooltip" }
+        # Make unlinked badges focusable so keyboard users can reveal the tooltip
+        options[:tabindex] = 0 unless url
+      end
+      content = safe_join([
+        (concurrency_claim_icon(state_name) if state_name),
+        truncated_label,
+        (tag.span(" (#{state_text})", class: "visually-hidden") if state_text),
+      ].compact)
+      url ? link_to(content, url, **options) : tag.span(content, **options)
+    end
+
+    def concurrency_claim_icon(state_name)
+      render_icon(CONCURRENCY_CLAIM_ICONS.fetch(state_name), class: "badge-icon me-1", aria: { hidden: true })
+    end
+
     def job_action_states
       {
         reschedule: %w[scheduled retried queued],

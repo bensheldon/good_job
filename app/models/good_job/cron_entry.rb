@@ -226,24 +226,13 @@ module GoodJob # :nodoc:
     end
 
     def fugit
-      @_fugit ||= parse_schedule(cron)
-    end
+      return @_fugit if defined?(@_fugit)
 
-    # Parses strictly so Fugit's natural language parser cannot turn nonsense
-    # into a misleading schedule (e.g. "every 5 hours" becomes "0 */5 * * *",
-    # running five times a day rather than every five hours).
-    def parse_schedule(schedule)
-      Fugit.parse(schedule, strict: true)
-    rescue NoMethodError => e
-      # Fugit::Nat#restrict calls Integer#match on non-interval slots; in that
-      # case there is nothing to reject and the lenient parse is equivalent.
-      raise unless e.name == :match && e.receiver.is_a?(Integer)
-
-      Fugit.parse(schedule)
+      @_fugit = parse_cron_string(cron)
     end
 
     def parse_cron_string(string)
-      schedule = parse_schedule(string)
+      schedule = Fugit.parse(string)
       schedule if schedule.instance_of?(Fugit::Cron)
     end
 

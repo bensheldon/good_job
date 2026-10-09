@@ -14,7 +14,10 @@ module GoodJob
     # Valid execution modes.
     EXECUTION_MODES = [:async, :async_all, :async_server, :external, :inline].freeze
     # Default number of threads to use per {Scheduler}
-    DEFAULT_MAX_THREADS = 5
+    DEFAULT_THREADS = 5
+    # @deprecated Use {DEFAULT_THREADS} instead.
+    DEFAULT_MAX_THREADS = DEFAULT_THREADS
+    deprecate_constant :DEFAULT_MAX_THREADS
     # Default number of seconds between polls for jobs
     DEFAULT_POLL_INTERVAL = 10
     # Default poll interval for async in development environment
@@ -140,17 +143,23 @@ module GoodJob
       end
     end
 
-    # Indicates the number of threads to use per {Scheduler}. Note that
+    # Indicates the default number of threads to use per {Scheduler}. Note that
     # {#queue_string} may provide more specific thread counts to use with
     # individual schedulers.
     # @return [Integer]
-    def max_threads
+    def threads
       (
-        options[:max_threads] ||
-          rails_config[:max_threads] ||
-          env['GOOD_JOB_MAX_THREADS'] ||
+        options[:threads] ||
+          rails_config[:threads] ||
+          env['GOOD_JOB_THREADS'] ||
+          deprecated_value(
+            replacement: "the `threads:` option, `config.good_job.threads`, or the `GOOD_JOB_THREADS` environment variable",
+            options_key: :max_threads,
+            rails_config_key: :max_threads,
+            env_var: 'GOOD_JOB_MAX_THREADS'
+          ) ||
           env['RAILS_MAX_THREADS'] ||
-          DEFAULT_MAX_THREADS
+          DEFAULT_THREADS
       ).to_i
     end
 
@@ -164,6 +173,12 @@ module GoodJob
           env['GOOD_JOB_FIBERS'] ||
           0
       ).to_i
+    end
+
+    # @deprecated Use {#threads} instead.
+    # @return [Integer]
+    def max_threads
+      threads
     end
 
     # The number of subprocesses to fork when running in cluster mode. When
@@ -526,6 +541,33 @@ module GoodJob
     end
 
     private
+
+    # Reads a configuration value from one or more deprecated sources, emitting a
+    # deprecation warning (naming the +replacement+) when a value is found. This
+    # keeps "submerged" configuration—explicit options, Rails config, and
+    # environment variables—discoverable as they are renamed across releases.
+    #
+    # Deprecated sources are checked in the same precedence order as live
+    # configuration: options, then Rails config, then environment variable.
+    #
+    # @param replacement [String] human-readable description of what to use instead
+    # @param options_key [Symbol, nil] deprecated key in {#options}
+    # @param rails_config_key [Symbol, nil] deprecated key in +config.good_job+
+    # @param env_var [String, nil] deprecated environment variable name
+    # @return the found value, or +nil+ if none of the deprecated sources are set
+    def deprecated_value(replacement:, options_key: nil, rails_config_key: nil, env_var: nil)
+      source, value = if options_key && !options[options_key].nil?
+                        ["the `#{options_key}:` option", options[options_key]]
+                      elsif rails_config_key && !rails_config[rails_config_key].nil?
+                        ["`config.good_job.#{rails_config_key}`", rails_config[rails_config_key]]
+                      elsif env_var && !env[env_var].nil?
+                        ["the `#{env_var}` environment variable", env[env_var]]
+                      end
+      return if value.nil?
+
+      GoodJob.deprecator.warn("Configuring GoodJob with #{source} is deprecated. Use #{replacement} instead.")
+      value
+    end
 
     # The pipe-delimited subprocess pools within the queue configuration, if any.
     # @return [Array<String>]

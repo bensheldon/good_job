@@ -65,6 +65,150 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
+  describe 'labels applied in enqueue callbacks' do
+    let(:test_rule) { { label: -> { "TestJob-#{arguments.first[:name]}" }, total_limit: 1 } }
+
+    def concurrency_callbacks(klass)
+      klass._enqueue_callbacks.select { |cb| cb.filter == :_good_job_concurrency_before_enqueue }
+    end
+
+    before { stub_job_class(test_rule) }
+
+    it 'checks rules after a before_enqueue defined later applies the label' do
+      TestJob.before_enqueue { |job| job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"] }
+
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be false
+      expect(TestJob.perform_later(name: "Bob")).to be_present
+      expect(GoodJob::Job.count).to eq 2
+    end
+
+    it 'checks rules after around_enqueue callbacks in subclasses' do
+      stub_const 'ChildJob', Class.new(TestJob)
+      ChildJob.around_enqueue do |job, block|
+        job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"]
+        block.call
+      end
+
+      expect(ChildJob.perform_later(name: "Alice")).to be_present
+      expect(ChildJob.perform_later(name: "Alice")).to be false
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+    end
+
+    it 'keeps the check last in subclasses when the parent adds callbacks' do
+      stub_const 'ChildJob', Class.new(TestJob)
+      ChildJob.before_enqueue { |job| job.good_job_labels |= ["child"] }
+      TestJob.before_enqueue { |job| job.good_job_labels |= ["parent"] }
+
+      [TestJob, ChildJob].each do |klass|
+        expect(klass._enqueue_callbacks.to_a.last.filter).to eq :_good_job_concurrency_before_enqueue
+        expect(concurrency_callbacks(klass).size).to eq 1
+      end
+    end
+
+    it 'does not duplicate the callbacks being defined' do
+      expect { TestJob.around_enqueue { |_job, block| block.call } }.to change { TestJob._enqueue_callbacks.count }.by(1)
+    end
+
+    it 'respects skip_callback in subclasses' do
+      stub_const 'ChildJob', Class.new(TestJob)
+      ChildJob.skip_callback(:enqueue, :before, :_good_job_concurrency_before_enqueue)
+      TestJob.before_enqueue { |job| job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"] }
+      ChildJob.before_enqueue { |job| job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"] }
+
+      expect(concurrency_callbacks(ChildJob)).to be_empty
+      expect(ChildJob.perform_later(name: "Alice")).to be_present
+      expect(ChildJob.perform_later(name: "Alice")).to be_present
+    end
+
+    it 'keeps conditions from a conditional skip_callback' do
+      stub_const 'ChildJob', Class.new(TestJob)
+      ChildJob.skip_callback(:enqueue, :before, :_good_job_concurrency_before_enqueue, if: -> { arguments.first[:name] == "Skip" })
+      ChildJob.before_enqueue { |job| job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"] }
+
+      expect(ChildJob._enqueue_callbacks.to_a.last.filter).to eq :_good_job_concurrency_before_enqueue
+      expect(ChildJob.perform_later(name: "Skip")).to be_present
+      expect(ChildJob.perform_later(name: "Skip")).to be_present
+      expect(ChildJob.perform_later(name: "Alice")).to be_present
+      expect(ChildJob.perform_later(name: "Alice")).to be false
+    end
+
+    it 'runs prepended callbacks before the check' do
+      TestJob.before_enqueue(prepend: true) { |job| job.good_job_labels |= ["TestJob-#{job.arguments.first[:name]}"] }
+
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be false
+    end
+  end
+
+  describe 'apply_label:' do
+    let(:test_rule) { { label: -> { arguments.first[:name] && "TestJob-#{arguments.first[:name]}" }, apply_label: true, total_limit: 1 } }
+
+    before { stub_job_class(test_rule) }
+
+    it 'applies the resolved label to jobs and enforces the rule' do
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be false
+      expect(TestJob.perform_later(name: "Bob")).to be_present
+
+      expect(GoodJob::Job.order(:created_at).map(&:labels)).to eq [["TestJob-Alice"], ["TestJob-Bob"]]
+    end
+
+    it 'keeps the applied label when labels are passed when enqueuing' do
+      TestJob.set(good_job_labels: ["other"]).perform_later(name: "Alice")
+
+      expect(GoodJob::Job.last.labels).to eq %w[other TestJob-Alice]
+      expect(TestJob.set(good_job_labels: []).perform_later(name: "Alice")).to be false
+    end
+
+    # activerecord-jdbc-adapter's ArrayEncoder calls the deprecated `ActiveRecord::Base.connection`
+    # when quoting the labels array in `insert_all`, which the test app disallows.
+    it 'applies the label to jobs enqueued in bulk', :skip_if_java do
+      stub_job_class({ label: -> { "TestJob-#{arguments.first[:name]}" }, apply_label: true, perform_limit: 1 })
+      GoodJob::Bulk.enqueue([TestJob.new(name: "Alice"), TestJob.new(name: "Bob")])
+
+      expect(GoodJob::Job.pluck(:labels)).to contain_exactly(["TestJob-Alice"], ["TestJob-Bob"])
+    end
+
+    it 'performs jobs after deserializing them' do
+      stub_job_class({ label: -> { "TestJob-#{arguments.first[:name]}" }, apply_label: true, perform_limit: 1 })
+      TestJob.perform_later(name: "Alice")
+
+      expect { GoodJob.perform_inline }.not_to raise_error
+      expect(GoodJob::Job.last).to have_attributes(finished_at: be_present, error: nil, labels: ["TestJob-Alice"])
+    end
+
+    it 'does not apply a nil label' do
+      TestJob.perform_later(name: nil)
+
+      expect(GoodJob::Job.last.labels).to be_nil
+    end
+
+    it 'does not apply the label by default' do
+      stub_job_class({ label: "unapplied", total_limit: 1 })
+      TestJob.perform_later(name: "Alice")
+
+      expect(GoodJob::Job.last.labels).to be_nil
+    end
+
+    it 'requires a label' do
+      expect { TestJob.good_job_concurrency_rule(apply_label: true, total_limit: 1) }.to raise_error(ArgumentError, /requires a `label:`/)
+    end
+  end
+
+  describe 'dynamic class-level labels' do
+    before do
+      stub_job_class({ label: -> { "TestJob-#{arguments.first[:name]}" }, total_limit: 1 })
+      TestJob.good_job_labels = [-> { "TestJob-#{arguments.first[:name]}" }]
+    end
+
+    it 'applies the label before enqueue-time checks' do
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be false
+      expect(TestJob.perform_later(name: "Bob")).to be_present
+    end
+  end
+
   describe 'label normalization' do
     let(:test_rule) { { label: -> { arguments.first[:name] }, enqueue_limit: 1, perform_limit: 0 } }
 
