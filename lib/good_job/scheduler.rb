@@ -94,7 +94,7 @@ module GoodJob # :nodoc:
       self.class.instances << self
     end
 
-    # Validate runtime support, Rails fiber isolation, and disabled reloading.
+    # Validate runtime support and Rails fiber isolation.
     # @raise [ArgumentError] when a requirement is not met
     # @return [void]
     def self.validate_fiber_execution!
@@ -102,10 +102,6 @@ module GoodJob # :nodoc:
       validate_fiber_rails!
 
       raise ArgumentError, "GoodJob's fiber execution requires `config.active_support.isolation_level = :fiber`" unless defined?(ActiveSupport::IsolatedExecutionState) && ActiveSupport::IsolatedExecutionState.isolation_level == :fiber
-
-      return unless rails_reloading_enabled?
-
-      raise ArgumentError, "GoodJob's fiber execution requires code reloading to be disabled (`config.cache_classes = true`, or `config.enable_reloading = false` on Rails 7.1+). The Rails reloader can block jobs sharing a thread."
     end
 
     # Check Ruby, +async+, and Rails version support without checking Rails settings.
@@ -139,14 +135,6 @@ module GoodJob # :nodoc:
       raise ArgumentError, "GoodJob's fiber execution requires Rails #{MINIMUM_RAILS_VERSION_FOR_FIBERS}+ (earlier Active Record connection pools are not fiber-aware), but this is Rails #{Rails.version}"
     end
     private_class_method :validate_fiber_rails!
-
-    def self.rails_reloading_enabled?
-      config = Rails.application&.config
-      return false unless config
-
-      config.respond_to?(:enable_reloading) ? config.enable_reloading : !config.cache_classes
-    end
-    private_class_method :rails_reloading_enabled?
 
     # Tests whether the scheduler is running.
     # @return [Boolean, nil]

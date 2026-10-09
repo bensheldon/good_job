@@ -47,10 +47,9 @@ RSpec.describe 'Fiber application boot' do
     end
   end
 
-  it 'raises in development when reloading is enabled', :fiber_isolation, :requires_async do
-    output, status = boot(fibers: '25', reloading: true, environment: 'development')
-    expect(status).not_to be_success
-    expect(output).to include('requires code reloading to be disabled')
+  it 'enables fibers when reloading is enabled', :fiber_isolation, :requires_async do
+    result = boot_result(fibers: '25', reloading: true, environment: 'development')
+    expect(result['schedulers'].pluck('max_fibers')).to eq [1, 8]
   end
 
   it 'enables fibers when reloading is disabled', :fiber_isolation, :requires_async do

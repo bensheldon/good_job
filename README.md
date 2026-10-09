@@ -1437,7 +1437,8 @@ Fiber execution requires:
 - Rails 7.1 or newer, so Active Record checks out connections per fiber
 - The `async` gem, version 2.25 or newer within the 2.x series
 - `config.active_support.isolation_level = :fiber`, so each job has its own Rails execution state
-- Code reloading disabled, because the Rails reloader can block jobs sharing a thread
+
+Code reloading should be disabled in fiber workers on Rails 8.1 and earlier. Rails' reloader lock tracks ownership by thread rather than by fiber, so it can unload code while other jobs on the same thread are still running. This will be fixed in Rails 8.2 by [rails/rails#57423](https://github.com/rails/rails/pull/57423).
 
 Run CPU-heavy or blocking jobs in a separate thread worker. Fiber mode applies to every scheduler in the configured worker.
 
@@ -1453,7 +1454,7 @@ Configure a dedicated worker environment:
 
 ```ruby
 config.active_support.isolation_level = :fiber
-config.cache_classes = true # Or config.enable_reloading = false on Rails 7.1+
+config.enable_reloading = false # Recommended on Rails 8.1 and earlier
 config.good_job.fibers = 25
 config.good_job.queues = "http:50;mail:10;other_io"
 config.good_job.lock_strategy = :skiplocked # Requires the lock_type migration below
