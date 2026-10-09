@@ -80,6 +80,7 @@ RSpec.describe 'Breaking migrations' do
   it 'enforces concurrency limits without the concurrency claims table' do
     expect(GoodJob::ConcurrencyClaim.table_exists?).to be false
 
+    allow(GoodJob.deprecator).to receive(:warn)
     stub_const 'LimitedJob', (Class.new(ActiveJob::Base) do
       include GoodJob::ActiveJobExtensions::Concurrency
 

@@ -1,8 +1,9 @@
 class PgHeroMaintenanceJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
 
-  good_job_control_concurrency_with(
-    key: "pg_hero_maintenance",
+  self.good_job_labels = ["pg_hero_maintenance"]
+  good_job_concurrency_rule(
+    label: "pg_hero_maintenance",
     total_limit: 1
   )
 
