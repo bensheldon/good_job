@@ -37,6 +37,15 @@ RSpec.describe GoodJob::LogSubscriber do
       subscriber.scheduler_create_pool(event)
       expect(logs.string).to include("GoodJob #{GoodJob::VERSION} started scheduler with queues= max_threads=")
     end
+
+    it 'logs fiber capacity separately from reactor thread capacity' do
+      described_class.loggers << Logger.new(logs)
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", { performer_name: "*", max_threads: 1, max_fibers: 25 })
+
+      subscriber.scheduler_create_pool(event)
+
+      expect(logs.string).to include("GoodJob #{GoodJob::VERSION} started scheduler with queues=* max_threads=1 max_fibers=25.")
+    end
   end
 
   describe "#enqueue_concurrency_limit_exceeded" do

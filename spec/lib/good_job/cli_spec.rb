@@ -12,6 +12,21 @@ RSpec.describe GoodJob::CLI do
   end
 
   describe '#start' do
+    describe 'fiber option parsing' do
+      before do
+        allow(Kernel).to receive(:loop)
+      end
+
+      it 'parses --fibers as an integer' do
+        described_class.start(['start', '--fibers', '12'])
+        expect(GoodJob.configuration.fibers).to eq 12
+      end
+
+      it 'documents --fibers in help' do
+        expect { described_class.start(%w[help start]) }.to output(/--fibers.*GOOD_JOB_FIBERS/m).to_stdout
+      end
+    end
+
     it 'starts and stops a capsule' do
       allow(Kernel).to receive(:loop)
 
@@ -22,17 +37,23 @@ RSpec.describe GoodJob::CLI do
       expect(capsule_mock).to have_received(:shutdown)
     end
 
-    it 'can gracefully shut down on INT signal' do
-      cli = described_class.new([], {}, {})
+    %w[INT TERM].each do |signal|
+      it "can gracefully shut down on #{signal} signal" do
+        cli = described_class.new([], { shutdown_timeout: 0.5 }, {})
+        trapped = Concurrent::Event.new
+        allow(cli).to receive(:trap).and_wrap_original do |original, name, &block|
+          original.call(name, &block).tap { trapped.set if name == signal }
+        end
 
-      cli_thread = Concurrent::Promises.future { cli.start }
-      sleep_until { cli.instance_variable_get(:@stop_good_job_executable) }
+        cli_thread = Concurrent::Promises.future { cli.start }
+        expect(trapped.wait(5)).to be true
 
-      Process.kill 'INT', Process.pid # Send the signal to ourselves
+        Process.kill signal, Process.pid # Send the signal to ourselves
 
-      sleep_until { cli_thread.fulfilled? }
+        sleep_until { cli_thread.fulfilled? }
 
-      expect(capsule_mock).to have_received(:shutdown)
+        expect(capsule_mock).to have_received(:shutdown).with(timeout: 0.5)
+      end
     end
 
     describe 'configuration options' do

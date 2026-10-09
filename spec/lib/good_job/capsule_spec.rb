@@ -74,6 +74,16 @@ describe GoodJob::Capsule do
   end
 
   describe '#restart' do
+    it 'does not replace executors that are still stopping' do
+      capsule = described_class.new
+      scheduler = instance_double(GoodJob::MultiScheduler, shutdown: nil, shutdown?: false)
+      capsule.instance_variable_set(:@multi_scheduler, scheduler)
+      expect { capsule.restart(timeout: 0) }.to raise_error(RuntimeError, /terminated/)
+      expect(capsule.instance_variable_get(:@multi_scheduler)).to equal scheduler
+    ensure
+      capsule&.instance_variable_set(:@multi_scheduler, nil)
+    end
+
     it 'can start a previously shutdown capsule' do
       capsule = described_class.new
       capsule.shutdown
@@ -85,6 +95,35 @@ describe GoodJob::Capsule do
   end
 
   describe '#shutdown' do
+    it 'keeps utility execution alive until a stopping scheduler terminates' do
+      capsule = described_class.new
+      shared = capsule.instance_variable_get(:@shared_executor)
+      shared.post { nil }
+      release = Concurrent::Event.new
+      stopped = Concurrent::AtomicBoolean.new(false)
+      scheduler = instance_double(GoodJob::MultiScheduler)
+      allow(scheduler).to receive(:shutdown?) { stopped.true? }
+      allow(scheduler).to receive(:shutdown) do |timeout:|
+        if timeout == -1
+          release.wait(5)
+          stopped.make_true
+        end
+      end
+      capsule.instance_variable_set(:@multi_scheduler, scheduler)
+
+      capsule.shutdown(timeout: 0)
+
+      expect(shared.running?).to be true
+      expect(capsule).not_to be_shutdown
+      release.set
+      wait_until { expect(capsule).to be_shutdown }
+    ensure
+      release&.set
+      capsule&.instance_variable_get(:@shutdown_thread)&.join(5)
+      capsule&.instance_variable_set(:@multi_scheduler, nil)
+      shared&.shutdown
+    end
+
     it 'shuts down the capsule' do
       capsule = described_class.new
       capsule.start
@@ -116,6 +155,18 @@ describe GoodJob::Capsule do
     it 'returns true if no threads are active' do
       capsule = described_class.new
       expect(capsule).to be_idle
+    end
+
+    it 'uses job activity when deciding whether fiber execution is idle' do
+      capsule = described_class.new
+      scheduler = instance_double(GoodJob::MultiScheduler, stats: { active_execution_count: 3 })
+      capsule.instance_variable_set(:@multi_scheduler, scheduler)
+      expect(capsule).not_to be_idle
+      allow(scheduler).to receive(:stats).and_return({ active_execution_count: 0 })
+      expect(capsule).to be_idle
+      allow(scheduler).to receive(:stats).and_return({ active_execution_count: 0, queued_execution_count: 1 })
+      expect(capsule).not_to be_idle
+      capsule.instance_variable_set(:@multi_scheduler, nil)
     end
 
     it 'returns false if started in last N seconds' do

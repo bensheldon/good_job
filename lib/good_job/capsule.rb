@@ -60,7 +60,24 @@ module GoodJob
     # @return [void]
     def shutdown(timeout: NONE)
       timeout = configuration.shutdown_timeout if timeout == NONE
-      GoodJob._shutdown_all([@notifier, @poller, @multi_scheduler, @cron_manager].compact, after: [@shared_executor], timeout: timeout)
+      executables = [@notifier, @poller, @multi_scheduler, @cron_manager].compact
+      GoodJob._shutdown_all(executables, timeout: timeout)
+      unless timeout.nil?
+        if executables.all?(&:shutdown?)
+          @shared_executor.shutdown(timeout: timeout)
+        else
+          # Keep tracker heartbeats alive while cancelled jobs finish cleanup.
+          # Returning at the deadline must not make running jobs look stale.
+          @mutex.synchronize do
+            unless @shutdown_thread&.alive?
+              @shutdown_thread = Thread.new do
+                Thread.current.name = "GoodJob::Capsule-shutdown"
+                GoodJob._shutdown_all(executables, after: [@shared_executor], timeout: -1)
+              end
+            end
+          end
+        end
+      end
       @startable = false
       @started_at = nil
     end
@@ -72,6 +89,8 @@ module GoodJob
       raise ArgumentError, "Capsule#restart cannot be called with a timeout of nil" if timeout.nil?
 
       shutdown(timeout: timeout)
+      raise "Cannot restart a capsule before its executors have terminated" unless shutdown?
+
       start(force: true)
     end
 
@@ -82,14 +101,14 @@ module GoodJob
 
     # @return [Boolean] Whether the capsule has been shutdown.
     def shutdown?
-      [@notifier, @poller, @multi_scheduler, @cron_manager].compact.all?(&:shutdown?)
+      [@notifier, @poller, @multi_scheduler, @cron_manager, @shared_executor].compact.all?(&:shutdown?)
     end
 
     # @param duration [nil, Numeric] Length of idleness to check for (in seconds).
     # @return [Boolean] Whether the capsule is idle
     def idle?(duration = nil)
       scheduler_stats = @multi_scheduler&.stats || {}
-      is_idle = scheduler_stats.fetch(:active_execution_thread_count, 0).zero?
+      is_idle = scheduler_stats.fetch(:active_execution_count, 0).zero? && scheduler_stats.fetch(:queued_execution_count, 0).zero?
 
       if is_idle && duration
         active_at = scheduler_stats.fetch(:execution_at, nil) || @started_at

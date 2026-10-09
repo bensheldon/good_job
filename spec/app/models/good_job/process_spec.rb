@@ -31,6 +31,14 @@ RSpec.describe GoodJob::Process do
   end
 
   describe '.ns_current_state' do
+    it 'round trips fiber and thread capacity through persisted process state', :fiber_isolation, :requires_async do
+      scheduler = GoodJob::Scheduler.new(GoodJob::JobPerformer.new('io'), fibers: 25)
+      record = described_class.create!(state: described_class.process_state)
+      expect(record.reload.schedulers).to include(include('queues' => 'io', 'max_threads' => 1, 'max_fibers' => 25))
+    ensure
+      scheduler&.shutdown
+    end
+
     it 'contains information about the process' do
       expect(described_class.process_state).to include(
         database_connection_pool: include(

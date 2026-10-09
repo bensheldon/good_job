@@ -49,13 +49,13 @@
     {
       "warning_type": "Dangerous Eval",
       "warning_code": 13,
-      "fingerprint": "54b7ac445eea2aa1735ae97fab1d841e15405a747ba0fdb577cf779286647534",
+      "fingerprint": "07a0aaf281a85d85c91bb71e7cf23db1e5afcd44edf57b57f3d05a69b509e931",
       "check_name": "Evaluation",
       "message": "Dynamic string evaluated as code",
       "file": "lib/good_job/log_subscriber.rb",
-      "line": 356,
+      "line": 359,
       "link": "https://brakemanscanner.org/docs/warning_types/dangerous_eval/",
-      "code": "class_eval(\"        def #{level}(progname = nil, tags: [], &block)   # def info(progname = nil, tags: [], &block)\\n          return unless logger                           #   return unless logger\\n                                                         #\\n          tag_logger(*tags) do                           #   tag_logger(*tags) do\\n            logger.#{level}(progname, &block)            #     logger.info(progname, &block)\\n          end                                            #   end\\n        end                                              #\\n\", \"lib/good_job/log_subscriber.rb\", (356 + 1))",
+      "code": "class_eval(\"        def #{level}(progname = nil, tags: [], &block)   # def info(progname = nil, tags: [], &block)\\n          return unless logger                           #   return unless logger\\n                                                         #\\n          tag_logger(*tags) do                           #   tag_logger(*tags) do\\n            logger.#{level}(progname, &block)            #     logger.info(progname, &block)\\n          end                                            #   end\\n        end                                              #\\n\", \"lib/good_job/log_subscriber.rb\", (359 + 1))",
       "render_path": null,
       "location": {
         "type": "method",
