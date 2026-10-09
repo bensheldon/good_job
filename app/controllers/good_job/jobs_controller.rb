@@ -62,6 +62,7 @@ module GoodJob
 
     def show
       @job = Job.includes(:executions).includes_advisory_locks.find(params[:id])
+      @concurrency_claims = ConcurrencyClaim.table_exists? ? @job.concurrency_claims.to_a.sort_by(&:created_at) : []
     end
 
     def discard

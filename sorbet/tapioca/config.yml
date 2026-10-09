@@ -5,6 +5,9 @@ gem:
   # - gem_name
   # doc: true
   # workers: 5
+  exclude:
+  # herb's inline RBS uses `(...)`, which rbi can't parse
+  - herb
   prerequire: sorbet/tapioca/prerequire.rb
 dsl:
   # Add your `dsl` command parameters here:

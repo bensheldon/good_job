@@ -31,9 +31,6 @@ AllCops:
     - lib/good_job/sd_notify.rb
   NewCops: enable
 
-Capybara/ClickLinkOrButtonStyle:
-  Enabled: false
-
 Gemspec/DevelopmentDependencies:
   Enabled: false
 

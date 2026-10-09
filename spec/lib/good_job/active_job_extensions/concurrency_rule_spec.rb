@@ -141,6 +141,61 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
     end
   end
 
+  describe 'apply_label:' do
+    let(:test_rule) { { label: -> { arguments.first[:name] && "TestJob-#{arguments.first[:name]}" }, apply_label: true, total_limit: 1 } }
+
+    before { stub_job_class(test_rule) }
+
+    it 'applies the resolved label to jobs and enforces the rule' do
+      expect(TestJob.perform_later(name: "Alice")).to be_present
+      expect(TestJob.perform_later(name: "Alice")).to be false
+      expect(TestJob.perform_later(name: "Bob")).to be_present
+
+      expect(GoodJob::Job.order(:created_at).map(&:labels)).to eq [["TestJob-Alice"], ["TestJob-Bob"]]
+    end
+
+    it 'keeps the applied label when labels are passed when enqueuing' do
+      TestJob.set(good_job_labels: ["other"]).perform_later(name: "Alice")
+
+      expect(GoodJob::Job.last.labels).to eq %w[other TestJob-Alice]
+      expect(TestJob.set(good_job_labels: []).perform_later(name: "Alice")).to be false
+    end
+
+    # activerecord-jdbc-adapter's ArrayEncoder calls the deprecated `ActiveRecord::Base.connection`
+    # when quoting the labels array in `insert_all`, which the test app disallows.
+    it 'applies the label to jobs enqueued in bulk', :skip_if_java do
+      stub_job_class({ label: -> { "TestJob-#{arguments.first[:name]}" }, apply_label: true, perform_limit: 1 })
+      GoodJob::Bulk.enqueue([TestJob.new(name: "Alice"), TestJob.new(name: "Bob")])
+
+      expect(GoodJob::Job.pluck(:labels)).to contain_exactly(["TestJob-Alice"], ["TestJob-Bob"])
+    end
+
+    it 'performs jobs after deserializing them' do
+      stub_job_class({ label: -> { "TestJob-#{arguments.first[:name]}" }, apply_label: true, perform_limit: 1 })
+      TestJob.perform_later(name: "Alice")
+
+      expect { GoodJob.perform_inline }.not_to raise_error
+      expect(GoodJob::Job.last).to have_attributes(finished_at: be_present, error: nil, labels: ["TestJob-Alice"])
+    end
+
+    it 'does not apply a nil label' do
+      TestJob.perform_later(name: nil)
+
+      expect(GoodJob::Job.last.labels).to be_nil
+    end
+
+    it 'does not apply the label by default' do
+      stub_job_class({ label: "unapplied", total_limit: 1 })
+      TestJob.perform_later(name: "Alice")
+
+      expect(GoodJob::Job.last.labels).to be_nil
+    end
+
+    it 'requires a label' do
+      expect { TestJob.good_job_concurrency_rule(apply_label: true, total_limit: 1) }.to raise_error(ArgumentError, /requires a `label:`/)
+    end
+  end
+
   describe 'dynamic class-level labels' do
     before do
       stub_job_class({ label: -> { "TestJob-#{arguments.first[:name]}" }, total_limit: 1 })

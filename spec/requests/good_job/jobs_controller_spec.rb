@@ -26,6 +26,32 @@ describe GoodJob::JobsController do
     end
   end
 
+  describe 'concurrency claims' do
+    let(:job_id) { SecureRandom.uuid }
+
+    before do
+      GoodJob::Job.create!(id: job_id, active_job_id: job_id, job_class: "ExampleJob", queue_name: "default", labels: %w[slow other], serialized_params: { "job_class" => "ExampleJob", "arguments" => [] })
+      GoodJob::ConcurrencyClaim.create!(job_id: job_id, key: "label:slow", state: GoodJob::ConcurrencyClaim::WAITING)
+      GoodJob::ConcurrencyClaim.create!(job_id: job_id, key: "key:other", state: GoodJob::ConcurrencyClaim::GRANTED)
+    end
+
+    it 'styles labels by their claim on the index' do
+      get good_job.jobs_path
+
+      html = Nokogiri::HTML(response.body)
+      expect(html.at_css("a.badge.border-warning[title='Waiting']").text).to eq "slow (Waiting)"
+      expect(html.at_css("a.badge.text-bg-secondary").text).to eq "other"
+    end
+
+    it 'lists the claims on the job page' do
+      get good_job.job_path(job_id)
+
+      html = Nokogiri::HTML(response.body)
+      expect(html.at_css("a.badge.border-warning[title='Waiting']").text).to eq "slow (Waiting)"
+      expect(response.body).to include("label:slow", "key:other", "Granted")
+    end
+  end
+
   describe 'PUT #mass_update' do
     let!(:job) do
       ExampleJob.perform_later

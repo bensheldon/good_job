@@ -49,6 +49,11 @@ zh-CN:
         last_7_days: 最近 7 天
         title: 丢弃任务清理器
         total: 总计
+    concurrency_claims:
+      states:
+        granted: 已授予
+        promoted: 已提升
+        waiting: 等待中
     cron_entries:
       actions:
         confirm_disable: 您确定要禁用此定时任务吗？
@@ -199,6 +204,7 @@ zh-CN:
       job:
         arguments: 参数
         attempts: 尝试次数
+        concurrency_claims: 并发声明
         labels: 标签
         priority: 优先级
         queue: 队列

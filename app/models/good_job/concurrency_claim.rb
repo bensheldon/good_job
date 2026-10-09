@@ -20,12 +20,30 @@ module GoodJob
     PROMOTION_PENDING = 2
     # A waiting job that has already been scheduled to retry immediately.
     PROMOTED = 3
+    # Display names for the values of the +state+ column
+    STATE_NAMES = {
+      WAITING => :waiting,
+      GRANTED => :granted,
+      PROMOTION_PENDING => :promoted,
+      PROMOTED => :promoted,
+    }.freeze
+    LABEL_KEY_PREFIX = "label:"
 
     self.table_name = "good_job_concurrency_claims"
     self.implicit_order_column = "created_at"
 
     scope :granted, -> { where(state: GRANTED) }
     scope :waiting, -> { where(state: WAITING) }
+
+    # @return [Symbol] +:waiting+, +:granted+, or +:promoted+
+    def state_name
+      STATE_NAMES.fetch(state)
+    end
+
+    # @return [String, nil] the label, if the claim is on a concurrency label
+    def label
+      key.delete_prefix(LABEL_KEY_PREFIX) if key.start_with?(LABEL_KEY_PREFIX)
+    end
 
     class << self
       # Grants a claim on the key if fewer than +limit+ other jobs in +scope+ are running;

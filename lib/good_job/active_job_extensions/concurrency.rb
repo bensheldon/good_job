@@ -16,10 +16,13 @@ module GoodJob
       ThrottleExceededError = Class.new(ConcurrencyExceededError)
 
       class Rule
-        attr_reader :label, :total_limit, :enqueue_limit, :perform_limit, :enqueue_throttle, :perform_throttle
+        attr_reader :label, :apply_label, :total_limit, :enqueue_limit, :perform_limit, :enqueue_throttle, :perform_throttle
 
         def initialize(config)
           @label = config[:label]
+          @apply_label = config[:apply_label] || false
+          raise ArgumentError, "`apply_label: true` requires a `label:`" if @apply_label && @label.blank?
+
           @key = config.key?(:key) ? config[:key] : GoodJob::NONE
           @total_limit = config[:total_limit]
           @enqueue_limit = config[:enqueue_limit]
@@ -34,6 +37,12 @@ module GoodJob
 
         def key
           @key.equal?(GoodJob::NONE) ? nil : @key
+        end
+
+        # The label to apply to the job when the rule is defined with +apply_label: true+.
+        # @return [String, nil]
+        def applied_label(job)
+          resolve_label(job) if @apply_label
         end
 
         # Whether the rule limits or throttles jobs at enqueue time.
@@ -363,11 +372,12 @@ module GoodJob
 
         # Define a concurrency rule. Rules are appended to the class-level
         # `good_job_concurrency_rules` array. Each rule uses keyword arguments that may
-        # include keys such as :label, :key (deprecated), and
+        # include keys such as :label, :apply_label, :key (deprecated), and
         # stage-specific settings like :enqueue_limit, :enqueue_throttle,
         # :perform_limit, :perform_throttle, and :total_limit.
         def good_job_concurrency_rule(
           label: NONE,
+          apply_label: NONE,
           key: NONE,
           total_limit: NONE,
           enqueue_limit: NONE,
@@ -377,6 +387,7 @@ module GoodJob
         )
           rule = {
             label: label,
+            apply_label: apply_label,
             key: key,
             total_limit: total_limit,
             enqueue_limit: enqueue_limit,

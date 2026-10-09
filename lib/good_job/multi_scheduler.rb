@@ -11,7 +11,7 @@ module GoodJob
       # Flattened, because a +|+ subprocess boundary means nothing to the queue parser.
       schedulers = configuration.flattened_queue_string.split(';').map(&:strip).map do |queue_string_and_max_threads|
         queue_string, max_threads = queue_string_and_max_threads.split(':').map { |str| str.strip.presence }
-        max_threads = (max_threads || configuration.max_threads).to_i
+        max_threads = (max_threads || configuration.threads).to_i
 
         job_performer = GoodJob::JobPerformer.new(queue_string, capsule: capsule)
         GoodJob::Scheduler.new(
