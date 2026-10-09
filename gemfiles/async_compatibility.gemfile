@@ -1,3 +1,6 @@
 # Set GOOD_JOB_TEST_ASYNC to absent, 2.24.0, 2.25.0, or >= 2.25.
 # Separate lockfile for Async compatibility tests.
+# json 3 removed `quirks_mode`, which ActiveSupport 7.1 passes (see gemfiles/rails_7.1.gemfile)
+gem "json", "< 3.0" if ENV["RAILS_VERSION"] == "7.1"
+
 eval_gemfile '../Gemfile'

@@ -7,7 +7,6 @@ RSpec.describe 'Fiber application boot' do
   def boot(fibers:, reloading:, environment: 'test')
     output, status = Open3.capture2e(
       { 'GOOD_JOB_FIBERS' => fibers, 'GOOD_JOB_EXECUTION_MODE' => 'external', 'GOOD_JOB_ENABLE_CRON' => 'false',
-        'DATABASE_URL' => ENV.fetch('DATABASE_URL', 'postgresql://localhost/good_job_test'),
         'SECRET_KEY_BASE' => 'fiber-boot-test-' * 8,
         'RAILS_ENV' => environment, 'CI' => 'true', 'TEST_RELOADING' => reloading.to_s },
       RbConfig.ruby, '-rbundler/setup', '-e', <<~'RUBY'

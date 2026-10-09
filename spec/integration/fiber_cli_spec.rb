@@ -39,8 +39,7 @@ RSpec.describe 'Fiber CLI shutdown', :fiber_isolation, :requires_async do
       WORKER
       pid = Process.spawn(
         { 'GOOD_JOB_FIBERS' => '1', 'GOOD_JOB_EXECUTION_MODE' => 'external', 'GOOD_JOB_ENABLE_CRON' => 'false',
-          'GOOD_JOB_LOCK_STRATEGY' => 'advisory', 'RAILS_ENV' => 'test', 'CI' => 'true',
-          'DATABASE_URL' => ENV.fetch('DATABASE_URL', 'postgresql://localhost/good_job_test') },
+          'GOOD_JOB_LOCK_STRATEGY' => 'advisory', 'RAILS_ENV' => 'test', 'CI' => 'true' },
         RbConfig.ruby, '-rbundler/setup', '-e', script,
         chdir: Rails.root.to_s, out: log_path, err: [:child, :out]
       )
