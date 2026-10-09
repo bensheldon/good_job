@@ -1,5 +1,28 @@
 # Changelog
 
+## [v4.22.0](https://github.com/bensheldon/good_job/tree/v4.22.0) (2026-10-09)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.21.1...v4.22.0)
+
+**Implemented enhancements:**
+
+- Rename max\_threads config to threads and deprecate max\_threads [\#1846](https://github.com/bensheldon/good_job/pull/1846) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- CI: json 3.0.2 removed `quirks_mode`, breaking ActiveSupport's JSON encoder on every test job [\#1816](https://github.com/bensheldon/good_job/issues/1816)
+
+**Merged pull requests:**
+
+- Restore JRuby gems to Gemfile.lock and add a spec guarding it [\#1861](https://github.com/bensheldon/good_job/pull/1861) ([bensheldon](https://github.com/bensheldon))
+- Upgrade vendored frontend libraries \(Turbo, Stimulus, es-module-shims, Bootstrap, Chart.js\) [\#1860](https://github.com/bensheldon/good_job/pull/1860) ([bensheldon](https://github.com/bensheldon))
+- Upgrade dev environment: Ruby 4.0.7, Bundler 4.0.22, and gems [\#1859](https://github.com/bensheldon/good_job/pull/1859) ([bensheldon](https://github.com/bensheldon))
+- Don't crash demo when git is unavailable \(e.g. Heroku\) [\#1858](https://github.com/bensheldon/good_job/pull/1858) ([bensheldon](https://github.com/bensheldon))
+- Add apply\_label: option to good\_job\_concurrency\_rule [\#1857](https://github.com/bensheldon/good_job/pull/1857) ([bensheldon](https://github.com/bensheldon))
+- Deprecate good\_job\_control\_concurrency\_with and key-only concurrency rules in favor of labels [\#1856](https://github.com/bensheldon/good_job/pull/1856) ([bensheldon](https://github.com/bensheldon))
+- Show concurrency claims on the dashboard [\#1855](https://github.com/bensheldon/good_job/pull/1855) ([bensheldon](https://github.com/bensheldon))
+- Allow json 3 for Rails versions that support it; pin json \< 3 only for older Rails [\#1854](https://github.com/bensheldon/good_job/pull/1854) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.21.1](https://github.com/bensheldon/good_job/tree/v4.21.1) (2026-10-07)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.21.0...v4.21.1)
@@ -3741,7 +3764,7 @@
 
 **Fixed bugs:**
 
-- Don’t attempt to enforce concurrency limits with other queue adapters [\#333](https://github.com/bensheldon/good_job/pull/333) ([codyrobbins](https://github.com/codyrobbins))
+- Don’t attempt to enforce concurrency limits with other queue adapters [\#333](https://github.com/bensheldon/good_job/pull/333) ([CodyRobbins](https://github.com/CodyRobbins))
 
 ## [v1.13.0](https://github.com/bensheldon/good_job/tree/v1.13.0) (2021-08-18)
 
@@ -3768,7 +3791,7 @@
 
 **Fixed bugs:**
 
-- Fixes for race conditions in ActiveJob concurrency extension [\#326](https://github.com/bensheldon/good_job/pull/326) ([codyrobbins](https://github.com/codyrobbins))
+- Fixes for race conditions in ActiveJob concurrency extension [\#326](https://github.com/bensheldon/good_job/pull/326) ([CodyRobbins](https://github.com/CodyRobbins))
 
 **Merged pull requests:**
 
