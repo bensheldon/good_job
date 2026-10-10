@@ -60,20 +60,21 @@ module GoodJob
     # @return [void]
     def shutdown(timeout: NONE)
       timeout = configuration.shutdown_timeout if timeout == NONE
+      stop_at = Time.current + timeout if timeout.is_a?(Numeric) && timeout.positive?
       executables = [@notifier, @poller, @multi_scheduler, @cron_manager].compact
       GoodJob._shutdown_all(executables, timeout: timeout)
-      unless timeout.nil?
-        if executables.all?(&:shutdown?)
-          @shared_executor.shutdown(timeout: timeout)
-        else
-          # Keep tracker heartbeats alive while cancelled jobs finish cleanup.
-          # Returning at the deadline must not make running jobs look stale.
-          @mutex.synchronize do
-            unless @shutdown_thread&.alive?
-              @shutdown_thread = Thread.new do
-                Thread.current.name = "GoodJob::Capsule-shutdown"
-                GoodJob._shutdown_all(executables, after: [@shared_executor], timeout: -1)
-              end
+      if !timeout.nil? && executables.all?(&:shutdown?)
+        # Share the deadline with the executables rather than granting a fresh timeout.
+        @shared_executor.shutdown(timeout: stop_at ? [stop_at - Time.current, 0].max : timeout)
+      else
+        # Keep tracker heartbeats alive while cancelled jobs finish cleanup (or, when
+        # not waiting, until executables drain). Returning at the deadline must not
+        # make running jobs look stale.
+        @mutex.synchronize do
+          unless @shutdown_thread&.alive?
+            @shutdown_thread = Thread.new do
+              Thread.current.name = "GoodJob::Capsule-shutdown"
+              GoodJob._shutdown_all(executables, after: [@shared_executor], timeout: -1)
             end
           end
         end
@@ -91,6 +92,9 @@ module GoodJob
       shutdown(timeout: timeout)
       raise "Cannot restart a capsule before its executors have terminated" unless shutdown?
 
+      # A prior background shutdown must finish before new work can lazily
+      # recreate the shared executor, or it would shut down the new one.
+      @shutdown_thread&.join
       start(force: true)
     end
 

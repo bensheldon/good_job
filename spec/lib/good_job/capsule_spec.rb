@@ -84,6 +84,32 @@ describe GoodJob::Capsule do
       capsule&.instance_variable_set(:@multi_scheduler, nil)
     end
 
+    it 'does not let a prior background shutdown stop the restarted shared executor' do
+      capsule = described_class.new
+      shared = capsule.instance_variable_get(:@shared_executor)
+      gate = Concurrent::Event.new
+      scheduler = instance_double(GoodJob::MultiScheduler, shutdown?: true)
+      allow(scheduler).to receive(:shutdown) { |timeout:| gate.wait(5) if timeout == -1 }
+      capsule.instance_variable_set(:@multi_scheduler, scheduler)
+
+      capsule.shutdown(timeout: nil)
+      shutdown_thread = capsule.instance_variable_get(:@shutdown_thread)
+      restarted_executor = nil
+      allow(capsule).to receive(:start).and_wrap_original do |original, **kwargs|
+        shared.post { nil } # new utility work recreates the executor
+        restarted_executor = shared.executor
+        gate.set
+        shutdown_thread.join(5)
+        original.call(**kwargs)
+      end
+      capsule.restart(timeout: 0)
+
+      expect(restarted_executor).to be_running
+    ensure
+      gate&.set
+      capsule&.shutdown(timeout: -1)
+    end
+
     it 'can start a previously shutdown capsule' do
       capsule = described_class.new
       capsule.shutdown
@@ -122,6 +148,32 @@ describe GoodJob::Capsule do
       capsule&.instance_variable_get(:@shutdown_thread)&.join(5)
       capsule&.instance_variable_set(:@multi_scheduler, nil)
       shared&.shutdown
+    end
+
+    it 'eventually shuts down the shared executor when not waiting' do
+      capsule = described_class.new
+      capsule.start
+
+      capsule.shutdown(timeout: nil)
+
+      wait_until { expect(capsule).to be_shutdown }
+    ensure
+      capsule&.instance_variable_get(:@shutdown_thread)&.join(5)
+    end
+
+    it 'gives the shared executor only the remaining timeout' do
+      capsule = described_class.new
+      shared = capsule.instance_variable_get(:@shared_executor)
+      scheduler = instance_double(GoodJob::MultiScheduler, shutdown?: true)
+      allow(scheduler).to receive(:shutdown) { |timeout:| sleep 0.3 unless timeout.nil? }
+      capsule.instance_variable_set(:@multi_scheduler, scheduler)
+      allow(shared).to receive(:shutdown).and_call_original
+
+      capsule.shutdown(timeout: 1)
+
+      expect(shared).to have_received(:shutdown).with(timeout: a_value <= 0.75)
+    ensure
+      capsule&.instance_variable_set(:@multi_scheduler, nil)
     end
 
     it 'shuts down the capsule' do

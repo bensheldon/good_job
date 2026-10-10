@@ -191,6 +191,30 @@ RSpec.describe GoodJob::FiberPoolExecutor, :requires_async do
       executor&.wait_for_termination(5)
     end
 
+    it 'reports child cleanup errors without losing the worker' do
+      executor = described_class.new(max_fibers: 1)
+      errors = Concurrent::Array.new
+      allow(GoodJob).to receive(:_on_thread_error) { |error| errors << error }
+      next_task = Concurrent::Event.new
+      executor.post do
+        Async::Task.current.async do
+          sleep 60
+        ensure
+          raise "cleanup boom"
+        end
+      end
+      executor.post { next_task.set }
+
+      expect(next_task.wait(5)).to be true
+      expect(errors.map(&:message)).to include "cleanup boom"
+      expect(executor.ready_worker_count).to eq 1
+      executor.shutdown
+      expect(executor.wait_for_termination(5)).to be true
+    ensure
+      executor&.kill
+      executor&.wait_for_termination(5)
+    end
+
     it 'queues tasks when all fibers are busy' do
       latch = Concurrent::CountDownLatch.new(1)
       completed = Concurrent::AtomicFixnum.new(0)

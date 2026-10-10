@@ -203,8 +203,17 @@ module GoodJob # :nodoc:
       GoodJob._on_thread_error(e)
     ensure
       children = descendants(task)
-      task.children.to_a.each(&:stop)
-      children.each(&:wait)
+      task.children.to_a.each { |child| cleanup_child { child.stop } }
+      children.each { |child| cleanup_child { child.wait } }
+    end
+
+    # Cleanup failures must not escape and kill the worker fiber.
+    def cleanup_child
+      yield
+    rescue Exception => e # rubocop:disable Lint/RescueException
+      raise if self.class.fatal_exception?(e)
+
+      GoodJob._on_thread_error(e)
     end
   end
 end
