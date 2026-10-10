@@ -528,6 +528,15 @@ module GoodJob
       (options[:dequeue_query_sort] || rails_config[:dequeue_query_sort] || :created_at).to_sym
     end
 
+    # Resolves lazily memoized values so the configuration can be frozen.
+    # @return [self]
+    def prepare_for_sharing
+      in_webserver?
+      validator
+      @_rails_config = rails_config
+      self
+    end
+
     private
 
     # Reads a configuration value from one or more deprecated sources, emitting a
@@ -586,7 +595,7 @@ module GoodJob
     end
 
     def rails_config
-      Rails.application.config.good_job
+      @_rails_config || Rails.application.config.good_job
     end
   end
 end

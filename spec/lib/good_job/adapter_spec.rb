@@ -218,6 +218,35 @@ RSpec.describe GoodJob::Adapter do
       end
     end
 
+    context 'when not on the main Ractor' do
+      before do
+        allow(GoodJob::Ractors).to receive(:main?).and_return(false)
+        allow(GoodJob::Job).to receive(:insert_all)
+      end
+
+      it 'inserts jobs individually' do
+        active_jobs = [ExampleJob.new, ExampleJob.new]
+        result = adapter.enqueue_all(active_jobs)
+
+        expect(result).to eq 2
+        expect(GoodJob::Job).not_to have_received(:insert_all)
+        expect(active_jobs.map(&:provider_job_id)).to all be_present
+        expect(GoodJob::Job.where(active_job_id: active_jobs.map(&:job_id)).count).to eq 2
+      end
+
+      it 'skips jobs that were already enqueued' do
+        existing_job = ExampleJob.new
+        adapter.enqueue_all([existing_job])
+        new_job = ExampleJob.new
+        duplicate_job = ExampleJob.deserialize(existing_job.serialize)
+
+        result = adapter.enqueue_all([duplicate_job, new_job])
+
+        expect(result).to eq 1
+        expect(new_job.provider_job_id).to be_present
+      end
+    end
+
     context 'when the adapter is inline' do
       let(:adapter) { described_class.new(execution_mode: :inline) }
 
