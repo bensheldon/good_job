@@ -6,6 +6,7 @@ require 'open3'
 RSpec.describe 'Ractors' do
   # GoodJob.ractorize! freezes global state, so it is run in a separate process.
   it 'makes the adapter and global state shareable' do
+    skip "Ractors require Ruby 4.0+" if RUBY_VERSION < "4.0"
     skip "Rails does not support Ractors" unless GoodJob::Ractors.enabled? && Rails::Application.method_defined?(:ractorize!)
 
     script = <<~RUBY
