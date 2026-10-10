@@ -127,7 +127,7 @@ module GoodJob
       def upsert_claim(key:, job_id:, locked_by_id:, state:)
         # Raw SQL because `upsert(update_only:)` requires Rails 7.0+
         now = Time.current
-        lease_connection.exec_update(sanitize_sql_array([<<~SQL.squish, key, job_id, locked_by_id, state, now, now]))
+        lease_connection.update(sanitize_sql_array([<<~SQL.squish, key, job_id, locked_by_id, state, now, now]))
           INSERT INTO #{quoted_table_name} (key, job_id, locked_by_id, state, created_at, updated_at)
           VALUES (?, ?, ?, ?, ?, ?)
           ON CONFLICT (key, job_id)
