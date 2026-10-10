@@ -13,7 +13,7 @@ describe GoodJob::BatchesController do
       get good_job.batch_path(batch)
 
       html = Nokogiri::HTML(response.body)
-      expect(html.at_css("span.badge.border-warning[title='Waiting'][tabindex='0']").text).to eq "slow (Waiting)"
+      expect(html.at_css("span.badge.border-warning[title='slow · Waiting'][tabindex='0']").text).to eq "slow (Waiting)"
       expect(html.at_css("span.badge.font-monospace.text-bg-secondary").text).to eq "other"
     end
   end

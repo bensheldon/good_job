@@ -6,7 +6,7 @@
     <div class="list-group list-group-flush text-nowrap table-jobs" role="table">
       <header class="list-group-item bg-body-tertiary">
         <div class="row small text-muted text-uppercase align-items-center">
-          <div class="col-lg-4 d-flex gap-2 flex-wrap">
+          <div class="col-lg-5 d-flex gap-2 flex-wrap">
             <div class="form-check d-flex flex-row px-0 mb-0">
               <%= check_box_tag('toggle_job_ids', "1", false, data: { "checkbox-toggle-target": "all", action: "change->checkbox-toggle#toggleAll" }) %>
               <%= label_tag('toggle_job_ids', t(".toggle_all_jobs"), class: "visually-hidden") %>
@@ -53,7 +53,6 @@
           </div>
           <div class="d-none d-lg-block col-lg-1 text-lg-center"><%= t "good_job.models.job.queue" %></div>
           <div class="d-none d-lg-block col-lg-1 text-lg-end"><%= t "good_job.models.job.priority" %></div>
-          <div class="d-none d-lg-block col-lg-1 text-lg-end"><%= t "good_job.models.job.labels" %></div>
           <div class="d-none d-lg-block col-lg-1 text-lg-end"><%= t "good_job.models.job.attempts" %></div>
           <div class="col text-end">
             <%= tag.button type: "button", class: "btn btn-sm text-muted", role: "button",
@@ -80,11 +79,18 @@
         <% jobs.each do |job| %>
           <%= label_tag dom_id(job, :checkbox), id: dom_id(job), role: "row", class: "list-group-item list-group-item-action py-3" do %>
             <div class="row align-items-center">
-              <div class="col-lg-4 d-flex">
+              <div class="col-lg-5 d-flex">
                 <%= check_box_tag 'job_ids[]', job.id, false, id: dom_id(job, :checkbox), data: { "checkbox-toggle-target": "each", action: "change->checkbox-toggle#syncAll" } %>
-                <div class="ms-2">
+                <div class="ms-2 min-width-0">
                   <%= tag.code link_to(job.id, job_path(job), class: "small text-muted text-decoration-none") %>
                   <%= tag.h5 tag.code(link_to(job.display_name, job_path(job), class: "text-reset text-decoration-none")), class: "text-reset mb-0" %>
+                  <% if job.labels.present? %>
+                    <div class="mt-1 d-flex flex-wrap gap-1" aria-label="<%= t "good_job.models.job.labels" %>" role="group">
+                      <% job.labels.each do |label| %>
+                        <%= job_label_badge(job, label, url: filter.to_params(label: label), full: true) %>
+                      <% end %>
+                    </div>
+                  <% end %>
                   <% if job.error %>
                     <div class="mt-1 small">
                       <strong class="small text-danger"><%= t "good_job.shared.error" %>:</strong>
@@ -100,12 +106,6 @@
               <div class="col-4 col-lg-1 text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.priority" %></div>
                 <%= job.priority %>
-              </div>
-              <div class="col-4 col-lg-1 text-wrap text-lg-end">
-                <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.labels" %></div>
-                <% job.labels&.each do |label| %>
-                  <%= job_label_badge(job, label, url: filter.to_params(label: label)) %>
-                <% end %>
               </div>
               <div class="col-4 col-lg-1 text-lg-end">
                 <div class="d-lg-none small text-muted mt-1"><%= t "good_job.models.job.attempts" %></div>
