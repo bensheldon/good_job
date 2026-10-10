@@ -5,6 +5,7 @@ require "active_job/queue_adapters"
 
 require_relative "good_job/version"
 require_relative "good_job/engine"
+require_relative "good_job/ractors"
 
 require_relative "good_job/adapter"
 require_relative "good_job/adapter/inline_buffer"
@@ -77,7 +78,8 @@ module GoodJob
   #   @return [ActiveRecord::Base]
   #   @example Change the base class:
   #     GoodJob.active_record_parent_class = "CustomApplicationRecord"
-  mattr_accessor :active_record_parent_class, default: nil
+  singleton_class.attr_accessor :active_record_parent_class
+  self.active_record_parent_class = nil
 
   # @!attribute [rw] logger
   #   @!scope class
@@ -86,7 +88,8 @@ module GoodJob
   #   @return [Logger, nil]
   #   @example Output GoodJob logs to a file:
   #     GoodJob.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new("log/my_logs.log"))
-  mattr_accessor :logger, default: DEFAULT_LOGGER
+  singleton_class.attr_accessor :logger
+  self.logger = DEFAULT_LOGGER
 
   # @!attribute [rw] preserve_job_records
   #   @!scope class
@@ -99,7 +102,8 @@ module GoodJob
   #   @example Preserve only jobs that were discarded
   #     GoodJob.preserve_job_records = ->(active_job, exception, error_event) { error_event == :discarded }
   #   @return [Boolean, Symbol, Proc, nil]
-  mattr_accessor :preserve_job_records, default: true
+  singleton_class.attr_accessor :preserve_job_records
+  self.preserve_job_records = true
 
   # @!attribute [rw] retry_on_unhandled_error
   #   @!scope class
@@ -108,7 +112,8 @@ module GoodJob
   #   If +false+, jobs will be discarded or marked as finished if they raise an instance of a handled exception.
   #   @see GoodJob.handled_exceptions
   #   @return [Boolean, nil]
-  mattr_accessor :retry_on_unhandled_error, default: false
+  singleton_class.attr_accessor :retry_on_unhandled_error
+  self.retry_on_unhandled_error = false
 
   # @!attribute [rw] handled_exceptions
   #   @!scope class
@@ -118,7 +123,8 @@ module GoodJob
   #   @example Also rescue ScriptError
   #     GoodJob.handled_exceptions = [StandardError, NotImplementedError, ScriptError]
   #   @return [Array<Class, String>]
-  mattr_accessor :handled_exceptions, default: [StandardError, NotImplementedError]
+  singleton_class.attr_accessor :handled_exceptions
+  self.handled_exceptions = [StandardError, NotImplementedError]
 
   # Resolved exception classes from {handled_exceptions}.
   # @return [Array<Class>]
@@ -134,19 +140,22 @@ module GoodJob
   #     # config/initializers/good_job.rb
   #     GoodJob.on_thread_error = -> (exception) { Raven.capture_exception(exception) }
   #   @return [Proc, nil]
-  mattr_accessor :on_thread_error, default: nil
+  singleton_class.attr_accessor :on_thread_error
+  self.on_thread_error = nil
 
   # @!attribute [rw] configuration
   #   @!scope class
   #   Global configuration object for GoodJob.
   #   @return [GoodJob::Configuration, nil]
-  mattr_accessor :configuration, default: GoodJob::Configuration.new({})
+  singleton_class.attr_accessor :configuration
+  self.configuration = GoodJob::Configuration.new({})
 
   # @!attribute [rw] capsule
   #   @!scope class
   #   Global/default execution capsule for GoodJob.
   #   @return [GoodJob::Capsule, nil]
-  mattr_accessor :capsule, default: GoodJob::Capsule.new(configuration: configuration)
+  singleton_class.attr_accessor :capsule
+  self.capsule = GoodJob::Capsule.new(configuration: configuration)
 
   # Called with exception when a GoodJob thread raises an exception
   # @param exception [Exception] Exception that was raised
@@ -167,7 +176,57 @@ module GoodJob
     self._active_record_configuration = block
   end
 
-  mattr_accessor :_active_record_configuration, default: nil
+  singleton_class.attr_accessor :_active_record_configuration
+  self._active_record_configuration = nil
+
+  # Makes GoodJob's global state Ractor-shareable so that jobs can be enqueued
+  # and performed from non-main Ractors. Called automatically by
+  # +Rails.application.ractorize!+ on Rails versions that support Ractors.
+  # Background execution (capsules, schedulers, the notifier) remains on the
+  # main Ractor.
+  # @return [void]
+  def self.ractorize!
+    _load_record_schemas
+    LogSubscriber.prepare_for_sharing
+    Ractors.make_shareable(configuration.prepare_for_sharing)
+    Ractors.make_shareable(handled_exceptions)
+    Ractors.make_shareable(logger)
+    self.preserve_job_records = Ractors.try_shareable_proc(preserve_job_records)
+    self.on_thread_error = Ractors.try_shareable_proc(on_thread_error)
+    _make_job_classes_shareable
+  end
+
+  # Concurrency and label settings are class attributes that may hold
+  # user-provided procs; they are frozen in place on each job class.
+  # @return [void]
+  def self._make_job_classes_shareable
+    attributes = %i[good_job_concurrency_config good_job_concurrency_rules good_job_labels]
+    [ActiveJob::Base, *ActiveJob::Base.descendants].each do |job_class|
+      attributes.each do |attribute|
+        Ractors.try_make_shareable(job_class.public_send(attribute)) if job_class.respond_to?(attribute)
+      end
+    end
+  end
+
+  # Active Record schemas and GoodJob's database capability checks are
+  # lazily loaded into class-level state, which can only be written from
+  # the main Ractor.
+  # @return [void]
+  def self._load_record_schemas
+    GoodJob::AdvisoryLockable.hash_function
+    GoodJob::BaseRecord.descendants.each do |record_class|
+      next if record_class.abstract_class?
+
+      record_class.load_schema
+      record_class.define_attribute_methods
+    end
+    GoodJob::Job.lock_type_column_exists?
+    GoodJob::Job.supports_cte_materialization_specifiers?
+    GoodJob::Job.database_supports_websearch_to_tsquery?
+    GoodJob::BatchRecord.database_supports_websearch_to_tsquery?
+  rescue ActiveRecord::ActiveRecordError => e
+    logger&.warn("GoodJob could not load its database schema before ractorizing: #{e.message}")
+  end
 
   # Stop executing jobs.
   # GoodJob does its work in pools of background threads.

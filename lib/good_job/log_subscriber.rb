@@ -316,6 +316,15 @@ module GoodJob
       def reset_logger
         @_logger = nil
       end
+
+      # Builds {LogSubscriber.logger} so that it can be read from non-main
+      # Ractors. A single logger is used directly because
+      # +ActiveSupport::BroadcastLogger+ is not Ractor-shareable.
+      # @return [void]
+      def prepare_for_sharing
+        @_loggers = GoodJob::Ractors.make_shareable(loggers)
+        @_logger = loggers.size == 1 ? loggers.first : GoodJob::Ractors.try_make_shareable(logger)
+      end
     end
 
     private
