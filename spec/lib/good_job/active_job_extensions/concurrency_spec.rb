@@ -445,6 +445,20 @@ RSpec.describe GoodJob::ActiveJobExtensions::Concurrency do
       end
     end
 
+    describe 'when the label resolves to blank' do
+      it 'does not limit concurrency' do
+        TestJob.good_job_concurrency_rule(label: -> {}, total_limit: 1, perform_limit: 1)
+        TestJob.good_job_concurrency_rule(label: -> { " " }, key: 'custom', total_limit: 1, perform_limit: 1)
+
+        expect(TestJob.perform_later(name: "Alice")).to be_present
+        expect(TestJob.perform_later(name: "Alice")).to be_present
+        TestJob.good_job_concurrency_rules.each do |rule|
+          expect(rule.evaluate(TestJob.new(name: "Alice"), :perform)).to be_nil
+        end
+        expect(GoodJob::ConcurrencyClaim.count).to eq 0
+      end
+    end
+
     describe 'perform_limit: with multiple rules' do
       before do
         TestJob.good_job_concurrency_rule(perform_limit: 1, label: "first")
