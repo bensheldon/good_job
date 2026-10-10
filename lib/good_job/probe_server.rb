@@ -3,7 +3,7 @@
 module GoodJob
   class ProbeServer
     def self.task_observer(time, output, thread_error) # rubocop:disable Lint/UnusedMethodArgument
-      return if thread_error.is_a? Concurrent::CancelledOperationError
+      return if thread_error.is_a? GoodJob::Concurrency::CancelledOperationError
 
       GoodJob._on_thread_error(thread_error) if thread_error
     end

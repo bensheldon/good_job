@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-require 'concurrent/atomic/atomic_boolean'
-
 module GoodJob # :nodoc:
   #
   # Pollers regularly wake up execution threads to check for new work.
   #
   class Poller
-    # Defaults for instance of Concurrent::TimerTask.
+    # Defaults for instance of GoodJob::Concurrency::TimerTask.
     # The timer controls how and when sleeping threads check for new work.
     DEFAULT_TIMER_OPTIONS = {
       execution_interval: Configuration::DEFAULT_POLL_INTERVAL,
@@ -18,7 +16,7 @@ module GoodJob # :nodoc:
     #   @!scope class
     #   List of all instantiated Pollers in the current process.
     #   @return [Array<GoodJob::Poller>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    cattr_reader :instances, default: Farce::Unshared::Vector.new, instance_reader: false
 
     # Creates GoodJob::Poller from a GoodJob::Configuration instance.
     # @param configuration [GoodJob::Configuration]
@@ -34,7 +32,7 @@ module GoodJob # :nodoc:
     # @param recipients [Array<Proc, #call, Array(Object, Symbol)>]
     # @param poll_interval [Integer, nil] number of seconds between polls
     def initialize(*recipients, poll_interval: nil)
-      @recipients = Concurrent::Array.new(recipients)
+      @recipients = Farce::Unshared::Vector.new(recipients)
 
       @timer_options = DEFAULT_TIMER_OPTIONS.dup
       @timer_options[:execution_interval] = poll_interval if poll_interval.present?
@@ -94,14 +92,14 @@ module GoodJob # :nodoc:
 
     private
 
-    # @return [Concurrent::TimerTask]
+    # @return [GoodJob::Concurrency::TimerTask]
     attr_reader :timer
 
     # @return [void]
     def create_timer
       return if @timer_options[:execution_interval] <= 0
 
-      @timer = Concurrent::TimerTask.new(@timer_options) do
+      @timer = GoodJob::Concurrency::TimerTask.new(**@timer_options) do
         recipients.each do |recipient|
           target, method_name = recipient.is_a?(Array) ? recipient : [recipient, :call]
           target.send(method_name)

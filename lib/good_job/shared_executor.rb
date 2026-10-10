@@ -1,19 +1,14 @@
 # frozen_string_literal: true
 
-require 'concurrent/executor/executor_service'
-
 module GoodJob
   class SharedExecutor
-    # Allow posting tasks directly to instances
-    include Concurrent::ExecutorService
-
     MAX_THREADS = 2
 
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated SharedExecutor in the current process.
     #   @return [Array<GoodJob::SharedExecutor>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    cattr_reader :instances, default: Farce::Unshared::Vector.new, instance_reader: false
 
     attr_reader :executor
 
@@ -75,15 +70,13 @@ module GoodJob
     private
 
     def create_executor
-      @executor = Concurrent::ThreadPoolExecutor.new(
+      @executor = GoodJob::Concurrency::ThreadPool.new(
         # On JRuby, a Java thread pool with an unbounded queue never grows beyond min_threads (except to a single
         # thread from 0), and the Notifier's listen loop occupies a thread for as long as it runs.
         min_threads: MAX_THREADS,
         max_threads: MAX_THREADS,
-        auto_terminate: true,
         idletime: 60,
-        max_queue: 0,
-        fallback_policy: :discard
+        max_queue: 0
       )
     end
   end

@@ -41,7 +41,7 @@ module GoodJob
       end
 
       def build_future
-        Concurrent::Future.new(args: [@handler, @port, GoodJob.logger]) do |thr_handler, thr_port, thr_logger|
+        GoodJob::Concurrency::Future.new(args: [@handler, @port, GoodJob.logger]) do |thr_handler, thr_port, thr_logger|
           thr_handler.run(@app, Port: thr_port, Host: '0.0.0.0', Logger: thr_logger, AccessLog: [])
         end
       end

@@ -11,7 +11,7 @@ module GoodJob # :nodoc:
   #
   class SystemdService
     def self.task_observer(_time, _output, thread_error) # :nodoc:
-      return if !thread_error || thread_error.is_a?(Concurrent::CancelledOperationError)
+      return if !thread_error || thread_error.is_a?(GoodJob::Concurrency::CancelledOperationError)
 
       ActiveSupport::Notifications.instrument("systemd_watchdog_error.good_job", { error: thread_error })
       GoodJob._on_thread_error(thread_error)
@@ -63,7 +63,7 @@ module GoodJob # :nodoc:
       interval = watchdog_interval / 2
 
       ActiveSupport::Notifications.instrument("systemd_watchdog_start.good_job", { interval: interval })
-      @watchdog = Concurrent::TimerTask.execute(execution_interval: interval) do
+      @watchdog = GoodJob::Concurrency::TimerTask.execute(execution_interval: interval) do
         GoodJob::SdNotify.watchdog
       end
       @watchdog.add_observer(self.class, :task_observer)

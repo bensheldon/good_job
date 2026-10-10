@@ -9,7 +9,7 @@ module GoodJob
     #   @!scope class
     #   List of all instantiated Capsules in the current process.
     #   @return [Array<GoodJob::Capsule>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    cattr_reader :instances, default: Farce::Unshared::Vector.new, instance_reader: false
 
     delegate :register, :renew, :unregister, :id_for_lock, to: :@tracker, prefix: :_tracker
 

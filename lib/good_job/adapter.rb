@@ -9,13 +9,13 @@ module GoodJob
     #   @!scope class
     #   List of all instantiated Adapters in the current process.
     #   @return [Array<GoodJob::Adapter>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    cattr_reader :instances, default: Farce::Unshared::Vector.new, instance_reader: false
 
     # Mutable per-adapter state (the capsule and whether it was started), kept
     # off the adapter instance so that the adapter itself can be made
     # Ractor-shareable. Only accessed from the main Ractor.
     Runtime = Struct.new(:capsule, :async_started)
-    RUNTIMES = Concurrent::Map.new
+    RUNTIMES = Farce::Unshared::Map.new
     private_constant :Runtime, :RUNTIMES
 
     # @param execution_mode [Symbol, nil] specifies how and where jobs should be executed. You can also set this with the environment variable +GOOD_JOB_EXECUTION_MODE+.

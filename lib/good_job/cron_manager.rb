@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "concurrent/hash"
-require "concurrent/scheduled_task"
 require "fugit"
 
 module GoodJob # :nodoc:
@@ -13,14 +11,14 @@ module GoodJob # :nodoc:
     #   @!scope class
     #   List of all instantiated CronManagers in the current process.
     #   @return [Array<GoodJob::CronManager>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    cattr_reader :instances, default: Farce::Unshared::Vector.new, instance_reader: false
 
     # Task observer for cron task
     # @param time [Time]
     # @param output [Object]
     # @param thread_error [Exception]
     def self.task_observer(time, output, thread_error) # rubocop:disable Lint/UnusedMethodArgument
-      return if thread_error.is_a? Concurrent::CancelledOperationError
+      return if thread_error.is_a? GoodJob::Concurrency::CancelledOperationError
 
       GoodJob._on_thread_error(thread_error) if thread_error
     end
@@ -32,12 +30,12 @@ module GoodJob # :nodoc:
     # @param cron_entries [Array<CronEntry>]
     # @param start_on_initialize [Boolean]
     # @param graceful_restart_period [ActiveSupport::Duration, nil]
-    # @param executor [Concurrent::Executor]
-    def initialize(cron_entries = [], start_on_initialize: false, graceful_restart_period: nil, executor: Concurrent.global_io_executor)
+    # @param executor [#post]
+    def initialize(cron_entries = [], start_on_initialize: false, graceful_restart_period: nil, executor: GoodJob::Concurrency.global_executor)
       @executor = executor
       @running = false
       @cron_entries = cron_entries
-      @tasks = Concurrent::Hash.new
+      @tasks = Farce::Unshared::Map.new
       @graceful_restart_period = graceful_restart_period
 
       start if start_on_initialize
@@ -95,7 +93,7 @@ module GoodJob # :nodoc:
       # https://github.com/ruby-concurrency/concurrent-ruby/blob/56227a4c3ebdd53b8b0976eb8296ceb7a093496f/lib/concurrent-ruby/concurrent/executor/timer_set.rb#L97
       delay = cron_at <= Time.current ? 0.0 : [(cron_at - Time.current).to_f, 0.02].max
 
-      future = Concurrent::ScheduledTask.new(delay, args: [self, cron_entry, cron_at, previously_at], executor: @executor) do |thr_manager, thr_cron_entry, thr_cron_at|
+      future = GoodJob::Concurrency::ScheduledTask.new(delay, args: [self, cron_entry, cron_at, previously_at], executor: @executor) do |thr_manager, thr_cron_entry, thr_cron_at|
         if thr_cron_at && thr_cron_at > Time.current
           # If clock drift or other inaccuracy, reschedule the task again
           thr_manager.create_task(thr_cron_entry, at: thr_cron_at, previously_at: previously_at)
@@ -121,7 +119,7 @@ module GoodJob # :nodoc:
       return unless @graceful_restart_period
 
       started_at = Time.current
-      future = Concurrent::Future.new(args: [self, cron_entry, started_at], executor: @executor) do |thr_manager, thr_cron_entry, thr_started_at|
+      future = GoodJob::Concurrency::Future.new(args: [self, cron_entry, started_at], executor: @executor) do |thr_manager, thr_cron_entry, thr_started_at|
         # Resume after the last job from before starting, so that times which already have a job aren't attempted again
         last_cron_at = Rails.application.executor.wrap { thr_cron_entry.jobs.where(cron_at: ..thr_started_at).maximum(:cron_at) }
         time_period = [thr_started_at - @graceful_restart_period, last_cron_at].compact.max..thr_started_at

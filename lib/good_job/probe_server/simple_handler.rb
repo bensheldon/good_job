@@ -10,11 +10,11 @@ module GoodJob
         @port   = options[:port]
         @logger = options[:logger]
 
-        @running = Concurrent::AtomicBoolean.new(false)
+        @running = Farce::Flag.new(false)
       end
 
       def stop
-        @running.make_false
+        @running.unset
         @server&.close
       end
 
@@ -24,26 +24,26 @@ module GoodJob
       end
 
       def running?
-        @running.true?
+        @running.value
       end
 
       # Binds the listening socket, before the thread that serves it is started, so
       # that a process forking afterwards can reliably close its inherited copy.
       def listen
         @server = TCPServer.new('0.0.0.0', @port)
-        @running.make_true
+        @running.set
       rescue StandardError => e
         @logger.error "Failed to start server: #{e}"
       end
 
       def build_future
-        Concurrent::Future.new { run }
+        GoodJob::Concurrency::Future.new { run }
       end
 
       private
 
       def run
-        handle_connections if @running.true?
+        handle_connections if @running.value
       rescue StandardError => e
         @logger.error "Server encountered an error: #{e.class} - #{e}"
       ensure
@@ -51,7 +51,7 @@ module GoodJob
       end
 
       def handle_connections
-        while @running.true?
+        while @running.value
           begin
             ready_sockets, = IO.select([@server], nil, nil, SOCKET_READ_TIMEOUT)
             next unless ready_sockets

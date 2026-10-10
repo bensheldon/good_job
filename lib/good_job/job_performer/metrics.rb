@@ -8,9 +8,9 @@ module GoodJob # :nodoc:
     class Metrics
       def initialize
         @mutex = Mutex.new
-        @empty_executions = Concurrent::AtomicFixnum.new
-        @errored_executions = Concurrent::AtomicFixnum.new
-        @succeeded_executions = Concurrent::AtomicFixnum.new
+        @empty_executions = Farce::Counter.new
+        @errored_executions = Farce::Counter.new
+        @succeeded_executions = Farce::Counter.new
         @execution_at = nil
         @check_queue_at = nil
       end
@@ -64,9 +64,9 @@ module GoodJob # :nodoc:
       # Reset counters.
       # @return [void]
       def reset
-        @empty_executions.value = 0
-        @errored_executions.value = 0
-        @succeeded_executions.value = 0
+        @empty_executions.reset
+        @errored_executions.reset
+        @succeeded_executions.reset
         @execution_at = nil
         @check_queue_at = nil
       end

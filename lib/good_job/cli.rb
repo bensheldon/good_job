@@ -159,8 +159,7 @@ module GoodJob
         probe_server.start
       end
 
-      require 'concurrent/atomic/event'
-      @stop_good_job_executable = Concurrent::Event.new
+      @stop_good_job_executable = GoodJob::Concurrency::Event.new
       %w[INT TERM].each do |signal|
         trap(signal) { Thread.new { @stop_good_job_executable.set }.join }
       end

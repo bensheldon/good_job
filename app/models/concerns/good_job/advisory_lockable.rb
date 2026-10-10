@@ -667,7 +667,7 @@ module GoodJob
       # @param query [String]
       # @return [Boolean]
       def pg_or_jdbc_query(query)
-        if Concurrent.on_jruby?
+        if GoodJob::Concurrency::JRUBY
           # Replace $1 bind parameters with ?
           query.gsub(/\$\d*/, '?')
         else

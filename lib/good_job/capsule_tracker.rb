@@ -20,10 +20,10 @@ module GoodJob # :nodoc:
     #   @!scope class
     #   List of all instantiated CapsuleTrackers in the current process.
     #   @return [Array<GoodJob::CapsuleTracker>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    cattr_reader :instances, default: Farce::Unshared::Vector.new, instance_reader: false
 
-    # @param executor [Concurrent::AbstractExecutorService] The executor to use for refreshing the process record.
-    def initialize(executor: Concurrent.global_io_executor)
+    # @param executor [#post] The executor to use for refreshing the process record.
+    def initialize(executor: GoodJob::Concurrency.global_executor)
       @executor = executor
       @mutex = Mutex.new
       @locks = 0
@@ -160,7 +160,7 @@ module GoodJob # :nodoc:
 
     # @!visibility private
     def task_observer(_time, _output, thread_error)
-      GoodJob._on_thread_error(thread_error) if thread_error && !thread_error.is_a?(Concurrent::CancelledOperationError)
+      GoodJob._on_thread_error(thread_error) if thread_error && !thread_error.is_a?(GoodJob::Concurrency::CancelledOperationError)
     end
 
     private
@@ -178,7 +178,7 @@ module GoodJob # :nodoc:
       return unless @executor
 
       delay ||= task_interval
-      refresh_task = Concurrent::ScheduledTask.new(delay.to_f, executor: @executor) do
+      refresh_task = GoodJob::Concurrency::ScheduledTask.new(delay.to_f, executor: @executor) do
         Rails.application.executor.wrap do
           acquired = false
           begin

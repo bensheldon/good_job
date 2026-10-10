@@ -40,13 +40,13 @@ RSpec.configure do |config|
     GoodJob.shutdown(timeout: -1)
 
     executables = [].concat(
-      GoodJob::Capsule.instances,
-      GoodJob::SharedExecutor.instances,
-      GoodJob::CronManager.instances,
-      GoodJob::Notifier.instances,
-      GoodJob::Poller.instances,
-      GoodJob::Scheduler.instances,
-      GoodJob::CronManager.instances
+      GoodJob::Capsule.instances.to_a,
+      GoodJob::SharedExecutor.instances.to_a,
+      GoodJob::CronManager.instances.to_a,
+      GoodJob::Notifier.instances.to_a,
+      GoodJob::Poller.instances.to_a,
+      GoodJob::Scheduler.instances.to_a,
+      GoodJob::CronManager.instances.to_a
     )
     GoodJob._shutdown_all(executables, timeout: -1)
 

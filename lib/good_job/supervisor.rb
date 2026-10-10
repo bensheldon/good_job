@@ -78,7 +78,7 @@ module GoodJob # :nodoc:
         @readiness_reader = readiness_reader
         @started_at = Supervisor.monotonic
         # Written by the supervise loop, read by the probe server thread.
-        @last_ready_at = Concurrent::AtomicReference.new(nil)
+        @last_ready_at = Farce::Unshared::Atom.new(nil)
       end
 
       # Seconds since this subprocess was forked (monotonic, immune to wall-clock changes).
@@ -91,7 +91,7 @@ module GoodJob # :nodoc:
       # @param at [Float]
       # @return [void]
       def mark_ready(at)
-        @last_ready_at.set(at)
+        @last_ready_at.value = at
       end
 
       # Whether the subprocess has reported itself ready recently enough to be
@@ -101,7 +101,7 @@ module GoodJob # :nodoc:
       # @param timeout [Numeric] seconds after which a readiness report is stale
       # @return [Boolean]
       def connected?(now, timeout)
-        last_ready_at = @last_ready_at.get
+        last_ready_at = @last_ready_at.value
         !last_ready_at.nil? && (now - last_ready_at) <= timeout
       end
     end
@@ -111,7 +111,7 @@ module GoodJob # :nodoc:
       @configuration = configuration
       # pid => SubprocessHandle. Mutated only from the main thread, but read from
       # the probe server thread (via #started?), so it must be thread-safe.
-      @subprocesses = Concurrent::Hash.new
+      @subprocesses = Farce::Unshared::Map.new
       @received_signals = []
       @self_pipe_reader, @self_pipe_writer = IO.pipe
       @stopped = false

@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-require "concurrent/executor/thread_pool_executor"
-require "concurrent/executor/timer_set"
-require "concurrent/scheduled_task"
-require "concurrent/utility/processor_counter"
-
 module GoodJob # :nodoc:
   #
   # Schedulers are generic thread pools that are responsible for
@@ -12,12 +7,12 @@ module GoodJob # :nodoc:
   # and efficiently scaling active threads.
   #
   # Every scheduler has a single {JobPerformer} that will execute tasks.
-  # The scheduler is responsible for calling its performer efficiently across threads managed by an instance of +Concurrent::ThreadPoolExecutor+.
+  # The scheduler is responsible for calling its performer efficiently across threads managed by an instance of +GoodJob::Concurrency::ThreadPool+.
   # If a performer does not have work, the thread will go to sleep.
-  # The scheduler maintains an instance of +Concurrent::TimerTask+, which wakes sleeping threads and causes them to check whether the performer has new work.
+  # The scheduler maintains an instance of +GoodJob::Concurrency::TimerTask+, which wakes sleeping threads and causes them to check whether the performer has new work.
   #
   class Scheduler
-    # Defaults for instance of Concurrent::ThreadPoolExecutor
+    # Defaults for instance of GoodJob::Concurrency::ThreadPool
     # The thread pool executor is where work is performed.
     DEFAULT_EXECUTOR_OPTIONS = {
       name: name,
@@ -36,7 +31,7 @@ module GoodJob # :nodoc:
     #   @!scope class
     #   List of all instantiated Schedulers in the current process.
     #   @return [Array<GoodJob::Scheduler>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    cattr_reader :instances, default: Farce::Unshared::Vector.new, instance_reader: false
 
     # Human readable name of the scheduler that includes configuration values.
     # @return [String]
@@ -226,7 +221,7 @@ module GoodJob # :nodoc:
     def warm_cache
       return if @max_cache.zero?
 
-      future = Concurrent::Future.new(args: [self, @performer], executor: executor) do |thr_scheduler, thr_performer|
+      future = GoodJob::Concurrency::Future.new(args: [self, @performer], executor: executor) do |thr_scheduler, thr_performer|
         Rails.application.executor.wrap do
           thr_performer.next_at(
             limit: @max_cache,
@@ -250,7 +245,7 @@ module GoodJob # :nodoc:
     def cleanup
       @cleanup_tracker.reset
 
-      future = Concurrent::Future.new(args: [self, @performer], executor: executor) do |_thr_scheduler, thr_performer|
+      future = GoodJob::Concurrency::Future.new(args: [self, @performer], executor: executor) do |_thr_scheduler, thr_performer|
         Rails.application.executor.wrap do
           thr_performer.cleanup
         end
@@ -271,8 +266,8 @@ module GoodJob # :nodoc:
     # @return [void]
     def create_executor
       instrument("scheduler_create_pool", { performer_name: performer.name, max_threads: @executor_options[:max_threads] }) do
-        @timer_set = TimerSet.new
-        @executor = ThreadPoolExecutor.new(@executor_options)
+        @timer_set = GoodJob::Concurrency::TimerSet.new
+        @executor = GoodJob::Concurrency::ThreadPool.new(**@executor_options)
       end
     end
 
@@ -280,7 +275,7 @@ module GoodJob # :nodoc:
     # @param fanout [Boolean] Whether to eagerly create a 2nd execution thread if a job is found.
     # @return [void]
     def create_task(delay = 0, fanout: false)
-      future = Concurrent::ScheduledTask.new(delay, args: [self, performer], executor: executor, timer_set: timer_set) do |thr_scheduler, thr_performer|
+      future = GoodJob::Concurrency::ScheduledTask.new(delay, args: [self, performer], executor: executor, timer_set: timer_set) do |thr_scheduler, thr_performer|
         Thread.current.name = Thread.current.name.sub("-worker-", "-thread-") if Thread.current.name
         GoodJob::SafeState[:good_job_scheduler] = thr_scheduler
         Thread.current.priority = -3 if thr_scheduler.lower_thread_priority
@@ -314,39 +309,6 @@ module GoodJob # :nodoc:
 
     def remaining_cache_count
       @max_cache - cache_count
-    end
-
-    # Custom sub-class of +Concurrent::ThreadPoolExecutor+ to add additional worker status.
-    # @private
-    class ThreadPoolExecutor < ::Concurrent::ThreadPoolExecutor
-      # Number of inactive threads available to execute tasks.
-      # https://github.com/ruby-concurrency/concurrent-ruby/issues/684#issuecomment-427594437
-      # @return [Integer]
-      def ready_worker_count
-        synchronize do
-          if Concurrent.on_jruby?
-            @executor.getMaximumPoolSize - @executor.getActiveCount
-          else
-            workers_still_to_be_created = @max_length - @pool.length
-            workers_created_but_waiting = @ready.length
-            workers_still_to_be_created + workers_created_but_waiting
-          end
-        end
-      end
-    end
-
-    # Custom sub-class of +Concurrent::TimerSet+ for additional behavior.
-    # @private
-    class TimerSet < ::Concurrent::TimerSet
-      # Number of scheduled jobs in the queue
-      # @return [Integer]
-      delegate :length, to: :@queue
-
-      # Clear the queue
-      # @return [void]
-      def reset
-        synchronize { @queue.clear }
-      end
     end
   end
 end

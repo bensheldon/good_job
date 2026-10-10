@@ -3,6 +3,16 @@ require_relative 'boot'
 require 'logger' # Before rails: https://github.com/rails/rails/pull/54264
 
 require 'rails/all'
+
+# Farce (loaded by good_job) prepends a `require` hook onto Object, which breaks gems like Skylight
+# that later `alias` and redefine Kernel#require ("super: no superclass method 'require'").
+# Loading Skylight before Farce avoids it.
+begin
+  require "skylight"
+rescue LoadError
+  nil
+end
+
 require "good_job"
 require "good_job/engine"
 

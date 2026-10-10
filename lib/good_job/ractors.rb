@@ -25,7 +25,7 @@ module GoodJob
       end
     end
 
-    LOCAL_STORAGE = Concurrent::Map.new
+    LOCAL_STORAGE = Farce::Unshared::Map.new
     private_constant :LOCAL_STORAGE
 
     class << self
@@ -89,7 +89,7 @@ module GoodJob
         if NATIVE
           ActiveSupport::Ractors.store_if_absent(key, &block)
         else
-          LOCAL_STORAGE.compute_if_absent(key, &block)
+          LOCAL_STORAGE.store_if_absent(key, &block)
         end
       end
     end

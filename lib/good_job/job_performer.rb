@@ -11,7 +11,7 @@ module GoodJob
   # The JobPerformer must be safe to execute across multiple threads.
   #
   class JobPerformer
-    cattr_accessor :performing_active_job_ids, default: Concurrent::Set.new
+    cattr_accessor :performing_active_job_ids, default: Farce::Unshared::Set.new
 
     # @param queue_string [String] Queues to execute jobs from
     def initialize(queue_string, capsule: GoodJob.capsule)

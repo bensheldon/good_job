@@ -5,6 +5,7 @@ require "active_job/queue_adapters"
 
 require_relative "good_job/version"
 require_relative "good_job/engine"
+require_relative "good_job/concurrency"
 require_relative "good_job/ractors"
 
 require_relative "good_job/adapter"

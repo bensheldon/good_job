@@ -10,7 +10,7 @@ module GoodJob # :nodoc:
   # Notifiers hook into Postgres LISTEN/NOTIFY functionality to emit and listen for notifications across processes.
   #
   # Notifiers can emit NOTIFY messages through Postgres.
-  # A notifier will LISTEN for messages by creating a background thread that runs in an instance of +Concurrent::ThreadPoolExecutor+.
+  # A notifier will LISTEN for messages by creating a background thread that runs in an instance of +GoodJob::Concurrency::ThreadPool+.
   # When a message is received, the notifier passes the message to each of its recipients.
   #
   class Notifier
@@ -43,7 +43,7 @@ module GoodJob # :nodoc:
     #   @!scope class
     #   List of all instantiated Notifiers in the current process.
     #   @return [Array<GoodJob::Notifier>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    cattr_reader :instances, default: Farce::Unshared::Vector.new, instance_reader: false
 
     # @!attribute [rw] connection
     #   @!scope class
@@ -67,18 +67,18 @@ module GoodJob # :nodoc:
 
     # @param recipients [Array<#call, Array(Object, Symbol)>]
     # @param enable_listening [true, false]
-    def initialize(*recipients, enable_listening: true, capsule: GoodJob.capsule, executor: Concurrent.global_io_executor)
-      @recipients = Concurrent::Array.new(recipients)
+    def initialize(*recipients, enable_listening: true, capsule: GoodJob.capsule, executor: GoodJob::Concurrency.global_executor)
+      @recipients = Farce::Unshared::Vector.new(recipients)
       @enable_listening = enable_listening
       @executor = executor
 
       @monitor = Monitor.new
-      @shutdown_event = Concurrent::Event.new.tap(&:set)
-      @running = Concurrent::AtomicBoolean.new(false)
-      @connected = Concurrent::Event.new
-      @listening = Concurrent::Event.new
-      @connection_errors_count = Concurrent::AtomicFixnum.new(0)
-      @connection_errors_reported = Concurrent::AtomicBoolean.new(false)
+      @shutdown_event = GoodJob::Concurrency::Event.new.tap(&:set)
+      @running = Farce::Flag.new(false)
+      @connected = GoodJob::Concurrency::Event.new
+      @listening = GoodJob::Concurrency::Event.new
+      @connection_errors_count = Farce::Counter.new(0)
+      @connection_errors_reported = Farce::Flag.new(false)
       @enable_listening = enable_listening
       @task = nil
       @capsule = capsule
@@ -89,7 +89,7 @@ module GoodJob # :nodoc:
     end
 
     def running?
-      @executor.running? && @running.true?
+      @executor.running? && @running.value
     end
 
     # Tests whether the notifier is active and has acquired a dedicated database connection.
@@ -128,7 +128,7 @@ module GoodJob # :nodoc:
     # @return [void]
     def shutdown(timeout: -1)
       synchronize do
-        @running.make_false
+        @running.unset
 
         if @executor.shutdown? || @task&.complete?
           # clean up in the even the executor is killed
@@ -170,17 +170,17 @@ module GoodJob # :nodoc:
 
         if connection_error
           @connection_errors_count.increment
-          if @connection_errors_reported.false? && @connection_errors_count.value >= CONNECTION_ERRORS_REPORTING_THRESHOLD
+          if !@connection_errors_reported.value && @connection_errors_count.value >= CONNECTION_ERRORS_REPORTING_THRESHOLD
             @connected.reset
             GoodJob._on_thread_error(thread_error)
-            @connection_errors_reported.make_true
+            @connection_errors_reported.set
           end
         else
           GoodJob._on_thread_error(thread_error)
         end
       end
 
-      if @running.true?
+      if @running.value
         create_listen_task(delay: connection_error ? RECONNECT_INTERVAL : 0)
       else
         @shutdown_event.set
@@ -193,16 +193,16 @@ module GoodJob # :nodoc:
 
     def start
       synchronize do
-        return if @running.true?
+        return if @running.value
 
-        @running.make_true
+        @running.set
         @shutdown_event.reset
         create_listen_task(delay: 0)
       end
     end
 
     def create_listen_task(delay: 0)
-      @task = Concurrent::ScheduledTask.new(delay, args: [@recipients, @running, @executor, @enable_listening, @connected, @listening], executor: @executor) do |thr_recipients, thr_running, thr_executor, thr_enable_listening, thr_connected, thr_listening|
+      @task = GoodJob::Concurrency::ScheduledTask.new(delay, args: [@recipients, @running, @executor, @enable_listening, @connected, @listening], executor: @executor) do |thr_recipients, thr_running, thr_executor, thr_enable_listening, thr_connected, thr_listening|
         with_connection do
           thr_connected.set
 
@@ -218,7 +218,7 @@ module GoodJob # :nodoc:
               end
             end
 
-            while thr_executor.running? && thr_running.true?
+            while thr_executor.running? && thr_running.value
               Rails.application.executor.wrap { run_callbacks(:tick) }
 
               wait_for_notify do |channel, payload|
@@ -297,7 +297,7 @@ module GoodJob # :nodoc:
 
     def reset_connection_errors
       @connection_errors_count.value = 0
-      @connection_errors_reported.make_false
+      @connection_errors_reported.unset
     end
   end
 end
