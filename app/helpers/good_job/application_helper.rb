@@ -27,14 +27,15 @@ module GoodJob
     # Renders a job's label as a badge. Labels on which the job has a concurrency claim
     # are colored and prefixed with an icon for the claim's state.
     # Claims are only shown when the job's +concurrency_claims+ are already loaded.
-    def job_label_badge(job, label, url: nil)
+    # With +full: true+, the badge shows the full label and CSS clips it at the container width.
+    def job_label_badge(job, label, url: nil, full: false)
       claim = job.concurrency_claims.find { |job_claim| job_claim.label == label } if job.association(:concurrency_claims).loaded?
       state_name = claim&.state_name
-      truncated_label = truncate(label, length: 15)
+      truncated_label = full ? label : truncate(label, length: 15)
       state_text = t(state_name, scope: "good_job.concurrency_claims.states") if state_name
-      title = [(label if truncated_label != label), state_text].compact.join(" · ")
+      title = [(label if full || truncated_label != label), state_text].compact.join(" · ")
 
-      options = { class: "badge font-monospace text-decoration-none #{CONCURRENCY_CLAIM_BADGE_CLASSES.fetch(state_name)}" }
+      options = { class: "badge font-monospace text-decoration-none #{'text-truncate mw-100 ' if full}#{CONCURRENCY_CLAIM_BADGE_CLASSES.fetch(state_name)}" }
       if title.present?
         options[:title] = title
         options[:data] = { bs_toggle: "tooltip" }
