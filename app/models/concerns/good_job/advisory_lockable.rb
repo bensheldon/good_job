@@ -62,8 +62,22 @@ module GoodJob
     # require additional synchronization.
     #
     # Per-key structure: [session_count, xact_txns, cte]
-    #   xact_txns: Array of WeakRefs to AR transaction objects
+    #   xact_txns: Array of TransactionRefs to AR transaction objects
     class AdvisoryLockCounter
+      # A weak reference to an Active Record transaction. Unlike +WeakRef+,
+      # which uses a class variable, this can be used from non-main Ractors.
+      class TransactionRef
+        def initialize(transaction)
+          @ref = ObjectSpace::WeakMap.new
+          @ref[:transaction] = transaction
+        end
+
+        def open?
+          transaction = @ref[:transaction]
+          !transaction.nil? && transaction.open?
+        end
+      end
+
       def initialize
         if defined?(ObjectSpace::WeakKeyMap)
           # WeakKeyMap (Ruby 3.3+) holds weak keys with strong values:
@@ -144,13 +158,13 @@ module GoodJob
 
       # Record a lock acquisition.
       # Per-key structure: [session_count, xact_txns, cte]
-      #   xact_txns is an Array of WeakRefs to transaction objects
+      #   xact_txns is an Array of TransactionRefs
       def record_lock(conn, key, cte: false, xact: false)
         prune(conn)
         counts = self[conn] || (self[conn] = {})
         session_count, xact_txns, was_cte = counts[key] || [0, [], false]
         if xact
-          xact_txns += [WeakRef.new(conn.current_transaction)]
+          xact_txns += [TransactionRef.new(conn.current_transaction)]
         else
           session_count += 1
         end
@@ -191,11 +205,7 @@ module GoodJob
         return unless counts
 
         counts.each do |key, (session_count, xact_txns, cte)|
-          live_txns = xact_txns.select do |ref|
-            ref.weakref_alive? && ref.open?
-          rescue WeakRef::RefError
-            false
-          end
+          live_txns = xact_txns.select(&:open?)
 
           if session_count.zero? && live_txns.empty?
             counts.delete(key)
@@ -206,8 +216,14 @@ module GoodJob
       end
     end
 
-    ADVISORY_LOCK_COUNTS = AdvisoryLockCounter.new
-    private_constant :ADVISORY_LOCK_COUNTS
+    # Lock counts are tracked per connection, and connections are not shared
+    # across Ractors, so each Ractor has its own counter.
+    # @api private
+    # @return [AdvisoryLockCounter]
+    def self.advisory_lock_counts
+      GoodJob::Ractors.local(:good_job_advisory_lock_counts) { AdvisoryLockCounter.new }
+    end
+
     AREL_TABLE_NEW_KWARGS = Arel::Table.instance_method(:initialize).parameters.any? { |type, name| type == :key && name == :name }
 
     included do
@@ -447,7 +463,7 @@ module GoodJob
       # @return [Boolean] whether the lock was released.
       def advisory_unlock_key(key, function: advisory_unlockable_function, connection: nil)
         conn = connection || lease_connection
-        session_count, _xact_count, cte = ADVISORY_LOCK_COUNTS.counts_for(conn, key)
+        session_count, _xact_count, cte = AdvisoryLockable.advisory_lock_counts.counts_for(conn, key)
 
         if session_count <= 1 && cte
           advisory_unlock_key!(key, function: function, connection: conn)
@@ -474,7 +490,7 @@ module GoodJob
       # @return [void]
       def advisory_unlock_key!(key, function: advisory_unlockable_function, connection: nil)
         conn = connection || lease_connection
-        _, xact_count, = ADVISORY_LOCK_COUNTS.counts_for(conn, key)
+        _, xact_count, = AdvisoryLockable.advisory_lock_counts.counts_for(conn, key)
 
         if xact_count.positive?
           # An active xact lock on the same key means owns_advisory_lock_key? will
@@ -617,15 +633,15 @@ module GoodJob
       end
 
       def record_advisory_lock(conn, key, cte: false, xact: false)
-        ADVISORY_LOCK_COUNTS.record_lock(conn, key, cte: cte, xact: xact)
+        AdvisoryLockable.advisory_lock_counts.record_lock(conn, key, cte: cte, xact: xact)
       end
 
       def record_advisory_unlock(conn, key)
-        ADVISORY_LOCK_COUNTS.record_unlock(conn, key)
+        AdvisoryLockable.advisory_lock_counts.record_unlock(conn, key)
       end
 
       def prune_advisory_locks(conn)
-        ADVISORY_LOCK_COUNTS.prune(conn)
+        AdvisoryLockable.advisory_lock_counts.prune(conn)
       end
 
       # Postgres advisory unlocking function for the class
@@ -643,7 +659,7 @@ module GoodJob
       # @return [void]
       def advisory_unlock_session(connection: nil)
         conn = connection || lease_connection
-        ADVISORY_LOCK_COUNTS.clear_session_locks(conn)
+        AdvisoryLockable.advisory_lock_counts.clear_session_locks(conn)
         conn.exec_query("SELECT pg_advisory_unlock_all()::text AS unlocked", 'GoodJob::Lockable Unlock Session').first[:unlocked]
       end
 
@@ -745,7 +761,7 @@ module GoodJob
     def advisory_lock_active_on?(connection, key: lockable_key)
       return false unless connection&.active?
 
-      ADVISORY_LOCK_COUNTS.counts_for(connection, key).first.positive?
+      AdvisoryLockable.advisory_lock_counts.counts_for(connection, key).first.positive?
     end
 
     # Releases all advisory locks on the record that are held by the current

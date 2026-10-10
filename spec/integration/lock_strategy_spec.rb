@@ -181,6 +181,7 @@ RSpec.describe 'Lock strategy integration' do
 
   describe 'perform_throttle with ordered queues' do
     before do
+      allow(GoodJob.deprecator).to receive(:warn)
       stub_const 'ThrottledJob', (Class.new(ActiveJob::Base) do
         include GoodJob::ActiveJobExtensions::Concurrency
 

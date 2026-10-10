@@ -208,6 +208,7 @@ describe GoodJob::Batch do
 
     context 'with concurrency-limited jobs' do
       before do
+        allow(GoodJob.deprecator).to receive(:warn)
         stub_const 'ConcurrencyJob', (Class.new(ActiveJob::Base) do
           include GoodJob::ActiveJobExtensions::Concurrency
 

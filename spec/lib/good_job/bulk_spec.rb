@@ -108,6 +108,7 @@ describe GoodJob::Bulk do
     it 'does not enqueue jobs that fail enqueue concurrency' do
       TestJob.include(GoodJob::ActiveJobExtensions::Concurrency)
 
+      allow(GoodJob.deprecator).to receive(:warn)
       TestJob.good_job_control_concurrency_with(total_limit: 1, key: 'test')
       job_1 = TestJob.new
       job_2 = TestJob.new
