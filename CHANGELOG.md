@@ -1,5 +1,22 @@
 # Changelog
 
+## [v4.22.1](https://github.com/bensheldon/good_job/tree/v4.22.1) (2026-10-13)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.22.0...v4.22.1)
+
+**Implemented enhancements:**
+
+- Show full job labels under the job name in dashboard tables [\#1862](https://github.com/bensheldon/good_job/pull/1862) ([olivier-thatch](https://github.com/olivier-thatch))
+
+**Fixed bugs:**
+
+- Keep the process id when refresh recreates a deleted process record [\#1866](https://github.com/bensheldon/good_job/pull/1866) ([wivern-co-uk](https://github.com/wivern-co-uk))
+- Don't apply a concurrency lock when a rule's label resolves to blank [\#1864](https://github.com/bensheldon/good_job/pull/1864) ([bensheldon](https://github.com/bensheldon))
+
+**Merged pull requests:**
+
+- Support enqueuing jobs from non-main Ractors [\#1863](https://github.com/bensheldon/good_job/pull/1863) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.22.0](https://github.com/bensheldon/good_job/tree/v4.22.0) (2026-10-09)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.21.1...v4.22.0)
