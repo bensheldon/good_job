@@ -39,7 +39,7 @@ describe GoodJob::JobsController do
       get good_job.jobs_path
 
       html = Nokogiri::HTML(response.body)
-      expect(html.at_css("a.badge.border-warning[title='Waiting']").text).to eq "slow (Waiting)"
+      expect(html.at_css("a.badge.border-warning[title='slow · Waiting']").text).to eq "slow (Waiting)"
       expect(html.at_css("a.badge.text-bg-secondary").text).to eq "other"
     end
 
