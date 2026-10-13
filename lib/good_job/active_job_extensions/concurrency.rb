@@ -6,6 +6,8 @@ module GoodJob
       extend ActiveSupport::Concern
 
       VALID_TYPES = [String, Symbol, Numeric, Date, Time, TrueClass, FalseClass, NilClass].freeze
+      # The lock and claim key for a rule without a label or key, which counts all jobs.
+      ALL_KEY = "all"
 
       class ConcurrencyExceededError < StandardError
         def backtrace
@@ -52,6 +54,9 @@ module GoodJob
 
         def evaluate(job, stage)
           resolved_label = resolve_label(job)
+          # A rule with a label that resolves to blank does not apply
+          return nil if @label.present? && resolved_label.blank?
+
           resolved_key = resolve_key(job, resolved_label)
           return nil if resolved_key.blank? && resolved_label.blank?
 
@@ -77,8 +82,10 @@ module GoodJob
         end
 
         def resolve_key(job, label)
-          if label.present? || key.blank?
+          if label.present?
             "label:#{label}"
+          elsif key.blank?
+            ALL_KEY
           else
             key_value = @key.respond_to?(:call) ? job.instance_exec(&@key) : @key
             raise TypeError, "Concurrency key must be a String; was a #{key_value.class}" if key_value.present? && VALID_TYPES.none? { |type| key_value.is_a?(type) }
@@ -117,7 +124,7 @@ module GoodJob
           elsif key_explicit? && key.present?
             "key:#{key}"
           else
-            "all"
+            ALL_KEY
           end
         end
 
