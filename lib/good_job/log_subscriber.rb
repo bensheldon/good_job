@@ -42,11 +42,14 @@ module GoodJob
     # @!macro notification_responder
     def scheduler_create_pool(event)
       max_threads = event.payload[:max_threads]
+      max_fibers = event.payload[:max_fibers]
       performer_name = event.payload[:performer_name]
       process_id = event.payload[:process_id]
+      capacity = "max_threads=#{max_threads}"
+      capacity += " max_fibers=#{max_fibers}" if max_fibers
 
       info(tags: [process_id]) do
-        "GoodJob #{GoodJob::VERSION} started scheduler with queues=#{performer_name} max_threads=#{max_threads}."
+        "GoodJob #{GoodJob::VERSION} started scheduler with queues=#{performer_name} #{capacity}."
       end
     end
 

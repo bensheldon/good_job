@@ -163,6 +163,18 @@ module GoodJob
       ).to_i
     end
 
+    # Number of fibers per {Scheduler}, overridden by counts in {#queue_string}.
+    # Zero, the default, executes jobs with threads.
+    # @return [Integer]
+    def fibers
+      (
+        options[:fibers] ||
+          rails_config[:fibers] ||
+          env['GOOD_JOB_FIBERS'] ||
+          0
+      ).to_i
+    end
+
     # @deprecated Use {#threads} instead.
     # @return [Integer]
     def max_threads
@@ -478,7 +490,7 @@ module GoodJob
       DEFAULT_ENABLE_PAUSES
     end
 
-    # Strategy for locking jobs during dequeue.
+    # Strategy for locking jobs during dequeue. Defaults to +:advisory+.
     # @return [Symbol]
     def lock_strategy
       (

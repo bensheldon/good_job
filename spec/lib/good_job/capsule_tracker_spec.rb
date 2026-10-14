@@ -62,6 +62,37 @@ describe GoodJob::CapsuleTracker do
     end
   end
 
+  describe 'fiber synchronization', :requires_async do
+    it 'blocks a fiber registering while another fiber destroys the last record' do
+      tracker = described_class.new(executor: nil)
+      events = Concurrent::Array.new
+      Rails.application.executor.wrap do
+        Sync do |task|
+          tracker.register
+          tracker.id_for_lock
+          allow(tracker.record).to receive(:destroy).and_wrap_original do |original|
+            events << :destroy_start
+            sleep 0.1 # yields to other fibers during database IO
+            original.call.tap { events << :destroy_end }
+          end
+
+          unregistering = task.async { tracker.unregister }
+          registering = task.async do
+            sleep 0.01 until events.include?(:destroy_start)
+            tracker.register
+            events << :registered
+          end
+          [unregistering, registering].each(&:wait)
+        end
+        expect(events).to eq [:destroy_start, :destroy_end, :registered]
+        expect(tracker.locks).to eq 1
+        expect(tracker.id_for_lock).to be_present
+      end
+    ensure
+      tracker&.unregister
+    end
+  end
+
   describe '#register' do
     context 'when used with an advisory lock' do
       it 'creates a Process and sets the lock_type' do

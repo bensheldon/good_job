@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'active_support/core_ext/enumerable'
+
 module GoodJob # :nodoc:
   # Extends the GoodJob module with a registry of cluster-mode lifecycle
   # callbacks. Blocks registered here run at specific points around forking so

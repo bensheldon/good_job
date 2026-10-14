@@ -43,7 +43,7 @@
           </div>
           <div class="col mw-100">
             <% process.schedulers.each do |scheduler_data| %>
-              <pre class="mb-0" title="<%= scheduler_data %>">queues=<%= scheduler_data["queues"] %> max_threads=<%= scheduler_data["max_threads"] %></pre>
+              <pre class="mb-0" title="<%= scheduler_data %>">queues=<%= scheduler_data["queues"] %> max_threads=<%= scheduler_data["max_threads"] %><%= " max_fibers=#{scheduler_data['max_fibers']}" if scheduler_data["max_fibers"] %></pre>
             <% end %>
           </div>
           <div class="col-2 small"><%= t(ActiveModel::Type::Boolean.new.cast(process.state["cron_enabled"]), scope: "good_job.shared.boolean") %></div>

@@ -32,6 +32,19 @@ module GoodJob # :nodoc:
     # In CRuby, this sets the thread quantum to ~12.5ms ( 100ms * 2^(-3) ).
     LOW_THREAD_PRIORITY = -3
 
+    # Maximum additional wait for cooperative cleanup after forced cancellation.
+    FIBER_CANCELLATION_TIMEOUT = 1
+
+    # Minimum version of the +async+ gem required for fiber execution.
+    MINIMUM_ASYNC_VERSION = "2.25"
+    # Async major upgrades must pass compatibility checks before being enabled.
+    MAXIMUM_ASYNC_VERSION = "3"
+    # Minimum Ruby version required for fiber execution.
+    MINIMUM_RUBY_VERSION_FOR_FIBERS = "3.2"
+    # Rails 7.0's Active Record connection pool caches connections per thread, so
+    # fibers sharing the reactor thread would share (and check in) one connection.
+    MINIMUM_RAILS_VERSION_FOR_FIBERS = "7.1"
+
     # @!attribute [r] instances
     #   @!scope class
     #   List of all instantiated Schedulers in the current process.
@@ -52,9 +65,13 @@ module GoodJob # :nodoc:
     # @param warm_cache_on_initialize [Boolean] whether to warm the cache immediately, or manually by calling +warm_cache+
     # @param cleanup_interval_seconds [Numeric, nil] number of seconds between cleaning up job records
     # @param cleanup_interval_jobs [Numeric, nil] number of executed jobs between cleaning up job records
-    # @param lower_thread_priority [Boolean] whether to lower the thread priority of execution threads
-    def initialize(performer, max_threads: nil, max_cache: nil, warm_cache_on_initialize: false, cleanup_interval_seconds: nil, cleanup_interval_jobs: nil, lower_thread_priority: false)
+    # @param lower_thread_priority [Boolean] whether to lower execution thread priority; ignored in fiber mode
+    # @param fibers [Integer, nil] number of fibers executing jobs on one reactor thread; +nil+ uses a thread pool
+    def initialize(performer, max_threads: nil, max_cache: nil, warm_cache_on_initialize: false, cleanup_interval_seconds: nil, cleanup_interval_jobs: nil, lower_thread_priority: false, fibers: nil)
       raise ArgumentError, "Performer argument must implement #next" unless performer.respond_to?(:next)
+
+      @fibers = fibers
+      self.class.validate_fiber_execution! if @fibers
 
       @performer = performer
 
@@ -64,7 +81,7 @@ module GoodJob # :nodoc:
         @executor_options[:max_threads] = max_threads
         @executor_options[:max_queue] = max_threads
       end
-      @name = "GoodJob::Scheduler(queues=#{@performer.name} max_threads=#{@executor_options[:max_threads]})"
+      @name = "GoodJob::Scheduler(queues=#{@performer.name} #{@fibers ? "fibers=#{@fibers}" : "max_threads=#{@executor_options[:max_threads]}"})"
       @executor_options[:name] = name
 
       @cleanup_tracker = CleanupTracker.new(cleanup_interval_seconds: cleanup_interval_seconds, cleanup_interval_jobs: cleanup_interval_jobs)
@@ -77,9 +94,57 @@ module GoodJob # :nodoc:
       self.class.instances << self
     end
 
+    # Validate runtime support and Rails fiber isolation.
+    # @raise [ArgumentError] when a requirement is not met
+    # @return [void]
+    def self.validate_fiber_execution!
+      validate_fiber_runtime!
+      validate_fiber_rails!
+
+      raise ArgumentError, "GoodJob's fiber execution requires `config.active_support.isolation_level = :fiber`" unless defined?(ActiveSupport::IsolatedExecutionState) && ActiveSupport::IsolatedExecutionState.isolation_level == :fiber
+    end
+
+    # Check Ruby, +async+, and Rails version support without checking Rails settings.
+    # @return [Boolean]
+    def self.fiber_execution_supported?
+      validate_fiber_runtime!
+      validate_fiber_rails!
+      true
+    rescue ArgumentError
+      false
+    end
+
+    def self.validate_fiber_runtime!
+      raise ArgumentError, "GoodJob's fiber execution requires CRuby (MRI), but this is #{RUBY_ENGINE}" unless RUBY_ENGINE == "ruby"
+      raise ArgumentError, "GoodJob's fiber execution requires Ruby #{MINIMUM_RUBY_VERSION_FOR_FIBERS}+, but this is #{RUBY_VERSION}" if Gem.ruby_version < Gem::Version.new(MINIMUM_RUBY_VERSION_FOR_FIBERS)
+
+      begin
+        require "async"
+      rescue LoadError
+        raise ArgumentError, "GoodJob's fiber execution requires the 'async' gem. Add `gem \"async\", \">= #{MINIMUM_ASYNC_VERSION}\", \"< #{MAXIMUM_ASYNC_VERSION}\"` to your Gemfile."
+      end
+
+      async_version = defined?(Async::VERSION) ? Async::VERSION : nil
+      raise ArgumentError, "GoodJob's fiber execution requires the 'async' gem >= #{MINIMUM_ASYNC_VERSION} and < #{MAXIMUM_ASYNC_VERSION}, but #{async_version || 'an unknown version'} is installed" unless async_version && Gem::Version.new(async_version) >= Gem::Version.new(MINIMUM_ASYNC_VERSION) && Gem::Version.new(async_version) < Gem::Version.new(MAXIMUM_ASYNC_VERSION)
+    end
+    private_class_method :validate_fiber_runtime!
+
+    def self.validate_fiber_rails!
+      return if Rails.gem_version >= Gem::Version.new(MINIMUM_RAILS_VERSION_FOR_FIBERS)
+
+      raise ArgumentError, "GoodJob's fiber execution requires Rails #{MINIMUM_RAILS_VERSION_FOR_FIBERS}+ (earlier Active Record connection pools are not fiber-aware), but this is Rails #{Rails.version}"
+    end
+    private_class_method :validate_fiber_rails!
+
     # Tests whether the scheduler is running.
     # @return [Boolean, nil]
     delegate :running?, to: :executor, allow_nil: true
+
+    # Whether this scheduler executes jobs as fibers.
+    # @return [Boolean]
+    def fibers?
+      !@fibers.nil?
+    end
 
     # Tests whether the scheduler is shutdown and no tasks are running.
     # @return [Boolean, nil]
@@ -112,7 +177,7 @@ module GoodJob # :nodoc:
 
           instrument("scheduler_shutdown_kill", { active_job_ids: @performer.performing_active_job_ids.to_a })
           executor.kill
-          executor.wait_for_termination
+          executor.wait_for_termination(fibers? ? FIBER_CANCELLATION_TIMEOUT : nil)
         end
       end
     end
@@ -126,6 +191,8 @@ module GoodJob # :nodoc:
 
       instrument("scheduler_restart_pools") do
         shutdown(timeout: timeout)
+        raise "Cannot restart a scheduler before its executor has terminated" unless shutdown?
+
         @performer.reset_stats
         create_executor
         warm_cache
@@ -188,6 +255,9 @@ module GoodJob # :nodoc:
     # @!visibility private
     # @return [void]
     def task_observer(time, output, thread_error)
+      # ScheduledTask captures Exception, including fiber cancellation and process signals.
+      raise thread_error if fibers? && FiberPoolExecutor.fatal_exception?(thread_error)
+
       result = output.is_a?(GoodJob::ExecutionResult) ? output : nil
 
       unhandled_error = thread_error || result&.unhandled_error
@@ -207,18 +277,35 @@ module GoodJob # :nodoc:
     # Information about the Scheduler
     # @return [Hash]
     def stats
-      available_threads = executor.ready_worker_count
+      available_workers = executor.ready_worker_count
+      active_workers = fibers? ? executor.active_worker_count : capacity - available_workers
+      max_threads = fibers? ? 1 : capacity
+      active_threads = if fibers?
+                         active_workers.positive? ? 1 : 0
+                       else
+                         active_workers
+                       end
+      available_threads = max_threads - active_threads
 
       {
         name: name,
         queues: performer.name,
-        max_threads: @executor_options[:max_threads],
-        active_threads: @executor_options[:max_threads] - available_threads,
+        max_threads: max_threads,
+        active_threads: active_threads,
         available_threads: available_threads,
         max_cache: @max_cache,
         active_cache: cache_count,
         available_cache: remaining_cache_count,
-      }.merge!(@performer.stats.without(:name))
+      }.tap do |stats|
+        if fibers?
+          stats.merge!(
+            max_fibers: capacity,
+            active_fibers: active_workers,
+            available_fibers: capacity - active_workers,
+            queued_tasks: executor.queue_length
+          )
+        end
+      end.merge!(@performer.stats.without(:name))
     end
 
     # Preload existing runnable and future-scheduled jobs
@@ -230,7 +317,7 @@ module GoodJob # :nodoc:
         Rails.application.executor.wrap do
           thr_performer.next_at(
             limit: @max_cache,
-            now_limit: @executor_options[:max_threads]
+            now_limit: capacity
           ).each do |scheduled_at|
             thr_scheduler.create_thread({ scheduled_at: scheduled_at })
           end
@@ -270,9 +357,16 @@ module GoodJob # :nodoc:
 
     # @return [void]
     def create_executor
-      instrument("scheduler_create_pool", { performer_name: performer.name, max_threads: @executor_options[:max_threads] }) do
+      payload = { performer_name: performer.name, max_threads: fibers? ? 1 : capacity }
+      payload[:max_fibers] = capacity if fibers?
+
+      instrument("scheduler_create_pool", payload) do
         @timer_set = TimerSet.new
-        @executor = ThreadPoolExecutor.new(@executor_options)
+        @executor = if @fibers
+                      FiberPoolExecutor.new(max_fibers: @fibers, name: name)
+                    else
+                      ThreadPoolExecutor.new(@executor_options)
+                    end
       end
     end
 
@@ -283,7 +377,7 @@ module GoodJob # :nodoc:
       future = Concurrent::ScheduledTask.new(delay, args: [self, performer], executor: executor, timer_set: timer_set) do |thr_scheduler, thr_performer|
         Thread.current.name = Thread.current.name.sub("-worker-", "-thread-") if Thread.current.name
         GoodJob::SafeState[:good_job_scheduler] = thr_scheduler
-        Thread.current.priority = -3 if thr_scheduler.lower_thread_priority
+        Thread.current.priority = LOW_THREAD_PRIORITY if thr_scheduler.lower_thread_priority && !thr_scheduler.fibers?
 
         Rails.application.reloader.wrap do
           thr_performer.next do |found|
@@ -306,6 +400,12 @@ module GoodJob # :nodoc:
                                       })
 
       ActiveSupport::Notifications.instrument("#{name}.good_job", payload, &block)
+    end
+
+    # Number of tasks this scheduler can execute concurrently (fibers or threads).
+    # @return [Integer]
+    def capacity
+      @fibers || @executor_options[:max_threads]
     end
 
     def cache_count
