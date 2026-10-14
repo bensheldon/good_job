@@ -139,8 +139,10 @@ module GoodJob # :nodoc:
           job_klass = resolve_job_class
           next unless job_klass.is_a?(Class)
 
-          configured_job = job_klass.set(set_value)
-          kwargs_value.present? ? configured_job.perform_later(*args_value, **kwargs_value) : configured_job.perform_later(*args_value)
+          configured_job = job_klass.set(resolve_set)
+          job_args = resolve_args
+          job_kwargs = resolve_kwargs
+          job_kwargs.present? ? configured_job.perform_later(*job_args, **job_kwargs) : configured_job.perform_later(*job_args)
         end
       end
     end
@@ -213,7 +215,8 @@ module GoodJob # :nodoc:
     end
 
     def resolve_job_class
-      value = job_class_value
+      value = job_class
+      value = value.call if value.respond_to?(:call)
       value.is_a?(String) ? value.constantize : value
     end
 
@@ -236,22 +239,17 @@ module GoodJob # :nodoc:
       schedule if schedule.instance_of?(Fugit::Cron)
     end
 
-    def job_class_value
-      value = job_class || nil
-      value.respond_to?(:call) ? value.call : value
-    end
-
-    def set_value
+    def resolve_set
       value = set || {}
       value.respond_to?(:call) ? value.call : value
     end
 
-    def args_value
+    def resolve_args
       value = args || []
       value.respond_to?(:call) ? value.call : value
     end
 
-    def kwargs_value
+    def resolve_kwargs
       value = kwargs || nil
       value.respond_to?(:call) ? value.call : value
     end
