@@ -306,6 +306,45 @@ RSpec.describe GoodJob::Adapter do
     end
   end
 
+  describe '#async_started?' do
+    it 'uses GoodJob.capsule when no capsule is given' do
+      adapter = described_class.new(execution_mode: :external)
+      capsule = GoodJob::Capsule.new(configuration: GoodJob::Configuration.new({ queues: 'mice:1', poll_interval: -1 }))
+      GoodJob.capsule = capsule
+
+      expect { capsule.start }.to change(adapter, :async_started?).from(false).to(true)
+      expect { adapter.shutdown }.to change(capsule, :shutdown?).from(false).to(true)
+    end
+
+    it 'uses its own capsule when given' do
+      capsule = GoodJob::Capsule.new(configuration: GoodJob::Configuration.new({ queues: 'mice:1', poll_interval: -1 }))
+      adapter = described_class.new(execution_mode: :external, _capsule: capsule)
+
+      expect { capsule.start }.to change(adapter, :async_started?).from(false).to(true)
+      expect(GoodJob.capsule).not_to be_running
+      adapter.shutdown
+    end
+  end
+
+  describe '.prune' do
+    it 'removes adapters once Rails has initialized' do
+      adapter
+      expect(described_class.instances).to include(adapter)
+
+      described_class.prune
+      expect(described_class.instances).not_to include(adapter)
+    end
+
+    it 'retains adapters until Rails has initialized so they can be started' do
+      allow(GoodJob).to receive(:async_ready?).and_return(false)
+      adapter
+
+      described_class.prune
+      expect(described_class.instances).to include(adapter)
+      described_class.instances.delete(adapter)
+    end
+  end
+
   describe '#stopping?' do
     it 'is callable without a job argument for Rails <= 8.1 compatibility' do
       expect { adapter.stopping? }.not_to raise_error

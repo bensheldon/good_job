@@ -53,6 +53,7 @@ RSpec.configure do |config|
     # Everything should be shut down (and trackers unlocked), so pruning should empty every registry
     GoodJob.prune
     [
+      GoodJob::Adapter,
       GoodJob::Capsule,
       GoodJob::CapsuleTracker,
       GoodJob::CronManager,
