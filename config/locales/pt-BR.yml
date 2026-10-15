@@ -37,17 +37,17 @@ pt-BR:
         no_batches_found: Nenhum lote encontrado.
     cleaner:
       index:
-        all: All
-        class: Class
-        exception: Exception
-        grouped_by_class: Discards grouped by Class
-        grouped_by_exception: Discards grouped by Exception
-        last_1_hour: Last 1 hour
-        last_24_hours: Last 24 hours
-        last_3_days: Last 3 days
-        last_3_hours: Last 3 hours
-        last_7_days: Last 7 days
-        title: Discard Cleaner
+        all: Tudo
+        class: Classe
+        exception: Exceção
+        grouped_by_class: Descartes agrupados por Classe
+        grouped_by_exception: Descartes agrupados por Exceção
+        last_1_hour: Última hora
+        last_24_hours: Últimas 24 horas
+        last_3_days: Últimos 3 dias
+        last_3_hours: Últimas 3 horas
+        last_7_days: Últimos 7 dias
+        title: Limpeza de Descartes
         total: Total
     concurrency_claims:
       states:
@@ -142,12 +142,12 @@ pt-BR:
         reschedule: Reagendar tarefa
         retry: Tentar tarefa novamente
       destroy:
-        notice: A tarefa foi excluida.
+        notice: A tarefa foi excluída.
       discard:
         notice: A tarefa foi descartada.
       executions:
-        application_trace: Application Trace
-        full_trace: Full Trace
+        application_trace: Trace da aplicação
+        full_trace: Trace completo
         in_queue: na fila
         recovery: recuperação
         runtime: tempo de execução
@@ -175,7 +175,7 @@ pt-BR:
           destroy_all: Excluir tudo
           discard_all: Descartar tudo
           reschedule_all: Reagendar tudo
-          retry_all: Tentar novamente tudo
+          retry_all: Tentar tudo novamente
           title: Ações
         no_jobs_found: Nenhuma tarefa encontrada.
         toggle_actions: Alternar Ações
@@ -204,7 +204,7 @@ pt-BR:
       job:
         arguments: Argumentos
         attempts: Tentativas
-        concurrency_claims: Reivindicações de concorrência
+        concurrency_claims: Reservas de concorrência
         labels: Rótulos
         priority: Prioridade
         queue: Fila
@@ -230,7 +230,7 @@ pt-BR:
         confirm_pause: Tem certeza que deseja pausar %{value}?
         confirm_unpause: Tem certeza que deseja retomar %{value}?
         disabled: O recurso experimental de Pausas do GoodJob está desativado por padrão porque pode degradar o desempenho. Configure para ativar
-        job_class: Classe do trabalho
+        job_class: Classe da tarefa
         label: Rótulo
         pause: Pausar
         queue: Fila
@@ -245,8 +245,8 @@ pt-BR:
         chart_title_total: Latência total média em segundos
         execution_latency: Latência de execução
         executions: Execuções
-        job_class: Classe do trabalho
-        jobs: Trabalhos
+        job_class: Classe da tarefa
+        jobs: Tarefas
         no_executions: Nenhuma execução neste intervalo de tempo.
         queue_latency: Latência na fila
         queue_name: Nome da fila
@@ -267,7 +267,9 @@ pt-BR:
           days: "%{count}d"
           hours: "%{count}h"
           minutes: "%{count}m"
-          months: "~%{count} mês"
+          months:
+            one: "~%{count} mês"
+            other: "~%{count} meses"
           seconds: "%{count}s"
           years: "~%{count}a"
         chart_bucket_size: 'Granularidade temporal do gráfico: %{size}'
@@ -317,8 +319,8 @@ pt-BR:
         search: Pesquisar
       navbar:
         batches: Lotes
-        cleaner: Discard Cleaner
-        cron_schedules: Agendamentos
+        cleaner: Limpeza de Descartes
+        cron_schedules: Tarefas Programadas
         jobs: Tarefas
         live_poll: Acompanhamento ao Vivo
         name: "GoodJob 👍"
@@ -332,7 +334,7 @@ pt-BR:
           theme: Tema
       pending_migrations: O GoodJob tem migrações pendentes no banco de dados.
       secondary_navbar:
-        inspiration: Lembre-se, você também está fazendo uma Boa Tarefa!
+        inspiration: Lembre-se, você também está fazendo um Bom Trabalho!
         last_updated: Última atualização
     status:
       discarded: Descartado
