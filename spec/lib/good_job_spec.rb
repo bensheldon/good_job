@@ -52,6 +52,37 @@ describe GoodJob do
     end
   end
 
+  describe '.prune' do
+    it 'removes shut down instances from the registries' do
+      capsule = GoodJob::Capsule.new(configuration: configuration)
+      capsule.start
+      scheduler = GoodJob::Scheduler.instances.last
+      notifier = GoodJob::Notifier.instances.last
+
+      described_class.prune
+      expect(GoodJob::Capsule.instances).to include(capsule)
+      expect(GoodJob::Scheduler.instances).to include(scheduler)
+
+      capsule.shutdown
+      described_class.prune
+      expect(GoodJob::Capsule.instances).not_to include(capsule)
+      expect(GoodJob::Scheduler.instances).not_to include(scheduler)
+      expect(GoodJob::Notifier.instances).not_to include(notifier)
+      expect(GoodJob::SharedExecutor.instances).not_to include(capsule.instance_variable_get(:@shared_executor))
+      expect(GoodJob::CapsuleTracker.instances).not_to include(capsule.tracker)
+    end
+
+    it 're-registers a pruned capsule when it is started again' do
+      capsule = GoodJob::Capsule.new(configuration: configuration)
+      described_class.prune
+      expect(GoodJob::Capsule.instances).not_to include(capsule)
+
+      capsule.start
+      expect(GoodJob::Capsule.instances).to include(capsule)
+      expect { described_class.shutdown }.to change(capsule, :shutdown?).from(false).to(true)
+    end
+  end
+
   describe '.cleanup_preserved_jobs' do
     let!(:recent_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 12.hours.ago) }
     let!(:old_unfinished_job) { GoodJob::Job.create!(active_job_id: SecureRandom.uuid, scheduled_at: 15.days.ago, finished_at: nil) }

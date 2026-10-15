@@ -32,11 +32,7 @@ module GoodJob # :nodoc:
     # In CRuby, this sets the thread quantum to ~12.5ms ( 100ms * 2^(-3) ).
     LOW_THREAD_PRIORITY = -3
 
-    # @!attribute [r] instances
-    #   @!scope class
-    #   List of all instantiated Schedulers in the current process.
-    #   @return [Array<GoodJob::Scheduler>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    include InstanceRegistry
 
     # Human readable name of the scheduler that includes configuration values.
     # @return [String]
@@ -74,7 +70,6 @@ module GoodJob # :nodoc:
 
       create_executor
       warm_cache if warm_cache_on_initialize
-      self.class.instances << self
     end
 
     # Tests whether the scheduler is running.
@@ -270,6 +265,7 @@ module GoodJob # :nodoc:
 
     # @return [void]
     def create_executor
+      register_instance
       instrument("scheduler_create_pool", { performer_name: performer.name, max_threads: @executor_options[:max_threads] }) do
         @timer_set = TimerSet.new
         @executor = ThreadPoolExecutor.new(@executor_options)

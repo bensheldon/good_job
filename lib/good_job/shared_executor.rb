@@ -9,18 +9,14 @@ module GoodJob
 
     MAX_THREADS = 2
 
-    # @!attribute [r] instances
-    #   @!scope class
-    #   List of all instantiated SharedExecutor in the current process.
-    #   @return [Array<GoodJob::SharedExecutor>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    include InstanceRegistry
 
     attr_reader :executor
 
     def initialize
       @mutex = Mutex.new
 
-      self.class.instances << self
+      register_instance
     end
 
     def post(*args, &task)
@@ -75,6 +71,7 @@ module GoodJob
     private
 
     def create_executor
+      register_instance
       @executor = Concurrent::ThreadPoolExecutor.new(
         # On JRuby, a Java thread pool with an unbounded queue never grows beyond min_threads (except to a single
         # thread from 0), and the Notifier's listen loop occupies a thread for as long as it runs.
