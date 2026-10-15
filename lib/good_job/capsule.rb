@@ -5,11 +5,7 @@ module GoodJob
   # a {GoodJob::Scheduler}, {GoodJob::Poller}, {GoodJob::Notifier}, and {GoodJob::CronManager}.
   # GoodJob creates a default capsule on initialization.
   class Capsule
-    # @!attribute [r] instances
-    #   @!scope class
-    #   List of all instantiated Capsules in the current process.
-    #   @return [Array<GoodJob::Capsule>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    include InstanceRegistry
 
     delegate :register, :renew, :unregister, :id_for_lock, to: :@tracker, prefix: :_tracker
 
@@ -26,7 +22,7 @@ module GoodJob
       @tracker = GoodJob::CapsuleTracker.new(executor: @shared_executor)
       @lower_thread_priority = nil
 
-      self.class.instances << self
+      register_instance
     end
 
     # Start the capsule once. After a shutdown, {#restart} must be used to start again.
@@ -36,6 +32,8 @@ module GoodJob
 
       @mutex.synchronize do
         return unless startable?(force: force)
+
+        register_instance
 
         @notifier = GoodJob::Notifier.new(enable_listening: configuration.enable_listen_notify, capsule: self, executor: @shared_executor)
         @poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)

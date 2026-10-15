@@ -12,6 +12,7 @@ require_relative "good_job/adapter/inline_buffer"
 require_relative "active_job/queue_adapters/good_job_adapter"
 require_relative "good_job/active_job_extensions/batches"
 require_relative "good_job/active_job_extensions/concurrency"
+require_relative "good_job/instance_registry"
 require_relative "good_job/interrupt_error"
 require_relative "good_job/interrupted_error"
 require_relative "good_job/active_job_extensions/interrupt_errors"
@@ -247,6 +248,16 @@ module GoodJob
   # @return [Boolean] whether background threads are shut down
   def self.shutdown?
     Capsule.instances.all?(&:shutdown?)
+  end
+
+  # Removes shut down instances (e.g. {GoodJob::Capsule}, {GoodJob::Scheduler}, {GoodJob::Notifier}) from their
+  # class-level registries so they can be garbage collected. Shut down instances are otherwise retained so that
+  # {.restart} can restart them; pruned instances will not be restarted by {.restart} unless started again directly.
+  # This is useful in processes that repeatedly create and shut down capsules, such as test suites.
+  # @return [void]
+  def self.prune
+    [Capsule, CronManager, Notifier, Poller, Scheduler, SharedExecutor, CapsuleTracker].each(&:prune)
+    nil
   end
 
   # Stops and restarts executing jobs.

@@ -33,7 +33,7 @@ RSpec.describe GoodJob::ProbeServer::HealthcheckMiddleware do
 
       context 'when there are running schedulers' do
         it 'returns 200' do
-          scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true)
+          scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true, prunable?: true)
           GoodJob::Scheduler.instances << scheduler
 
           response = healthcheck_middleware.call(env)
@@ -54,10 +54,10 @@ RSpec.describe GoodJob::ProbeServer::HealthcheckMiddleware do
 
       context 'when there are running schedulers but disconnected notifiers' do
         it 'returns 200' do
-          scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true)
+          scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true, prunable?: true)
           GoodJob::Scheduler.instances << scheduler
 
-          notifier = instance_double(GoodJob::Notifier, connected?: false, shutdown: true, shutdown?: true)
+          notifier = instance_double(GoodJob::Notifier, connected?: false, shutdown: true, shutdown?: true, prunable?: true)
           GoodJob::Notifier.instances << notifier
 
           response = healthcheck_middleware.call(env)
@@ -67,10 +67,10 @@ RSpec.describe GoodJob::ProbeServer::HealthcheckMiddleware do
 
       context 'when there are running schedulers and connected notifiers' do
         it 'returns 200' do
-          scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true)
+          scheduler = instance_double(GoodJob::Scheduler, running?: true, shutdown: true, shutdown?: true, prunable?: true)
           GoodJob::Scheduler.instances << scheduler
 
-          notifier = instance_double(GoodJob::Notifier, connected?: true, shutdown: true, shutdown?: true)
+          notifier = instance_double(GoodJob::Notifier, connected?: true, shutdown: true, shutdown?: true, prunable?: true)
           GoodJob::Notifier.instances << notifier
 
           response = healthcheck_middleware.call(env)

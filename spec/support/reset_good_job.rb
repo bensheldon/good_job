@@ -50,25 +50,20 @@ RSpec.configure do |config|
     )
     GoodJob._shutdown_all(executables, timeout: -1)
 
-    GoodJob::CapsuleTracker.instances.each do |tracker|
-      expect(tracker.locks).to eq 0
+    # Everything should be shut down (and trackers unlocked), so pruning should empty every registry
+    GoodJob.prune
+    [
+      GoodJob::Capsule,
+      GoodJob::CapsuleTracker,
+      GoodJob::CronManager,
+      GoodJob::Notifier,
+      GoodJob::Poller,
+      GoodJob::Scheduler,
+      GoodJob::SharedExecutor,
+    ].each do |klass|
+      expect(klass.instances).to be_empty, "Expected #{klass} instances to be pruned, but #{klass.instances.size} remain"
+      klass.instances.clear
     end
-    GoodJob::CapsuleTracker.instances.clear
-
-    expect(GoodJob::Notifier.instances).to all be_shutdown
-    GoodJob::Notifier.instances.clear
-
-    expect(GoodJob::Poller.instances).to all be_shutdown
-    GoodJob::Poller.instances.clear
-
-    expect(GoodJob::CronManager.instances).to all be_shutdown
-    GoodJob::CronManager.instances.clear
-
-    expect(GoodJob::Scheduler.instances).to all be_shutdown
-    GoodJob::Scheduler.instances.clear
-
-    expect(GoodJob::Capsule.instances).to all be_shutdown
-    GoodJob::Capsule.instances.clear
 
     # always make sure there is a capsule; unstub it first if necessary
     RSpec::Mocks.space.proxy_for(GoodJob::Capsule).reset

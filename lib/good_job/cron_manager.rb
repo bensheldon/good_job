@@ -9,11 +9,7 @@ module GoodJob # :nodoc:
   # CronManagers enqueue jobs on a repeating schedule.
   #
   class CronManager
-    # @!attribute [r] instances
-    #   @!scope class
-    #   List of all instantiated CronManagers in the current process.
-    #   @return [Array<GoodJob::CronManager>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    include InstanceRegistry
 
     # Task observer for cron task
     # @param time [Time]
@@ -41,11 +37,12 @@ module GoodJob # :nodoc:
       @graceful_restart_period = graceful_restart_period
 
       start if start_on_initialize
-      self.class.instances << self
+      register_instance
     end
 
     # Schedule tasks that will enqueue jobs based on their schedule
     def start
+      register_instance
       ActiveSupport::Notifications.instrument("cron_manager_start.good_job", cron_entries: cron_entries) do
         @running = true
         graceful_restart = graceful_restart?
