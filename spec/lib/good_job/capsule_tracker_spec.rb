@@ -427,7 +427,8 @@ describe GoodJob::CapsuleTracker do
           original_value = tracker.id_for_lock
           original_process_id = tracker.process_id
 
-          allow(Process).to receive(:pid).and_return(Process.pid + 1)
+          # Simulate a fork by making the recorded pid differ from the current pid
+          tracker.instance_variable_set(:@pid, Process.pid + 1)
 
           expect(tracker.process_id).not_to eq original_process_id
           expect(tracker.id_for_lock).not_to eq original_value
