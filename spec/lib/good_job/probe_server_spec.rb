@@ -37,7 +37,7 @@ RSpec.describe GoodJob::ProbeServer do
         it 'starts a http server that binds to all interfaces and returns healthcheck responses' do
           probe_server = described_class.new(port: port, app: nil)
           probe_server.start
-          wait_until(max: 1) { expect(probe_server).to be_running }
+          wait_until(max: 1) { expect(probe_server.running?).to be true }
 
           ip_addresses = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address)
           expect(ip_addresses.size).to be >= 2
@@ -71,7 +71,7 @@ RSpec.describe GoodJob::ProbeServer do
           app = proc { [200, { "Content-Type" => "text/plain" }, ["Hello World"]] }
           probe_server = described_class.new(app: app, port: port)
           probe_server.start
-          wait_until(max: 1) { expect(probe_server).to be_running }
+          wait_until(max: 1) { expect(probe_server.running?).to be true }
 
           ip_addresses = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address)
           expect(ip_addresses.size).to be >= 2
@@ -94,7 +94,7 @@ RSpec.describe GoodJob::ProbeServer do
         it 'starts a WEBrick http server' do
           probe_server = described_class.new(port: port, handler: :webrick)
           probe_server.start
-          wait_until(max: 1) { expect(probe_server).to be_running }
+          wait_until(max: 1) { expect(probe_server.running?).to be true }
 
           ip_address = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address).first
           response = Net::HTTP.get_response(ip_address, "/", port)
@@ -107,7 +107,7 @@ RSpec.describe GoodJob::ProbeServer do
         it 'server binds to all interfaces and returns healthcheck responses' do
           probe_server = described_class.new(port: port, handler: :webrick)
           probe_server.start
-          wait_until(max: 1) { expect(probe_server).to be_running }
+          wait_until(max: 1) { expect(probe_server.running?).to be true }
 
           ip_addresses = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address)
           expect(ip_addresses.size).to be >= 2
@@ -142,7 +142,7 @@ RSpec.describe GoodJob::ProbeServer do
 
             probe_server = described_class.new(port: port, handler: :webrick)
             probe_server.start
-            wait_until(max: 1) { expect(probe_server).to be_running }
+            wait_until(max: 1) { expect(probe_server.running?).to be true }
 
             ip_address = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address).first
             response = Net::HTTP.get(ip_address, "/", port)
@@ -160,7 +160,7 @@ RSpec.describe GoodJob::ProbeServer do
           app = proc { [200, { "Content-Type" => "text/plain" }, ["Hello World"]] }
           probe_server = described_class.new(app: app, port: port)
           probe_server.start
-          wait_until(max: 1) { expect(probe_server).to be_running }
+          wait_until(max: 1) { expect(probe_server.running?).to be true }
 
           ip_addresses = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address)
           expect(ip_addresses.size).to be >= 2
@@ -184,7 +184,7 @@ RSpec.describe GoodJob::ProbeServer do
 
         probe_server = described_class.new(port: port, handler: :puma)
         probe_server.start
-        wait_until(max: 1) { expect(probe_server).to be_running }
+        wait_until(max: 1) { expect(probe_server.running?).to be true }
 
         ip_address = Socket.ip_address_list.select(&:ipv4?).map(&:ip_address).first
         response = Net::HTTP.get(ip_address, "/", port)

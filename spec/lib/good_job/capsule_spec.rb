@@ -150,7 +150,7 @@ describe GoodJob::Capsule do
       ACTIVE_EVENT.wait(5)
       WAIT_EVENT.set
 
-      wait_until { expect(capsule).to be_idle(1.second) }
+      wait_until { expect(capsule.idle?(1.second)).to be true }
     end
   end
 
