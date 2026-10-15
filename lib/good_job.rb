@@ -7,12 +7,12 @@ require_relative "good_job/version"
 require_relative "good_job/engine"
 require_relative "good_job/ractors"
 
+require_relative "good_job/instance_registry"
 require_relative "good_job/adapter"
 require_relative "good_job/adapter/inline_buffer"
 require_relative "active_job/queue_adapters/good_job_adapter"
 require_relative "good_job/active_job_extensions/batches"
 require_relative "good_job/active_job_extensions/concurrency"
-require_relative "good_job/instance_registry"
 require_relative "good_job/interrupt_error"
 require_relative "good_job/interrupted_error"
 require_relative "good_job/active_job_extensions/interrupt_errors"
@@ -256,7 +256,7 @@ module GoodJob
   # This is useful in processes that repeatedly create and shut down capsules, such as test suites.
   # @return [void]
   def self.prune
-    [Capsule, CronManager, Notifier, Poller, Scheduler, SharedExecutor, CapsuleTracker].each(&:prune)
+    [Adapter, Capsule, CronManager, Notifier, Poller, Scheduler, SharedExecutor, CapsuleTracker].each(&:prune)
     nil
   end
 

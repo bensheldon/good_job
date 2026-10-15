@@ -5,18 +5,7 @@ module GoodJob
   # ActiveJob Adapter.
   #
   class Adapter
-    # @!attribute [r] instances
-    #   @!scope class
-    #   List of all instantiated Adapters in the current process.
-    #   @return [Array<GoodJob::Adapter>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
-
-    # Mutable per-adapter state (the capsule and whether it was started), kept
-    # off the adapter instance so that the adapter itself can be made
-    # Ractor-shareable. Only accessed from the main Ractor.
-    Runtime = Struct.new(:capsule, :async_started)
-    RUNTIMES = Concurrent::Map.new
-    private_constant :Runtime, :RUNTIMES
+    include InstanceRegistry
 
     # @param execution_mode [Symbol, nil] specifies how and where jobs should be executed. You can also set this with the environment variable +GOOD_JOB_EXECUTION_MODE+.
     #
@@ -32,13 +21,15 @@ module GoodJob
     #   -+test+: +:inline+
     #  - +production+ and all other environments: +:external+
     #
-    def initialize(execution_mode: nil, _capsule: GoodJob.capsule) # rubocop:disable Lint/UnderscorePrefixedVariableName
+    # @param _capsule [GoodJob::Capsule, nil] Capsule to use instead of {GoodJob.capsule}. An adapter with
+    #   its own capsule cannot be made Ractor-shareable.
+    def initialize(execution_mode: nil, _capsule: nil) # rubocop:disable Lint/UnderscorePrefixedVariableName
       @_execution_mode_override = execution_mode
       GoodJob::Configuration.validate_execution_mode(@_execution_mode_override) if @_execution_mode_override
-      RUNTIMES[self] = Runtime.new(_capsule, false)
+      @_capsule = _capsule
 
       start_async if GoodJob.async_ready?
-      self.class.instances << self
+      register_instance
     end
 
     # Enqueues the ActiveJob job to be performed.
@@ -255,9 +246,7 @@ module GoodJob
     #   * A positive number will wait that many seconds before stopping any remaining active threads.
     # @return [void]
     def shutdown(timeout: NONE)
-      runtime = RUNTIMES[self]
-      runtime.capsule&.shutdown(timeout: timeout)
-      runtime.async_started = false
+      capsule.shutdown(timeout: timeout)
     end
 
     # This adapter's execution mode
@@ -292,40 +281,51 @@ module GoodJob
     def start_async
       return unless execute_async?
 
-      runtime = RUNTIMES[self]
-      runtime.capsule.start
-      runtime.capsule.lower_thread_priority = true if GoodJob.configuration.lower_thread_priority.in?([true, nil])
-      runtime.async_started = true
+      capsule.start
+      capsule.lower_thread_priority = true if GoodJob.configuration.lower_thread_priority.in?([true, nil])
     end
 
     # Whether the async executors are running
     # @return [Boolean]
     def async_started?
-      GoodJob::Ractors.on_main(self) { RUNTIMES[self].async_started }
+      GoodJob::Ractors.on_main(self) { capsule.running? }
+    end
+
+    # Adapters are retained until Rails has initialized so that async adapters can be started.
+    # @return [Boolean]
+    def prunable?
+      GoodJob.async_ready?
     end
 
     private
 
+    # The capsule is resolved on each use (rather than stored) so the adapter
+    # remains Ractor-shareable. Only call from the main Ractor.
+    # @return [GoodJob::Capsule]
+    def capsule
+      @_capsule || GoodJob.capsule
+    end
+
     # The capsule is not Ractor-shareable, so it is always used on the main Ractor.
     def create_capsule_thread(state)
       job_state = GoodJob::Ractors.main? ? state : GoodJob::Ractors.make_shareable(state.dup)
-      GoodJob::Ractors.on_main(self) { RUNTIMES[self].capsule&.create_thread(job_state) }
+      GoodJob::Ractors.on_main(self) { capsule&.create_thread(job_state) }
     end
 
     def register_tracker
       GoodJob::Ractors.on_main(self) do
-        tracker = RUNTIMES[self].capsule.tracker
+        tracker = capsule.tracker
         tracker.register
         tracker.id_for_lock
       end
     end
 
     def unregister_tracker
-      GoodJob::Ractors.on_main(self) { RUNTIMES[self].capsule.tracker.unregister }
+      GoodJob::Ractors.on_main(self) { capsule.tracker.unregister }
     end
 
     def tracker_id_for_lock
-      GoodJob::Ractors.on_main(self) { RUNTIMES[self].capsule.tracker.id_for_lock }
+      GoodJob::Ractors.on_main(self) { capsule.tracker.id_for_lock }
     end
 
     # Active Record does not support +insert_all+ outside of the main Ractor.
