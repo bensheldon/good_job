@@ -85,6 +85,7 @@ platforms :ruby do
   end
 
   group :demo, :production do
+    gem "rack-attack"
     gem "skylight"
   end
 end
