@@ -2,7 +2,14 @@ require_relative 'boot'
 
 require 'logger' # Before rails: https://github.com/rails/rails/pull/54264
 
-require 'rails/all'
+require "rails"
+# Load only the frameworks the demo uses; skipping ActionCable, ActionMailer,
+# ActionMailbox, ActionText, and ActiveStorage reduces memory usage
+require "active_record/railtie"
+require "active_job/railtie"
+require "action_controller/railtie"
+require "action_view/railtie"
+require "rails/test_unit/railtie"
 require "good_job"
 require "good_job/engine"
 

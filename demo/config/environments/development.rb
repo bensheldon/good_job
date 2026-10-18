@@ -66,7 +66,6 @@ Rails.application.configure do
     pf_host = "#{ENV['CODESPACE_NAME']}-#{pf_port}.#{pf_domain}"
 
     config.hosts << pf_host
-    config.action_cable.allowed_request_origins = ["https://#{pf_host}"]
     config.action_dispatch.default_headers['X-Frame-Options'] = "ALLOW-FROM #{pf_domain}"
   end
 end
