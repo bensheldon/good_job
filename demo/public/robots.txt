@@ -1,2 +1,2 @@
 User-agent: *
-Disallow: /good_job
+Disallow: /good_job/jobs/
