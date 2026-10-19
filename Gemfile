@@ -41,13 +41,14 @@ install_if -> { ENV["RAILS_VERSION"] == "6.1" } do
   gem "benchmark"
 end
 
+gem "rack-attack"
+
 platforms :ruby do
   gem "bootsnap"
   gem "dotenv-rails"
   gem "foreman"
   gem "gem-release"
   gem "github_changelog_generator", require: false
-  gem "rack-attack"
   gem "rdoc", require: false
   gem "warning"
 
