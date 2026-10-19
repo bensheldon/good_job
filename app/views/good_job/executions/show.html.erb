@@ -1,0 +1,11 @@
+<%= content_tag "turbo-frame", id: dom_id(@execution, :full_trace) do %>
+  <div class="small">
+    <code class="text-wrap text-break m-0 text-secondary-emphasis">
+      <%= safe_join(@execution.error_backtrace || [], tag.br) %>
+    </code>
+  </div>
+<% end %>
+
+<%= content_tag "turbo-frame", id: dom_id(@execution, :serialized_params) do %>
+  <%= tag.pre JSON.pretty_generate(truncate_display_value(@execution.display_serialized_params)) %>
+<% end %>

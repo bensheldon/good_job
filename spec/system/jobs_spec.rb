@@ -170,6 +170,22 @@ describe 'Jobs', :js, :without_executor do
       end
     end
 
+    it 'loads execution details on demand' do
+      execution = discarded_job.executions.order(:created_at).last
+      visit good_job.job_path(discarded_job)
+      wait_for_turbo_load
+
+      within "##{dom_id(execution)}" do
+        click_on 'Full Trace'
+        expect(page).to have_css "##{dom_id(execution, :full_pane)}", text: execution.error_backtrace.last
+
+        click_on 'Inspect'
+      end
+      # Lazy frames load once scrolled into view
+      scroll_to find("##{dom_id(execution, :params)}")
+      expect(page).to have_css "##{dom_id(execution, :params)}", text: '"job_class": "ExampleJob"'
+    end
+
     it 'can retry discarded jobs' do
       visit '/good_job'
       wait_for_turbo_load
