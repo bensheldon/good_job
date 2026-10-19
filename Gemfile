@@ -41,6 +41,8 @@ install_if -> { ENV["RAILS_VERSION"] == "6.1" } do
   gem "benchmark"
 end
 
+gem "rack-attack"
+
 platforms :ruby do
   gem "bootsnap"
   gem "dotenv-rails"
@@ -85,7 +87,6 @@ platforms :ruby do
   end
 
   group :demo, :production do
-    gem "rack-attack"
     gem "skylight"
   end
 end
