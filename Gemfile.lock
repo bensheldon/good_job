@@ -365,6 +365,8 @@ GEM
     racc (1.8.1)
     racc (1.8.1-java)
     rack (3.2.7)
+    rack-attack (6.8.0)
+      rack (>= 1.0, < 4)
     rack-mini-profiler (5.0.0)
       rack (>= 1.2.0)
     rack-session (2.1.2)
@@ -604,6 +606,7 @@ DEPENDENCIES
   pg
   pghero
   puma
+  rack-attack
   rack-mini-profiler
   rails (~> 8.1.4)
   rbs (= 4.1.0.pre.2)
