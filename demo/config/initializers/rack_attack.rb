@@ -8,4 +8,13 @@ if defined?(Rack::Attack)
   Rack::Attack.throttle("job pages/ip", limit: 10, period: 1.minute) do |req|
     req.ip if req.get? && req.path.start_with?("/good_job/jobs/")
   end
+
+  # Action routes only accept PUT/POST, so a GET means a crawler is following links
+  ACTION_PATH = %r{\A/good_job/(jobs/[^/]+/(discard|force_discard|reschedule|retry)|batches/[^/]+/retry|cron_entries/[^/]+/(enqueue|enable|disable))\z}
+
+  Rack::Attack.blocklist("action links/ip") do |req|
+    Rack::Attack::Fail2Ban.filter("action-links-#{req.ip}", maxretry: 0, findtime: 1.minute, bantime: 1.minute) do
+      req.get? && ACTION_PATH.match?(req.path)
+    end
+  end
 end
