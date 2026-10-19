@@ -47,6 +47,7 @@ platforms :ruby do
   gem "foreman"
   gem "gem-release"
   gem "github_changelog_generator", require: false
+  gem "rack-attack"
   gem "rdoc", require: false
   gem "warning"
 
@@ -85,7 +86,6 @@ platforms :ruby do
   end
 
   group :demo, :production do
-    gem "rack-attack"
     gem "skylight"
   end
 end
