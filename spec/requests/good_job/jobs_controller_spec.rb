@@ -52,6 +52,13 @@ describe GoodJob::JobsController do
     end
   end
 
+  describe 'GET /jobs/mass_update' do
+    it 'is not found' do
+      get '/good_job/jobs/mass_update'
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
   describe 'PUT #mass_update' do
     let!(:job) do
       ExampleJob.perform_later
