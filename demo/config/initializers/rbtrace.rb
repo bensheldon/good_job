@@ -2,9 +2,6 @@
 #   $ bundle exec rbtrace --pid PID --eval 'Thread.new { require "objspace"; GC.start; File.open("tmp/heap-#{Process.pid}.json", "w") { |io| ObjectSpace.dump_all(output: io) } }.join; "done"'
 # Then analyze it with the sheap gem.
 #
-# rbtrace only responds once a Ruby thread wakes up to do work, so an idle process
-# may report "pid is not listening"; send it a few web requests and try again.
-#
 # rbtrace doesn't survive a fork, so a clustered Puma server requires it in each worker
 # after forking instead (before_worker_boot in config/puma.rb).
 clustered_server = (defined?(Rails::Server) || defined?(Puma::Launcher)) && ENV.fetch("WEB_CONCURRENCY", 0).to_i > 0
