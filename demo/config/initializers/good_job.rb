@@ -1,10 +1,59 @@
 Rails.application.configure do
   config.good_job.enable_pauses = true
+
+  # Cron is configured in every environment so the dashboard shows it,
+  # but entries only run by default in the demo (or with CRON_ENABLED_BY_DEFAULT);
+  # enable them through the dashboard elsewhere.
+  # Cron procs must be shareable for GoodJob.ractorize! (Ruby 4+)
+  shareable = defined?(Ractor) && Ractor.respond_to?(:shareable_lambda) ? ->(&block) { Ractor.shareable_lambda(&block) } : ->(&block) { block }
+
+  enabled_in_demo = shareable.call { Rails.env.demo? || ActiveModel::Type::Boolean.new.cast(ENV.fetch("CRON_ENABLED_BY_DEFAULT", nil)) }
   config.good_job.cron = {
     example: {
-      cron: '*/5 * * * * *', # every 5 seconds
-      class: 'ExampleJob',
-      description: "Enqueue ExampleJob every 5 seconds",
+      description: "Enqueue an ExampleJob with a random sample of configuration",
+      cron: "* * * * * *",
+      class: "ExampleJob",
+      args: (shareable.call do
+        [ExampleJob::TYPES.sample.to_s]
+      end),
+      set: (shareable.call do
+        queue = [:default, :elephants, :mice].sample
+        delay = [0, (0..60).to_a.sample].sample
+        priority = [-10, 0, 10].sample
+
+        { wait: delay, queue: queue, priority: priority }
+      end),
+      enabled_by_default: enabled_in_demo,
+    },
+    other_example: {
+      description: "Enqueue an OtherJob occasionally",
+      cron: "*/15 * * * * *",
+      class: "OtherJob",
+      set: { queue: :default },
+      enabled_by_default: enabled_in_demo,
+    },
+    batch_example: {
+      description: "Enqueue a Batch",
+      cron: "*/30 * * * * *",
+      class: "ExampleJob::BatchJob",
+      enabled_by_default: enabled_in_demo,
+    },
+    concurrency_example: {
+      description: "Enqueue slow jobs that contend for a concurrency limit",
+      cron: "*/30 * * * * *",
+      class: "ExampleJob::ConcurrencyExampleJob",
+      enabled_by_default: enabled_in_demo,
+    },
+    complex_schedule: {
+      cron: shareable.call { |last_ran| last_ran ? last_ran + 17.hours : Time.now },
+      class: "OtherJob",
+      enabled_by_default: enabled_in_demo,
+    },
+    pg_hero_maintenance: {
+      cron: "*/10 * * * *", # Every 10 minutes
+      class: "PgHeroMaintenanceJob",
+      description: "Runs PG Hero maintenance",
+      enabled_by_default: enabled_in_demo,
     },
   }
 end
@@ -21,37 +70,6 @@ when 'development'
 
   Rails.application.configure do
     config.good_job.enable_cron = ActiveModel::Type::Boolean.new.cast(ENV.fetch('GOOD_JOB_ENABLE_CRON', true))
-    config.good_job.cron = {
-      batch_example: {
-        description: "Enqueue a Batch",
-        cron: "*/15 * * * * *",
-        class: "ExampleJob::BatchJob",
-      },
-      concurrency_example: {
-        description: "Enqueue slow jobs that contend for a concurrency limit",
-        cron: "*/30 * * * * *",
-        class: "ExampleJob::ConcurrencyExampleJob",
-      },
-      frequent_example: {
-        description: "Enqueue an ExampleJob",
-        cron: "*/5 * * * * *",
-        class: "ExampleJob",
-        args: (lambda do
-          [ExampleJob::TYPES.sample.to_s]
-        end),
-        set: (lambda do
-          queue = [:default, :elephants, :mice].sample
-          delay = [0, (0..60).to_a.sample].sample
-          priority = [-10, 0, 10].sample
-
-          { wait: delay, queue: queue, priority: priority }
-        end),
-      },
-      complex_schedule: {
-        cron: -> (last_ran) { last_ran ? last_ran + 17.hours : Time.now},
-        class: "OtherJob",
-      }
-    }
   end
 when 'test'
   # Exercised by spec/integration/supervisor_spec.rb to prove cluster lifecycle
@@ -74,50 +92,7 @@ when 'demo'
   Rails.application.configure do
     config.good_job.execution_mode = :async
     config.good_job.poll_interval = 30
-
     config.good_job.enable_cron = true
-    config.good_job.cron = {
-      frequent_example: {
-        description: "Enqueue an ExampleJob with a random sample of configuration",
-        cron: "* * * * * *",
-        class: "ExampleJob",
-        args: (lambda do
-          [ExampleJob::TYPES.sample.to_s]
-        end),
-        set: (lambda do
-          queue = [:default, :elephants, :mice].sample
-          delay = [0, (0..60).to_a.sample].sample
-          priority = [-10, 0, 10].sample
-
-          { wait: delay, queue: queue, priority: priority }
-        end),
-      },
-      other_example: {
-        description: "Enqueue an OtherJob occasionally",
-        cron: "*/15 * * * * *",
-        class: "OtherJob",
-        set: { queue: :default },
-      },
-      batch_example: {
-        description: "Enqueue a Batch",
-        cron: "*/30 * * * * *",
-        class: "ExampleJob::BatchJob",
-      },
-      concurrency_example: {
-        description: "Enqueue slow jobs that contend for a concurrency limit",
-        cron: "*/30 * * * * *",
-        class: "ExampleJob::ConcurrencyExampleJob",
-      },
-      complex_schedule: {
-        cron: -> (last_ran) { last_ran ? last_ran + 17.hours : Time.now},
-        class: "OtherJob",
-      },
-      pg_hero_maintenance: {
-        cron: "*/10 * * * *", # Every 10 minutes
-        class: "PgHeroMaintenanceJob",
-        description: "Runs PG Hero maintenance",
-      }
-    }
   end
 when 'production'
   # production

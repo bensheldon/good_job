@@ -41,6 +41,7 @@ install_if -> { ENV["RAILS_VERSION"] == "6.1" } do
   gem "benchmark"
 end
 
+gem "actionview_precompiler", require: false
 gem "rack-attack"
 
 platforms :ruby do
@@ -88,5 +89,6 @@ platforms :ruby do
 
   group :demo, :production do
     gem "skylight"
+    gem "thruster"
   end
 end

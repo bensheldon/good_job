@@ -58,6 +58,8 @@ GEM
       erubi (~> 1.11)
       rails-dom-testing (~> 2.2)
       rails-html-sanitizer (~> 1.6)
+    actionview_precompiler (0.4.0)
+      actionview (>= 6.0.a)
     activejob (8.1.4)
       activesupport (= 8.1.4)
       globalid (>= 0.3.6)
@@ -546,6 +548,10 @@ GEM
     thread (0.2.2)
     thread_safe (0.3.6)
     thread_safe (0.3.6-java)
+    thruster (0.1.27-aarch64-linux)
+    thruster (0.1.27-arm64-darwin)
+    thruster (0.1.27-x86_64-darwin)
+    thruster (0.1.27-x86_64-linux)
     timecop (0.9.11)
     timeout (0.6.1)
     tomlrb (2.0.4)
@@ -580,6 +586,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  actionview_precompiler
   activerecord-explain-analyze
   activerecord-jdbcpostgresql-adapter
   benchmark
@@ -626,6 +633,7 @@ DEPENDENCIES
   sprockets-rails
   stackprof
   tapioca
+  thruster
   timecop
   warning
   webrick

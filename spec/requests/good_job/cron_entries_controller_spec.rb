@@ -13,6 +13,7 @@ describe GoodJob::CronEntriesController do
   describe 'PUT #disable' do
     it 'disables cron' do
       cron_entry = GoodJob::CronEntry.find(:example)
+      cron_entry.enable
       expect do
         put good_job.disable_cron_entry_path(cron_key: 'example')
       end.to change { cron_entry.enabled? }.from(true).to(false)

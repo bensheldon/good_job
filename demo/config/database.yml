@@ -87,5 +87,6 @@ production:
 
 demo:
   <<: *default
+  pool: 50
   database: "good_job_demo"
   url: <%= ENV['DATABASE_URL'] %>

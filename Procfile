@@ -1,2 +1,2 @@
 release: bin/rails db:prepare
-web: bin/rails server
+web: HTTP_PORT=$PORT bundle exec thrust bin/rails server
