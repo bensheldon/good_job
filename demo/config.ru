@@ -3,7 +3,7 @@
 require_relative 'config/environment'
 
 if Rails.env.demo?
-  require_relative 'lib/warmup'
+  require_relative 'config/warmup'
   warmup { |app| Warmup.run(app) }
 end
 
