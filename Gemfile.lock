@@ -1,3 +1,13 @@
+GIT
+  remote: https://github.com/bensheldon/rbtrace.git
+  revision: d3a32c38db47e6f68c48663ac40230b06d7f6e7a
+  branch: trap-sigurg-on-main-thread
+  specs:
+    rbtrace (0.5.5)
+      ffi (>= 1.0.6)
+      msgpack (>= 0.4.3)
+      optimist (>= 3.0.0)
+
 PATH
   remote: .
   specs:
@@ -424,10 +434,6 @@ GEM
       logger
       prism (>= 1.6.0)
       tsort
-    rbtrace (0.5.5)
-      ffi (>= 1.0.6)
-      msgpack (>= 0.4.3)
-      optimist (>= 3.0.0)
     rdoc (8.1.0)
       erb
       prism (>= 1.6.0)
@@ -618,7 +624,7 @@ DEPENDENCIES
   rack-mini-profiler
   rails (~> 8.1.4)
   rbs (= 4.1.0.pre.2)
-  rbtrace
+  rbtrace!
   rdoc
   rspec-rails
   rubocop

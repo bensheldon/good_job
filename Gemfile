@@ -59,7 +59,7 @@ platforms :ruby do
     gem "debug"
     gem "memory_profiler"
     gem "rack-mini-profiler"
-    gem "rbtrace"
+    gem "rbtrace", github: "bensheldon/rbtrace", branch: "trap-sigurg-on-main-thread" # Responds when idle: https://github.com/tmm1/rbtrace/issues/97
     gem "sheap", require: false
     gem "stackprof"
   end
