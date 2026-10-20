@@ -35,6 +35,11 @@ workers web_concurrency
 #
 preload_app! if ENV["PRELOAD_APP"]
 
+# rbtrace doesn't survive a fork, so clustered workers require it after forking
+# (config/initializers/rbtrace.rb skips it in the master).
+# This can run before Rails loads, so don't use ActiveModel here.
+rbtrace = %w[1 true yes on].include?(ENV.fetch("RBTRACE", "").downcase)
+
 before_fork do
   GoodJob.shutdown
   ActiveRecord::Base.connection_pool.disconnect! if defined?(ActiveRecord)
@@ -44,7 +49,8 @@ end if web_concurrency > 0
 
 # Puma 7+ renamed on_worker_boot/on_worker_shutdown
 public_send(respond_to?(:before_worker_boot) ? :before_worker_boot : :on_worker_boot) do
-  GoodJob.restart
+  require "rbtrace" if rbtrace
+  GoodJob.restart if defined?(GoodJob)
 end if web_concurrency > 0
 
 public_send(respond_to?(:before_worker_shutdown) ? :before_worker_shutdown : :on_worker_shutdown) do
