@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
-# Renders representative pages once in the Puma master before it forks,
-# so compiled templates, loaded schema, and lazily-initialized state are
-# shared copy-on-write by the workers instead of being rebuilt in each one.
+# Exercises the app once in the Puma master before it forks, so compiled
+# templates, loaded schema, and lazily-initialized state are shared
+# copy-on-write by the workers instead of being rebuilt in each one.
 # See https://dev.37signals.com/warming-up-the-puma-master-before-it-forks/
 module Warmup
+  BUDGET = 15 # seconds
+
   PATHS = %w[
     /good_job/jobs
     /good_job/batches
@@ -27,6 +29,40 @@ module Warmup
   # @return [Hash{String => Integer}] response status by path
   def self.run(app)
     started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    deadline = started_at + BUDGET
+    expired = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline }
+
+    precompile_templates
+    statuses = visit_pages(app, expired)
+    load_schemas(expired)
+    Rack::Attack.reset! if defined?(Rack::Attack)
+
+    duration = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
+    failed = statuses.reject { |_path, status| status == 200 }
+    Rails.logger.info("Warmed up #{statuses.size} pages in #{duration.round(2)}s")
+    Rails.logger.warn("Warmup pages did not succeed: #{failed}") if failed.any?
+    Rails.logger.warn("Warmup stopped early after #{BUDGET}s") if expired.call
+    statuses
+  rescue StandardError => e
+    Rails.logger.warn("Warmup failed: #{e.class}: #{e.message}")
+    {}
+  ensure
+    ActiveRecord::Base.connection_handler.clear_all_connections!(:all)
+  end
+
+  # Compile every template up front, including ones the visited pages don't render
+  def self.precompile_templates
+    require "actionview_precompiler"
+    ActionviewPrecompiler.precompile do |precompiler|
+      ActionController::Base.view_paths.each { |view_path| precompiler.scan_view_dir(view_path.path) }
+      [Rails.root, GoodJob::Engine.root].each do |root|
+        precompiler.scan_controller_dir(root.join("app/controllers").to_s)
+        precompiler.scan_helper_dir(root.join("app/helpers").to_s)
+      end
+    end
+  end
+
+  def self.visit_pages(app, expired)
     request = Rack::MockRequest.new(app)
     statuses = {}
     visit = lambda do |path|
@@ -36,6 +72,8 @@ module Warmup
     end
 
     PATHS.each do |path|
+      break if expired.call
+
       body = visit.call(path)
       next unless FOLLOW[path]
 
@@ -48,17 +86,17 @@ module Warmup
         break
       end
     end
-    Rack::Attack.reset! if defined?(Rack::Attack)
-
-    duration = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
-    failed = statuses.reject { |_path, status| status == 200 }
-    Rails.logger.info("Warmed up #{statuses.size} pages in #{duration.round(2)}s")
-    Rails.logger.warn("Warmup pages did not succeed: #{failed}") if failed.any?
     statuses
-  rescue StandardError => e
-    Rails.logger.warn("Warmup failed: #{e.class}: #{e.message}")
-    {}
-  ensure
-    ActiveRecord::Base.connection_handler.clear_all_connections!(:all)
+  end
+
+  # Load the schema of models the visited pages didn't touch
+  def self.load_schemas(expired)
+    ActiveRecord::Base.connection_pool.with_connection do
+      ActiveRecord::Base.descendants.reject(&:abstract_class?).each do |model|
+        break if expired.call
+
+        model.load_schema if model.table_exists?
+      end
+    end
   end
 end
