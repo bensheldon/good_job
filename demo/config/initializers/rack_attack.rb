@@ -3,7 +3,7 @@
 # Protect the demo from crawlers that fan out across every job and locale,
 # which queue up requests and cause timeouts on a single small dyno.
 if defined?(Rack::Attack)
-  Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new(size: 8.megabytes)
+  Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new(size: 4.megabytes)
   # Loaded in every environment so it can be tested, but only enabled where it's needed
   Rack::Attack.enabled = Rails.env.demo? || Rails.env.production?
 
