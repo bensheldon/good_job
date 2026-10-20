@@ -5,7 +5,7 @@ Rails.application.configure do
   # but entries only run by default in the demo (or with CRON_ENABLED_BY_DEFAULT);
   # enable them through the dashboard elsewhere.
   # Cron procs must be shareable for GoodJob.ractorize! (Ruby 4+)
-  shareable = Ractor.respond_to?(:shareable_lambda) ? ->(&block) { Ractor.shareable_lambda(&block) } : ->(&block) { block }
+  shareable = defined?(Ractor) && Ractor.respond_to?(:shareable_lambda) ? ->(&block) { Ractor.shareable_lambda(&block) } : ->(&block) { block }
 
   enabled_in_demo = shareable.call { Rails.env.demo? || ActiveModel::Type::Boolean.new.cast(ENV.fetch("CRON_ENABLED_BY_DEFAULT", nil)) }
   config.good_job.cron = {
