@@ -2,7 +2,7 @@
 
 require_relative 'config/environment'
 
-if Rails.env.demo?
+if ActiveModel::Type::Boolean.new.cast(ENV.fetch("WARMUP_APP", nil))
   require_relative 'config/warmup'
   warmup { |app| Warmup.run(app) }
 end
