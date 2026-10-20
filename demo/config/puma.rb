@@ -44,6 +44,7 @@ end if web_concurrency > 0
 
 # Puma 7+ renamed on_worker_boot/on_worker_shutdown
 public_send(respond_to?(:before_worker_boot) ? :before_worker_boot : :on_worker_boot) do
+  require "rbtrace" if ActiveModel::Type::Boolean.new.cast(ENV.fetch("RBTRACE", nil))
   GoodJob.restart
 end if web_concurrency > 0
 

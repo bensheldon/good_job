@@ -1,10 +1,18 @@
-if ENV['RBTRACE']
+# Attach to a running process with rbtrace, e.g. to take a heap dump:
+#   $ bundle exec rbtrace --pid PID --eval 'Thread.new { require "objspace"; GC.start; File.open("tmp/heap-#{Process.pid}.json", "w") { |io| ObjectSpace.dump_all(output: io) } }.join; "done"'
+# Then analyze it with the sheap gem.
+#
+# rbtrace doesn't survive a fork, so clustered Puma workers require it in before_worker_boot (config/puma.rb).
+puma_cluster_master = defined?(Puma::Cluster) && ENV.fetch("WEB_CONCURRENCY", 0).to_i > 0
+if ActiveModel::Type::Boolean.new.cast(ENV.fetch('RBTRACE', nil)) && !puma_cluster_master
   require 'rbtrace'
 
-  $stdout.puts "Enabled rbtrace. Example commands:"
-  $stdout.puts "  Show all method calls: $ bundle exec rbtrace --pid #{Process.pid} --firehose"
-  $stdout.puts "  Debug Rails deadlock: $ bundle exec rbtrace --pid #{Process.pid} --eval \"puts output = ActionDispatch::DebugLocks.new(nil).send(:render_details, nil); output\""
-  $stdout.puts "  Heap Dump: $ bundle exec rbtrace --pid #{Process.pid} --eval 'Thread.new{require \"objspace\"; GC.start; io=File.open(\"tmp/ruby-heap.\#{Time.now.to_i}.dump\", \"w\"); ObjectSpace.dump_all(output: io); io.close }'"
-  $stdout.puts 'Press Enter to continue...'
-  $stdin.gets
+  # Pause boot so there's time to attach from another terminal
+  if ActiveModel::Type::Boolean.new.cast(ENV.fetch('RBTRACE_TTY', nil))
+    $stdout.puts "Enabled rbtrace. Example commands:"
+    $stdout.puts "  Show all method calls: $ bundle exec rbtrace --pid #{Process.pid} --firehose"
+    $stdout.puts "  Debug Rails deadlock: $ bundle exec rbtrace --pid #{Process.pid} --eval \"puts output = ActionDispatch::DebugLocks.new(nil).send(:render_details, nil); output\""
+    $stdout.puts 'Press Enter to continue...'
+    $stdin.gets
+  end
 end

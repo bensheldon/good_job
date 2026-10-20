@@ -60,6 +60,7 @@ platforms :ruby do
     gem "memory_profiler"
     gem "rack-mini-profiler"
     gem "rbtrace"
+    gem "sheap", require: false
     gem "stackprof"
   end
 
