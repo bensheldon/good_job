@@ -2,9 +2,10 @@
 #   $ bundle exec rbtrace --pid PID --eval 'Thread.new { require "objspace"; GC.start; File.open("tmp/heap-#{Process.pid}.json", "w") { |io| ObjectSpace.dump_all(output: io) } }.join; "done"'
 # Then analyze it with the sheap gem.
 #
-# rbtrace doesn't survive a fork, so clustered Puma workers require it in before_worker_boot (config/puma.rb).
-puma_cluster_master = defined?(Puma::Cluster) && ENV.fetch("WEB_CONCURRENCY", 0).to_i > 0
-if ActiveModel::Type::Boolean.new.cast(ENV.fetch('RBTRACE', nil)) && !puma_cluster_master
+# rbtrace doesn't survive a fork, so a clustered Puma server requires it in each worker
+# after forking instead (before_worker_boot in config/puma.rb).
+clustered_server = (defined?(Rails::Server) || defined?(Puma::Launcher)) && ENV.fetch("WEB_CONCURRENCY", 0).to_i > 0
+if ActiveModel::Type::Boolean.new.cast(ENV.fetch('RBTRACE', nil)) && !clustered_server
   require 'rbtrace'
 
   # Pause boot so there's time to attach from another terminal
