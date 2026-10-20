@@ -42,11 +42,12 @@ before_fork do
   Process.warmup if Process.respond_to?(:warmup)
 end if web_concurrency > 0
 
-before_worker_boot do
+# Puma 7+ renamed on_worker_boot/on_worker_shutdown
+public_send(respond_to?(:before_worker_boot) ? :before_worker_boot : :on_worker_boot) do
   GoodJob.restart
 end if web_concurrency > 0
 
-before_worker_shutdown do
+public_send(respond_to?(:before_worker_shutdown) ? :before_worker_shutdown : :on_worker_shutdown) do
   GoodJob.shutdown
 end if web_concurrency > 0
 
@@ -57,7 +58,7 @@ end
 
 # Thruster keeps idle connections to Puma open for HTTP_IDLE_TIMEOUT (default 60s),
 # so Puma must not close them first or Thruster will get errors reusing them.
-max_keep_alive Float::INFINITY
+max_keep_alive Float::INFINITY if respond_to?(:max_keep_alive) # Puma 7+
 persistent_timeout ENV.fetch("THRUSTER_HTTP_IDLE_TIMEOUT", 60).to_i + 5
 
 MAIN_PID = Process.pid

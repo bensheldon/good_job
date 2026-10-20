@@ -4,16 +4,19 @@ Rails.application.configure do
   # Cron is configured in every environment so the dashboard shows it,
   # but entries only run by default in the demo (or with CRON_ENABLED_BY_DEFAULT);
   # enable them through the dashboard elsewhere.
-  enabled_in_demo = -> { Rails.env.demo? || ActiveModel::Type::Boolean.new.cast(ENV.fetch("CRON_ENABLED_BY_DEFAULT", nil)) }
+  # Cron procs must be shareable for GoodJob.ractorize! (Ruby 4+)
+  shareable = Ractor.respond_to?(:shareable_lambda) ? ->(&block) { Ractor.shareable_lambda(&block) } : ->(&block) { block }
+
+  enabled_in_demo = shareable.call { Rails.env.demo? || ActiveModel::Type::Boolean.new.cast(ENV.fetch("CRON_ENABLED_BY_DEFAULT", nil)) }
   config.good_job.cron = {
     example: {
       description: "Enqueue an ExampleJob with a random sample of configuration",
       cron: "* * * * * *",
       class: "ExampleJob",
-      args: (lambda do
+      args: (shareable.call do
         [ExampleJob::TYPES.sample.to_s]
       end),
-      set: (lambda do
+      set: (shareable.call do
         queue = [:default, :elephants, :mice].sample
         delay = [0, (0..60).to_a.sample].sample
         priority = [-10, 0, 10].sample
@@ -42,7 +45,7 @@ Rails.application.configure do
       enabled_by_default: enabled_in_demo,
     },
     complex_schedule: {
-      cron: -> (last_ran) { last_ran ? last_ran + 17.hours : Time.now },
+      cron: shareable.call { |last_ran| last_ran ? last_ran + 17.hours : Time.now },
       class: "OtherJob",
       enabled_by_default: enabled_in_demo,
     },

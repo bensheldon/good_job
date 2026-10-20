@@ -95,7 +95,7 @@ module Warmup
       ActiveRecord::Base.descendants.reject(&:abstract_class?).each do |model|
         break if expired.call
 
-        model.load_schema if model.table_exists?
+        model.columns_hash if model.table_exists?
       end
     end
   end
