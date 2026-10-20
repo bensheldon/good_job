@@ -88,5 +88,6 @@ platforms :ruby do
 
   group :demo, :production do
     gem "skylight"
+    gem "thruster"
   end
 end

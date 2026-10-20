@@ -37,6 +37,8 @@ preload_app! if ENV["PRELOAD_APP"]
 
 before_fork do
   GoodJob.shutdown
+  # Compact the heap and free unused pages so forked workers share as much memory as possible
+  Process.warmup if Process.respond_to?(:warmup)
 end if web_concurrency > 0
 
 on_worker_boot do

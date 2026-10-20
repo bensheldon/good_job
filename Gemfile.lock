@@ -546,6 +546,10 @@ GEM
     thread (0.2.2)
     thread_safe (0.3.6)
     thread_safe (0.3.6-java)
+    thruster (0.1.27-aarch64-linux)
+    thruster (0.1.27-arm64-darwin)
+    thruster (0.1.27-x86_64-darwin)
+    thruster (0.1.27-x86_64-linux)
     timecop (0.9.11)
     timeout (0.6.1)
     tomlrb (2.0.4)
@@ -626,6 +630,7 @@ DEPENDENCIES
   sprockets-rails
   stackprof
   tapioca
+  thruster
   timecop
   warning
   webrick
