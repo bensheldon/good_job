@@ -17,11 +17,37 @@ module Warmup
     /good_job/jobs/metrics/job_status
   ].freeze
 
+  # Links to follow from a rendered page, so detail pages are warmed up the way a browser would reach them
+  FOLLOW = {
+    "/good_job/jobs" => %r{href="(/good_job/jobs/[0-9a-f-]{36}[^"]*)"},
+    "/good_job/cron_entries" => %r{href="(/good_job/cron_entries/[^/"?]+[^/"]*)"},
+  }.freeze
+  FRAME_SRC = %r{<turbo-frame[^>]* src="([^"]+)"}
+
   # @return [Hash{String => Integer}] response status by path
   def self.run(app)
     started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     request = Rack::MockRequest.new(app)
-    statuses = paths.index_with { |path| request.get(path, "REMOTE_ADDR" => "127.0.0.1").status }
+    statuses = {}
+    visit = lambda do |path|
+      response = request.get(CGI.unescapeHTML(path), "REMOTE_ADDR" => "127.0.0.1")
+      statuses[path] = response.status
+      response.body
+    end
+
+    PATHS.each do |path|
+      body = visit.call(path)
+      next unless FOLLOW[path]
+
+      # Follow a few links until reaching a page with lazy-loaded frames (e.g. a job that has executions)
+      body.scan(FOLLOW[path]).flatten.uniq.first(3).each do |link|
+        frame_src = visit.call(link)[FRAME_SRC, 1]
+        next unless frame_src
+
+        visit.call(frame_src)
+        break
+      end
+    end
     Rack::Attack.reset! if defined?(Rack::Attack)
 
     duration = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
@@ -34,15 +60,5 @@ module Warmup
     {}
   ensure
     ActiveRecord::Base.connection_handler.clear_all_connections!(:all)
-  end
-
-  def self.paths
-    paths = PATHS.dup
-    if (execution = GoodJob::Execution.order(created_at: :desc).first)
-      paths << "/good_job/jobs/#{execution.active_job_id}"
-      paths << "/good_job/jobs/#{execution.active_job_id}/executions/#{execution.id}"
-    end
-    paths << "/good_job/cron_entries/#{GoodJob.configuration.cron_entries.first.key}" if GoodJob.configuration.cron_entries.any?
-    paths
   end
 end

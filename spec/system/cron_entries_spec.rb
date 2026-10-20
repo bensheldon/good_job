@@ -29,15 +29,16 @@ describe 'Cron Schedules' do
   it 'can be enabled and disabled' do
     visit '/good_job/cron_entries'
 
-    within "##{dom_id(cron_entry)}" do
-      accept_confirm { click_button "Disable cron entry" }
-    end
     expect(cron_entry.enabled?).to be false
 
     within "##{dom_id(cron_entry)}" do
       accept_confirm { click_button "Enable cron entry" }
     end
-
     expect(cron_entry.enabled?).to be true
+
+    within "##{dom_id(cron_entry)}" do
+      accept_confirm { click_button "Disable cron entry" }
+    end
+    expect(cron_entry.enabled?).to be false
   end
 end
