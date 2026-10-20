@@ -37,17 +37,28 @@ preload_app! if ENV["PRELOAD_APP"]
 
 before_fork do
   GoodJob.shutdown
+  ActiveRecord::Base.connection_pool.disconnect! if defined?(ActiveRecord)
   # Compact the heap and free unused pages so forked workers share as much memory as possible
   Process.warmup if Process.respond_to?(:warmup)
 end if web_concurrency > 0
 
-on_worker_boot do
+before_worker_boot do
   GoodJob.restart
 end if web_concurrency > 0
 
-on_worker_shutdown do
+before_worker_shutdown do
   GoodJob.shutdown
 end if web_concurrency > 0
+
+# Run a minor GC between requests so it doesn't happen during one
+out_of_band do
+  GC.start(full_mark: false, immediate_sweep: false)
+end
+
+# Thruster keeps idle connections to Puma open for HTTP_IDLE_TIMEOUT (default 60s),
+# so Puma must not close them first or Thruster will get errors reusing them.
+max_keep_alive Float::INFINITY
+persistent_timeout ENV.fetch("THRUSTER_HTTP_IDLE_TIMEOUT", 60).to_i + 5
 
 MAIN_PID = Process.pid
 at_exit do
