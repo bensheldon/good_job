@@ -2,8 +2,9 @@ Rails.application.configure do
   config.good_job.enable_pauses = true
 
   # Cron is configured in every environment so the dashboard shows it,
-  # but entries only run by default in the demo; enable them through the dashboard elsewhere.
-  enabled_in_demo = -> { Rails.env.demo? }
+  # but entries only run by default in the demo (or with CRON_ENABLED_BY_DEFAULT);
+  # enable them through the dashboard elsewhere.
+  enabled_in_demo = -> { Rails.env.demo? || ActiveModel::Type::Boolean.new.cast(ENV.fetch("CRON_ENABLED_BY_DEFAULT", nil)) }
   config.good_job.cron = {
     example: {
       description: "Enqueue an ExampleJob with a random sample of configuration",
