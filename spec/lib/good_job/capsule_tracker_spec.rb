@@ -281,6 +281,25 @@ describe GoodJob::CapsuleTracker do
           expect(GoodJob::Process.count).to eq 0
         end
 
+        it 'never appears inactive to cleanup while releasing the advisory lock with other registrations remaining' do
+          tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+          tracker.register
+
+          inactive_after_unlock = nil
+          allow(tracker.record).to receive(:advisory_unlock).and_wrap_original do |original, *args, **kwargs|
+            original.call(*args, **kwargs).tap do
+              inactive_after_unlock = GoodJob::Process.inactive.exists?(id: tracker.process_id)
+            end
+          end
+
+          tracker.unregister(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+
+          expect(inactive_after_unlock).to be false
+          expect(GoodJob::Process.find(tracker.process_id).lock_type).to be_nil
+        ensure
+          tracker.unregister
+        end
+
         it 'downgrades lock_type when an advisory unregister finds a dead lock connection while other registrations remain' do
           tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection)
           tracker.register
