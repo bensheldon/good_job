@@ -6,6 +6,7 @@ module GoodJob
     include AdvisoryLockable
     include Job::Lockable
     include ErrorEvents
+    include FilteredArguments
     include Filterable
     include Reportable
 
@@ -622,6 +623,7 @@ module GoodJob
     # @return [Hash]
     def display_serialized_params
       serialized_params.merge({
+                                "arguments" => display_arguments,
                                 _good_job: attributes.except('serialized_params', 'locktype', 'owns_advisory_lock'),
                               })
     end

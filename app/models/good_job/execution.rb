@@ -3,6 +3,7 @@
 module GoodJob # :nodoc:
   class Execution < BaseRecord
     include ErrorEvents
+    include FilteredArguments
 
     self.table_name = 'good_job_executions'
     self.implicit_order_column = 'created_at'
@@ -63,6 +64,7 @@ module GoodJob # :nodoc:
 
     def display_serialized_params
       serialized_params.merge({
+                                "arguments" => display_arguments,
                                 _good_job_execution: attributes.except('serialized_params'),
                               })
     end

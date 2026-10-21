@@ -44,6 +44,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Dashboard](#dashboard)
         - [API-only Rails applications](#api-only-rails-applications)
         - [Live polling](#live-polling)
+        - [Filtering sensitive arguments](#filtering-sensitive-arguments)
         - [Extending dashboard views](#extending-dashboard-views)
     - [Job priority](#job-priority)
     - [Concurrency controls](#concurrency-controls)
@@ -478,6 +479,15 @@ end
 #### Live polling
 
 The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
+
+#### Filtering sensitive arguments
+
+The Dashboard hides job arguments the same way Rails hides them from logs:
+
+- Hash values whose keys match `Rails.application.config.filter_parameters` (e.g. `password:`) are displayed as `[FILTERED]`.
+- All arguments are displayed as `[FILTERED]` for jobs with `log_arguments` disabled, either for every job with `config.active_job.log_arguments = false` or per job class with `self.log_arguments = false`.
+
+Filtering only applies to how arguments are displayed; arguments are still stored unfiltered in the database and are used when the job is performed or retried.
 
 #### Extending dashboard views
 

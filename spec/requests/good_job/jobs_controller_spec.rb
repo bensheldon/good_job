@@ -52,6 +52,29 @@ describe GoodJob::JobsController do
     end
   end
 
+  describe 'filtered arguments' do
+    let(:job_id) { SecureRandom.uuid }
+
+    before do
+      allow(Rails.application.config).to receive(:filter_parameters).and_return([:password])
+      GoodJob::Job.create!(id: job_id, active_job_id: job_id, job_class: "ExampleJob", queue_name: "default", serialized_params: { "job_class" => "ExampleJob", "arguments" => ["visible", { "password" => "hunter2" }] })
+    end
+
+    it 'does not show filtered argument values on the jobs index' do
+      get good_job.jobs_path
+
+      expect(response.body).to include("visible", "[FILTERED]")
+      expect(response.body).not_to include("hunter2")
+    end
+
+    it 'does not show filtered argument values on the job page' do
+      get good_job.job_path(job_id)
+
+      expect(response.body).to include("visible", "[FILTERED]")
+      expect(response.body).not_to include("hunter2")
+    end
+  end
+
   describe 'GET /jobs/mass_update' do
     it 'is not found' do
       get '/good_job/jobs/mass_update'
