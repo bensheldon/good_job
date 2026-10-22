@@ -6,6 +6,8 @@
 # See https://dev.37signals.com/warming-up-the-puma-master-before-it-forks/
 module Warmup
   BUDGET = 15 # seconds
+  JOBS = 3
+  QUEUE = "warmup"
 
   PATHS = %w[
     /good_job/jobs
@@ -34,6 +36,7 @@ module Warmup
 
     precompile_templates
     statuses = visit_pages(app, expired)
+    perform_jobs unless expired.call
     load_schemas(expired)
     Rack::Attack.reset! if defined?(Rack::Attack)
 
@@ -87,6 +90,17 @@ module Warmup
       end
     end
     statuses
+  end
+
+  # Enqueue and perform a few jobs on their own queue so the job execution path is loaded,
+  # without performing other jobs or leaving records in the dashboard
+  def self.perform_jobs
+    job_ids = Array.new(JOBS) do
+      ExampleJob.set(queue: QUEUE).perform_later(ExampleJob::SUCCESS_TYPE).job_id
+    end
+    GoodJob.perform_inline(QUEUE, limit: JOBS)
+  ensure
+    GoodJob::Job.where(id: job_ids).destroy_all if job_ids
   end
 
   # Load the schema of models the visited pages didn't touch

@@ -21,4 +21,13 @@ describe Warmup do
     )
     expect(statuses).to all(satisfy { |_path, status| status == 200 })
   end
+
+  it "performs warmup jobs and removes their records" do
+    allow(GoodJob).to receive(:perform_inline).and_call_original
+
+    described_class.run(Rails.application)
+
+    expect(GoodJob).to have_received(:perform_inline).with(described_class::QUEUE, limit: described_class::JOBS)
+    expect(GoodJob::Job.where(queue_name: described_class::QUEUE)).to be_empty
+  end
 end
