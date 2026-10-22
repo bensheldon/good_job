@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+require "concurrent/array"
 require 'concurrent/atomic/atomic_boolean'
+require "concurrent/timer_task"
 
 module GoodJob # :nodoc:
   #

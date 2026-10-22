@@ -2,6 +2,7 @@
 
 require "concurrent/executor/thread_pool_executor"
 require "concurrent/executor/timer_set"
+require "concurrent/future"
 require "concurrent/scheduled_task"
 require "concurrent/utility/processor_counter"
 
