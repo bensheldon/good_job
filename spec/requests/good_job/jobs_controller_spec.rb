@@ -56,8 +56,8 @@ describe GoodJob::JobsController do
     let(:job_id) { SecureRandom.uuid }
 
     before do
-      allow(Rails.application.config).to receive(:filter_parameters).and_return([:password])
-      GoodJob::Job.create!(id: job_id, active_job_id: job_id, job_class: "ExampleJob", queue_name: "default", serialized_params: { "job_class" => "ExampleJob", "arguments" => ["visible", { "password" => "hunter2" }] })
+      allow(Rails.application.config).to receive(:filter_parameters).and_return([:filtered_arg])
+      GoodJob::Job.create!(id: job_id, active_job_id: job_id, job_class: "ExampleJob", queue_name: "default", serialized_params: { "job_class" => "ExampleJob", "arguments" => ["visible", { "filtered_arg" => "hunter2" }] })
     end
 
     it 'does not show filtered argument values on the jobs index' do
