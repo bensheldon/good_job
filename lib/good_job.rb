@@ -398,8 +398,8 @@ module GoodJob
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    GoodJob::ConcurrencyClaim.connection_pool.with_connection do |connection|
-      connection.table_exists?(GoodJob::ConcurrencyClaim.table_name)
+    GoodJob::Execution.connection_pool.with_connection do |connection|
+      connection.index_name_exists?(GoodJob::Execution.table_name, :index_good_job_executions_on_created_at)
     end
   end
 

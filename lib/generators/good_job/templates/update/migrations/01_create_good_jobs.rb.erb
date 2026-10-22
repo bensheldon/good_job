@@ -97,6 +97,7 @@ class CreateGoodJobs < ActiveRecord::Migration<%= migration_version %>
 
     add_index :good_job_executions, [:active_job_id, :created_at], name: :index_good_job_executions_on_active_job_id_and_created_at
     add_index :good_job_executions, :scheduled_at, name: :index_good_job_executions_on_scheduled_at
+    add_index :good_job_executions, :created_at, name: :index_good_job_executions_on_created_at
     add_index :good_jobs, :locked_by_id,
       where: "locked_by_id IS NOT NULL", name: "index_good_jobs_on_locked_by_id"
     add_index :good_jobs, [:priority, :scheduled_at, :id],
