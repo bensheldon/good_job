@@ -54,24 +54,31 @@ describe GoodJob::JobsController do
 
   describe 'filtered arguments' do
     let(:job_id) { SecureRandom.uuid }
+    let(:job_class) { "ExampleJob" }
 
     before do
-      allow(Rails.application.config).to receive(:filter_parameters).and_return([:password])
-      GoodJob::Job.create!(id: job_id, active_job_id: job_id, job_class: "ExampleJob", queue_name: "default", serialized_params: { "job_class" => "ExampleJob", "arguments" => ["visible", { "password" => "hunter2" }] })
+      allow(Rails.application.config).to receive(:filter_parameters).and_return([:filtered_arg])
+      GoodJob::Job.create!(id: job_id, active_job_id: job_id, job_class: job_class, queue_name: "default", serialized_params: { "job_class" => job_class, "arguments" => ["visible-value", { "filtered_arg" => "hidden-value" }] })
     end
 
-    it 'does not show filtered argument values on the jobs index' do
-      get good_job.jobs_path
-
-      expect(response.body).to include("visible", "[FILTERED]")
-      expect(response.body).not_to include("hunter2")
-    end
-
-    it 'does not show filtered argument values on the job page' do
+    it 'hides values whose keys match filter_parameters' do
       get good_job.job_path(job_id)
 
-      expect(response.body).to include("visible", "[FILTERED]")
-      expect(response.body).not_to include("hunter2")
+      expect(response.body).to include("visible-value", "[FILTERED]")
+      expect(response.body).not_to include("hidden-value")
+    end
+
+    context 'when the job class disables log_arguments' do
+      let(:job_class) { "NoLogArgumentsJob" }
+
+      before { stub_const job_class, Class.new(ActiveJob::Base) { self.log_arguments = false } }
+
+      it 'hides every argument' do
+        get good_job.job_path(job_id)
+
+        expect(response.body).to include("[FILTERED]")
+        expect(response.body).not_to include("visible-value", "hidden-value")
+      end
     end
   end
 
