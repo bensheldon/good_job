@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "concurrent/map"
+
 module GoodJob
   # Compatibility layer for running GoodJob in a Ractor-ized Rails application.
   #

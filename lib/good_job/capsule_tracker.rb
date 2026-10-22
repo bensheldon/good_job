@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "concurrent/errors"
+require "concurrent/scheduled_task"
+
 module GoodJob # :nodoc:
   # CapsuleTracker save a record in the database and periodically refreshes it. The intention is to
   # create a heartbeat that can be used to determine whether a capsule/process is still active

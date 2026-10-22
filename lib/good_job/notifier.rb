@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 require 'active_support/core_ext/module/attribute_accessors_per_thread'
+require "concurrent/array"
 require 'concurrent/atomic/atomic_boolean'
+require "concurrent/atomic/atomic_fixnum"
+require "concurrent/atomic/event"
 require "concurrent/scheduled_task"
 require "good_job/notifier/process_heartbeat"
 

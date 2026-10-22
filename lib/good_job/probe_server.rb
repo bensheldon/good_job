@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "concurrent/errors"
+
 module GoodJob
   class ProbeServer
     def self.task_observer(time, output, thread_error) # rubocop:disable Lint/UnusedMethodArgument

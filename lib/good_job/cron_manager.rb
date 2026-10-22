@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "concurrent/errors"
+require "concurrent/future"
 require "concurrent/hash"
 require "concurrent/scheduled_task"
 require "fugit"

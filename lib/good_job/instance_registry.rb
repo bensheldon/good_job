@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "concurrent/array"
+
 module GoodJob # :nodoc:
   # Tracks instances of a class in a class-level +instances+ registry so they can be
   # shut down or restarted together (e.g. by {GoodJob.shutdown} and {GoodJob.restart}).

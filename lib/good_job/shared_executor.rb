@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'concurrent/executor/executor_service'
+require "concurrent/executor/thread_pool_executor"
 
 module GoodJob
   class SharedExecutor

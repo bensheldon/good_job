@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'concurrent/delay'
+require "concurrent/set"
 
 module GoodJob
   #
