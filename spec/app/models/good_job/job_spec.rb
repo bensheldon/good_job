@@ -136,6 +136,57 @@ RSpec.describe GoodJob::Job do
     end
   end
 
+  describe '#display_arguments' do
+    let(:arguments) { ActiveJob::Arguments.serialize(['cat', { password: 'hunter2', api_key: 'abc123', name: 'Mittens', nested: [{ secret: 'shh' }] }]) }
+
+    before do
+      job.update!(serialized_params: job.serialized_params.merge('arguments' => arguments))
+      allow(Rails.application.config).to receive(:filter_parameters).and_return([:passw, :secret, :_key])
+    end
+
+    it 'filters hash values whose keys match filter_parameters' do
+      expect(job.display_arguments).to eq [
+        'cat',
+        {
+          'password' => '[FILTERED]',
+          'api_key' => '[FILTERED]',
+          'name' => 'Mittens',
+          'nested' => [{ 'secret' => '[FILTERED]', '_aj_symbol_keys' => '[FILTERED]' }],
+          '_aj_symbol_keys' => '[FILTERED]',
+        },
+      ]
+    end
+
+    it 'does not modify serialized_params' do
+      job.display_arguments
+      expect(job.serialized_params['arguments']).to eq arguments
+    end
+
+    it 'returns arguments unchanged when there are no filter_parameters' do
+      allow(Rails.application.config).to receive(:filter_parameters).and_return([])
+      expect(job.display_arguments).to eq arguments
+    end
+
+    it 'filters every argument when the job class disables log_arguments' do
+      TestJob.log_arguments = false
+      expect(job.display_arguments).to eq ['[FILTERED]', '[FILTERED]']
+    end
+
+    it 'uses ActiveJob::Base.log_arguments when the job class cannot be loaded' do
+      job.update!(job_class: 'MissingJob')
+      allow(ActiveJob::Base).to receive(:log_arguments?).and_return(false)
+      expect(job.display_arguments).to eq ['[FILTERED]', '[FILTERED]']
+    end
+
+    it 'is used by display_serialized_params of jobs and executions' do
+      execution = job.executions.first
+      execution.update!(serialized_params: job.serialized_params)
+
+      expect(job.display_serialized_params['arguments']).to eq job.display_arguments
+      expect(execution.display_serialized_params['arguments']).to eq job.display_arguments
+    end
+  end
+
   describe '#retry_job' do
     context 'when job is retried' do
       before do
