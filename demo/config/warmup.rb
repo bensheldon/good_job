@@ -6,6 +6,9 @@
 # See https://dev.37signals.com/warming-up-the-puma-master-before-it-forks/
 module Warmup
   BUDGET = 15 # seconds
+  # YJIT compiles a method after it is called 30 times (its default call threshold),
+  # so repeat the pages and jobs to compile them in the master before forking
+  ROUNDS = 30
   JOBS = 3
   QUEUE = "warmup"
 
@@ -35,8 +38,13 @@ module Warmup
     expired = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline }
 
     precompile_templates
-    statuses = visit_pages(app, expired)
-    perform_jobs unless expired.call
+    statuses = {}
+    ROUNDS.times do
+      break if expired.call
+
+      statuses.merge!(visit_pages(app, expired))
+      perform_jobs unless expired.call
+    end
     load_schemas(expired)
     Rack::Attack.reset! if defined?(Rack::Attack)
 

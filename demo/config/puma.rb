@@ -50,8 +50,6 @@ end if web_concurrency > 0
 # Puma 7+ renamed on_worker_boot/on_worker_shutdown
 public_send(respond_to?(:before_worker_boot) ? :before_worker_boot : :on_worker_boot) do
   require "rbtrace" if rbtrace
-  # YJIT is enabled only after forking (see config/environments/demo.rb)
-  RubyVM::YJIT.enable(**YJIT_OPTIONS) if defined?(YJIT_OPTIONS) && defined?(RubyVM::YJIT.enable)
   GoodJob.restart if defined?(GoodJob)
 end if web_concurrency > 0
 
