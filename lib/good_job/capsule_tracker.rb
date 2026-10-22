@@ -119,9 +119,10 @@ module GoodJob # :nodoc:
         if with_advisory_lock && @advisory_locked
           active = advisory_locked?
           if !active || matches_advisory_locked_connection?(advisory_lock_connection)
-            @record.advisory_unlock(connection: advisory_lock_connection) if active
-            # Remaining jobs need heartbeat liveness once the advisory lock is gone.
+            # Move remaining jobs to heartbeat liveness before releasing the lock; otherwise
+            # another process's cleanup can see an unlocked advisory record and release them.
             @record&.update(lock_type: nil) if @locks > 1
+            @record.advisory_unlock(connection: advisory_lock_connection) if active
             @advisory_locked = false
             @advisory_locked_connection = nil
           end
