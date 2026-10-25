@@ -205,6 +205,7 @@ RSpec.describe GoodJob::Job::Lockable do
         failure = ActiveRecord::ConnectionNotEstablished.new('still disconnected')
         attempts = 0
         allow(GoodJob::Job).to receive(:sleep)
+        allow(GoodJob.logger).to receive(:warn)
 
         expect do
           GoodJob::Job.where(id: job.id).public_send(claim_method, locked_by_id: process_id, locked_at: Time.current, lock_type: strategy) do
@@ -220,6 +221,7 @@ RSpec.describe GoodJob::Job::Lockable do
 
         expect(attempts).to eq 5
         expect(GoodJob::Job).to have_received(:sleep).with(5).exactly(4).times
+        expect(GoodJob.logger).to have_received(:warn).with(/could not release the claim on job #{job.id} \(attempt 1\)/).once
         expect(job.reload).to have_attributes(locked_by_id: nil, locked_at: nil, lock_type: nil)
       end
 

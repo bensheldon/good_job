@@ -8,6 +8,11 @@ module GoodJob
     module Lockable
       extend ActiveSupport::Concern
 
+      # Seconds to wait between attempts to release a claim after a connection failure.
+      RELEASE_CLAIM_RETRY_INTERVAL = 5
+      # Log a warning on the first failed release and then every this many attempts.
+      RELEASE_CLAIM_RETRY_WARNING_EVERY = 10
+
       class_methods do
         # Claims a job by acquiring a session-level advisory lock via the CTE
         # query, and records the lock acquisition for phantom re-entrancy cleanup.
@@ -22,7 +27,11 @@ module GoodJob
 
           advisory_lock(select_limit: select_limit) do |records|
             record = records.first
-            yield(record).tap { record&.run_callbacks(:perform_unlocked) }
+            begin
+              yield(record)
+            ensure
+              record&.run_callbacks(:perform_unlocked)
+            end
           end
         end
 
@@ -118,7 +127,9 @@ module GoodJob
 
           # Keep the worker registered until its claim can be released. Otherwise a
           # live process can keep the abandoned job locked indefinitely.
-          sleep 5
+          attempts = (attempts || 0) + 1
+          GoodJob.logger.warn("GoodJob could not release the claim on job #{record.id} (attempt #{attempts}): #{e.class}: #{e.message}. Retrying every #{RELEASE_CLAIM_RETRY_INTERVAL} seconds.") if attempts == 1 || (attempts % RELEASE_CLAIM_RETRY_WARNING_EVERY).zero?
+          sleep RELEASE_CLAIM_RETRY_INTERVAL
           retry
         end
       end
