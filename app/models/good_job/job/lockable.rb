@@ -58,10 +58,13 @@ module GoodJob
 
           record = unscoped.find_by_sql([sql, locked_by_id, locked_at, lock_types[lock_type.to_s]]).first
 
+          completed = false
           begin
-            unscoped { yield(record) }
+            result = unscoped { yield(record) }
+            completed = true
+            result
           ensure
-            record.update(locked_by_id: nil, locked_at: nil, lock_type: nil) if record && !record.destroyed? && record.locked_by_id.present?
+            release_lock_claim(record, locked_by_id: locked_by_id, locked_at: locked_at, completed: completed)
             record&.run_callbacks(:perform_unlocked)
           end
         end
@@ -102,14 +105,42 @@ module GoodJob
           record = unscoped.find_by_sql([sql, locked_by_id, locked_at, lock_types[lock_type.to_s]]).first
           record_advisory_lock(lease_connection, record.lockable_column_key, cte: true) if record
 
+          completed = false
           begin
-            unscoped { yield(record) }
+            result = unscoped { yield(record) }
+            completed = true
+            result
           ensure
             if record
-              record.advisory_unlock
-              record.update(locked_by_id: nil, locked_at: nil, lock_type: nil) if !record.destroyed? && record.locked_by_id.present?
+              begin
+                record.advisory_unlock
+              ensure
+                release_lock_claim(record, locked_by_id: locked_by_id, locked_at: locked_at, completed: completed)
+              end
             end
             record&.run_callbacks(:perform_unlocked)
+          end
+        end
+
+        private
+
+        def release_lock_claim(record, locked_by_id:, locked_at:, completed:)
+          return unless record
+          return if completed && (record.destroyed? || record.locked_by_id_in_database.blank?)
+
+          # Keep the execution registered until cleanup succeeds. Returning while
+          # the database is unavailable would orphan the claim under a live process.
+          retry_on_connection_error(attempts: Float::INFINITY) do
+            transaction do
+              # Completion may have cleared these attributes in memory without
+              # committing them. Only release this claim, without saving dirty fields.
+              released = unscoped.where(id: record.id, locked_by_id: locked_by_id, locked_at: locked_at)
+                                 .update_all(locked_by_id: nil, locked_at: nil, lock_type: nil) # rubocop:disable Rails/SkipsModelValidations
+              GoodJob::ConcurrencyClaim.release_job(record.id) if released.positive? && GoodJob::ConcurrencyClaim.table_exists?
+              # Unlocked callbacks must see the persisted result, not an
+              # uncommitted finished_at/error that could discard a batch.
+              record.reload if released.positive?
+            end
           end
         end
       end

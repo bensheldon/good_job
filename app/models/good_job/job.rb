@@ -305,6 +305,23 @@ module GoodJob
         where(locked_by_id: locked_by_id).update_all(locked_by_id: nil, locked_at: nil) # rubocop:disable Rails/SkipsModelValidations
       end
 
+      # @!visibility private
+      # Retry bookkeeping, never the Active Job itself. Older Rails versions wrap
+      # PostgreSQL connection failures in StatementInvalid rather than ConnectionFailed.
+      def retry_on_connection_error(attempts: 3)
+        connection_errors = %w[ActiveRecord::ConnectionNotEstablished ActiveRecord::ConnectionFailed PG::ConnectionBad PG::UnableToSend].filter_map(&:safe_constantize)
+        failures = 0
+        begin
+          yield
+        rescue StandardError => e
+          failures += 1
+          raise unless failures < attempts && connection_errors.any? { |klass| e.is_a?(klass) || e.cause.is_a?(klass) }
+
+          sleep 5
+          retry
+        end
+      end
+
       def lock_type_migrated?
         index_exists = connection_pool.with_connection do |connection|
           connection.index_name_exists?(table_name, :index_good_jobs_for_candidate_dequeue_unlocked)
@@ -907,13 +924,26 @@ module GoodJob
         end
 
         assign_attributes(job_attributes)
-        if finished_at.blank? || cron_key.present? || preserve_job_record?(result)
-          transaction do
-            execution.save!
-            save!
+        completion_attributes = {
+          self => changes_to_save.transform_values(&:last),
+          execution => execution.changes_to_save.transform_values(&:last),
+        }
+        self.class.retry_on_connection_error do
+          # A reconnect can reset Rails' transaction bookkeeping after a write
+          # that PostgreSQL rolled back. Reapply the result even if Rails thinks
+          # those attributes were already saved.
+          completion_attributes.each do |record, attributes|
+            record.assign_attributes(attributes)
+            attributes.each_key { |name| record.public_send("#{name}_will_change!") }
           end
-        else
-          destroy!
+          if finished_at.blank? || cron_key.present? || preserve_job_record?(result)
+            transaction do
+              execution.save!
+              save!
+            end
+          else
+            destroy!
+          end
         end
 
         release_concurrency_claims

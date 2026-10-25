@@ -153,4 +153,57 @@ RSpec.describe GoodJob::Job::Lockable do
       expect(claimed.first.id).to eq job.id
     end
   end
+
+  [:skiplocked, :hybrid].each do |strategy|
+    describe "#{strategy} claim cleanup" do
+      it 'releases persisted claims after completion attributes were cleared only in memory' do
+        job = create_job
+        failure = ActiveRecord::ConnectionNotEstablished.new('completion failed')
+        GoodJob::ConcurrencyClaim.create!(key: 'cleanup-test', job_id: job.id, locked_by_id: process_id, state: GoodJob::ConcurrencyClaim::GRANTED)
+
+        expect do
+          GoodJob::Job.where(id: job.id).public_send("with_#{strategy == :skiplocked ? 'skip_locked' : 'hybrid_lock'}_claim", locked_by_id: process_id, locked_at: Time.current, lock_type: strategy) do |record|
+            record.assign_attributes(locked_by_id: nil, locked_at: nil, lock_type: nil, finished_at: Time.current)
+            raise failure
+          end
+        end.to raise_error(failure)
+
+        expect(job.reload).to have_attributes(finished_at: nil, locked_by_id: nil, locked_at: nil, lock_type: nil)
+        expect(GoodJob::ConcurrencyClaim.where(job_id: job.id)).to be_empty
+      end
+
+      it 'does not release a claim acquired later by the same process' do
+        job = create_job
+        locked_at = Time.current
+        next_locked_at = locked_at + 1.second
+        claim = GoodJob::ConcurrencyClaim.create!(key: 'cleanup-test', job_id: job.id, locked_by_id: process_id, state: GoodJob::ConcurrencyClaim::GRANTED)
+
+        GoodJob::Job.where(id: job.id).public_send("with_#{strategy == :skiplocked ? 'skip_locked' : 'hybrid_lock'}_claim", locked_by_id: process_id, locked_at: locked_at, lock_type: strategy) do |record|
+          GoodJob::Job.find(job.id).update!(locked_at: next_locked_at)
+          record.assign_attributes(locked_by_id: nil, locked_at: nil, finished_at: Time.current)
+        end
+
+        expect(job.reload).to have_attributes(locked_by_id: process_id, locked_at: within(0.001).of(next_locked_at), finished_at: nil)
+        expect(claim.reload.state).to eq GoodJob::ConcurrencyClaim::GRANTED
+      end
+
+      it 'does not release another process claim after a failure' do
+        job = create_job
+        next_process_id = SecureRandom.uuid
+        failure = StandardError.new('failed after ownership changed')
+        claim = GoodJob::ConcurrencyClaim.create!(key: 'cleanup-test', job_id: job.id, locked_by_id: next_process_id, state: GoodJob::ConcurrencyClaim::GRANTED)
+
+        expect do
+          GoodJob::Job.where(id: job.id).public_send("with_#{strategy == :skiplocked ? 'skip_locked' : 'hybrid_lock'}_claim", locked_by_id: process_id, locked_at: Time.current, lock_type: strategy) do |record|
+            GoodJob::Job.find(job.id).update!(locked_by_id: next_process_id)
+            record.assign_attributes(locked_by_id: nil, finished_at: Time.current)
+            raise failure
+          end
+        end.to raise_error(failure)
+
+        expect(job.reload).to have_attributes(locked_by_id: next_process_id, finished_at: nil)
+        expect(claim.reload.state).to eq GoodJob::ConcurrencyClaim::GRANTED
+      end
+    end
+  end
 end
