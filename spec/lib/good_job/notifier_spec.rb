@@ -61,6 +61,8 @@ RSpec.describe GoodJob::Notifier do
     end
 
     it 'receives messages buffered by other queries on the connection' do
+      skip "JRuby polls for messages and has no libpq buffer" if Concurrent.on_jruby?
+
       event = Concurrent::Event.new
       notifier = described_class.new(proc { |_payload| event.set }, enable_listening: true)
       expect(notifier.listening?(timeout: 5)).to be true
@@ -199,12 +201,12 @@ RSpec.describe GoodJob::Notifier do
       recipient = proc { |_payload| event.set }
       notifier = described_class.new(recipient, enable_listening: true)
       expect(notifier.listening?(timeout: 5)).to be true
-      first_pid = notifier.instance_variable_get(:@connection).post { |connection| connection.raw_connection.backend_pid }.value!
+      first_pid = notifier.instance_variable_get(:@connection).post { |connection| connection.select_value("SELECT pg_backend_pid()") }.value!
 
       GoodJob::Job.connection_pool.with_connection { |connection| connection.execute("SELECT pg_terminate_backend(#{first_pid})") }
 
       wait_until(max: 5) do
-        pid = notifier.instance_variable_get(:@connection).post { |connection| connection.raw_connection.backend_pid }.value
+        pid = notifier.instance_variable_get(:@connection).post { |connection| connection.select_value("SELECT pg_backend_pid()") }.value
         expect(pid).to be_present
         expect(pid).not_to eq first_pid
       end

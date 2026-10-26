@@ -11,9 +11,9 @@ RSpec.describe GoodJob::ProcessHeartbeat do
     expect(notifier.listening?(timeout: 5)).to be true
     wait_until { expect(GoodJob.capsule.tracker.locks).to eq 1 }
     process_id = GoodJob.capsule.tracker.id_for_lock
-    first_pid = connection.post { |conn| conn.raw_connection.backend_pid }.value!
+    first_pid = connection.post { |conn| conn.select_value("SELECT pg_backend_pid()") }.value!
 
-    wait_until(max: 5) { expect(connection.post { |conn| conn.raw_connection.backend_pid }.value!).not_to eq first_pid }
+    wait_until(max: 5) { expect(connection.post { |conn| conn.select_value("SELECT pg_backend_pid()") }.value!).not_to eq first_pid }
     expect(notifier).to be_listening
     expect(GoodJob.capsule.tracker.locks).to eq 1
     expect(GoodJob.capsule.tracker.id_for_lock).to eq process_id
