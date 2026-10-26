@@ -123,11 +123,13 @@ module GoodJob
       @multi_scheduler&.lower_thread_priority = value
     end
 
-    private
-
+    # Configuration for this capsule, falling back to the global configuration.
+    # @return [GoodJob::Configuration]
     def configuration
       @configuration || GoodJob.configuration
     end
+
+    private
 
     def startable?(force: false)
       !@started_at && (@startable || force)
