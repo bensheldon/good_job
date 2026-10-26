@@ -272,7 +272,10 @@ module GoodJob
 
       def run_due_timers
         now = @clock.now
-        @timers.select { |timer| !timer.canceled? && timer.due <= now }.sort_by(&:due).each { |timer| timer.fire(now) }
+        # Single passes that only allocate when a timer is due; the loop runs this on every pass.
+        due = nil
+        @timers.each { |timer| (due ||= []) << timer if !timer.canceled? && timer.due <= now }
+        due&.sort_by!(&:due)&.each { |timer| timer.fire(now) }
         @timers.reject!(&:canceled?)
       end
 
@@ -294,7 +297,8 @@ module GoodJob
       end
 
       def next_timeout
-        due = @timers.reject(&:canceled?).map(&:due).min
+        due = nil
+        @timers.each { |timer| due = timer.due if !timer.canceled? && (due.nil? || timer.due < due) }
         return nil if due.nil?
 
         [due - @clock.now, 0.0].max
