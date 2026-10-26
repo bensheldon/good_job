@@ -11,8 +11,10 @@ module GoodJob # :nodoc:
 
     # @param connection [GoodJob::DedicatedConnection]
     # @param capsule [GoodJob::Capsule]
-    def initialize(connection:, capsule: GoodJob.capsule)
+    # @param advisory_lock [Boolean] Whether to advisory lock the process record on the connection, which must then not be replaced on a schedule.
+    def initialize(connection:, capsule: GoodJob.capsule, advisory_lock: GoodJob.configuration.advisory_lock_heartbeat)
       @capsule = capsule
+      @advisory_lock_heartbeat = advisory_lock
       @process_registered = false
 
       # A replacement connection doesn't re-register; the advisory lock heartbeat doesn't replace connections.
@@ -24,7 +26,6 @@ module GoodJob # :nodoc:
     # Registers the current process.
     # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter] Dedicated connection to hold the advisory lock.
     def register_process(connection)
-      @advisory_lock_heartbeat = GoodJob.configuration.advisory_lock_heartbeat
       GoodJob::Process.connection_pool.with_connection do
         @capsule.tracker.cleanup
         @capsule.tracker.register(with_advisory_lock: @advisory_lock_heartbeat, advisory_lock_connection: connection)

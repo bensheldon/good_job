@@ -154,6 +154,7 @@ RSpec.describe GoodJob::ProcessHeartbeat do
       tracker.register
       process_id = tracker.id_for_lock
       heartbeat = described_class.allocate
+      heartbeat.instance_variable_set(:@advisory_lock_heartbeat, true)
       heartbeat.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
       pool = GoodJob::Process.connection_pool
       allow(pool).to receive(:with_connection).and_raise(ActiveRecord::ConnectionTimeoutError)
@@ -179,6 +180,7 @@ RSpec.describe GoodJob::ProcessHeartbeat do
       tracker = GoodJob::CapsuleTracker.new(executor: nil)
       tracker.register
       heartbeat = described_class.allocate
+      heartbeat.instance_variable_set(:@advisory_lock_heartbeat, true)
       heartbeat.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
       heartbeat.register_process(nil)
       expect(tracker.locks).to eq 2
@@ -192,6 +194,7 @@ RSpec.describe GoodJob::ProcessHeartbeat do
 
     it 'skips cleanup on a checkout timeout without unregistering the process' do
       heartbeat = described_class.allocate
+      heartbeat.instance_variable_set(:@advisory_lock_heartbeat, true)
       tracker = instance_spy(GoodJob::CapsuleTracker, renew: true)
       heartbeat.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
       allow(GoodJob::Process).to receive(:cleanup)
@@ -206,6 +209,7 @@ RSpec.describe GoodJob::ProcessHeartbeat do
 
     it 'does not retry a timeout raised after deregistration starts' do
       heartbeat = described_class.allocate
+      heartbeat.instance_variable_set(:@advisory_lock_heartbeat, true)
       heartbeat.instance_variable_set(:@process_registered, true)
       tracker = instance_double(GoodJob::CapsuleTracker)
       heartbeat.instance_variable_set(:@capsule, Struct.new(:tracker).new(tracker))
