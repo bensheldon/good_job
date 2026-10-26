@@ -27,11 +27,9 @@ module GoodJob
 
           advisory_lock(select_limit: select_limit) do |records|
             record = records.first
-            begin
-              yield(record)
-            ensure
-              record&.run_callbacks(:perform_unlocked)
-            end
+            # Not in an ensure: if the block raised, the record may hold completion
+            # fields that were never saved, and batch callbacks would act on them.
+            yield(record).tap { record&.run_callbacks(:perform_unlocked) }
           end
         end
 
