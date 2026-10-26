@@ -134,7 +134,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
 
   it 'shuts the reactor down on a failed promotion' do
     resource = fake_resource(retirement_age: 60)
-    failures = Concurrent::Collection::TimeoutQueue.new
+    failures = Queue.new
     reactor.on_failure { |error| failures << error }
     resource.around_promotion do |promotion, old_gen, new_gen|
       raise "could not move the heartbeat" if old_gen && new_gen
@@ -144,7 +144,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
     reactor.start
     clock.advance(60)
 
-    expect(failures.pop(timeout: 2).message).to eq "could not move the heartbeat"
+    expect(ReactorSpecHelpers.pop_within(failures, 2).message).to eq "could not move the heartbeat"
     sleep 0.01 while reactor.started?
     expect(connections.none?(&:open?)).to be true
   end
@@ -238,13 +238,13 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
   end
 
   it 'fails the reactor on an on_fault error' do
-    failures = Concurrent::Collection::TimeoutQueue.new
+    failures = Queue.new
     reactor.on_failure { |error| failures << error }
     resource = fake_resource(on_fault: ->(*_args) { raise "give up" })
     reactor.start
     on_loop { resource.current_generation.fault(IOError.new("connection lost")) }
 
-    expect(failures.pop(timeout: 2).message).to eq "give up"
+    expect(ReactorSpecHelpers.pop_within(failures, 2).message).to eq "give up"
   end
 
   it 'accepts anything with to_f as retirement_age' do

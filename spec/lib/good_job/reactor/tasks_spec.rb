@@ -32,7 +32,7 @@ RSpec.describe GoodJob::Reactor::Resource do # rubocop:disable RSpec/SpecFilePat
 
   it 'wraps posts, watchers and timers with around_task' do
     resource = fake_resource
-    wrapped = Concurrent::Collection::TimeoutQueue.new
+    wrapped = Queue.new
     resource.around_task do |task, generation|
       wrapped << generation.value.id
       task.call
@@ -41,19 +41,19 @@ RSpec.describe GoodJob::Reactor::Resource do # rubocop:disable RSpec/SpecFilePat
     reactor.start
 
     resource.post { :post }.value!
-    expect(wrapped.pop(timeout: 2)).to eq 1
+    expect(ReactorSpecHelpers.pop_within(wrapped, 2)).to eq 1
 
-    watched = Concurrent::Collection::TimeoutQueue.new
+    watched = Queue.new
     on_loop do
       generation = resource.current_generation
       generation.watch(generation.value.reader) { |g| watched << g.value.reader.read_nonblock(10) }
     end
     connections.first.writer.write("notify")
-    expect(watched.pop(timeout: 2)).to eq "notify"
-    expect(wrapped.pop(timeout: 2)).to eq 1
+    expect(ReactorSpecHelpers.pop_within(watched, 2)).to eq "notify"
+    expect(ReactorSpecHelpers.pop_within(wrapped, 2)).to eq 1
 
     advance(10)
-    expect(wrapped.pop(timeout: 2)).to eq 1
+    expect(ReactorSpecHelpers.pop_within(wrapped, 2)).to eq 1
   end
 
   it 'lets around_task fault the generation' do
@@ -90,7 +90,7 @@ RSpec.describe GoodJob::Reactor::Resource do # rubocop:disable RSpec/SpecFilePat
 
   it "sends watcher errors to the generation's on_error" do
     resource = fake_resource
-    errors = Concurrent::Collection::TimeoutQueue.new
+    errors = Queue.new
     reactor.start
     on_loop do
       generation = resource.current_generation
@@ -99,7 +99,7 @@ RSpec.describe GoodJob::Reactor::Resource do # rubocop:disable RSpec/SpecFilePat
     end
     connections.first.writer.write("x")
 
-    expect(errors.pop(timeout: 2).message).to eq "dispatch failed"
+    expect(ReactorSpecHelpers.pop_within(errors, 2).message).to eq "dispatch failed"
   end
 
   it 'stops generation watchers when removed' do

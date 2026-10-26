@@ -33,25 +33,25 @@ RSpec.describe GoodJob::Reactor::Loop do
 
   it 'calls back a watcher when the io is readable' do
     reader, writer = IO.pipe
-    seen = Concurrent::Collection::TimeoutQueue.new
+    seen = Queue.new
     reactor_loop.watch(reader) { seen << reader.read_nonblock(10) }
     writer.write("hi")
 
-    expect(seen.pop(timeout: 2)).to eq "hi"
+    expect(ReactorSpecHelpers.pop_within(seen, 2)).to eq "hi"
   ensure
     reader&.close
     writer&.close
   end
 
   it 'fires timers following the clock' do
-    fired = Concurrent::Collection::TimeoutQueue.new
+    fired = Queue.new
     reactor_loop.after(5) { fired << :after }
     reactor_loop.every(2) { fired << :every }
 
     clock.advance(2)
-    expect(fired.pop(timeout: 2)).to eq :every
+    expect(ReactorSpecHelpers.pop_within(fired, 2)).to eq :every
     clock.advance(3)
-    expect([fired.pop(timeout: 2), fired.pop(timeout: 2)].sort).to eq [:after, :every].sort
+    expect([ReactorSpecHelpers.pop_within(fired, 2), ReactorSpecHelpers.pop_within(fired, 2)].sort).to eq [:after, :every].sort
   end
 
   it 'does not fire canceled timers' do
@@ -65,12 +65,12 @@ RSpec.describe GoodJob::Reactor::Loop do
   end
 
   it 'sends watcher and timer errors to on_error' do
-    errors = Concurrent::Collection::TimeoutQueue.new
+    errors = Queue.new
     reactor_loop.on_error { |error| errors << error }
     reactor_loop.after(1) { raise "timer failed" }
     clock.advance(1)
 
-    expect(errors.pop(timeout: 2).message).to eq "timer failed"
+    expect(ReactorSpecHelpers.pop_within(errors, 2).message).to eq "timer failed"
   end
 
   it 'counts starts' do

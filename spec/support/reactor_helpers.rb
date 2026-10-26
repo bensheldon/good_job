@@ -1,10 +1,21 @@
 # frozen_string_literal: true
 
-require "concurrent/collection/timeout_queue"
-
 # Helpers for the GoodJob::Reactor specs (ported from PebbleBed's test_helper).
 # Include with `include ReactorSpecHelpers` in a reactor spec.
 module ReactorSpecHelpers
+  # Pops from the queue, waiting up to `seconds`; returns nil on timeout. Queue#pop(timeout:) needs Ruby 3.2, and
+  # concurrent-ruby's TimeoutQueue backport needs a newer concurrent-ruby than Rails 6.1 allows.
+  def self.pop_within(queue, seconds = 2)
+    deadline = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) + seconds
+    loop do
+      return queue.pop(true)
+    rescue ThreadError
+      return nil if ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) > deadline
+
+      sleep 0.01
+    end
+  end
+
   # A clock that only moves when advanced, waking any loop reading it.
   class ManualClock
     def initialize
