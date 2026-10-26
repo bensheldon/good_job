@@ -22,7 +22,7 @@ RSpec.describe GoodJob::ProcessHeartbeat do
     expect(GoodJob.capsule.tracker.locks).to eq 0
   end
 
-  it 'refreshes a stale process record on the dedicated connection, using a pooled connection only for cleanup' do
+  it 'refreshes a stale process record on the dedicated connection without a pooled connection' do
     connection = GoodJob::DedicatedConnection.new
     heartbeat = described_class.new(connection: connection)
     connection.start
@@ -42,13 +42,8 @@ RSpec.describe GoodJob::ProcessHeartbeat do
 
     connection.post { |conn| heartbeat.refresh_process(conn) }.value!
     expect(GoodJob::Process.find(record.id).updated_at).to be > 1.minute.ago
-    expect(GoodJob::Process).to have_received(:cleanup).once
-    expect(checkouts.value).to eq 1
-
-    # Not stale: neither refreshes nor checks out a pooled connection
-    connection.post { |conn| heartbeat.refresh_process(conn) }.value!
-    expect(GoodJob::Process).to have_received(:cleanup).once
-    expect(checkouts.value).to eq 1
+    expect(GoodJob::Process).not_to have_received(:cleanup)
+    expect(checkouts.value).to eq 0
     connection.shutdown
   end
 
@@ -192,7 +187,7 @@ RSpec.describe GoodJob::ProcessHeartbeat do
       tracker&.unregister
     end
 
-    it 'skips cleanup on a checkout timeout without unregistering the process' do
+    it 'refreshes without a pooled connection or unregistering the process' do
       heartbeat = described_class.allocate
       heartbeat.instance_variable_set(:@advisory_lock_heartbeat, true)
       tracker = instance_spy(GoodJob::CapsuleTracker, renew: true)

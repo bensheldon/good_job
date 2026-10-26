@@ -33,12 +33,12 @@ module GoodJob # :nodoc:
       end
     end
 
-    # Refreshes the process record on the dedicated connection, and cleans up inactive processes after a refresh.
+    # Refreshes the process record on the dedicated connection. Inactive processes are cleaned up by the
+    # {GoodJob::CapsuleTracker}'s own refresh, which uses a pooled connection off the reactor thread.
     # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter] Dedicated connection.
     def refresh_process(connection)
       GoodJob::Process.with_logger_silenced do
-        refreshed = @capsule.tracker.renew(connection: connection)
-        with_heartbeat_connection { GoodJob::Process.cleanup } if refreshed
+        @capsule.tracker.renew(connection: connection)
       end
     end
 

@@ -23,8 +23,9 @@ module GoodJob # :nodoc:
     CONNECTION_ERRORS_REPORTING_THRESHOLD = 6
     # Interval for emitting a noop SQL query to keep the connection alive
     KEEPALIVE_INTERVAL = 10
-    # Seconds after which to replace the connection, when replacing it on a schedule
-    RETIREMENT_AGE = 3600
+    # Seconds after which to replace the connection, when replacing it on a schedule. Long-lived connections
+    # are more likely to be dropped by the network. Each connection's age is jittered by up to 10%.
+    RETIREMENT_AGE = 600
 
     # Connection errors that will wait {RECONNECT_INTERVAL} before reconnecting
     CONNECTION_ERRORS = %w[
@@ -55,6 +56,7 @@ module GoodJob # :nodoc:
       @reactor.loop.on_error { |error| report_error(error) }
       @reactor.on_failure { |error| report_error(error) }
 
+      retirement_age &&= retirement_age * (0.9 + (0.2 * Kernel.rand))
       @resource = @reactor.create_resource(name: :connection, retirement_age: retirement_age, on_fault: method(:connection_fault))
       @resource.around_add { |add, generation| add_connection(add, generation) }
       @resource.around_remove { |remove, generation| remove_connection(remove, generation) }
