@@ -79,7 +79,8 @@ module GoodJob # :nodoc:
 
     delegate :shutdown?, to: :@connection
 
-    # Shut down the notifier, when it owns its connection.
+    # Shut down the notifier, when it owns its connection. A notifier given a +connection:+ (e.g. by a {GoodJob::Capsule})
+    # doesn't shut it down: the connection's owner does, and {#shutdown?} reports the connection's state.
     # Use {#shutdown?} to determine whether threads have stopped.
     # @param timeout [Numeric, nil] Seconds to wait for active threads.
     #   * +nil+, the scheduler will trigger a shutdown but not wait for it to complete.
@@ -91,7 +92,8 @@ module GoodJob # :nodoc:
       shutdown?
     end
 
-    # Restart the notifier, when it owns its connection.
+    # Restart the notifier, when it owns its connection. A notifier given a +connection:+ is restarted by restarting
+    # the connection's owner (e.g. {GoodJob::Capsule#restart}); this does not restart it.
     # When shutdown, start; or shutdown and start.
     # @param timeout [nil, Numeric] Seconds to wait; shares same values as {#shutdown}.
     # @return [void]
