@@ -33,7 +33,7 @@ RSpec.describe GoodJob::Reactor::Loop do
 
   it 'calls back a watcher when the io is readable' do
     reader, writer = IO.pipe
-    seen = Queue.new
+    seen = Concurrent::Collection::TimeoutQueue.new
     reactor_loop.watch(reader) { seen << reader.read_nonblock(10) }
     writer.write("hi")
 
@@ -44,7 +44,7 @@ RSpec.describe GoodJob::Reactor::Loop do
   end
 
   it 'fires timers following the clock' do
-    fired = Queue.new
+    fired = Concurrent::Collection::TimeoutQueue.new
     reactor_loop.after(5) { fired << :after }
     reactor_loop.every(2) { fired << :every }
 
@@ -65,7 +65,7 @@ RSpec.describe GoodJob::Reactor::Loop do
   end
 
   it 'sends watcher and timer errors to on_error' do
-    errors = Queue.new
+    errors = Concurrent::Collection::TimeoutQueue.new
     reactor_loop.on_error { |error| errors << error }
     reactor_loop.after(1) { raise "timer failed" }
     clock.advance(1)

@@ -106,7 +106,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
     end
 
     it 'skips work waiting after a fault when stopping' do
-      resource = fake_resource(on_fault: ->(*) { 5 })
+      resource = fake_resource(on_fault: ->(*_args) { 5 })
       reactor.start
       on_loop { resource.current_generation.fault(IOError.new("connection lost")) }
       settle
@@ -138,7 +138,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
     end
 
     it 'promotes nothing with the faulted generation when stopping in a fault gap' do
-      resource = fake_resource(on_fault: ->(*) { 5 })
+      resource = fake_resource(on_fault: ->(*_args) { 5 })
       promotions = []
       resource.around_promotion do |promotion, old_gen, new_gen|
         promotions << [old_gen, new_gen]

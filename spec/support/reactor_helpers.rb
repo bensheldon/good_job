@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "concurrent/collection/timeout_queue"
+
 # Helpers for the GoodJob::Reactor specs (ported from PebbleBed's test_helper).
 # Include with `include ReactorSpecHelpers` in a reactor spec.
 module ReactorSpecHelpers

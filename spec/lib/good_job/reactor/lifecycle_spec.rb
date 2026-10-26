@@ -68,7 +68,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
   end
 
   it 'removes on fault, then adds after the delay from on_fault' do
-    resource = fake_resource(on_fault: ->(*) { 5 })
+    resource = fake_resource(on_fault: ->(*_args) { 5 })
     reactor.start
     log.clear
     on_loop { resource.current_generation.fault(IOError.new("connection lost")) }
@@ -82,7 +82,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
   end
 
   it 'passes the faulted generation to promotion as not alive' do
-    resource = fake_resource(on_fault: ->(*) { 5 })
+    resource = fake_resource(on_fault: ->(*_args) { 5 })
     old_gens = []
     resource.around_promotion do |promotion, old_gen, _new_gen|
       old_gens << old_gen
@@ -100,7 +100,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
   end
 
   it 'treats a failed add as a fault and retries after the delay from on_fault' do
-    resource = fake_resource(on_fault: ->(*) { 5 })
+    resource = fake_resource(on_fault: ->(*_args) { 5 })
     attempts = 0
     resource.around_add do |add, _generation|
       attempts += 1
@@ -119,7 +119,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
   end
 
   it 'makes unpinned work wait for a current generation' do
-    resource = fake_resource(on_fault: ->(*) { 5 })
+    resource = fake_resource(on_fault: ->(*_args) { 5 })
     reactor.start
     on_loop { resource.current_generation.fault(IOError.new("connection lost")) }
     settle
@@ -134,7 +134,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
 
   it 'shuts the reactor down on a failed promotion' do
     resource = fake_resource(retirement_age: 60)
-    failures = Queue.new
+    failures = Concurrent::Collection::TimeoutQueue.new
     reactor.on_failure { |error| failures << error }
     resource.around_promotion do |promotion, old_gen, new_gen|
       raise "could not move the heartbeat" if old_gen && new_gen
@@ -217,7 +217,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
   end
 
   it 'adds no new generation when on_fault returns nil' do
-    resource = fake_resource(on_fault: ->(*) {})
+    resource = fake_resource(on_fault: ->(*_args) {})
     reactor.start
     on_loop { resource.current_generation.fault(IOError.new("connection lost")) }
     advance(60)
@@ -228,7 +228,7 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
 
   it 'lets on_fault stop the reactor' do
     the_reactor = reactor
-    resource = fake_resource(on_fault: ->(*) { the_reactor.stop })
+    resource = fake_resource(on_fault: ->(*_args) { the_reactor.stop })
     reactor.start
     on_loop { resource.current_generation.fault(IOError.new("connection lost")) }
     sleep 0.001 while reactor.started?
@@ -238,9 +238,9 @@ RSpec.describe GoodJob::Reactor do # rubocop:disable RSpec/SpecFilePathFormat
   end
 
   it 'fails the reactor on an on_fault error' do
-    failures = Queue.new
+    failures = Concurrent::Collection::TimeoutQueue.new
     reactor.on_failure { |error| failures << error }
-    resource = fake_resource(on_fault: ->(*) { raise "give up" })
+    resource = fake_resource(on_fault: ->(*_args) { raise "give up" })
     reactor.start
     on_loop { resource.current_generation.fault(IOError.new("connection lost")) }
 

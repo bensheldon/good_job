@@ -32,7 +32,7 @@ RSpec.describe GoodJob::Reactor::Resource do # rubocop:disable RSpec/SpecFilePat
 
   it 'wraps posts, watchers and timers with around_task' do
     resource = fake_resource
-    wrapped = Queue.new
+    wrapped = Concurrent::Collection::TimeoutQueue.new
     resource.around_task do |task, generation|
       wrapped << generation.value.id
       task.call
@@ -43,7 +43,7 @@ RSpec.describe GoodJob::Reactor::Resource do # rubocop:disable RSpec/SpecFilePat
     resource.post { :post }.value!
     expect(wrapped.pop(timeout: 2)).to eq 1
 
-    watched = Queue.new
+    watched = Concurrent::Collection::TimeoutQueue.new
     on_loop do
       generation = resource.current_generation
       generation.watch(generation.value.reader) { |g| watched << g.value.reader.read_nonblock(10) }
@@ -57,7 +57,7 @@ RSpec.describe GoodJob::Reactor::Resource do # rubocop:disable RSpec/SpecFilePat
   end
 
   it 'lets around_task fault the generation' do
-    resource = fake_resource(on_fault: ->(*) { 5 })
+    resource = fake_resource(on_fault: ->(*_args) { 5 })
     resource.around_task do |task, generation|
       task.call
     rescue IOError => e
@@ -90,7 +90,7 @@ RSpec.describe GoodJob::Reactor::Resource do # rubocop:disable RSpec/SpecFilePat
 
   it "sends watcher errors to the generation's on_error" do
     resource = fake_resource
-    errors = Queue.new
+    errors = Concurrent::Collection::TimeoutQueue.new
     reactor.start
     on_loop do
       generation = resource.current_generation
