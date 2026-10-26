@@ -29,6 +29,8 @@ AllCops:
     - Brewfile
     # Vendored dependencies
     - lib/good_job/sd_notify.rb
+    - lib/good_job/reactor.rb
+    - lib/good_job/reactor/**/*
   NewCops: enable
 
 Gemspec/DevelopmentDependencies:

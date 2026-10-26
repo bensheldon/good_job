@@ -75,7 +75,7 @@ module GoodJob
       register_instance
       @executor = Concurrent::ThreadPoolExecutor.new(
         # On JRuby, a Java thread pool with an unbounded queue never grows beyond min_threads (except to a single
-        # thread from 0), and the Notifier's listen loop occupies a thread for as long as it runs.
+        # thread from 0).
         min_threads: MAX_THREADS,
         max_threads: MAX_THREADS,
         auto_terminate: true,

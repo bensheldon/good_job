@@ -256,7 +256,7 @@ module GoodJob
   # This is useful in processes that repeatedly create and shut down capsules, such as test suites.
   # @return [void]
   def self.prune
-    [Adapter, Capsule, CronManager, Notifier, Poller, Scheduler, SharedExecutor, CapsuleTracker].each(&:prune)
+    [Adapter, Capsule, CronManager, DedicatedConnection, Notifier, Poller, Scheduler, SharedExecutor, CapsuleTracker].each(&:prune)
     nil
   end
 
