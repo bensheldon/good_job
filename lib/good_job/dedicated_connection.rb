@@ -61,7 +61,8 @@ module GoodJob # :nodoc:
       @resource.around_add { |add, generation| add_connection(add, generation) }
       @resource.around_remove { |remove, generation| remove_connection(remove, generation) }
       @resource.around_task { |task, generation| connection_task(task, generation) }
-      every(TICK_INTERVAL) { |generation| tick(generation) }
+      every(TICK_INTERVAL) { reset_connection_errors }
+      every(KEEPALIVE_INTERVAL, jitter: 0.1) { |generation| keepalive(generation) }
     end
 
     # Calls the block with each new connection's generation, before it becomes current. An error faults the connection.
@@ -97,8 +98,8 @@ module GoodJob # :nodoc:
     # Calls the block with the current connection's generation every +seconds+.
     # @yieldparam generation [GoodJob::Reactor::Resource::Generation]
     # @return [void]
-    def every(seconds)
-      @resource.every(seconds) { |resource| yield resource.current_generation }
+    def every(seconds, jitter: 0)
+      @resource.every(seconds, jitter: jitter) { |resource| yield resource.current_generation }
     end
 
     # Calls the block after each task that runs on the connection (from {#every}, {#post}, or a
@@ -194,17 +195,14 @@ module GoodJob # :nodoc:
       generation.fault(e)
     end
 
-    def tick(generation)
-      if Time.current - @last_keepalive_time >= KEEPALIVE_INTERVAL
-        raw_connection = generation.value.raw_connection
-        if raw_connection.respond_to?(:async_exec)
-          raw_connection.async_exec("SELECT 1")
-        else
-          raw_connection.execute_query("SELECT 1")
-        end
-        @last_keepalive_time = Time.current
+    def keepalive(generation)
+      raw_connection = generation.value.raw_connection
+      if raw_connection.respond_to?(:async_exec)
+        raw_connection.async_exec("SELECT 1")
+      else
+        raw_connection.execute_query("SELECT 1")
       end
-      reset_connection_errors
+      @last_keepalive_time = Time.current
     end
 
     # Called by the reactor after each fault.

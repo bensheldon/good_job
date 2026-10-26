@@ -54,6 +54,22 @@ RSpec.describe GoodJob::Reactor::Loop do
     expect([ReactorSpecHelpers.pop_within(fired, 2), ReactorSpecHelpers.pop_within(fired, 2)].sort).to eq [:after, :every].sort
   end
 
+  it 'varies each interval by up to the jitter' do
+    # Kernel.rand of 0.75 lengthens each interval by half the jitter: 10 * (1 + (0.2 * 0.5)) = 11
+    allow(Kernel).to receive(:rand).and_return(0.75)
+    fired = Queue.new
+    reactor_loop.every(10, jitter: 0.2) { fired << clock.now }
+
+    clock.advance(10.9)
+    expect(ReactorSpecHelpers.pop_within(fired, 0.2)).to be_nil
+    clock.advance(0.1)
+    expect(ReactorSpecHelpers.pop_within(fired, 2)).to eq 11.0
+    clock.advance(10.9)
+    expect(ReactorSpecHelpers.pop_within(fired, 0.2)).to be_nil
+    clock.advance(0.1)
+    expect(ReactorSpecHelpers.pop_within(fired, 2)).to be_within(0.001).of(22.0)
+  end
+
   it 'does not fire canceled timers' do
     fired = []
     timer = reactor_loop.after(1) { fired << :fired }

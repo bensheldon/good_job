@@ -25,12 +25,13 @@ module GoodJob
 
       # @!visibility private
       class Timer < Handle
-        attr_reader :due, :interval
+        attr_reader :due, :interval, :jitter
 
-        def initialize(loop, due, interval, callback)
+        def initialize(loop, due, interval, callback, jitter: 0)
           super(loop)
           @due = due
           @interval = interval
+          @jitter = jitter
           @callback = callback
         end
 
@@ -38,10 +39,17 @@ module GoodJob
           @callback.call
         ensure
           if (interval = @interval)
-            @due = now + interval
+            @due = now + Timer.jittered(interval, @jitter)
           else
             cancel
           end
+        end
+
+        # `seconds` varied randomly by up to `jitter` (a fraction of it) either way.
+        def self.jittered(seconds, jitter)
+          return seconds if jitter.zero?
+
+          seconds * (1 + (jitter * ((2 * Kernel.rand) - 1)))
         end
       end
 
@@ -143,8 +151,10 @@ module GoodJob
         schedule(seconds, nil, block)
       end
 
-      def every(seconds, &block)
-        schedule(seconds, seconds, block)
+      # Calls the block every `seconds`. With `jitter` (a fraction, e.g. 0.1), each interval, including the
+      # first, varies randomly by up to that fraction either way, so timers started together drift apart.
+      def every(seconds, jitter: 0, &block)
+        schedule(Timer.jittered(seconds, jitter), seconds, block, jitter: jitter)
       end
 
       # Errors raised by watchers and timers registered directly on the loop.
@@ -200,8 +210,8 @@ module GoodJob
         wake
       end
 
-      def schedule(seconds, interval, block)
-        timer = Timer.new(self, @clock.now + seconds, interval, guard(block))
+      def schedule(seconds, interval, block, jitter: 0)
+        timer = Timer.new(self, @clock.now + seconds, interval, guard(block), jitter: jitter)
         dispatch { @timers << timer }
         timer
       end

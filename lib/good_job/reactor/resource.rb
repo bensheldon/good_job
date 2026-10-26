@@ -98,9 +98,9 @@ module GoodJob
 
       # Runs the block on whichever generation is current, every `seconds`, while
       # the reactor is running. It receives the resource.
-      def every(seconds, &block)
-        @recurring << [seconds, block]
-        @loop.dispatch { start_recurring(seconds, block) } if @loop.running?
+      def every(seconds, jitter: 0, &block)
+        @recurring << [seconds, jitter, block]
+        @loop.dispatch { start_recurring(seconds, jitter, block) } if @loop.running?
         self
       end
 
@@ -120,7 +120,7 @@ module GoodJob
         @running = true
         @stopping = false
         @last_promoted = nil
-        @recurring.each { |(seconds, block)| start_recurring(seconds, block) }
+        @recurring.each { |(seconds, jitter, block)| start_recurring(seconds, jitter, block) }
         add_next(nil)
       end
 
@@ -223,8 +223,8 @@ module GoodJob
         @current || raise(NoCurrentGenerationError, "#{inspect} has no current generation")
       end
 
-      def start_recurring(seconds, block)
-        @timers << @loop.every(seconds) { @current&.perform { block.call(self) } }
+      def start_recurring(seconds, jitter, block)
+        @timers << @loop.every(seconds, jitter: jitter) { @current&.perform { block.call(self) } }
       end
 
       def add_next(old)

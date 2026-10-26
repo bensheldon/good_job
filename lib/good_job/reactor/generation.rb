@@ -72,8 +72,8 @@ module GoodJob
           track(@loop.watch(io) { perform { block.call(self) } })
         end
 
-        def every(seconds, &block)
-          track(@loop.every(seconds) { perform { block.call(self) } })
+        def every(seconds, jitter: 0, &block)
+          track(@loop.every(seconds, jitter: jitter) { perform { block.call(self) } })
         end
 
         # Returns a Claim; with a block, yields it and releases it afterward.
