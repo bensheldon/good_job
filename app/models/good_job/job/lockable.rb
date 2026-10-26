@@ -25,11 +25,17 @@ module GoodJob
         def with_advisory_lock_claim(select_limit: nil, &block)
           raise ArgumentError, "Must provide a block" unless block
 
-          advisory_lock(select_limit: select_limit) do |records|
-            record = records.first
-            # Not in an ensure: if the block raised, the record may hold completion
-            # fields that were never saved, and batch callbacks would act on them.
-            yield(record).tap { record&.run_callbacks(:perform_unlocked) }
+          record = nil
+          begin
+            advisory_lock(select_limit: select_limit) do |records|
+              record = records.first
+              yield(record)
+            end
+          ensure
+            # Runs after the advisory lock is released. A failed completion leaves the
+            # row lock in the database and may leave unsaved completion fields on the
+            # record, which batch callbacks would act on.
+            record.run_callbacks(:perform_unlocked) if record && (record.destroyed? || record.locked_by_id_in_database.nil?)
           end
         end
 
@@ -121,7 +127,8 @@ module GoodJob
           connection_errors = %w[ActiveRecord::ConnectionNotEstablished ActiveRecord::ConnectionFailed PG::ConnectionBad PG::UnableToSend].filter_map(&:safe_constantize)
           cause = e.is_a?(ActiveRecord::StatementInvalid) ? e.cause : nil # older Rails wraps PG connection errors
           raise unless connection_errors.any? { |klass| e.is_a?(klass) || cause.is_a?(klass) }
-          return false if Thread.current.status == "aborting"
+          # Once the process is exiting, its stale process record lets cleanup release the claim.
+          return false if Thread.current.status == "aborting" || GoodJob.current_thread_shutting_down?
 
           # Keep the worker registered until its claim can be released. Otherwise a
           # live process can keep the abandoned job locked indefinitely.

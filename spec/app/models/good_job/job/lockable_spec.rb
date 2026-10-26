@@ -26,6 +26,44 @@ RSpec.describe GoodJob::Job::Lockable do
     )
   end
 
+  describe '.with_advisory_lock_claim' do
+    it 'runs perform_unlocked callbacks after the advisory lock is released' do
+      job = create_job
+      locked_during_callback = nil
+      allow_any_instance_of(GoodJob::Job).to receive(:continue_discard_or_finish_batch) do |record|
+        locked_during_callback = record.advisory_locked?
+      end
+
+      GoodJob::Job.where(id: job.id).with_advisory_lock_claim { |claimed| expect(claimed).to be_advisory_locked }
+
+      expect(locked_during_callback).to be false
+    end
+
+    it 'runs perform_unlocked callbacks when the block raises after the row lock is released' do
+      job = create_job
+      callback_ran = false
+      allow_any_instance_of(GoodJob::Job).to receive(:continue_discard_or_finish_batch) { callback_ran = true }
+
+      expect do
+        GoodJob::Job.where(id: job.id).with_advisory_lock_claim { raise 'boom' }
+      end.to raise_error('boom')
+
+      expect(callback_ran).to be true
+    end
+
+    it 'skips perform_unlocked callbacks when the row lock was not released' do
+      job = create_job(locked_by_id: process_id, locked_at: Time.current, lock_type: :advisory)
+      callback_ran = false
+      allow_any_instance_of(GoodJob::Job).to receive(:continue_discard_or_finish_batch) { callback_ran = true }
+
+      expect do
+        GoodJob::Job.where(id: job.id).with_advisory_lock_claim { raise 'completion failed' }
+      end.to raise_error('completion failed')
+
+      expect(callback_ran).to be false
+    end
+  end
+
   describe '.with_skip_locked_claim' do
     it 'claims the first available job and sets lock columns' do
       job = create_job
@@ -245,6 +283,21 @@ RSpec.describe GoodJob::Job::Lockable do
         expect(attempts).to eq 2
         expect(job.reload.locked_by_id).to be_nil
         expect(GoodJob::ConcurrencyClaim.where(job_id: job.id)).to be_empty
+      end
+
+      it 'stops retrying when the worker is shutting down' do
+        job = create_job
+        allow(GoodJob::Job).to receive(:transaction).and_raise(ActiveRecord::ConnectionNotEstablished, 'database unavailable')
+        allow(GoodJob::Job).to receive(:sleep)
+        allow(GoodJob).to receive(:current_thread_shutting_down?).and_return(true)
+
+        expect do
+          GoodJob::Job.where(id: job.id).public_send(claim_method, locked_by_id: process_id, locked_at: Time.current, lock_type: strategy) do
+            raise 'completion failed'
+          end
+        end.to raise_error('completion failed')
+
+        expect(GoodJob::Job).not_to have_received(:sleep)
       end
 
       it 'does not keep a killed worker alive while the database is unavailable' do
