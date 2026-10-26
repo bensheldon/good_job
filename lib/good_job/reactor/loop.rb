@@ -108,6 +108,14 @@ module GoodJob
         @thread&.alive? || false
       end
 
+      # Waits up to `timeout` seconds (forever when nil) for the thread to exit. Returns whether it has.
+      def join(timeout = nil)
+        thread = @thread
+        return true if thread.nil? || on_thread?
+
+        !thread.join(timeout).nil?
+      end
+
       def on_thread?
         !@thread.nil? && Thread.current == @thread
       end

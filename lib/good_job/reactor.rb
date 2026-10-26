@@ -180,7 +180,12 @@ module GoodJob
     # Waits for a stop that has already begun, as `stop` does with `timeout`.
     # Lets a stop that began without waiting be waited on later.
     def finish_stop(timeout)
-      return true unless started?
+      unless started?
+        # A stop that timed out leaves the loop stopped while its thread finishes queued removal.
+        return !@loop.alive? if timeout.nil?
+
+        return @loop.join(timeout.negative? ? nil : timeout)
+      end
       return nil if timeout.nil?
 
       deadline = monotonic_now + timeout unless timeout.negative?

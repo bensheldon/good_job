@@ -69,6 +69,15 @@ RSpec.describe GoodJob::DedicatedConnection do
       expect(connection.shutdown(timeout: nil)).to be false
       expect(connection.shutdown(timeout: 0.2)).to be false
       expect(Time.current - started_at).to be < 1
+
+      # Waiting again waits for the blocked removal to finish
+      expect(connection).not_to be_shutdown
+      Thread.new do
+        sleep 0.3
+        release.set
+      end
+      expect(connection.shutdown(timeout: -1)).to be true
+      expect(connection).to be_shutdown
     ensure
       release.set
       wait_until { expect(connection).to be_shutdown }
