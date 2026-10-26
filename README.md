@@ -1654,7 +1654,7 @@ end
 GOOD_JOB_LOCK_STRATEGY=skiplocked
 ```
 
-All three strategies (`:advisory`, `:skiplocked`, `:hybrid`) can coexist safely during a rolling deploy — each strategy excludes jobs that are already locked by another worker regardless of which strategy that worker uses.
+During a rolling deploy, `:hybrid` workers can safely run alongside either `:advisory` or `:skiplocked` workers. But `:advisory` and `:skiplocked` workers must not run at the same time, because neither sees the other's locks and the same job may be performed twice. To move from `:advisory` to `:skiplocked`, deploy `:hybrid` first, wait until no `:advisory` workers remain, and then deploy `:skiplocked`.
 
 #### PgBouncer configuration
 

@@ -78,8 +78,14 @@ RSpec.describe 'Schedule Integration' do
       scheduler = GoodJob::Scheduler.new(performer, max_threads: max_threads)
       max_threads.times { scheduler.create_thread }
 
-      max_wait = Concurrent.on_jruby? ? 120 : 60
-      wait_until(max: max_wait, increments_of: 0.5) { expect(GoodJob::Job.unfinished.count).to be_zero }
+      # Under a loaded database this can take minutes; only fail if jobs stop being finished.
+      wait_while_progressing(progress: -> { GoodJob::Job.finished.count }) do
+        # A thread stops looping when its dequeue comes up empty (e.g. it lost a lock race),
+        # and in production the Poller wakes it again. Do the same here so contention can't
+        # leave jobs stranded; this is a no-op while all threads are busy.
+        max_threads.times { scheduler.create_thread }
+        expect(GoodJob::Job.unfinished.count).to be_zero, -> { "#{GoodJob::Job.unfinished.count} unfinished jobs; #{scheduler.stats}" }
+      end
       scheduler.shutdown
 
       expect(GoodJob::Job.unfinished.count).to eq(0), -> { "Unworked jobs are #{GoodJob::Job.unfinished.map(&:id)}" }
