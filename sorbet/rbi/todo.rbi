@@ -64,3 +64,8 @@ module ::ENTERED; end
 module ::HOLD; end
 module ::HoldingJob; end
 module ::LimitedJob; end
+module ::AdapterDefaultJob; end
+module ::DeferredCallbackJob; end
+module ::DeferredJob; end
+module ::ImmediateJob; end
+module ::PERFORMED_BATCHES; end

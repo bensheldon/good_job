@@ -574,11 +574,11 @@ module GoodJob
       end
     end
 
+    # Whether Active Job would defer enqueuing any of these job classes until the transaction commits.
     def self.enqueue_after_commit?(good_job_or_active_job_classes)
-      good_job_or_active_job_classes = Array(good_job_or_active_job_classes)
+      return false unless ActiveRecord.respond_to?(:after_all_transactions_commit)
 
-      feature_exists = ActiveRecord.respond_to?(:after_all_transactions_commit)
-      feature_exists && good_job_or_active_job_classes.any? do |klass|
+      Array(good_job_or_active_job_classes).any? do |klass|
         active_job_class = case klass
                            when String
                              klass.constantize
@@ -588,9 +588,34 @@ module GoodJob
                              klass
                            end
 
-        active_job_class.respond_to?(:enqueue_after_transaction_commit)
+        active_job_class_enqueues_after_commit?(active_job_class)
       end
     end
+
+    # Mirrors ActiveJob::EnqueueAfterTransactionCommit#raw_enqueue for each Rails version.
+    def self.active_job_class_enqueues_after_commit?(active_job_class)
+      return false unless active_job_class.respond_to?(:enqueue_after_transaction_commit)
+
+      value = active_job_class.enqueue_after_transaction_commit
+      if ActiveJob.gem_version < Gem::Version.new('8.0.0.alpha')
+        case value
+        when :always then true
+        when :never then false
+        else
+          adapter = active_job_class.queue_adapter
+          adapter.respond_to?(:enqueue_after_transaction_commit?) ? adapter.enqueue_after_transaction_commit? : false
+        end
+      elsif ActiveJob.gem_version < Gem::Version.new('8.1.0.alpha')
+        case value
+        when :always then true
+        when :never, :default then false
+        else value ? true : false
+        end
+      else
+        value ? true : false
+      end
+    end
+    private_class_method :active_job_class_enqueues_after_commit?
 
     # TODO: it would be nice to enforce these values at the model
     # validates :active_job_id, presence: true
@@ -696,6 +721,9 @@ module GoodJob
           new_active_jobs = []
 
           transaction do
+            self.error_event = :retried if error
+            save!
+
             Job.defer_after_commit_maybe(active_job.class) do
               GoodJob::CurrentThread.within do |current_thread|
                 current_thread.job = self
@@ -707,8 +735,6 @@ module GoodJob
                 end
               end
             end
-            self.error_event = :retried if error
-            save!
           end
 
           new_active_jobs.first

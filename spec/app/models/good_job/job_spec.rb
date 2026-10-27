@@ -46,6 +46,47 @@ RSpec.describe GoodJob::Job do
     stub_const 'TestJob::Error', Class.new(StandardError)
   end
 
+  describe '.enqueue_after_commit?', skip: !ActiveRecord.respond_to?(:after_all_transactions_commit) do
+    let(:rails_7_2) { Rails.gem_version < Gem::Version.new('8.0.0.alpha') }
+
+    before do
+      immediate, deferred = rails_7_2 ? [:never, :always] : [false, true]
+      stub_const 'ImmediateJob', Class.new(ActiveJob::Base) { self.enqueue_after_transaction_commit = immediate }
+      stub_const 'DeferredJob', Class.new(ActiveJob::Base) { self.enqueue_after_transaction_commit = deferred }
+    end
+
+    it 'is false for a job class that does not enqueue after transaction commit' do
+      expect(described_class.enqueue_after_commit?(ImmediateJob)).to be false
+      expect(described_class.enqueue_after_commit?('ImmediateJob')).to be false
+      expect(described_class.enqueue_after_commit?(described_class.new(job_class: 'ImmediateJob'))).to be false
+    end
+
+    it 'is true for a job class that enqueues after transaction commit' do
+      expect(described_class.enqueue_after_commit?(DeferredJob)).to be true
+      expect(described_class.enqueue_after_commit?('DeferredJob')).to be true
+      expect(described_class.enqueue_after_commit?(described_class.new(job_class: 'DeferredJob'))).to be true
+    end
+
+    it 'is true when any of the job classes enqueues after transaction commit' do
+      expect(described_class.enqueue_after_commit?([ImmediateJob, DeferredJob])).to be true
+      expect(described_class.enqueue_after_commit?([ImmediateJob, ImmediateJob])).to be false
+    end
+
+    context 'when the job class lets the queue adapter decide', skip: Rails.gem_version >= Gem::Version.new('8.0.0.alpha') do
+      before do
+        stub_const 'AdapterDefaultJob', Class.new(ActiveJob::Base) { self.enqueue_after_transaction_commit = :default }
+      end
+
+      it 'follows the queue adapter' do
+        allow(GoodJob.configuration).to receive(:enqueue_after_transaction_commit).and_return(false)
+        expect(described_class.enqueue_after_commit?(AdapterDefaultJob)).to be false
+
+        allow(GoodJob.configuration).to receive(:enqueue_after_transaction_commit).and_return(true)
+        expect(described_class.enqueue_after_commit?(AdapterDefaultJob)).to be true
+      end
+    end
+  end
+
   describe '#id' do
     it 'is the ActiveJob ID' do
       expect(job.id).to eq job.active_job_id
@@ -208,6 +249,15 @@ RSpec.describe GoodJob::Job do
         )
       end
 
+      it 'updates the original job when the job class enqueues after transaction commit', skip: !ActiveRecord.respond_to?(:after_all_transactions_commit) do
+        TestJob.enqueue_after_transaction_commit = Rails.gem_version < Gem::Version.new('8.0.0.alpha') ? :always : true
+
+        expect do
+          job.retry_job
+        end.to change { job.reload.finished? }.from(true).to(false)
+        expect(job).to have_attributes(error_event: "retried")
+      end
+
       context 'when run inline' do
         before do
           stub_const "TestJob", (Class.new(ActiveJob::Base) do
@@ -225,12 +275,22 @@ RSpec.describe GoodJob::Job do
           job.retry_job
 
           expect(job).to be_finished
+          expect(job.reload).to have_attributes(error: nil, error_event: nil)
 
           executions = job.executions.order(created_at: :asc).to_a
           expect(executions.size).to eq 3 # initial execution isn't created in test
           expect(executions.map(&:error)).to eq ["TestJob::Error: TestJob::Error", "TestJob::Error: TestJob::Error", nil]
           expect(executions[0].finished_at).to be < executions[1].finished_at
           expect(executions[1].finished_at).to be < executions[2].finished_at
+        end
+
+        it 'executes and deletes the job when job records are not preserved' do
+          allow(GoodJob).to receive(:preserve_job_records).and_return(false)
+          TestJob.queue_adapter = GoodJob::Adapter.new(execution_mode: :inline)
+
+          job.retry_job
+
+          expect(described_class.where(id: job.id)).not_to exist
         end
 
         describe "created_at behavior" do
