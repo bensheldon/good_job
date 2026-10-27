@@ -1,5 +1,13 @@
 # Changelog
 
+## [v4.23.1](https://github.com/bensheldon/good_job/tree/v4.23.1) (2026-10-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.23.0...v4.23.1)
+
+**Fixed bugs:**
+
+- Release abandoned job claims after database failures [\#1887](https://github.com/bensheldon/good_job/pull/1887) ([ollym](https://github.com/ollym))
+
 ## [v4.23.0](https://github.com/bensheldon/good_job/tree/v4.23.0) (2026-10-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.22.1...v4.23.0)
