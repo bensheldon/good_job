@@ -1225,6 +1225,8 @@ Note that when running jobs in `:inline` execution mode, `GoodJob.current_thread
 
 Jobs will be automatically retried if the process is interrupted while performing a job and the job is unable to finish before the timeout or as the result of a `SIGKILL` or power failure. The interrupted execution's error record will show `GoodJob::InterruptedError` to distinguish it from the rescuable `GoodJob::InterruptError` that is raised when the job is retried.
 
+With `:skiplocked` or `:hybrid` locking, a worker releases its claim even if recording the job's completion fails. If the database connection is unavailable during cleanup, the worker waits and retries every five seconds until it can release the claim, GoodJob begins shutting down, or the worker is forcibly terminated. If the worker stops retrying, the claim is released when the exited process's record is cleaned up. The job can then be recovered as an interrupted execution, which may run it again; external effects should be idempotent.
+
 If you need more control over interrupt-caused retries, include the `GoodJob::ActiveJobExtensions::InterruptErrors` extension in your job class. When an interrupted job is retried, the extension will raise a `GoodJob::InterruptError` exception within the job, which allows you to use Active Job's `retry_on` and `discard_on` to control the behavior of the job.
 
 ```ruby

@@ -5,16 +5,26 @@
 #
 POSTGRES_NOTICES = Concurrent::Array.new
 
-ActiveSupport.on_load :active_record do
-  ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkout, :before, lambda { |conn|
-    raw_connection = conn.raw_connection
-    next unless raw_connection.respond_to? :set_notice_receiver
+# Attach on (re)connect rather than on checkout: calling `raw_connection` on
+# the adapter marks it dirty, which prevents Rails from reconnecting it.
+module PostgresNoticeReceiver
+  def configure_connection
+    super
+    # Rails < 7.1 stores the PG::Connection in @connection
+    pg_connection = @raw_connection || @connection
+    return unless pg_connection.respond_to?(:set_notice_receiver)
 
-    raw_connection.set_notice_receiver do |result|
+    pg_connection.set_notice_receiver do |result|
       Rails.logger.warn(result.error_message.strip)
       POSTGRES_NOTICES << result.error_message
     end
-  }
+  end
+end
+
+ActiveSupport.on_load :active_record do
+  # Rails < 7.0 has no :active_record_postgresqladapter load hook
+  require "active_record/connection_adapters/postgresql_adapter"
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend PostgresNoticeReceiver
 
   ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkin, :before, lambda { |conn|
     count = PgLock.count_locks_for(conn)
