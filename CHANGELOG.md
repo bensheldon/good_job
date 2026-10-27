@@ -1,5 +1,43 @@
 # Changelog
 
+## [v4.23.0](https://github.com/bensheldon/good_job/tree/v4.23.0) (2026-10-27)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.22.1...v4.23.0)
+
+**Implemented enhancements:**
+
+- Filter sensitive job arguments in the Dashboard [\#1881](https://github.com/bensheldon/good_job/pull/1881) ([bogdan](https://github.com/bogdan))
+
+**Fixed bugs:**
+
+- Respect enable\_listen\_notify when promoting concurrency claims [\#1892](https://github.com/bensheldon/good_job/pull/1892) ([eidam](https://github.com/eidam))
+- Downgrade lock\_type before releasing advisory lock [\#1883](https://github.com/bensheldon/good_job/pull/1883) ([jmsanders](https://github.com/jmsanders))
+
+**Closed issues:**
+
+- ConcurrencyClaim sends NOTIFY even when enable\_listen\_notify is false [\#1891](https://github.com/bensheldon/good_job/issues/1891)
+
+**Merged pull requests:**
+
+- Keep JRuby platform in Gemfile.lock when Bundler re-resolves [\#1893](https://github.com/bensheldon/good_job/pull/1893) ([bensheldon](https://github.com/bensheldon))
+- Make integration specs robust under database load; fix mixed lock strategy specs [\#1890](https://github.com/bensheldon/good_job/pull/1890) ([bensheldon](https://github.com/bensheldon))
+- Pin CI test runners to ubuntu-24.04 [\#1888](https://github.com/bensheldon/good_job/pull/1888) ([bensheldon](https://github.com/bensheldon))
+- Require the concurrent-ruby classes GoodJob uses [\#1885](https://github.com/bensheldon/good_job/pull/1885) ([czj](https://github.com/czj))
+- Add index\_good\_job\_executions\_on\_created\_at [\#1884](https://github.com/bensheldon/good_job/pull/1884) ([clinejj](https://github.com/clinejj))
+- Demo: cap YJIT memory and shrink the Rack::Attack store [\#1880](https://github.com/bensheldon/good_job/pull/1880) ([bensheldon](https://github.com/bensheldon))
+- Demo: enable rbtrace in Puma workers for heap dumps; add sheap [\#1879](https://github.com/bensheldon/good_job/pull/1879) ([bensheldon](https://github.com/bensheldon))
+- Demo: warm up Puma before forking, add Thruster, raise DB pool [\#1878](https://github.com/bensheldon/good_job/pull/1878) ([bensheldon](https://github.com/bensheldon))
+- Return 404 for GET /jobs/mass\_update instead of redirecting [\#1877](https://github.com/bensheldon/good_job/pull/1877) ([bensheldon](https://github.com/bensheldon))
+- Load execution full traces and serialized params on demand [\#1876](https://github.com/bensheldon/good_job/pull/1876) ([bensheldon](https://github.com/bensheldon))
+- Add specs for the demo's Rack::Attack rules [\#1875](https://github.com/bensheldon/good_job/pull/1875) ([bensheldon](https://github.com/bensheldon))
+- Fix demo boot: don't require rails/all in bin/rails [\#1874](https://github.com/bensheldon/good_job/pull/1874) ([bensheldon](https://github.com/bensheldon))
+- Reduce demo app memory and crawler load [\#1873](https://github.com/bensheldon/good_job/pull/1873) ([bensheldon](https://github.com/bensheldon))
+- Fix JRuby flake from inspect in wait\_until predicate expectations [\#1872](https://github.com/bensheldon/good_job/pull/1872) ([bensheldon](https://github.com/bensheldon))
+- Remove Adapter::RUNTIMES so adapters can be garbage collected [\#1870](https://github.com/bensheldon/good_job/pull/1870) ([bensheldon](https://github.com/bensheldon))
+- Add GoodJob.prune to release shut down capsules, schedulers, and notifiers [\#1869](https://github.com/bensheldon/good_job/pull/1869) ([bensheldon](https://github.com/bensheldon))
+- Use resolve\_\[property\] naming for CronEntry configuration resolvers [\#1868](https://github.com/bensheldon/good_job/pull/1868) ([bensheldon](https://github.com/bensheldon))
+- Fix inconsistencies in the Brazilian Portuguese locale [\#1867](https://github.com/bensheldon/good_job/pull/1867) ([tiagoamaro](https://github.com/tiagoamaro))
+
 ## [v4.22.1](https://github.com/bensheldon/good_job/tree/v4.22.1) (2026-10-13)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.22.0...v4.22.1)

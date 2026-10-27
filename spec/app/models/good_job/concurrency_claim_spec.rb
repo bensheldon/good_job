@@ -81,6 +81,20 @@ RSpec.describe GoodJob::ConcurrencyClaim do
       expect(GoodJob::Notifier).to have_received(:notify).with({ queue_name: "default" })
     end
 
+    it 'does not notify when enable_listen_notify is disabled' do
+      allow(GoodJob.configuration).to receive(:enable_listen_notify).and_return(false)
+      holder = create_job(performed_at: Time.current)
+      waiter = create_job
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 1, job_id: holder.id, locked_by_id: nil)
+      described_class.claim(key: key, scope: GoodJob::Job.all, limit: 0, job_id: waiter.id, locked_by_id: nil)
+
+      allow(GoodJob::Notifier).to receive(:notify)
+      described_class.release_job(holder.id)
+
+      expect(waiter.reload.scheduled_at).to be <= Time.current
+      expect(GoodJob::Notifier).not_to have_received(:notify)
+    end
+
     it 'skips and deletes waiting rows for jobs that are finished or missing' do
       holder = create_job(performed_at: Time.current)
       finished_waiter = create_job(finished_at: Time.current)

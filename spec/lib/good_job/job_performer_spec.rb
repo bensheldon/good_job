@@ -21,6 +21,16 @@ RSpec.describe GoodJob::JobPerformer do
       expect(GoodJob::Job).to have_received(:perform_with_advisory_lock)
     end
 
+    it "uses its capsule's lock strategy and queue select limit" do
+      allow(GoodJob::Job).to receive(:perform_with_lock)
+      capsule = GoodJob::Capsule.new(configuration: GoodJob::Configuration.new({ lock_strategy: :skiplocked, queue_select_limit: 7 }))
+
+      job_performer = described_class.new('*', capsule: capsule)
+      job_performer.next
+
+      expect(GoodJob::Job).to have_received(:perform_with_lock).with(hash_including(lock_strategy: :skiplocked, queue_select_limit: 7))
+    end
+
     it 'records the active job id for the duration of #next' do
       job_performer = described_class.new('*')
 

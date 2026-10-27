@@ -274,8 +274,18 @@ RSpec.describe 'Batches' do
         50.times { |i| TestJob.perform_later(i) }
       end
 
-      wait_until(max: 30) { expect(GoodJob::Job.finished.count).to eq 52 }
+      # 50 jobs plus the discard and finish callbacks. Under a loaded database this can take
+      # much longer than usual; only fail if jobs stop being finished.
+      wait_while_progressing(progress: -> { GoodJob::Job.finished.count }) do
+        expect(GoodJob::Job.finished.count).to eq 52
+      end
       capsule.shutdown(timeout: -1)
+
+      expect(GoodJob::Job.where(batch_id: batch.id).count).to eq 50
+      expect(batch.reload).to be_finished
+      expect(batch).to be_discarded
+      callback_arguments = GoodJob::Job.where(batch_callback_id: batch.id).map { |job| job.active_job.arguments.second }
+      expect(callback_arguments).to contain_exactly({ event: :discard }, { event: :finish })
     end
   end
 
