@@ -21,11 +21,11 @@ module PostgresNoticeReceiver
   end
 end
 
-ActiveSupport.on_load :active_record_postgresqladapter do
-  prepend PostgresNoticeReceiver
-end
-
 ActiveSupport.on_load :active_record do
+  # Rails < 7.0 has no :active_record_postgresqladapter load hook
+  require "active_record/connection_adapters/postgresql_adapter"
+  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend PostgresNoticeReceiver
+
   ActiveRecord::ConnectionAdapters::AbstractAdapter.set_callback :checkin, :before, lambda { |conn|
     count = PgLock.count_locks_for(conn)
     next if count.zero?
