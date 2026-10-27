@@ -555,6 +555,7 @@ GEM
     thread (0.2.2)
     thread_safe (0.3.6)
     thread_safe (0.3.6-java)
+    thruster (0.1.27)
     thruster (0.1.27-aarch64-linux)
     thruster (0.1.27-arm64-darwin)
     thruster (0.1.27-x86_64-darwin)
