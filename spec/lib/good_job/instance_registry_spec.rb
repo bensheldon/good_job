@@ -38,6 +38,16 @@ RSpec.describe GoodJob::InstanceRegistry do
       expect(klass.instances).to eq [running]
     end
 
+    it 'prunes only the given instances' do
+      running = klass.new
+      stopped = klass.new
+      other_stopped = klass.new
+      [stopped, other_stopped].each { |instance| instance.shutdown = true }
+
+      expect(klass.prune(running, stopped)).to eq [stopped]
+      expect(klass.instances).to eq [running, other_stopped]
+    end
+
     it 'allows pruned instances to re-register' do
       instance = klass.new
       instance.shutdown = true

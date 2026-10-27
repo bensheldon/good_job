@@ -69,7 +69,10 @@ module GoodJob
     def restart(timeout: NONE)
       raise ArgumentError, "Capsule#restart cannot be called with a timeout of nil" if timeout.nil?
 
+      replaced_instances = [@notifier, @poller, @cron_manager, *@multi_scheduler&.schedulers].compact
       shutdown(timeout: timeout)
+      # Start creates new components, so unregister the replaced ones to let them be garbage collected
+      replaced_instances.each { |instance| instance.class.prune(instance) }
       start(force: true)
     end
 

@@ -50,7 +50,9 @@ end if web_concurrency > 0
 # Puma 7+ renamed on_worker_boot/on_worker_shutdown
 public_send(respond_to?(:before_worker_boot) ? :before_worker_boot : :on_worker_boot) do
   require "rbtrace" if rbtrace
-  GoodJob.restart if defined?(GoodJob)
+  # Without preload_app!, each worker boots the app and GoodJob starts itself;
+  # only a preloaded app needs GoodJob restarted after the fork.
+  GoodJob.restart if ENV["PRELOAD_APP"] && defined?(GoodJob)
 end if web_concurrency > 0
 
 public_send(respond_to?(:before_worker_shutdown) ? :before_worker_shutdown : :on_worker_shutdown) do

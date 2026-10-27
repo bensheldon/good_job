@@ -82,6 +82,21 @@ describe GoodJob::Capsule do
       expect { capsule.restart }.not_to change(capsule, :running?).from(true)
       expect { capsule.shutdown }.to change(capsule, :running?).from(true).to(false)
     end
+
+    it 'unregisters the components it replaces' do
+      capsule = described_class.new
+      capsule.start
+      replaced_schedulers = GoodJob::Scheduler.instances.dup
+      replaced_notifiers = GoodJob::Notifier.instances.dup
+      replaced_pollers = GoodJob::Poller.instances.dup
+
+      capsule.restart
+
+      expect(GoodJob::Scheduler.instances).not_to include(*replaced_schedulers)
+      expect(GoodJob::Notifier.instances).not_to include(*replaced_notifiers)
+      expect(GoodJob::Poller.instances).not_to include(*replaced_pollers)
+      expect(GoodJob::Scheduler.instances.size).to eq replaced_schedulers.size
+    end
   end
 
   describe '#shutdown' do

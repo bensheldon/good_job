@@ -21,9 +21,11 @@ module GoodJob # :nodoc:
     class_methods do
       # Removes prunable (e.g. shut down) instances from the registry so they can be garbage collected.
       # Instances are re-registered if they are started again.
+      # @param candidates [Array] Instances to prune; defaults to all registered instances.
       # @return [Array] The pruned instances.
-      def prune
-        pruned = instances.select(&:prunable?)
+      def prune(*candidates)
+        candidates = instances if candidates.empty?
+        pruned = candidates.select { |instance| instances.include?(instance) && instance.prunable? }
         instances.delete_if { |instance| pruned.include?(instance) }
         pruned
       end

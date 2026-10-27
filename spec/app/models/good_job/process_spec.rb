@@ -39,6 +39,16 @@ RSpec.describe GoodJob::Process do
         )
       )
     end
+
+    it 'excludes schedulers that have been shut down' do
+      GoodJob::Scheduler.new(GoodJob::JobPerformer.new('running'), max_threads: 1)
+      stopped_scheduler = GoodJob::Scheduler.new(GoodJob::JobPerformer.new('stopped'), max_threads: 1)
+      stopped_scheduler.shutdown
+
+      schedulers = described_class.process_state[:schedulers]
+      expect(schedulers.pluck(:queues)).to include('running')
+      expect(schedulers.pluck(:queues)).not_to include('stopped')
+    end
   end
 
   describe 'find_or_create_record' do
