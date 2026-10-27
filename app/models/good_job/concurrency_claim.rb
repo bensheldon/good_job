@@ -172,6 +172,8 @@ module GoodJob
       end
 
       def notify(job_id)
+        return unless GoodJob.configuration.enable_listen_notify
+
         queue_name = GoodJob::Job.where(id: job_id).pick(:queue_name)
         GoodJob::Notifier.notify({ queue_name: queue_name }) if queue_name
       end
