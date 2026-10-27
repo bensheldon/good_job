@@ -23,7 +23,11 @@ RSpec.describe 'Gemfile.lock' do # rubocop:disable RSpec/DescribeClass
   # for whenever it re-resolves (e.g. `bundle update --conservative good_job`
   # during release). Gems that only ship native variants also need their
   # generic (ruby platform) variant locked, as with pg and thruster.
+  # Bundler.definition is only the root Gemfile in the development environment;
+  # the CI matrix runs against gemfiles/*.gemfile with older Bundlers.
   it 'is complete for every locked platform' do
+    skip 'Only checked against the root Gemfile' unless Bundler.default_gemfile.to_s == File.expand_path('../Gemfile', __dir__)
+
     specs = Bundler::SpecSet.new(lockfile.specs)
     dependencies = Bundler.definition.send(:current_dependencies)
 
