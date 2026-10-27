@@ -10,9 +10,11 @@ POSTGRES_NOTICES = Concurrent::Array.new
 module PostgresNoticeReceiver
   def configure_connection
     super
-    return unless @raw_connection.respond_to?(:set_notice_receiver)
+    # Rails < 7.1 stores the PG::Connection in @connection
+    pg_connection = @raw_connection || @connection
+    return unless pg_connection.respond_to?(:set_notice_receiver)
 
-    @raw_connection.set_notice_receiver do |result|
+    pg_connection.set_notice_receiver do |result|
       Rails.logger.warn(result.error_message.strip)
       POSTGRES_NOTICES << result.error_message
     end
