@@ -32,6 +32,17 @@ RSpec.describe GoodJob::Job do
     job
   end
 
+  # Kill the session server-side, like a real network drop. Closing
+  # `raw_connection` directly marks the adapter dirty and blocks reconnects.
+  def terminate_connection!
+    pid = described_class.lease_connection.select_value("SELECT pg_backend_pid()")
+    rails_promise do
+      described_class.connection_pool.with_connection do |conn|
+        conn.execute("SELECT pg_terminate_backend(#{pid})")
+      end
+    end.value!
+  end
+
   failure_points = [:execution, :job, :destroy]
   [:advisory, :skiplocked, :hybrid].each do |strategy|
     context "with #{strategy} locking" do
@@ -99,7 +110,7 @@ RSpec.describe GoodJob::Job do
         allow_any_instance_of(described_class).to receive(:save!).and_wrap_original do |method, *args, **kwargs|
           if method.receiver.finished_at.present? && !disconnected
             disconnected = true
-            described_class.lease_connection.raw_connection.close
+            terminate_connection!
           end
           method.call(*args, **kwargs)
         end
@@ -123,7 +134,7 @@ RSpec.describe GoodJob::Job do
     allow_any_instance_of(described_class).to receive(:save!).and_wrap_original do |method, *args, **kwargs|
       if method.receiver.finished_at.present? && !failed
         failed = true
-        described_class.lease_connection.raw_connection.close
+        terminate_connection!
         rails_promise do
           described_class.find(job.id).update!(locked_by_id: next_process_id, locked_at: Time.current)
         end.value!
