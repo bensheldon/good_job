@@ -88,8 +88,6 @@ production:
 demo:
   <<: *default
   pool: 50
-  # Close idle and long-lived connections so the dyno doesn't hold the plan's
-  # connection limit and the release phase can connect.
   idle_timeout: 30
   reaping_frequency: 10
   keepalive: 60
