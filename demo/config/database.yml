@@ -88,5 +88,9 @@ production:
 demo:
   <<: *default
   pool: 50
+  idle_timeout: 30
+  reaping_frequency: 10
+  keepalive: 60
+  max_age: 300
   database: "good_job_demo"
   url: <%= ENV['DATABASE_URL'] %>
