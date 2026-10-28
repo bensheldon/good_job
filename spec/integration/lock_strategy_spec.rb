@@ -66,7 +66,9 @@ RSpec.describe 'Lock strategy integration' do
       scheduler = GoodJob::Scheduler.new(performer, max_threads: 5)
       5.times { scheduler.create_thread }
 
-      wait_until(max: 30, increments_of: 0.2) do
+      wait_while_progressing(progress: -> { GoodJob::Job.finished.count }, increments_of: 0.2) do
+        # Wake threads whose dequeue came up empty, as the Poller does in production
+        5.times { scheduler.create_thread }
         expect(GoodJob::Job.unfinished.count).to be_zero
       end
       scheduler.shutdown
@@ -112,32 +114,34 @@ RSpec.describe 'Lock strategy integration' do
   it_behaves_like 'a lock strategy that executes jobs correctly', :hybrid
 
   describe 'mixed-mode coexistence (rolling deploy)' do
-    it 'does not double-execute jobs when advisory and skiplocked workers run concurrently' do
-      number_of_jobs = 20
+    # Each worker gets its own capsule so that it uses its own lock strategy, like separate processes would.
+    def start_worker(lock_strategy)
+      capsule = GoodJob::Capsule.new(configuration: GoodJob::Configuration.new({ lock_strategy: lock_strategy }))
+      performer = GoodJob::JobPerformer.new('*', capsule: capsule)
+      GoodJob::Scheduler.new(performer, max_threads: 3).tap do |scheduler|
+        3.times { scheduler.create_thread }
+      end
+    end
 
+    def expect_no_double_execution(*lock_strategies)
+      number_of_jobs = 20
       GoodJob::Job.logger.silence do
         jobs = Array.new(number_of_jobs) { TestJob.new }
         TestJob.queue_adapter.enqueue_all(jobs)
       end
 
-      # Worker 1: advisory strategy
-      GoodJob.configuration.options[:lock_strategy] = :advisory
-      advisory_performer = GoodJob::JobPerformer.new('*')
-      advisory_scheduler = GoodJob::Scheduler.new(advisory_performer, max_threads: 3)
-      3.times { advisory_scheduler.create_thread }
-
-      # Worker 2: skiplocked strategy
-      GoodJob.configuration.options[:lock_strategy] = :skiplocked
-      skiplocked_performer = GoodJob::JobPerformer.new('*')
-      skiplocked_scheduler = GoodJob::Scheduler.new(skiplocked_performer, max_threads: 3)
-      3.times { skiplocked_scheduler.create_thread }
-
-      wait_until(max: 30, increments_of: 0.2) do
-        expect(GoodJob::Job.unfinished.count).to be_zero
+      %i[perform_with_advisory_lock perform_with_skip_locked perform_with_hybrid_lock].each do |method|
+        allow(GoodJob::Job).to receive(method).and_call_original
       end
 
-      advisory_scheduler.shutdown
-      skiplocked_scheduler.shutdown
+      schedulers = lock_strategies.map { |lock_strategy| start_worker(lock_strategy) }
+
+      wait_while_progressing(progress: -> { GoodJob::Job.finished.count }, increments_of: 0.2) do
+        # Wake threads whose dequeue came up empty, as the Poller does in production
+        schedulers.each { |scheduler| 3.times { scheduler.create_thread } }
+        expect(GoodJob::Job.unfinished.count).to be_zero
+      end
+      schedulers.each(&:shutdown)
 
       expect(RUN_JOBS.size).to eq(number_of_jobs), lambda {
         job_counts = RUN_JOBS.tally
@@ -146,36 +150,19 @@ RSpec.describe 'Lock strategy integration' do
       }
     end
 
+    # :advisory and :skiplocked workers cannot run together: neither sees the other's locks.
+    it 'does not double-execute jobs when advisory and hybrid workers run concurrently' do
+      expect_no_double_execution(:advisory, :hybrid)
+
+      expect(GoodJob::Job).to have_received(:perform_with_advisory_lock).at_least(:once)
+      expect(GoodJob::Job).to have_received(:perform_with_hybrid_lock).at_least(:once)
+    end
+
     it 'does not double-execute jobs when skiplocked and hybrid workers run concurrently' do
-      number_of_jobs = 20
+      expect_no_double_execution(:skiplocked, :hybrid)
 
-      GoodJob::Job.logger.silence do
-        jobs = Array.new(number_of_jobs) { TestJob.new }
-        TestJob.queue_adapter.enqueue_all(jobs)
-      end
-
-      GoodJob.configuration.options[:lock_strategy] = :skiplocked
-      skiplocked_performer = GoodJob::JobPerformer.new('*')
-      skiplocked_scheduler = GoodJob::Scheduler.new(skiplocked_performer, max_threads: 3)
-      3.times { skiplocked_scheduler.create_thread }
-
-      GoodJob.configuration.options[:lock_strategy] = :hybrid
-      hybrid_performer = GoodJob::JobPerformer.new('*')
-      hybrid_scheduler = GoodJob::Scheduler.new(hybrid_performer, max_threads: 3)
-      3.times { hybrid_scheduler.create_thread }
-
-      wait_until(max: 30, increments_of: 0.2) do
-        expect(GoodJob::Job.unfinished.count).to be_zero
-      end
-
-      skiplocked_scheduler.shutdown
-      hybrid_scheduler.shutdown
-
-      expect(RUN_JOBS.size).to eq(number_of_jobs), lambda {
-        job_counts = RUN_JOBS.tally
-        duplicates = job_counts.select { |_, count| count > 1 }
-        "Expected #{number_of_jobs} unique executions but got #{RUN_JOBS.size}. Duplicates: #{duplicates}"
-      }
+      expect(GoodJob::Job).to have_received(:perform_with_skip_locked).at_least(:once)
+      expect(GoodJob::Job).to have_received(:perform_with_hybrid_lock).at_least(:once)
     end
   end
 

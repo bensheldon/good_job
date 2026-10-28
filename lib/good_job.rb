@@ -7,6 +7,7 @@ require_relative "good_job/version"
 require_relative "good_job/engine"
 require_relative "good_job/ractors"
 
+require_relative "good_job/instance_registry"
 require_relative "good_job/adapter"
 require_relative "good_job/adapter/inline_buffer"
 require_relative "active_job/queue_adapters/good_job_adapter"
@@ -250,6 +251,16 @@ module GoodJob
     Capsule.instances.all?(&:shutdown?)
   end
 
+  # Removes shut down instances (e.g. {GoodJob::Capsule}, {GoodJob::Scheduler}, {GoodJob::Notifier}) from their
+  # class-level registries so they can be garbage collected. Shut down instances are otherwise retained so that
+  # {.restart} can restart them; pruned instances will not be restarted by {.restart} unless started again directly.
+  # This is useful in processes that repeatedly create and shut down capsules, such as test suites.
+  # @return [void]
+  def self.prune
+    [Adapter, Capsule, CronManager, Notifier, Poller, Scheduler, SharedExecutor, CapsuleTracker].each(&:prune)
+    nil
+  end
+
   # Stops and restarts executing jobs.
   # GoodJob does its work in pools of background threads.
   # When forking processes you should shut down these background threads before forking, and restart them after forking.
@@ -388,8 +399,8 @@ module GoodJob
   # For use in tests/CI to validate GoodJob is up-to-date.
   # @return [Boolean]
   def self.migrated?
-    GoodJob::ConcurrencyClaim.connection_pool.with_connection do |connection|
-      connection.table_exists?(GoodJob::ConcurrencyClaim.table_name)
+    GoodJob::Execution.connection_pool.with_connection do |connection|
+      connection.index_name_exists?(GoodJob::Execution.table_name, :index_good_job_executions_on_created_at)
     end
   end
 

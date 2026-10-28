@@ -44,6 +44,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
     - [Dashboard](#dashboard)
         - [API-only Rails applications](#api-only-rails-applications)
         - [Live polling](#live-polling)
+        - [Filtering sensitive arguments](#filtering-sensitive-arguments)
         - [Extending dashboard views](#extending-dashboard-views)
     - [Job priority](#job-priority)
     - [Concurrency controls](#concurrency-controls)
@@ -480,6 +481,15 @@ end
 #### Live polling
 
 The Dashboard can be set to automatically refresh by checking "Live Poll" in the Dashboard header, or by setting `?poll=10` with the interval in seconds (default 30 seconds).
+
+#### Filtering sensitive arguments
+
+The Dashboard hides job arguments the same way Rails hides them from logs:
+
+- Hash values whose keys match `Rails.application.config.filter_parameters` (e.g. `password:`) are displayed as `[FILTERED]`.
+- All arguments are displayed as `[FILTERED]` for jobs with `log_arguments` disabled, either for every job with `config.active_job.log_arguments = false` or per job class with `self.log_arguments = false`.
+
+Filtering only applies to how arguments are displayed; arguments are still stored unfiltered in the database and are used when the job is performed or retried.
 
 #### Extending dashboard views
 
@@ -1217,6 +1227,8 @@ Note that when running jobs in `:inline` execution mode, `GoodJob.current_thread
 
 Jobs will be automatically retried if the process is interrupted while performing a job and the job is unable to finish before the timeout or as the result of a `SIGKILL` or power failure. The interrupted execution's error record will show `GoodJob::InterruptedError` to distinguish it from the rescuable `GoodJob::InterruptError` that is raised when the job is retried.
 
+With `:skiplocked` or `:hybrid` locking, a worker releases its claim even if recording the job's completion fails. If the database connection is unavailable during cleanup, the worker waits and retries every five seconds until it can release the claim, GoodJob begins shutting down, or the worker is forcibly terminated. If the worker stops retrying, the claim is released when the exited process's record is cleaned up. The job can then be recovered as an interrupted execution, which may run it again; external effects should be idempotent.
+
 If you need more control over interrupt-caused retries, include the `GoodJob::ActiveJobExtensions::InterruptErrors` extension in your job class. When an interrupted job is retried, the extension will raise a `GoodJob::InterruptError` exception within the job, which allows you to use Active Job's `retry_on` and `discard_on` to control the behavior of the job.
 
 ```ruby
@@ -1723,7 +1735,7 @@ end
 GOOD_JOB_LOCK_STRATEGY=skiplocked
 ```
 
-All three strategies (`:advisory`, `:skiplocked`, `:hybrid`) can coexist safely during a rolling deploy — each strategy excludes jobs that are already locked by another worker regardless of which strategy that worker uses.
+During a rolling deploy, `:hybrid` workers can safely run alongside either `:advisory` or `:skiplocked` workers. But `:advisory` and `:skiplocked` workers must not run at the same time, because neither sees the other's locks and the same job may be performed twice. To move from `:advisory` to `:skiplocked`, deploy `:hybrid` first, wait until no `:advisory` workers remain, and then deploy `:skiplocked`.
 
 #### PgBouncer configuration
 

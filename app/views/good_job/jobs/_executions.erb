@@ -58,11 +58,7 @@
                 </div>
               <% end %>
               <%= tag.div class: "tab-pane fade", id: dom_id(execution, :full_pane), role: "tabpane", aria: { labelledby: dom_id(execution, :full) }, tabindex: 0 do %>
-                <div class="small">
-                  <code class="text-wrap text-break m-0 text-secondary-emphasis">
-                    <%= safe_join(execution.error_backtrace, tag.br) %>
-                  </code>
-                </div>
+                <%= content_tag "turbo-frame", "", id: dom_id(execution, :full_trace), src: job_execution_path(@job.id, execution.id), loading: "lazy" %>
               <% end %>
             <% end %>
           <% end %>
@@ -70,7 +66,7 @@
       <% end %>
       <%= render 'good_job/custom_execution_details', execution: execution, job: @job %>
       <%= tag.div id: dom_id(execution, "params"), class: "list-group-item collapse small bg-dark text-light" do %>
-        <%= tag.pre JSON.pretty_generate(truncate_display_value(execution.display_serialized_params)) %>
+        <%= content_tag "turbo-frame", "", id: dom_id(execution, :serialized_params), src: job_execution_path(@job.id, execution.id), loading: "lazy" %>
       <% end %>
     <% end %>
   </div>

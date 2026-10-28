@@ -158,18 +158,18 @@ RSpec.describe GoodJob::Notifier do
       skip "Thread#kill does not reliably terminate JRuby threads" if Concurrent.on_jruby?
 
       notifier = described_class.new(executor: executor, enable_listening: true)
-      wait_until { expect(notifier).to be_listening }
+      wait_until { expect(notifier.listening?).to be true }
       executor.kill
-      wait_until { expect(notifier).not_to be_listening }
+      wait_until { expect(notifier.listening?).to be false }
       notifier.shutdown
       expect(notifier).to be_shutdown
     end
 
     it 'can be shut down asynchronously' do
       notifier = described_class.new(executor: executor, enable_listening: true)
-      wait_until { expect(notifier).to be_listening }
+      wait_until { expect(notifier.listening?).to be true }
       notifier.shutdown(timeout: nil)
-      wait_until { expect(notifier).to be_shutdown }
+      wait_until { expect(notifier.shutdown?).to be true }
       notifier.shutdown
     end
   end
@@ -179,7 +179,7 @@ RSpec.describe GoodJob::Notifier do
 
     it 'shuts down and restarts when already running' do
       notifier = described_class.new(executor: executor, enable_listening: true)
-      wait_until { expect(notifier).to be_listening }
+      wait_until { expect(notifier.listening?).to be true }
       notifier.restart
       expect(notifier).to be_running
     end
@@ -189,7 +189,7 @@ RSpec.describe GoodJob::Notifier do
       notifier.shutdown
       expect(notifier).to be_shutdown
       notifier.restart
-      wait_until { expect(notifier).to be_listening }
+      wait_until { expect(notifier.listening?).to be true }
       notifier.shutdown
     end
   end

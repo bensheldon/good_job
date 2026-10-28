@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 require 'active_support/core_ext/module/attribute_accessors_per_thread'
+require "concurrent/array"
 require 'concurrent/atomic/atomic_boolean'
+require "concurrent/atomic/atomic_fixnum"
+require "concurrent/atomic/event"
 require "concurrent/scheduled_task"
 require "good_job/notifier/process_heartbeat"
 
@@ -39,11 +42,7 @@ module GoodJob # :nodoc:
       PG::Error
     ].freeze
 
-    # @!attribute [r] instances
-    #   @!scope class
-    #   List of all instantiated Notifiers in the current process.
-    #   @return [Array<GoodJob::Notifier>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    include InstanceRegistry
 
     # @!attribute [rw] connection
     #   @!scope class
@@ -85,7 +84,6 @@ module GoodJob # :nodoc:
       @last_keepalive_time = Time.current
 
       start
-      self.class.instances << self
     end
 
     def running?
@@ -192,6 +190,7 @@ module GoodJob # :nodoc:
     delegate :synchronize, to: :@monitor
 
     def start
+      register_instance
       synchronize do
         return if @running.true?
 

@@ -46,6 +46,9 @@ install_if -> { ENV["RAILS_VERSION"] == "6.1" } do
   gem "benchmark"
 end
 
+gem "actionview_precompiler", require: false
+gem "rack-attack"
+
 platforms :ruby do
   gem "bootsnap"
   gem "dotenv-rails"
@@ -62,7 +65,8 @@ platforms :ruby do
     gem "debug"
     gem "memory_profiler"
     gem "rack-mini-profiler"
-    gem "rbtrace"
+    gem "rbtrace", github: "bensheldon/rbtrace", branch: "trap-sigurg-on-main-thread" # Responds when idle: https://github.com/tmm1/rbtrace/issues/97
+    gem "sheap", require: false
     gem "stackprof"
   end
 
@@ -92,5 +96,6 @@ platforms :ruby do
 
   group :demo, :production do
     gem "skylight"
+    gem "thruster"
   end
 end

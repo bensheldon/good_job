@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "concurrent/errors"
+require "concurrent/scheduled_task"
+
 module GoodJob # :nodoc:
   # CapsuleTracker save a record in the database and periodically refreshes it. The intention is to
   # create a heartbeat that can be used to determine whether a capsule/process is still active
@@ -16,11 +19,7 @@ module GoodJob # :nodoc:
     # @return [Integer]
     attr_reader :advisory_locks
 
-    # @!attribute [r] instances
-    #   @!scope class
-    #   List of all instantiated CapsuleTrackers in the current process.
-    #   @return [Array<GoodJob::CapsuleTracker>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    include InstanceRegistry
 
     # @param executor [Concurrent::AbstractExecutorService] The executor to use for refreshing the process record.
     def initialize(executor: Concurrent.global_io_executor)
@@ -32,10 +31,9 @@ module GoodJob # :nodoc:
       @record_id = SecureRandom.uuid
       @record = nil
       @refresh_task = nil
+      @pid = ::Process.pid
 
-      ActiveSupport::ForkTracker.after_fork { reset }
-
-      self.class.instances << self
+      register_instance
     end
 
     # The UUID to use for locking. May be nil if the process is not registered or is unusable/expired.
@@ -57,10 +55,18 @@ module GoodJob # :nodoc:
       value
     end
 
+    # Whether the tracker has no active registrations and can be removed from {.instances}.
+    # It is re-added to {.instances} when it is registered again.
+    # @return [Boolean]
+    def prunable?
+      @locks.zero?
+    end
+
     # The expected UUID of the process for use in inspection.
     # Use {#id_for_lock} if using this as a lock key.
     # @return [String]
     def process_id
+      reset if forked?
       @record_id
     end
 
@@ -75,6 +81,7 @@ module GoodJob # :nodoc:
       # where with_connection always returns a newly borrowed connection.
       GoodJob::Process.lease_connection if with_advisory_lock && advisory_lock_connection.nil?
 
+      register_instance
       synchronize(with_connection: with_advisory_lock) do
         if with_advisory_lock && !advisory_locked?
           if @record
@@ -112,9 +119,10 @@ module GoodJob # :nodoc:
         if with_advisory_lock && @advisory_locked
           active = advisory_locked?
           if !active || matches_advisory_locked_connection?(advisory_lock_connection)
-            @record.advisory_unlock(connection: advisory_lock_connection) if active
-            # Remaining jobs need heartbeat liveness once the advisory lock is gone.
+            # Move remaining jobs to heartbeat liveness before releasing the lock; otherwise
+            # another process's cleanup can see an unlocked advisory record and release them.
             @record&.update(lock_type: nil) if @locks > 1
+            @record.advisory_unlock(connection: advisory_lock_connection) if active
             @advisory_locked = false
             @advisory_locked_connection = nil
           end
@@ -213,7 +221,14 @@ module GoodJob # :nodoc:
       synchronize { ns_reset }
     end
 
+    # Reset lazily after a fork (rather than with an ActiveSupport::ForkTracker callback)
+    # so that the tracker is not retained after it is no longer used.
+    def forked?
+      @pid != ::Process.pid
+    end
+
     def ns_reset
+      @pid = ::Process.pid
       @record_id = SecureRandom.uuid
       @record = nil
       @advisory_locked = false
@@ -235,7 +250,10 @@ module GoodJob # :nodoc:
       elsif @mutex.owned?
         yield
       else
-        @mutex.synchronize(&block)
+        @mutex.synchronize do
+          ns_reset if forked?
+          yield
+        end
       end
     end
   end

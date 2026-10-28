@@ -5,7 +5,7 @@ GoodJob::Engine.routes.draw do
 
   resources :jobs, only: %i[index show destroy] do
     collection do
-      get :mass_update, to: redirect(path: 'jobs')
+      get :mass_update, to: ->(_env) { raise ActionController::RoutingError, 'Not Found' }
       put :mass_update
     end
 
@@ -15,6 +15,8 @@ GoodJob::Engine.routes.draw do
       put :reschedule
       put :retry
     end
+
+    resources :executions, only: %i[show]
   end
   get 'jobs/metrics/primary_nav', to: 'metrics#primary_nav', as: :metrics_primary_nav
   get 'jobs/metrics/job_status', to: 'metrics#job_status', as: :metrics_job_status

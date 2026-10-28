@@ -14,6 +14,7 @@ RSpec.describe 'Server modes', :skip_if_java do
         "RAILS_ENV" => "development",
         "GOOD_JOB_EXECUTION_MODE" => "async",
         "GOOD_JOB_ENABLE_CRON" => "true",
+        "CRON_ENABLED_BY_DEFAULT" => "true",
       }
 
       ShellOut.command("bundle exec rails s -p #{port} -P #{pidfile}", env: env) do |shell|
@@ -28,7 +29,7 @@ RSpec.describe 'Server modes', :skip_if_java do
             # Still booting
           end
 
-          # Cron should be enabled and enqueuing an ExampleJob every 5 seconds (defined in config/initializers/good_job.rb)
+          # Cron should be enabled and enqueuing an ExampleJob every second (defined in config/initializers/good_job.rb)
           expect(shell.output).to include(/Enqueued ExampleJob/)
         end
       end

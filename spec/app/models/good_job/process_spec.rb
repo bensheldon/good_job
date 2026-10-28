@@ -47,6 +47,16 @@ RSpec.describe GoodJob::Process do
         )
       )
     end
+
+    it 'excludes schedulers that have been shut down' do
+      GoodJob::Scheduler.new(GoodJob::JobPerformer.new('running'), max_threads: 1)
+      stopped_scheduler = GoodJob::Scheduler.new(GoodJob::JobPerformer.new('stopped'), max_threads: 1)
+      stopped_scheduler.shutdown
+
+      schedulers = described_class.process_state[:schedulers]
+      expect(schedulers.pluck(:queues)).to include('running')
+      expect(schedulers.pluck(:queues)).not_to include('stopped')
+    end
   end
 
   describe 'find_or_create_record' do
@@ -95,6 +105,15 @@ RSpec.describe GoodJob::Process do
         described_class.where(id: process.id).delete_all
 
         expect { process.refresh }.to change(described_class, :count).from(0).to(1)
+      end
+
+      it 'recreates the record with the same id' do
+        process = described_class.create! state: {}, updated_at: 1.day.ago
+        described_class.where(id: process.id).delete_all
+
+        2.times { process.refresh }
+
+        expect(described_class.pluck(:id)).to eq [process.id]
       end
     end
   end

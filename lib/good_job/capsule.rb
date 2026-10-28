@@ -5,11 +5,7 @@ module GoodJob
   # a {GoodJob::Scheduler}, {GoodJob::Poller}, {GoodJob::Notifier}, and {GoodJob::CronManager}.
   # GoodJob creates a default capsule on initialization.
   class Capsule
-    # @!attribute [r] instances
-    #   @!scope class
-    #   List of all instantiated Capsules in the current process.
-    #   @return [Array<GoodJob::Capsule>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    include InstanceRegistry
 
     delegate :register, :renew, :unregister, :id_for_lock, to: :@tracker, prefix: :_tracker
 
@@ -26,7 +22,7 @@ module GoodJob
       @tracker = GoodJob::CapsuleTracker.new(executor: @shared_executor)
       @lower_thread_priority = nil
 
-      self.class.instances << self
+      register_instance
     end
 
     # Start the capsule once. After a shutdown, {#restart} must be used to start again.
@@ -36,6 +32,8 @@ module GoodJob
 
       @mutex.synchronize do
         return unless startable?(force: force)
+
+        register_instance
 
         @notifier = GoodJob::Notifier.new(enable_listening: configuration.enable_listen_notify, capsule: self, executor: @shared_executor)
         @poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
@@ -89,12 +87,15 @@ module GoodJob
     def restart(timeout: NONE)
       raise ArgumentError, "Capsule#restart cannot be called with a timeout of nil" if timeout.nil?
 
+      replaced_instances = [@notifier, @poller, @cron_manager, *@multi_scheduler&.schedulers].compact
       shutdown(timeout: timeout)
       raise "Cannot restart a capsule before its executors have terminated" unless shutdown?
 
       # A prior background shutdown must finish before new work can lazily
       # recreate the shared executor, or it would shut down the new one.
       @shutdown_thread&.join
+      # Start creates new components, so unregister the replaced ones to let them be garbage collected
+      replaced_instances.each { |instance| instance.class.prune(instance) }
       start(force: true)
     end
 
@@ -139,11 +140,13 @@ module GoodJob
       @multi_scheduler&.lower_thread_priority = value
     end
 
-    private
-
+    # Configuration for this capsule, falling back to the global configuration.
+    # @return [GoodJob::Configuration]
     def configuration
       @configuration || GoodJob.configuration
     end
+
+    private
 
     def startable?(force: false)
       !@started_at && (@startable || force)

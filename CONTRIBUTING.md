@@ -19,6 +19,7 @@ For gem development and debugging information, please review the [README's Gem D
   - Update `GoodJob.migrated?` to check for the latest migration change. It only needs to check the last change because migrations are expected to run in order.
   - Add an entry to `spec/integration/breaking_migrations_spec.rb` to smoke-test that the new column is handled gracefully when absent.
   - Some Active Record features are difficult to make safe, e.g. `enum`, which raises at schema load time when the backing column does not exist.
+- When converting dynamic configuration into a value, call the method `resolve_[property]`. For example, if the configuration takes a constantizable string or a callable proc that needs to, at some point, be evaluated into a usable value.
 
 ## Other Errata
 

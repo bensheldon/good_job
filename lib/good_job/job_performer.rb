@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'concurrent/delay'
+require "concurrent/set"
 
 module GoodJob
   #
@@ -32,7 +33,7 @@ module GoodJob
     def next
       active_job_id = nil
       @capsule.tracker.register do
-        job_query.perform_with_lock(lock_id: @capsule.tracker.id_for_lock, parsed_queues: parsed_queues, queue_select_limit: GoodJob.configuration.queue_select_limit, lock_strategy: GoodJob.configuration.lock_strategy) do |execution|
+        job_query.perform_with_lock(lock_id: @capsule.tracker.id_for_lock, parsed_queues: parsed_queues, queue_select_limit: @capsule.configuration.queue_select_limit, lock_strategy: @capsule.configuration.lock_strategy) do |execution|
           @metrics.touch_check_queue_at
 
           if execution

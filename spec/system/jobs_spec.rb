@@ -156,16 +156,34 @@ describe 'Jobs', :js, :without_executor do
         expect(table).to have_text(labeled_job.job_id)
       end
 
-      it "renders long labels truncated with a tooltip showing the full label" do
+      it "renders full labels under the job name with a tooltip showing the full label" do
         long_label = "a_very_long_label_that_exceeds_the_badge_width"
-        ExampleJob.set(wait: 10.minutes, good_job_labels: [long_label]).perform_later
+        labeled_job = ExampleJob.set(wait: 10.minutes, good_job_labels: [long_label]).perform_later
 
         visit good_job.jobs_path
         wait_for_turbo_load
 
-        expect(page).to have_css("a.badge[data-bs-toggle='tooltip']", text: "a_very_long_...")
-        expect(page).to have_css("a.badge[data-bs-original-title='#{long_label}']")
+        within("##{dom_id(GoodJob::Job.find_by(active_job_id: labeled_job.job_id))} [role=group]") do
+          expect(page).to have_css("a.badge.text-truncate[data-bs-toggle='tooltip']", exact_text: long_label)
+          expect(page).to have_css("a.badge[data-bs-original-title='#{long_label}']")
+        end
       end
+    end
+
+    it 'loads execution details on demand' do
+      execution = discarded_job.executions.order(:created_at).last
+      visit good_job.job_path(discarded_job)
+      wait_for_turbo_load
+
+      within "##{dom_id(execution)}" do
+        click_on 'Full Trace'
+        expect(page).to have_css "##{dom_id(execution, :full_pane)}", text: execution.error_backtrace.last
+
+        click_on 'Inspect'
+      end
+      # Lazy frames load once scrolled into view
+      scroll_to find("##{dom_id(execution, :params)}")
+      expect(page).to have_css "##{dom_id(execution, :params)}", text: '"job_class": "ExampleJob"'
     end
 
     it 'can retry discarded jobs' do

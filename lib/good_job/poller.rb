@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+require "concurrent/array"
 require 'concurrent/atomic/atomic_boolean'
+require "concurrent/timer_task"
 
 module GoodJob # :nodoc:
   #
@@ -14,11 +16,7 @@ module GoodJob # :nodoc:
       run_now: true,
     }.freeze
 
-    # @!attribute [r] instances
-    #   @!scope class
-    #   List of all instantiated Pollers in the current process.
-    #   @return [Array<GoodJob::Poller>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    include InstanceRegistry
 
     # Creates GoodJob::Poller from a GoodJob::Configuration instance.
     # @param configuration [GoodJob::Configuration]
@@ -40,7 +38,6 @@ module GoodJob # :nodoc:
       @timer_options[:execution_interval] = poll_interval if poll_interval.present?
 
       create_timer
-      self.class.instances << self
     end
 
     # Tests whether the timer is running.
@@ -99,6 +96,7 @@ module GoodJob # :nodoc:
 
     # @return [void]
     def create_timer
+      register_instance
       return if @timer_options[:execution_interval] <= 0
 
       @timer = Concurrent::TimerTask.new(@timer_options) do

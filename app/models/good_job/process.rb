@@ -119,7 +119,7 @@ module GoodJob # :nodoc:
         proctitle: $PROGRAM_NAME,
         preserve_job_records: GoodJob.preserve_job_records,
         retry_on_unhandled_error: GoodJob.retry_on_unhandled_error,
-        schedulers: GoodJob::Scheduler.instances.map(&:stats),
+        schedulers: GoodJob::Scheduler.instances.reject(&:shutdown?).map(&:stats),
         cron_enabled: GoodJob.configuration.enable_cron?,
         total_succeeded_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:succeeded_executions_count) },
         total_errored_executions_count: GoodJob::Scheduler.instances.sum { |scheduler| scheduler.stats.fetch(:errored_executions_count) },
@@ -137,6 +137,7 @@ module GoodJob # :nodoc:
     rescue ActiveRecord::RecordNotFound
       @new_record = true
       self.created_at = self.updated_at = nil
+      id_will_change!
       state_will_change!
       save
     end

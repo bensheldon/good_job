@@ -312,6 +312,25 @@ describe GoodJob::CapsuleTracker do
           expect(GoodJob::Process.count).to eq 0
         end
 
+        it 'never appears inactive to cleanup while releasing the advisory lock with other registrations remaining' do
+          tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+          tracker.register
+
+          inactive_after_unlock = nil
+          allow(tracker.record).to receive(:advisory_unlock).and_wrap_original do |original, *args, **kwargs|
+            original.call(*args, **kwargs).tap do
+              inactive_after_unlock = GoodJob::Process.inactive.exists?(id: tracker.process_id)
+            end
+          end
+
+          tracker.unregister(with_advisory_lock: true, advisory_lock_connection: lock_connection)
+
+          expect(inactive_after_unlock).to be false
+          expect(GoodJob::Process.find(tracker.process_id).lock_type).to be_nil
+        ensure
+          tracker.unregister
+        end
+
         it 'downgrades lock_type when an advisory unregister finds a dead lock connection while other registrations remain' do
           tracker.register(with_advisory_lock: true, advisory_lock_connection: lock_connection)
           tracker.register
@@ -453,14 +472,23 @@ describe GoodJob::CapsuleTracker do
     end
 
     describe "on fork" do
-      it 'when reset via ForkTracker' do
+      it 'resets when the process id changes' do
         tracker.register do
           original_value = tracker.id_for_lock
+          original_process_id = tracker.process_id
 
-          tracker.send(:reset)
+          # Simulate a fork by making the recorded pid differ from the current pid
+          tracker.instance_variable_set(:@pid, Process.pid + 1)
 
+          expect(tracker.process_id).not_to eq original_process_id
           expect(tracker.id_for_lock).not_to eq original_value
         end
+      end
+
+      it 'is not retained by a fork callback' do
+        allow(ActiveSupport::ForkTracker).to receive(:after_fork)
+        described_class.new
+        expect(ActiveSupport::ForkTracker).not_to have_received(:after_fork)
       end
     end
   end

@@ -7,7 +7,7 @@ on:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     env:
       BUNDLE_JOBS: 4
@@ -30,7 +30,7 @@ jobs:
 
   development_demo:
     name: Tests for Development and Demo
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       PGHOST: localhost
@@ -95,7 +95,7 @@ jobs:
 
   test:
     name: Test - ${{ matrix.gemfile }} - Ruby ${{ matrix.ruby }} - PG ${{ matrix.pg }}${{ matrix.async_name && format(' - Async {0}', matrix.async_name) || '' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     strategy:
       fail-fast: false

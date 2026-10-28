@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "concurrent/atomic/atomic_boolean"
+require "concurrent/future"
+
 module GoodJob
   class ProbeServer
     class SimpleHandler

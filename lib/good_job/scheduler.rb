@@ -2,6 +2,7 @@
 
 require "concurrent/executor/thread_pool_executor"
 require "concurrent/executor/timer_set"
+require "concurrent/future"
 require "concurrent/scheduled_task"
 require "concurrent/utility/processor_counter"
 
@@ -45,11 +46,7 @@ module GoodJob # :nodoc:
     # fibers sharing the reactor thread would share (and check in) one connection.
     MINIMUM_RAILS_VERSION_FOR_FIBERS = "7.1"
 
-    # @!attribute [r] instances
-    #   @!scope class
-    #   List of all instantiated Schedulers in the current process.
-    #   @return [Array<GoodJob::Scheduler>, nil]
-    cattr_reader :instances, default: Concurrent::Array.new, instance_reader: false
+    include InstanceRegistry
 
     # Human readable name of the scheduler that includes configuration values.
     # @return [String]
@@ -91,7 +88,6 @@ module GoodJob # :nodoc:
 
       create_executor
       warm_cache if warm_cache_on_initialize
-      self.class.instances << self
     end
 
     # Validate runtime support and Rails fiber isolation.
@@ -357,6 +353,7 @@ module GoodJob # :nodoc:
 
     # @return [void]
     def create_executor
+      register_instance
       payload = { performer_name: performer.name, max_threads: fibers? ? 1 : capacity }
       payload[:max_fibers] = capacity if fibers?
 

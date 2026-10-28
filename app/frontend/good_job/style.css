@@ -186,3 +186,8 @@
   border-top-left-radius: 0 !important;
   border-bottom-left-radius: 0 !important;
 }
+
+/* Stop a long job name from widening its cell, so label badges clip at the column edge. */
+.min-width-0 {
+  min-width: 0;
+}

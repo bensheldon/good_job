@@ -76,7 +76,7 @@ describe GoodJob::Capsule do
   describe '#restart' do
     it 'does not replace executors that are still stopping' do
       capsule = described_class.new
-      scheduler = instance_double(GoodJob::MultiScheduler, shutdown: nil, shutdown?: false)
+      scheduler = instance_double(GoodJob::MultiScheduler, shutdown: nil, shutdown?: false, schedulers: [])
       capsule.instance_variable_set(:@multi_scheduler, scheduler)
       expect { capsule.restart(timeout: 0) }.to raise_error(RuntimeError, /terminated/)
       expect(capsule.instance_variable_get(:@multi_scheduler)).to equal scheduler
@@ -88,7 +88,7 @@ describe GoodJob::Capsule do
       capsule = described_class.new
       shared = capsule.instance_variable_get(:@shared_executor)
       gate = Concurrent::Event.new
-      scheduler = instance_double(GoodJob::MultiScheduler, shutdown?: true)
+      scheduler = instance_double(GoodJob::MultiScheduler, shutdown?: true, schedulers: [])
       allow(scheduler).to receive(:shutdown) { |timeout:| gate.wait(5) if timeout == -1 }
       capsule.instance_variable_set(:@multi_scheduler, scheduler)
 
@@ -117,6 +117,21 @@ describe GoodJob::Capsule do
       expect { capsule.restart }.to change(capsule, :running?).from(false).to(true)
       expect { capsule.restart }.not_to change(capsule, :running?).from(true)
       expect { capsule.shutdown }.to change(capsule, :running?).from(true).to(false)
+    end
+
+    it 'unregisters the components it replaces' do
+      capsule = described_class.new
+      capsule.start
+      replaced_schedulers = GoodJob::Scheduler.instances.dup
+      replaced_notifiers = GoodJob::Notifier.instances.dup
+      replaced_pollers = GoodJob::Poller.instances.dup
+
+      capsule.restart
+
+      expect(GoodJob::Scheduler.instances).not_to include(*replaced_schedulers)
+      expect(GoodJob::Notifier.instances).not_to include(*replaced_notifiers)
+      expect(GoodJob::Poller.instances).not_to include(*replaced_pollers)
+      expect(GoodJob::Scheduler.instances.size).to eq replaced_schedulers.size
     end
   end
 
@@ -253,7 +268,7 @@ describe GoodJob::Capsule do
       ACTIVE_EVENT.wait(5)
       WAIT_EVENT.set
 
-      wait_until { expect(capsule).to be_idle(1.second) }
+      wait_until { expect(capsule.idle?(1.second)).to be true }
     end
   end
 
