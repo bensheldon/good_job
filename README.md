@@ -236,7 +236,8 @@ Usage:
   good_job cleanup_preserved_jobs
 
 Options:
-  [--before-seconds-ago=SECONDS] # Destroy records finished more than this many seconds ago (env var:  GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 1209600 (14 days))
+  [--before-seconds-ago=SECONDS]            # Destroy records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO, default: 1209600 (14 days))
+  [--discarded-before-seconds-ago=SECONDS]  # Destroy discarded records finished more than this many seconds ago (env var: GOOD_JOB_CLEANUP_DISCARDED_JOBS_BEFORE_SECONDS_AGO, default: same as --before-seconds-ago)
 
 Manually destroys preserved job records.
 
@@ -317,6 +318,7 @@ Available configuration options are:
 - `cron` (hash) cron configuration. Defaults to `{}`. You can also set this as a JSON string with the environment variable `GOOD_JOB_CRON`
 - `cleanup_discarded_jobs` (boolean) whether to destroy discarded jobs when cleaning up preserved jobs using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `true`. Can also be set with the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS`.
 - `cleanup_preserved_jobs_before_seconds_ago` (integer) number of seconds to preserve jobs when using the `$ good_job cleanup_preserved_jobs` CLI command or calling `GoodJob.cleanup_preserved_jobs`. Defaults to `1209600` (14 days). Can also be set with  the environment variable `GOOD_JOB_CLEANUP_PRESERVED_JOBS_BEFORE_SECONDS_AGO`.
+- `cleanup_discarded_jobs_before_seconds_ago` (integer) number of seconds to preserve discarded jobs, when they should be kept longer (or shorter) than other jobs. Has no effect when `cleanup_discarded_jobs` is `false`. Defaults to `nil`, which uses `cleanup_preserved_jobs_before_seconds_ago`. Can also be set with the environment variable `GOOD_JOB_CLEANUP_DISCARDED_JOBS_BEFORE_SECONDS_AGO`.
 - `cleanup_interval_jobs` (integer) Number of jobs a Scheduler will execute before cleaning up preserved jobs. Defaults to `1000`. Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_JOBS` and disabled with `0`).
 - `cleanup_interval_seconds` (integer) Number of seconds a Scheduler will wait before cleaning up preserved jobs. Defaults to `600` (10 minutes). Disable with `false`. Can also be set with  the environment variable `GOOD_JOB_CLEANUP_INTERVAL_SECONDS` and disabled with `0`).
 - `logger` ([Rails Logger](https://api.rubyonrails.org/classes/ActiveSupport/Logger.html)) lets you set a custom logger for GoodJob. It should be an instance of a Rails `Logger` (Default: `Rails.logger`).
@@ -1600,6 +1602,7 @@ GoodJob will automatically delete preserved job records after 14 days. The reten
 
 ```ruby
 config.good_job.cleanup_preserved_jobs_before_seconds_ago = 14.days
+config.good_job.cleanup_discarded_jobs_before_seconds_ago = 90.days # Optional: keep discarded jobs longer than the others.
 config.good_job.cleanup_interval_jobs = 1_000 # Number of executed jobs between deletion sweeps.
 config.good_job.cleanup_interval_seconds = 10.minutes # Number of seconds between deletion sweeps.
 ```
@@ -1611,6 +1614,7 @@ It is also possible to manually trigger a cleanup of preserved job records:
     ```ruby
     GoodJob.cleanup_preserved_jobs # Will use default retention period
     GoodJob.cleanup_preserved_jobs(older_than: 7.days) # custom retention period
+    GoodJob.cleanup_preserved_jobs(older_than: 7.days, discarded_older_than: 90.days) # keep discarded jobs longer
     ```
 
 - For example, using the `good_job` command-line utility:

@@ -161,6 +161,39 @@ RSpec.describe GoodJob::Configuration do
     end
   end
 
+  describe '#cleanup_discarded_jobs_before_seconds_ago' do
+    it 'defaults to nil' do
+      configuration = described_class.new({})
+      expect(configuration.cleanup_discarded_jobs_before_seconds_ago).to be_nil
+    end
+
+    it 'uses the rails configuration' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ cleanup_discarded_jobs_before_seconds_ago: 90.days })
+      configuration = described_class.new({})
+      expect(configuration.cleanup_discarded_jobs_before_seconds_ago).to eq 90.days.to_i
+    end
+
+    context 'when environment variable is set' do
+      before do
+        stub_const 'ENV', ENV.to_hash.merge({ 'GOOD_JOB_CLEANUP_DISCARDED_JOBS_BEFORE_SECONDS_AGO' => '72000' })
+      end
+
+      context 'when option is given' do
+        it 'uses option value' do
+          configuration = described_class.new({ discarded_before_seconds_ago: 20000 })
+          expect(configuration.cleanup_discarded_jobs_before_seconds_ago).to eq 20000
+        end
+      end
+
+      context 'when option is not given' do
+        it 'uses environment variable' do
+          configuration = described_class.new({})
+          expect(configuration.cleanup_discarded_jobs_before_seconds_ago).to eq 72000
+        end
+      end
+    end
+  end
+
   describe '#cleanup_interval_jobs' do
     it 'defaults to 1000' do
       configuration = described_class.new({})

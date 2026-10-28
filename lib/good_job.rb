@@ -306,42 +306,55 @@ module GoodJob
   # destroy old records and preserve space in your database.
   # @param older_than [nil,Numeric,ActiveSupport::Duration] Jobs older than this will be destroyed (default: +86400+).
   # @param include_discarded [Boolean] Whether or not to destroy discarded jobs (default: per +cleanup_discarded_jobs+ config option)
+  # @param discarded_older_than [nil,Numeric,ActiveSupport::Duration] Discarded jobs older than this will be destroyed (default: per +cleanup_discarded_jobs_before_seconds_ago+ config option, or +older_than+ when that is not set)
   # @return [Integer] Number of job execution records and batches that were destroyed.
-  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000, include_discarded: GoodJob.configuration.cleanup_discarded_jobs?)
+  def self.cleanup_preserved_jobs(older_than: nil, in_batches_of: 1_000, include_discarded: GoodJob.configuration.cleanup_discarded_jobs?, discarded_older_than: nil)
     older_than ||= GoodJob.configuration.cleanup_preserved_jobs_before_seconds_ago
     timestamp = Time.current - older_than
+    discarded_older_than ||= GoodJob.configuration.cleanup_discarded_jobs_before_seconds_ago
+    discarded_timestamp = discarded_older_than ? Time.current - discarded_older_than : timestamp
 
-    ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", { older_than: older_than, timestamp: timestamp }) do |payload|
+    instrument_payload = { older_than: older_than, timestamp: timestamp }
+    if include_discarded && discarded_older_than
+      instrument_payload[:discarded_older_than] = discarded_older_than
+      instrument_payload[:discarded_timestamp] = discarded_timestamp
+    end
+
+    ActiveSupport::Notifications.instrument("cleanup_preserved_jobs.good_job", instrument_payload) do |payload|
       deleted_jobs_count = 0
       deleted_batches_count = 0
       deleted_executions_count = 0
 
-      jobs_query = GoodJob::Job.finished_before(timestamp).order(finished_at: :asc).limit(in_batches_of)
-      jobs_query = jobs_query.succeeded unless include_discarded
-      loop do
-        break if GoodJob.current_thread_shutting_down?
+      jobs_queries = cleanup_queries(GoodJob::Job, timestamp, include_discarded, discarded_timestamp)
+      jobs_queries.each do |jobs_query|
+        jobs_query = jobs_query.order(finished_at: :asc).limit(in_batches_of)
+        loop do
+          break if GoodJob.current_thread_shutting_down?
 
-        active_job_ids = jobs_query.pluck(:active_job_id)
-        break if active_job_ids.empty?
+          active_job_ids = jobs_query.pluck(:active_job_id)
+          break if active_job_ids.empty?
 
-        deleted_executions = GoodJob::Execution.where(active_job_id: active_job_ids).delete_all
-        deleted_executions_count += deleted_executions
+          deleted_executions = GoodJob::Execution.where(active_job_id: active_job_ids).delete_all
+          deleted_executions_count += deleted_executions
 
-        deleted_jobs = GoodJob::Job.where(active_job_id: active_job_ids).delete_all
-        deleted_jobs_count += deleted_jobs
+          deleted_jobs = GoodJob::Job.where(active_job_id: active_job_ids).delete_all
+          deleted_jobs_count += deleted_jobs
+        end
       end
 
       GoodJob::ConcurrencyClaim.cleanup_orphaned if GoodJob::ConcurrencyClaim.table_exists?
 
-      batches_query = GoodJob::BatchRecord.finished_before(timestamp).limit(in_batches_of)
-      batches_query = batches_query.succeeded unless include_discarded
-      loop do
-        break if GoodJob.current_thread_shutting_down?
+      batches_queries = cleanup_queries(GoodJob::BatchRecord, timestamp, include_discarded, discarded_timestamp)
+      batches_queries.each do |batches_query|
+        batches_query = batches_query.limit(in_batches_of)
+        loop do
+          break if GoodJob.current_thread_shutting_down?
 
-        deleted = batches_query.delete_all
-        break if deleted.zero?
+          deleted = batches_query.delete_all
+          break if deleted.zero?
 
-        deleted_batches_count += deleted
+          deleted_batches_count += deleted
+        end
       end
 
       payload[:destroyed_batches_count] = deleted_batches_count
@@ -354,6 +367,18 @@ module GoodJob
       destroyed_records_count
     end
   end
+
+  # The queries for the finished records of +model+ that {.cleanup_preserved_jobs} destroys:
+  # succeeded records finished before +timestamp+, and discarded records finished before
+  # +discarded_timestamp+ when +include_discarded+.
+  # @return [Array<ActiveRecord::Relation>]
+  def self.cleanup_queries(model, timestamp, include_discarded, discarded_timestamp)
+    return [model.finished_before(timestamp).succeeded] unless include_discarded
+    return [model.finished_before(timestamp)] if discarded_timestamp == timestamp
+
+    [model.finished_before(timestamp).succeeded, model.finished_before(discarded_timestamp).discarded]
+  end
+  private_class_method :cleanup_queries
 
   # Perform all queued jobs in the current thread.
   # This is primarily intended for usage in a test environment.

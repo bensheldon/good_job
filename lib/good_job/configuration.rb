@@ -366,6 +366,18 @@ module GoodJob
       ).to_i
     end
 
+    # Number of seconds to preserve discarded jobs before automatic destruction.
+    # When not set, discarded jobs are destroyed after {#cleanup_preserved_jobs_before_seconds_ago}
+    # like any other finished job.
+    # @return [Integer, nil]
+    def cleanup_discarded_jobs_before_seconds_ago
+      (
+        options[:discarded_before_seconds_ago] ||
+          rails_config[:cleanup_discarded_jobs_before_seconds_ago] ||
+          env['GOOD_JOB_CLEANUP_DISCARDED_JOBS_BEFORE_SECONDS_AGO']
+      )&.to_i
+    end
+
     # Number of jobs a {Scheduler} will execute before automatically cleaning up preserved jobs.
     # Positive values will clean up after that many jobs have run, false or 0 will disable, and -1 will clean up after every job.
     # @return [Integer, Boolean, nil]
