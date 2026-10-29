@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 
 require "active_job"
@@ -414,7 +415,7 @@ module GoodJob
   # @return [ActiveSupport::Deprecation]
   def self.deprecator
     @_deprecator ||= begin
-      next_major_version = GEM_VERSION.segments[0] + 1
+      next_major_version = GEM_VERSION.segments.first.to_i + 1
       ActiveSupport::Deprecation.new("#{next_major_version}.0", "GoodJob")
     end
   end

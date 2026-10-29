@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 
 module GoodJob # :nodoc:
@@ -44,7 +45,7 @@ module GoodJob # :nodoc:
 
     def status
       if finished_at.present?
-        if error.present? && job.finished_at.present?
+        if error.present? && job&.finished_at.present?
           :discarded
         elsif error.present?
           :retried
@@ -57,9 +58,11 @@ module GoodJob # :nodoc:
     end
 
     def interrupted_duration
-      return unless error_event == "interrupted" && finished_at && performed_at
+      interrupted_at = finished_at
+      started_at = performed_at
+      return unless error_event == "interrupted" && interrupted_at && started_at
 
-      finished_at - performed_at
+      interrupted_at - started_at
     end
 
     def display_serialized_params

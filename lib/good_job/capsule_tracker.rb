@@ -1,5 +1,7 @@
+# typed: true
 # frozen_string_literal: true
 
+require "concurrent/atomic/atomic_boolean"
 require "concurrent/errors"
 require "concurrent/scheduled_task"
 
@@ -40,7 +42,6 @@ module GoodJob # :nodoc:
     # If UUID has not yet been persisted to the database, this method will make a query to insert or update it.
     # @return [String, nil]
     def id_for_lock
-      value = nil
       synchronize(with_connection: true) do
         next if @locks.zero?
 
@@ -50,9 +51,8 @@ module GoodJob # :nodoc:
           @record = GoodJob::Process.find_or_create_record(id: @record_id)
           create_refresh_task
         end
-        value = @record&.id
+        @record&.id
       end
-      value
     end
 
     # Whether the tracker has no active registrations and can be removed from {.instances}.
@@ -188,15 +188,15 @@ module GoodJob # :nodoc:
       delay ||= task_interval
       refresh_task = Concurrent::ScheduledTask.new(delay.to_f, executor: @executor) do
         Rails.application.executor.wrap do
-          acquired = false
+          acquired = Concurrent::AtomicBoolean.new(false)
           begin
             # Match notifier/job lock ordering: acquire a connection before the mutex.
             GoodJob::Process.connection_pool.with_connection do
-              acquired = true
+              acquired.make_true
               synchronize { renew(silent: true) if @locks.positive? }
             end
           rescue ActiveRecord::ConnectionTimeoutError
-            raise if acquired
+            raise if acquired.true?
           ensure
             synchronize do
               if @refresh_task.equal?(refresh_task)

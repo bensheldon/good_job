@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 
 module GoodJob
@@ -6,7 +7,7 @@ module GoodJob
     # expression over +good_job_executions+, the aggregate that summarizes it per
     # time bucket, and their titles.
     class Base
-      def expression = self.class::EXPRESSION
+      def expression = self.class.const_get(:EXPRESSION)
 
       def to_arel = Arel.sql(expression)
 

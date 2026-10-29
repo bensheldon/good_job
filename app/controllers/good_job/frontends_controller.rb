@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 
 module GoodJob
@@ -6,7 +7,7 @@ module GoodJob
     skip_after_action :verify_same_origin_request, raise: false
 
     def self.asset_path(*path)
-      Engine.root.join("app/frontend/good_job", *path)
+      path.reduce(Engine.root.join("app/frontend/good_job")) { |asset_path, segment| asset_path.join(segment) }
     end
 
     STATIC_ASSETS = {
@@ -38,9 +39,7 @@ module GoodJob
       end.merge(MODULE_OVERRIDES)
     end
 
-    before_action do
-      expires_in 1.year, public: true
-    end
+    before_action :set_cache_headers
 
     def static
       render file: STATIC_ASSETS.dig(params[:format]&.to_sym, params[:id]&.to_sym) || raise(ActionController::RoutingError, 'Not Found')
@@ -50,6 +49,12 @@ module GoodJob
       raise(ActionController::RoutingError, 'Not Found') if params[:format] != "js"
 
       render file: self.class.js_modules[params[:id]&.to_sym] || raise(ActionController::RoutingError, 'Not Found')
+    end
+
+    private
+
+    def set_cache_headers
+      expires_in 1.year, public: true
     end
   end
 end

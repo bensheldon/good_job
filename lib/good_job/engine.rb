@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 
 require "rails"
@@ -53,7 +54,8 @@ module GoodJob
     initializer 'good_job.active_record' do
       config.to_prepare do
         ActiveSupport.on_load :good_job_base_record, run_once: true do
-          GoodJob::BaseRecord.class_eval(&GoodJob._active_record_configuration) if GoodJob._active_record_configuration
+          configuration = GoodJob._active_record_configuration
+          GoodJob::BaseRecord.class_eval(&configuration) if configuration
         end
       end
     end

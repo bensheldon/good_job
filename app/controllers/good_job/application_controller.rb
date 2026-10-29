@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 
 module GoodJob
@@ -19,13 +20,15 @@ module GoodJob
       policy.frame_ancestors(:none) if policy.frame_ancestors(*policy.frame_ancestors).blank?
     end
 
-    before_action do
-      next if request.content_security_policy_nonce_generator
+    before_action :set_content_security_policy_nonce_generator
+
+    private
+
+    def set_content_security_policy_nonce_generator
+      return if request.content_security_policy_nonce_generator
 
       request.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
     end
-
-    private
 
     def default_url_options(options = {})
       { locale: I18n.locale }.merge(options)

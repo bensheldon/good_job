@@ -41,7 +41,7 @@ RSpec.describe GoodJob::LogSubscriber do
 
   describe "#enqueue_concurrency_limit_exceeded" do
     let(:logs) { StringIO.new }
-    let(:job_class) { Class.new(ActiveJob::Base) { def self.name = "MyJob" } }
+    let(:job_class) { Class.new(ActiveJob::Base) { define_singleton_method(:name) { "MyJob" } } }
     let(:job) { job_class.new.tap { |j| j.job_id = "abc-123" } }
 
     it 'logs the aborted enqueue message' do
@@ -63,7 +63,7 @@ RSpec.describe GoodJob::LogSubscriber do
 
   describe "#enqueue_concurrency_throttle_exceeded" do
     let(:logs) { StringIO.new }
-    let(:job_class) { Class.new(ActiveJob::Base) { def self.name = "MyJob" } }
+    let(:job_class) { Class.new(ActiveJob::Base) { define_singleton_method(:name) { "MyJob" } } }
     let(:job) { job_class.new.tap { |j| j.job_id = "abc-123" } }
 
     it 'logs the aborted enqueue message' do
