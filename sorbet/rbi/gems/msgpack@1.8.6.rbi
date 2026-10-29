@@ -57,8 +57,6 @@ class Integer < ::Numeric
   def to_msgpack_with_packer(packer); end
 end
 
-Integer::GMP_VERSION = T.let(T.unsafe(nil), String)
-
 # MessagePack extention packer and unpacker for built-in Time class
 #
 # pkg:gem/msgpack#lib/msgpack/version.rb:1
@@ -95,14 +93,14 @@ end
 # pkg:gem/msgpack#lib/msgpack/bigint.rb:4
 module MessagePack::Bigint
   class << self
-    # pkg:gem/msgpack#lib/msgpack/bigint.rb:55
+    # pkg:gem/msgpack#lib/msgpack/bigint.rb:56
     def from_msgpack_ext(data); end
 
     # Ruby 2.7 and newer
     # Starting from Ruby 2.7 we can address arbitrary bitranges inside an Integer with Integer#[]
     # This allows to not allocate any Integer.
     #
-    # pkg:gem/msgpack#lib/msgpack/bigint.rb:13
+    # pkg:gem/msgpack#lib/msgpack/bigint.rb:14
     def to_msgpack_ext(bigint); end
   end
 end
@@ -114,6 +112,9 @@ end
 MessagePack::Bigint::CHUNK_BITLENGTH = T.let(T.unsafe(nil), Integer)
 
 # pkg:gem/msgpack#lib/msgpack/bigint.rb:8
+MessagePack::Bigint::CHUNK_FORMAT = T.let(T.unsafe(nil), String)
+
+# pkg:gem/msgpack#lib/msgpack/bigint.rb:9
 MessagePack::Bigint::FORMAT = T.let(T.unsafe(nil), String)
 
 # pkg:gem/msgpack#lib/msgpack.rb:7

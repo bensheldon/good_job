@@ -24,7 +24,7 @@ class Capybara::Cuprite::Browser < ::Ferrum::Browser
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:12
   def accept_prompt(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:142
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:141
   def active_element; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:262
@@ -39,13 +39,13 @@ class Capybara::Cuprite::Browser < ::Ferrum::Browser
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:12
   def before_click(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:146
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:145
   def browser_error; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:133
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:134
   def close_window(target_id); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:26
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:28
   def command(*, **, &); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:229
@@ -60,25 +60,25 @@ class Capybara::Cuprite::Browser < ::Ferrum::Browser
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:12
   def dismiss_prompt(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:154
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:153
   def drag(node, other, drop_modifiers, options = T.unsafe(nil)); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:190
   def drag_by(node, dx, dy, steps, delay = T.unsafe(nil), scroll = T.unsafe(nil)); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:184
-  def drag_html5(node, other, drop_modifiers, delay); end
+  def drag_html5(node, other, drop_modifiers, delay, drop_offset = T.unsafe(nil)); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:205
   def drop(node, *args); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:93
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:96
   def find(method, selector); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:12
   def find_modal(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:101
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:104
   def find_within(node, method, selector); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:12
@@ -87,7 +87,7 @@ class Capybara::Cuprite::Browser < ::Ferrum::Browser
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:258
   def obscured?(node); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:33
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:35
   def page; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:221
@@ -96,25 +96,25 @@ class Capybara::Cuprite::Browser < ::Ferrum::Browser
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:254
   def path(node); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:97
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:100
   def property(node, name); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:45
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:48
   def quit; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:55
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:58
   def raise_on_unhandled_modal; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:59
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:62
   def raise_on_unhandled_modal=(value); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:39
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:41
   def reset; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:12
   def reset_modals(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:50
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:53
   def resize(**options); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:12
@@ -129,43 +129,43 @@ class Capybara::Cuprite::Browser < ::Ferrum::Browser
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:12
   def set(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:150
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:149
   def source; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:89
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:92
   def status_code; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:12
   def switch_to_frame(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:125
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:128
   def switch_to_window(target_id); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:12
   def trigger(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:66
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:69
   def url_allowlist; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:72
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:75
   def url_allowlist=(patterns); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:74
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:77
   def url_blacklist; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:79
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:82
   def url_blacklist=(patterns); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:77
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:80
   def url_blocklist; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:83
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:86
   def url_blocklist=(patterns); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:63
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:66
   def url_whitelist; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:68
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:71
   def url_whitelist=(patterns); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:242
@@ -177,28 +177,31 @@ class Capybara::Cuprite::Browser < ::Ferrum::Browser
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:225
   def visible_text(node); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:85
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:88
   def visit(*args); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:107
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:110
   def window_handle; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:111
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:114
   def window_handles; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:115
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:118
   def within_window(locator = T.unsafe(nil)); end
 
   private
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:300
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:311
   def attach_page(target_id = T.unsafe(nil)); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:268
   def find_all(method, selector, within = T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:282
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:286
   def prepare_wildcards(patterns); end
+
+  # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:304
+  def window_target(target_id); end
 end
 
 # pkg:gem/cuprite#lib/capybara/cuprite/browser.rb:10
@@ -219,6 +222,26 @@ class Capybara::Cuprite::ClosedPage
   def closed?; end
 end
 
+# pkg:gem/cuprite#lib/capybara/cuprite/devices.rb:5
+module Capybara::Cuprite::Devices
+  class << self
+    # pkg:gem/cuprite#lib/capybara/cuprite/devices.rb:181
+    def fetch(name); end
+  end
+end
+
+# pkg:gem/cuprite#lib/capybara/cuprite/devices.rb:6
+Capybara::Cuprite::Devices::IPHONE_USER_AGENT = T.let(T.unsafe(nil), String)
+
+# pkg:gem/cuprite#lib/capybara/cuprite/devices.rb:10
+Capybara::Cuprite::Devices::LIST = T.let(T.unsafe(nil), Hash)
+
+# pkg:gem/cuprite#lib/capybara/cuprite/devices.rb:7
+Capybara::Cuprite::Devices::SAMSUNG_GALAXY_S8_PLUS_USER_AGENT = T.let(T.unsafe(nil), String)
+
+# pkg:gem/cuprite#lib/capybara/cuprite/devices.rb:8
+Capybara::Cuprite::Devices::WINDOWS_USER_AGENT = T.let(T.unsafe(nil), String)
+
 # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:9
 class Capybara::Cuprite::Driver < ::Capybara::Driver::Base
   extend ::Forwardable
@@ -226,52 +249,52 @@ class Capybara::Cuprite::Driver < ::Capybara::Driver::Base
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:26
   def initialize(app, options = T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:336
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:338
   def accept_modal(type, options = T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:74
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:75
   def active_element; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:239
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:241
   def add_header(name, value, permanent: T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:235
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:237
   def add_headers(headers); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:24
   def app; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:282
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:284
   def authorize(user, password); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def back(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:277
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:279
   def basic_authorize(user, password); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def body(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:53
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:54
   def browser; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:265
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:267
   def clear_cookies; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:273
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:275
   def clear_memory_cache; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:219
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:221
   def clear_network_traffic; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:90
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:91
   def click(x, y); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def close_window(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:247
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:249
   def cookies; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
@@ -280,43 +303,43 @@ class Capybara::Cuprite::Driver < ::Capybara::Driver::Base
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:20
   def current_window_handle(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:284
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:286
   def debug(*, **, &); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def device_pixel_ratio(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:349
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:351
   def dismiss_modal(type, options = T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:99
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:100
   def evaluate_async_script(script, *args); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:94
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:95
   def evaluate_script(script, *args); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:104
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:105
   def execute_script(script, *args); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:86
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:87
   def find(method, selector); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:82
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:83
   def find_css(selector); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:78
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:79
   def find_xpath(selector); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def forward(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:70
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:71
   def frame_title; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:62
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:63
   def frame_url; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:195
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:197
   def fullscreen_window(handle); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:21
@@ -325,40 +348,40 @@ class Capybara::Cuprite::Driver < ::Capybara::Driver::Base
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:22
   def go_forward(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:227
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:229
   def headers; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:231
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:233
   def headers=(headers); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:19
   def html(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:328
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:330
   def invalid_element_errors; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:185
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:187
   def maximize_window(handle); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:49
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:50
   def needs_server?; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:205
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:207
   def network_traffic(type = T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:131
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:132
   def no_such_window_error; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:124
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:125
   def open_new_window; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:24
   def options; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:172
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:174
   def paper_size=(_arg0); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:288
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:290
   def pause; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
@@ -367,58 +390,58 @@ class Capybara::Cuprite::Driver < ::Capybara::Driver::Base
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def refresh(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:259
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:261
   def remove_cookie(name, **options); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:156
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:158
   def render(path, options = T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:158
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:160
   def render_base64(format = T.unsafe(nil), options = T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:135
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:136
   def reset!; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:174
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:176
   def resize(width, height); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:177
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:179
   def resize_window(width, height); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:179
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:181
   def resize_window_to(handle, width, height); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:243
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:245
   def response_headers; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def restart(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:145
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:147
   def save_screenshot(path, options = T.unsafe(nil)); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:24
   def screen_size; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:201
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:203
   def scroll_to(left, top); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:18
   def send_keys(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:251
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:253
   def set_cookie(name, value, options = T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:223
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:225
   def set_proxy(host, port, user = T.unsafe(nil), password = T.unsafe(nil), bypass = T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:66
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:67
   def source; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def status_code(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:109
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:110
   def switch_to_frame(locator); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
@@ -436,13 +459,13 @@ class Capybara::Cuprite::Driver < ::Capybara::Driver::Base
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def viewport_size(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:57
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:58
   def visit(url); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:324
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:326
   def wait?; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:269
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:271
   def wait_for_network_idle(**options); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
@@ -454,33 +477,33 @@ class Capybara::Cuprite::Driver < ::Capybara::Driver::Base
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def window_handles(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:189
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:191
   def window_size(handle); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:15
   def within_window(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:168
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:170
   def zoom_factor=(value); end
 
   private
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:388
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:390
   def default_cookie_host; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:364
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:366
   def default_domain; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:372
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:374
   def native_args(args); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:409
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:411
   def pdf?(path, options); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:376
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:378
   def session_wait_time; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:396
+  # pkg:gem/cuprite#lib/capybara/cuprite/driver.rb:398
   def unwrap_script_result(arg); end
 end
 
@@ -527,7 +550,7 @@ class Capybara::Cuprite::Node < ::Capybara::Driver::Node
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:17
   def initialize(driver, node); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:227
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:230
   def ==(other); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:73
@@ -538,7 +561,7 @@ class Capybara::Cuprite::Node < ::Capybara::Driver::Node
 
   # @api private
   #
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:270
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:273
   def as_json(*); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:88
@@ -565,13 +588,13 @@ class Capybara::Cuprite::Node < ::Capybara::Driver::Node
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:175
   def double_click(keys = T.unsafe(nil), **options); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:191
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:194
   def drag_by(x, y, **options); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:183
   def drag_to(other, **options); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:198
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:201
   def drop(*, **, &); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:51
@@ -586,34 +609,34 @@ class Capybara::Cuprite::Node < ::Capybara::Driver::Node
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:179
   def hover; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:260
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:263
   def inspect; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:8
   def node; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:243
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:246
   def obscured?; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:37
   def parents; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:239
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:242
   def path; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:69
   def property(name); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:254
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:257
   def rect; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:171
   def right_click(keys = T.unsafe(nil), **options); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:215
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:218
   def scroll_by(x, y); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:204
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:207
   def scroll_to(element, location, position = T.unsafe(nil)); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:138
@@ -622,16 +645,16 @@ class Capybara::Cuprite::Node < ::Capybara::Driver::Node
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:159
   def selected?; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:237
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:240
   def send_key(*keys); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:231
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:234
   def send_keys(*keys); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:96
   def set(value, options = T.unsafe(nil)); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:247
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:250
   def shadow_root; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:147
@@ -639,10 +662,10 @@ class Capybara::Cuprite::Node < ::Capybara::Driver::Node
 
   # @api private
   #
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:265
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:268
   def to_json(*); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:200
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:203
   def trigger(event); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:142
@@ -659,19 +682,22 @@ class Capybara::Cuprite::Node < ::Capybara::Driver::Node
 
   private
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:285
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:288
+  def drop_offset(x, y, position); end
+
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:295
   def filter_text(text); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:277
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:280
   def prepare_and_click(mode, name, keys, options); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:293
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:303
   def scroll_element_to_location(element, location); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:323
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:333
   def scroll_to_coords(x, y); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:309
+  # pkg:gem/cuprite#lib/capybara/cuprite/node.rb:319
   def scroll_to_location(location); end
 end
 
@@ -695,10 +721,10 @@ class Capybara::Cuprite::Page < ::Ferrum::Page
   # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:23
   def initialize(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:77
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:81
   def accept_confirm; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:85
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:89
   def accept_prompt(modal_response); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:19
@@ -707,13 +733,13 @@ class Capybara::Cuprite::Page < ::Ferrum::Page
   # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:19
   def at_xpath(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:122
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:126
   def before_click(node, name, _keys = T.unsafe(nil), offset = T.unsafe(nil)); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:19
   def body(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:155
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:159
   def closed?; end
 
   # The `Page.javascriptDialogOpening` event is handled on Ferrum's
@@ -735,10 +761,10 @@ class Capybara::Cuprite::Page < ::Ferrum::Page
   # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:19
   def current_url(*, **, &); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:81
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:85
   def dismiss_confirm; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:90
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:94
   def dismiss_prompt; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:19
@@ -766,34 +792,37 @@ class Capybara::Cuprite::Page < ::Ferrum::Page
   # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:35
   def ferrum_command(method, wait: T.unsafe(nil), slowmoable: T.unsafe(nil), timeout: T.unsafe(nil), **params); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:94
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:98
   def find_modal(options); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:147
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:151
   def frame_name; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:62
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:66
   def hover(node); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:115
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:119
   def reset_modals; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:52
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:56
   def select(node, value); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:68
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:72
   def send_keys(node, keys); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:47
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:51
   def set(node, value); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:136
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:47
+  def set_viewport(width: T.unsafe(nil), height: T.unsafe(nil), scale_factor: T.unsafe(nil), mobile: T.unsafe(nil)); end
+
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:140
   def switch_to_frame(handle); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:151
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:155
   def title; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:56
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:60
   def trigger(node, event); end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:19
@@ -801,16 +830,16 @@ class Capybara::Cuprite::Page < ::Ferrum::Page
 
   private
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:225
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:230
   def active_frame; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:217
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:222
   def find_position(node, **options); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:173
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:177
   def prepare_page; end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:161
+  # pkg:gem/cuprite#lib/capybara/cuprite/page.rb:165
   def raise_pending_unhandled_modal_error!; end
 end
 
@@ -837,14 +866,26 @@ class Ferrum::Browser; end
 
 # pkg:gem/cuprite#lib/capybara/cuprite/options.rb:5
 class Ferrum::Browser::Options
+  # pkg:gem/cuprite#lib/capybara/cuprite/options.rb:21
+  def default_user_agent; end
+
+  # pkg:gem/cuprite#lib/capybara/cuprite/options.rb:17
+  def device_user_agent; end
+
+  # pkg:gem/cuprite#lib/capybara/cuprite/options.rb:9
+  def mobile; end
+
   # pkg:gem/cuprite#lib/capybara/cuprite/options.rb:7
   def raise_on_unhandled_modal; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/options.rb:7
   def raise_on_unhandled_modal=(_arg0); end
 
-  # pkg:gem/cuprite#lib/capybara/cuprite/options.rb:9
+  # pkg:gem/cuprite#lib/capybara/cuprite/options.rb:28
   def reset_window_size; end
+
+  # pkg:gem/cuprite#lib/capybara/cuprite/options.rb:13
+  def scale_factor; end
 
   # pkg:gem/cuprite#lib/capybara/cuprite/options.rb:7
   def url_blacklist; end

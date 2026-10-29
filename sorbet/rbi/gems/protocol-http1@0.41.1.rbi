@@ -230,7 +230,7 @@ Protocol::HTTP1::CONTENT_LENGTH = T.let(T.unsafe(nil), String)
 
 # Represents a single HTTP/1.x connection, which may be used to send and receive multiple requests and responses.
 #
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:51
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:52
 class Protocol::HTTP1::Connection
   # Initialize the connection with the given stream.
   #
@@ -238,12 +238,12 @@ class Protocol::HTTP1::Connection
   # @parameter persistent [Boolean] whether the connection is persistent.
   # @parameter state [Symbol] the initial state of the connection, typically idle.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:65
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:66
   def initialize(stream, persistent: T.unsafe(nil), state: T.unsafe(nil), maximum_line_length: T.unsafe(nil)); end
 
   # Close the connection and underlying stream and transition to the closed state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:225
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:227
   def close(error = T.unsafe(nil)); end
 
   # Transition to the closed state.
@@ -252,12 +252,12 @@ class Protocol::HTTP1::Connection
   #
   # @parameter error [Exxception] the error that caused the connection to close.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:745
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:775
   def close!(error = T.unsafe(nil)); end
 
   # Close the read end of the connection and transition to the half-closed remote state (or closed if already in the half-closed local state).
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:216
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:218
   def close_read; end
 
   # The connection (stream) was closed. It may now be in the idle state.
@@ -266,17 +266,17 @@ class Protocol::HTTP1::Connection
   #
   # @parameter error [Exception | Nil] the error that caused the connection to be closed, if any.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:737
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:767
   def closed(error = T.unsafe(nil)); end
 
   # @return [Boolean] whether the connection is in the closed state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:144
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:145
   def closed?; end
 
   # @attribute [Integer] the number of requests and responses processed by this connection.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:149
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:150
   def count; end
 
   # Extract the content length from the headers, if possible.
@@ -286,36 +286,36 @@ class Protocol::HTTP1::Connection
   # 	@parameter length [Integer] the content length.
   # @raises [BadRequest] if the content length is invalid.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:880
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:910
   def extract_content_length(headers); end
 
   # @return [Boolean] whether the connection is in the half-closed local state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:134
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:135
   def half_closed_local?; end
 
   # @return [Boolean] whether the connection is in the half-closed remote state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:139
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:140
   def half_closed_remote?; end
 
   # Hijack the connection - that is, take over the underlying IO and close the connection.
   #
   # @returns [IO | Nil] the underlying non-blocking IO.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:201
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:203
   def hijack!; end
 
   # Indicates whether the connection has been hijacked meaning its IO has been handed over and is not usable anymore.
   #
   # @returns [Boolean] hijack status
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:194
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:196
   def hijacked?; end
 
   # @return [Boolean] whether the connection is in the idle state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:124
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:125
   def idle?; end
 
   # Indicates whether the status code is an interim status code.
@@ -323,33 +323,33 @@ class Protocol::HTTP1::Connection
   # @parameter status [Integer] the status code.
   # @returns [Boolean] whether the status code is an interim status code.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:455
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:485
   def interim_status?(status); end
 
   # Force a transition to the open state.
   #
   # @raises [ProtocolError] if the connection is not in the idle state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:242
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:244
   def open!; end
 
   # @return [Boolean] whether the connection is in the open state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:129
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:130
   def open?; end
 
   # @attribute [Boolean] true if the connection is persistent.
   #
   # This determines what connection headers are sent in the response and whether the connection can be reused after the response is sent. This setting is automatically managed according to the nature of the request and response. Changing to false is safe. Changing to true from outside this class should generally be avoided and, depending on the response semantics, may be reset to false anyway.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:82
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:83
   def persistent; end
 
   # @attribute [Boolean] true if the connection is persistent.
   #
   # This determines what connection headers are sent in the response and whether the connection can be reused after the response is sent. This setting is automatically managed according to the nature of the request and response. Changing to false is safe. Changing to true from outside this class should generally be avoided and, depending on the response semantics, may be reset to false anyway.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:82
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:83
   def persistent=(_arg0); end
 
   # Indicates whether the connection is persistent given the version, method, and headers.
@@ -359,14 +359,14 @@ class Protocol::HTTP1::Connection
   # @parameter headers [Hash] the HTTP headers.
   # @return [Boolean] whether the connection can be persistent.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:157
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:158
   def persistent?(version, method, headers); end
 
   # Read some data from the connection.
   #
   # @parameter length [Integer] the number of bytes to read.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:350
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:380
   def read(length); end
 
   # Read the body of the message.
@@ -379,7 +379,7 @@ class Protocol::HTTP1::Connection
   # @parameter remainder [Boolean] whether to read the remainder of the body.
   # @returns [Object] the body.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:978
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:1008
   def read_body(headers, remainder = T.unsafe(nil)); end
 
   # Read the body, assuming it is using the chunked transfer encoding.
@@ -387,7 +387,7 @@ class Protocol::HTTP1::Connection
   # @parameters headers [Hash] the headers of the request.
   # @returns [Protocol::HTTP1::Body::Chunked] the body.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:814
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:844
   def read_chunked_body(headers); end
 
   # Read the body, assuming it has a fixed length.
@@ -395,7 +395,7 @@ class Protocol::HTTP1::Connection
   # @parameters length [Integer] the length of the body.
   # @returns [Protocol::HTTP1::Body::Fixed] the body.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:822
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:852
   def read_fixed_body(length); end
 
   # Read the body, assuming that we are not receiving any actual data, but just the length.
@@ -403,7 +403,7 @@ class Protocol::HTTP1::Connection
   # @parameters length [Integer] the length of the body.
   # @returns [Protocol::HTTP::Body::Head] the body.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:838
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:868
   def read_head_body(length); end
 
   # Read headers from the connection until an empty line is encountered.
@@ -412,7 +412,7 @@ class Protocol::HTTP1::Connection
   # @raises [EOFError] if the connection is closed.
   # @raises [BadHeader] if a header could not be parsed.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:501
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:531
   def read_headers; end
 
   # Read a line from the connection.
@@ -420,7 +420,7 @@ class Protocol::HTTP1::Connection
   # @raises [EOFError] if a line could not be read.
   # @raises [LineLengthError] if the line is too long.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:384
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:414
   def read_line; end
 
   # Read a line from the connection.
@@ -429,14 +429,14 @@ class Protocol::HTTP1::Connection
   # @raises [LineLengthError] if the line is too long.
   # @raises [ProtocolError] if the line is not terminated properly.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:361
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:391
   def read_line?; end
 
   # Read the body, assuming that we read until the connection is closed.
   #
   # @returns [Protocol::HTTP1::Body::Remainder] the body.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:829
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:859
   def read_remainder_body; end
 
   # Read a request from the connection, including the request line and request headers, and prepares to read the request body.
@@ -447,7 +447,7 @@ class Protocol::HTTP1::Connection
   # @returns [Tuple(String, String, String, String, HTTP::Headers, Protocol::HTTP1::Body) | Nil] the host, method, path, version, headers, and body of the request, or `nil` if the connection is closed.
   # @raises [ProtocolError] if the connection is not in the idle state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:410
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:440
   def read_request; end
 
   # Read the body of the request.
@@ -459,14 +459,14 @@ class Protocol::HTTP1::Connection
   # @parameter method [String] the HTTP method.
   # @parameter headers [Hash] the headers of the request.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:949
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:979
   def read_request_body(method, headers); end
 
   # Read a request line from the connection.
   #
   # @returns [Tuple(String, String, String) | Nil] the method, path, and version of the request, or nil if the connection is closed.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:391
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:421
   def read_request_line; end
 
   # Read a response from the connection.
@@ -477,7 +477,7 @@ class Protocol::HTTP1::Connection
   # @raises [ProtocolError] if the connection is not in the open or half-closed local state.
   # @raises [EOFError] if the connection is closed.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:466
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:496
   def read_response(method); end
 
   # Read the body of the response.
@@ -492,7 +492,7 @@ class Protocol::HTTP1::Connection
   # @parameter status [Integer] the HTTP status code.
   # @parameter headers [Hash] the headers of the response.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:901
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:931
   def read_response_body(method, status, headers); end
 
   # Read a response line from the connection.
@@ -500,7 +500,7 @@ class Protocol::HTTP1::Connection
   # @returns [Tuple(String, Integer, String)] the version, status, and reason of the response.
   # @raises [EOFError] if the connection is closed.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:443
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:473
   def read_response_line; end
 
   # Read the body, assuming it is a tunnel.
@@ -509,7 +509,7 @@ class Protocol::HTTP1::Connection
   #
   # @returns [Protocol::HTTP::Body::Remainder] the body.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:850
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:880
   def read_tunnel_body; end
 
   # Read the body, assuming it is an upgrade.
@@ -518,14 +518,14 @@ class Protocol::HTTP1::Connection
   #
   # @returns [Protocol::HTTP::Body::Remainder] the body.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:859
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:889
   def read_upgrade_body; end
 
   # Read some data from the connection.
   #
   # @parameter length [Integer] the maximum number of bytes to read.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:341
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:371
   def readpartial(length); end
 
   # Indicate that the end of the stream (body) has been received.
@@ -534,7 +534,7 @@ class Protocol::HTTP1::Connection
   #
   # @raises [ProtocolError] if the connection is not in the open or half-closed remote state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:800
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:830
   def receive_end_stream!; end
 
   # Transition to the half-closed local state, in other words, the connection is closed for writing.
@@ -543,7 +543,7 @@ class Protocol::HTTP1::Connection
   #
   # @raises [ProtocolError] if the connection is not in the open state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:523
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:553
   def send_end_stream!; end
 
   # The current state of the connection.
@@ -584,7 +584,7 @@ class Protocol::HTTP1::Connection
   #
   # State transition methods use a trailing "!".
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:121
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:122
   def state; end
 
   # The current state of the connection.
@@ -625,12 +625,12 @@ class Protocol::HTTP1::Connection
   #
   # State transition methods use a trailing "!".
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:121
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:122
   def state=(_arg0); end
 
   # The underlying IO stream.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:77
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:78
   def stream; end
 
   # Write a body to the connection.
@@ -642,7 +642,7 @@ class Protocol::HTTP1::Connection
   # @parameter head [Boolean] whether the request was a `HEAD` request.
   # @parameter trailer [Hash | Nil] the trailers to write.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:764
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:794
   def write_body(version, body, head = T.unsafe(nil), trailer = T.unsafe(nil)); end
 
   # Write the body to the connection and close the connection.
@@ -650,7 +650,7 @@ class Protocol::HTTP1::Connection
   # @parameter body [Object] the body to write.
   # @parameter head [Boolean] whether the request was a `HEAD` request.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:705
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:735
   def write_body_and_close(body, head); end
 
   # Write a chunked body to the connection.
@@ -663,12 +663,12 @@ class Protocol::HTTP1::Connection
   # @parameter head [Boolean] whether the request was a `HEAD` request.
   # @parameter trailer [Hash | Nil] the trailers to write.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:663
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:693
   def write_chunked_body(body, head, trailer = T.unsafe(nil)); end
 
   # Write the appropriate header for connection persistence.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:178
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:179
   def write_connection_header(version); end
 
   # Write an empty body to the connection.
@@ -677,7 +677,7 @@ class Protocol::HTTP1::Connection
   #
   # @parameter body [Object | Nil] the body to write.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:601
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:631
   def write_empty_body(body = T.unsafe(nil)); end
 
   # Write a fixed length body to the connection.
@@ -689,15 +689,24 @@ class Protocol::HTTP1::Connection
   # @parameter head [Boolean] whether the request was a `HEAD` request.
   # @raises [ContentLengthError] if the body length does not match the content length specified.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:618
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:648
   def write_fixed_length_body(body, length, head); end
+
+  # Write a header to the connection, rejecting CR, LF, and NUL in its value.
+  #
+  # @parameter name [String] the header name.
+  # @parameter value [String] the header value.
+  # @raises [BadHeader] if the header name or value is invalid.
+  #
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:340
+  def write_header(name, value); end
 
   # Write headers to the connection.
   #
   # @parameter headers [Hash] the headers to write.
   # @raises [BadHeader] if the header name or value is invalid.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:318
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:362
   def write_headers(headers); end
 
   # Write an interim response to the connection. It is expected you will eventually write the final response after this method.
@@ -708,12 +717,14 @@ class Protocol::HTTP1::Connection
   # @parameter reason [String] the reason phrase, defaults to the standard reason phrase for the status code.
   # @raises [ProtocolError] if the connection is not in the open or half-closed remote state.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:299
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:320
   def write_interim_response(version, status, headers, reason = T.unsafe(nil)); end
 
   # Write a request to the connection. It is expected you will write the body after this method.
   #
   # Transitions to the open state.
+  #
+  # Requires the method to be an HTTP token and rejects CR, LF, and NUL bytes in the authority and target before writing any request bytes.
   #
   # @parameter authority [String] the authority of the request.
   # @parameter method [String] the HTTP method.
@@ -722,7 +733,7 @@ class Protocol::HTTP1::Connection
   # @parameter headers [Hash] the HTTP headers.
   # @raises [RefusedError] if the request was not processed.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:262
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:266
   def write_request(authority, method, target, version, headers); end
 
   # Write a response to the connection. It is expected you will write the body after this method.
@@ -732,7 +743,7 @@ class Protocol::HTTP1::Connection
   # @parameter headers [Hash] the HTTP headers.
   # @parameter reason [String] the reason phrase, defaults to the standard reason phrase for the status code.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:279
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:300
   def write_response(version, status, headers, reason = T.unsafe(nil)); end
 
   # Write a tunnel body to the connection.
@@ -745,7 +756,7 @@ class Protocol::HTTP1::Connection
   # @parameter body [Object | Nil] the body to write.
   # @returns [IO] the underlying IO stream.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:574
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:604
   def write_tunnel_body(version, body = T.unsafe(nil)); end
 
   # Write an upgrade body to the connection.
@@ -758,52 +769,52 @@ class Protocol::HTTP1::Connection
   # @parameter body [Object | Nil] the body to write.
   # @returns [IO] the underlying IO stream.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:542
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:572
   def write_upgrade_body(protocol, body = T.unsafe(nil)); end
 
   # Write the appropriate header for connection upgrade.
   #
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:187
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:188
   def write_upgrade_header(upgrade); end
 
   private
 
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:1048
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:1078
   def close_write_stream; end
 
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:1042
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:1072
   def flush_stream; end
 
-  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:1036
+  # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:1066
   def write_stream(data); end
 end
 
 # The HTTP `CONNECT` method.
 #
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:869
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:899
 Protocol::HTTP1::Connection::CONNECT = T.let(T.unsafe(nil), String)
 
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:52
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:53
 Protocol::HTTP1::Connection::CRLF = T.let(T.unsafe(nil), String)
 
 # The HTTP `HEAD` method.
 #
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:866
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:896
 Protocol::HTTP1::Connection::HEAD = T.let(T.unsafe(nil), String)
 
 # The HTTP/1.0 version string.
 #
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:55
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:56
 Protocol::HTTP1::Connection::HTTP10 = T.let(T.unsafe(nil), String)
 
 # The HTTP/1.1 version string.
 #
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:58
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:59
 Protocol::HTTP1::Connection::HTTP11 = T.let(T.unsafe(nil), String)
 
 # The pattern for valid content length values.
 #
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:872
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:902
 Protocol::HTTP1::Connection::VALID_CONTENT_LENGTH = T.let(T.unsafe(nil), Regexp)
 
 # The specified content length and the given content's length do not match.
@@ -811,7 +822,7 @@ Protocol::HTTP1::Connection::VALID_CONTENT_LENGTH = T.let(T.unsafe(nil), Regexp)
 # pkg:gem/protocol-http1#lib/protocol/http1/error.rb:36
 class Protocol::HTTP1::ContentLengthError < ::Protocol::HTTP1::Error; end
 
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:48
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:49
 Protocol::HTTP1::DEFAULT_MAXIMUM_LINE_LENGTH = T.let(T.unsafe(nil), Integer)
 
 # The base class for all HTTP/1.x errors.
@@ -821,15 +832,15 @@ class Protocol::HTTP1::Error < ::Protocol::HTTP::Error; end
 
 # HTTP/1.x header parser:
 #
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:39
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:40
 Protocol::HTTP1::FIELD_NAME = T.let(T.unsafe(nil), Regexp)
 
 # A field value is any string of characters that does not contain a null character, CR, or LF. After reflecting on the RFCs and surveying real implementations, I came to the conclusion that the RFCs are too restrictive. Most servers only check for the presence of null bytes, and obviously CR/LF characters have semantic meaning in the parser. So, I decided to follow this defacto standard, even if I'm not entirely happy with it.
 #
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:42
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:43
 Protocol::HTTP1::FIELD_VALUE = T.let(T.unsafe(nil), Regexp)
 
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:43
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:44
 Protocol::HTTP1::HEADER = T.let(T.unsafe(nil), Regexp)
 
 # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:31
@@ -848,7 +859,7 @@ Protocol::HTTP1::KEEP_ALIVE = T.let(T.unsafe(nil), String)
 # pkg:gem/protocol-http1#lib/protocol/http1/error.rb:19
 class Protocol::HTTP1::LineLengthError < ::Protocol::HTTP1::Error; end
 
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:40
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:41
 Protocol::HTTP1::OWS = T.let(T.unsafe(nil), Regexp)
 
 # The protocol was violated in some way, e.g. trying to write a request while reading a response.
@@ -856,7 +867,7 @@ Protocol::HTTP1::OWS = T.let(T.unsafe(nil), Regexp)
 # pkg:gem/protocol-http1#lib/protocol/http1/error.rb:15
 class Protocol::HTTP1::ProtocolError < ::Protocol::HTTP1::Error; end
 
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:36
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:37
 Protocol::HTTP1::REQUEST_LINE = T.let(T.unsafe(nil), Regexp)
 
 # HTTP/1.x request line parser:
@@ -870,11 +881,14 @@ Protocol::HTTP1::TRANSFER_ENCODING = T.let(T.unsafe(nil), String)
 # pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:32
 Protocol::HTTP1::UPGRADE = T.let(T.unsafe(nil), String)
 
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:45
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:46
 Protocol::HTTP1::VALID_FIELD_NAME = T.let(T.unsafe(nil), Regexp)
 
-# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:46
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:47
 Protocol::HTTP1::VALID_FIELD_VALUE = T.let(T.unsafe(nil), Regexp)
+
+# pkg:gem/protocol-http1#lib/protocol/http1/connection.rb:36
+Protocol::HTTP1::VALID_METHOD = T.let(T.unsafe(nil), Regexp)
 
 # pkg:gem/protocol-http1#lib/protocol/http1/version.rb:8
 Protocol::HTTP1::VERSION = T.let(T.unsafe(nil), String)

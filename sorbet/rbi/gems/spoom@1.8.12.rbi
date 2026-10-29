@@ -76,7 +76,7 @@ class Spoom::Cli::Deadcode < ::Thor
   # pkg:gem/spoom#lib/spoom/cli.rb:71
   def help(command = T.unsafe(nil), subcommand = T.unsafe(nil)); end
 
-  # pkg:gem/spoom#lib/spoom/cli/deadcode.rb:153
+  # pkg:gem/spoom#lib/spoom/cli/deadcode.rb:164
   def remove(location_string); end
 end
 
@@ -263,19 +263,19 @@ class Spoom::Cli::Srb::Coverage < ::Thor
   include ::Spoom::Colorize
   include ::Spoom::Cli::Helper
 
-  # pkg:gem/spoom#lib/spoom/cli/srb/coverage.rb:199
+  # pkg:gem/spoom#lib/spoom/cli/srb/coverage.rb:202
   def bundle_install(path, sha); end
 
   # pkg:gem/spoom#lib/spoom/cli/srb.rb:23
   def help(command = T.unsafe(nil), subcommand = T.unsafe(nil)); end
 
-  # pkg:gem/spoom#lib/spoom/cli/srb/coverage.rb:211
+  # pkg:gem/spoom#lib/spoom/cli/srb/coverage.rb:214
   def message_no_data(file); end
 
-  # pkg:gem/spoom#lib/spoom/cli/srb/coverage.rb:174
+  # pkg:gem/spoom#lib/spoom/cli/srb/coverage.rb:177
   def open(file = T.unsafe(nil)); end
 
-  # pkg:gem/spoom#lib/spoom/cli/srb/coverage.rb:190
+  # pkg:gem/spoom#lib/spoom/cli/srb/coverage.rb:193
   def parse_time(string, option); end
 
   # pkg:gem/spoom#lib/spoom/cli/srb/coverage.rb:143
@@ -1095,38 +1095,55 @@ end
 class Spoom::Coverage::D3::Base
   abstract!
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:13
+  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:16
   sig { params(id: ::String, data: T.untyped).void }
   def initialize(id, data); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:31
+  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:34
   sig { returns(::String) }
   def html; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:10
+  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:13
   sig { returns(::String) }
   def id; end
 
   # @abstract
   #
-  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:45
+  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:48
   sig { abstract.returns(::String) }
   def script; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:39
+  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:42
   sig { returns(::String) }
   def tooltip; end
 
+  private
+
+  # Serialize `value` as a JavaScript literal that is safe to embed in a `<script>` tag
+  #
+  # `script_safe` escapes `/` so the data can't contain `</script>`. We also escape `<`, `>` and `&`
+  # so the data can't contain `<!--` or `<script`, which change how the HTML parser reads the rest
+  # of the `<script>` element.
+  #
+  # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:58
+  sig { params(value: T.untyped).returns(::String) }
+  def js_literal(value); end
+
   class << self
-    # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:25
+    # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:28
     sig { returns(::String) }
     def header_script; end
 
-    # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:20
+    # pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:23
     sig { returns(::String) }
     def header_style; end
   end
 end
+
+# Characters that must not appear raw inside a `<script>` element, and their JSON string escapes
+#
+# pkg:gem/spoom#lib/spoom/coverage/d3/base.rb:10
+Spoom::Coverage::D3::Base::JS_LITERAL_ESCAPES = T.let(T.unsafe(nil), Hash)
 
 # pkg:gem/spoom#lib/spoom/coverage/d3.rb:12
 Spoom::Coverage::D3::COLOR_FALSE = T.let(T.unsafe(nil), String)
@@ -1180,9 +1197,9 @@ class Spoom::Coverage::D3::CircleMap::Sigils < ::Spoom::Coverage::D3::CircleMap
   def tree_node_to_json(node); end
 end
 
-# pkg:gem/spoom#lib/spoom/coverage/d3.rb:101
+# pkg:gem/spoom#lib/spoom/coverage/d3.rb:110
 class Spoom::Coverage::D3::ColorPalette
-  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:124
+  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:133
   sig do
     params(
       ignore_color: ::String,
@@ -1194,40 +1211,45 @@ class Spoom::Coverage::D3::ColorPalette
   end
   def initialize(ignore_color:, false_color:, true_color:, strict_color:, strong_color:); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:106
+  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:115
   sig { returns(::String) }
   def false_color; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:106
-  def false_color=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:115
+  sig { params(false_color: ::String).returns(::String) }
+  def false_color=(false_color); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:103
+  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:112
   sig { returns(::String) }
   def ignore_color; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:103
-  def ignore_color=(_arg0); end
-
   # pkg:gem/spoom#lib/spoom/coverage/d3.rb:112
+  sig { params(ignore_color: ::String).returns(::String) }
+  def ignore_color=(ignore_color); end
+
+  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:121
   sig { returns(::String) }
   def strict_color; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:112
-  def strict_color=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:121
+  sig { params(strict_color: ::String).returns(::String) }
+  def strict_color=(strict_color); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:115
+  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:124
   sig { returns(::String) }
   def strong_color; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:115
-  def strong_color=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:124
+  sig { params(strong_color: ::String).returns(::String) }
+  def strong_color=(strong_color); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:109
+  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:118
   sig { returns(::String) }
   def true_color; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:109
-  def true_color=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/d3.rb:118
+  sig { params(true_color: ::String).returns(::String) }
+  def true_color=(true_color); end
 end
 
 # @abstract
@@ -1570,7 +1592,7 @@ end
 
 # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:6
 class Spoom::Coverage::Snapshot
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:85
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:87
   sig do
     params(
       timestamp: ::Integer,
@@ -1596,180 +1618,213 @@ class Spoom::Coverage::Snapshot
   end
   def initialize(timestamp: T.unsafe(nil), version_static: T.unsafe(nil), version_runtime: T.unsafe(nil), duration: T.unsafe(nil), commit_sha: T.unsafe(nil), commit_timestamp: T.unsafe(nil), files: T.unsafe(nil), rbi_files: T.unsafe(nil), modules: T.unsafe(nil), classes: T.unsafe(nil), singleton_classes: T.unsafe(nil), methods_without_sig: T.unsafe(nil), methods_with_sig: T.unsafe(nil), calls_untyped: T.unsafe(nil), calls_typed: T.unsafe(nil), sigils: T.unsafe(nil), methods_with_sig_excluding_rbis: T.unsafe(nil), methods_without_sig_excluding_rbis: T.unsafe(nil), sigils_excluding_rbis: T.unsafe(nil)); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:50
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:52
   sig { returns(::Integer) }
   def calls_typed; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:50
-  def calls_typed=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:52
+  sig { params(calls_typed: ::Integer).returns(::Integer) }
+  def calls_typed=(calls_typed); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:47
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:49
   sig { returns(::Integer) }
   def calls_untyped; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:47
-  def calls_untyped=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:49
+  sig { params(calls_untyped: ::Integer).returns(::Integer) }
+  def calls_untyped=(calls_untyped); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:35
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:37
   sig { returns(::Integer) }
   def classes; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:35
-  def classes=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:37
+  sig { params(classes: ::Integer).returns(::Integer) }
+  def classes=(classes); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:20
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:22
   sig { returns(T.nilable(::String)) }
   def commit_sha; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:20
-  def commit_sha=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:22
+  sig { params(commit_sha: T.nilable(::String)).returns(T.nilable(::String)) }
+  def commit_sha=(commit_sha); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:23
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:25
   sig { returns(T.nilable(::Integer)) }
   def commit_timestamp; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:23
-  def commit_timestamp=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:25
+  sig { params(commit_timestamp: T.nilable(::Integer)).returns(T.nilable(::Integer)) }
+  def commit_timestamp=(commit_timestamp); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:17
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:19
   sig { returns(::Integer) }
   def duration; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:17
-  def duration=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:19
+  sig { params(duration: ::Integer).returns(::Integer) }
+  def duration=(duration); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:26
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:28
   sig { returns(::Integer) }
   def files; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:26
-  def files=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:28
+  sig { params(files: ::Integer).returns(::Integer) }
+  def files=(files); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:44
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:46
   sig { returns(::Integer) }
   def methods_with_sig; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:44
-  def methods_with_sig=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:46
+  sig { params(methods_with_sig: ::Integer).returns(::Integer) }
+  def methods_with_sig=(methods_with_sig); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:56
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:58
   sig { returns(::Integer) }
   def methods_with_sig_excluding_rbis; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:56
-  def methods_with_sig_excluding_rbis=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:58
+  sig { params(methods_with_sig_excluding_rbis: ::Integer).returns(::Integer) }
+  def methods_with_sig_excluding_rbis=(methods_with_sig_excluding_rbis); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:41
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:43
   sig { returns(::Integer) }
   def methods_without_sig; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:41
-  def methods_without_sig=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:43
+  sig { params(methods_without_sig: ::Integer).returns(::Integer) }
+  def methods_without_sig=(methods_without_sig); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:59
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:61
   sig { returns(::Integer) }
   def methods_without_sig_excluding_rbis; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:59
-  def methods_without_sig_excluding_rbis=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:61
+  sig { params(methods_without_sig_excluding_rbis: ::Integer).returns(::Integer) }
+  def methods_without_sig_excluding_rbis=(methods_without_sig_excluding_rbis); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:32
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:34
   sig { returns(::Integer) }
   def modules; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:32
-  def modules=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:34
+  sig { params(modules: ::Integer).returns(::Integer) }
+  def modules=(modules); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:131
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:133
   sig { params(out: T.any(::IO, ::StringIO), colors: T::Boolean, indent_level: ::Integer).void }
   def print(out: T.unsafe(nil), colors: T.unsafe(nil), indent_level: T.unsafe(nil)); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:29
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:31
   sig { returns(::Integer) }
   def rbi_files; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:29
-  def rbi_files=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:31
+  sig { params(rbi_files: ::Integer).returns(::Integer) }
+  def rbi_files=(rbi_files); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:53
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:55
   sig { returns(T::Hash[::String, ::Integer]) }
   def sigils; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:53
-  def sigils=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:55
+  sig { params(sigils: T::Hash[::String, ::Integer]).returns(T::Hash[::String, ::Integer]) }
+  def sigils=(sigils); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:62
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:64
   sig { returns(T::Hash[::String, ::Integer]) }
   def sigils_excluding_rbis; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:62
-  def sigils_excluding_rbis=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:64
+  sig { params(sigils_excluding_rbis: T::Hash[::String, ::Integer]).returns(T::Hash[::String, ::Integer]) }
+  def sigils_excluding_rbis=(sigils_excluding_rbis); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:38
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:40
   sig { returns(::Integer) }
   def singleton_classes; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:38
-  def singleton_classes=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:40
+  sig { params(singleton_classes: ::Integer).returns(::Integer) }
+  def singleton_classes=(singleton_classes); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:8
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:10
   sig { returns(::Integer) }
   def timestamp; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:8
-  def timestamp=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:10
+  sig { params(timestamp: ::Integer).returns(::Integer) }
+  def timestamp=(timestamp); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:143
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:145
   sig { returns(T::Hash[::String, T.untyped]) }
   def to_h; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:137
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:139
   sig { params(arg: T.untyped).returns(::String) }
   def to_json(*arg); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:14
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:16
   sig { returns(T.nilable(::String)) }
   def version_runtime; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:14
-  def version_runtime=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:16
+  sig { params(version_runtime: T.nilable(::String)).returns(T.nilable(::String)) }
+  def version_runtime=(version_runtime); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:11
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:13
   sig { returns(T.nilable(::String)) }
   def version_static; end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:11
-  def version_static=(_arg0); end
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:13
+  sig { params(version_static: T.nilable(::String)).returns(T.nilable(::String)) }
+  def version_static=(version_static); end
 
   class << self
-    # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:169
+    # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:171
     sig { params(json: ::String).returns(::Spoom::Coverage::Snapshot) }
     def from_json(json); end
 
-    # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:174
+    # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:176
     sig { params(obj: T::Hash[::String, T.untyped]).returns(::Spoom::Coverage::Snapshot) }
     def from_obj(obj); end
+
+    private
+
+    # Read `key` from `obj` as an Integer
+    #
+    # Snapshot files live in the analyzed project and can't be trusted to hold the types spoom wrote.
+    # Raises `Snapshot::Error` if the value can't be interpreted as an Integer.
+    #
+    # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:226
+    sig { params(obj: T::Hash[::String, T.untyped], key: ::String, default: ::Integer).returns(::Integer) }
+    def integer_field(obj, key, default: T.unsafe(nil)); end
   end
 end
 
+# pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:7
+class Spoom::Coverage::Snapshot::Error < ::Spoom::Error; end
+
 # The strictness name as found in the Sorbet metrics file
 #
-# pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:128
+# pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:130
 Spoom::Coverage::Snapshot::STRICTNESSES = T.let(T.unsafe(nil), Array)
 
-# pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:217
+# pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:238
 class Spoom::Coverage::SnapshotPrinter < ::Spoom::Printer
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:219
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:240
   sig { params(snapshot: ::Spoom::Coverage::Snapshot).void }
   def print_snapshot(snapshot); end
 
   private
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:278
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:299
   sig { params(value: T.nilable(::Integer), total: T.nilable(::Integer)).returns(::String) }
   def percent(value, total); end
 
-  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:267
+  # pkg:gem/spoom#lib/spoom/coverage/snapshot.rb:288
   sig { params(hash: T::Hash[::String, ::Integer], total: ::Integer).void }
   def print_map(hash, total); end
 end
@@ -2719,7 +2774,8 @@ class Spoom::Deadcode::Remover::NodeContext
   def nesting; end
 
   # pkg:gem/spoom#lib/spoom/deadcode/remover.rb:507
-  def nesting=(_arg0); end
+  sig { params(nesting: T::Array[::Prism::Node]).returns(T::Array[::Prism::Node]) }
+  def nesting=(nesting); end
 
   # pkg:gem/spoom#lib/spoom/deadcode/remover.rb:562
   sig { returns(T.nilable(::Prism::Node)) }
@@ -3808,7 +3864,8 @@ class Spoom::LSP::SymbolPrinter < ::Spoom::Printer
   def prefix; end
 
   # pkg:gem/spoom#lib/spoom/sorbet/lsp/structures.rb:406
-  def prefix=(_arg0); end
+  sig { params(prefix: T.nilable(::String)).returns(T.nilable(::String)) }
+  def prefix=(prefix); end
 
   # pkg:gem/spoom#lib/spoom/sorbet/lsp/structures.rb:439
   sig { params(objects: T::Array[::Spoom::LSP::PrintableSymbol]).void }
@@ -4053,7 +4110,8 @@ class Spoom::Model::Class < ::Spoom::Model::Namespace
   def superclass_name; end
 
   # pkg:gem/spoom#lib/spoom/model/model.rb:130
-  def superclass_name=(_arg0); end
+  sig { params(superclass_name: T.nilable(::String)).returns(T.nilable(::String)) }
+  def superclass_name=(superclass_name); end
 end
 
 # pkg:gem/spoom#lib/spoom/model/model.rb:8
@@ -4737,7 +4795,8 @@ class Spoom::Printer
   def out; end
 
   # pkg:gem/spoom#lib/spoom/printer.rb:11
-  def out=(_arg0); end
+  sig { params(out: T.any(::IO, ::StringIO)).returns(T.any(::IO, ::StringIO)) }
+  def out=(out); end
 
   # Print `string` into `out`
   #
@@ -4915,7 +4974,8 @@ class Spoom::Sorbet::Config
   def no_stdlib; end
 
   # pkg:gem/spoom#lib/spoom/sorbet/config.rb:33
-  def no_stdlib=(_arg0); end
+  sig { params(no_stdlib: T::Boolean).returns(T::Boolean) }
+  def no_stdlib=(no_stdlib); end
 
   # Returns self as a string of options that can be passed to Sorbet
   #
@@ -4939,7 +4999,8 @@ class Spoom::Sorbet::Config
   def paths; end
 
   # pkg:gem/spoom#lib/spoom/sorbet/config.rb:30
-  def paths=(_arg0); end
+  sig { params(paths: T::Array[::String]).returns(T::Array[::String]) }
+  def paths=(paths); end
 
   # pkg:gem/spoom#lib/spoom/sorbet/config.rb:30
   def typed_overrides; end
@@ -5277,13 +5338,13 @@ module Spoom::Sorbet::Sigils
   class << self
     # changes the sigil in the file at the passed path to the specified new strictness
     #
-    # pkg:gem/spoom#lib/spoom/sorbet/sigils.rb:72
+    # pkg:gem/spoom#lib/spoom/sorbet/sigils.rb:87
     sig { params(path: T.any(::Pathname, ::String), new_strictness: ::String).returns(T::Boolean) }
     def change_sigil_in_file(path, new_strictness); end
 
     # changes the sigil to have a new strictness in a list of files
     #
-    # pkg:gem/spoom#lib/spoom/sorbet/sigils.rb:83
+    # pkg:gem/spoom#lib/spoom/sorbet/sigils.rb:98
     sig { params(path_list: T::Array[::String], new_strictness: ::String).returns(T::Array[::String]) }
     def change_sigil_in_files(path_list, new_strictness); end
 
@@ -5296,9 +5357,16 @@ module Spoom::Sorbet::Sigils
     # returns a string containing the strictness of a sigil in a file at the passed path
     # * returns nil if no sigil
     #
-    # pkg:gem/spoom#lib/spoom/sorbet/sigils.rb:63
+    # pkg:gem/spoom#lib/spoom/sorbet/sigils.rb:78
     sig { params(path: T.any(::Pathname, ::String)).returns(T.nilable(::String)) }
     def file_strictness(path); end
+
+    # returns true if the passed content contains a valid sigil at or above the passed strictness
+    # internal sigils do not satisfy a minimum strictness
+    #
+    # pkg:gem/spoom#lib/spoom/sorbet/sigils.rb:57
+    sig { params(content: ::String, strictness: ::String).returns(T::Boolean) }
+    def satisfies_minimum_strictness?(content, strictness); end
 
     # returns the full sigil comment string for the passed strictness
     #
@@ -5314,7 +5382,7 @@ module Spoom::Sorbet::Sigils
 
     # returns a string which is the passed content but with the sigil updated to a new strictness
     #
-    # pkg:gem/spoom#lib/spoom/sorbet/sigils.rb:56
+    # pkg:gem/spoom#lib/spoom/sorbet/sigils.rb:71
     sig { params(content: ::String, new_strictness: ::String).returns(::String) }
     def update_sigil(content, new_strictness); end
 
@@ -5475,7 +5543,14 @@ end
 # pkg:gem/spoom#lib/spoom/sorbet/translate/rbs_comments_to_sorbet_sigs.rb:7
 module Spoom::Sorbet::Translate::RBSCommentsToSorbetSigs
   class << self
-    # pkg:gem/spoom#lib/spoom/sorbet/translate/rbs_comments_to_sorbet_sigs.rb:29
+    # Detects RBS comment markers (`#:`, `#|`, and supported `# @...` annotations).
+    # Use this check to skip parsing files without those markers.
+    #
+    # pkg:gem/spoom#lib/spoom/sorbet/translate/rbs_comments_to_sorbet_sigs.rb:27
+    sig { params(ruby_contents: ::String).returns(T::Boolean) }
+    def contains_rbs_syntax?(ruby_contents); end
+
+    # pkg:gem/spoom#lib/spoom/sorbet/translate/rbs_comments_to_sorbet_sigs.rb:38
     sig do
       params(
         ruby_contents: ::String,
