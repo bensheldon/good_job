@@ -23,7 +23,7 @@
 # Released under the MIT License.
 # Copyright, 2019-2025, by Samuel Williams.
 # Released under the MIT License.
-# Copyright, 2018-2025, by Samuel Williams.
+# Copyright, 2019-2026, by Samuel Williams.
 # Released under the MIT License.
 # Copyright, 2024-2025, by Samuel Williams.
 # Released under the MIT License.
@@ -1691,25 +1691,25 @@ Protocol::HTTP::Header::Connection::UPGRADE = T.let(T.unsafe(nil), String)
 # It is used by clients to send key-value pairs representing stored cookies back to the server.
 # Multiple cookies within a single `Cookie` header are joined with `"; "` per RFC 6265.
 #
-# pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:15
+# pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:16
 class Protocol::HTTP::Header::Cookie < ::Array
   # Initializes the cookie header with the given values.
   #
   # @parameter value [Array | Nil] an array of cookie strings, or `nil` for an empty header.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:40
+  # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:41
   def initialize(value = T.unsafe(nil)); end
 
   # Parses the `cookie` header into a hash of cookie names and their corresponding cookie objects.
   #
   # @returns [Hash(String, HTTP::Cookie)] a hash where keys are cookie names and values are {HTTP::Cookie} objects.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:51
+  # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:52
   def to_h; end
 
   # Serializes the `cookie` header by joining individual cookie strings with `"; "` per RFC 6265.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:63
+  # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:64
   def to_s; end
 
   class << self
@@ -1718,7 +1718,7 @@ class Protocol::HTTP::Header::Cookie < ::Array
     # @parameter value [String | Array] the value to coerce.
     # @returns [Cookie] a parsed header object.
     #
-    # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:28
+    # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:29
     def coerce(value); end
 
     # Parses a raw header value.
@@ -1726,14 +1726,14 @@ class Protocol::HTTP::Header::Cookie < ::Array
     # @parameter value [String] a single raw header value.
     # @returns [Cookie] a new instance containing the parsed value.
     #
-    # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:20
+    # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:21
     def parse(value); end
 
     # Whether this header is acceptable in HTTP trailers.
     # Cookie headers should not appear in trailers as they contain state information needed early in processing.
     # @returns [Boolean] `false`, as cookie headers are needed during initial request processing.
     #
-    # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:70
+    # pkg:gem/protocol-http#lib/protocol/http/header/cookie.rb:71
     def trailer?; end
   end
 end
@@ -2163,12 +2163,12 @@ class Protocol::HTTP::Header::Range
     # pkg:gem/protocol-http#lib/protocol/http/header/range.rb:99
     def coerce(value); end
 
-    # Parse a raw range header value.
-    # @parameter value [String] The raw header value.
-    # @returns [Range] The parsed range header.
     # Parse one byte range.
     # @parameter value [String] The byte range to parse.
     # @returns [ByteRange] The parsed byte range.
+    # Parse a raw range header value.
+    # @parameter value [String] The raw header value.
+    # @returns [Range] The parsed range header.
     #
     # pkg:gem/protocol-http#lib/protocol/http/header/range.rb:75
     def parse(value); end
@@ -2336,20 +2336,20 @@ class Protocol::HTTP::Header::ServerTiming::ParseError < ::Protocol::HTTP::Inval
 # It is used to store cookies on the client side, which are then sent back to the server
 # in subsequent requests using the `cookie` header.
 #
-# pkg:gem/protocol-http#lib/protocol/http/header/set_cookie.rb:17
+# pkg:gem/protocol-http#lib/protocol/http/header/set_cookie.rb:18
 class Protocol::HTTP::Header::SetCookie < ::Protocol::HTTP::Header::Multiple
   # Parses the `set-cookie` headers into a hash of cookie names and their corresponding cookie objects.
   #
   # @returns [Hash(String, HTTP::Cookie)] a hash where keys are cookie names and values are {HTTP::Cookie} objects.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/header/set_cookie.rb:21
+  # pkg:gem/protocol-http#lib/protocol/http/header/set_cookie.rb:22
   def to_h; end
 
   class << self
     # Whether this header is acceptable in HTTP trailers.
     # @returns [Boolean] `false`, as set-cookie headers are needed during initial response processing.
     #
-    # pkg:gem/protocol-http#lib/protocol/http/header/set_cookie.rb:31
+    # pkg:gem/protocol-http#lib/protocol/http/header/set_cookie.rb:32
     def trailer?; end
   end
 end
@@ -2744,21 +2744,21 @@ end
 
 # Headers are an array of key-value pairs. Some header keys represent multiple values.
 #
-# pkg:gem/protocol-http#lib/protocol/http/headers.rb:41
+# pkg:gem/protocol-http#lib/protocol/http/headers.rb:42
 class Protocol::HTTP::Headers
   # Initialize the headers with the specified fields.
   #
   # @parameter fields [Array] An array of `[key, value]` pairs.
   # @parameter tail [Integer | Nil] The index of the trailer start in the @fields array.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:76
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:77
   def initialize(fields = T.unsafe(nil), tail = T.unsafe(nil), indexed: T.unsafe(nil), policy: T.unsafe(nil)); end
 
   # Compare this object to another object. May depend on the order of the fields.
   #
   # @returns [Boolean] Whether the other object is equal to this one.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:503
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:504
   def ==(other); end
 
   # Get the value of the specified header key.
@@ -2766,7 +2766,7 @@ class Protocol::HTTP::Headers
   # @parameter key [String] The header key.
   # @returns [String | Array | Object] The header value.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:318
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:319
   def [](key); end
 
   # Set the specified header key to the specified value, replacing any existing values.
@@ -2776,7 +2776,7 @@ class Protocol::HTTP::Headers
   # @parameter key [String] the header key.
   # @parameter value [String | Array] the header value to assign.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:286
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:287
   def []=(key, value); end
 
   # Add the specified header key value pair.
@@ -2785,15 +2785,15 @@ class Protocol::HTTP::Headers
   # @parameter value [String] the header value to assign.
   # @parameter trailer [Boolean] whether this header is being added as a trailer.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:253
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:254
   def add(key, value, trailer: T.unsafe(nil)); end
 
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:491
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:492
   def as_json; end
 
   # Clear all headers.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:112
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:113
   def clear; end
 
   # Delete all header values for the given key, and return the merged value.
@@ -2801,7 +2801,7 @@ class Protocol::HTTP::Headers
   # @parameter key [String] The header key.
   # @returns [String | Array | Object] The merged header value.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:421
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:422
   def delete(key); end
 
   # Enumerate all header keys and values.
@@ -2810,39 +2810,39 @@ class Protocol::HTTP::Headers
   # 	@parameter key [String] The header key.
   # 	@parameter value [String] The raw header value.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:215
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:216
   def each(&block); end
 
   # @returns [Boolean] Whether the headers are empty.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:206
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:207
   def empty?; end
 
   # Extract the specified keys from the headers.
   #
   # @parameter keys [Array] The keys to extract.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:234
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:235
   def extract(keys); end
 
   # @attribute [Array] An array of `[key, value]` pairs.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:134
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:135
   def fields; end
 
   # Flatten trailer into the headers, returning a new instance of {Headers}.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:129
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:130
   def flatten; end
 
   # Flatten trailer into the headers, in-place.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:119
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:120
   def flatten!; end
 
   # Freeze the headers, and ensure the indexed hash is generated.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:193
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:194
   def freeze; end
 
   # Enumerate all the headers in the header, if there are any.
@@ -2851,42 +2851,42 @@ class Protocol::HTTP::Headers
   # 	@parameter key [String] The header key.
   # 	@parameter value [String] The raw header value.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:169
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:170
   def header(&block); end
 
   # @returns [Boolean] Whether the headers include the specified key.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:220
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:221
   def include?(key); end
 
   # Inspect the headers.
   #
   # @returns [String] A string representation of the headers.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:496
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:497
   def inspect; end
 
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:224
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:225
   def key?(key); end
 
   # @returns [Array] All the keys of the headers.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:227
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:228
   def keys; end
 
   # Merge the headers into a new instance of {Headers}.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:332
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:333
   def merge(headers); end
 
   # Merge the headers into this instance.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:323
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:324
   def merge!(headers); end
 
   # @attribute [Hash] The policy for the headers.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:89
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:90
   def policy; end
 
   # Set the policy for the headers.
@@ -2895,7 +2895,7 @@ class Protocol::HTTP::Headers
   #
   # @parameter policy [Hash] The policy for the headers.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:96
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:97
   def policy=(policy); end
 
   # Set the specified header key to the specified value, replacing any existing header keys with the same name.
@@ -2903,17 +2903,17 @@ class Protocol::HTTP::Headers
   # @parameter key [String] the header key to replace.
   # @parameter value [String] the header value to assign.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:275
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:276
   def set(key, value); end
 
   # @attribute [Integer | Nil] The index where trailers begin.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:137
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:138
   def tail; end
 
   # @returns [Array] The fields of the headers.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:140
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:141
   def to_a; end
 
   # Compute a hash table of headers, where the keys are normalized to lower case and the values are normalized according to the policy for that header.
@@ -2922,7 +2922,7 @@ class Protocol::HTTP::Headers
   #
   # @returns [Hash] A hash table of `{key, value}` pairs.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:476
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:477
   def to_h; end
 
   # Enumerate all headers in the trailer, if there are any.
@@ -2931,7 +2931,7 @@ class Protocol::HTTP::Headers
   # 	@parameter key [String] The header key.
   # 	@parameter value [String] The raw header value.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:184
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:185
   def trailer(&block); end
 
   # Record the current headers, and prepare to add trailers.
@@ -2944,12 +2944,12 @@ class Protocol::HTTP::Headers
   # @yields {|name, value| ...} the trailing headers if a block is given.
   # @returns An enumerator which is suitable for iterating over trailers.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:158
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:159
   def trailer!(&block); end
 
   # @returns [Boolean] Whether there are any trailers.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:145
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:146
   def trailer?; end
 
   protected
@@ -2960,7 +2960,7 @@ class Protocol::HTTP::Headers
   # @parameter key [String] The header key.
   # @parameter value [String] The raw header value.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:455
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:456
   def merge_into(hash, key, value); end
 
   private
@@ -2969,7 +2969,7 @@ class Protocol::HTTP::Headers
   #
   # @parameter other [Headers] The headers to copy.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:104
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:105
   def initialize_dup(other); end
 
   class << self
@@ -2977,14 +2977,14 @@ class Protocol::HTTP::Headers
     #
     # @return [Headers] an instance of headers.
     #
-    # pkg:gem/protocol-http#lib/protocol/http/headers.rb:50
+    # pkg:gem/protocol-http#lib/protocol/http/headers.rb:51
     def [](headers); end
   end
 end
 
 # Used for merging objects into a sequential list of headers. Normalizes header keys and values.
 #
-# pkg:gem/protocol-http#lib/protocol/http/headers.rb:515
+# pkg:gem/protocol-http#lib/protocol/http/headers.rb:516
 class Protocol::HTTP::Headers::Merged
   include ::Enumerable
 
@@ -2992,19 +2992,19 @@ class Protocol::HTTP::Headers::Merged
   #
   # @parameter *all [Array] An array of all headers to merge.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:521
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:522
   def initialize(*all); end
 
   # Add a new set of headers to the merged list.
   #
   # @parameter headers [Headers | Array | Hash] A list of headers to add.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:543
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:544
   def <<(headers); end
 
   # Clear the references to all headers.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:536
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:537
   def clear; end
 
   # Enumerate all headers in the merged list.
@@ -3013,21 +3013,21 @@ class Protocol::HTTP::Headers::Merged
   # 	@parameter key [String] The header key (lower case).
   # 	@parameter value [String] The header value.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:554
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:555
   def each(&block); end
 
   # @returns [Array] A list of all headers, in the order they were added, as `[key, value]` pairs.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:526
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:527
   def fields; end
 
   # @returns [Headers] A new instance of {Headers} containing all the merged headers.
   #
-  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:531
+  # pkg:gem/protocol-http#lib/protocol/http/headers.rb:532
   def flatten; end
 end
 
-# pkg:gem/protocol-http#lib/protocol/http/headers.rb:43
+# pkg:gem/protocol-http#lib/protocol/http/headers.rb:44
 Protocol::HTTP::Headers::Multiple = Protocol::HTTP::Header::Multiple
 
 # The policy for various headers, including how they are merged and normalized.
@@ -3036,13 +3036,13 @@ Protocol::HTTP::Headers::Multiple = Protocol::HTTP::Header::Multiple
 #
 # Otherwise, the policy is a class which implements the header normalization logic, including `parse` and `coerce` class methods.
 #
-# pkg:gem/protocol-http#lib/protocol/http/headers.rb:341
+# pkg:gem/protocol-http#lib/protocol/http/headers.rb:342
 Protocol::HTTP::Headers::POLICY = T.let(T.unsafe(nil), Hash)
 
-# pkg:gem/protocol-http#lib/protocol/http/headers.rb:42
+# pkg:gem/protocol-http#lib/protocol/http/headers.rb:43
 Protocol::HTTP::Headers::Split = Protocol::HTTP::Header::Split
 
-# pkg:gem/protocol-http#lib/protocol/http/headers.rb:45
+# pkg:gem/protocol-http#lib/protocol/http/headers.rb:46
 Protocol::HTTP::Headers::TRAILER = T.let(T.unsafe(nil), String)
 
 # Raised when an HTTP header is malformed or invalid. When raised while processing an incoming request, it may be treated as a bad request.

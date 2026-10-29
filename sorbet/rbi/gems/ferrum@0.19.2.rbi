@@ -5,7 +5,7 @@
 # Please instead update this file by running `bin/tapioca gem ferrum`.
 
 
-# Ferrum is a pure Ruby driver for headless Chrome and Firefox. It talks
+# Ferrum is a pure Ruby driver for headless Chrome. It talks
 # directly to the browser over the Chrome DevTools Protocol (CDP), so it
 # doesn't depend on Selenium, WebDriver or any other third party gem.
 #
@@ -277,9 +277,8 @@ class Ferrum::Browser
   #   why you have slow responses and fix or block them rather than turn this
   #   setting off.
   #
-  # @option options [:chrome, :firefox] :browser_name (:chrome)
-  #   Sets the browser's name. **Note:** only experimental support for
-  #   `:firefox` for now.
+  # @option options [:chrome, :opera, :edge] :browser_name (:chrome)
+  #   Sets the browser's name.
   #
   # @option options [String] :browser_path
   #   Path to Chrome binary, you can also set ENV variable as
@@ -323,7 +322,7 @@ class Ferrum::Browser
   # @option options [Hash] :env
   #   Environment variables you'd like to pass through to the process.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:152
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:151
   def initialize(options = T.unsafe(nil)); end
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:31
@@ -366,7 +365,7 @@ class Ferrum::Browser
   #
   # You should clean up resources/connections in ruby world manually, it's only a CDP command.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:263
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:271
   def close; end
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:49
@@ -383,7 +382,7 @@ class Ferrum::Browser
 
   # Crashes browser.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:254
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:262
   def crash; end
 
   # Creates a new page.
@@ -397,7 +396,7 @@ class Ferrum::Browser
   # @return [Ferrum::Page]
   #   Created page.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:171
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:170
   def create_page(new_context: T.unsafe(nil), proxy: T.unsafe(nil)); end
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:30
@@ -418,7 +417,7 @@ class Ferrum::Browser
   #
   # @since 0.16
   #
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:285
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:293
   def debug(bind = T.unsafe(nil)); end
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:29
@@ -466,7 +465,7 @@ class Ferrum::Browser
   #     });
   #   JS
   #
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:208
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:207
   def evaluate_on_new_document(expression); end
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:31
@@ -549,8 +548,16 @@ class Ferrum::Browser
 
   # Terminates the browser process and closes the client connection.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:241
-  def quit; end
+  # @param [Boolean] wait
+  #   Whether to block until the process is confirmed dead and its user
+  #   data directory removed (the default), or return immediately and run
+  #   that cleanup on a background thread instead. See {Process#stop}.
+  #
+  # @return [Thread, nil]
+  #   The background cleanup thread when `wait: false`, `nil` otherwise.
+  #
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:248
+  def quit(wait: T.unsafe(nil)); end
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:31
   def refresh(*, **, &); end
@@ -571,7 +578,7 @@ class Ferrum::Browser
   #
   #   browser.quit
   #
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:226
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:225
   def reset; end
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:31
@@ -579,7 +586,7 @@ class Ferrum::Browser
 
   # Restarts the browser process, keeping the same options.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:233
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:232
   def restart; end
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:31
@@ -621,7 +628,7 @@ class Ferrum::Browser
   #
   # @since 0.13
   #
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:274
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:282
   def version; end
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:31
@@ -629,6 +636,9 @@ class Ferrum::Browser
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:31
   def wait_for_reload(*, **, &); end
+
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:31
+  def wait_for_selector(*, **, &); end
 
   # pkg:gem/ferrum#lib/ferrum/browser.rb:30
   def windows(*, **, &); end
@@ -641,13 +651,13 @@ class Ferrum::Browser
 
   private
 
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:323
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:331
   def build_remote_debug_url(path:); end
 
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:314
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:322
   def debug_url; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser.rb:298
+  # pkg:gem/ferrum#lib/ferrum/browser.rb:306
   def start; end
 end
 
@@ -763,16 +773,16 @@ end
 #
 # pkg:gem/ferrum#lib/ferrum/browser/command.rb:11
 class Ferrum::Browser::Command
-  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:33
+  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:31
   def initialize(defaults, options, user_data_dir); end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:31
+  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:29
   def defaults; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:31
+  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:29
   def options; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:31
+  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:29
   def path; end
 
   # Command line arguments for spawning the browser process.
@@ -780,26 +790,26 @@ class Ferrum::Browser::Command
   # @return [Array<String>]
   #   The browser path followed by its CLI flags.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:57
+  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:55
   def to_a; end
 
   # String representation of the command used to spawn the browser process.
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:66
+  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:64
   def to_s; end
 
   # Whether the browser should be launched under Xvfb.
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:47
+  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:45
   def xvfb?; end
 
   private
 
-  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:72
+  # pkg:gem/ferrum#lib/ferrum/browser/command.rb:70
   def merge_options; end
 
   class << self
@@ -972,12 +982,11 @@ Ferrum::Browser::Options::BROWSER_HOST = T.let(T.unsafe(nil), String)
 Ferrum::Browser::Options::BROWSER_PORT = T.let(T.unsafe(nil), String)
 
 # Abstract base for browser-specific default option builders. Subclasses
-# (e.g. {Options::Chrome}, {Options::Firefox}) declare their own
-# `DEFAULT_OPTIONS` and `PLATFORM_PATH` constants and implement
-# {#merge_required}/{#merge_default} to produce the final CLI flags used
-# by {Command}.
+# (e.g. {Options::Chrome}) declare their own `DEFAULT_OPTIONS` and
+# `PLATFORM_PATH` constants and implement {#merge_required}/{#merge_default}
+# to produce the final CLI flags used by {Command}.
 #
-# pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:16
+# pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:15
 class Ferrum::Browser::Options::Base
   include ::Singleton::SingletonInstanceMethods
   include ::Singleton
@@ -988,7 +997,7 @@ class Ferrum::Browser::Options::Base
   # @return [String, nil]
   #   Absolute path to the browser binary, or `nil` if not found.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:67
+  # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:66
   def detect_path; end
 
   # Default CLI flags excluding the given keys.
@@ -998,12 +1007,12 @@ class Ferrum::Browser::Options::Base
   #
   # @return [Hash{String => Object}]
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:57
+  # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:56
   def except(*keys); end
 
   # Merges this browser's default CLI flags (see {#to_h}) into `flags`,
   # unless `options.ignore_default_browser_options` is set. Abstract;
-  # overridden by {Options::Chrome}/{Options::Firefox}.
+  # overridden by {Options::Chrome}.
   #
   # @param [Hash{String => Object}] flags
   #   The flags accumulated so far.
@@ -1015,12 +1024,12 @@ class Ferrum::Browser::Options::Base
   # @raise [NotImplementedError]
   #   Always, unless overridden by a subclass.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:107
+  # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:106
   def merge_default(flags, options); end
 
   # Merges the CLI flags that are always required to drive the browser
   # over CDP (e.g. remote debugging port, user data dir) into `flags`.
-  # Abstract; overridden by {Options::Chrome}/{Options::Firefox}.
+  # Abstract; overridden by {Options::Chrome}.
   #
   # @param [Hash{String => Object}] flags
   #   The flags accumulated so far.
@@ -1034,14 +1043,14 @@ class Ferrum::Browser::Options::Base
   # @raise [NotImplementedError]
   #   Always, unless overridden by a subclass.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:88
+  # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:87
   def merge_required(flags, options, user_data_dir); end
 
   # Default CLI flags for the browser.
   #
   # @return [Hash{String => Object}]
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:45
+  # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:44
   def to_h; end
 
   class << self
@@ -1049,7 +1058,7 @@ class Ferrum::Browser::Options::Base
     #
     # @return [Base]
     #
-    # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:24
+    # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:23
     def options; end
 
     # The installed browser's version string, obtained by running its
@@ -1058,15 +1067,15 @@ class Ferrum::Browser::Options::Base
     # @return [String, nil]
     #   The version output, or `nil` if the binary can't be found/run.
     #
-    # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:33
+    # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:32
     def version; end
 
     private
 
-    # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:17
+    # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:16
     def allocate; end
 
-    # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:17
+    # pkg:gem/ferrum#lib/ferrum/browser/options/base.rb:16
     def new(*_arg0); end
   end
 end
@@ -1090,7 +1099,7 @@ class Ferrum::Browser::Options::Chrome < ::Ferrum::Browser::Options::Base
   # @return [Hash]
   #   Merged flags.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:132
+  # pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:129
   def merge_default(flags, options); end
 
   # Merges CLI flags required for Chrome to work with CDP.
@@ -1107,23 +1116,23 @@ class Ferrum::Browser::Options::Chrome < ::Ferrum::Browser::Options::Base
   # @return [Hash]
   #   Merged flags.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:105
+  # pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:103
   def merge_required(flags, options, user_data_dir); end
 end
 
 # pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:13
 Ferrum::Browser::Options::Chrome::DEFAULT_OPTIONS = T.let(T.unsafe(nil), Hash)
 
-# pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:78
+# pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:76
 Ferrum::Browser::Options::Chrome::LINUX_BIN_PATH = T.let(T.unsafe(nil), Array)
 
-# pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:74
+# pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:72
 Ferrum::Browser::Options::Chrome::MAC_BIN_PATH = T.let(T.unsafe(nil), Array)
 
-# pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:84
+# pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:82
 Ferrum::Browser::Options::Chrome::PLATFORM_PATH = T.let(T.unsafe(nil), Hash)
 
-# pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:80
+# pkg:gem/ferrum#lib/ferrum/browser/options/chrome.rb:78
 Ferrum::Browser::Options::Chrome::WINDOWS_BIN_PATH = T.let(T.unsafe(nil), Array)
 
 # pkg:gem/ferrum#lib/ferrum/browser/options.rb:19
@@ -1134,59 +1143,6 @@ Ferrum::Browser::Options::DEFAULT_PROTOCOL_TIMEOUT = T.let(T.unsafe(nil), Intege
 
 # pkg:gem/ferrum#lib/ferrum/browser/options.rb:16
 Ferrum::Browser::Options::DEFAULT_TIMEOUT = T.let(T.unsafe(nil), Integer)
-
-# Firefox-specific default flags and binary locations. Provides the CLI
-# flags required to drive Firefox over CDP (remote debugger address and
-# profile directory) along with its (minimal) set of default flags.
-#
-# pkg:gem/ferrum#lib/ferrum/browser/options/firefox.rb:11
-class Ferrum::Browser::Options::Firefox < ::Ferrum::Browser::Options::Base
-  # Merges Firefox's default flags with the given ones.
-  #
-  # @param [Hash] flags
-  #   Flags that take precedence over the defaults.
-  #
-  # @param [Ferrum::Browser::Options] options
-  #   Browser options.
-  #
-  # @return [Hash]
-  #   Merged flags.
-  #
-  # pkg:gem/ferrum#lib/ferrum/browser/options/firefox.rb:61
-  def merge_default(flags, options); end
-
-  # Merges CLI flags required for Firefox to work with CDP.
-  #
-  # @param [Hash] flags
-  #   Flags to merge required ones into.
-  #
-  # @param [Ferrum::Browser::Options] options
-  #   Browser options.
-  #
-  # @param [String] user_data_dir
-  #   Path to the browser's profile directory.
-  #
-  # @return [Hash]
-  #   Merged flags.
-  #
-  # pkg:gem/ferrum#lib/ferrum/browser/options/firefox.rb:45
-  def merge_required(flags, options, user_data_dir); end
-end
-
-# pkg:gem/ferrum#lib/ferrum/browser/options/firefox.rb:12
-Ferrum::Browser::Options::Firefox::DEFAULT_OPTIONS = T.let(T.unsafe(nil), Hash)
-
-# pkg:gem/ferrum#lib/ferrum/browser/options/firefox.rb:19
-Ferrum::Browser::Options::Firefox::LINUX_BIN_PATH = T.let(T.unsafe(nil), Array)
-
-# pkg:gem/ferrum#lib/ferrum/browser/options/firefox.rb:16
-Ferrum::Browser::Options::Firefox::MAC_BIN_PATH = T.let(T.unsafe(nil), Array)
-
-# pkg:gem/ferrum#lib/ferrum/browser/options/firefox.rb:24
-Ferrum::Browser::Options::Firefox::PLATFORM_PATH = T.let(T.unsafe(nil), Hash)
-
-# pkg:gem/ferrum#lib/ferrum/browser/options/firefox.rb:20
-Ferrum::Browser::Options::Firefox::WINDOWS_BIN_PATH = T.let(T.unsafe(nil), Array)
 
 # pkg:gem/ferrum#lib/ferrum/browser/options.rb:18
 Ferrum::Browser::Options::PROCESS_TIMEOUT = T.let(T.unsafe(nil), Integer)
@@ -1199,119 +1155,130 @@ Ferrum::Browser::Options::WINDOW_SIZE = T.let(T.unsafe(nil), Array)
 # waits for the CDP WebSocket endpoint to become available, and handles
 # stopping/restarting the process and cleaning up its user data directory.
 #
-# pkg:gem/ferrum#lib/ferrum/browser/process.rb:23
+# pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:9
 class Ferrum::Browser::Process
   extend ::Forwardable
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:95
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:49
   def initialize(options); end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def browser_version; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def command; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def default_user_agent; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def host; end
 
   # Custom inspection that omits noisy internal command details.
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:179
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:142
   def inspect; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:29
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:31
   def path(*, **, &); end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def pid; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def port; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def protocol_version; end
 
   # Stops and starts the browser process again.
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:169
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:132
   def restart; end
 
   # Spawns the browser process and waits for it to become reachable over CDP.
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:121
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:78
   def start; end
 
   # Kills the browser process (and Xvfb, if running) and removes the user
   # data directory.
   #
-  # @return [void]
+  # @param [Boolean] wait
+  #   Whether to block until the process is confirmed dead and its user
+  #   data directory removed (the default), or return immediately and
+  #   run that cleanup on a background thread instead. Killing a
+  #   stubborn process group can block for up to {Killer::KILL_TIMEOUT}
+  #   seconds, plus retries removing its directory, which matters when quitting
+  #   many browsers in a hot path. `wait: false` is not used by
+  #   {#restart}, which always waits so the old process is fully gone
+  #   before the new one starts.
   #
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:153
-  def stop; end
+  # @return [Thread, nil]
+  #   The background cleanup thread when `wait: false`; the caller can
+  #   `#join` it if they need cleanup to have finished, e.g. before
+  #   process exit or before reusing a fixed port. `nil` when `wait:
+  #   true`.
+  #
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:121
+  def stop(wait: T.unsafe(nil)); end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def v8_version; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def webkit_version; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def ws_url; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:91
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:45
   def xvfb; end
 
   private
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:231
+  # Snapshots what needs killing/removing, clears instance state so the
+  # object looks stopped right away, and does the actual work on a
+  # background thread. The finalizer is left in place as a backup until
+  # that thread finishes, in case the process exits before it does.
+  #
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:173
+  def async_stop; end
+
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:228
   def close_io(*ios); end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:192
-  def kill(pid); end
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:250
+  def json_version_url(url); end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:239
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:236
   def parse_json_version(url); end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:201
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:192
   def parse_ws_url(read_io, timeout); end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:196
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:257
+  def reachable_ws_url(ws_url, endpoint); end
+
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:187
   def remove_user_data_dir; end
 
-  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:225
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:222
+  def rewrite_host(url); end
+
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:155
+  def sync_stop; end
+
+  # pkg:gem/ferrum#lib/ferrum/browser/process.rb:216
   def ws_url=(url); end
 
   class << self
-    # Builds a finalizer proc that removes the directory at the given path.
-    #
-    # @param [String] path
-    #   Directory to remove.
-    #
-    # @return [Proc]
-    #
-    # pkg:gem/ferrum#lib/ferrum/browser/process.rb:81
-    def directory_remover(path); end
-
-    # Builds a finalizer proc that kills the process with the given pid.
-    #
-    # @param [Integer] pid
-    #   Process id to kill.
-    #
-    # @return [Proc]
-    #
-    # pkg:gem/ferrum#lib/ferrum/browser/process.rb:51
-    def process_killer(pid); end
-
     # Builds and starts a new browser process.
     #
     # @param [Array] args
@@ -1319,16 +1286,226 @@ class Ferrum::Browser::Process
     #
     # @return [Process]
     #
-    # pkg:gem/ferrum#lib/ferrum/browser/process.rb:39
+    # pkg:gem/ferrum#lib/ferrum/browser/process.rb:41
     def start(*args); end
   end
 end
 
-# pkg:gem/ferrum#lib/ferrum/browser/process.rb:24
-Ferrum::Browser::Process::KILL_TIMEOUT = T.let(T.unsafe(nil), Integer)
+# pkg:gem/ferrum#lib/ferrum/browser/process.rb:27
+Ferrum::Browser::Process::HTTP_SCHEMES = T.let(T.unsafe(nil), Hash)
 
-# pkg:gem/ferrum#lib/ferrum/browser/process.rb:25
-Ferrum::Browser::Process::WAIT_KILLED = T.let(T.unsafe(nil), Float)
+# OS-level process termination and user-data-directory removal, kept
+# separate from the rest of {Process} (spawning, CDP handshake, ...).
+# Both the GC finalizer and the explicit {Process#stop} path need to
+# run the exact same kill/cleanup logic on plain pid/path values --
+# never on `self`. A finalizer proc that closes over the object it's
+# attached to creates a reference cycle GC can never collect, so the
+# finalizer would never run; keeping this logic as free functions
+# taking plain arguments sidesteps that entirely.
+#
+# pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:20
+module Ferrum::Browser::Process::Killer
+  private
+
+  # Builds the proc registered as a browser's `ObjectSpace` finalizer,
+  # cleaning up after a browser nobody quit.
+  #
+  # Kills every pid first and removes the directory afterwards. That
+  # order is the whole point of this being one finalizer instead of
+  # two: Ruby runs an object's finalizers in registration order, and
+  # removing the user data directory while the browser is still alive
+  # means Chrome recreates it on the way out, leaking it for good.
+  #
+  # @param [Array<Integer>, Integer, nil] pids
+  #   Process ids to kill, e.g. the browser and Xvfb.
+  # @param [String, nil] path
+  #   User data directory to remove once they are dead.
+  #
+  # @return [Proc]
+  #
+  # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:112
+  def finalizer(pids, path); end
+
+  # Kills the process at the given pid (and its process group, if
+  # any), escalating from TERM to KILL if it doesn't exit within
+  # {KILL_TIMEOUT} seconds.
+  #
+  # @param [Integer] pid
+  #
+  # @return [void]
+  #
+  # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:38
+  def kill(pid); end
+
+  # Checks whether any process in pid's process group is still alive.
+  #
+  # @param [Integer] pid
+  #
+  # @return [Boolean]
+  #
+  # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:146
+  def process_group_alive?(pid); end
+
+  # Removes the given directory, retrying with exponential backoff on
+  # transient errors. Chrome can briefly hold file locks right after
+  # being killed, so the directory may not be removable on the first
+  # try; retrying avoids leaking temp directories in that case.
+  #
+  # @param [String] path
+  #   Directory to remove.
+  # @param [Integer] retries
+  #   Maximum number of removal attempts.
+  # @param [Float] delay
+  #   Base delay, in seconds, before the first retry; doubles on each
+  #   subsequent attempt.
+  #
+  # @return [void]
+  #
+  # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:171
+  def remove_directory(path, retries: T.unsafe(nil), delay: T.unsafe(nil)); end
+
+  # Signals the whole process group Chrome was spawned into (it's
+  # spawned with `pgroup: true`), so its child processes (renderer,
+  # GPU, zygote, ...) are cleaned up too instead of being left
+  # orphaned. Falls back to signaling just the pid directly if
+  # there's no such process group to signal (e.g. Xvfb, which isn't
+  # spawned with `pgroup: true`) or the group can't be signaled.
+  #
+  # @param [Integer] pid
+  # @param [String] name
+  #
+  # @return [void]
+  #
+  # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:133
+  def send_signal(pid, name); end
+
+  # Waits for `pid` to become reapable, giving up after `timeout`.
+  #
+  # Deliberately a bounded poll rather than a blocking `Process.wait`.
+  # {#finalizer} installs {#kill} as an `ObjectSpace` finalizer, so
+  # it can run while the interpreter is shutting down, and a blocking
+  # wait there never returns.
+  #
+  # @param [Integer] pid
+  # @param [Float] timeout
+  #
+  # @return [Integer, nil]
+  #   The reaped pid, or `nil` if it didn't exit in time or wasn't ours.
+  #
+  # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:82
+  def wait_reaped(pid, timeout: T.unsafe(nil)); end
+
+  class << self
+    # Builds the proc registered as a browser's `ObjectSpace` finalizer,
+    # cleaning up after a browser nobody quit.
+    #
+    # Kills every pid first and removes the directory afterwards. That
+    # order is the whole point of this being one finalizer instead of
+    # two: Ruby runs an object's finalizers in registration order, and
+    # removing the user data directory while the browser is still alive
+    # means Chrome recreates it on the way out, leaking it for good.
+    #
+    # @param [Array<Integer>, Integer, nil] pids
+    #   Process ids to kill, e.g. the browser and Xvfb.
+    # @param [String, nil] path
+    #   User data directory to remove once they are dead.
+    #
+    # @return [Proc]
+    #
+    # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:112
+    def finalizer(pids, path); end
+
+    # Kills the process at the given pid (and its process group, if
+    # any), escalating from TERM to KILL if it doesn't exit within
+    # {KILL_TIMEOUT} seconds.
+    #
+    # @param [Integer] pid
+    #
+    # @return [void]
+    #
+    # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:38
+    def kill(pid); end
+
+    # Checks whether any process in pid's process group is still alive.
+    #
+    # @param [Integer] pid
+    #
+    # @return [Boolean]
+    #
+    # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:146
+    def process_group_alive?(pid); end
+
+    # Removes the given directory, retrying with exponential backoff on
+    # transient errors. Chrome can briefly hold file locks right after
+    # being killed, so the directory may not be removable on the first
+    # try; retrying avoids leaking temp directories in that case.
+    #
+    # @param [String] path
+    #   Directory to remove.
+    # @param [Integer] retries
+    #   Maximum number of removal attempts.
+    # @param [Float] delay
+    #   Base delay, in seconds, before the first retry; doubles on each
+    #   subsequent attempt.
+    #
+    # @return [void]
+    #
+    # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:171
+    def remove_directory(path, retries: T.unsafe(nil), delay: T.unsafe(nil)); end
+
+    # Signals the whole process group Chrome was spawned into (it's
+    # spawned with `pgroup: true`), so its child processes (renderer,
+    # GPU, zygote, ...) are cleaned up too instead of being left
+    # orphaned. Falls back to signaling just the pid directly if
+    # there's no such process group to signal (e.g. Xvfb, which isn't
+    # spawned with `pgroup: true`) or the group can't be signaled.
+    #
+    # @param [Integer] pid
+    # @param [String] name
+    #
+    # @return [void]
+    #
+    # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:133
+    def send_signal(pid, name); end
+
+    # Waits for `pid` to become reapable, giving up after `timeout`.
+    #
+    # Deliberately a bounded poll rather than a blocking `Process.wait`.
+    # {#finalizer} installs {#kill} as an `ObjectSpace` finalizer, so
+    # it can run while the interpreter is shutting down, and a blocking
+    # wait there never returns.
+    #
+    # @param [Integer] pid
+    # @param [Float] timeout
+    #
+    # @return [Integer, nil]
+    #   The reaped pid, or `nil` if it didn't exit in time or wasn't ours.
+    #
+    # pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:82
+    def wait_reaped(pid, timeout: T.unsafe(nil)); end
+  end
+end
+
+# pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:23
+Ferrum::Browser::Process::Killer::KILL_TIMEOUT = T.let(T.unsafe(nil), Integer)
+
+# pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:25
+Ferrum::Browser::Process::Killer::REAP_TIMEOUT = T.let(T.unsafe(nil), Float)
+
+# pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:26
+Ferrum::Browser::Process::Killer::REMOVE_DIR_RETRIES = T.let(T.unsafe(nil), Integer)
+
+# pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:27
+Ferrum::Browser::Process::Killer::REMOVE_DIR_RETRY_DELAY = T.let(T.unsafe(nil), Float)
+
+# pkg:gem/ferrum#lib/ferrum/browser/process/killer.rb:24
+Ferrum::Browser::Process::Killer::WAIT_KILLED = T.let(T.unsafe(nil), Float)
+
+# pkg:gem/ferrum#lib/ferrum/browser/process.rb:29
+Ferrum::Browser::Process::LOCAL_HOSTS = T.let(T.unsafe(nil), Array)
+
+# pkg:gem/ferrum#lib/ferrum/browser/process.rb:28
+Ferrum::Browser::Process::WS_SCHEMES = T.let(T.unsafe(nil), Hash)
 
 # The browser's version information returned by [Browser.getVersion].
 #
@@ -1436,26 +1613,26 @@ Ferrum::Browser::Xvfb::NOT_FOUND = T.let(T.unsafe(nil), String)
 # Raised when the browser returns an error response over CDP. Wraps the
 # raw response so callers can inspect its code and data.
 #
-# pkg:gem/ferrum#lib/ferrum/errors.rb:128
+# pkg:gem/ferrum#lib/ferrum/errors.rb:172
 class Ferrum::BrowserError < ::Ferrum::Error
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:131
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:175
   def initialize(response); end
 
   # Error code from the raw CDP error response.
   #
   # @return [Integer, nil]
   #
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:141
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:185
   def code; end
 
   # Additional data from the raw CDP error response.
   #
   # @return [Object, nil]
   #
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:150
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:194
   def data; end
 
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:129
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:173
   def response; end
 end
 
@@ -1481,7 +1658,7 @@ class Ferrum::Client
   #
   # @return [Hash]
   #
-  # pkg:gem/ferrum#lib/ferrum/client.rb:325
+  # pkg:gem/ferrum#lib/ferrum/client.rb:334
   def build_message(method, params); end
 
   # Closes the underlying websocket, drops pending commands and stops
@@ -1489,7 +1666,7 @@ class Ferrum::Client
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/client.rb:294
+  # pkg:gem/ferrum#lib/ferrum/client.rb:302
   def close; end
 
   # Sends a CDP command to the browser-wide session.
@@ -1517,7 +1694,7 @@ class Ferrum::Client
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/client.rb:307
+  # pkg:gem/ferrum#lib/ferrum/client.rb:316
   def inspect; end
 
   # Unsubscribes from a CDP event.
@@ -1530,7 +1707,7 @@ class Ferrum::Client
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/client.rb:261
+  # pkg:gem/ferrum#lib/ferrum/client.rb:269
   def off(event, id); end
 
   # Subscribes to a CDP event.
@@ -1541,7 +1718,7 @@ class Ferrum::Client
   # @return [Integer]
   #   The subscription id, used to unsubscribe via {#off}.
   #
-  # pkg:gem/ferrum#lib/ferrum/client.rb:246
+  # pkg:gem/ferrum#lib/ferrum/client.rb:254
   def on(event, &); end
 
   # pkg:gem/ferrum#lib/ferrum/client.rb:155
@@ -1570,13 +1747,14 @@ class Ferrum::Client
   #   Whether to return immediately instead of waiting for a response.
   #
   # @param [Numeric, nil] timeout
-  #   How long to wait for the response. Defaults to `protocol_timeout`.
+  #   How long to wait for the response, counting the time the message waits
+  #   to be sent. Defaults to `protocol_timeout`.
   #
   # @return [Boolean, Hash]
   #   `true` when sent asynchronously, otherwise the parsed `"result"`
   #   from the response.
   #
-  # pkg:gem/ferrum#lib/ferrum/client.rb:217
+  # pkg:gem/ferrum#lib/ferrum/client.rb:218
   def send_message(message, async:, timeout: T.unsafe(nil)); end
 
   # Builds a client scoped to a given CDP session, e.g. a browsing
@@ -1587,7 +1765,7 @@ class Ferrum::Client
   #
   # @return [SessionClient]
   #
-  # pkg:gem/ferrum#lib/ferrum/client.rb:284
+  # pkg:gem/ferrum#lib/ferrum/client.rb:292
   def session(session_id); end
 
   # Whether there's at least one callback registered for the event.
@@ -1597,7 +1775,7 @@ class Ferrum::Client
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/client.rb:271
+  # pkg:gem/ferrum#lib/ferrum/client.rb:279
   def subscribed?(event); end
 
   # pkg:gem/ferrum#lib/ferrum/client.rb:155
@@ -1608,16 +1786,25 @@ class Ferrum::Client
 
   private
 
+  # pkg:gem/ferrum#lib/ferrum/client.rb:368
+  def dead_browser_error; end
+
   # Locked so two concurrent commands never share an id and read each
   # other's responses from @pendings.
   #
-  # pkg:gem/ferrum#lib/ferrum/client.rb:348
+  # pkg:gem/ferrum#lib/ferrum/client.rb:374
   def next_command_id; end
 
-  # pkg:gem/ferrum#lib/ferrum/client.rb:352
+  # pkg:gem/ferrum#lib/ferrum/client.rb:378
   def raise_browser_error(error); end
 
-  # pkg:gem/ferrum#lib/ferrum/client.rb:331
+  # Nothing is going to answer the commands still in flight once the socket
+  # is gone, release them instead of making each wait out its timeout.
+  #
+  # pkg:gem/ferrum#lib/ferrum/client.rb:364
+  def release_pendings; end
+
+  # pkg:gem/ferrum#lib/ferrum/client.rb:340
   def start; end
 end
 
@@ -1712,27 +1899,57 @@ Ferrum::Client::Subscriber::INTERRUPTIONS = T.let(T.unsafe(nil), Array)
 # framing, and exposes a queue of parsed incoming messages alongside
 # methods to send commands and close the connection.
 #
-# pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:15
+# The socket is only ever touched by two threads: the reader reads it and
+# the writer writes it, both blocking. Callers and the driver only encode
+# frames and queue them for the writer, so no lock is held while waiting
+# on the socket and a browser that stops reading blocks nobody but the
+# writer. A frame chunk the browser doesn't take within the write timeout
+# closes the connection. JRuby can't mix a blocking read with
+# `write_nonblock` or `IO.select` from another thread on the same socket,
+# so neither is used.
+#
+# pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:24
 class Ferrum::Client::WebSocket
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:22
-  def initialize(url, max_receive_size, logger); end
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:37
+  def initialize(url, max_receive_size, logger, write_timeout = T.unsafe(nil)); end
 
   # Closes the websocket connection by sending a close frame.
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:140
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:165
   def close; end
 
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:20
-  def messages; end
+  # @return [String, nil]
+  #   Why Ferrum closed the connection itself, `nil` if it didn't.
+  #
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:35
+  def close_reason; end
 
-  # Handles the driver's `:close` event: closes the message queue and
-  # underlying socket, then kills the reader thread.
+  # Stops the writer and closes the underlying socket whether or not the
+  # close handshake ever completed.
+  #
+  # {#close} only queues a close frame; the socket itself is closed by the
+  # writer once {#on_close} runs, when the browser answers with a close
+  # frame of its own. A browser that is already dead never answers, so without this
+  # the socket stays open until GC finalizes it -- long enough to exhaust
+  # the process's file descriptors when browsers are restarted in a loop.
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:96
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:181
+  def force_close; end
+
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:31
+  def messages; end
+
+  # Handles the driver's `:close` event: closes the message queue, lets the
+  # writer send what's queued and close the socket, then kills the reader
+  # thread.
+  #
+  # @return [void]
+  #
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:116
   def on_close(_event); end
 
   # Handles the driver's `:message` event: parses the incoming frame
@@ -1741,62 +1958,88 @@ class Ferrum::Client::WebSocket
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:73
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:92
   def on_message(event); end
 
   # Handles the driver's `:open` event.
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:61
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:80
   def on_open(_event); end
 
-  # Serializes a CDP command to JSON and sends it as a websocket text
-  # frame.
+  # Serializes a CDP command to JSON and queues it as a websocket text
+  # frame. Returns without waiting for the frame to be written.
   #
   # @param [Hash] data
   #   The message to send, must include an `:id` key.
   #
+  # @param [Numeric, nil] timeout
+  #   How long the frame may wait in the queue. A frame still queued after
+  #   that is dropped, nobody waits for its response anymore. `nil` keeps it
+  #   until it's written.
+  #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:111
-  def send_message(data); end
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:137
+  def send_message(data, timeout = T.unsafe(nil)); end
 
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:20
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:31
   def url; end
 
-  # Writes raw bytes to the underlying socket. Called by
-  # `websocket-driver` to emit frames. Closes {#messages} instead of
-  # raising if the connection has already been torn down.
+  # Collects the raw bytes of a frame. Called by `websocket-driver` to
+  # emit frames, one call per frame, always from within the driver call
+  # that queues them for the writer thread.
   #
   # @param [String] data
-  #   The raw bytes to write.
+  #   The raw bytes of one frame.
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:129
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:156
   def write(data); end
 
   private
 
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:167
-  def safely_parse_escaped_json(data); end
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:230
+  def abandon_stalled_write; end
 
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:159
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:190
+  def drive(deadline = T.unsafe(nil)); end
+
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:197
+  def queue_encoded(deadline = T.unsafe(nil)); end
+
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:253
   def safely_parse_json(data); end
 
-  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:146
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:261
+  def safely_parse_lone_surrogates(data); end
+
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:236
   def start; end
+
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:205
+  def start_writer; end
+
+  # pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:221
+  def write_frame(data); end
 end
 
-# pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:17
+# pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:26
 Ferrum::Client::WebSocket::DEFAULT_PORTS = T.let(T.unsafe(nil), Hash)
 
-# pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:18
+# pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:29
+Ferrum::Client::WebSocket::ESCAPE_OR_LONE_SURROGATE = T.let(T.unsafe(nil), Regexp)
+
+# pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:27
 Ferrum::Client::WebSocket::SKIP_LOGGING_SCREENSHOTS = T.let(T.unsafe(nil), TrueClass)
 
-# pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:16
+# pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:25
 Ferrum::Client::WebSocket::WEBSOCKET_BUG_SLEEP = T.let(T.unsafe(nil), Float)
+
+# pkg:gem/ferrum#lib/ferrum/client/web_socket.rb:28
+Ferrum::Client::WebSocket::WRITE_CHUNK_SIZE = T.let(T.unsafe(nil), Integer)
 
 # Represents a browser context, i.e. an isolated browsing profile (similar
 # to an incognito window) with its own cookies, cache and storage. Keeps
@@ -1807,7 +2050,7 @@ Ferrum::Client::WebSocket::WEBSOCKET_BUG_SLEEP = T.let(T.unsafe(nil), Float)
 # pkg:gem/ferrum#lib/ferrum/context.rb:13
 class Ferrum::Context
   # pkg:gem/ferrum#lib/ferrum/context.rb:18
-  def initialize(client, contexts, id); end
+  def initialize(client, contexts, id, implicit: T.unsafe(nil)); end
 
   # Registers a target discovered via a CDP `Target.*` event, or updates
   # the session id on one already known. Called by {Contexts} as targets
@@ -1820,7 +2063,7 @@ class Ferrum::Context
   #
   # @return [Target]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:116
+  # pkg:gem/ferrum#lib/ferrum/context.rb:128
   def add_target(params:, session_id: T.unsafe(nil)); end
 
   # Manually attaches to a target, e.g. a service worker discovered via
@@ -1830,7 +2073,7 @@ class Ferrum::Context
   # Note: attaching to a service worker's session prevents Chrome from
   # ever terminating it while the connection is open.
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:156
+  # pkg:gem/ferrum#lib/ferrum/context.rb:168
   def attach_target(target_id); end
 
   # Closes the WebSocket connection of every connected target, without
@@ -1838,7 +2081,7 @@ class Ferrum::Context
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:179
+  # pkg:gem/ferrum#lib/ferrum/context.rb:191
   def close_targets_connection; end
 
   # Creates a new target in this context and eagerly connects to it as a
@@ -1848,7 +2091,7 @@ class Ferrum::Context
   #
   # @return [Page]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:83
+  # pkg:gem/ferrum#lib/ferrum/context.rb:94
   def create_page(**options); end
 
   # Creates a new target in this context via `Target.createTarget` and
@@ -1858,7 +2101,7 @@ class Ferrum::Context
   #
   # @raise [NoSuchTargetError]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:94
+  # pkg:gem/ferrum#lib/ferrum/context.rb:105
   def create_target; end
 
   # The context's first known target, creating one via
@@ -1866,7 +2109,7 @@ class Ferrum::Context
   #
   # @return [Target]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:30
+  # pkg:gem/ferrum#lib/ferrum/context.rb:41
   def default_target; end
 
   # Removes a target, e.g. on `Target.targetDestroyed`/`targetCrashed`.
@@ -1875,45 +2118,56 @@ class Ferrum::Context
   #
   # @return [Target, nil]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:146
+  # pkg:gem/ferrum#lib/ferrum/context.rb:158
   def delete_target(target_id); end
 
-  # Disposes this browser context and all of its targets.
+  # Disposes this browser context and all of its targets. The browser's
+  # implicit context cannot be disposed, see {#implicit?}.
   #
-  # @return [Boolean]
+  # @return [Boolean, nil]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:190
+  # pkg:gem/ferrum#lib/ferrum/context.rb:203
   def dispose; end
 
   # Returns the first target for which the block returns truthy.
   #
   # @return [Target, nil]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:169
+  # pkg:gem/ferrum#lib/ferrum/context.rb:181
   def find_target; end
 
   # pkg:gem/ferrum#lib/ferrum/context.rb:16
   def id; end
 
+  # Whether this is the browser's implicit context, the one it puts its
+  # startup window in. We didn't create it, so we can't dispose it, and
+  # Chrome doesn't let us address it by id either: targets are created in
+  # it by omitting `browserContextId` altogether.
+  #
+  # @return [Boolean]
+  #
+  # pkg:gem/ferrum#lib/ferrum/context.rb:33
+  def implicit?; end
+
   # Debug representation of the context, including its known targets.
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:206
+  # pkg:gem/ferrum#lib/ferrum/context.rb:219
   def inspect; end
 
   # Connects to and returns the {#default_target}'s page.
   #
   # @return [Page]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:37
+  # pkg:gem/ferrum#lib/ferrum/context.rb:48
   def page; end
 
   # All page targets in this context, connected to as {Page}s.
   #
   # @return [Array<Page>]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:44
+  # pkg:gem/ferrum#lib/ferrum/context.rb:55
   def pages; end
 
   # Service worker targets registered in this context. Unlike {#workers},
@@ -1923,7 +2177,7 @@ class Ferrum::Context
   #
   # @return [Array<Target>]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:61
+  # pkg:gem/ferrum#lib/ferrum/context.rb:72
   def service_workers; end
 
   # Whether a target with the given id is known in this context.
@@ -1932,7 +2186,7 @@ class Ferrum::Context
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:199
+  # pkg:gem/ferrum#lib/ferrum/context.rb:212
   def target?(target_id); end
 
   # pkg:gem/ferrum#lib/ferrum/context.rb:16
@@ -1946,7 +2200,7 @@ class Ferrum::Context
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:137
+  # pkg:gem/ferrum#lib/ferrum/context.rb:149
   def update_target(target_id, params); end
 
   # When we call `page` method on target it triggers ruby to connect to given
@@ -1954,14 +2208,14 @@ class Ferrum::Context
   # it makes more sense to get and connect to the needed one only which
   # usually is the last one.
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:69
+  # pkg:gem/ferrum#lib/ferrum/context.rb:80
   def windows(pos = T.unsafe(nil), size = T.unsafe(nil)); end
 
   # Dedicated and shared workers spawned by any page in this context.
   #
   # @return [Array<Worker>]
   #
-  # pkg:gem/ferrum#lib/ferrum/context.rb:51
+  # pkg:gem/ferrum#lib/ferrum/context.rb:62
   def workers; end
 end
 
@@ -1987,7 +2241,7 @@ class Ferrum::Contexts
   #
   # @return [Context, nil]
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:58
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:61
   def [](id); end
 
   # Closes the WebSocket connection of every target in every context,
@@ -1995,7 +2249,7 @@ class Ferrum::Contexts
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:106
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:120
   def close_connections; end
 
   # pkg:gem/ferrum#lib/ferrum/contexts.rb:19
@@ -2008,23 +2262,32 @@ class Ferrum::Contexts
   #
   # @return [Context]
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:79
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:82
   def create(**options); end
 
-  # The browser's first context, created lazily.
+  # The context we work in unless told otherwise: the browser's implicit
+  # context when it came up with a startup window (see {#find_implicit_context}),
+  # otherwise one of our own, created lazily.
   #
   # @return [Context]
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:39
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:42
   def default_context; end
 
-  # Disposes a browser context and all of its targets.
+  # Disposes a browser context and all of its targets. The browser's implicit
+  # context is not ours to dispose, see {Context#implicit?}.
+  #
+  # The context is forgotten even if Chrome fails to dispose it in time: its
+  # targets are disconnected by then, and asking again only gets
+  # `Disposal of browser context ... is already pending` back.
   #
   # @param [String] context_id
   #
-  # @return [Boolean]
+  # @return [Boolean, nil]
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:92
+  # @raise [TimeoutError, BrowserError]
+  #
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:102
   def dispose(context_id); end
 
   # Iterates over `[id, context]` pairs; returns an `Enumerator` if no
@@ -2032,7 +2295,7 @@ class Ferrum::Contexts
   #
   # @return [void, Enumerator]
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:47
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:50
   def each(&); end
 
   # The context that owns the given target, if any.
@@ -2041,76 +2304,108 @@ class Ferrum::Contexts
   #
   # @return [Context, nil]
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:67
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:70
   def find_by(target_id:); end
 
   # Marks a target, so the next time we see it attached, we leave its session alone instead of {#detach}ing it.
   # Used by {Context#attach_target} right before it manually attaches to a service worker on the caller's behalf.
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:32
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:33
   def manually_attached(target_id); end
 
-  # Disposes every context still known to the browser.
+  # Disposes every context still known to the browser. A context that fails
+  # to dispose doesn't stop the others from being disposed; the first error
+  # is raised once all of them have been tried.
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:113
+  # @raise [TimeoutError, BrowserError]
+  #
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:131
   def reset; end
 
   # Number of known contexts.
   #
   # @return [Integer]
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:122
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:146
   def size; end
 
   private
 
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:241
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:280
   def add_context(context_id); end
 
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:237
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:276
   def auto_attach; end
 
   # Workers have no events to notify us when they're ready, so we
   # connect right away. Worker#prepare enables the Network domain and
   # only then resumes the debugger itself.
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:218
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:257
   def connect_worker(target); end
 
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:228
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:267
   def detach(session_id); end
 
   # Attaching keeps a service worker alive forever, so unless the caller
   # explicitly asked to connect to it (via Context#attach_target), we
   # just resume it and let go.
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:207
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:246
   def detach_unless_manually_attached(target, session_id); end
 
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:233
+  # Auto-attach pauses every target it attaches to, including the types
+  # we don't track: Chrome's own `browser_ui` targets, for instance. We
+  # never resume those, so left alone they stay attached and paused for
+  # the lifetime of the browser. Resume them and drop the session.
+  #
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:237
+  def detach_untracked(session_id); end
+
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:272
   def discover; end
 
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:192
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:207
+  def find_frame_owner(context_id, frame_id); end
+
+  # The browser's implicit context, the context Chrome uses for its startup window.
+  # We register it so events for that window are routed to it.
+  # `Target.getBrowserContexts` reports every context created with
+  # `Target.createBrowserContext`, ours and those of anyone else driving the same
+  # browser, so the context holding targets that it doesn't report is the implicit
+  # one. Chrome also reports its id as `defaultBrowserContextId`, but only since
+  # 145 and only as an experimental field, so we don't rely on it.
+  #
+  # Returns nil if the browser has no startup window, which happens when it is
+  # launched with `--no-startup-window` (used for `incognito: true`). In that case,
+  # we create our own context instead.
+  #
+  # @return [Context, nil]
+  #
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:299
+  def find_implicit_context; end
+
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:221
   def handle_attach(target, session_id, params); end
 
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:184
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:213
   def rearm_auto_attach(session_id, type); end
 
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:224
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:263
   def resume(session_id); end
 
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:128
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:152
   def subscribe; end
 
   # Registered once on the top-level client, and again on every page's/
   # worker's own session once we re-arm auto-attach on it.
   #
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:135
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:159
   def subscribe_attached_target(client); end
 
-  # pkg:gem/ferrum#lib/ferrum/contexts.rb:149
+  # pkg:gem/ferrum#lib/ferrum/contexts.rb:173
   def subscribe_target_created; end
 end
 
@@ -2423,9 +2718,9 @@ end
 
 # Raised when the content quads (coordinates) for a node cannot be computed.
 #
-# pkg:gem/ferrum#lib/ferrum/errors.rb:111
+# pkg:gem/ferrum#lib/ferrum/errors.rb:155
 class Ferrum::CoordinatesNotFoundError < ::Ferrum::Error
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:112
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:156
   def initialize(message = T.unsafe(nil)); end
 end
 
@@ -2461,9 +2756,9 @@ end
 # Raised when trying to interact with a browser process that has died or
 # a window that has already been closed.
 #
-# pkg:gem/ferrum#lib/ferrum/errors.rb:82
+# pkg:gem/ferrum#lib/ferrum/errors.rb:126
 class Ferrum::DeadBrowserError < ::Ferrum::Error
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:83
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:127
   def initialize(message = T.unsafe(nil)); end
 end
 
@@ -2566,21 +2861,21 @@ class Ferrum::Downloads
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/downloads.rb:77
+  # pkg:gem/ferrum#lib/ferrum/downloads.rb:78
   def subscribe; end
 
   # Subscribes to the `Browser.downloadProgress` event to track download state.
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/downloads.rb:99
+  # pkg:gem/ferrum#lib/ferrum/downloads.rb:100
   def subscribe_download_progress; end
 
   # Subscribes to the `Browser.downloadWillBegin` event to track new downloads.
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/downloads.rb:87
+  # pkg:gem/ferrum#lib/ferrum/downloads.rb:88
   def subscribe_download_will_begin; end
 
   # Waits until the current download finishes.
@@ -2846,7 +3141,7 @@ module Ferrum::Frame::DOM
   # @example
   #   browser.add_script_tag(url: "http://example.com/stylesheet.css") # => true
   #
-  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:260
+  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:309
   def add_script_tag(url: T.unsafe(nil), path: T.unsafe(nil), content: T.unsafe(nil), type: T.unsafe(nil)); end
 
   # Adds a `<style>` tag to the document.
@@ -2860,7 +3155,7 @@ module Ferrum::Frame::DOM
   # @example
   #   browser.add_style_tag(content: "h1 { font-size: 40px; }") # => true
   #
-  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:286
+  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:335
   def add_style_tag(url: T.unsafe(nil), path: T.unsafe(nil), content: T.unsafe(nil)); end
 
   # Finds a node by using a CSS path selector.
@@ -2878,7 +3173,7 @@ module Ferrum::Frame::DOM
   #   browser.go_to("https://github.com/")
   #   browser.at_css("a[aria-label='Issues you created']") # => Node
   #
-  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:235
+  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:236
   def at_css(selector, within: T.unsafe(nil)); end
 
   # Finds a node by using a XPath selector.
@@ -2896,7 +3191,7 @@ module Ferrum::Frame::DOM
   #   browser.go_to("https://github.com/")
   #   browser.at_xpath("//a[@aria-label='Issues you created']") # => Node
   #
-  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:181
+  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:182
   def at_xpath(selector, within: T.unsafe(nil)); end
 
   # Returns current page's html.
@@ -2926,7 +3221,7 @@ module Ferrum::Frame::DOM
   #   browser.go_to("https://github.com/")
   #   browser.css("a[aria-label='Issues you created']") # => [Node]
   #
-  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:208
+  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:209
   def css(selector, within: T.unsafe(nil)); end
 
   # Returns current top window title.
@@ -2969,7 +3264,8 @@ module Ferrum::Frame::DOM
   # Returns the element in which the window is embedded.
   #
   # @return [Node, nil]
-  #   The element in which the window is embedded.
+  #   The element in which the window is embedded, `nil` for the main frame
+  #   and for a frame from a different origin than its parent.
   #
   # @example
   #   browser.go_to("https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe")
@@ -2977,8 +3273,41 @@ module Ferrum::Frame::DOM
   #   frame.frame_element # => [Node]
   #   frame.parent.parent.parent.frame_element # => nil
   #
-  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:127
+  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:128
   def frame_element; end
+
+  # Finds a node by using a CSS path or XPath selector, retrying until
+  # it appears or `timeout` elapses. Pass exactly one of `css`/`xpath`;
+  # each attempt delegates to {#at_css}/{#at_xpath} respectively, so it
+  # matches their behavior exactly.
+  #
+  # @param [String, nil] css
+  #   The CSS path selector. Mutually exclusive with `xpath`.
+  #
+  # @param [String, nil] xpath
+  #   The XPath selector. Mutually exclusive with `css`.
+  #
+  # @param [Node, nil] within
+  #   The parent node to search within.
+  #
+  # @param [Float, Integer] timeout
+  #   How long to keep retrying, in seconds.
+  #
+  # @param [Float, Integer] interval
+  #   How long to sleep between attempts, in seconds.
+  #
+  # @return [Node, nil]
+  #   The matching node, or `nil` if `timeout` elapses without a match.
+  #
+  # @raise [ArgumentError]
+  #   If neither or both of `css`/`xpath` are given.
+  #
+  # @example
+  #   browser.go_to("https://github.com/")
+  #   browser.wait_for_selector(css: "a[aria-label='Issues you created']") # => Node
+  #
+  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:278
+  def wait_for_selector(css: T.unsafe(nil), xpath: T.unsafe(nil), within: T.unsafe(nil), timeout: T.unsafe(nil), interval: T.unsafe(nil)); end
 
   # Finds nodes by using a XPath selector.
   #
@@ -2995,7 +3324,7 @@ module Ferrum::Frame::DOM
   #   browser.go_to("https://github.com/")
   #   browser.xpath("//a[@aria-label='Issues you created']") # => [Node]
   #
-  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:147
+  # pkg:gem/ferrum#lib/ferrum/frame/dom.rb:148
   def xpath(selector, within: T.unsafe(nil)); end
 end
 
@@ -3103,25 +3432,25 @@ module Ferrum::Frame::Runtime
   # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:148
   def call(expression:, arguments: T.unsafe(nil), on: T.unsafe(nil), wait: T.unsafe(nil), handle: T.unsafe(nil), **options); end
 
-  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:249
+  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:250
   def cyclic?(object_id); end
 
-  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:282
+  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:283
   def cyclic_object; end
 
   # FIXME: We should have a central place to handle all type of errors
   #
-  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:176
+  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:177
   def handle_error(response); end
 
-  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:188
-  def handle_response(response); end
+  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:189
+  def handle_response(response, check_cyclic: T.unsafe(nil)); end
 
-  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:223
+  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:224
   def prepare_args(args); end
 
-  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:236
-  def reduce_props(object_id, to); end
+  # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:237
+  def reduce_props(object_id, to, check_cyclic: T.unsafe(nil)); end
 end
 
 # pkg:gem/ferrum#lib/ferrum/frame/runtime.rb:31
@@ -3186,11 +3515,12 @@ class Ferrum::Headers
 end
 
 # Shared by {Page} and {Worker}: subscribes to the CDP events behind the
-# `:request` (Fetch-domain request interception) and `:auth` (proxy/basic
-# auth challenges) pseudo-events, on top of the includer's own `client`
-# and `network`. Anything else is passed straight through to `client`.
+# `:request` (Fetch-domain request interception), `:response` (a request's
+# response has fully loaded) and `:auth` (proxy/basic auth challenges)
+# pseudo-events, on top of the includer's own `client` and `network`.
+# Anything else is passed straight through to `client`.
 #
-# pkg:gem/ferrum#lib/ferrum/interceptable.rb:8
+# pkg:gem/ferrum#lib/ferrum/interceptable.rb:9
 module Ferrum::Interceptable
   # Unsubscribes a listener previously registered via {#on}.
   #
@@ -3201,17 +3531,30 @@ module Ferrum::Interceptable
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/interceptable.rb:42
+  # pkg:gem/ferrum#lib/ferrum/interceptable.rb:61
   def off(name, id); end
 
-  # Subscribes to a CDP event, or to `:request`/`:auth`.
+  # Subscribes to a CDP event, or to `:request`/`:response`/`:auth`.
   #
   # @param [Symbol, String] name
+  #
+  # @yieldparam [Network::InterceptedRequest, Network::Exchange, Network::AuthRequest, Hash] arg
+  #   For `:request`, the intercepted {Network::InterceptedRequest}. For
+  #   `:response`, the finished {Network::Exchange}. For `:auth`, the
+  #   {Network::AuthRequest} challenge. For any other (raw CDP) event name,
+  #   the event's params `Hash`.
+  #
+  # @yieldparam [Integer] index
+  #   This callback's position among all callbacks currently registered for
+  #   the event.
+  #
+  # @yieldparam [Integer] total
+  #   Total number of callbacks currently registered for the event.
   #
   # @return [Integer]
   #   The subscription id, used to unsubscribe via {#off}.
   #
-  # pkg:gem/ferrum#lib/ferrum/interceptable.rb:15
+  # pkg:gem/ferrum#lib/ferrum/interceptable.rb:29
   def on(name, &block); end
 
   # Whether there's at least one callback registered for the event.
@@ -3220,34 +3563,34 @@ module Ferrum::Interceptable
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/interceptable.rb:58
+  # pkg:gem/ferrum#lib/ferrum/interceptable.rb:79
   def subscribed?(event); end
 end
 
 # Raised when the `:format` option passed to a screenshot call is not one
 # of the supported formats.
 #
-# pkg:gem/ferrum#lib/ferrum/errors.rb:119
+# pkg:gem/ferrum#lib/ferrum/errors.rb:163
 class Ferrum::InvalidScreenshotFormatError < ::Ferrum::Error
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:120
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:164
   def initialize(format); end
 end
 
 # Raised when JavaScript evaluated in the page throws an exception. Carries
 # the JS exception's class name, message, and stack trace.
 #
-# pkg:gem/ferrum#lib/ferrum/errors.rb:168
+# pkg:gem/ferrum#lib/ferrum/errors.rb:212
 class Ferrum::JavaScriptError < ::Ferrum::BrowserError
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:171
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:215
   def initialize(response); end
 
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:169
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:213
   def class_name; end
 
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:169
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:213
   def message; end
 
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:169
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:213
   def stack_trace; end
 end
 
@@ -3451,13 +3794,16 @@ class Ferrum::Mouse
 
   private
 
-  # pkg:gem/ferrum#lib/ferrum/mouse.rb:173
+  # pkg:gem/ferrum#lib/ferrum/mouse.rb:175
   def mouse_event(type:, button: T.unsafe(nil), count: T.unsafe(nil), modifiers: T.unsafe(nil), wait: T.unsafe(nil)); end
 
-  # pkg:gem/ferrum#lib/ferrum/mouse.rb:188
+  # pkg:gem/ferrum#lib/ferrum/mouse.rb:190
+  def pressed_button; end
+
+  # pkg:gem/ferrum#lib/ferrum/mouse.rb:194
   def register_event_button(type, button); end
 
-  # pkg:gem/ferrum#lib/ferrum/mouse.rb:181
+  # pkg:gem/ferrum#lib/ferrum/mouse.rb:183
   def validate_button(button); end
 end
 
@@ -4710,9 +5056,9 @@ end
 # Raised when there's no JavaScript execution context available to run a
 # command against, e.g. because the frame isn't attached.
 #
-# pkg:gem/ferrum#lib/ferrum/errors.rb:160
+# pkg:gem/ferrum#lib/ferrum/errors.rb:204
 class Ferrum::NoExecutionContextError < ::Ferrum::BrowserError
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:161
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:205
   def initialize(response = T.unsafe(nil)); end
 end
 
@@ -4725,6 +5071,18 @@ class Ferrum::NoSuchPageError < ::Ferrum::Error; end
 #
 # pkg:gem/ferrum#lib/ferrum/errors.rb:9
 class Ferrum::NoSuchTargetError < ::Ferrum::Error; end
+
+# Raised when connecting to an already running browser, but its
+# `/json/version` endpoint doesn't answer with the websocket url.
+#
+# pkg:gem/ferrum#lib/ferrum/errors.rb:114
+class Ferrum::NoWebSocketUrlError < ::Ferrum::Error
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:117
+  def initialize(url); end
+
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:115
+  def url; end
+end
 
 # Represents a DOM node (an element or a text node) found on a {Page} or
 # within a {Frame}. Provides methods to inspect it (`text`, `property`,
@@ -5140,22 +5498,22 @@ Ferrum::Node::MOVING_WAIT_DELAY = T.let(T.unsafe(nil), Float)
 # Raised when a node keeps moving between attempts to interact with it,
 # e.g. while trying to click it.
 #
-# pkg:gem/ferrum#lib/ferrum/errors.rb:90
+# pkg:gem/ferrum#lib/ferrum/errors.rb:134
 class Ferrum::NodeMovingError < ::Ferrum::Error
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:91
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:135
   def initialize(node, prev, current); end
 
   # Explains that the node moved between attempts to interact with it.
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:103
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:147
   def message; end
 end
 
 # Raised when the browser reports that a DOM node no longer exists.
 #
-# pkg:gem/ferrum#lib/ferrum/errors.rb:156
+# pkg:gem/ferrum#lib/ferrum/errors.rb:200
 class Ferrum::NodeNotFoundError < ::Ferrum::BrowserError; end
 
 # Raised when a requested feature isn't implemented for the current setup.
@@ -5197,7 +5555,7 @@ class Ferrum::Page
   # @example
   #   page.activate # => true
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:409
+  # pkg:gem/ferrum#lib/ferrum/page.rb:415
   def activate; end
 
   # pkg:gem/ferrum#lib/ferrum/page.rb:34
@@ -5219,7 +5577,7 @@ class Ferrum::Page
   #   page.at_xpath("//a").click
   #   page.back
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:349
+  # pkg:gem/ferrum#lib/ferrum/page.rb:355
   def back; end
 
   # pkg:gem/ferrum#lib/ferrum/page.rb:38
@@ -5241,7 +5599,7 @@ class Ferrum::Page
   #   page.add_script_tag(content: "window.__injected = 42")
   #   page.evaluate("window.__injected") # => 42
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:395
+  # pkg:gem/ferrum#lib/ferrum/page.rb:401
   def bypass_csp(enabled: T.unsafe(nil)); end
 
   # Client connection.
@@ -5292,7 +5650,7 @@ class Ferrum::Page
   # @example
   #   page.command("Page.navigate", url: "https://github.com/")
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:439
+  # pkg:gem/ferrum#lib/ferrum/page.rb:445
   def command(method, wait: T.unsafe(nil), slowmoable: T.unsafe(nil), timeout: T.unsafe(nil), **params); end
 
   # pkg:gem/ferrum#lib/ferrum/page.rb:34
@@ -5324,7 +5682,7 @@ class Ferrum::Page
   #
   # This doesn't prevent users evaluate JavaScript with Ferrum.
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:229
+  # pkg:gem/ferrum#lib/ferrum/page.rb:235
   def disable_javascript; end
 
   # pkg:gem/ferrum#lib/ferrum/page.rb:34
@@ -5338,7 +5696,7 @@ class Ferrum::Page
   # @return [Integer, Boolean]
   #   The root node id, or `true` when sent asynchronously.
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:510
+  # pkg:gem/ferrum#lib/ferrum/page.rb:516
   def document_node_id(async: T.unsafe(nil)); end
 
   # Downloads object.
@@ -5380,7 +5738,7 @@ class Ferrum::Page
   #   page.back
   #   page.forward
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:362
+  # pkg:gem/ferrum#lib/ferrum/page.rb:368
   def forward; end
 
   # pkg:gem/ferrum#lib/ferrum/page.rb:141
@@ -5438,18 +5796,18 @@ class Ferrum::Page
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:481
+  # pkg:gem/ferrum#lib/ferrum/page.rb:487
   def off(name, id); end
 
-  # Subscribes to a CDP event, or to `:dialog`, `:request`, `:auth` (the
-  # latter two handled by {Interceptable}).
+  # Subscribes to a CDP event, or to `:dialog`, `:request`, `:response`,
+  # `:auth` (the latter three handled by {Interceptable}).
   #
   # @param [Symbol, String] name
   #
   # @return [Integer]
   #   The subscription id, used to unsubscribe via {#off}.
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:464
+  # pkg:gem/ferrum#lib/ferrum/page.rb:470
   def on(name, &block); end
 
   # The current position of the window.
@@ -5460,7 +5818,7 @@ class Ferrum::Page
   # @example
   #   page.position # => [10, 20]
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:242
+  # pkg:gem/ferrum#lib/ferrum/page.rb:248
   def position; end
 
   # Sets the position of the window.
@@ -5476,7 +5834,7 @@ class Ferrum::Page
   # @example
   #   page.position = { left: 10, top: 20 }
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:260
+  # pkg:gem/ferrum#lib/ferrum/page.rb:266
   def position=(options); end
 
   # pkg:gem/ferrum#lib/ferrum/page.rb:47
@@ -5491,10 +5849,10 @@ class Ferrum::Page
   #   page.go_to("https://github.com/")
   #   page.refresh
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:325
+  # pkg:gem/ferrum#lib/ferrum/page.rb:331
   def refresh; end
 
-  # pkg:gem/ferrum#lib/ferrum/page.rb:328
+  # pkg:gem/ferrum#lib/ferrum/page.rb:334
   def reload; end
 
   # Resizes the window and emulates the viewport accordingly, optionally
@@ -5516,7 +5874,7 @@ class Ferrum::Page
   # @example
   #   page.resize(fullscreen: true)
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:212
+  # pkg:gem/ferrum#lib/ferrum/page.rb:218
   def resize(width: T.unsafe(nil), height: T.unsafe(nil), fullscreen: T.unsafe(nil)); end
 
   # Overrides device screen dimensions and emulates viewport according to parameters
@@ -5529,10 +5887,10 @@ class Ferrum::Page
   #
   # @param [Float] scale_factor device scale factor value. 0 disables the override
   #
-  # @param [Boolean] mobile whether to emulate mobile device
+  # @param [Boolean] mobile whether to emulate mobile device and enable touch
   #
   # pkg:gem/ferrum#lib/ferrum/page.rb:181
-  def set_viewport(width:, height:, scale_factor: T.unsafe(nil), mobile: T.unsafe(nil)); end
+  def set_viewport(width: T.unsafe(nil), height: T.unsafe(nil), scale_factor: T.unsafe(nil), mobile: T.unsafe(nil)); end
 
   # Stop all navigations and loading pending resources on the page.
   #
@@ -5540,7 +5898,7 @@ class Ferrum::Page
   #   page.go_to("https://github.com/")
   #   page.stop
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:337
+  # pkg:gem/ferrum#lib/ferrum/page.rb:343
   def stop; end
 
   # pkg:gem/ferrum#lib/ferrum/page.rb:48
@@ -5565,14 +5923,14 @@ class Ferrum::Page
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:497
+  # pkg:gem/ferrum#lib/ferrum/page.rb:503
   def use_authorized_proxy?; end
 
   # Whether the page is configured to use a proxy.
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:490
+  # pkg:gem/ferrum#lib/ferrum/page.rb:496
   def use_proxy?; end
 
   # Blocks until the page reloads or the timeout is reached.
@@ -5583,8 +5941,11 @@ class Ferrum::Page
   # @example
   #   page.wait_for_reload
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:375
+  # pkg:gem/ferrum#lib/ferrum/page.rb:381
   def wait_for_reload(timeout = T.unsafe(nil)); end
+
+  # pkg:gem/ferrum#lib/ferrum/page.rb:34
+  def wait_for_selector(*, **, &); end
 
   # Current window bounds.
   #
@@ -5593,7 +5954,7 @@ class Ferrum::Page
   # @example
   #   page.window_bounds # => { "left": 0, "top": 1286, "width": 10, "height": 10, "windowState": "normal" }
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:302
+  # pkg:gem/ferrum#lib/ferrum/page.rb:308
   def window_bounds; end
 
   # Sets the position of the window.
@@ -5618,7 +5979,7 @@ class Ferrum::Page
   # @example
   #   page.window_bounds = { left: 10, top: 20, width: 1024, height: 768, window_state: "normal" }
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:286
+  # pkg:gem/ferrum#lib/ferrum/page.rb:292
   def window_bounds=(bounds); end
 
   # Current window id.
@@ -5628,7 +5989,7 @@ class Ferrum::Page
   # @example
   #   page.window_id # => 1
   #
-  # pkg:gem/ferrum#lib/ferrum/page.rb:314
+  # pkg:gem/ferrum#lib/ferrum/page.rb:320
   def window_id; end
 
   # pkg:gem/ferrum#lib/ferrum/page.rb:34
@@ -5636,25 +5997,25 @@ class Ferrum::Page
 
   private
 
-  # pkg:gem/ferrum#lib/ferrum/page.rb:619
+  # pkg:gem/ferrum#lib/ferrum/page.rb:625
   def combine_url!(url_or_path); end
 
-  # pkg:gem/ferrum#lib/ferrum/page.rb:605
+  # pkg:gem/ferrum#lib/ferrum/page.rb:611
   def history_navigate(delta:); end
 
-  # pkg:gem/ferrum#lib/ferrum/page.rb:592
+  # pkg:gem/ferrum#lib/ferrum/page.rb:598
   def inject_extensions; end
 
-  # pkg:gem/ferrum#lib/ferrum/page.rb:582
+  # pkg:gem/ferrum#lib/ferrum/page.rb:588
   def log_console_api(params); end
 
-  # pkg:gem/ferrum#lib/ferrum/page.rb:545
+  # pkg:gem/ferrum#lib/ferrum/page.rb:551
   def prepare_page; end
 
-  # pkg:gem/ferrum#lib/ferrum/page.rb:630
+  # pkg:gem/ferrum#lib/ferrum/page.rb:636
   def proxy=(options); end
 
-  # pkg:gem/ferrum#lib/ferrum/page.rb:518
+  # pkg:gem/ferrum#lib/ferrum/page.rb:524
   def subscribe; end
 end
 
@@ -6107,8 +6468,20 @@ Ferrum::Page::Screenshot::SUPPORTED_SCREENSHOT_FORMAT = T.let(T.unsafe(nil), Arr
 #
 # pkg:gem/ferrum#lib/ferrum/page/stream.rb:10
 module Ferrum::Page::Stream
+  # Releases a CDP `IO` stream handle, discarding any backing storage
+  # the browser is holding for it.
+  #
+  # @param [String] handle
+  #   The CDP `IO` stream handle to close.
+  #
+  # @return [void]
+  #
+  # pkg:gem/ferrum#lib/ferrum/page/stream.rb:104
+  def close_stream(handle:); end
+
   # Reads a CDP `IO` stream in chunks, writing each chunk to the given
-  # output until the stream is exhausted.
+  # output until the stream is exhausted, then releases the stream
+  # handle on the browser side.
   #
   # @param [#<<] output
   #   Anything that responds to `#<<`, e.g. an open `File` or a `String`.
@@ -6118,7 +6491,7 @@ module Ferrum::Page::Stream
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/page/stream.rb:83
+  # pkg:gem/ferrum#lib/ferrum/page/stream.rb:84
   def stream(output:, handle:); end
 
   # Reads a CDP `IO` stream to a file on disk, or into memory when no
@@ -6250,12 +6623,12 @@ end
 # Raised when the browser process doesn't produce a websocket URL within
 # the configured `:process_timeout`.
 #
-# pkg:gem/ferrum#lib/ferrum/errors.rb:71
+# pkg:gem/ferrum#lib/ferrum/errors.rb:103
 class Ferrum::ProcessTimeoutError < ::Ferrum::Error
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:74
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:106
   def initialize(timeout, output); end
 
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:72
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:104
   def output; end
 end
 
@@ -6313,13 +6686,13 @@ end
 
 # Raised when an evaluated script takes too long to return a value.
 #
-# pkg:gem/ferrum#lib/ferrum/errors.rb:58
+# pkg:gem/ferrum#lib/ferrum/errors.rb:90
 class Ferrum::ScriptTimeoutError < ::Ferrum::Error
   # Explains that the evaluated script timed out.
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:64
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:96
   def message; end
 end
 
@@ -6468,7 +6841,7 @@ end
 # pkg:gem/ferrum#lib/ferrum/target.rb:10
 class Ferrum::Target
   # pkg:gem/ferrum#lib/ferrum/target.rb:20
-  def initialize(browser_client, session_id = T.unsafe(nil), params = T.unsafe(nil)); end
+  def initialize(browser_client, session_id = T.unsafe(nil), params = T.unsafe(nil), implicit: T.unsafe(nil)); end
 
   # Builds a {Page} for this target. Called lazily by `page`, or eagerly
   # by {Context#create_page}.
@@ -6477,14 +6850,14 @@ class Ferrum::Target
   #
   # @return [Page]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:75
+  # pkg:gem/ferrum#lib/ferrum/target.rb:76
   def build_page(**options); end
 
   # Builds a {Worker} for this target. Called lazily by {#worker}.
   #
   # @return [Worker]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:83
+  # pkg:gem/ferrum#lib/ferrum/target.rb:84
   def build_worker; end
 
   # The client connected to this target's own session (or a dedicated
@@ -6492,7 +6865,7 @@ class Ferrum::Target
   #
   # @return [Client, SessionClient]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:65
+  # pkg:gem/ferrum#lib/ferrum/target.rb:66
   def client; end
 
   # Closes the WebSocket connection, without closing the target itself
@@ -6500,7 +6873,7 @@ class Ferrum::Target
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:91
+  # pkg:gem/ferrum#lib/ferrum/target.rb:92
   def close_connection; end
 
   # Sends a CDP command through {#client}.
@@ -6508,7 +6881,7 @@ class Ferrum::Target
   # @return [Boolean, Hash]
   #   `true` when sent asynchronously, otherwise the command's result.
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:203
+  # pkg:gem/ferrum#lib/ferrum/target.rb:207
   def command(*, **, &); end
 
   # Whether this target has already been connected to as a {Page} or
@@ -6516,28 +6889,31 @@ class Ferrum::Target
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:43
+  # pkg:gem/ferrum#lib/ferrum/target.rb:44
   def connected?; end
 
-  # The id of the browser context this target belongs to.
+  # The id of the browser context this target belongs to, `nil` for the
+  # browser's implicit context, which Chrome doesn't let us address by id,
+  # see {Context#implicit?}. Commands scoped to a browser context target it
+  # by omitting `browserContextId`.
   #
   # @return [String, nil]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:143
+  # pkg:gem/ferrum#lib/ferrum/target.rb:147
   def context_id; end
 
   # The target's id.
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:99
+  # pkg:gem/ferrum#lib/ferrum/target.rb:100
   def id; end
 
   # Whether this target is an iframe.
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:158
+  # pkg:gem/ferrum#lib/ferrum/target.rb:162
   def iframe?; end
 
   # Chrome fires no events for a newly opened window, so we sleep a bit
@@ -6545,7 +6921,7 @@ class Ferrum::Target
   #
   # @return [void]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:194
+  # pkg:gem/ferrum#lib/ferrum/target.rb:198
   def maybe_sleep_if_new_window; end
 
   # The id of the target that opened this one, set only for
@@ -6553,7 +6929,7 @@ class Ferrum::Target
   #
   # @return [String, nil]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:129
+  # pkg:gem/ferrum#lib/ferrum/target.rb:130
   def opener_id; end
 
   # pkg:gem/ferrum#lib/ferrum/target.rb:17
@@ -6565,7 +6941,7 @@ class Ferrum::Target
   #
   # @return [Page]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:50
+  # pkg:gem/ferrum#lib/ferrum/target.rb:51
   def page; end
 
   # You can create page yourself and assign it to target, used in cuprite
@@ -6581,21 +6957,21 @@ class Ferrum::Target
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:165
+  # pkg:gem/ferrum#lib/ferrum/target.rb:169
   def page?; end
 
   # The id of the target that spawned this one, set for iframes and
   # workers. Unlike `opener_id`, which is only set for windows/tabs opened
   # via `window.open`/links/etc.
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:136
+  # pkg:gem/ferrum#lib/ferrum/target.rb:137
   def parent_id; end
 
   # Whether this target is a service worker.
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:186
+  # pkg:gem/ferrum#lib/ferrum/target.rb:190
   def service_worker?; end
 
   # pkg:gem/ferrum#lib/ferrum/target.rb:18
@@ -6608,14 +6984,14 @@ class Ferrum::Target
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:179
+  # pkg:gem/ferrum#lib/ferrum/target.rb:183
   def shared_worker?; end
 
   # The target's title.
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:114
+  # pkg:gem/ferrum#lib/ferrum/target.rb:115
   def title; end
 
   # The target's type, e.g. `"page"`, `"iframe"`, `"worker"`,
@@ -6623,7 +6999,7 @@ class Ferrum::Target
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:107
+  # pkg:gem/ferrum#lib/ferrum/target.rb:108
   def type; end
 
   # Merges freshly received CDP target info into this target's params,
@@ -6633,14 +7009,14 @@ class Ferrum::Target
   #
   # @return [Hash]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:35
+  # pkg:gem/ferrum#lib/ferrum/target.rb:36
   def update(params); end
 
   # The target's URL.
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:121
+  # pkg:gem/ferrum#lib/ferrum/target.rb:122
   def url; end
 
   # Whether this target is a window/tab, i.e. was opened via
@@ -6648,29 +7024,29 @@ class Ferrum::Target
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:151
+  # pkg:gem/ferrum#lib/ferrum/target.rb:155
   def window?; end
 
   # Connects to and returns this target's {Worker}.
   #
   # @return [Worker]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:57
+  # pkg:gem/ferrum#lib/ferrum/target.rb:58
   def worker; end
 
   # Whether this target is a dedicated worker.
   #
   # @return [Boolean]
   #
-  # pkg:gem/ferrum#lib/ferrum/target.rb:172
+  # pkg:gem/ferrum#lib/ferrum/target.rb:176
   def worker?; end
 
   private
 
-  # pkg:gem/ferrum#lib/ferrum/target.rb:209
+  # pkg:gem/ferrum#lib/ferrum/target.rb:213
   def build_client; end
 
-  # pkg:gem/ferrum#lib/ferrum/target.rb:215
+  # pkg:gem/ferrum#lib/ferrum/target.rb:219
   def ws_url; end
 end
 
@@ -6681,12 +7057,41 @@ Ferrum::Target::NEW_WINDOW_WAIT = T.let(T.unsafe(nil), Float)
 #
 # pkg:gem/ferrum#lib/ferrum/errors.rb:42
 class Ferrum::TimeoutError < ::Ferrum::Error
-  # Explains that waiting for a response timed out.
+  # @param [String, nil] command
+  #   The CDP method that timed out.
+  #
+  # @param [String, nil] session_id
+  #   The session it was sent to.
+  #
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:60
+  def initialize(command = T.unsafe(nil), session_id: T.unsafe(nil)); end
+
+  # The CDP method that didn't answer in time, `nil` when the wait wasn't for a command.
+  #
+  # @return [String, nil]
+  #
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:46
+  def command; end
+
+  # Explains that waiting for a response timed out, naming the command when
+  # there was one.
   #
   # @return [String]
   #
-  # pkg:gem/ferrum#lib/ferrum/errors.rb:48
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:72
   def message; end
+
+  # The session the command was sent to, `nil` for the browser-wide session.
+  #
+  # @return [String, nil]
+  #
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:51
+  def session_id; end
+
+  private
+
+  # pkg:gem/ferrum#lib/ferrum/errors.rb:82
+  def awaited; end
 end
 
 # pkg:gem/ferrum#lib/ferrum/utils/event.rb:4
@@ -6946,10 +7351,12 @@ module Ferrum::Utils::Thread
   #
   # @param [Boolean] abort_on_exception
   #   Whether the thread aborts the process if it raises an unhandled exception.
+  #   Off by default: an exception in one of Ferrum's own threads reaches the
+  #   main thread wherever it happens to be, or kills the process outright.
   #
   # @return [Thread]
   #
-  # pkg:gem/ferrum#lib/ferrum/utils/thread.rb:20
+  # pkg:gem/ferrum#lib/ferrum/utils/thread.rb:22
   def spawn(abort_on_exception: T.unsafe(nil)); end
 
   class << self
@@ -6957,10 +7364,12 @@ module Ferrum::Utils::Thread
     #
     # @param [Boolean] abort_on_exception
     #   Whether the thread aborts the process if it raises an unhandled exception.
+    #   Off by default: an exception in one of Ferrum's own threads reaches the
+    #   main thread wherever it happens to be, or kills the process outright.
     #
     # @return [Thread]
     #
-    # pkg:gem/ferrum#lib/ferrum/utils/thread.rb:20
+    # pkg:gem/ferrum#lib/ferrum/utils/thread.rb:22
     def spawn(abort_on_exception: T.unsafe(nil)); end
   end
 end

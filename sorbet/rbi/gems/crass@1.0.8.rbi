@@ -469,32 +469,32 @@ class Crass::Tokenizer
   #
   # 4.3.2. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#consume-comments
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:302
+  # pkg:gem/crass#lib/crass/tokenizer.rb:300
   def consume_comments; end
 
   # Consumes an escaped code point and returns its unescaped value.
   #
   # This method assumes that the `\` has already been consumed, and that the
-  # next character in the input has already been verified not to be a newline
-  # or EOF.
+  # next character in the input has already been verified not to be a
+  # newline. If the input is at EOF, U+FFFD is returned.
   #
   # 4.3.8. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#consume-an-escaped-code-point
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:327
+  # pkg:gem/crass#lib/crass/tokenizer.rb:325
   def consume_escaped; end
 
   # Consumes an ident-like token and returns it.
   #
   # 4.3.4. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#consume-an-ident-like-token
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:351
+  # pkg:gem/crass#lib/crass/tokenizer.rb:349
   def consume_ident; end
 
   # Consumes a name and returns it.
   #
   # 4.3.12. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#consume-a-name
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:376
+  # pkg:gem/crass#lib/crass/tokenizer.rb:374
   def consume_name; end
 
   # Consumes a number and returns a 3-element array containing the number's
@@ -503,14 +503,14 @@ class Crass::Tokenizer
   #
   # 4.3.13. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#consume-a-number
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:408
+  # pkg:gem/crass#lib/crass/tokenizer.rb:406
   def consume_number; end
 
   # Consumes a numeric token and returns it.
   #
   # 4.3.3. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#consume-a-numeric-token
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:431
+  # pkg:gem/crass#lib/crass/tokenizer.rb:429
   def consume_numeric; end
 
   # Consumes a string token that ends at the given character, and returns the
@@ -518,7 +518,7 @@ class Crass::Tokenizer
   #
   # 4.3.5. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#consume-a-string-token
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:470
+  # pkg:gem/crass#lib/crass/tokenizer.rb:468
   def consume_string(ending = T.unsafe(nil)); end
 
   # Consumes a Unicode range token and returns it. Assumes the initial "u+" or
@@ -526,7 +526,7 @@ class Crass::Tokenizer
   #
   # 4.3.7. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#consume-a-unicode-range-token
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:511
+  # pkg:gem/crass#lib/crass/tokenizer.rb:509
   def consume_unicode_range; end
 
   # Consumes a URL token and returns it. Assumes the original "url(" has
@@ -534,26 +534,26 @@ class Crass::Tokenizer
   #
   # 4.3.6. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#consume-a-url-token
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:543
+  # pkg:gem/crass#lib/crass/tokenizer.rb:541
   def consume_url; end
 
   # Converts a valid CSS number string into a number and returns the number.
   #
   # 4.3.14. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#convert-a-string-to-a-number
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:591
+  # pkg:gem/crass#lib/crass/tokenizer.rb:589
   def convert_string_to_number(str); end
 
   # Creates and returns a new token with the given _properties_.
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:643
+  # pkg:gem/crass#lib/crass/tokenizer.rb:641
   def create_token(type, properties = T.unsafe(nil)); end
 
   # Preprocesses _input_ to prepare it for the tokenizer.
   #
   # 3.3. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#input-preprocessing
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:654
+  # pkg:gem/crass#lib/crass/tokenizer.rb:652
   def preprocess(input); end
 
   # Returns `true` if the given three-character _text_ would start an
@@ -562,7 +562,7 @@ class Crass::Tokenizer
   #
   # 4.3.10. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#would-start-an-identifier
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:669
+  # pkg:gem/crass#lib/crass/tokenizer.rb:667
   def start_identifier?(text = T.unsafe(nil)); end
 
   # Returns `true` if the given three-character _text_ would start a number.
@@ -571,12 +571,12 @@ class Crass::Tokenizer
   #
   # 4.3.11. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#starts-with-a-number
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:693
+  # pkg:gem/crass#lib/crass/tokenizer.rb:691
   def start_number?(text = T.unsafe(nil)); end
 
   # Tokenizes the input stream and returns an array of tokens.
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:712
+  # pkg:gem/crass#lib/crass/tokenizer.rb:710
   def tokenize; end
 
   # Returns `true` if the given two-character _text_ is the beginning of a
@@ -585,7 +585,7 @@ class Crass::Tokenizer
   #
   # 4.3.9. https://www.w3.org/TR/2013/WD-css-syntax-3-20130919/#starts-with-a-valid-escape
   #
-  # pkg:gem/crass#lib/crass/tokenizer.rb:729
+  # pkg:gem/crass#lib/crass/tokenizer.rb:727
   def valid_escape?(text = T.unsafe(nil)); end
 
   class << self

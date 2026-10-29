@@ -298,6 +298,12 @@ class PgHero::Database
   def connection_model; end
 end
 
+# pkg:gem/pghero#lib/pghero/engine.rb:18
+class PgHero::DatabaseConstraint
+  # pkg:gem/pghero#lib/pghero/engine.rb:19
+  def matches?(request); end
+end
+
 # pkg:gem/pghero#lib/pghero/engine.rb:2
 class PgHero::Engine < ::Rails::Engine; end
 
@@ -408,16 +414,16 @@ module PgHero::Methods::Basic
 
   private
 
-  # pkg:gem/pghero#lib/pghero/methods/basic.rb:115
+  # pkg:gem/pghero#lib/pghero/methods/basic.rb:127
   def execute(sql, binds = T.unsafe(nil)); end
 
   # pkg:gem/pghero#lib/pghero/methods/basic.rb:39
   def prepare_sql(sql, binds = T.unsafe(nil), stats: T.unsafe(nil)); end
 
-  # pkg:gem/pghero#lib/pghero/methods/basic.rb:130
+  # pkg:gem/pghero#lib/pghero/methods/basic.rb:142
   def quote_column_name(value); end
 
-  # pkg:gem/pghero#lib/pghero/methods/basic.rb:126
+  # pkg:gem/pghero#lib/pghero/methods/basic.rb:138
   def quote_table_name(value); end
 
   # pkg:gem/pghero#lib/pghero/methods/basic.rb:50
@@ -426,25 +432,25 @@ module PgHero::Methods::Basic
   # pkg:gem/pghero#lib/pghero/methods/basic.rb:57
   def select_all_leased(sql, conn:, query_columns:); end
 
-  # pkg:gem/pghero#lib/pghero/methods/basic.rb:103
+  # pkg:gem/pghero#lib/pghero/methods/basic.rb:115
   def select_all_size(sql, binds = T.unsafe(nil)); end
 
-  # pkg:gem/pghero#lib/pghero/methods/basic.rb:99
+  # pkg:gem/pghero#lib/pghero/methods/basic.rb:111
   def select_all_stats(sql, binds = T.unsafe(nil), **options); end
 
-  # pkg:gem/pghero#lib/pghero/methods/basic.rb:111
+  # pkg:gem/pghero#lib/pghero/methods/basic.rb:123
   def select_one(sql, binds = T.unsafe(nil)); end
 
-  # pkg:gem/pghero#lib/pghero/methods/basic.rb:151
+  # pkg:gem/pghero#lib/pghero/methods/basic.rb:163
   def table_exists?(table); end
 
-  # pkg:gem/pghero#lib/pghero/methods/basic.rb:134
+  # pkg:gem/pghero#lib/pghero/methods/basic.rb:146
   def unquote(part); end
 
-  # pkg:gem/pghero#lib/pghero/methods/basic.rb:121
+  # pkg:gem/pghero#lib/pghero/methods/basic.rb:133
   def with_connection(stats: T.unsafe(nil), &block); end
 
-  # pkg:gem/pghero#lib/pghero/methods/basic.rb:142
+  # pkg:gem/pghero#lib/pghero/methods/basic.rb:154
   def with_transaction(lock_timeout: T.unsafe(nil), statement_timeout: T.unsafe(nil), rollback: T.unsafe(nil)); end
 end
 
@@ -545,7 +551,7 @@ module PgHero::Methods::Kill
   # note: this method is not affected by disable_kill option
   #
   # pkg:gem/pghero#lib/pghero/methods/kill.rb:5
-  def kill(pid); end
+  def kill(pid, key: T.unsafe(nil)); end
 
   # note: this method is not affected by disable_kill option
   #
@@ -556,6 +562,11 @@ module PgHero::Methods::Kill
   #
   # pkg:gem/pghero#lib/pghero/methods/kill.rb:10
   def kill_long_running_queries(min_duration: T.unsafe(nil)); end
+
+  private
+
+  # pkg:gem/pghero#lib/pghero/methods/kill.rb:23
+  def kill_backends(pid: T.unsafe(nil), key: T.unsafe(nil), min_duration: T.unsafe(nil), backend_type: T.unsafe(nil)); end
 end
 
 # pkg:gem/pghero#lib/pghero/methods/maintenance.rb:3
@@ -589,10 +600,10 @@ module PgHero::Methods::Queries
   # from https://wiki.postgresql.org/wiki/Lock_Monitoring
   # and https://big-elephants.com/2013-09/exploring-query-locks-in-postgres/
   #
-  # pkg:gem/pghero#lib/pghero/methods/queries.rb:40
+  # pkg:gem/pghero#lib/pghero/methods/queries.rb:49
   def blocked_queries; end
 
-  # pkg:gem/pghero#lib/pghero/methods/queries.rb:34
+  # pkg:gem/pghero#lib/pghero/methods/queries.rb:43
   def long_running_queries; end
 
   # pkg:gem/pghero#lib/pghero/methods/queries.rb:4
@@ -798,24 +809,24 @@ module PgHero::Methods::SuggestedIndexes
   # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:198
   def best_index_structure(statement); end
 
-  # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:311
+  # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:312
   def column_stats(schema: T.unsafe(nil), table: T.unsafe(nil)); end
 
-  # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:302
+  # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:303
   def parse_sort(sort_clause); end
 
-  # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:271
+  # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:272
   def parse_table(tree); end
 
   # TODO capture values
   #
-  # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:283
+  # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:284
   def parse_where(tree); end
 
   # TODO better row estimation
   # https://www.postgresql.org/docs/current/static/row-estimation-examples.html
   #
-  # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:239
+  # pkg:gem/pghero#lib/pghero/methods/suggested_indexes.rb:240
   def row_estimates(stats, total_rows, rows_left, op); end
 end
 

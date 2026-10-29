@@ -140,70 +140,70 @@ class IO::Event::Debug::Selector
   # @parameter selector [Selector] The selector to wrap.
   # @parameter log [IO] The log to write debug messages to.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:42
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:54
   def initialize(selector, log: T.unsafe(nil)); end
 
   # Run the given blocking operation and wait for its completion.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:162
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:174
   def blocking_operation_wait(operation); end
 
   # Close the selector.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:101
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:113
   def close; end
 
   # @returns [Boolean] Whether the wrapped selector is closed.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:115
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:127
   def closed?; end
 
   # The idle duration of the underlying selector.
   #
   # @returns [Numeric] The idle duration.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:73
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:85
   def idle_duration; end
 
   # Read from the given IO, forwarded to the underlying selector.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:180
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:192
   def io_read(fiber, io, buffer, *arguments); end
 
   # Wait for the given IO, forwarded to the underlying selector.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:174
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:186
   def io_wait(fiber, io, events); end
 
   # Write to the given IO, forwarded to the underlying selector.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:186
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:198
   def io_write(fiber, io, buffer, *arguments); end
 
   # Log the given message.
   #
   # @asynchronous Will block the calling fiber and the entire event loop.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:87
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:99
   def log(message); end
 
   # The current time.
   #
   # @returns [Numeric] The current time.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:80
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:92
   def now; end
 
   # Wait for the given process, forwarded to the underlying selector.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:168
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:180
   def process_wait(*arguments); end
 
   # Push the given fiber to the selector ready list, such that it will be resumed on the next call to {select}.
   #
   # @parameter fiber [Fiber] The fiber that is ready.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:140
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:152
   def push(fiber); end
 
   # Raise the given exception on the given fiber.
@@ -211,49 +211,49 @@ class IO::Event::Debug::Selector
   # @parameter fiber [Fiber] The fiber to raise the exception on.
   # @parameter arguments [Array] The arguments to use when raising the exception.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:149
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:161
   def raise(fiber, *arguments, **options); end
 
   # Check if the selector is ready.
   #
   # @returns [Boolean] Whether the selector is ready.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:157
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:169
   def ready?; end
 
   # Forward the given method to the underlying selector.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:192
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:204
   def respond_to?(name, include_private = T.unsafe(nil)); end
 
   # Resume the given fiber with the given arguments.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:126
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:138
   def resume(*arguments); end
 
   # Select for the given duration, forwarded to the underlying selector.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:197
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:209
   def select(duration = T.unsafe(nil)); end
 
   # Transfer from the calling fiber to the selector.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:120
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:132
   def transfer; end
 
   # Wakeup the the selector.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:96
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:108
   def wakeup; end
 
   # Yield to the selector.
   #
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:132
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:144
   def yield; end
 
   private
 
-  # pkg:gem/io-event#lib/io/event/debug/selector.rb:58
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:70
   def install_optional_forwarders(selector); end
 
   class << self
@@ -262,7 +262,7 @@ class IO::Event::Debug::Selector
     # @parameter selector [Selector] The selector to wrap.
     # @parameter env [Hash] The environment to read configuration from.
     #
-    # pkg:gem/io-event#lib/io/event/debug/selector.rb:28
+    # pkg:gem/io-event#lib/io/event/debug/selector.rb:40
     def wrap(selector, env = T.unsafe(nil)); end
   end
 end
@@ -271,6 +271,16 @@ end
 #
 # pkg:gem/io-event#lib/io/event/debug/selector.rb:14
 module IO::Event::Debug::Selector::Forwarders
+  # Wait for a futex value to change, forwarded to the underlying selector.
+  #
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:24
+  def futex_wait(fiber, futex, expected); end
+
+  # Wait for any futex value to change, forwarded to the underlying selector.
+  #
+  # pkg:gem/io-event#lib/io/event/debug/selector.rb:30
+  def futex_waitv(fiber, entries); end
+
   # Close a file descriptor, forwarded to the underlying selector. Ruby invokes this hook with a raw integer descriptor (Ruby 4.0+).
   #
   # @parameter descriptor [Integer] The raw file descriptor being closed.

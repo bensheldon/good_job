@@ -165,7 +165,7 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to include("America/St_Johns")
-        start_input = Capybara.string(response.body).find("input[name='chart_start']")
+        start_input = Capybara.string(response.body).find_field(name: 'chart_start')
         expect(start_input["aria-label"]).to eq("Start time")
         expect(start_input["value"]).to eq("2024-01-01T10:03:17")
       end
@@ -180,8 +180,8 @@ RSpec.describe GoodJob::PerformanceController, type: :controller do
 
         page = Capybara.string(response.body)
         form = page.find("form[data-controller='performance-range']")
-        start_input = page.find("input[type='datetime-local'][name='chart_start']")
-        end_input = page.find("input[type='datetime-local'][name='chart_end']")
+        start_input = page.find_field(type: 'datetime-local', name: 'chart_start')
+        end_input = page.find_field(type: 'datetime-local', name: 'chart_end')
         start_canonical = page.find("input[type='hidden'][name='chart_start'][disabled]", visible: :all)
         end_canonical = page.find("input[type='hidden'][name='chart_end'][disabled]", visible: :all)
         time_zone_input = page.find("input[type='hidden'][name='chart_time_zone'][disabled]", visible: :all)

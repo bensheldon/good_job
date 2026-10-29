@@ -119,7 +119,7 @@ end
 # This is the core connection class that handles HTTP/2 protocol semantics including
 # stream management, settings negotiation, and frame processing.
 #
-# pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:18
+# pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:19
 class Protocol::HTTP2::Connection
   include ::Protocol::HTTP2::FlowControlled
 
@@ -127,27 +127,27 @@ class Protocol::HTTP2::Connection
   # @parameter framer [Framer] The frame handler for reading/writing HTTP/2 frames.
   # @parameter local_stream_id [Integer] The starting stream ID for locally-initiated streams.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:24
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:25
   def initialize(framer, local_stream_id); end
 
   # Access streams by ID, with 0 returning the connection itself.
   # @parameter id [Integer] The stream ID to look up.
   # @returns [Connection | Stream | Nil] The connection (if id=0), stream, or nil.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:62
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:63
   def [](id); end
 
   # Accept an incoming push promise from the other side of the connection.
   # On the client side, we accept push promise streams.
   # On the server side, existing streams create push promise streams.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:471
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:472
   def accept_push_promise_stream(stream_id, &block); end
 
   # Accept an incoming stream from the other side of the connnection.
   # On the server side, we accept requests.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:460
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:461
   def accept_stream(stream_id, &block); end
 
   # Check if the given stream ID represents a client-initiated stream.
@@ -155,40 +155,40 @@ class Protocol::HTTP2::Connection
   # @parameter id [Integer] The stream ID to check.
   # @returns [Boolean] True if the stream ID is client-initiated.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:566
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:567
   def client_stream_id?(id); end
 
   # Close the underlying framer and all streams.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:139
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:140
   def close(error = T.unsafe(nil)); end
 
   # Transition the connection into the closed state.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:244
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:245
   def close!; end
 
   # Transition the connection into the closed state if a graceful GOAWAY was received and there is nothing left to drain.
   #
   # As with {close!}, this is a state transition only: the owner of the connection is responsible for closing the underlying framer.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:118
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:119
   def close_if_drained!; end
 
   # Whether the connection is effectively or actually closed.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:105
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:106
   def closed?; end
 
   # This is only valid if the stream doesn't exist in `@streams`.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:600
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:601
   def closed_stream_id?(id); end
 
   # Traverse active streams and allow them to consume the available flow-control window.
   # @parameter amount [Integer] the amount of data to write. Defaults to the current window capacity.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:626
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:627
   def consume_window(size = T.unsafe(nil)); end
 
   # Create a push promise stream.
@@ -196,21 +196,21 @@ class Protocol::HTTP2::Connection
   # @yields {|stream| ...} Optional block to configure the created stream.
   # @returns [Stream] The created push promise stream.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:499
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:500
   def create_push_promise_stream(&block); end
 
   # Create a stream, defaults to an outgoing stream.
   # On the client side, we create requests.
   # @return [Stream] the created stream.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:478
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:479
   def create_stream(id = T.unsafe(nil), &block); end
 
   # Decode headers using HPACK decompression.
   # @parameter data [String] The encoded header block data.
   # @returns [Array] The decoded headers.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:168
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:169
   def decode_headers(data); end
 
   # Remove a stream from the active streams collection.
@@ -220,13 +220,13 @@ class Protocol::HTTP2::Connection
   # @parameter id [Integer] The stream ID to remove.
   # @returns [Stream | Nil] The removed stream, or nil if not found.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:130
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:131
   def delete(id); end
 
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:183
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:184
   def dependencies; end
 
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:185
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:186
   def dependency; end
 
   # Encode headers using HPACK compression.
@@ -234,51 +234,51 @@ class Protocol::HTTP2::Connection
   # @parameter buffer [String] Optional buffer for encoding output.
   # @returns [String] The encoded header block.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:161
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:162
   def encode_headers(headers, buffer = T.unsafe(nil)); end
 
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:82
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:83
   def framer; end
 
   # Whether the remote peer has sent us a GOAWAY frame. We must not initiate any new streams on this connection, but existing streams may still be in progress.
   # @returns [Boolean] True if a GOAWAY frame has been received.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:111
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:112
   def goaway_received?; end
 
   # The lowest Last-Stream-ID received in a GOAWAY frame.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:102
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:103
   def goaway_stream_id; end
 
   # The connection stream ID (always 0 for connection-level operations).
   # @returns [Integer] Always returns 0 for the connection itself.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:55
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:56
   def id; end
 
   # Check if the given stream ID represents an idle stream.
   # @parameter id [Integer] The stream ID to check.
   # @returns [Boolean] True if the stream ID is idle (not yet used).
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:581
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:582
   def idle_stream_id?(id); end
 
   # 6.8. GOAWAY
   # There is an inherent race condition between an endpoint starting new streams and the remote sending a GOAWAY frame. To deal with this case, the GOAWAY contains the stream identifier of the last peer-initiated stream that was or might be processed on the sending endpoint in this connection. For instance, if the server sends a GOAWAY frame, the identified stream is the highest-numbered stream initiated by the client.
   # Once sent, the sender will ignore frames sent on streams initiated by the receiver if the stream has an identifier higher than the included last stream identifier. Receivers of a GOAWAY frame MUST NOT open additional streams on the connection, although a new connection can be established for new streams.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:190
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:191
   def ignore_frame?(frame); end
 
   # Current settings value for local and peer
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:88
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:89
   def local_settings; end
 
   # Current settings value for local and peer
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:88
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:89
   def local_settings=(_arg0); end
 
   # Check if the given stream ID represents a locally-initiated stream.
@@ -286,68 +286,68 @@ class Protocol::HTTP2::Connection
   # @parameter id [Integer] The stream ID to check.
   # @returns [Boolean] True if the stream ID is locally-initiated.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:454
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:455
   def local_stream_id?(id); end
 
   # Our window for receiving data. When we receive data, it reduces this window.
   # If the window gets too small, we must send a window update.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:93
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:94
   def local_window; end
 
   # The maximum number of concurrent streams that this connection can initiate. This is a setting that can be changed by the remote peer.
   #
   # It is not the same as the number of streams that can be accepted by the connection. The number of streams that can be accepted is determined by the local settings, and the number of streams that can be initiated is determined by the remote settings.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:78
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:79
   def maximum_concurrent_streams; end
 
   # The size of a frame payload is limited by the maximum size that a receiver advertises in the SETTINGS_MAX_FRAME_SIZE setting.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:71
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:72
   def maximum_frame_size; end
 
   # Streams are identified with an unsigned 31-bit integer.  Streams initiated by a client MUST use odd-numbered stream identifiers; those initiated by the server MUST use even-numbered stream identifiers.  A stream identifier of zero (0x0) is used for connection control messages; the stream identifier of zero cannot be used to establish a new stream.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:173
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:174
   def next_stream_id; end
 
   # Transition the connection to the open state.
   # @returns [Connection] Self for method chaining.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:374
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:375
   def open!; end
 
   # In addition to changing the flow-control window for streams that are not yet active, a SETTINGS frame can alter the initial flow-control window size for streams with active flow-control windows (that is, streams in the "open" or "half-closed (remote)" state).  When the value of SETTINGS_INITIAL_WINDOW_SIZE changes, a receiver MUST adjust the size of all stream flow-control windows that it maintains by the difference between the new value and the old value.
   #
   # @return [Boolean] whether the frame was an acknowledgement
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:349
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:350
   def process_settings(frame); end
 
   # Reads one frame from the network and processes. Processing the frame updates the state of the connection and related streams. If the frame triggers an error, e.g. a protocol error, the connection will typically emit a goaway frame and re-raise the exception. You should continue processing frames until the underlying connection is closed.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:207
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:208
   def read_frame; end
 
   # Receive and process a CONTINUATION frame.
   # @parameter frame [ContinuationFrame] The continuation frame.
   # @raises [ProtocolError] Always raises as unexpected continuation frames are not supported.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:661
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:662
   def receive_continuation(frame); end
 
   # Process a DATA frame from the remote peer.
   # @parameter frame [DataFrame] The data frame to process.
   # @raises [ProtocolError] If data is received for invalid stream.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:430
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:431
   def receive_data(frame); end
 
   # Receive and process a generic frame (default handler).
   # @parameter frame [Frame] The frame to receive.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:667
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:668
   def receive_frame(frame); end
 
   # Process a GOAWAY frame from the remote peer.
@@ -359,86 +359,86 @@ class Protocol::HTTP2::Connection
   # @parameter frame [GoawayFrame] The GOAWAY frame to process.
   # @raises [GoawayError] If the frame indicates a connection error.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:268
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:269
   def receive_goaway(frame); end
 
   # On the server side, starts a new request.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:504
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:505
   def receive_headers(frame); end
 
   # Process a PING frame from the remote peer.
   # @parameter frame [PingFrame] The ping frame to process.
   # @raises [ProtocolError] If ping is received in invalid state.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:410
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:411
   def receive_ping(frame); end
 
   # Receive and process a PRIORITY_UPDATE frame.
   # @parameter frame [PriorityUpdateFrame] The priority update frame.
   # @raises [ProtocolError] If the stream ID is invalid.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:549
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:550
   def receive_priority_update(frame); end
 
   # Receive and process a PUSH_PROMISE frame.
   # @parameter frame [PushPromiseFrame] The push promise frame.
   # @raises [ProtocolError] Always raises as push promises are not supported.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:542
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:543
   def receive_push_promise(frame); end
 
   # Receive and process a RST_STREAM frame.
   # @parameter frame [ResetStreamFrame] The reset stream frame.
   # @raises [ProtocolError] If the frame is invalid for connection context.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:612
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:613
   def receive_reset_stream(frame); end
 
   # Receive and process a SETTINGS frame from the remote peer.
   # @parameter frame [SettingsFrame] The settings frame to process.
   # @raises [ProtocolError] If the connection is in an invalid state.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:383
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:384
   def receive_settings(frame); end
 
   # Receive and process a WINDOW_UPDATE frame.
   # @parameter frame [WindowUpdateFrame] The window update frame.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:639
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:640
   def receive_window_update(frame); end
 
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:89
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:90
   def remote_settings; end
 
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:89
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:90
   def remote_settings=(_arg0); end
 
   # The highest stream_id that has been successfully accepted by this connection.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:99
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:100
   def remote_stream_id; end
 
   # Our window for sending data. When we send data, it reduces this window.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:96
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:97
   def remote_window; end
 
   # Tell the remote end that the connection is being shut down. If the `error_code` is 0, this is a graceful shutdown. The other end of the connection should not make any new streams, but existing streams may be completed.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:251
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:252
   def send_goaway(error_code = T.unsafe(nil), message = T.unsafe(nil)); end
 
   # Send a PING frame to the remote peer.
   # @parameter data [String] The 8-byte ping payload data.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:396
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:397
   def send_ping(data); end
 
   # Send updated settings to the remote peer.
   # @parameter changes [Hash] The settings changes to send.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:234
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:235
   def send_settings(changes); end
 
   # Check if the given stream ID represents a server-initiated stream.
@@ -446,39 +446,39 @@ class Protocol::HTTP2::Connection
   # @parameter id [Integer] The stream ID to check.
   # @returns [Boolean] True if the stream ID is server-initiated.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:574
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:575
   def server_stream_id?(id); end
 
   # Connection state (:new, :open, :closed).
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:85
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:86
   def state; end
 
   # Connection state (:new, :open, :closed).
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:85
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:86
   def state=(_arg0); end
 
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:181
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:182
   def streams; end
 
   # Execute a block within a synchronized context.
   # This method provides a synchronization primitive for thread safety.
   # @yields The block to execute within the synchronized context.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:202
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:203
   def synchronize; end
 
   # Update local settings and adjust stream window capacities.
   # @parameter changes [Hash] The settings changes to apply locally.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:326
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:327
   def update_local_settings(changes); end
 
   # Update remote settings and adjust stream window capacities.
   # @parameter changes [Hash] The settings changes to apply to remote peer.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:338
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:339
   def update_remote_settings(changes); end
 
   # Check if the given stream ID is valid for remote initiation.
@@ -486,13 +486,13 @@ class Protocol::HTTP2::Connection
   # @parameter stream_id [Integer] The stream ID to validate.
   # @returns [Boolean] True if the stream ID is valid for remote initiation.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:446
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:447
   def valid_remote_stream_id?(stream_id); end
 
   # Write a single frame to the connection.
   # @parameter frame [Frame] The frame to write.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:300
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:301
   def write_frame(frame); end
 
   # Write multiple frames within a synchronized block.
@@ -500,7 +500,7 @@ class Protocol::HTTP2::Connection
   #   @parameter framer [Framer] The framer instance.
   # @raises [EOFError] If the connection is closed.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:312
+  # pkg:gem/protocol-http2#lib/protocol/http2/connection.rb:313
   def write_frames; end
 end
 
@@ -509,19 +509,19 @@ end
 # +---------------------------------------------------------------+
 # +---------------------------------------------------------------+
 #
-# pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:121
+# pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:122
 class Protocol::HTTP2::ContinuationFrame < ::Protocol::HTTP2::Frame
   include ::Protocol::HTTP2::Continued
 
   # This is only invoked if the continuation is received out of the normal flow.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:135
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:136
   def apply(connection); end
 
   # Get a string representation of the continuation frame.
   # @returns [String] Human-readable frame information.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:141
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:142
   def inspect; end
 
   # Read the frame and any continuation frames from the stream.
@@ -529,46 +529,46 @@ class Protocol::HTTP2::ContinuationFrame < ::Protocol::HTTP2::Frame
   # @parameter maximum_frame_size [Integer] Maximum allowed frame size.
   # @parameter limit [Integer] The maximum number of continuation frames to read.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:130
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:131
   def read(stream, maximum_frame_size, limit = T.unsafe(nil)); end
 end
 
-# pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:124
+# pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:125
 Protocol::HTTP2::ContinuationFrame::TYPE = T.let(T.unsafe(nil), Integer)
 
 # Module for frames that can be continued with CONTINUATION frames.
 #
-# pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:11
+# pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:12
 module Protocol::HTTP2::Continued
   # Initialize a continuable frame.
   # @parameter arguments [Array] Arguments passed to parent constructor.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:17
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:18
   def initialize(*); end
 
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:78
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:79
   def continuation; end
 
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:78
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:79
   def continuation=(_arg0); end
 
   # Check if this frame has continuation frames.
   # @returns [Boolean] True if there are continuation frames.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:25
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:26
   def continued?; end
 
   # Check if this is the last header block fragment.
   # @returns [Boolean] True if the END_HEADERS flag is set.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:31
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:32
   def end_headers?; end
 
   # Pack data into this frame, creating continuation frames if needed.
   # @parameter data [String] The data to pack.
   # @parameter options [Hash] Options including maximum_size.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:83
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:84
   def pack(data, **options); end
 
   # Read the frame and any continuation frames from the stream.
@@ -579,25 +579,25 @@ module Protocol::HTTP2::Continued
   # @parameter maximum_frame_size [Integer] Maximum allowed frame size.
   # @parameter limit [Integer] The maximum number of continuation frames to read.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:42
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:43
   def read(stream, maximum_frame_size, limit = T.unsafe(nil)); end
 
   # Unpack data from this frame and any continuation frames.
   # @returns [String] The complete unpacked data.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:106
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:107
   def unpack; end
 
   # Write the frame and any continuation frames to the stream.
   # @parameter stream [IO] The stream to write to.
   #
-  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:70
+  # pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:71
   def write(stream); end
 end
 
 # @constant [Integer] The maximum number of continuation frames to read to prevent resource exhaustion.
 #
-# pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:13
+# pkg:gem/protocol-http2#lib/protocol/http2/continuation_frame.rb:14
 Protocol::HTTP2::Continued::LIMIT = T.let(T.unsafe(nil), Integer)
 
 # DATA frames convey arbitrary, variable-length sequences of octets associated with a stream. One or more DATA frames are used, for instance, to carry HTTP request or response payloads.

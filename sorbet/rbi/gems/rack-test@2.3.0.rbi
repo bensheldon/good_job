@@ -10,7 +10,7 @@ module Rack; end
 
 # For backwards compatibility with 1.1.0 and below
 #
-# pkg:gem/rack-test#lib/rack/test.rb:381
+# pkg:gem/rack-test#lib/rack/test.rb:406
 Rack::MockSession = Rack::Test::Session
 
 # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:7
@@ -18,9 +18,7 @@ module Rack::Test
   class << self
     # Whether the version of rack in use handles encodings.
     #
-    # @return [Boolean]
-    #
-    # pkg:gem/rack-test#lib/rack/test.rb:375
+    # pkg:gem/rack-test#lib/rack/test.rb:400
     def encoding_aware_strings?; end
   end
 end
@@ -32,8 +30,6 @@ end
 class Rack::Test::Cookie
   include ::Rack::Utils
 
-  # @return [Cookie] a new instance of Cookie
-  #
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:23
   def initialize(raw, uri = T.unsafe(nil), default_host = T.unsafe(nil)); end
 
@@ -49,14 +45,10 @@ class Rack::Test::Cookie
 
   # Whether the cookie has a value.
   #
-  # @return [Boolean]
-  #
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:54
   def empty?; end
 
   # Whether the cookie is currently expired.
-  #
-  # @return [Boolean]
   #
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:86
   def expired?; end
@@ -69,14 +61,10 @@ class Rack::Test::Cookie
   # Whether the cookie has the httponly flag, indicating it is not available via
   # a javascript API.
   #
-  # @return [Boolean]
-  #
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:71
   def http_only?; end
 
   # Cookies that do not match the URI will not be sent in requests to the URI.
-  #
-  # @return [Boolean]
   #
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:101
   def matches?(uri); end
@@ -97,17 +85,13 @@ class Rack::Test::Cookie
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:21
   def raw; end
 
-  # Wether the given cookie can replace the current cookie in the cookie jar.
-  #
-  # @return [Boolean]
+  # Whether the given cookie can replace the current cookie in the cookie jar.
   #
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:49
   def replaces?(other); end
 
   # Whether the cookie has the secure flag, indicating it can only be sent over
   # an encrypted connection.
-  #
-  # @return [Boolean]
   #
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:65
   def secure?; end
@@ -117,14 +101,10 @@ class Rack::Test::Cookie
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:111
   def to_h; end
 
-  # A hash of cookie options, including the cookie value, but excluding the cookie name.
-  #
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:120
   def to_hash; end
 
   # Whether the cookie is valid for the given URI.
-  #
-  # @return [Boolean]
   #
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:91
   def valid?(uri); end
@@ -149,8 +129,6 @@ end
 #
 # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:134
 class Rack::Test::CookieJar
-  # @return [CookieJar] a new instance of CookieJar
-  #
   # pkg:gem/rack-test#lib/rack/test/cookie_jar.rb:137
   def initialize(cookies = T.unsafe(nil), default_host = T.unsafe(nil)); end
 
@@ -271,10 +249,10 @@ module Rack::Test::Methods
   def _rack_test_current_session=(_arg0); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def authorize(*_arg0, **_arg1, &_arg2); end
+  def authorize(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def basic_authorize(*_arg0, **_arg1, &_arg2); end
+  def basic_authorize(*, **, &); end
 
   # Create a new Rack::Test::Session for #app.
   #
@@ -282,7 +260,7 @@ module Rack::Test::Methods
   def build_rack_test_session(_name); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def clear_cookies(*_arg0, **_arg1, &_arg2); end
+  def clear_cookies(*, **, &); end
 
   # Return the currently actively session.  This is the session to
   # which the delegated methods are sent.
@@ -291,46 +269,44 @@ module Rack::Test::Methods
   def current_session; end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def custom_request(*_arg0, **_arg1, &_arg2); end
+  def custom_request(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def delete(*_arg0, **_arg1, &_arg2); end
+  def delete(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def env(*_arg0, **_arg1, &_arg2); end
+  def env(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def follow_redirect!(*_arg0, **_arg1, &_arg2); end
+  def follow_redirect!(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def get(*_arg0, **_arg1, &_arg2); end
+  def get(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def head(*_arg0, **_arg1, &_arg2); end
+  def head(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def header(*_arg0, **_arg1, &_arg2); end
+  def header(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def last_request(*_arg0, **_arg1, &_arg2); end
+  def last_request(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def last_response(*_arg0, **_arg1, &_arg2); end
+  def last_response(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def options(*_arg0, **_arg1, &_arg2); end
+  def options(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def patch(*_arg0, **_arg1, &_arg2); end
+  def patch(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def post(*_arg0, **_arg1, &_arg2); end
+  def post(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def put(*_arg0, **_arg1, &_arg2); end
+  def put(*, **, &); end
 
-  # Return the existing session with the given name, or a new
-  # rack session.  Always use a new session if name is nil.
   # For backwards compatibility with older rack-test versions.
   #
   # pkg:gem/rack-test#lib/rack/test/methods.rb:37
@@ -343,10 +319,10 @@ module Rack::Test::Methods
   def rack_test_session(name = T.unsafe(nil)); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def request(*_arg0, **_arg1, &_arg2); end
+  def request(*, **, &); end
 
   # pkg:gem/rack-test#lib/rack/test/methods.rb:68
-  def set_cookie(*_arg0, **_arg1, &_arg2); end
+  def set_cookie(*, **, &); end
 
   # Create a new session (or reuse an existing session with the given name),
   # and make it the current session for the given block.
@@ -408,8 +384,6 @@ class Rack::Test::Session
   # response in #last_response. #last_response is also returned by the methods.
   # If a block is given, #last_response is also yielded to the block.
   #
-  # @return [Session] a new instance of Session
-  #
   # pkg:gem/rack-test#lib/rack/test.rb:99
   def initialize(app, default_host = T.unsafe(nil)); end
 
@@ -418,12 +392,6 @@ class Rack::Test::Session
   # pkg:gem/rack-test#lib/rack/test.rb:118
   def after_request(&block); end
 
-  # Set the username and password for HTTP Basic authorization, to be
-  # included in subsequent requests in the HTTP_AUTHORIZATION header.
-  #
-  # Example:
-  #   basic_authorize "bryan", "secret"
-  #
   # pkg:gem/rack-test#lib/rack/test.rb:203
   def authorize(username, password); end
 
@@ -504,15 +472,11 @@ class Rack::Test::Session
   # Return the last request issued in the session. Raises an error if no
   # requests have been sent yet.
   #
-  # @raise [Error]
-  #
   # pkg:gem/rack-test#lib/rack/test.rb:134
   def last_request; end
 
   # Return the last response received in the session. Raises an error if
   # no requests have been sent yet.
-  #
-  # @raise [Error]
   #
   # pkg:gem/rack-test#lib/rack/test.rb:141
   def last_response; end
@@ -541,7 +505,7 @@ class Rack::Test::Session
   # cookie jar to the state they were prior to block execution upon
   # exiting the block.
   #
-  # pkg:gem/rack-test#lib/rack/test.rb:240
+  # pkg:gem/rack-test#lib/rack/test.rb:255
   def restore_state; end
 
   # Set a cookie in the current cookie jar.
@@ -553,35 +517,43 @@ class Rack::Test::Session
 
   # Append a string version of the query params to the array of query params.
   #
-  # pkg:gem/rack-test#lib/rack/test.rb:340
+  # pkg:gem/rack-test#lib/rack/test.rb:355
   def append_query_params(query_array, query_params); end
 
   # close() gets called automatically in newer Rack versions.
   #
-  # pkg:gem/rack-test#lib/rack/test.rb:266
+  # pkg:gem/rack-test#lib/rack/test.rb:281
   def close_body(body); end
+
+  # Convert the given params hash into a request body string.
+  #
+  # pkg:gem/rack-test#lib/rack/test.rb:394
+  def convert_input_hash_to_string(value, prefix = T.unsafe(nil)); end
+
+  # Return the default content type to use when none is given.
+  #
+  # pkg:gem/rack-test#lib/rack/test.rb:389
+  def default_input_content_type; end
 
   # Update environment to use based on given URI.
   #
-  # pkg:gem/rack-test#lib/rack/test.rb:293
+  # pkg:gem/rack-test#lib/rack/test.rb:308
   def env_for(uri, env); end
 
   # Return the multipart content type to use based on the environment.
   #
-  # pkg:gem/rack-test#lib/rack/test.rb:346
+  # pkg:gem/rack-test#lib/rack/test.rb:361
   def multipart_content_type(env); end
 
   # Normalize URI based on given URI/path and environment.
   #
-  # pkg:gem/rack-test#lib/rack/test.rb:271
+  # pkg:gem/rack-test#lib/rack/test.rb:286
   def parse_uri(path, env); end
 
   # Submit the request with the given URI and rack environment to
   # the mock session.  Returns and potentially yields the last response.
   #
-  # @yield [@last_response]
-  #
-  # pkg:gem/rack-test#lib/rack/test.rb:357
+  # pkg:gem/rack-test#lib/rack/test.rb:372
   def process_request(uri, env); end
 
   class << self
@@ -590,7 +562,7 @@ class Rack::Test::Session
   end
 end
 
-# pkg:gem/rack-test#lib/rack/test.rb:279
+# pkg:gem/rack-test#lib/rack/test.rb:294
 Rack::Test::Session::DEFAULT_ENV = T.let(T.unsafe(nil), Hash)
 
 # Wraps a Tempfile with a content type. Including one or more UploadedFile's
@@ -609,8 +581,6 @@ class Rack::Test::UploadedFile
   # binary :: Whether the file should be set to binmode (content treated as binary).
   # original_filename :: The filename to use for the file. Required if content is StringIO, optional override if not
   #
-  # @return [UploadedFile] a new instance of UploadedFile
-  #
   # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:31
   def initialize(content, content_type = T.unsafe(nil), binary = T.unsafe(nil), original_filename: T.unsafe(nil)); end
 
@@ -619,7 +589,7 @@ class Rack::Test::UploadedFile
   # after to make sure all data in tempfile is appended to the
   # buffer.
   #
-  # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:60
+  # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:61
   def append_to(buffer); end
 
   # The content type of the "uploaded" file
@@ -632,8 +602,6 @@ class Rack::Test::UploadedFile
   # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:22
   def content_type=(_arg0); end
 
-  # The path to the tempfile. Will not work if the receiver's content is from a StringIO.
-  #
   # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:49
   def local_path; end
 
@@ -662,19 +630,15 @@ class Rack::Test::UploadedFile
   # Create a tempfile and copy the content from the given path into the tempfile, optionally renaming if
   # original_filename has been set.
   #
-  # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:86
+  # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:88
   def initialize_from_file_path(path); end
 
   # Use the StringIO as the tempfile.
   #
-  # @raise [ArgumentError]
-  #
-  # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:78
+  # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:80
   def initialize_from_stringio(stringio); end
 
-  # @return [Boolean]
-  #
-  # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:71
+  # pkg:gem/rack-test#lib/rack/test/uploaded_file.rb:73
   def respond_to_missing?(method_name, include_private = T.unsafe(nil)); end
 end
 
@@ -686,43 +650,49 @@ module Rack::Test::Utils
 
   # Build a multipart body for the given params.
   #
-  # @raise [ArgumentError]
-  #
-  # pkg:gem/rack-test#lib/rack/test/utils.rb:34
+  # pkg:gem/rack-test#lib/rack/test/utils.rb:41
   def build_multipart(params, _first = T.unsafe(nil), multipart = T.unsafe(nil)); end
 
   # Build a query string for the given value and prefix. The value
   # can be an array or hash of parameters.
   #
-  # pkg:gem/rack-test#lib/rack/test/utils.rb:11
+  # pkg:gem/rack-test#lib/rack/test/utils.rb:16
   def build_nested_query(value, prefix = T.unsafe(nil)); end
 
   private
 
   # Append each multipart parameter value to the buffer.
   #
-  # pkg:gem/rack-test#lib/rack/test/utils.rb:100
+  # pkg:gem/rack-test#lib/rack/test/utils.rb:101
   def _build_parts(buffer, parameters); end
 
   # Append the multipart fragment for a parameter that is a file upload to the buffer.
   #
-  # pkg:gem/rack-test#lib/rack/test/utils.rb:133
+  # pkg:gem/rack-test#lib/rack/test/utils.rb:138
   def build_file_part(buffer, parameter_name, uploaded_file); end
 
   # Build the multipart content for uploading.
   #
-  # pkg:gem/rack-test#lib/rack/test/utils.rb:94
+  # pkg:gem/rack-test#lib/rack/test/utils.rb:95
   def build_parts(buffer, parameters); end
 
   # Append the multipart fragment for a parameter that isn't a file upload to the buffer.
   #
-  # pkg:gem/rack-test#lib/rack/test/utils.rb:121
+  # pkg:gem/rack-test#lib/rack/test/utils.rb:126
   def build_primitive_part(buffer, parameter_name, value); end
 
   # Return a flattened hash of parameter values based on the given params.
   #
-  # pkg:gem/rack-test#lib/rack/test/utils.rb:62
+  # pkg:gem/rack-test#lib/rack/test/utils.rb:69
   def normalize_multipart_params(params, first = T.unsafe(nil)); end
+
+  class << self
+    # pkg:gem/rack-test#lib/rack/test/utils.rb:10
+    def override_build_nested_query; end
+
+    # pkg:gem/rack-test#lib/rack/test/utils.rb:10
+    def override_build_nested_query=(_arg0); end
+  end
 end
 
 # pkg:gem/rack-test#lib/rack/test/version.rb:3
