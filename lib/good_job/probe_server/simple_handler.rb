@@ -7,6 +7,8 @@ module GoodJob
   class ProbeServer
     class SimpleHandler
       SOCKET_READ_TIMEOUT = 5 # in seconds
+      CLIENT_READ_TIMEOUT = 1 # in seconds
+      MAX_REQUEST_LINE_LENGTH = 8192 # in bytes
 
       def initialize(app, options = {})
         @app    = app
@@ -60,18 +62,9 @@ module GoodJob
             next unless ready_sockets
 
             client = @server.accept_nonblock
-            request = client.gets
-
-            if request
-              status, headers, body = @app.call(parse_request(request))
-              respond(client, status, headers, body)
-            end
-
-            client.close
+            handle_client(client)
           rescue IO::WaitReadable, Errno::EINTR
             retry # on transient errors
-          rescue Errno::EPIPE
-            next # Client disconnected - continue
           rescue Errno::EBADF
             break if @server&.closed? # Server shut down - stop
 
@@ -80,9 +73,52 @@ module GoodJob
         end
       end
 
+      def handle_client(client)
+        request_line = read_request_line(client)
+        return unless request_line
+
+        env = parse_request(request_line)
+        if env
+          status, headers, body = @app.call(env)
+          respond(client, status, headers, body)
+        else
+          respond(client, 400, { "Content-Type" => "text/plain" }, ["Bad Request"])
+        end
+      rescue Errno::EPIPE, Errno::ECONNRESET
+        nil # Client disconnected - continue
+      rescue StandardError => e
+        @logger.error "Server failed to handle request: #{e.class} - #{e}"
+      ensure
+        client.close
+      end
+
+      # Reads the request line without blocking longer than CLIENT_READ_TIMEOUT,
+      # so that an idle or slow client can't stall the server.
+      def read_request_line(client)
+        deadline = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC) + CLIENT_READ_TIMEOUT
+        buffer = +""
+        until buffer.include?("\n")
+          return if buffer.bytesize > MAX_REQUEST_LINE_LENGTH
+
+          chunk = client.read_nonblock(1024, exception: false)
+          case chunk
+          when :wait_readable
+            remaining = deadline - ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
+            return if remaining <= 0 || IO.select([client], nil, nil, remaining).nil?
+          when nil
+            break # EOF
+          else
+            buffer << chunk
+          end
+        end
+        buffer.lines.first
+      end
+
       def parse_request(request)
         method, full_path = request.split
-        path, query = full_path.split('?')
+        return if method.nil? || full_path.nil?
+
+        path, query = full_path.split('?', 2)
         { 'REQUEST_METHOD' => method, 'PATH_INFO' => path, 'QUERY_STRING' => query || '' }
       end
 

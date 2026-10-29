@@ -229,5 +229,36 @@ RSpec.describe GoodJob::ProbeServer do
         expect { handler.close_socket }.not_to raise_error
       end
     end
+
+    describe 'serving requests' do
+      before do
+        handler.listen
+        handler.build_future.execute
+      end
+
+      after { handler.stop }
+
+      def probe
+        Net::HTTP.start('127.0.0.1', port, read_timeout: 5) { |http| http.get('/') }
+      end
+
+      it 'is not blocked by an idle connection' do
+        idle_client = TCPSocket.new('127.0.0.1', port)
+
+        expect(probe.code).to eq '200'
+      ensure
+        idle_client&.close
+      end
+
+      it 'responds 400 to a malformed request and keeps serving' do
+        client = TCPSocket.new('127.0.0.1', port)
+        client.write "\r\n"
+        expect(client.read).to start_with "HTTP/1.1 400"
+        client.close
+
+        expect(probe.code).to eq '200'
+        expect(handler).to be_running
+      end
+    end
   end
 end
