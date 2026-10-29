@@ -31,7 +31,7 @@ module GoodJob
     # @example
     #   GoodJob::AdvisoryLockable.hash_function = "sha256"
     # pgcrypto digest() types; "md5", "hashtext", and "uuid_v5" have dedicated branches in +advisory_lock_bigint_sql+.
-    DIGEST_HASH_FUNCTIONS =%w[sha1 sha224 sha256 sha384 sha512].freeze
+    DIGEST_HASH_FUNCTIONS = %w[sha1 sha224 sha256 sha384 sha512].freeze
     ADVISORY_LOCK_FUNCTION_PATTERN = /\Apg_(try_)?advisory_(xact_)?(un)?lock(_shared)?\z/
 
     class << self
