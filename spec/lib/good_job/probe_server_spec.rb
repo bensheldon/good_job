@@ -231,6 +231,14 @@ RSpec.describe GoodJob::ProbeServer do
     end
 
     describe 'serving requests' do
+      # Use an unused port to avoid colliding with other parallel test processes
+      let(:port) do
+        server = TCPServer.new('127.0.0.1', 0)
+        server.addr[1]
+      ensure
+        server&.close
+      end
+
       before do
         handler.listen
         handler.build_future.execute
