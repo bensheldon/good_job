@@ -15,7 +15,7 @@ module GoodJob
     def records
       @_records ||= begin
         after_id = params[:after_id]
-        after_at = params[:after_at].present? ? Time.zone.parse(params[:after_at]) : nil
+        after_at = parse_after_at(params[:after_at])
         limit = params.fetch(:limit, DEFAULT_LIMIT)
 
         query_for_records.display_all(
@@ -87,6 +87,14 @@ module GoodJob
     end
 
     private
+
+    def parse_after_at(value)
+      return unless value.is_a?(String) && value.present?
+
+      Time.zone.parse(value)
+    rescue ArgumentError
+      nil
+    end
 
     def query_for_records
       raise NotImplementedError

@@ -30,6 +30,10 @@ module GoodJob
     #
     # @example
     #   GoodJob::AdvisoryLockable.hash_function = "sha256"
+    # pgcrypto digest() types; "md5", "hashtext", and "uuid_v5" have dedicated branches in +advisory_lock_bigint_sql+.
+    DIGEST_HASH_FUNCTIONS = %w[sha1 sha224 sha256 sha384 sha512].freeze
+    ADVISORY_LOCK_FUNCTION_PATTERN = /\Apg_(try_)?advisory_(xact_)?(un)?lock(_shared)?\z/
+
     class << self
       def hash_function=(value)
         @_hash_function = value
@@ -386,7 +390,7 @@ module GoodJob
           cte_type = supports_cte_materialization_specifiers? ? :MATERIALIZED : :""
           composed_cte = Arel::Nodes::As.new(cte_table, Arel::Nodes::UnaryOperation.new(cte_type, cte_query.arel))
 
-          lock_condition = "#{function}(#{advisory_lock_bigint_sql("#{_quoted_table_name_string} || '-' || #{adapter_class.quote_table_name(cte_table.name)}.#{adapter_class.quote_column_name(column)}::text")})"
+          lock_condition = "#{advisory_lock_function_sql(function)}(#{advisory_lock_bigint_sql("#{_quoted_table_name_string} || '-' || #{adapter_class.quote_table_name(cte_table.name)}.#{adapter_class.quote_column_name(column)}::text")})"
           query = cte_table.project(cte_table[:id])
                            .with(composed_cte)
                            .where(defined?(Arel::Nodes::BoundSqlLiteral) ? Arel::Nodes::BoundSqlLiteral.new(lock_condition, [], {}) : Arel::Nodes::SqlLiteral.new(lock_condition))
@@ -414,11 +418,11 @@ module GoodJob
       def advisory_lock_key(key, function: advisory_lockable_function, connection: nil)
         query = if function.include? "_try_"
                   <<~SQL.squish
-                    SELECT #{function}(#{advisory_lock_bigint_sql('$1::text')}) AS locked
+                    SELECT #{advisory_lock_function_sql(function)}(#{advisory_lock_bigint_sql('$1::text')}) AS locked
                   SQL
                 else
                   <<~SQL.squish
-                    SELECT #{function}(#{advisory_lock_bigint_sql('$1::text')})::text AS locked
+                    SELECT #{advisory_lock_function_sql(function)}(#{advisory_lock_bigint_sql('$1::text')})::text AS locked
                   SQL
                 end
 
@@ -522,7 +526,7 @@ module GoodJob
         raise ArgumentError, "No unlock function provided" if function.blank?
 
         query = <<~SQL.squish
-          SELECT #{function}(#{advisory_lock_bigint_sql('$1::text')}) AS unlocked
+          SELECT #{advisory_lock_function_sql(function)}(#{advisory_lock_bigint_sql('$1::text')}) AS unlocked
         SQL
         binds = [
           ActiveRecord::Relation::QueryAttribute.new('key', key, ActiveRecord::Type::String.new),
@@ -608,8 +612,21 @@ module GoodJob
           "('x' || substr(replace(uuid_generate_v5('6ba7b810-9dad-11d1-80b4-00c04fd430c8'::uuid, (#{value_sql})::text)::text, '-', ''), 1, 16))::bit(64)::bigint"
         else
           # pgcrypto's digest() supports sha1, sha224, sha256, sha384, sha512
-          "('x' || substr(encode(digest((#{value_sql})::text, '#{GoodJob::AdvisoryLockable.hash_function}'), 'hex'), 1, 16))::bit(64)::bigint"
+          digest_type = GoodJob::AdvisoryLockable.hash_function.to_s.downcase
+          raise ArgumentError, "Unsupported advisory lock hash function: #{digest_type.inspect}" unless DIGEST_HASH_FUNCTIONS.include?(digest_type)
+
+          "('x' || substr(encode(digest((#{value_sql})::text, '#{digest_type}'), 'hex'), 1, 16))::bit(64)::bigint"
         end
+      end
+
+      # Validates a Postgres advisory lock function name before it is interpolated into SQL.
+      # @param function [String, Symbol]
+      # @return [String]
+      def advisory_lock_function_sql(function)
+        function = function.to_s
+        raise ArgumentError, "Unsupported advisory lock function: #{function.inspect}" unless ADVISORY_LOCK_FUNCTION_PATTERN.match?(function)
+
+        function
       end
 
       # Extracts the upper 32 bits of the advisory lock bigint, used as +classid+ in pg_locks.
