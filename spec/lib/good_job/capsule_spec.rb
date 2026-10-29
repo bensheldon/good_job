@@ -200,4 +200,18 @@ describe GoodJob::Capsule do
       expect(capsule.create_thread).to be_nil
     end
   end
+
+  describe 'advisory_lock_heartbeat' do
+    it "uses the capsule's configuration rather than the global one" do
+      allow(GoodJob.configuration).to receive(:advisory_lock_heartbeat).and_return(false)
+      configuration = GoodJob::Configuration.new({ advisory_lock_heartbeat: true })
+      capsule = described_class.new(configuration: configuration)
+      capsule.start
+
+      connection = capsule.instance_variable_get(:@connection)
+      expect(connection.instance_variable_get(:@resource).retirement_age).to be_nil
+      expect(capsule.instance_variable_get(:@process_heartbeat).instance_variable_get(:@advisory_lock_heartbeat)).to be true
+      capsule.shutdown
+    end
+  end
 end

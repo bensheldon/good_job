@@ -142,6 +142,22 @@ module GoodJob # :nodoc:
       save
     end
 
+    # Refreshes the record with a single statement on the given connection, which can be outside
+    # the connection pool (e.g. a {GoodJob::DedicatedConnection}). Recreates the record if it was deleted.
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter]
+    # @return [void]
+    def refresh_with(connection)
+      self.state = self.class.process_state
+      now = Time.current
+      connection.exec_query(<<~SQL.squish, "GoodJob::Process Refresh")
+        INSERT INTO #{self.class.quoted_table_name} (id, state, lock_type, created_at, updated_at)
+        VALUES (#{connection.quote(id)}, #{connection.quote(state.to_json)}, #{connection.quote(self.class.lock_types[lock_type])}, #{connection.quote(now)}, #{connection.quote(now)})
+        ON CONFLICT (id) DO UPDATE SET state = EXCLUDED.state, updated_at = EXCLUDED.updated_at
+      SQL
+      self.updated_at = now
+      clear_changes_information
+    end
+
     def refresh_if_stale(cleanup: false)
       return unless stale?
 

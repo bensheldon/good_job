@@ -146,8 +146,19 @@ module GoodJob # :nodoc:
 
     # Refreshes the process record in the database.
     # @param silent [Boolean] Whether to silence logging.
-    # @return [void]
-    def renew(silent: false)
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter, nil] Connection outside the pool to refresh with.
+    #   When given, the record is only refreshed when stale, inactive records are not cleaned up, and no pooled connection is used.
+    # @return [Boolean, void] With a connection, whether the record was refreshed.
+    def renew(silent: false, connection: nil)
+      if connection
+        return synchronize do
+          next false unless @record&.stale?
+
+          GoodJob::Process.with_logger_silenced(silent: silent) { @record.refresh_with(connection) }
+          true
+        end
+      end
+
       synchronize(with_connection: true) do
         GoodJob::Process.with_logger_silenced(silent: silent) do
           @record&.refresh_if_stale(cleanup: true)

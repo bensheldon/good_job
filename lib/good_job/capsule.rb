@@ -2,7 +2,7 @@
 
 module GoodJob
   # A GoodJob::Capsule contains the resources necessary to execute jobs, including
-  # a {GoodJob::Scheduler}, {GoodJob::Poller}, {GoodJob::Notifier}, and {GoodJob::CronManager}.
+  # a {GoodJob::Scheduler}, {GoodJob::Poller}, {GoodJob::DedicatedConnection} (with a {GoodJob::Notifier} and {GoodJob::ProcessHeartbeat}), and {GoodJob::CronManager}.
   # GoodJob creates a default capsule on initialization.
   class Capsule
     include InstanceRegistry
@@ -35,13 +35,21 @@ module GoodJob
 
         register_instance
 
-        @notifier = GoodJob::Notifier.new(enable_listening: configuration.enable_listen_notify, capsule: self, executor: @shared_executor)
+        @reactor = GoodJob::Reactor.new(name: "good_job-reactor")
+        # The advisory lock heartbeat holds its lock on the connection, so the connection isn't replaced on a schedule.
+        advisory_lock_heartbeat = configuration.advisory_lock_heartbeat
+        retirement_age = GoodJob::DedicatedConnection::RETIREMENT_AGE unless advisory_lock_heartbeat
+        @connection = GoodJob::DedicatedConnection.new(reactor: @reactor, retirement_age: retirement_age)
+        # Attach the heartbeat first, so the process is registered before LISTEN.
+        @process_heartbeat = GoodJob::ProcessHeartbeat.new(connection: @connection, capsule: self, advisory_lock: advisory_lock_heartbeat)
+        @notifier = GoodJob::Notifier.new(enable_listening: configuration.enable_listen_notify, capsule: self, connection: @connection)
         @poller = GoodJob::Poller.new(poll_interval: configuration.poll_interval)
         @multi_scheduler = GoodJob::MultiScheduler.from_configuration(configuration, capsule: self, warm_cache_on_initialize: true).tap do |multischeduler|
           multischeduler.lower_thread_priority = @lower_thread_priority unless @lower_thread_priority.nil?
         end
         @notifier.recipients.push([@multi_scheduler, :create_thread])
         @poller.recipients.push(-> { @multi_scheduler.create_thread({ fanout: true }) })
+        @connection.start
 
         @cron_manager = GoodJob::CronManager.new(configuration.cron_entries, start_on_initialize: true, graceful_restart_period: configuration.cron_graceful_restart_period, executor: @shared_executor) if configuration.enable_cron?
         @startable = false
@@ -58,7 +66,8 @@ module GoodJob
     # @return [void]
     def shutdown(timeout: NONE)
       timeout = configuration.shutdown_timeout if timeout == NONE
-      GoodJob._shutdown_all([@notifier, @poller, @multi_scheduler, @cron_manager].compact, after: [@shared_executor], timeout: timeout)
+      # The connection is last: deregistering the process can wait for job threads to return pooled connections.
+      GoodJob._shutdown_all([@poller, @multi_scheduler, @cron_manager, @connection].compact, after: [@shared_executor], timeout: timeout)
       @startable = false
       @started_at = nil
     end
@@ -83,7 +92,7 @@ module GoodJob
 
     # @return [Boolean] Whether the capsule has been shutdown.
     def shutdown?
-      [@notifier, @poller, @multi_scheduler, @cron_manager].compact.all?(&:shutdown?)
+      [@connection, @poller, @multi_scheduler, @cron_manager].compact.all?(&:shutdown?)
     end
 
     # @param duration [nil, Numeric] Length of idleness to check for (in seconds).

@@ -44,6 +44,7 @@ RSpec.configure do |config|
       GoodJob::SharedExecutor.instances,
       GoodJob::CronManager.instances,
       GoodJob::Notifier.instances,
+      GoodJob::DedicatedConnection.instances,
       GoodJob::Poller.instances,
       GoodJob::Scheduler.instances,
       GoodJob::CronManager.instances
@@ -57,6 +58,7 @@ RSpec.configure do |config|
       GoodJob::Capsule,
       GoodJob::CapsuleTracker,
       GoodJob::CronManager,
+      GoodJob::DedicatedConnection,
       GoodJob::Notifier,
       GoodJob::Poller,
       GoodJob::Scheduler,

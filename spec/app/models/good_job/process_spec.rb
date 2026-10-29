@@ -110,6 +110,26 @@ RSpec.describe GoodJob::Process do
     end
   end
 
+  describe '#refresh_with' do
+    it 'updates the record using the given connection' do
+      process = described_class.create!(id: SecureRandom.uuid, state: {}, lock_type: :advisory, updated_at: 1.hour.ago)
+      described_class.connection_pool.with_connection { |connection| process.refresh_with(connection) }
+
+      process.reload
+      expect(process.updated_at).to be > 1.minute.ago
+      expect(process.state).to include("pid" => Process.pid)
+      expect(process.lock_type).to eq "advisory"
+    end
+
+    it 'recreates a deleted record' do
+      process = described_class.create!(id: SecureRandom.uuid, state: {}, lock_type: :advisory)
+      described_class.where(id: process.id).delete_all
+      described_class.connection_pool.with_connection { |connection| process.refresh_with(connection) }
+
+      expect(described_class.find(process.id).lock_type).to eq "advisory"
+    end
+  end
+
   describe '#stale?' do
     it 'returns true when the record is stale' do
       process = described_class.create! state: {}, updated_at: 1.day.ago
