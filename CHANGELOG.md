@@ -1,5 +1,30 @@
 # Changelog
 
+## [v4.24.0](https://github.com/bensheldon/good_job/tree/v4.24.0) (2026-10-29)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.23.1...v4.24.0)
+
+**Implemented enhancements:**
+
+- Add a separate retention period for discarded jobs [\#1897](https://github.com/bensheldon/good_job/pull/1897) ([IslamElsayed](https://github.com/IslamElsayed))
+
+**Fixed bugs:**
+
+- Prevent idle or malformed connections from stalling or stopping the probe server [\#1902](https://github.com/bensheldon/good_job/pull/1902) ([bensheldon](https://github.com/bensheldon))
+- Validate advisory lock SQL identifiers and harden dashboard filter params [\#1901](https://github.com/bensheldon/good_job/pull/1901) ([bensheldon](https://github.com/bensheldon))
+- Don't retain or report schedulers replaced by a capsule restart [\#1894](https://github.com/bensheldon/good_job/pull/1894) ([bensheldon](https://github.com/bensheldon))
+
+**Closed issues:**
+
+- \[feature request\] Cleanup older discarded jobs [\#1597](https://github.com/bensheldon/good_job/issues/1597)
+
+**Merged pull requests:**
+
+- Restructure code so it type-checks under Sorbet without runtime assertions [\#1899](https://github.com/bensheldon/good_job/pull/1899) ([bensheldon](https://github.com/bensheldon))
+- Upgrade development/demo Ruby to 4.0.9 and update dependencies [\#1898](https://github.com/bensheldon/good_job/pull/1898) ([bensheldon](https://github.com/bensheldon))
+- Fix flaky JRuby FrozenError by preloading record schemas in specs [\#1896](https://github.com/bensheldon/good_job/pull/1896) ([bensheldon](https://github.com/bensheldon))
+- Demo: shorten database connection lifetimes [\#1895](https://github.com/bensheldon/good_job/pull/1895) ([bensheldon](https://github.com/bensheldon))
+
 ## [v4.23.1](https://github.com/bensheldon/good_job/tree/v4.23.1) (2026-10-27)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.23.0...v4.23.1)
