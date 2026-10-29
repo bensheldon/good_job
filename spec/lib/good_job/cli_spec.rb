@@ -269,5 +269,17 @@ RSpec.describe GoodJob::CLI do
       expect { old_unfinished_job.reload }.not_to raise_error
       expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
     end
+
+    it 'keeps discarded jobs for their own retention period' do
+      old_discarded_job = GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 36.hours.ago, error: "Error")
+      older_discarded_job = GoodJob::Job.create!(active_job_id: SecureRandom.uuid, finished_at: 4.days.ago, error: "Error")
+      cli = described_class.new([], { before_seconds_ago: 24.hours.to_i, discarded_before_seconds_ago: 3.days.to_i }, {})
+
+      cli.cleanup_preserved_jobs
+
+      expect { old_finished_job.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { old_discarded_job.reload }.not_to raise_error
+      expect { older_discarded_job.reload }.to raise_error ActiveRecord::RecordNotFound
+    end
   end
 end
