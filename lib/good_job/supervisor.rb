@@ -180,14 +180,19 @@ module GoodJob # :nodoc:
 
     private
 
+    # Read through a method because {#process_signals} sets @stopped while the supervise loop is checking it.
+    def stopped?
+      @stopped
+    end
+
     # The main supervise loop. Runs on the calling (main) thread so that all
     # forking happens on the main thread.
     # @param on_shutdown [#call, nil] See {#start}.
     # @return [void]
     def supervise(on_shutdown: nil)
-      until @stopped
+      until stopped?
         process_signals
-        break if @stopped
+        break if stopped?
 
         reap_and_replace
         wait_for_wakeup
@@ -267,11 +272,11 @@ module GoodJob # :nodoc:
 
         handle = forget_subprocess(pid)
         ActiveSupport::Notifications.instrument("cluster_reap.good_job", { pid: pid, status: status&.exitstatus, signal: status&.termsig })
-        next if @stopped || handle.nil?
+        next if stopped? || handle.nil?
 
         restart_count = restart_count_after(handle)
         backoff(restart_count)
-        break if @stopped # a shutdown signal arrived during the backoff
+        break if stopped? # a shutdown signal arrived during the backoff
 
         spawn_subprocess(handle.recipe, index: handle.index, restart_count: restart_count)
       end
@@ -304,7 +309,7 @@ module GoodJob # :nodoc:
       # signal that arrived just before the drain would go unnoticed for the
       # entire delay.
       process_signals
-      return if @stopped
+      return if stopped?
 
       IO.select([@self_pipe_reader], nil, nil, delay)
       process_signals
@@ -498,17 +503,18 @@ module GoodJob # :nodoc:
     def drain_readiness(reader)
       return false if reader.nil? || reader.closed?
 
-      read_any = false
-      loop do
-        reader.read_nonblock(256)
-        read_any = true
+      bytes_read = 0
+      begin
+        loop do
+          bytes_read += reader.read_nonblock(256).bytesize
+        end
+      rescue IO::WaitReadable
+        bytes_read.positive?
+      rescue IOError
+        # EOF (the subprocess closed its end) or a closed pipe during shutdown; the
+        # subprocess will be reaped and its handle removed.
+        false
       end
-    rescue IO::WaitReadable
-      read_any
-    rescue IOError
-      # EOF (the subprocess closed its end) or a closed pipe during shutdown; the
-      # subprocess will be reaped and its handle removed.
-      false
     end
 
     # Discards any bytes buffered in the self-pipe by signal handlers.

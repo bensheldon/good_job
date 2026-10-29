@@ -28,7 +28,7 @@ module GoodJob # :nodoc:
                        end
                      when /darwin|bsd/
                        lambda do |pid|
-                         `ps -o pid,rss -p #{pid.to_i}`.lines.last.split.last.to_i
+                         `ps -o pid,rss -p #{pid.to_i}`.lines.last&.split&.last.to_i
                        end
                      else
                        ->(_pid) { 0 }
@@ -92,12 +92,11 @@ module GoodJob # :nodoc:
       }
       attributes[:lock_type] = :advisory if with_advisory_lock
 
-      record = nil
       transaction do
         record = create!(attributes)
         record.advisory_lock!(connection: advisory_lock_connection) if with_advisory_lock
+        record
       end
-      record
     rescue ActiveRecord::RecordNotUnique
       find_by(id: id).tap do |existing_record|
         next unless existing_record
@@ -136,7 +135,7 @@ module GoodJob # :nodoc:
       update(state: state, updated_at: Time.current)
     rescue ActiveRecord::RecordNotFound
       @new_record = true
-      self.created_at = self.updated_at = nil
+      assign_attributes(created_at: nil, updated_at: nil)
       id_will_change!
       state_will_change!
       save

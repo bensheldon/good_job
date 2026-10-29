@@ -109,7 +109,7 @@ module GoodJob
 
     # @return [String] Current thread name
     def self.thread_name
-      (Thread.current.name || Thread.current.object_id).to_s
+      (Thread.current.name.presence || Thread.current.object_id).to_s
     end
 
     # Wrap the yielded block with CurrentThread values and reset after the block

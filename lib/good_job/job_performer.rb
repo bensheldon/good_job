@@ -31,14 +31,14 @@ module GoodJob
     # @yield [Execution] Yields the execution, if one is dequeued
     # @return [Object, nil] Returns job result or +nil+ if no job was found
     def next
-      active_job_id = nil
+      active_job_ids = []
       @capsule.tracker.register do
         job_query.perform_with_lock(lock_id: @capsule.tracker.id_for_lock, parsed_queues: parsed_queues, queue_select_limit: @capsule.configuration.queue_select_limit, lock_strategy: @capsule.configuration.lock_strategy) do |execution|
           @metrics.touch_check_queue_at
 
           if execution
-            active_job_id = execution.active_job_id
-            performing_active_job_ids << active_job_id
+            active_job_ids << execution.active_job_id
+            performing_active_job_ids << execution.active_job_id
             @metrics.touch_execution_at
             yield(execution) if block_given?
           else
@@ -51,7 +51,7 @@ module GoodJob
         end
       end
     ensure
-      performing_active_job_ids.delete(active_job_id) if active_job_id
+      active_job_ids&.each { |active_job_id| performing_active_job_ids.delete(active_job_id) }
     end
 
     # Tests whether this performer should be used in GoodJob's current state.

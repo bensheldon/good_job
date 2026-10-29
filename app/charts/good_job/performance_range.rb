@@ -281,8 +281,9 @@ module GoodJob
       components = match.captures
       components[-1] ||= "0"
       numeric_components = components.map { |component| Integer(component, 10) }
-      local_time = Time.utc(*numeric_components)
-      normalized_value = format("%04d-%02d-%02dT%02d:%02d:%02d", *numeric_components)
+      year, month, day, hour, minute, second = numeric_components
+      local_time = Time.utc(year, month, day, hour, minute, second)
+      normalized_value = format("%04d-%02d-%02dT%02d:%02d:%02d", year, month, day, hour, minute, second)
       return unless local_time.strftime("%Y-%m-%dT%H:%M:%S") == normalized_value
 
       periods = @local_time_zone.tzinfo.periods_for_local(local_time)
@@ -291,7 +292,7 @@ module GoodJob
       # A local input cannot carry an offset. Include both repeated fall-back occurrences
       # by resolving starts to the earlier instant and ends to the later instant.
       instants = periods.map do |period|
-        (local_time - period.utc_total_offset).in_time_zone
+        local_time.ago(period.utc_total_offset).in_time_zone
       end
       parameter_key == "chart_end" ? instants.max : instants.min
     end

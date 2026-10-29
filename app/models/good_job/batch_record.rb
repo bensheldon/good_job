@@ -63,8 +63,8 @@ module GoodJob
           if job_discarded && !discarded_at
             update(discarded_at: Time.current)
 
-            if on_discard.present?
-              discard_job_class = on_discard.constantize
+            discard_job_class = on_discard.presence&.constantize
+            if discard_job_class
               Job.defer_after_commit_maybe(discard_job_class) do
                 Batch.within_thread(batch_id: nil, batch_callback_id: id) do
                   discard_job_class.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :discard })
@@ -76,8 +76,8 @@ module GoodJob
           if enqueued_at && !(self.class.jobs_finished_at_migrated? ? jobs_finished_at : finished_at) && jobs.where(finished_at: nil).none?
             self.class.jobs_finished_at_migrated? ? update(jobs_finished_at: Time.current) : update(finished_at: Time.current)
 
-            if !discarded_at && on_success.present?
-              success_job_class = on_success.constantize
+            success_job_class = on_success.presence&.constantize unless discarded_at
+            if success_job_class
               Job.defer_after_commit_maybe(success_job_class) do
                 Batch.within_thread(batch_id: nil, batch_callback_id: id) do
                   success_job_class.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :success })
@@ -85,11 +85,11 @@ module GoodJob
               end
             end
 
-            if on_finish.present?
-              finish_job_class = on_finish.constantize
+            finish_job_class = on_finish.presence&.constantize
+            if finish_job_class
               Job.defer_after_commit_maybe(finish_job_class) do
                 Batch.within_thread(batch_id: nil, batch_callback_id: id) do
-                  on_finish.constantize.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :finish })
+                  finish_job_class.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :finish })
                 end
               end
             end
@@ -113,7 +113,8 @@ module GoodJob
     end
 
     if Rails.gem_version < Gem::Version.new('7.1.0.alpha')
-      serialize :serialized_properties, PropertySerializer, default: -> { {} }
+      # Positional coder argument; Sorbet only knows the Rails 7.1+ signature
+      public_send(:serialize, :serialized_properties, PropertySerializer, default: -> { {} }) # rubocop:disable Style/SendWithLiteralMethodName
     else
       serialize :serialized_properties, coder: PropertySerializer, default: -> { {} }
     end
