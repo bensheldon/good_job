@@ -112,6 +112,14 @@ RSpec.describe GoodJob::JobsFilter do
         end
       end
 
+      describe 'non-string query' do
+        before { params[:query] = ['DeadError'] }
+
+        it 'ignores the query' do
+          expect(filter.records.size).to eq 5
+        end
+      end
+
       describe 'Job ID query' do
         before do
           params[:query] = GoodJob::Job.last.id
@@ -121,6 +129,17 @@ RSpec.describe GoodJob::JobsFilter do
           expect(filter.records.size).to eq 1
           expect(filter.records.first).to eq GoodJob::Job.last
         end
+      end
+    end
+
+    context 'when after_at is malformed' do
+      before do
+        params[:after_id] = GoodJob::Job.last.id
+        params[:after_at] = 'not-a-time'
+      end
+
+      it 'ignores the after_at fallback' do
+        expect { filter.records.to_a }.not_to raise_error
       end
     end
 

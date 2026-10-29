@@ -122,6 +122,16 @@ RSpec.describe GoodJob::AdvisoryLockable do
       ensure
         described_class.hash_function = "md5"
       end
+
+      it 'rejects an unsupported hash function' do
+        allow(described_class).to receive(:hash_function).and_return("sha256'); SELECT 1; --")
+
+        expect { model_class.advisory_lock.to_sql }.to raise_error(ArgumentError, /Unsupported advisory lock hash function/)
+      end
+    end
+
+    it 'rejects an unsupported lock function' do
+      expect { model_class.advisory_lock(function: "pg_sleep(1) OR pg_try_advisory_lock") }.to raise_error(ArgumentError, /Unsupported advisory lock function/)
     end
 
     describe 'select limit' do
@@ -169,6 +179,11 @@ RSpec.describe GoodJob::AdvisoryLockable do
   end
 
   describe '.advisory_lock_key' do
+    it 'rejects an unsupported lock function' do
+      expect { model_class.advisory_lock_key(job.lockable_key, function: "pg_sleep") }.to raise_error(ArgumentError, /Unsupported advisory lock function/)
+      expect { model_class.advisory_unlock_key(job.lockable_key, function: "pg_sleep") }.to raise_error(ArgumentError, /Unsupported advisory lock function/)
+    end
+
     it 'locks a key' do
       model_class.advisory_lock_key(job.lockable_key)
       expect(job).to be_advisory_locked

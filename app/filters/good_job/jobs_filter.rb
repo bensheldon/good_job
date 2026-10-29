@@ -92,7 +92,9 @@ module GoodJob
     end
 
     def filter_by_search_query(query)
-      search_query = query&.strip
+      return {} unless query.is_a?(String)
+
+      search_query = query.strip
       return {} if search_query.blank?
 
       if query_is_uuid_and_job_exists?(search_query)
