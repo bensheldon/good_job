@@ -26,6 +26,11 @@ RSpec.configure do |config|
     expect(PgLock.current_database.advisory_lock.count).to eq(0), "Existing advisory locks BEFORE test run"
 
     GoodJob::CurrentThread.reset
+
+    # Some specs call `reset_column_information`; reload schemas on the main thread so
+    # background threads don't race on lazy schema loading, which isn't thread-safe on JRuby.
+    GoodJob._load_record_schemas
+
     THREAD_ERRORS.clear
     GoodJob.on_thread_error = lambda do |exception|
       THREAD_ERRORS << [Thread.current.name, exception, exception.backtrace]

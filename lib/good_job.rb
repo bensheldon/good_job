@@ -218,7 +218,7 @@ module GoodJob
     GoodJob::BaseRecord.descendants.each do |record_class|
       next if record_class.abstract_class?
 
-      record_class.load_schema
+      record_class.columns_hash # loads the schema; `load_schema` is private before Rails 7.1
       record_class.define_attribute_methods
     end
     GoodJob::Job.lock_type_column_exists?
