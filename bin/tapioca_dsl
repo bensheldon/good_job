@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Generates Sorbet DSL RBIs for GoodJob constants only.
+# Tapioca needs a Rails app to load, so it runs against the demo app;
+# RBIs for the demo app's own constants are discarded.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+# Forking workers crash on macOS without this
+OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES bin/tapioca dsl --app-root=demo --workers=1 "$@"
+
+find sorbet/rbi/dsl -type f -name "*.rbi" ! -path "sorbet/rbi/dsl/good_job/*" -delete
+find sorbet/rbi/dsl -type d -empty -delete

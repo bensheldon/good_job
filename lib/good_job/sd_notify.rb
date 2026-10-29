@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 
 # This is a copy of https://github.com/agis/ruby-sdnotify as of v0.1.1
