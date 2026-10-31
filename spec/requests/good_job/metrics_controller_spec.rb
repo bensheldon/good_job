@@ -20,6 +20,26 @@ describe GoodJob::MetricsController do
         }.to_json
       )
     end
+
+    it 'counts cron entries enabled or disabled through settings' do
+      cron_entries = [
+        GoodJob::CronEntry.new(key: :on_by_default, cron: "* * * * *", class: "ExampleJob"),
+        GoodJob::CronEntry.new(key: :on_by_default_then_disabled, cron: "* * * * *", class: "ExampleJob"),
+        GoodJob::CronEntry.new(key: :off_by_default, cron: "* * * * *", class: "ExampleJob", enabled_by_default: false),
+        GoodJob::CronEntry.new(key: :off_by_default_then_enabled, cron: "* * * * *", class: "ExampleJob", enabled_by_default: false),
+      ]
+      allow(GoodJob::CronEntry).to receive(:all).and_return(cron_entries)
+      GoodJob::Setting.cron_key_disable(:on_by_default_then_disabled)
+      GoodJob::Setting.cron_key_enable(:off_by_default_then_enabled)
+
+      get good_job.metrics_primary_nav_path
+
+      expect(response.parsed_body).to include(
+        'cron_entries_count' => '4',
+        'cron_entries_enabled_count' => '2',
+        'cron_entries_paused_count' => '2'
+      )
+    end
   end
 
   describe 'GET #job_status' do
