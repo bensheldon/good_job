@@ -805,6 +805,8 @@ GoodJob can enqueue Active Job jobs on a recurring basis that can be used as a r
 
 Cron-style jobs can be enequeued by any GoodJob process (e.g., CLI or `:async` execution mode) that has `config.good_job.enable_cron` set to `true`. Enabling cron on multiple processes will not enqueue duplicate jobs; GoodJob's cron uses unique indexes to ensure that only a single job is enqueued for a given time interval.  In order for this to work, GoodJob must preserve cron-created job records; these records will be automatically deleted like any other preserved record.
 
+When cron is enabled on multiple processes, each process attempts to enqueue every scheduled job and all but one of the inserts fail on the unique index. GoodJob rescues these failures, but PostgreSQL still writes them to its own log as `duplicate key value violates unique constraint "index_good_jobs_on_cron_key_and_cron_at_cond"`. These errors are expected and harmless. If they are too noisy, enable cron on a single process instead, at the cost of no redundancy if that process stops.
+
 Cron-format is parsed by the [`fugit`](https://github.com/floraison/fugit) gem, which has support for seconds-level resolution (e.g. `* * * * * *`) and natural language parsing (e.g. `every second`).
 
 If you use the [Dashboard](#dashboard) the scheduled tasks can be viewed in the 'cron' menu. In this view you can also disable a task or run/enqueue a task immediately.
