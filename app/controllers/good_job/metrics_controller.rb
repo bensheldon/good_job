@@ -8,7 +8,9 @@ module GoodJob
       batches_count = GoodJob::BatchRecord.all.size
       cron_entries = GoodJob::CronEntry.all
       cron_entries_count = cron_entries.size
-      cron_entries_enabled_count = cron_entries.count(&:enabled?)
+      cron_entries_enabled_count = GoodJob::Setting.cron_keys_enabled(
+        cron_entries.map { |entry| [entry.key, entry.enabled_by_default?] }
+      ).values.count(true)
       cron_entries_paused_count = cron_entries_count - cron_entries_enabled_count
       pauses_count = GoodJob::Setting.paused.values.sum(&:count)
       processes_count = GoodJob::Process.active.count
