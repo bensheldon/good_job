@@ -1,5 +1,23 @@
 # Changelog
 
+## [v4.24.1](https://github.com/bensheldon/good_job/tree/v4.24.1) (2026-11-03)
+
+[Full Changelog](https://github.com/bensheldon/good_job/compare/v4.24.0...v4.24.1)
+
+**Fixed bugs:**
+
+- Look up cron settings once, not per entry, in the primary nav \(36 ms → 0.75 ms at 100 entries\) [\#1906](https://github.com/bensheldon/good_job/pull/1906) ([czj](https://github.com/czj))
+- Sort dashboard chart legends alphabetically [\#1903](https://github.com/bensheldon/good_job/pull/1903) ([6temes](https://github.com/6temes))
+
+**Closed issues:**
+
+- Unique constraint violation messages in postgres error logs [\#1536](https://github.com/bensheldon/good_job/issues/1536)
+
+**Merged pull requests:**
+
+- Document expected duplicate key errors from cron in Postgres logs [\#1908](https://github.com/bensheldon/good_job/pull/1908) ([rafayqayyum](https://github.com/rafayqayyum))
+- Bump github/codeql-action from 4.38.2 to 4.39.1 [\#1907](https://github.com/bensheldon/good_job/pull/1907) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v4.24.0](https://github.com/bensheldon/good_job/tree/v4.24.0) (2026-10-29)
 
 [Full Changelog](https://github.com/bensheldon/good_job/compare/v4.23.1...v4.24.0)
