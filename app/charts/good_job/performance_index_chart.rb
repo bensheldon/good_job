@@ -49,7 +49,7 @@ module GoodJob
 
       executions_data = GoodJob::Job.connection_pool.with_connection { |conn| conn.exec_query(GoodJob::Job.pg_or_jdbc_query(sum_query), "GoodJob Performance Chart", binds) }
 
-      job_names = executions_data.reject { |d| d['value'].nil? }.map { |d| d['job_class'] || BaseFilter::EMPTY }.uniq
+      job_names = executions_data.reject { |d| d['value'].nil? }.map { |d| d['job_class'] || BaseFilter::EMPTY }.uniq.sort
       timestamp_values = []
       timestamps = []
       jobs_data = executions_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|

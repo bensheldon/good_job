@@ -41,6 +41,13 @@ RSpec.describe GoodJob::PerformanceIndexChart do
       end
     end
 
+    it "orders the job classes alphabetically, like the job class filter" do
+      create_execution(job_class: "ZebraJob", scheduled_at: 3.hours.ago)
+      create_execution(job_class: "AlphaJob", scheduled_at: 1.hour.ago)
+
+      expect(chart.data.dig(:data, :datasets).pluck(:label)).to eq(%w[AlphaJob ZebraJob])
+    end
+
     context "with a non-whole-hour custom range" do
       let(:params) do
         {
