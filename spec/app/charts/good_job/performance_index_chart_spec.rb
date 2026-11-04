@@ -48,6 +48,14 @@ RSpec.describe GoodJob::PerformanceIndexChart do
       expect(chart.data.dig(:data, :datasets).pluck(:label)).to eq(%w[AlphaJob ZebraJob])
     end
 
+    it "plots executions with a NULL job class under the [none] series" do
+      create_execution(job_class: nil, scheduled_at: 3.hours.ago)
+
+      dataset = chart.data.dig(:data, :datasets).find { |d| d[:label] == "[none]" }
+      expect(dataset).not_to be_nil
+      expect(dataset[:data]).to include(1.0)
+    end
+
     context "with a non-whole-hour custom range" do
       let(:params) do
         {

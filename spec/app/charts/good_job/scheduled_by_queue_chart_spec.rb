@@ -16,6 +16,14 @@ RSpec.describe GoodJob::ScheduledByQueueChart do
 
       expect(chart.data.dig(:data, :datasets).pluck(:label)).to eq(%w[alpha zebra])
     end
+
+    it "plots jobs with a NULL queue name under the [none] series" do
+      create_job(queue_name: nil, scheduled_at: 3.hours.ago)
+
+      dataset = chart.data.dig(:data, :datasets).find { |d| d[:label] == "[none]" }
+      expect(dataset).not_to be_nil
+      expect(dataset[:data]).to include(1)
+    end
   end
 
   def create_job(queue_name:, scheduled_at:)
