@@ -56,7 +56,7 @@ module GoodJob
         timestamp_values << timestamp
         timestamps << @range.canonical_timestamp(timestamp)
         job_names.each do |job_class|
-          value = values.find { |d| d['job_class'] == job_class }&.[]('value')
+          value = values.find { |d| (d['job_class'] || BaseFilter::EMPTY) == job_class }&.[]('value')
           seconds = value ? ActiveSupport::Duration.parse(value).to_f : @metric.empty_value
           (hash[job_class] ||= []) << seconds
         end
@@ -67,8 +67,7 @@ module GoodJob
         type: "line",
         data: {
           labels: labels,
-          datasets: jobs_data.map do |job_class, data|
-            label = job_class || '(none)'
+          datasets: jobs_data.map do |label, data|
             {
               label: label,
               data: data,
