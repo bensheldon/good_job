@@ -61,8 +61,7 @@ module GoodJob
         type: "line",
         data: {
           labels: labels,
-          datasets: queues_data.map do |queue, data|
-            label = queue
+          datasets: queues_data.map do |label, data|
             {
               label: label,
               data: data,

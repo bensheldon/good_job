@@ -67,8 +67,7 @@ module GoodJob
         type: "line",
         data: {
           labels: labels,
-          datasets: jobs_data.map do |job_class, data|
-            label = job_class
+          datasets: jobs_data.map do |label, data|
             {
               label: label,
               data: data,
