@@ -48,6 +48,15 @@ RSpec.describe GoodJob::PerformanceIndexChart do
       expect(chart.data.dig(:data, :datasets).pluck(:label)).to eq(%w[AlphaJob ZebraJob])
     end
 
+    it "plots executions without a job class under [none]" do
+      create_execution(job_class: nil, scheduled_at: 1.hour.ago)
+
+      datasets = described_class.new(range, GoodJob::LatencyMetric::Execution.new).data.dig(:data, :datasets)
+
+      expect(datasets.pluck(:label)).to eq([GoodJob::BaseFilter::EMPTY])
+      expect(datasets.first[:data].sum).to eq(1.0)
+    end
+
     context "with a non-whole-hour custom range" do
       let(:params) do
         {
