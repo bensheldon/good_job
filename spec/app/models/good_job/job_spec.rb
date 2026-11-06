@@ -72,7 +72,7 @@ RSpec.describe GoodJob::Job do
       expect(described_class.enqueue_after_commit?([ImmediateJob, ImmediateJob])).to be false
     end
 
-    context 'when the job class lets the queue adapter decide', skip: Rails.gem_version >= Gem::Version.new('8.0.0.alpha') do
+    context 'when the job class lets the queue adapter decide', skip: !ActiveRecord.respond_to?(:after_all_transactions_commit) || Rails.gem_version >= Gem::Version.new('8.0.0.alpha') do
       before do
         stub_const 'AdapterDefaultJob', Class.new(ActiveJob::Base) { self.enqueue_after_transaction_commit = :default }
       end
