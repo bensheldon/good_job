@@ -65,6 +65,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         - [Retries](#retries)
         - [Action Mailer retries](#action-mailer-retries)
         - [Interrupts, graceful shutdown, and SIGKILL](#Interrupts-graceful-shutdown-and-SIGKILL)
+        - [Active Job Continuations](#active-job-continuations)
     - [Timeouts](#timeouts)
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
     - [Database connections](#database-connections)
@@ -344,6 +345,7 @@ Available configuration options are:
     ```
 
 - `enable_pauses` (boolean) whether job processing can be paused. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_PAUSES`.
+- `continuation_progress_interval` (number of seconds or `ActiveSupport::Duration`) the minimum number of seconds between periodic writes of an [Active Job Continuation's](#active-job-continuations) progress, so it can resume from a recent checkpoint after a non-graceful shutdown. Defaults to `5`. Disable with `false` or `0`. You can also set this with the environment variable `GOOD_JOB_CONTINUATION_PROGRESS_INTERVAL`.
 - `dequeue_query_sort` (symbol) sets the sort order used when querying for the next job(s) to execute. Defaults to `:created_at`. It can be any one of:
     - `:created_at` sorts by priority, then job creation order. This is the default, but no longer best matches GoodJob's contemporary data model.
     - `:scheduled_at` sorts by priority, then `scheduled_at`, then `id`, which better matches GoodJob's contemporary data model. This will become the default/only behavior in a future major release.
@@ -1241,6 +1243,31 @@ class MyJob < ApplicationJob
   discard_on GoodJob::InterruptError
   # Retry the job if it is interrupted
   retry_on GoodJob::InterruptError, wait: 0, attempts: Float::INFINITY
+end
+```
+
+### Active Job Continuations
+
+GoodJob supports [Active Job Continuations](https://api.rubyonrails.org/classes/ActiveJob/Continuation.html) (`ActiveJob::Continuable`). On a graceful shutdown, or when the job's queue, job class, or label is [paused](#pausing-jobs), a continuable job is interrupted at its next checkpoint and retried with its progress.
+
+If the process exits without a graceful shutdown (e.g. `SIGKILL`, running out of memory, or a power failure), the job is retried from the progress that was last written to the database. To keep that close to where the job was, GoodJob periodically writes the progress of a performing continuable job at its checkpoints (when the step's cursor is set or advanced, or `checkpoint!` is called):
+
+- Progress is written at most every `continuation_progress_interval` seconds (default `5`). Jobs that finish within the interval never write.
+- Rails does not allow checkpoints inside a database transaction, so progress is never written as part of the job's own transaction.
+- Work done after the last write is performed again, so each item of work must be idempotent.
+- Retrying a job from the Dashboard also resumes it from its last written progress.
+- Periodic writes require Rails 8.2 or later (currently Rails `main`), where Active Job passes the job to `queue_adapter.stopping?`. On earlier versions, progress is only written when the job is gracefully interrupted.
+
+To override the interval for a job class, for example when the job's arguments are large or its work is cheap to redo, include the `GoodJob::ActiveJobExtensions::ContinuationProgress` extension:
+
+```ruby
+class MyContinuableJob < ApplicationJob
+  include ActiveJob::Continuable
+  include GoodJob::ActiveJobExtensions::ContinuationProgress
+
+  self.good_job_continuation_progress_interval = 30.seconds
+  # Or only write progress when gracefully interrupted:
+  # self.good_job_continuation_progress_interval = false
 end
 ```
 

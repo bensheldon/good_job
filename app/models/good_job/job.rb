@@ -785,6 +785,7 @@ module GoodJob
         execution, result = GoodJob::CurrentThread.within do |current_thread|
           current_thread.reset
           current_thread.job = self
+          current_thread.continuation_progress_writer = ContinuationProgressWriter.new(self)
 
           existing_performed_at = performed_at
           if existing_performed_at

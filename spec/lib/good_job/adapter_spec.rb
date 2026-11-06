@@ -384,6 +384,31 @@ RSpec.describe GoodJob::Adapter do
       end
     end
 
+    it 'writes the continuation progress when not stopping' do
+      allow(GoodJob.configuration).to receive(:enable_pauses).and_return(false)
+      progress_writer = instance_double(GoodJob::ContinuationProgressWriter, write_if_due: true)
+
+      GoodJob::CurrentThread.within do |current_thread|
+        current_thread.continuation_progress_writer = progress_writer
+
+        expect(adapter.stopping?(active_job)).to be false
+        expect(adapter.stopping?).to be false
+      end
+      expect(progress_writer).to have_received(:write_if_due).with(active_job).once
+    end
+
+    it 'does not write the continuation progress when stopping' do
+      allow(GoodJob).to receive(:current_thread_shutting_down?).and_return(true)
+      progress_writer = instance_double(GoodJob::ContinuationProgressWriter, write_if_due: true)
+
+      GoodJob::CurrentThread.within do |current_thread|
+        current_thread.continuation_progress_writer = progress_writer
+
+        expect(adapter.stopping?(active_job)).to eq(:stopping)
+      end
+      expect(progress_writer).not_to have_received(:write_if_due)
+    end
+
     it 'ignores pauses when pauses are disabled' do
       allow(GoodJob.configuration).to receive(:enable_pauses).and_return(false)
       GoodJob::Setting.pause(queue: "default")
