@@ -65,6 +65,7 @@ For more of the story of GoodJob, read the [introductory blog post](https://isla
         - [Retries](#retries)
         - [Action Mailer retries](#action-mailer-retries)
         - [Interrupts, graceful shutdown, and SIGKILL](#Interrupts-graceful-shutdown-and-SIGKILL)
+        - [Active Job Continuations](#active-job-continuations)
     - [Timeouts](#timeouts)
     - [Optimize queues, threads, and processes](#optimize-queues-threads-and-processes)
     - [Database connections](#database-connections)
@@ -1243,6 +1244,27 @@ class MyJob < ApplicationJob
   retry_on GoodJob::InterruptError, wait: 0, attempts: Float::INFINITY
 end
 ```
+
+### Active Job Continuations
+
+GoodJob supports [Active Job Continuations](https://api.rubyonrails.org/classes/ActiveJob/Continuation.html) (`ActiveJob::Continuable`). On a graceful shutdown, or when the job's queue, job class, or label is [paused](#pausing-jobs), a continuable job is interrupted at its next checkpoint and retried with its progress.
+
+If the process exits without a graceful shutdown (e.g. `SIGKILL`, running out of memory, or a power failure), the job is retried from the progress that was last saved to the database, which may be from the start of the job. To save the progress of a performing continuable job periodically, include the `GoodJob::ActiveJobExtensions::ContinuationSaving` extension:
+
+```ruby
+class MyContinuableJob < ApplicationJob
+  include ActiveJob::Continuable
+  include GoodJob::ActiveJobExtensions::ContinuationSaving
+
+  # Optional: save progress at most every 30 seconds (default: 5)
+  self.good_job_continuation_save_interval = 30.seconds
+end
+```
+
+- Progress is saved at the job's checkpoints (when the step's cursor is set or advanced, or `checkpoint!` is called), at most every `good_job_continuation_save_interval` seconds. Jobs that finish within the interval never save. Set the interval to `false` or `0` to turn periodic saving off, e.g. in a subclass.
+- Rails does not allow checkpoints inside a database transaction, so progress is never saved as part of the job's own transaction.
+- Work done after the last save is performed again, so each item of work must be idempotent.
+- Retrying a job from the Dashboard also resumes it from its last saved progress.
 
 ### Timeouts
 
