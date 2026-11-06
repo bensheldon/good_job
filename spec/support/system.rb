@@ -21,6 +21,17 @@ module SystemTestHelpers
     end
   end
 
+  def chart_series_colors
+    page.document.synchronize do
+      page.evaluate_script(<<~JAVASCRIPT) || raise(Capybara::ExpectationNotMet, "chart not rendered")
+        (() => {
+          const chart = window.Chart?.getChart(document.querySelector("[data-chart-target='canvas']"))
+          return chart && Object.fromEntries(chart.data.datasets.map((dataset) => [dataset.label, dataset.borderColor]))
+        })()
+      JAVASCRIPT
+    end
+  end
+
   [
     :accept_alert,
     :dismiss_alert,

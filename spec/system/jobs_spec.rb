@@ -12,6 +12,18 @@ describe 'Jobs', :js, :without_executor do
     expect(page).to have_text 'GoodJob 👍'
   end
 
+  it 'draws each queue on the chart in its own color' do
+    ActiveJob::Base.queue_adapter = GoodJob::Adapter.new(execution_mode: :external)
+    # Anagrams, which a color derived from the sum of the name's bytes cannot tell apart.
+    %w[low owl].each { |queue| ExampleJob.set(queue: queue, wait_until: 1.hour.ago).perform_later }
+
+    visit good_job.jobs_path
+    colors = chart_series_colors
+
+    expect(colors.keys).to eq(%w[low owl])
+    expect(colors.values.uniq.size).to eq(2)
+  end
+
   it 'renders each top-level page successfully' do
     visit good_job.jobs_path
     expect(page).to have_text 'GoodJob 👍'

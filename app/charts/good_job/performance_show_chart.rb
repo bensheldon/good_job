@@ -58,8 +58,6 @@ module GoodJob
           datasets: [{
             label: @job_class,
             data: bucket_data,
-            backgroundColor: string_to_hsl(@job_class),
-            borderColor: string_to_hsl(@job_class),
           }],
         },
         options: {
