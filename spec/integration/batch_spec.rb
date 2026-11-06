@@ -457,6 +457,99 @@ RSpec.describe 'Batches' do
     end
   end
 
+  describe 'batch finishing while its callback job is waiting to run' do
+    before do
+      stub_const 'PERFORMED_BATCHES', []
+      stub_const 'DeferredCallbackJob', (Class.new(ActiveJob::Base) do
+        def perform(batch, _options)
+          PERFORMED_BATCHES << batch
+        end
+      end)
+    end
+
+    shared_examples 'a batch that finishes after its callback' do |callback, error: false|
+      it "is not finished or cleaned up until the #{callback} callback job finishes" do
+        batch = GoodJob::Batch.new(callback => "DeferredCallbackJob", callback_queue_name: "callbacks")
+        batch.enqueue { TestJob.perform_later(error: error) }
+
+        GoodJob.perform_inline("default")
+
+        expect(GoodJob::Job.where(batch_callback_id: batch.id, finished_at: nil).count).to eq 1
+        expect(batch.reload).not_to be_finished
+
+        GoodJob.cleanup_preserved_jobs(older_than: 0, include_discarded: true)
+        GoodJob.perform_inline("callbacks")
+
+        expect(GoodJob::Job.where(batch_callback_id: batch.id).last.error).to be_nil
+        expect(PERFORMED_BATCHES.map(&:id)).to eq [batch.id]
+        expect(batch.reload).to be_finished
+      end
+    end
+
+    context 'when the callback job does not enqueue after transaction commit' do
+      before do
+        DeferredCallbackJob.enqueue_after_transaction_commit = Rails.gem_version < Gem::Version.new('8.0.0.alpha') ? :never : false if DeferredCallbackJob.respond_to?(:enqueue_after_transaction_commit=)
+      end
+
+      it_behaves_like 'a batch that finishes after its callback', :on_finish
+      it_behaves_like 'a batch that finishes after its callback', :on_success
+      it_behaves_like 'a batch that finishes after its callback', :on_discard, error: true
+    end
+
+    context 'when the callback job enqueues after transaction commit', skip: !ActiveRecord.respond_to?(:after_all_transactions_commit) do
+      before do
+        DeferredCallbackJob.enqueue_after_transaction_commit = Rails.gem_version < Gem::Version.new('8.0.0.alpha') ? :always : true
+      end
+
+      it_behaves_like 'a batch that finishes after its callback', :on_finish
+      it_behaves_like 'a batch that finishes after its callback', :on_success
+      it_behaves_like 'a batch that finishes after its callback', :on_discard, error: true
+
+      it 'finishes the batch when the callback job enqueue is halted' do
+        DeferredCallbackJob.before_enqueue { throw :abort }
+
+        batch = GoodJob::Batch.new(on_finish: "DeferredCallbackJob")
+        batch.enqueue { TestJob.perform_later }
+
+        GoodJob.perform_inline
+
+        expect(GoodJob::Job.where(batch_callback_id: batch.id)).to be_empty
+        expect(batch.reload).to be_finished
+      end
+
+      it 'is not finished by a concurrent batch update while the callback job is being inserted' do
+        batch = GoodJob::Batch.new(on_finish: "DeferredCallbackJob", callback_queue_name: "callbacks")
+        batch.enqueue { TestJob.perform_later }
+
+        concurrent_update = nil
+        allow(GoodJob::Job).to receive(:enqueue).and_wrap_original do |original, active_job, **kwargs|
+          if active_job.is_a?(DeferredCallbackJob)
+            backend_pid = Concurrent::IVar.new
+            concurrent_update = Thread.new do
+              Rails.application.executor.wrap do
+                GoodJob::BatchRecord.connection_pool.with_connection do |connection|
+                  backend_pid.set(connection.select_value('SELECT pg_backend_pid()'))
+                  GoodJob::BatchRecord.find(batch.id)._continue_discard_or_finish
+                end
+              end
+            end
+
+            # Let the concurrent update either finish or block on the batch's advisory lock before inserting the callback job.
+            wait_until { expect(!concurrent_update.alive? || PgLock.advisory_lock.exists?(pid: backend_pid.value(5), granted: false)).to be true }
+          end
+
+          original.call(active_job, **kwargs)
+        end
+
+        GoodJob.perform_inline("default")
+        expect(concurrent_update.join(10)).to eq concurrent_update
+
+        expect(GoodJob::Job.where(batch_callback_id: batch.id, finished_at: nil).count).to eq 1
+        expect(batch.reload).not_to be_finished
+      end
+    end
+  end
+
   describe 'Batch.enqueue_all' do
     it 'executes jobs and fires callbacks for all batches' do
       batch_1 = GoodJob::Batch.new(on_finish: "BatchCallbackJob")
