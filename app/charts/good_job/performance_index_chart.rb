@@ -72,8 +72,6 @@ module GoodJob
             {
               label: label,
               data: data,
-              backgroundColor: string_to_hsl(label),
-              borderColor: string_to_hsl(label),
               spanGaps: @metric.span_gaps?,
             }
           end,
