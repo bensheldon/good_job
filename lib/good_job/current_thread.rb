@@ -10,6 +10,7 @@ module GoodJob
     # Resettable accessors for thread-local values.
     ACCESSORS = %i[
       active_job
+      continuation_progress_writer
       cron_at
       cron_key
       error_on_discard
@@ -26,6 +27,12 @@ module GoodJob
     #   Cron At
     #   @return [ActiveJob::Base, nil]
     thread_mattr_accessor :active_job
+
+    # @!attribute [rw] continuation_progress_writer
+    #   @!scope class
+    #   Continuation progress writer for the currently executing job
+    #   @return [GoodJob::ContinuationProgressWriter, nil]
+    thread_mattr_accessor :continuation_progress_writer
 
     # @!attribute [rw] cron_at
     #   @!scope class

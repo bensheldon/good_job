@@ -194,6 +194,48 @@ RSpec.describe GoodJob::Configuration do
     end
   end
 
+  describe '#continuation_progress_interval' do
+    it 'defaults to 5 seconds' do
+      expect(described_class.new({}).continuation_progress_interval).to eq 5.0
+    end
+
+    it 'uses the option' do
+      expect(described_class.new({ continuation_progress_interval: 2 }).continuation_progress_interval).to eq 2.0
+    end
+
+    it 'uses rails config and accepts durations' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ continuation_progress_interval: 1.minute })
+
+      expect(described_class.new({}).continuation_progress_interval).to eq 60.0
+    end
+
+    it 'uses the environment variable' do
+      configuration = described_class.new({}, env: { 'GOOD_JOB_CONTINUATION_PROGRESS_INTERVAL' => '7.5' })
+
+      expect(configuration.continuation_progress_interval).to eq 7.5
+    end
+
+    it 'uses the default with nil' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ continuation_progress_interval: nil })
+
+      expect(described_class.new({}).continuation_progress_interval).to eq 5.0
+    end
+
+    [false, 0, -1].each do |value|
+      it "is disabled with #{value.inspect}" do
+        allow(Rails.application.config).to receive(:good_job).and_return({ continuation_progress_interval: value })
+
+        expect(described_class.new({}).continuation_progress_interval).to be_nil
+      end
+    end
+
+    it 'is disabled with an environment variable of 0' do
+      configuration = described_class.new({}, env: { 'GOOD_JOB_CONTINUATION_PROGRESS_INTERVAL' => '0' })
+
+      expect(configuration.continuation_progress_interval).to be_nil
+    end
+  end
+
   describe '#cleanup_interval_jobs' do
     it 'defaults to 1000' do
       configuration = described_class.new({})

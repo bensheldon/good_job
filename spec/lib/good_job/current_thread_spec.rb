@@ -6,6 +6,7 @@ RSpec.describe GoodJob::CurrentThread do
   after { described_class.reset }
 
   [
+    :continuation_progress_writer,
     :cron_at,
     :cron_key,
     :error_on_discard,
@@ -57,6 +58,7 @@ RSpec.describe GoodJob::CurrentThread do
     it 'returns a hash' do
       value = {
         active_job: nil,
+        continuation_progress_writer: nil,
         cron_at: 5.minutes.ago,
         cron_key: 'example',
         error_on_discard: false,

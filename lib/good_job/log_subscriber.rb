@@ -191,6 +191,26 @@ module GoodJob
     end
 
     # @!macro notification_responder
+    def continuation_progress(event)
+      job = event.payload[:job]
+      exception = event.payload[:exception]
+
+      if exception
+        warn do
+          "GoodJob failed to write the continuation progress of job #{job.id}: #{exception.join(': ')}"
+        end
+      elsif event.payload[:lost_ownership]
+        warn do
+          "GoodJob stopped writing the continuation progress of job #{job.id} because the job is no longer owned by this execution"
+        end
+      else
+        debug do
+          "GoodJob wrote the continuation progress of job #{job.id} in #{event.duration.round(1)}ms"
+        end
+      end
+    end
+
+    # @!macro notification_responder
     def notifier_listen(event) # rubocop:disable Lint/UnusedMethodArgument
       info do
         "Notifier subscribed with LISTEN"

@@ -106,4 +106,32 @@ RSpec.describe GoodJob::LogSubscriber do
       expect(logs.string).to include("delaying the replacement of a repeatedly exiting subprocess by 2 seconds (consecutive unhealthy exits: 3)")
     end
   end
+
+  describe "#continuation_progress" do
+    let(:logs) { StringIO.new }
+    let(:job) { instance_double(GoodJob::Job, id: "a-job-id") }
+
+    before { described_class.loggers << Logger.new(logs) }
+
+    it 'logs a written checkpoint' do
+      event = ActiveSupport::Notifications::Event.new("", 1.0, 1.0025, "id", { job: job, lost_ownership: false })
+
+      subscriber.continuation_progress(event)
+      expect(logs.string).to include("DEBUG").and include("wrote the continuation progress of job a-job-id")
+    end
+
+    it 'warns when the job is no longer owned by the execution' do
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", { job: job, lost_ownership: true })
+
+      subscriber.continuation_progress(event)
+      expect(logs.string).to include("WARN").and include("stopped writing the continuation progress of job a-job-id")
+    end
+
+    it 'warns when the write raised' do
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", { job: job, exception: ["PG::Error", "boom"] })
+
+      subscriber.continuation_progress(event)
+      expect(logs.string).to include("WARN").and include("failed to write the continuation progress of job a-job-id: PG::Error: boom")
+    end
+  end
 end

@@ -45,6 +45,8 @@ module GoodJob
     DEFAULT_ENQUEUE_AFTER_TRANSACTION_COMMIT = false
     # Default enable_pauses setting
     DEFAULT_ENABLE_PAUSES = false
+    # Default minimum number of seconds between periodic writes of a continuable job's progress
+    DEFAULT_CONTINUATION_PROGRESS_INTERVAL = 5
     # Default number of candidate jobs to query when polling
     DEFAULT_QUEUE_SELECT_LIMIT = 1_000
     # Valid dequeue query sorts
@@ -489,6 +491,25 @@ module GoodJob
       return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_ENABLE_PAUSES']) unless env['GOOD_JOB_ENABLE_PAUSES'].nil?
 
       DEFAULT_ENABLE_PAUSES
+    end
+
+    # Minimum number of seconds between periodic writes of the progress of a
+    # performing Active Job continuation (+ActiveJob::Continuable+), so that it
+    # can resume from a recent checkpoint after a non-graceful shutdown (e.g.
+    # +SIGKILL+ or running out of memory). +false+ or +0+ disables periodic
+    # writes; progress is always written on a graceful interruption.
+    # @return [Float, nil]
+    def continuation_progress_interval
+      value = if !options[:continuation_progress_interval].nil?
+                options[:continuation_progress_interval]
+              elsif !rails_config[:continuation_progress_interval].nil?
+                rails_config[:continuation_progress_interval]
+              elsif env['GOOD_JOB_CONTINUATION_PROGRESS_INTERVAL'].present?
+                env['GOOD_JOB_CONTINUATION_PROGRESS_INTERVAL']
+              else
+                DEFAULT_CONTINUATION_PROGRESS_INTERVAL
+              end
+      value.present? && value.to_f.positive? ? value.to_f : nil
     end
 
     # Strategy for locking jobs during dequeue.
