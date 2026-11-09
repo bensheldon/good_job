@@ -175,10 +175,13 @@ module GoodJob
       relation = self
       relation = relation.queue_ordered(parsed_queues[:include]) if parsed_queues && parsed_queues[:ordered_queues] && parsed_queues[:include]
 
-      relation = if GoodJob.configuration.dequeue_query_sort == :scheduled_at
-                   relation.priority_ordered.schedule_ordered.order(:id)
+      sort_by_scheduled_at = GoodJob.configuration.dequeue_query_sort == :scheduled_at
+      # Ignoring priority is only supported with the :scheduled_at sort, which existing indexes cover.
+      relation = relation.priority_ordered if GoodJob.configuration.dequeue_query_priority || !sort_by_scheduled_at
+      relation = if sort_by_scheduled_at
+                   relation.schedule_ordered.order(:id)
                  else
-                   relation.priority_ordered.creation_ordered
+                   relation.creation_ordered
                  end
 
       relation

@@ -816,6 +816,76 @@ RSpec.describe GoodJob::Job do
       end
     end
 
+    describe '.dequeueing_ordered' do
+      let!(:old_low_priority_job) { described_class.create!(priority: 10, created_at: 3.minutes.ago, scheduled_at: 3.minutes.ago) }
+      let!(:new_high_priority_job) { described_class.create!(priority: -10, created_at: 2.minutes.ago, scheduled_at: 2.minutes.ago) }
+      let!(:scheduled_first_job) { described_class.create!(priority: 0, created_at: 1.minute.ago, scheduled_at: 4.minutes.ago) }
+
+      before do
+        allow(GoodJob.configuration).to receive_messages(dequeue_query_sort: dequeue_query_sort, dequeue_query_priority: dequeue_query_priority)
+      end
+
+      context 'when sorting by created_at with priority' do
+        let(:dequeue_query_sort) { :created_at }
+        let(:dequeue_query_priority) { true }
+
+        it 'orders by priority, then created_at' do
+          expect(described_class.dequeueing_ordered(nil).to_a).to eq [new_high_priority_job, scheduled_first_job, old_low_priority_job]
+        end
+      end
+
+      context 'when sorting by created_at without priority' do
+        let(:dequeue_query_sort) { :created_at }
+        let(:dequeue_query_priority) { false }
+
+        it 'still orders by priority, then created_at' do
+          expect(described_class.dequeueing_ordered(nil).to_a).to eq [new_high_priority_job, scheduled_first_job, old_low_priority_job]
+        end
+      end
+
+      context 'when sorting by scheduled_at with priority' do
+        let(:dequeue_query_sort) { :scheduled_at }
+        let(:dequeue_query_priority) { true }
+
+        it 'orders by priority, then scheduled_at' do
+          expect(described_class.dequeueing_ordered(nil).to_a).to eq [new_high_priority_job, scheduled_first_job, old_low_priority_job]
+        end
+      end
+
+      context 'when sorting by scheduled_at without priority' do
+        let(:dequeue_query_sort) { :scheduled_at }
+        let(:dequeue_query_priority) { false }
+
+        it 'orders by scheduled_at, then id' do
+          expect(described_class.dequeueing_ordered(nil).to_a).to eq [scheduled_first_job, old_low_priority_job, new_high_priority_job]
+          expect(described_class.dequeueing_ordered(nil).to_sql[/ORDER BY.*/]).not_to include('priority')
+        end
+
+        it 'still orders by queue first when queues are ordered' do
+          other_queue_job = described_class.create!(queue_name: 'first', priority: 0, scheduled_at: 1.minute.ago)
+          parsed_queues = described_class.queue_parser('+first,default')
+          expect(described_class.dequeueing_ordered(parsed_queues).first).to eq other_queue_job
+        end
+      end
+
+      %i[advisory skiplocked hybrid].each do |lock_strategy|
+        context "when performing with the #{lock_strategy} lock strategy and without priority" do
+          let(:dequeue_query_sort) { :scheduled_at }
+          let(:dequeue_query_priority) { false }
+
+          it 'claims the earliest scheduled job regardless of priority' do
+            described_class.delete_all
+            described_class.enqueue(TestJob.new('high priority').set(priority: -100), scheduled_at: 1.minute.ago)
+            earliest_job = described_class.enqueue(TestJob.new('earliest').set(priority: 100), scheduled_at: 5.minutes.ago)
+
+            claimed = nil
+            described_class.perform_with_lock(lock_id: process_id, lock_strategy: lock_strategy) { |job| claimed = job }
+            expect(claimed).to eq earliest_job
+          end
+        end
+      end
+    end
+
     describe '.next_scheduled_at' do
       let(:active_job) { TestJob.new }
 

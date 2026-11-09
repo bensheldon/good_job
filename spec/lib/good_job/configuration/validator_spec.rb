@@ -31,6 +31,18 @@ RSpec.describe GoodJob::Configuration::Validator do
       expect(configuration).to be_valid
     end
 
+    it 'is valid when priority is ignored with the scheduled_at dequeue sort' do
+      configuration = GoodJob::Configuration.new({ dequeue_query_sort: :scheduled_at, dequeue_query_priority: false })
+      expect(configuration).to be_valid
+    end
+
+    it 'is invalid when priority is ignored with the created_at dequeue sort' do
+      configuration = GoodJob::Configuration.new({ dequeue_query_sort: :created_at, dequeue_query_priority: false })
+
+      expect(configuration).not_to be_valid
+      expect(configuration.errors[:dequeue_query_priority]).to include(/dequeue_query_sort is :scheduled_at/)
+    end
+
     it 'is invalid when a cron job class does not exist' do
       cron = { test: { cron: "* * * * *", class: "NonexistentJob" } }
       configuration = GoodJob::Configuration.new({ cron: cron })
