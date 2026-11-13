@@ -1,6 +1,7 @@
-# The base image provides the vscode user, nvm and build tools. Ruby itself
-# is built below to match .ruby-version, whatever Ruby the base image ships.
-ARG VARIANT="3"
+# The base image provides Ruby, the vscode user, nvm and build tools.
+# The tag is <image version>-<Ruby version>-<Debian release>; its Ruby must
+# match .ruby-version, which the Gemfile requires exactly.
+ARG VARIANT="4-4.0-trixie"
 FROM mcr.microsoft.com/devcontainers/ruby:${VARIANT}
 
 # Default value to allow debug server to serve content over GitHub Codespace's port forwarding service
@@ -19,20 +20,19 @@ RUN rm -f /etc/apt/sources.list.d/yarn* \
     postgresql-client \
   && rm -rf /var/lib/apt/lists/*
 
-# Ruby as pinned in .ruby-version; the base image ships an older one.
-# Set as ENV directly: the base image's ENV RUBY_VERSION would override an ARG.
-# Checksum from https://cache.ruby-lang.org/pub/ruby/index.txt
-ENV RUBY_VERSION="4.0.9"
-ARG RUBY_SHA256="a8057adb39f51ad6dc3106237504c93dd792bb515837b4fe7817ae21ed7e51f4"
-RUN cd /tmp \
-  && curl -fsSL -o ruby.tar.xz "https://cache.ruby-lang.org/pub/ruby/${RUBY_VERSION%.*}/ruby-${RUBY_VERSION}.tar.xz" \
-  && echo "${RUBY_SHA256}  ruby.tar.xz" | sha256sum -c - \
-  && mkdir ruby-src && tar -xJf ruby.tar.xz -C ruby-src --strip-components=1 \
-  && cd ruby-src \
-  && ./configure --prefix=/usr/local --enable-shared --disable-install-doc \
-  && make -j"$(nproc)" \
-  && make install \
-  && cd / && rm -rf /tmp/ruby.tar.xz /tmp/ruby-src
+# Task (taskfile.dev) runs the commands in Taskfile.yml.
+# Checksums from the release's task_checksums.txt.
+ARG TASK_VERSION="3.54.0"
+RUN arch="$(dpkg --print-architecture)" \
+  && case "$arch" in \
+    amd64) sha256="680859dbb4d881a9c72d4d9a8f510825450849af8567deacd7302c01124416fb" ;; \
+    arm64) sha256="d7189d439d4a6058e39e1b2acd7c8b27acd4856691b408f23b242e4294e1df5b" ;; \
+    *) echo "No Task checksum for $arch" >&2; exit 1 ;; \
+  esac \
+  && curl -fsSL -o /tmp/task.tar.gz "https://github.com/go-task/task/releases/download/v${TASK_VERSION}/task_linux_${arch}.tar.gz" \
+  && echo "${sha256}  /tmp/task.tar.gz" | sha256sum -c - \
+  && tar -xzf /tmp/task.tar.gz -C /usr/local/bin task \
+  && rm /tmp/task.tar.gz
 
 # Add Gemfile and install the gems. This means the gem install can be done
 # during build instead of on start. When a fork or branch has different gems, we still have an
@@ -44,4 +44,5 @@ COPY lib/good_job/version.rb /tmp/good_job/lib/good_job
 RUN cd /tmp/good_job \
     && bundle install \
     && rm -rf /tmp/good_job
-RUN chown -R vscode:vscode /usr/local/rvm
+# Let postCreateCommand's bundle install, run as vscode, write to GEM_HOME.
+RUN chown -R vscode:vscode "${GEM_HOME}"

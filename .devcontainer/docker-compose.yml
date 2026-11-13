@@ -1,5 +1,7 @@
 services:
   app:
+    # A localhost/ name lets VS Code on podman find the built image.
+    image: localhost/good_job-app
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile

@@ -1,4 +1,4 @@
-// Ruby is built in Dockerfile to match .ruby-version
+// The Dockerfile's base image tag picks the Ruby that .ruby-version names
 {
 	"name": "Ruby on Rails & Postgres",
 	"dockerComposeFile": "docker-compose.yml",
@@ -18,7 +18,10 @@
 	},
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "bin/setup",
+	// Runs in every new container while the database volume persists, so it
+	// uses db:prepare (create and seed only when missing) rather than bin/setup's
+	// db:setup, which reloads the schema and reseeds each time.
+	"postCreateCommand": "bundle install && cd demo && bin/rails db:prepare db:test:prepare && bin/rails parallel:create parallel:load_schema",
 
 	// The base image's user; Postgres has a matching role (create-db-user.sql).
 	"remoteUser": "vscode",
