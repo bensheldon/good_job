@@ -1,4 +1,4 @@
-// Update the VARIANT arg in docker-compose.yml to pick a Ruby version
+// Ruby is built in Dockerfile to match .ruby-version
 {
 	"name": "Ruby on Rails & Postgres",
 	"dockerComposeFile": "docker-compose.yml",
