@@ -398,6 +398,35 @@ RSpec.describe GoodJob::Configuration do
     end
   end
 
+  describe '#dequeue_query_priority' do
+    it 'defaults to true' do
+      configuration = described_class.new({})
+      expect(configuration.dequeue_query_priority).to be true
+    end
+
+    it 'can be set false with options' do
+      configuration = described_class.new({ dequeue_query_priority: false })
+      expect(configuration.dequeue_query_priority).to be false
+    end
+
+    it 'can be set false with Rails config' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ dequeue_query_priority: false })
+      configuration = described_class.new({})
+      expect(configuration.dequeue_query_priority).to be false
+    end
+
+    it 'can be set false from ENV' do
+      configuration = described_class.new({}, env: { 'GOOD_JOB_DEQUEUE_QUERY_PRIORITY' => 'false' })
+      expect(configuration.dequeue_query_priority).to be false
+    end
+
+    it 'prefers options over Rails config and ENV' do
+      allow(Rails.application.config).to receive(:good_job).and_return({ dequeue_query_priority: false })
+      configuration = described_class.new({ dequeue_query_priority: true }, env: { 'GOOD_JOB_DEQUEUE_QUERY_PRIORITY' => 'false' })
+      expect(configuration.dequeue_query_priority).to be true
+    end
+  end
+
   describe '#dashboard_default_locale' do
     it 'delegates to rails configuration' do
       allow(Rails.application.config).to receive(:good_job).and_return({ dashboard_default_locale: :de })

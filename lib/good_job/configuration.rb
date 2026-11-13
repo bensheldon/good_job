@@ -541,6 +541,19 @@ module GoodJob
       (options[:dequeue_query_sort] || rails_config[:dequeue_query_sort] || :created_at).to_sym
     end
 
+    # Whether to order by job priority when querying for the next job(s) to
+    # execute. Disabling it dequeues jobs by +scheduled_at+ alone, which lets
+    # the query use narrower indexes when priority isn't used. It only takes
+    # effect when +dequeue_query_sort+ is +:scheduled_at+.
+    # @return [Boolean]
+    def dequeue_query_priority
+      return options[:dequeue_query_priority] unless options[:dequeue_query_priority].nil?
+      return rails_config[:dequeue_query_priority] unless rails_config[:dequeue_query_priority].nil?
+      return ActiveModel::Type::Boolean.new.cast(env['GOOD_JOB_DEQUEUE_QUERY_PRIORITY']) unless env['GOOD_JOB_DEQUEUE_QUERY_PRIORITY'].nil?
+
+      true
+    end
+
     # Resolves lazily memoized values so the configuration can be frozen.
     # @return [self]
     def prepare_for_sharing
