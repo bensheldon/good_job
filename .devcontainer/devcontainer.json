@@ -25,6 +25,9 @@
 
 	// Configure tool-specific properties.
 	"customizations": {
+		"vscode": {
+			"extensions": ["task.vscode-task"]
+		},
 		"taste-ide": {
 			"services": {
 				"server": { "port": 3000 },
