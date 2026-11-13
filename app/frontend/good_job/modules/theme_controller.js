@@ -5,19 +5,25 @@ export default class extends Controller {
 
   connect() {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      const theme = localStorage.getItem('good_job-theme');
-      if (!["light", "dark"].includes(theme)) {
-        this.setTheme(this.autoTheme());
+      if (this.getStoredTheme() === 'auto') {
+        this.setTheme('auto');
       }
     });
 
-    this.setTheme(this.getStoredTheme() || 'light');
+    this.setTheme(this.getStoredTheme());
   }
 
   change(event) {
     const theme = event.params.value;
     localStorage.setItem('good_job-theme', theme);
     this.setTheme(theme);
+  }
+
+  // Follows a theme chosen in another tab.
+  sync(event) {
+    if (event.key === 'good_job-theme' || event.key === null) {
+      this.setTheme(this.getStoredTheme());
+    }
   }
 
   setTheme(theme) {
@@ -34,8 +40,11 @@ export default class extends Controller {
     this.dropdownTarget.querySelector('svg').outerHTML = svg.outerHTML;
   }
 
+  // Matches the layout's inline script, which follows the system unless
+  // light or dark is stored.
   getStoredTheme() {
-    return localStorage.getItem('good_job-theme');
+    const theme = localStorage.getItem('good_job-theme');
+    return ["light", "dark"].includes(theme) ? theme : 'auto';
   }
 
   autoTheme() {
