@@ -10,13 +10,29 @@
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or the host.
-	"forwardPorts": [3000, 5432],
+	"forwardPorts": [3000, 5432, 8808],
+	"portsAttributes": {
+		"3000": { "label": "Demo app", "protocol": "http" },
+		"5432": { "label": "Postgres", "protocol": "tcp" },
+		"8808": { "label": "YARD docs", "protocol": "http" }
+	},
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "bin/setup"
+	"postCreateCommand": "bin/setup",
+
+	// The base image's user; Postgres has a matching role (create-db-user.sql).
+	"remoteUser": "vscode",
 
 	// Configure tool-specific properties.
-	// "customizations": {},
+	"customizations": {
+		"taste-ide": {
+			"services": {
+				"server": { "port": 3000 },
+				"server:quiet": { "port": 3000 },
+				"docs": { "port": 8808 }
+			}
+		}
+	}
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
