@@ -97,6 +97,7 @@ module GoodJob
                 job.respond_to?(:good_job_enqueue_concurrency_controlled?) && job.good_job_enqueue_concurrency_controlled?
               end
               adapter.enqueue_all(bulkable_jobs) if bulkable_jobs.any?
+              GoodJob.logger.info("Enqueuing #{unbulkable_jobs.size} job(s) with enqueue concurrency limits individually instead of in bulk: #{unbulkable_jobs.map(&:class).uniq.join(', ')}") if unbulkable_jobs.any?
             else
               unbulkable_jobs = jobs
             end
