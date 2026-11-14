@@ -754,6 +754,23 @@ module GoodJob
       end
     end
 
+    # Merge keys into the serialized params of a job that is being performed,
+    # leaving its other serialized params as they are in the database. The job
+    # is only updated while this execution is still performing it: not after
+    # it has finished (e.g. it was discarded) or been picked up by another
+    # execution, so a stale execution can't overwrite a newer one's data.
+    # @param params [Hash] top-level keys to set in the serialized params
+    # @return [Boolean] whether the job was updated
+    def update_serialized_params(params)
+      updated = self.class.where(id: id, finished_at: nil, executions_count: executions_count)
+                    .update_all(["serialized_params = serialized_params || ?::jsonb", params.to_json]) # rubocop:disable Rails/SkipsModelValidations
+      return false if updated.zero?
+
+      self.serialized_params = serialized_params.merge(params.as_json)
+      clear_attribute_changes([:serialized_params])
+      true
+    end
+
     # Build an ActiveJob instance and deserialize the arguments, using `#active_job_data`.
     #
     # @param ignore_deserialization_errors [Boolean]
