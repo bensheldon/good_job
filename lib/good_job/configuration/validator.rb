@@ -13,6 +13,7 @@ module GoodJob
       attr_accessor :configuration
 
       validate :validate_cron_entries
+      validate :validate_dequeue_query_priority
 
       def initialize(configuration)
         super()
@@ -37,6 +38,12 @@ module GoodJob
             errors.add(:cron, "entry '#{cron_entry.key}' #{message}")
           end
         end
+      end
+
+      def validate_dequeue_query_priority
+        return if configuration.dequeue_query_priority || configuration.dequeue_query_sort == :scheduled_at
+
+        errors.add(:dequeue_query_priority, "can only be disabled when dequeue_query_sort is :scheduled_at")
       end
     end
   end

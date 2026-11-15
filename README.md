@@ -347,6 +347,12 @@ Available configuration options are:
 - `dequeue_query_sort` (symbol) sets the sort order used when querying for the next job(s) to execute. Defaults to `:created_at`. It can be any one of:
     - `:created_at` sorts by priority, then job creation order. This is the default, but no longer best matches GoodJob's contemporary data model.
     - `:scheduled_at` sorts by priority, then `scheduled_at`, then `id`, which better matches GoodJob's contemporary data model. This will become the default/only behavior in a future major release.
+- `dequeue_query_priority` (boolean) whether to sort by priority when querying for the next job(s) to execute. Defaults to `true`. If your application doesn't use job priority, set this to `false` along with `dequeue_query_sort: :scheduled_at` so jobs are dequeued by `scheduled_at`, then `id`; this lets the query stop at the first eligible job in an existing index instead of sorting all eligible jobs. It has no effect with `dequeue_query_sort: :created_at`, which `GoodJob.configuration.valid?` reports as an error. You can also set this with the environment variable `GOOD_JOB_DEQUEUE_QUERY_PRIORITY`.
+
+    ```ruby
+    config.good_job.dequeue_query_sort = :scheduled_at
+    config.good_job.dequeue_query_priority = false
+    ```
 
 By default, GoodJob configures the following execution modes per environment:
 
