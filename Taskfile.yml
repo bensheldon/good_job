@@ -1,0 +1,73 @@
+version: '3'
+
+tasks:
+  setup:
+    desc: Install gems and set up the development and test databases
+    cmds:
+      - bin/setup
+
+  teardown:
+    desc: Drop this checkout's test databases
+    cmds:
+      - bin/teardown
+
+  server:
+    desc: Run the demo app's web server on port 3000
+    cmds:
+      - bin/rails server -b 0.0.0.0 -p 3000
+
+  server:quiet:
+    desc: Run the demo app's web server on port 3000 without job execution or cron
+    env:
+      GOOD_JOB_ENABLE_CRON: '0'
+      GOOD_JOB_EXECUTION_MODE: external
+    cmds:
+      - bin/rails server -b 0.0.0.0 -p 3000
+
+  db:migrate:
+    desc: Run the demo app's pending migrations
+    cmds:
+      - bin/rails db:migrate
+
+  test:
+    desc: Run the whole spec suite
+    cmds:
+      - bin/rspec
+
+  test:parallel:
+    desc: Run the whole spec suite in parallel
+    cmds:
+      - bin/parallel_rspec spec
+
+  test:file:
+    desc: Run the specs in one file or folder
+    requires:
+      vars: [FILE_OR_DIR]
+    cmds:
+      - bin/rspec {{q .FILE_OR_DIR}}
+
+  lint:
+    desc: Run Sorbet, RuboCop, YARD, Herb, ERB Lint, Markdown Lint, i18n-tasks and Brakeman, autocorrecting where possible
+    cmds:
+      - bin/lint
+
+  lint:check:
+    desc: Run every linter without changing files, as CI does
+    cmds:
+      - bin/lint --nofix
+
+  typecheck:
+    desc: Type-check with Sorbet
+    cmds:
+      - bundle exec srb tc
+
+  tapioca:dsl:
+    desc: Regenerate GoodJob's DSL RBIs
+    cmds:
+      - bin/tapioca_dsl
+
+  docs:
+    desc: Build the YARD documentation and serve it on port 8808
+    cmds:
+      - bundle exec yard doc --no-cache --list-undoc
+      - bundle exec yard server --reload --bind 0.0.0.0 --port 8808
