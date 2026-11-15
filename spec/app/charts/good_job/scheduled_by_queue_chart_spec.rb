@@ -16,6 +16,15 @@ RSpec.describe GoodJob::ScheduledByQueueChart do
 
       expect(chart.data.dig(:data, :datasets).pluck(:label)).to eq(%w[alpha zebra])
     end
+
+    it "counts jobs without a queue name under [none]" do
+      create_job(queue_name: nil, scheduled_at: 1.hour.ago)
+
+      datasets = chart.data.dig(:data, :datasets)
+
+      expect(datasets.pluck(:label)).to eq([GoodJob::BaseFilter::EMPTY])
+      expect(datasets.first[:data].compact).to eq([1])
+    end
   end
 
   def create_job(queue_name:, scheduled_at:)

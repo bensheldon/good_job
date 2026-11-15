@@ -53,7 +53,7 @@ module GoodJob
       queues_data = executions_data.to_a.group_by { |d| d['timestamp'] }.each_with_object({}) do |(timestamp, values), hash|
         labels << timestamp.in_time_zone.strftime('%H:%M')
         queue_names.each do |queue_name|
-          (hash[queue_name] ||= []) << values.find { |d| d['queue_name'] == queue_name }&.[]('count')
+          (hash[queue_name] ||= []) << values.find { |d| (d['queue_name'] || BaseFilter::EMPTY) == queue_name }&.[]('count')
         end
       end
 
@@ -61,8 +61,7 @@ module GoodJob
         type: "line",
         data: {
           labels: labels,
-          datasets: queues_data.map do |queue, data|
-            label = queue || '(none)'
+          datasets: queues_data.map do |label, data|
             {
               label: label,
               data: data,
