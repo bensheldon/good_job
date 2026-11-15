@@ -105,7 +105,7 @@
           <hr class="d-lg-none my-2 text-secondary">
         </li>
 
-        <li class="nav-item dropdown" data-controller="theme">
+        <li class="nav-item dropdown" data-controller="theme" data-action="storage@window->theme#sync">
           <button class="nav-link dropdown-toggle" data-theme-target="dropdown" type="button" aria-expanded="false" data-bs-toggle="dropdown" data-bs-display="static" aria-label="Toggle theme">
             <%= render_icon "circle_half" %>
             <span class="visually-hidden"><%= t(".theme.theme") %></span>
