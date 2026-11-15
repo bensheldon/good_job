@@ -343,6 +343,23 @@ describe GoodJob::Batch do
       expect(batch).to have_attributes(discarded_at: nil, jobs_finished_at: be_present, finished_at: be_present)
       expect(batch).to be_succeeded
     end
+
+    it 'retries discarded jobs whose job class enqueues after transaction commit', skip: !ActiveRecord.respond_to?(:after_all_transactions_commit) do
+      DiscardOnceJob.enqueue_after_transaction_commit = Rails.gem_version < Gem::Version.new('8.0.0.alpha') ? :always : true
+      batch.enqueue do
+        TestJob.perform_later
+        DiscardOnceJob.perform_later
+      end
+
+      GoodJob.perform_inline
+      expect(batch.reload).to be_discarded
+
+      batch.retry
+      expect(batch.reload).to have_attributes(discarded_at: nil, jobs_finished_at: nil, finished_at: nil)
+
+      GoodJob.perform_inline
+      expect(batch.reload).to be_succeeded
+    end
   end
 
   describe '#properties' do

@@ -63,37 +63,18 @@ module GoodJob
 
           if job_discarded && !discarded_at
             update(discarded_at: Time.current)
-
             discard_job_class = on_discard.presence&.constantize
-            if discard_job_class
-              Job.defer_after_commit_maybe(discard_job_class) do
-                Batch.within_thread(batch_id: nil, batch_callback_id: id) do
-                  discard_job_class.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :discard })
-                end
-              end
-            end
+            enqueue_callback_job(discard_job_class, :discard) if discard_job_class
           end
 
           if enqueued_at && !(self.class.jobs_finished_at_migrated? ? jobs_finished_at : finished_at) && jobs.where(finished_at: nil).none?
             self.class.jobs_finished_at_migrated? ? update(jobs_finished_at: Time.current) : update(finished_at: Time.current)
 
             success_job_class = on_success.presence&.constantize unless discarded_at
-            if success_job_class
-              Job.defer_after_commit_maybe(success_job_class) do
-                Batch.within_thread(batch_id: nil, batch_callback_id: id) do
-                  success_job_class.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :success })
-                end
-              end
-            end
+            enqueue_callback_job(success_job_class, :success) if success_job_class
 
             finish_job_class = on_finish.presence&.constantize
-            if finish_job_class
-              Job.defer_after_commit_maybe(finish_job_class) do
-                Batch.within_thread(batch_id: nil, batch_callback_id: id) do
-                  finish_job_class.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: :finish })
-                end
-              end
-            end
+            enqueue_callback_job(finish_job_class, :finish) if finish_job_class
           end
 
           update(finished_at: Time.current) if !finished_at && self.class.jobs_finished_at_migrated? && jobs_finished? && callback_jobs.where(finished_at: nil).none?
@@ -136,6 +117,17 @@ module GoodJob
     end
 
     private
+
+    # Inserts the callback job within the batch's transaction, even when its job class enqueues after
+    # transaction commit, so the batch isn't marked finished before its callback job exists. Active Job
+    # still defers if another connection pool on this thread has an open transaction (e.g. a separate database).
+    def enqueue_callback_job(job_class, event)
+      self.class.transaction(requires_new: true, joinable: false) do
+        Batch.within_thread(batch_id: nil, batch_callback_id: id) do
+          job_class.set(priority: callback_priority, queue: callback_queue_name).perform_later(to_batch, { event: event })
+        end
+      end
+    end
 
     def advisory_lock_maybe(value, &block)
       if value
