@@ -12,15 +12,5 @@ module GoodJob
         ActiveRecord::Relation::QueryAttribute.new('end_time', end_time, ActiveRecord::Type::DateTime.new),
       ]
     end
-
-    def string_to_hsl(string)
-      hash_value = string.sum
-
-      hue = hash_value % 360
-      saturation = (hash_value % 50) + 50
-      lightness = '50'
-
-      "hsl(#{hue}, #{saturation}%, #{lightness}%)"
-    end
   end
 end

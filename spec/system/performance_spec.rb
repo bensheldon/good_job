@@ -28,6 +28,27 @@ describe 'Performance Page', :js do
     expect(page).to have_text 'ExampleJob'
   end
 
+  it 'draws each job class on the index chart in its own color' do
+    # Anagrams, which a color derived from the sum of the name's bytes cannot tell apart.
+    %w[LowJob OwlJob].each do |job_class|
+      GoodJob::Execution.create!(
+        active_job_id: SecureRandom.uuid,
+        created_at: 1.hour.ago,
+        duration: 1.second,
+        job_class: job_class,
+        queue_name: "default",
+        scheduled_at: 1.hour.ago,
+        serialized_params: {}
+      )
+    end
+
+    visit good_job.performance_index_path
+    colors = chart_series_colors
+
+    expect(colors.keys).to eq(%w[LowJob OwlJob])
+    expect(colors.values.uniq.size).to eq(2)
+  end
+
   it 'switches the index chart between execution, queue, and total time' do
     ExampleJob.perform_later
     GoodJob.perform_inline
