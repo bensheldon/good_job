@@ -45,6 +45,7 @@ data:
 
 # Find translate calls
 search:
+  strict: false
   paths:
     - app
   relative_roots:

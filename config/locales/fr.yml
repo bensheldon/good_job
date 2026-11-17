@@ -79,8 +79,8 @@ fr:
           one: environ 1 heure
           other: environ %{count} heures
         about_x_months:
-          one: environ 1 heure
-          other: environ %{count} heures
+          one: environ 1 mois
+          other: environ %{count} mois
         about_x_years:
           one: environ 1 an
           other: environ %{count} ans
