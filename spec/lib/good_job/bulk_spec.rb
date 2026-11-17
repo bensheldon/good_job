@@ -131,6 +131,31 @@ describe GoodJob::Bulk do
       expect(job_2.provider_job_id).to be_nil
     end
 
+    it 'instruments enqueue_jobs_individually for jobs with enqueue concurrency limits' do
+      TestJob.include(GoodJob::ActiveJobExtensions::Concurrency)
+
+      allow(GoodJob.deprecator).to receive(:warn)
+      TestJob.good_job_control_concurrency_with(total_limit: 2, key: 'test')
+      jobs = [TestJob.new, TestJob.new]
+      payloads = []
+      callback = ->(*args) { payloads << args.last }
+
+      ActiveSupport::Notifications.subscribed(callback, "enqueue_jobs_individually.good_job") do
+        described_class.enqueue(jobs)
+      end
+      expect(payloads).to eq [{ jobs: jobs }]
+    end
+
+    it 'does not instrument enqueue_jobs_individually when no job has enqueue concurrency limits' do
+      payloads = []
+      callback = ->(*args) { payloads << args.last }
+
+      ActiveSupport::Notifications.subscribed(callback, "enqueue_jobs_individually.good_job") do
+        described_class.enqueue([TestJob.new, TestJob.new])
+      end
+      expect(payloads).to be_empty
+    end
+
     it 'sets queue, scheduled_at, and priority' do
       described_class.enqueue do
         TestJob.set(queue: 'elephant', wait: 10.minutes, priority: 50).perform_later

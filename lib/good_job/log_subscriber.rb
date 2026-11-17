@@ -255,6 +255,15 @@ module GoodJob
     end
 
     # @!macro notification_responder
+    def enqueue_jobs_individually(event)
+      jobs = event.payload[:jobs]
+
+      info do
+        "Enqueuing #{jobs.size} #{'job'.pluralize(jobs.size)} with enqueue concurrency limits individually instead of in bulk: #{jobs.map { |job| job.class.name }.uniq.join(', ')}"
+      end
+    end
+
+    # @!macro notification_responder
     def systemd_watchdog_start(event)
       interval = event.payload[:interval]
 

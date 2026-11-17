@@ -97,6 +97,7 @@ module GoodJob
                 job.respond_to?(:good_job_enqueue_concurrency_controlled?) && job.good_job_enqueue_concurrency_controlled?
               end
               adapter.enqueue_all(bulkable_jobs) if bulkable_jobs.any?
+              ActiveSupport::Notifications.instrument("enqueue_jobs_individually.good_job", { jobs: unbulkable_jobs }) if unbulkable_jobs.any?
             else
               unbulkable_jobs = jobs
             end
