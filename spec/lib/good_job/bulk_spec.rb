@@ -138,7 +138,7 @@ describe GoodJob::Bulk do
       TestJob.good_job_control_concurrency_with(total_limit: 2, key: 'test')
       jobs = [TestJob.new, TestJob.new]
       payloads = []
-      callback = ->(event) { payloads << event.payload }
+      callback = ->(*args) { payloads << args.last }
 
       ActiveSupport::Notifications.subscribed(callback, "enqueue_jobs_individually.good_job") do
         described_class.enqueue(jobs)
@@ -148,7 +148,7 @@ describe GoodJob::Bulk do
 
     it 'does not instrument enqueue_jobs_individually when no job has enqueue concurrency limits' do
       payloads = []
-      callback = ->(event) { payloads << event.payload }
+      callback = ->(*args) { payloads << args.last }
 
       ActiveSupport::Notifications.subscribed(callback, "enqueue_jobs_individually.good_job") do
         described_class.enqueue([TestJob.new, TestJob.new])

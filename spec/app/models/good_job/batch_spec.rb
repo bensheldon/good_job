@@ -234,7 +234,7 @@ describe GoodJob::Batch do
       it 'instruments enqueue_jobs_individually for concurrency-limited jobs' do
         concurrency_job = ConcurrencyJob.new
         payloads = []
-        callback = ->(event) { payloads << event.payload }
+        callback = ->(*args) { payloads << args.last }
 
         ActiveSupport::Notifications.subscribed(callback, "enqueue_jobs_individually.good_job") do
           described_class.enqueue_all([[described_class.new, [concurrency_job, TestJob.new]]])
