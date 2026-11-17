@@ -131,22 +131,29 @@ describe GoodJob::Bulk do
       expect(job_2.provider_job_id).to be_nil
     end
 
-    it 'logs that jobs with enqueue concurrency limits are enqueued individually' do
+    it 'instruments enqueue_jobs_individually for jobs with enqueue concurrency limits' do
       TestJob.include(GoodJob::ActiveJobExtensions::Concurrency)
 
       allow(GoodJob.deprecator).to receive(:warn)
       TestJob.good_job_control_concurrency_with(total_limit: 2, key: 'test')
-      allow(GoodJob.logger).to receive(:info)
+      jobs = [TestJob.new, TestJob.new]
+      payloads = []
+      callback = ->(event) { payloads << event.payload }
 
-      described_class.enqueue([TestJob.new, TestJob.new])
-      expect(GoodJob.logger).to have_received(:info).with(/Enqueuing 2 job\(s\) with enqueue concurrency limits individually/)
+      ActiveSupport::Notifications.subscribed(callback, "enqueue_jobs_individually.good_job") do
+        described_class.enqueue(jobs)
+      end
+      expect(payloads).to eq [{ jobs: jobs }]
     end
 
-    it 'does not log individual enqueueing when no job has enqueue concurrency limits' do
-      allow(GoodJob.logger).to receive(:info)
+    it 'does not instrument enqueue_jobs_individually when no job has enqueue concurrency limits' do
+      payloads = []
+      callback = ->(event) { payloads << event.payload }
 
-      described_class.enqueue([TestJob.new, TestJob.new])
-      expect(GoodJob.logger).not_to have_received(:info).with(/individually/)
+      ActiveSupport::Notifications.subscribed(callback, "enqueue_jobs_individually.good_job") do
+        described_class.enqueue([TestJob.new, TestJob.new])
+      end
+      expect(payloads).to be_empty
     end
 
     it 'sets queue, scheduled_at, and priority' do

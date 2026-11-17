@@ -231,12 +231,16 @@ describe GoodJob::Batch do
         expect(GoodJob::Job.where(batch_id: batch.id).count).to eq 2
       end
 
-      it 'logs that concurrency-limited jobs are enqueued individually' do
-        allow(GoodJob.logger).to receive(:info)
+      it 'instruments enqueue_jobs_individually for concurrency-limited jobs' do
+        concurrency_job = ConcurrencyJob.new
+        payloads = []
+        callback = ->(event) { payloads << event.payload }
 
-        described_class.enqueue_all([[described_class.new, [ConcurrencyJob.new, TestJob.new]]])
+        ActiveSupport::Notifications.subscribed(callback, "enqueue_jobs_individually.good_job") do
+          described_class.enqueue_all([[described_class.new, [concurrency_job, TestJob.new]]])
+        end
 
-        expect(GoodJob.logger).to have_received(:info).with(/Enqueuing 1 job\(s\) with enqueue concurrency limits individually/)
+        expect(payloads).to eq [{ jobs: [concurrency_job] }]
       end
 
       it 'respects concurrency limits by running before_enqueue checks' do

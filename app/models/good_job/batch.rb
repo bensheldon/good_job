@@ -147,7 +147,7 @@ module GoodJob
           end
 
           # Phase 5: Enqueue concurrency-limited jobs individually
-          GoodJob.logger.info("Enqueuing #{build_result[:unbulkable].size} job(s) with enqueue concurrency limits individually instead of in bulk: #{build_result[:unbulkable].map { |entry| entry[:active_job].class }.uniq.join(', ')}") if build_result[:unbulkable].any?
+          ActiveSupport::Notifications.instrument("enqueue_jobs_individually.good_job", { jobs: build_result[:unbulkable].map { |entry| entry[:active_job] } }) if build_result[:unbulkable].any?
           build_result[:unbulkable].each do |entry|
             within_thread(batch_id: entry[:batch].id) do
               entry[:active_job].enqueue

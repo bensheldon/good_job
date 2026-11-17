@@ -75,6 +75,27 @@ RSpec.describe GoodJob::LogSubscriber do
     end
   end
 
+  describe "#enqueue_jobs_individually" do
+    let(:logs) { StringIO.new }
+    let(:job_class) { Class.new(ActiveJob::Base) { define_singleton_method(:name) { "MyJob" } } }
+
+    it 'logs how many jobs were enqueued individually and their classes' do
+      described_class.loggers << Logger.new(logs)
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", { jobs: [job_class.new, job_class.new] })
+
+      subscriber.enqueue_jobs_individually(event)
+      expect(logs.string).to include("Enqueuing 2 jobs with enqueue concurrency limits individually instead of in bulk: MyJob")
+    end
+
+    it 'pluralizes the message for a single job' do
+      described_class.loggers << Logger.new(logs)
+      event = ActiveSupport::Notifications::Event.new("", nil, nil, "id", { jobs: [job_class.new] })
+
+      subscriber.enqueue_jobs_individually(event)
+      expect(logs.string).to include("Enqueuing 1 job with enqueue concurrency limits")
+    end
+  end
+
   describe "#cluster_reap" do
     let(:logs) { StringIO.new }
 

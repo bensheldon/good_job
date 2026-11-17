@@ -20,6 +20,7 @@ For gem development and debugging information, please review the [README's Gem D
   - Add an entry to `spec/integration/breaking_migrations_spec.rb` to smoke-test that the new column is handled gracefully when absent.
   - Some Active Record features are difficult to make safe, e.g. `enum`, which raises at schema load time when the backing column does not exist.
 - When converting dynamic configuration into a value, call the method `resolve_[property]`. For example, if the configuration takes a constantizable string or a callable proc that needs to, at some point, be evaluated into a usable value.
+- **Log through `GoodJob::LogSubscriber`.** Don't call `GoodJob.logger` directly. Instrument an `ActiveSupport::Notifications` event named `[event].good_job` and add a matching `[event]` method to `GoodJob::LogSubscriber` that writes the log line.
 
 ## Other Errata
 
