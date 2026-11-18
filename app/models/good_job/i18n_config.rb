@@ -22,5 +22,13 @@ module GoodJob
     def default_locale
       GoodJob.configuration.dashboard_default_locale
     end
+
+    # I18n::Config stores these settings in class variables, which are shared with the
+    # application's I18n config. Ignore writes made while the Dashboard is rendering
+    # (e.g. a gem lazily running `I18n.available_locales |= [...]`) so they don't
+    # replace the application's settings with the Dashboard's.
+    def available_locales=(_locales); end
+
+    def default_locale=(_locale); end
   end
 end
