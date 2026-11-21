@@ -22,6 +22,23 @@ RSpec.describe GoodJob::Configuration do
     end
   end
 
+  describe '#warn_dequeue_query_sort_default' do
+    before do
+      allow(GoodJob.deprecator).to receive(:warn)
+      allow(Rails.application.config).to receive(:good_job).and_return(ActiveSupport::OrderedOptions.new)
+    end
+
+    it 'warns when dequeue_query_sort is not configured' do
+      described_class.new({}).warn_dequeue_query_sort_default
+      expect(GoodJob.deprecator).to have_received(:warn).with(/dequeue_query_sort = :scheduled_at/)
+    end
+
+    it 'does not warn when dequeue_query_sort is explicitly configured' do
+      described_class.new({ dequeue_query_sort: :created_at }).warn_dequeue_query_sort_default
+      expect(GoodJob.deprecator).not_to have_received(:warn)
+    end
+  end
+
   describe '#threads' do
     it 'defaults to DEFAULT_THREADS' do
       expect(described_class.new({}).threads).to eq described_class::DEFAULT_THREADS

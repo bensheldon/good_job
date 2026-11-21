@@ -1,5 +1,6 @@
 Rails.application.configure do
   config.good_job.enable_pauses = true
+  config.good_job.dequeue_query_sort = :scheduled_at
 
   # Cron is configured in every environment so the dashboard shows it,
   # but entries only run by default in the demo (or with CRON_ENABLED_BY_DEFAULT);
