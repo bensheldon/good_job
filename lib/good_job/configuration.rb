@@ -541,6 +541,20 @@ module GoodJob
       (options[:dequeue_query_sort] || rails_config[:dequeue_query_sort] || :created_at).to_sym
     end
 
+    # Emits a deprecation warning when +dequeue_query_sort+ has not been
+    # explicitly configured, because the default will change from +:created_at+
+    # to +:scheduled_at+ (and the option will be removed) in the next major version.
+    # @return [void]
+    def warn_dequeue_query_sort_default
+      return unless options[:dequeue_query_sort].nil? && rails_config[:dequeue_query_sort].nil?
+
+      GoodJob.deprecator.warn(<<~MSG.squish)
+        GoodJob will dequeue jobs ordered by `scheduled_at` instead of `created_at` in the next major version,
+        and the `dequeue_query_sort` option will be removed. Opt in to the new behavior now and silence this
+        warning by setting `config.good_job.dequeue_query_sort = :scheduled_at`.
+      MSG
+    end
+
     # Resolves lazily memoized values so the configuration can be frozen.
     # @return [self]
     def prepare_for_sharing

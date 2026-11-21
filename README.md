@@ -344,7 +344,7 @@ Available configuration options are:
     ```
 
 - `enable_pauses` (boolean) whether job processing can be paused. Defaults to `false`. You can also set this with the environment variable `GOOD_JOB_ENABLE_PAUSES`.
-- `dequeue_query_sort` (symbol) sets the sort order used when querying for the next job(s) to execute. Defaults to `:created_at`. It can be any one of:
+- `dequeue_query_sort` (symbol) sets the sort order used when querying for the next job(s) to execute. Defaults to `:created_at`. **Leaving this unset is deprecated**: set `config.good_job.dequeue_query_sort = :scheduled_at` to opt in to the next major version's behavior (setting any value silences the deprecation warning). It can be any one of:
     - `:created_at` sorts by priority, then job creation order. This is the default, but no longer best matches GoodJob's contemporary data model.
     - `:scheduled_at` sorts by priority, then `scheduled_at`, then `id`, which better matches GoodJob's contemporary data model. This will become the default/only behavior in a future major release.
 
